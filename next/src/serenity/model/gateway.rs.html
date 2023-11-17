@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (2c1b65ee1 2023-11-11)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6b771f6b5 2023-11-15)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -738,6 +738,25 @@
 <a href="#738" id="738">738</a>
 <a href="#739" id="739">739</a>
 <a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -1161,83 +1180,95 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).
     ///
-    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [Gateway Intents]: https://discord.com/developers/docs/topics/gateway#gateway-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
     </span><span class="kw">pub struct </span>GatewayIntents: u64 {
-        <span class="doccomment">/// Enables following gateway events:
-        /// - GUILD_CREATE
-        /// - GUILD_DELETE
-        /// - GUILD_ROLE_CREATE
-        /// - GUILD_ROLE_UPDATE
-        /// - GUILD_ROLE_DELETE
-        /// - CHANNEL_CREATE
-        /// - CHANNEL_UPDATE
-        /// - CHANNEL_DELETE
-        /// - CHANNEL_PINS_UPDATE
-        /// - THREAD_CREATE
-        /// - THREAD_UPDATE
-        /// - THREAD_DELETE
-        /// - THREAD_LIST_SYNC
-        /// - THREAD_MEMBER_UPDATE
-        /// - THREAD_MEMBERS_UPDATE
-        /// - STAGE_INSTANCE_CREATE
-        /// - STAGE_INSTANCE_UPDATE
-        /// - STAGE_INSTANCE_DELETE
+        <span class="doccomment">/// Enables the following gateway events:
+        ///  - GUILD_CREATE
+        ///  - GUILD_UPDATE
+        ///  - GUILD_DELETE
+        ///  - GUILD_ROLE_CREATE
+        ///  - GUILD_ROLE_UPDATE
+        ///  - GUILD_ROLE_DELETE
+        ///  - CHANNEL_CREATE
+        ///  - CHANNEL_UPDATE
+        ///  - CHANNEL_DELETE
+        ///  - CHANNEL_PINS_UPDATE
+        ///  - THREAD_CREATE
+        ///  - THREAD_UPDATE
+        ///  - THREAD_DELETE
+        ///  - THREAD_LIST_SYNC
+        ///  - THREAD_MEMBER_UPDATE
+        ///  - THREAD_MEMBERS_UPDATE
+        ///  - STAGE_INSTANCE_CREATE
+        ///  - STAGE_INSTANCE_UPDATE
+        ///  - STAGE_INSTANCE_DELETE
+        ///
+        /// **Info:** The THREAD_MEMBERS_UPDATE event contains different data depending on which
+        /// intents are used. See [Discord&#39;s Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
+        /// for more information.
         </span><span class="kw">const </span>GUILDS = <span class="number">1</span>;
-        <span class="doccomment">/// Enables following gateway events:
+        <span class="doccomment">/// Enables the following gateway events:
         /// - GUILD_MEMBER_ADD
         /// - GUILD_MEMBER_UPDATE
         /// - GUILD_MEMBER_REMOVE
         /// - THREAD_MEMBERS_UPDATE
         ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
-        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*, as
+        /// well as enabling it in your code.
         ///
-        /// This intent is also necessary to even receive the events in contains.
+        /// **Info:** The THREAD_MEMBERS_UPDATE event contains different data depending on which
+        /// intents are used. See [Discord&#39;s Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
+        /// for more information.
         </span><span class="kw">const </span>GUILD_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
-        <span class="doccomment">/// Enables following gateway events:
+
+        <span class="doccomment">/// Enables the following gateway events:
         /// - GUILD_AUDIT_LOG_ENTRY_CREATE
         /// - GUILD_BAN_ADD
         /// - GUILD_BAN_REMOVE
         </span><span class="kw">const </span>GUILD_MODERATION = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
         <span class="doccomment">/// Backwards compatibility with old gateway event name. Same as GUILD_MODERATION
+        </span><span class="attr">#[deprecated = <span class="string">&quot;Use [`Self::GUILD_MODERATION`] instead&quot;</span>]
         </span><span class="kw">const </span>GUILD_BANS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
-        <span class="doccomment">/// Enables following gateway event:
+
+        <span class="doccomment">/// Enables the following gateway events:
         /// - GUILD_EMOJIS_UPDATE
         /// - GUILD_STICKERS_UPDATE
         </span><span class="kw">const </span>GUILD_EMOJIS_AND_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
-        <span class="doccomment">/// Enables following gateway event:
+        <span class="doccomment">/// Enables the following gateway events:
         /// - GUILD_INTEGRATIONS_UPDATE
         /// - INTEGRATION_CREATE
         /// - INTEGRATION_UPDATE
         /// - INTEGRATION_DELETE
         </span><span class="kw">const </span>GUILD_INTEGRATIONS = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
-        <span class="doccomment">/// Enables following gateway event:
+        <span class="doccomment">/// Enables the following gateway event:
         /// - WEBHOOKS_UPDATE
         </span><span class="kw">const </span>GUILD_WEBHOOKS = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
-        <span class="doccomment">/// Enables following gateway events:
+        <span class="doccomment">/// Enables the following gateway events:
         /// - INVITE_CREATE
         /// - INVITE_DELETE
         </span><span class="kw">const </span>GUILD_INVITES = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
-        <span class="doccomment">/// Enables following gateway event:
+        <span class="doccomment">/// Enables the following gateway event:
         /// - VOICE_STATE_UPDATE
+        ///
+        /// **Note**: this intent is mandatory for `songbird` to function properly.
         </span><span class="kw">const </span>GUILD_VOICE_STATES = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
-        <span class="doccomment">/// Enables following gateway event:
+        <span class="doccomment">/// Enables the following gateway event:
         /// - PRESENCE_UPDATE
         ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
-        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
-        ///
-        /// This intent is also necessary to even receive the events in contains.
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*,
+        /// as well as enabling it in your code.
         </span><span class="kw">const </span>GUILD_PRESENCES = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
-        <span class="doccomment">/// Enables following gateway events:
+        <span class="doccomment">/// Enables the following gateway events in guilds:
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - MESSAGE_DELETE_BULK
         </span><span class="kw">const </span>GUILD_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
-        <span class="doccomment">/// Enables following gateway events:
+        <span class="doccomment">/// Enables the following gateway events in guilds:
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
@@ -1246,40 +1277,45 @@
         <span class="doccomment">/// Enable following gateway event:
         /// - TYPING_START
         </span><span class="kw">const </span>GUILD_MESSAGE_TYPING = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
-        <span class="doccomment">/// Enable following gateway events:
+
+        <span class="doccomment">/// Enables the following gateway events for direct messages:
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
         /// - CHANNEL_PINS_UPDATE
         </span><span class="kw">const </span>DIRECT_MESSAGES = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
-        <span class="doccomment">/// Enable following gateway events:
+        <span class="doccomment">/// Enable following gateway events for direct messages:
         /// - MESSAGE_REACTION_ADD
         /// - MESSAGE_REACTION_REMOVE
         /// - MESSAGE_REACTION_REMOVE_ALL
         /// - MESSAGE_REACTION_REMOVE_EMOJI
         </span><span class="kw">const </span>DIRECT_MESSAGE_REACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
-        <span class="doccomment">/// Enable following gateway event:
+        <span class="doccomment">/// Enables the following gateway events for direct messages:
         /// - TYPING_START
         </span><span class="kw">const </span>DIRECT_MESSAGE_TYPING = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
-        <span class="doccomment">/// Enable message content in following gateway events:
-        /// - MESSAGE_CREATE
+
+        <span class="doccomment">/// Enables receiving message content in gateway events
+        ///
+        /// See [Discord&#39;s Docs](https://discord.com/developers/docs/topics/gateway#message-content-intent) for more information
         ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
-        /// application in the Developer Portal and enable the toggle for *Privileged Intents*.
+        /// application in the Developer Portal and enable the toggle for *Privileged Intents*,
+        /// as well as enabling it in your code.
         </span><span class="kw">const </span>MESSAGE_CONTENT = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
-        <span class="doccomment">/// Enable following gateway events:
+
+        <span class="doccomment">/// Enables the following gateway events:
         /// - GUILD_SCHEDULED_EVENT_CREATE
         /// - GUILD_SCHEDULED_EVENT_UPDATE
         /// - GUILD_SCHEDULED_EVENT_DELETE
         /// - GUILD_SCHEDULED_EVENT_USER_ADD
         /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
         </span><span class="kw">const </span>GUILD_SCHEDULED_EVENTS = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
-        <span class="doccomment">/// Enable following gateway events:
+        <span class="doccomment">/// Enables the following gateway events:
         /// - AUTO_MODERATION_RULE_CREATE
         /// - AUTO_MODERATION_RULE_UPDATE
         /// - AUTO_MODERATION_RULE_DELETE
         </span><span class="kw">const </span>AUTO_MODERATION_CONFIGURATION = <span class="number">1 </span>&lt;&lt; <span class="number">20</span>;
-        <span class="doccomment">/// Enable following gateway events:
+        <span class="doccomment">/// Enables the following gateway events:
         /// - AUTO_MODERATION_ACTION_EXECUTION
         </span><span class="kw">const </span>AUTO_MODERATION_EXECUTION = <span class="number">1 </span>&lt;&lt; <span class="number">21</span>;
     }
@@ -1334,8 +1370,10 @@
     ///
     /// This is the same as calling guild_moderation since Discord changed the name
     </span><span class="attr">#[must_use]
+    #[deprecated = <span class="string">&quot;Use [`Self::guild_moderation`] instead&quot;</span>]
     </span><span class="kw">pub const fn </span>guild_bans(<span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_BANS)
+        <span class="attr">#[allow(deprecated)] </span><span class="comment">// this is a deprecated method itself
+        </span><span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_BANS)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_MODERATION] intent.
