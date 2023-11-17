@@ -26,7 +26,6 @@
 <a href="#26" id="26">26</a>
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
-<a href="#29" id="29">29</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
 
@@ -36,8 +35,7 @@
 ///
 /// [`Client`]: super::Client
 /// [`Error::Client`]: crate::Error::Client
-</span><span class="attr">#[allow(clippy::enum_variant_names)]
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error {
     <span class="doccomment">/// When a shard has completely failed to reboot after resume and/or reconnect attempts.

@@ -350,7 +350,6 @@
 <a href="#350" id="350">350</a>
 <a href="#351" id="351">351</a>
 <a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
@@ -557,7 +556,6 @@
     </span>}
 
     <span class="doccomment">/// Set the reference message this message is a reply to.
-    </span><span class="attr">#[allow(clippy::unwrap_used)] </span><span class="comment">// allowing unwrap here because serializing MessageReference should never error
     </span><span class="kw">pub fn </span>reference_message(<span class="kw-2">mut </span><span class="self">self</span>, reference: <span class="kw">impl </span>Into&lt;MessageReference&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.message_reference = <span class="prelude-val">Some</span>(reference.into());
         <span class="self">self
