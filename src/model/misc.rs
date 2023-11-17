@@ -464,11 +464,11 @@ mod tests {
             format!("<t:{}:{}>", timestamp.timestamp(), FormattedTimestampStyle::ShortDateTime)
         );
 
-        let time_default = FormattedTimestamp::new(timestamp, None);
+        let unstyled = FormattedTimestamp::new(timestamp, None);
 
-        let time_default_str = time_default.to_string();
+        let unstyled_str = unstyled.to_string();
 
-        assert_eq!(time_default_str, format!("<t:{}>", timestamp.timestamp()));
+        assert_eq!(unstyled_str, format!("<t:{}>", timestamp.timestamp()));
     }
 
     #[test]
@@ -494,6 +494,14 @@ mod tests {
         let time_parsed = time_str.parse::<FormattedTimestamp>().unwrap();
 
         assert_eq!(time, time_parsed);
+
+        let unstyled = FormattedTimestamp::new(timestamp, None);
+
+        let unstyled_str = format!("<t:{}>", timestamp.timestamp());
+
+        let unstyled_parsed = unstyled_str.parse::<FormattedTimestamp>().unwrap();
+
+        assert_eq!(unstyled, unstyled_parsed);
     }
 
     #[test]
