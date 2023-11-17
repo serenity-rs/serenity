@@ -2,7 +2,7 @@
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
-use std::fmt;
+use std::fmt::{self, Display};
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
 use std::str::FromStr;
@@ -47,9 +47,7 @@ impl ImageHash {
     #[must_use]
     pub fn is_animated(&self) -> bool {
         match &self.0 {
-            ImageHashInner::Normal {
-                is_animated, ..
-            } => *is_animated,
+            ImageHashInner::Normal { is_animated, .. } => *is_animated,
             ImageHashInner::Clyde => true,
         }
     }
@@ -78,11 +76,7 @@ impl<'de> serde::Deserialize<'de> for ImageHash {
 
 impl std::fmt::Display for ImageHash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let ImageHashInner::Normal {
-            hash,
-            is_animated,
-        } = &self.0
-        else {
+        let ImageHashInner::Normal { hash, is_animated } = &self.0 else {
             return f.write_str("clyde");
         };
 
@@ -140,10 +134,7 @@ impl std::str::FromStr for ImageHash {
             });
         }
 
-        Ok(Self(ImageHashInner::Normal {
-            is_animated,
-            hash,
-        }))
+        Ok(Self(ImageHashInner::Normal { is_animated, hash }))
     }
 }
 
@@ -194,9 +185,8 @@ impl FromStr for EmojiIdentifier {
     type Err = EmojiIdentifierParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
-            parsed_string: s.to_owned(),
-        })
+        utils::parse_emoji(s)
+            .ok_or_else(|| EmojiIdentifierParseError { parsed_string: s.to_owned() })
     }
 }
 
@@ -271,5 +261,220 @@ mod test {
         assert_eq!(GuildId::new(3).to_string(), "3");
         assert_eq!(RoleId::new(4).to_string(), "4");
         assert_eq!(UserId::new(5).to_string(), "5");
+    }
+}
+
+/// Represents a combination of a timestamp and a style for formatting time in messages.
+#[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
+#[cfg(all(feature = "model", feature = "utils"))]
+pub struct MessageTime(i64, MessageTimeStyle);
+
+/// Enum representing various styles for formatting time in messages.
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[cfg(all(feature = "model", feature = "utils"))]
+pub enum MessageTimeStyle {
+    /// Represents a short time format, e.g., "12:34 PM".
+    ShortTime,
+    /// Represents a long time format, e.g., "12:34:56 PM".
+    LongTime,
+    /// Represents a short date format, e.g., "2023-11-17".
+    ShortDate,
+    /// Represents a long date format, e.g., "November 17, 2023".
+    LongDate,
+    /// Represents a short date and time format, e.g., "November 17, 2023 12:34 PM".
+    #[default]
+    ShortDateTime,
+
+    /// Represents a long date and time format, e.g., "Thursday, November 17, 2023 12:34 PM".
+    LongDateTime,
+    /// Represents a relative time format, indicating the time relative to the current moment, e.g., "2 hours ago" or "in 2 hours".
+    RelativeTime,
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl MessageTime {
+    /// Creates a new [`MessageTime`] instance from the given [`Timestamp`] and [`MessageTimeStyle`].
+    pub fn new(timestamp: Timestamp, style: MessageTimeStyle) -> Self {
+        Self(timestamp.timestamp(), style)
+    }
+
+    /// Creates a new [`MessageTime`] instance representing the current timestamp with the default style.
+    pub fn now() -> Self {
+        Self(Timestamp::now().timestamp(), MessageTimeStyle::default())
+    }
+
+    /// Returns the timestamp of this [`MessageTime`].
+    pub fn timestamp(&self) -> i64 {
+        self.0
+    }
+
+    /// Returns the style of this [`MessageTime`].
+    pub fn style(&self) -> MessageTimeStyle {
+        self.1
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl From<Timestamp> for MessageTime {
+    /// Creates a new [`MessageTime`] instance from the given [`Timestamp`] with the default style.
+    fn from(timestamp: Timestamp) -> Self {
+        Self(timestamp.timestamp(), MessageTimeStyle::default())
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl Display for MessageTime {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "<t:{}:{}>", self.0, self.1)
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl Display for MessageTimeStyle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let style = match self {
+            Self::ShortTime => "t",
+            Self::LongTime => "T",
+            Self::ShortDate => "d",
+            Self::LongDate => "D",
+            Self::ShortDateTime => "f",
+            Self::LongDateTime => "F",
+            Self::RelativeTime => "R",
+        };
+        f.write_str(style)
+    }
+}
+
+/// An error that can occur when parsing a [`MessageTime`] from a string.
+#[cfg(all(feature = "model", feature = "utils"))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MessageTimeParseError {
+    InvalidFormat,
+    InvalidTimestamp,
+    InvalidStyle,
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl StdError for MessageTimeParseError {}
+
+impl Display for MessageTimeParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidFormat => f.write_str("Invalid format"),
+            Self::InvalidTimestamp => f.write_str("Invalid timestamp"),
+            Self::InvalidStyle => f.write_str("Invalid style"),
+        }
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl FromStr for MessageTime {
+    type Err = MessageTimeParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !s.starts_with("<t:") || !s.ends_with('>') {
+            return Err(MessageTimeParseError::InvalidFormat);
+        }
+
+        let mut parts = s[3..s.len() - 1].split(':');
+
+        let secs = parts
+            .next()
+            .ok_or(MessageTimeParseError::InvalidFormat)?
+            .parse()
+            .map_err(|_| MessageTimeParseError::InvalidTimestamp)?;
+
+        let timestamp = Timestamp::from_unix_timestamp(secs)
+            .map_err(|_| MessageTimeParseError::InvalidTimestamp)?;
+
+        let style = parts.next().ok_or(MessageTimeParseError::InvalidFormat)?.parse()?;
+
+        Ok(Self(timestamp.timestamp(), style))
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl FromStr for MessageTimeStyle {
+    type Err = MessageTimeParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "t" => Ok(Self::ShortTime),
+            "T" => Ok(Self::LongTime),
+            "d" => Ok(Self::ShortDate),
+            "D" => Ok(Self::LongDate),
+            "f" => Ok(Self::ShortDateTime),
+            "F" => Ok(Self::LongDateTime),
+            "R" => Ok(Self::RelativeTime),
+            _ => Err(MessageTimeParseError::InvalidStyle),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_message_time() {
+        let timestamp = Timestamp::now();
+
+        let time = MessageTime::new(timestamp, MessageTimeStyle::ShortDateTime);
+
+        let time_str = time.to_string();
+
+        assert_eq!(
+            time_str,
+            format!("<t:{}:{}>", timestamp.timestamp(), MessageTimeStyle::ShortDateTime)
+        );
+    }
+
+    #[test]
+    fn test_message_time_style() {
+        let short_time = MessageTimeStyle::ShortTime;
+        let long_time = MessageTimeStyle::LongTime;
+        let short_date = MessageTimeStyle::ShortDate;
+        let long_date = MessageTimeStyle::LongDate;
+        let short_date_time = MessageTimeStyle::ShortDateTime;
+        let long_date_time = MessageTimeStyle::LongDateTime;
+        let relative_time = MessageTimeStyle::RelativeTime;
+
+        assert_eq!(short_time.to_string(), "t");
+        assert_eq!(long_time.to_string(), "T");
+        assert_eq!(short_date.to_string(), "d");
+        assert_eq!(long_date.to_string(), "D");
+        assert_eq!(short_date_time.to_string(), "f");
+        assert_eq!(long_date_time.to_string(), "F");
+        assert_eq!(relative_time.to_string(), "R");
+    }
+
+    #[test]
+    fn test_message_time_parse() {
+        let timestamp = Timestamp::now();
+
+        let time = MessageTime::new(timestamp, MessageTimeStyle::ShortDateTime);
+
+        let time_str = format!("<t:{}:{}>", timestamp.timestamp(), MessageTimeStyle::ShortDateTime);
+
+        let time_parsed = time_str.parse::<MessageTime>().unwrap();
+
+        assert_eq!(time, time_parsed);
+    }
+
+    #[test]
+    fn test_message_time_style_parse() {
+        let short_time = MessageTimeStyle::ShortTime;
+        let long_time = MessageTimeStyle::LongTime;
+        let short_date = MessageTimeStyle::ShortDate;
+        let long_date = MessageTimeStyle::LongDate;
+        let short_date_time = MessageTimeStyle::ShortDateTime;
+        let long_date_time = MessageTimeStyle::LongDateTime;
+        let relative_time = MessageTimeStyle::RelativeTime;
+
+        assert_eq!("t".parse(), Ok(short_time));
+        assert_eq!("T".parse(), Ok(long_time));
+        assert_eq!("d".parse(), Ok(short_date));
+        assert_eq!("D".parse(), Ok(long_date));
+        assert_eq!("f".parse(), Ok(short_date_time));
+        assert_eq!("F".parse(), Ok(long_date_time));
+        assert_eq!("R".parse(), Ok(relative_time));
     }
 }
