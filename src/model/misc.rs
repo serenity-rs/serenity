@@ -275,18 +275,23 @@ pub struct MessageTime(i64, MessageTimeStyle);
 pub enum MessageTimeStyle {
     /// Represents a short time format, e.g., "12:34 PM".
     ShortTime,
+
     /// Represents a long time format, e.g., "12:34:56 PM".
     LongTime,
+
     /// Represents a short date format, e.g., "2023-11-17".
     ShortDate,
+
     /// Represents a long date format, e.g., "November 17, 2023".
     LongDate,
+
     /// Represents a short date and time format, e.g., "November 17, 2023 12:34 PM".
     #[default]
     ShortDateTime,
 
     /// Represents a long date and time format, e.g., "Thursday, November 17, 2023 12:34 PM".
     LongDateTime,
+
     /// Represents a relative time format, indicating the time relative to the current moment, e.g., "2 hours ago" or "in 2 hours".
     RelativeTime,
 }
