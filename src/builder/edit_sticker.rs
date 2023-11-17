@@ -76,13 +76,16 @@ impl<'a> Builder for EditSticker<'a> {
 
     /// Edits the sticker.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     async fn execute(
         self,
         cache_http: impl CacheHttp,

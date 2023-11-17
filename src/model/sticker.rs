@@ -11,13 +11,17 @@ use crate::model::utils::comma_separated_string;
 impl StickerId {
     /// Delete a guild sticker.
     ///
-    /// **Note**: The [Manage Emojis and Stickers] permission is required.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
+    #[deprecated = "use `GuildId::delete_sticker` instead"]
     pub async fn delete(self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
         guild_id.into().delete_sticker(http, self).await
     }
@@ -34,13 +38,17 @@ impl StickerId {
 
     /// Edits the sticker.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
+    #[deprecated = "use `GuildId::edit_sticker` instead"]
     pub async fn edit(
         self,
         cache_http: impl CacheHttp,
@@ -161,10 +169,11 @@ pub struct Sticker {
     pub available: bool,
     /// Id of the guild that owns this sticker.
     pub guild_id: Option<GuildId>,
-    /// User that uploaded the sticker. This will be `None` if the current user does not have the
-    /// [Manage Emojis and Stickers] permission.
+    /// User that uploaded the sticker. This will be `None` if the current user does not have
+    /// either the [Create Guild Expressions] nor the [Manage Guild Expressions] permission.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     pub user: Option<User>,
     /// A sticker's sort order within a pack.
     pub sort_value: Option<u16>,
@@ -172,15 +181,18 @@ pub struct Sticker {
 
 #[cfg(feature = "model")]
 impl Sticker {
-    /// Deletes a [`Sticker`] by Id from the guild.
+    /// Deletes the [`Sticker`] from its guild.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
@@ -192,7 +204,9 @@ impl Sticker {
 
     /// Edits the sticker.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Examples
     ///
@@ -217,7 +231,8 @@ impl Sticker {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn edit(
         &mut self,
@@ -225,7 +240,7 @@ impl Sticker {
         builder: EditSticker<'_>,
     ) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            *self = self.id.edit(cache_http, guild_id, builder).await?;
+            *self = guild_id.edit_sticker(cache_http, self.id, builder).await?;
             Ok(())
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
