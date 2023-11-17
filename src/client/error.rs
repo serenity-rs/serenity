@@ -7,7 +7,6 @@ use std::fmt;
 ///
 /// [`Client`]: super::Client
 /// [`Error::Client`]: crate::Error::Client
-#[allow(clippy::enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Error {

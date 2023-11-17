@@ -204,7 +204,6 @@ impl CreateMessage {
     }
 
     /// Set the reference message this message is a reply to.
-    #[allow(clippy::unwrap_used)] // allowing unwrap here because serializing MessageReference should never error
     pub fn reference_message(mut self, reference: impl Into<MessageReference>) -> Self {
         self.message_reference = Some(reference.into());
         self
