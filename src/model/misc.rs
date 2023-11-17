@@ -292,23 +292,17 @@ pub struct FormattedTimestamp {
 pub enum FormattedTimestampStyle {
     /// Represents a short time format, e.g., "12:34 PM".
     ShortTime,
-
     /// Represents a long time format, e.g., "12:34:56 PM".
     LongTime,
-
     /// Represents a short date format, e.g., "2023-11-17".
     ShortDate,
-
     /// Represents a long date format, e.g., "November 17, 2023".
     LongDate,
-
     /// Represents a short date and time format, e.g., "November 17, 2023 12:34 PM".
     #[default]
     ShortDateTime,
-
     /// Represents a long date and time format, e.g., "Thursday, November 17, 2023 12:34 PM".
     LongDateTime,
-
     /// Represents a relative time format, indicating the time relative to the current moment,
     /// e.g., "2 hours ago" or "in 2 hours".
     RelativeTime,
@@ -476,31 +470,13 @@ mod tests {
 
     #[test]
     fn test_message_time_style() {
-        let (
-            short_time,
-            long_time,
-            short_date,
-            long_date,
-            short_date_time,
-            long_date_time,
-            relative_time,
-        ) = (
-            FormattedTimestampStyle::ShortTime,
-            FormattedTimestampStyle::LongTime,
-            FormattedTimestampStyle::ShortDate,
-            FormattedTimestampStyle::LongDate,
-            FormattedTimestampStyle::ShortDateTime,
-            FormattedTimestampStyle::LongDateTime,
-            FormattedTimestampStyle::RelativeTime,
-        );
-
-        assert_eq!(short_time.to_string(), "t");
-        assert_eq!(long_time.to_string(), "T");
-        assert_eq!(short_date.to_string(), "d");
-        assert_eq!(long_date.to_string(), "D");
-        assert_eq!(short_date_time.to_string(), "f");
-        assert_eq!(long_date_time.to_string(), "F");
-        assert_eq!(relative_time.to_string(), "R");
+        assert_eq!(FormattedTimestampStyle::ShortTime.to_string(), "t");
+        assert_eq!(FormattedTimestampStyle::LongTime.to_string(), "T");
+        assert_eq!(FormattedTimestampStyle::ShortDate.to_string(), "d");
+        assert_eq!(FormattedTimestampStyle::LongDate.to_string(), "D");
+        assert_eq!(FormattedTimestampStyle::ShortDateTime.to_string(), "f");
+        assert_eq!(FormattedTimestampStyle::LongDateTime.to_string(), "F");
+        assert_eq!(FormattedTimestampStyle::RelativeTime.to_string(), "R");
     }
 
     #[test]
@@ -519,30 +495,12 @@ mod tests {
 
     #[test]
     fn test_message_time_style_parse() {
-        let (
-            short_time,
-            long_time,
-            short_date,
-            long_date,
-            short_date_time,
-            long_date_time,
-            relative_time,
-        ) = (
-            FormattedTimestampStyle::ShortTime,
-            FormattedTimestampStyle::LongTime,
-            FormattedTimestampStyle::ShortDate,
-            FormattedTimestampStyle::LongDate,
-            FormattedTimestampStyle::ShortDateTime,
-            FormattedTimestampStyle::LongDateTime,
-            FormattedTimestampStyle::RelativeTime,
-        );
-
-        assert_eq!("t".parse(), Ok(short_time));
-        assert_eq!("T".parse(), Ok(long_time));
-        assert_eq!("d".parse(), Ok(short_date));
-        assert_eq!("D".parse(), Ok(long_date));
-        assert_eq!("f".parse(), Ok(short_date_time));
-        assert_eq!("F".parse(), Ok(long_date_time));
-        assert_eq!("R".parse(), Ok(relative_time));
+        assert_eq!("t".parse(), Ok(FormattedTimestampStyle::ShortTime));
+        assert_eq!("T".parse(), Ok(FormattedTimestampStyle::LongTime));
+        assert_eq!("d".parse(), Ok(FormattedTimestampStyle::ShortDate));
+        assert_eq!("D".parse(), Ok(FormattedTimestampStyle::LongDate));
+        assert_eq!("f".parse(), Ok(FormattedTimestampStyle::ShortDateTime));
+        assert_eq!("F".parse(), Ok(FormattedTimestampStyle::LongDateTime));
+        assert_eq!("R".parse(), Ok(FormattedTimestampStyle::RelativeTime));
     }
 }
