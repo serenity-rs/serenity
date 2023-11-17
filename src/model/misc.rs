@@ -401,9 +401,9 @@ impl Display for FormattedTimestampParseError {
 
 fn parse_formatted_timestamp(s: &str) -> Option<FormattedTimestamp> {
     // A formatted timestamp looks like: <t:TIMESTAMP> or <t:TIMESTAMP:STYLE>
-    let inner = s.strip_prefix("<t:")?.strip_suffix(">")?;
+    let inner = s.strip_prefix("<t:")?.strip_suffix('>')?;
 
-    Some(match inner.split_once(":") {
+    Some(match inner.split_once(':') {
         Some((timestamp, style)) => FormattedTimestamp {
             timestamp: timestamp.parse().ok()?,
             style: Some(style.parse().ok()?),
