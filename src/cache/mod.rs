@@ -34,7 +34,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use dashmap::mapref::entry::Entry;
-use dashmap::mapref::one::Ref;
+use dashmap::mapref::one::{MappedRef, MappedRefMut, Ref};
 use dashmap::DashMap;
 #[cfg(feature = "temp_cache")]
 use mini_moka::sync::Cache as MokaCache;
@@ -56,20 +56,21 @@ type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, BuildHasher>
 
 struct NotSend;
 
-enum CacheRefInner<'a, K, V> {
+enum CacheRefInner<'a, K, V, T> {
     #[cfg(feature = "temp_cache")]
     Arc(Arc<V>),
     DashRef(Ref<'a, K, V, BuildHasher>),
+    DashMappedRef(MappedRef<'a, K, T, V, BuildHasher>),
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
-pub struct CacheRef<'a, K, V> {
-    inner: CacheRefInner<'a, K, V>,
+pub struct CacheRef<'a, K, V, T = ()> {
+    inner: CacheRefInner<'a, K, V, T>,
     phantom: std::marker::PhantomData<*const NotSend>,
 }
 
-impl<'a, K, V> CacheRef<'a, K, V> {
-    fn new(inner: CacheRefInner<'a, K, V>) -> Self {
+impl<'a, K, V, T> CacheRef<'a, K, V, T> {
+    fn new(inner: CacheRefInner<'a, K, V, T>) -> Self {
         Self {
             inner,
             phantom: std::marker::PhantomData,
@@ -85,12 +86,16 @@ impl<'a, K, V> CacheRef<'a, K, V> {
         Self::new(CacheRefInner::DashRef(inner))
     }
 
+    fn from_mapped_ref(inner: MappedRef<'a, K, T, V, BuildHasher>) -> Self {
+        Self::new(CacheRefInner::DashMappedRef(inner))
+    }
+
     fn from_guard(inner: parking_lot::RwLockReadGuard<'a, V>) -> Self {
         Self::new(CacheRefInner::ReadGuard(inner))
     }
 }
 
-impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
+impl<K: Eq + Hash, V, T> std::ops::Deref for CacheRef<'_, K, V, T> {
     type Target = V;
 
     fn deref(&self) -> &Self::Target {
@@ -98,6 +103,7 @@ impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
             #[cfg(feature = "temp_cache")]
             CacheRefInner::Arc(inner) => inner,
             CacheRefInner::DashRef(inner) => inner.value(),
+            CacheRefInner::DashMappedRef(inner) => inner.value(),
             CacheRefInner::ReadGuard(inner) => inner,
         }
     }
@@ -106,8 +112,8 @@ impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
 pub type UserRef<'a> = CacheRef<'a, UserId, User>;
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
 pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
-pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
 pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
+pub type GuildChannelRef<'a> = CacheRef<'a, GuildId, GuildChannel, Guild>;
 pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
 
 #[derive(Debug)]
@@ -153,12 +159,8 @@ pub struct Cache {
     pub(crate) temp_users: MokaCache<UserId, Arc<User>, BuildHasher>,
 
     // Channels cache:
-    // ---
-    /// A map of channels in [`Guild`]s that the current user has received data for.
-    ///
-    /// When a [`Event::GuildDelete`] is received and processed by the cache, the relevant channels
-    /// are also removed from this map.
-    pub(crate) channels: MaybeMap<ChannelId, GuildChannel>,
+    /// A map of channel ids to the guilds in which the channel data is stored.
+    pub(crate) channels: MaybeMap<ChannelId, GuildId>,
     /// A map of direct message channels that the current user has open with other users.
     pub(crate) private_channels: MaybeMap<ChannelId, PrivateChannel>,
 
@@ -400,9 +402,8 @@ impl Cache {
     }
 
     fn _channel(&self, id: ChannelId) -> Option<Channel> {
-        if let Some(channel) = self.channels.get(&id) {
-            let channel = channel.clone();
-            return Some(Channel::Guild(channel));
+        if let Some(channel) = self.guild_channel(id) {
+            return Some(Channel::Guild(channel.clone()));
         }
 
         #[cfg(feature = "temp_cache")]
@@ -523,7 +524,18 @@ impl Cache {
     }
 
     fn _guild_channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
-        self.channels.get(&id).map(CacheRef::from_ref)
+        let guild_id = *self.channels.get(&id)?;
+        let guild_ref = self.guilds.get(&guild_id)?;
+        guild_ref.try_map(|g| g.channels.get(&id)).ok().map(CacheRef::from_mapped_ref)
+    }
+
+    pub(super) fn guild_channel_mut(
+        &self,
+        id: ChannelId,
+    ) -> Option<MappedRefMut<'_, GuildId, Guild, GuildChannel, BuildHasher>> {
+        let guild_id = *self.channels.get(&id)?;
+        let guild_ref = self.guilds.get_mut(&guild_id)?;
+        guild_ref.try_map(|g| g.channels.get_mut(&id)).ok()
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and user's given Ids.
@@ -861,31 +873,19 @@ impl Cache {
         CacheRef::from_guard(self.user.read())
     }
 
-    /// Clones all channel categories and returns them.
-    pub fn categories(&self) -> DashMap<ChannelId, GuildChannel> {
-        self.channels
-            .iter()
-            .filter(|channel| channel.value().kind == ChannelType::Category)
-            .map(|channel| (*channel.key(), channel.value().clone()))
-            .collect()
-    }
-
-    /// Returns the number of channel categories.
-    pub fn category_count(&self) -> usize {
-        self.channels.iter().filter(|channel| channel.value().kind == ChannelType::Category).count()
-    }
-
-    /// Clones a channel category matching the given ID and returns it.
-    pub fn category(&self, channel_id: ChannelId) -> Option<CacheRef<'_, ChannelId, GuildChannel>> {
-        match self.channels.get(&channel_id) {
-            Some(c) if c.kind == ChannelType::Category => Some(CacheRef::from_ref(c)),
-            _ => None,
+    /// Returns a channel category matching the given ID
+    pub fn category(&self, channel_id: ChannelId) -> Option<GuildChannelRef<'_>> {
+        let channel = self.guild_channel(channel_id)?;
+        if channel.kind == ChannelType::Category {
+            Some(channel)
+        } else {
+            None
         }
     }
 
     /// Returns the parent category of the given channel ID.
     pub fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
-        self.channels.get(&channel_id)?.parent_id
+        self.guild_channel(channel_id)?.parent_id
     }
 
     /// Clones all channel categories in the given guild and returns them.

@@ -50,8 +50,7 @@ impl CacheUpdate for ChannelCreateEvent {
                     .get_mut(&guild_id)
                     .and_then(|mut g| g.channels.insert(channel_id, channel.clone()));
 
-                cache.channels.insert(channel_id, channel.clone());
-
+                cache.channels.insert(channel_id, channel.guild_id);
                 old_channel.map(Channel::Guild)
             },
             Channel::Private(ref mut channel) => {
@@ -114,14 +113,12 @@ impl CacheUpdate for ChannelUpdateEvent {
 
         match &self.channel {
             Channel::Guild(channel) => {
-                let (guild_id, channel_id) = (channel.guild_id, channel.id);
-
-                cache.channels.insert(channel_id, channel.clone());
+                cache.channels.insert(channel.id, channel.guild_id);
 
                 cache
                     .guilds
-                    .get_mut(&guild_id)
-                    .map(|mut g| g.channels.insert(channel_id, channel.clone()));
+                    .get_mut(&channel.guild_id)
+                    .map(|mut g| g.channels.insert(channel.id, channel.clone()));
             },
             Channel::Private(channel) => {
                 if let Some(mut c) = cache.private_channels.get_mut(&channel.id) {
@@ -138,7 +135,7 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        if let Some(mut channel) = cache.channels.get_mut(&self.channel_id) {
+        if let Some(mut channel) = cache.guild_channel_mut(self.channel_id) {
             channel.last_pin_timestamp = self.last_pin_timestamp;
 
             return None;
@@ -168,11 +165,10 @@ impl CacheUpdate for GuildCreateEvent {
             }
         }
 
-        for (id, channel) in guild.channels.clone() {
-            cache.channels.insert(id, channel);
-        }
-
         cache.guilds.insert(self.guild.id, guild);
+        for channel_id in self.guild.channels.keys() {
+            cache.channels.insert(*channel_id, self.guild.id);
+        }
 
         None
     }
@@ -630,7 +626,7 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
     type Output = String;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(mut channel) = cache.channels.get_mut(&self.id) {
+        if let Some(mut channel) = cache.guild_channel_mut(self.id) {
             let old = channel.status.clone();
             channel.status = self.status.clone();
             // Discord updates topic but doesn't fire ChannelUpdate.
