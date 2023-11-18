@@ -159,7 +159,7 @@ pub struct CreateInteractionResponseMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    flags: Option<MessageFlags>,
+    flags: Option<InteractionResponseFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
     attachments: EditAttachments,
@@ -253,19 +253,19 @@ impl CreateInteractionResponseMessage {
     }
 
     /// Sets the flags for the message.
-    pub fn flags(mut self, flags: MessageFlags) -> Self {
+    pub fn flags(mut self, flags: InteractionResponseFlags) -> Self {
         self.flags = Some(flags);
         self
     }
 
     /// Adds or removes the ephemeral flag.
     pub fn ephemeral(mut self, ephemeral: bool) -> Self {
-        let mut flags = self.flags.unwrap_or_else(MessageFlags::empty);
+        let mut flags = self.flags.unwrap_or_else(InteractionResponseFlags::empty);
 
         if ephemeral {
-            flags |= MessageFlags::EPHEMERAL;
+            flags |= InteractionResponseFlags::EPHEMERAL;
         } else {
-            flags &= !MessageFlags::EPHEMERAL;
+            flags &= !InteractionResponseFlags::EPHEMERAL;
         };
 
         self.flags = Some(flags);
