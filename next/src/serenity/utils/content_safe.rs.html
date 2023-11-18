@@ -438,6 +438,7 @@
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
 <a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
@@ -753,11 +754,12 @@
 
         <span class="kw">let </span>cache = Arc::new(Cache::default());
 
+        guild.channels.insert(channel.id, channel.clone());
         guild.members.insert(user.id, member.clone());
         guild.roles.insert(role.id, role);
         cache.users.insert(user.id, user.clone());
         cache.guilds.insert(guild.id, guild.clone());
-        cache.channels.insert(channel.id, channel);
+        cache.channels.insert(channel.id, guild.id);
 
         <span class="kw">let </span>with_user_mentions = <span class="string">&quot;&lt;@!100000000000000000&gt; &lt;@!000000000000000000&gt; &lt;@123&gt; &lt;@!123&gt; \
         &lt;@!123123123123123123123&gt; &lt;@123&gt; &lt;@123123123123123123&gt; &lt;@!invalid&gt; \

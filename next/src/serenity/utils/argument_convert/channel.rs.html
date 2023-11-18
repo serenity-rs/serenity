@@ -212,17 +212,17 @@
         <span class="kw">return </span>channel_id.to_channel(<span class="kw-2">&amp;</span>ctx).<span class="kw">await</span>.map_err(ChannelParseError::Http);
     }
 
+    <span class="kw">let </span>guild_id = guild_id.ok_or(ChannelParseError::NotFoundOrMalformed)<span class="question-mark">?</span>;
+
     <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = ctx.cache() {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channels.iter().find_map(|m| {
-            <span class="kw">let </span>channel = m.value();
-            channel.name.eq_ignore_ascii_case(s).then(|| channel.clone())
-        }) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(channel));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.guild(guild_id) {
+            <span class="kw">let </span>channel = guild.channels.values().find(|c| c.name.eq_ignore_ascii_case(s));
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = channel {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(channel.clone()));
+            }
         }
-    }
-
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
+    } <span class="kw">else </span>{
         <span class="kw">let </span>channels = ctx.http().get_channels(guild_id).<span class="kw">await</span>.map_err(ChannelParseError::Http)<span class="question-mark">?</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) =
             channels.into_iter().find(|channel| channel.name.eq_ignore_ascii_case(s))
