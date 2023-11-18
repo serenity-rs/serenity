@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use super::{Cache, CacheUpdate};
-use crate::model::channel::{Channel, GuildChannel, Message};
+use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
     ChannelCreateEvent,
     ChannelDeleteEvent,
@@ -38,43 +38,16 @@ use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 
 impl CacheUpdate for ChannelCreateEvent {
-    type Output = Channel;
+    type Output = GuildChannel;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        match self.channel {
-            Channel::Guild(ref channel) => {
-                let (guild_id, channel_id) = (channel.guild_id, channel.id);
+        let old_channel = cache
+            .guilds
+            .get_mut(&self.channel.guild_id)
+            .and_then(|mut g| g.channels.insert(self.channel.id, self.channel.clone()));
 
-                let old_channel = cache
-                    .guilds
-                    .get_mut(&guild_id)
-                    .and_then(|mut g| g.channels.insert(channel_id, channel.clone()));
-
-                cache.channels.insert(channel_id, channel.guild_id);
-                old_channel.map(Channel::Guild)
-            },
-            Channel::Private(ref mut channel) => {
-                if let Some(channel) = cache.private_channels.get(&channel.id) {
-                    return Some(Channel::Private(channel.clone()));
-                }
-
-                let id = {
-                    let user_id = {
-                        cache.update_user_entry(&channel.recipient);
-
-                        channel.recipient.id
-                    };
-
-                    if let Some(u) = cache.users.get(&user_id) {
-                        channel.recipient = u.clone();
-                    }
-
-                    channel.id
-                };
-
-                cache.private_channels.insert(id, channel.clone()).map(Channel::Private)
-            },
-        }
+        cache.channels.insert(self.channel.id, self.channel.guild_id);
+        old_channel
     }
 }
 
@@ -82,52 +55,26 @@ impl CacheUpdate for ChannelDeleteEvent {
     type Output = Vec<Message>;
 
     fn update(&mut self, cache: &Cache) -> Option<Vec<Message>> {
-        match &self.channel {
-            Channel::Guild(channel) => {
-                let (guild_id, channel_id) = (channel.guild_id, channel.id);
+        let (channel_id, guild_id) = (self.channel.id, self.channel.guild_id);
 
-                cache.channels.remove(&channel_id);
-
-                cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
-            },
-            Channel::Private(channel) => {
-                let id = { channel.id };
-
-                cache.private_channels.remove(&id);
-            },
-        };
+        cache.channels.remove(&channel_id);
+        cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
 
         // Remove the cached messages for the channel.
-        cache
-            .messages
-            .remove(&self.channel.id())
-            .map(|(_, messages)| messages.into_values().collect())
+        cache.messages.remove(&channel_id).map(|(_, messages)| messages.into_values().collect())
     }
 }
 
 impl CacheUpdate for ChannelUpdateEvent {
-    type Output = Channel;
+    type Output = GuildChannel;
 
-    fn update(&mut self, cache: &Cache) -> Option<Channel> {
-        let old_channel = cache.channel(self.channel.id());
+    fn update(&mut self, cache: &Cache) -> Option<GuildChannel> {
+        cache.channels.insert(self.channel.id, self.channel.guild_id);
 
-        match &self.channel {
-            Channel::Guild(channel) => {
-                cache.channels.insert(channel.id, channel.guild_id);
-
-                cache
-                    .guilds
-                    .get_mut(&channel.guild_id)
-                    .map(|mut g| g.channels.insert(channel.id, channel.clone()));
-            },
-            Channel::Private(channel) => {
-                if let Some(mut c) = cache.private_channels.get_mut(&channel.id) {
-                    c.clone_from(channel);
-                }
-            },
-        }
-
-        old_channel
+        cache
+            .guilds
+            .get_mut(&self.channel.guild_id)
+            .and_then(|mut g| g.channels.insert(self.channel.id, self.channel.clone()))
     }
 }
 

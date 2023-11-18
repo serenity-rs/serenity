@@ -10,7 +10,7 @@ use crate::cache::CacheUpdate;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::internal::tokio::spawn_named;
-use crate::model::channel::{Channel, ChannelType};
+use crate::model::channel::ChannelType;
 use crate::model::event::Event;
 use crate::model::guild::Member;
 #[cfg(feature = "cache")]
@@ -95,46 +95,35 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
         },
         Event::ChannelCreate(mut event) => {
             update_cache(&ctx, &mut event);
-            match event.channel {
-                Channel::Guild(channel) => {
-                    if channel.kind == ChannelType::Category {
-                        FullEvent::CategoryCreate {
-                            ctx,
-                            category: channel,
-                        }
-                    } else {
-                        FullEvent::ChannelCreate {
-                            ctx,
-                            channel,
-                        }
-                    }
-                },
-                Channel::Private(_) => unreachable!(
-                    "Private channel create events are no longer sent to bots in the v8 gateway."
-                ),
+
+            let channel = event.channel;
+            if channel.kind == ChannelType::Category {
+                FullEvent::CategoryCreate {
+                    ctx,
+                    category: channel,
+                }
+            } else {
+                FullEvent::ChannelCreate {
+                    ctx,
+                    channel,
+                }
             }
         },
         Event::ChannelDelete(mut event) => {
             let cached_messages = if_cache!(update_cache(&ctx, &mut event));
 
-            match event.channel {
-                Channel::Private(_) => unreachable!(
-                    "Private channel create events are no longer sent to bots in the v8 gateway."
-                ),
-                Channel::Guild(channel) => {
-                    if channel.kind == ChannelType::Category {
-                        FullEvent::CategoryDelete {
-                            ctx,
-                            category: channel,
-                        }
-                    } else {
-                        FullEvent::ChannelDelete {
-                            ctx,
-                            channel,
-                            messages: cached_messages,
-                        }
-                    }
-                },
+            let channel = event.channel;
+            if channel.kind == ChannelType::Category {
+                FullEvent::CategoryDelete {
+                    ctx,
+                    category: channel,
+                }
+            } else {
+                FullEvent::ChannelDelete {
+                    ctx,
+                    channel,
+                    messages: cached_messages,
+                }
             }
         },
         Event::ChannelPinsUpdate(event) => FullEvent::ChannelPinsUpdate {

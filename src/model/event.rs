@@ -80,7 +80,6 @@ pub struct AutoModActionExecutionEvent {
 ///
 /// This is fired when:
 /// - A [`Channel`] is created in a [`Guild`]
-/// - A [`PrivateChannel`] is created
 ///
 /// Requires [`GatewayIntents::GUILDS`].
 ///
@@ -90,7 +89,7 @@ pub struct AutoModActionExecutionEvent {
 #[non_exhaustive]
 pub struct ChannelCreateEvent {
     /// The channel that was created.
-    pub channel: Channel,
+    pub channel: GuildChannel,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].
@@ -100,7 +99,7 @@ pub struct ChannelCreateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ChannelDeleteEvent {
-    pub channel: Channel,
+    pub channel: GuildChannel,
 }
 
 /// Requires [`GatewayIntents::GUILDS`] or [`GatewayIntents::DIRECT_MESSAGES`].
@@ -121,7 +120,7 @@ pub struct ChannelPinsUpdateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ChannelUpdateEvent {
-    pub channel: Channel,
+    pub channel: GuildChannel,
 }
 
 /// Requires [`GatewayIntents::GUILD_MODERATION`] and [`Permissions::VIEW_AUDIT_LOG`].
