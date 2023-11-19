@@ -413,6 +413,8 @@
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
 <a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::sync::atomic::{AtomicU32, Ordering};
 <span class="kw">use </span>std::sync::Arc;
@@ -692,10 +694,12 @@
 
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
 
-        drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)));
-
         {
             <span class="kw">let </span><span class="kw-2">mut </span>shard_shutdown = <span class="self">self</span>.shard_shutdown.lock().<span class="kw">await</span>;
+
+            drop(
+                <span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)),
+            );
             <span class="kw">match </span>timeout(TIMEOUT, shard_shutdown.next()).<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(shutdown_shard_id)) =&gt; {
                     <span class="kw">if </span>shutdown_shard_id != shard_id {
