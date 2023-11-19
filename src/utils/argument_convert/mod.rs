@@ -22,6 +22,7 @@ pub use role::*;
 mod emoji;
 pub use emoji::*;
 
+use super::DOMAINS;
 use crate::model::prelude::*;
 use crate::prelude::*;
 
@@ -109,13 +110,29 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 ///         MessageId::new(806164913558781963),
 ///     )),
 /// );
+/// assert_eq!(
+///     parse_message_url(
+///         "https://canary.discord.com/channels/381880193251409931/381880193700069377/806164913558781963"
+///     ),
+///     Some((
+///         GuildId::new(381880193251409931),
+///         ChannelId::new(381880193700069377),
+///         MessageId::new(806164913558781963),
+///     )),
+/// );
 /// assert_eq!(parse_message_url("https://google.com"), None);
 /// ```
 #[must_use]
 pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
-    let mut parts = s.strip_prefix("https://discord.com/channels/")?.splitn(3, '/');
-    let guild_id = parts.next()?.parse().ok()?;
-    let channel_id = parts.next()?.parse().ok()?;
-    let message_id = parts.next()?.parse().ok()?;
-    Some((guild_id, channel_id, message_id))
+    for domain in DOMAINS {
+        if let Some(parts) = s.strip_prefix(&format!("https://{domain}/channels/")) {
+            let mut parts = parts.splitn(3, '/');
+
+            let guild_id = parts.next()?.parse().ok()?;
+            let channel_id = parts.next()?.parse().ok()?;
+            let message_id = parts.next()?.parse().ok()?;
+            return Some((guild_id, channel_id, message_id));
+        }
+    }
+    None
 }
