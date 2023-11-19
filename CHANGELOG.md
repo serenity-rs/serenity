@@ -63,7 +63,7 @@ let channel = guild
     .await?;
 ```
 
-Note that in this particular example, the channel name is now a mandatory field that must be passed in when constructing the builder. Mutating the builder with subsequent calls to `CreateChannel::name` will change the underlying value. Additionally, all methods on builders now take `mut self` and return `Self`, instead of taking and returning `&mut self`/`&mut Self`. This allows for inline initialization as in the second example above. Also, builders no longer wrap a `pub HashMap<&'static str, T>`; the hashmap has been flattened into concrete private fields.
+Note that in this particular example, the channel name is now a mandatory field that must be passed in when constructing the builder. Mutating the builder with subsequent calls to `CreateChannel::name` will change the underlying value. Additionally, all methods on builders now take `mut self` and return `Self`, instead of taking and returning `&mut self`/`&mut Self`. This allows for explicit construction as in the second example above. Also, builders no longer wrap a `pub HashMap<&'static str, T>`; the hashmap has been flattened into concrete private fields.
 
 Some benefits to this new approach to builders are:
 
