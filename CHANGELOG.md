@@ -5325,7 +5325,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
-[0.12.0]: https://github.com/serenity-rs/serenity/compare/v0.11.7...v0.12.0
+[0.12.0]: https://github.com/serenity-rs/serenity/compare/v0.11.7...v0.12.0-rc
 [0.11.7]: https://github.com/serenity-rs/serenity/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/serenity-rs/serenity/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/serenity-rs/serenity/compare/v0.11.4...v0.11.5
