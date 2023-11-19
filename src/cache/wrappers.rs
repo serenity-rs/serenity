@@ -38,6 +38,12 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
         self.0.as_ref().map_or(0, |map| map.len())
     }
 
+    pub fn shrink_to_fit(&self) {
+        if let Some(map) = self.0.as_ref() {
+            map.shrink_to_fit();
+        }
+    }
+
     pub(crate) fn as_read_only(&self) -> ReadOnlyMapRef<'_, K, V> {
         ReadOnlyMapRef(self.0.as_ref())
     }
