@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (283170175 2023-11-17)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -899,132 +899,6 @@
 <a href="#899" id="899">899</a>
 <a href="#900" id="900">900</a>
 <a href="#901" id="901">901</a>
-<a href="#902" id="902">902</a>
-<a href="#903" id="903">903</a>
-<a href="#904" id="904">904</a>
-<a href="#905" id="905">905</a>
-<a href="#906" id="906">906</a>
-<a href="#907" id="907">907</a>
-<a href="#908" id="908">908</a>
-<a href="#909" id="909">909</a>
-<a href="#910" id="910">910</a>
-<a href="#911" id="911">911</a>
-<a href="#912" id="912">912</a>
-<a href="#913" id="913">913</a>
-<a href="#914" id="914">914</a>
-<a href="#915" id="915">915</a>
-<a href="#916" id="916">916</a>
-<a href="#917" id="917">917</a>
-<a href="#918" id="918">918</a>
-<a href="#919" id="919">919</a>
-<a href="#920" id="920">920</a>
-<a href="#921" id="921">921</a>
-<a href="#922" id="922">922</a>
-<a href="#923" id="923">923</a>
-<a href="#924" id="924">924</a>
-<a href="#925" id="925">925</a>
-<a href="#926" id="926">926</a>
-<a href="#927" id="927">927</a>
-<a href="#928" id="928">928</a>
-<a href="#929" id="929">929</a>
-<a href="#930" id="930">930</a>
-<a href="#931" id="931">931</a>
-<a href="#932" id="932">932</a>
-<a href="#933" id="933">933</a>
-<a href="#934" id="934">934</a>
-<a href="#935" id="935">935</a>
-<a href="#936" id="936">936</a>
-<a href="#937" id="937">937</a>
-<a href="#938" id="938">938</a>
-<a href="#939" id="939">939</a>
-<a href="#940" id="940">940</a>
-<a href="#941" id="941">941</a>
-<a href="#942" id="942">942</a>
-<a href="#943" id="943">943</a>
-<a href="#944" id="944">944</a>
-<a href="#945" id="945">945</a>
-<a href="#946" id="946">946</a>
-<a href="#947" id="947">947</a>
-<a href="#948" id="948">948</a>
-<a href="#949" id="949">949</a>
-<a href="#950" id="950">950</a>
-<a href="#951" id="951">951</a>
-<a href="#952" id="952">952</a>
-<a href="#953" id="953">953</a>
-<a href="#954" id="954">954</a>
-<a href="#955" id="955">955</a>
-<a href="#956" id="956">956</a>
-<a href="#957" id="957">957</a>
-<a href="#958" id="958">958</a>
-<a href="#959" id="959">959</a>
-<a href="#960" id="960">960</a>
-<a href="#961" id="961">961</a>
-<a href="#962" id="962">962</a>
-<a href="#963" id="963">963</a>
-<a href="#964" id="964">964</a>
-<a href="#965" id="965">965</a>
-<a href="#966" id="966">966</a>
-<a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
-<a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
-<a href="#975" id="975">975</a>
-<a href="#976" id="976">976</a>
-<a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
-<a href="#979" id="979">979</a>
-<a href="#980" id="980">980</a>
-<a href="#981" id="981">981</a>
-<a href="#982" id="982">982</a>
-<a href="#983" id="983">983</a>
-<a href="#984" id="984">984</a>
-<a href="#985" id="985">985</a>
-<a href="#986" id="986">986</a>
-<a href="#987" id="987">987</a>
-<a href="#988" id="988">988</a>
-<a href="#989" id="989">989</a>
-<a href="#990" id="990">990</a>
-<a href="#991" id="991">991</a>
-<a href="#992" id="992">992</a>
-<a href="#993" id="993">993</a>
-<a href="#994" id="994">994</a>
-<a href="#995" id="995">995</a>
-<a href="#996" id="996">996</a>
-<a href="#997" id="997">997</a>
-<a href="#998" id="998">998</a>
-<a href="#999" id="999">999</a>
-<a href="#1000" id="1000">1000</a>
-<a href="#1001" id="1001">1001</a>
-<a href="#1002" id="1002">1002</a>
-<a href="#1003" id="1003">1003</a>
-<a href="#1004" id="1004">1004</a>
-<a href="#1005" id="1005">1005</a>
-<a href="#1006" id="1006">1006</a>
-<a href="#1007" id="1007">1007</a>
-<a href="#1008" id="1008">1008</a>
-<a href="#1009" id="1009">1009</a>
-<a href="#1010" id="1010">1010</a>
-<a href="#1011" id="1011">1011</a>
-<a href="#1012" id="1012">1012</a>
-<a href="#1013" id="1013">1013</a>
-<a href="#1014" id="1014">1014</a>
-<a href="#1015" id="1015">1015</a>
-<a href="#1016" id="1016">1016</a>
-<a href="#1017" id="1017">1017</a>
-<a href="#1018" id="1018">1018</a>
-<a href="#1019" id="1019">1019</a>
-<a href="#1020" id="1020">1020</a>
-<a href="#1021" id="1021">1021</a>
-<a href="#1022" id="1022">1022</a>
-<a href="#1023" id="1023">1023</a>
-<a href="#1024" id="1024">1024</a>
-<a href="#1025" id="1025">1025</a>
-<a href="#1026" id="1026">1026</a>
-<a href="#1027" id="1027">1027</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -1139,7 +1013,6 @@
 <span class="kw">pub type </span>UserRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, UserId, User&gt;;
 <span class="kw">pub type </span>GuildRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, GuildId, Guild&gt;;
 <span class="kw">pub type </span>CurrentUserRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, (), CurrentUser&gt;;
-<span class="kw">pub type </span>PrivateChannelRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, ChannelId, PrivateChannel&gt;;
 <span class="kw">pub type </span>GuildChannelRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, GuildId, GuildChannel, Guild&gt;;
 <span class="kw">pub type </span>ChannelMessagesRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, ChannelId, HashMap&lt;MessageId, Message&gt;&gt;;
 
@@ -1157,7 +1030,6 @@
 ///
 /// This is the list of cached resources and the events that populate them:
 /// - channels: [`ChannelCreateEvent`], [`ChannelUpdateEvent`], [`GuildCreateEvent`]
-/// - private_channels: [`ChannelCreateEvent`]
 /// - guilds: [`GuildCreateEvent`]
 /// - unavailable_guilds: [`ReadyEvent`], [`GuildDeleteEvent`]
 /// - users: [`GuildMemberAddEvent`], [`GuildMemberRemoveEvent`], [`GuildMembersChunkEvent`],
@@ -1178,7 +1050,7 @@
     ///
     /// The TTL for each value is configured in CacheSettings.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_channels: MokaCache&lt;ChannelId, GuildChannel, BuildHasher&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_channels: MokaCache&lt;ChannelId, Arc&lt;GuildChannel&gt;, BuildHasher&gt;,
     <span class="doccomment">/// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
@@ -1188,8 +1060,6 @@
     <span class="comment">// Channels cache:
     </span><span class="doccomment">/// A map of channel ids to the guilds in which the channel data is stored.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) channels: MaybeMap&lt;ChannelId, GuildId&gt;,
-    <span class="doccomment">/// A map of direct message channels that the current user has open with other users.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) private_channels: MaybeMap&lt;ChannelId, PrivateChannel&gt;,
 
     <span class="comment">// Guilds cache:
     // ---
@@ -1285,7 +1155,6 @@
             </span>temp_users: temp_cache(settings.time_to_live),
 
             channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
-            private_channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
 
             guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
@@ -1358,26 +1227,6 @@
         total
     }
 
-    <span class="doccomment">/// Fetches a vector of all [`PrivateChannel`] Ids that are stored in the cache.
-    ///
-    /// # Examples
-    ///
-    /// If there are 6 private channels and 2 groups in the cache, then `8` Ids will be returned.
-    ///
-    /// Printing the count of all private channels and groups:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # let cache = Cache::default();
-    /// let amount = cache.private_channels().len();
-    ///
-    /// println!(&quot;There are {} private channels&quot;, amount);
-    /// ```
-    </span><span class="kw">pub fn </span>private_channels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">&#39;_</span>, ChannelId, PrivateChannel&gt; {
-        <span class="self">self</span>.private_channels.as_read_only()
-    }
-
     <span class="doccomment">/// Fetches a vector of all [`Guild`]s&#39; Ids that are stored in the cache.
     ///
     /// Note that if you are utilizing multiple [`Shard`]s, then the guilds retrieved over all
@@ -1414,38 +1263,38 @@
         <span class="self">self</span>.guilds.iter().map(|i| <span class="kw-2">*</span>i.key()).chain(unavailable_guild_ids).collect()
     }
 
-    <span class="doccomment">/// Retrieves a [`Channel`] from the cache based on the given Id.
-    ///
-    /// This will search the `channels` map, then the [`Self::private_channels`] map.
-    ///
-    /// If you know what type of channel you&#39;re looking for, you should instead manually retrieve
-    /// from one of the respective methods:
-    ///
-    /// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::guild_channels`]
-    /// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]
+    <span class="doccomment">/// Retrieves a [`GuildChannel`] from the cache based on the given Id.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: C) -&gt; <span class="prelude-ty">Option</span>&lt;Channel&gt; {
+    </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: C) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
         <span class="self">self</span>._channel(id.into())
     }
 
-    <span class="kw">fn </span>_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;Channel&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = <span class="self">self</span>.guild_channel(id) {
-            <span class="kw">return </span><span class="prelude-val">Some</span>(Channel::Guild(channel.clone()));
+    <span class="kw">fn </span>_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>channel = guild_ref.try_map(|g| g.channels.get(<span class="kw-2">&amp;</span>id)).ok();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = channel {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(channel));
         }
 
         <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = <span class="self">self</span>.temp_channels.get(<span class="kw-2">&amp;</span>id) {
-                <span class="kw">return </span><span class="prelude-val">Some</span>(Channel::Guild(channel));
+                <span class="kw">return </span><span class="prelude-val">Some</span>(CacheRef::from_arc(channel));
             }
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(private_channel) = <span class="self">self</span>.private_channels.get(<span class="kw-2">&amp;</span>id) {
-            <span class="kw">return </span><span class="prelude-val">Some</span>(Channel::Private(private_channel.clone()));
         }
 
         <span class="prelude-val">None
     </span>}
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>channel_mut(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        id: ChannelId,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;MappedRefMut&lt;<span class="lifetime">&#39;_</span>, GuildId, Guild, GuildChannel, BuildHasher&gt;&gt; {
+        <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
+        guild_ref.try_map(|g| g.channels.get_mut(<span class="kw-2">&amp;</span>id)).ok()
+    }
 
     <span class="doccomment">/// Get a reference to the cached messages for a channel based on the given `Id`.
     ///
@@ -1496,75 +1345,6 @@
         <span class="self">self</span>.guilds.len()
     }
 
-    <span class="doccomment">/// Retrieves a reference to a [`Guild`]&#39;s channel. Unlike [`Self::channel`], this will only
-    /// search guilds for the given channel.
-    ///
-    /// The only advantage of this method is that you can pass in anything that is indirectly a
-    /// [`ChannelId`].
-    ///
-    /// # Examples
-    ///
-    /// Getting a guild&#39;s channel via the Id of the message received through a
-    /// [`EventHandler::message`] event dispatch:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::prelude::*;
-    /// #
-    /// struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, context: Context, message: Message) {
-    ///         let channel_opt = context.cache.guild_channel(message.channel_id).as_deref().cloned();
-    ///         let channel = match channel_opt {
-    ///             Some(channel) =&gt; channel,
-    ///             None =&gt; {
-    ///                 let result = message
-    ///                     .channel_id
-    ///                     .say(&amp;context, &quot;Could not find guild&#39;s channel data&quot;)
-    ///                     .await;
-    ///                 if let Err(why) = result {
-    ///                     println!(&quot;Error sending message: {:?}&quot;, why);
-    ///                 }
-    ///
-    ///                 return;
-    ///             },
-    ///         };
-    ///     }
-    /// }
-    ///
-    /// # #[cfg(feature = &quot;client&quot;)]
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// let mut client =
-    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// [`EventHandler::message`]: crate::client::EventHandler::message
-    </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>guild_channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: C) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="self">self</span>._guild_channel(id.into())
-    }
-
-    <span class="kw">fn </span>_guild_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
-        <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
-        guild_ref.try_map(|g| g.channels.get(<span class="kw-2">&amp;</span>id)).ok().map(CacheRef::from_mapped_ref)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>guild_channel_mut(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        id: ChannelId,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;MappedRefMut&lt;<span class="lifetime">&#39;_</span>, GuildId, Guild, GuildChannel, BuildHasher&gt;&gt; {
-        <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
-        <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
-        guild_ref.try_map(|g| g.channels.get_mut(<span class="kw-2">&amp;</span>id)).ok()
-    }
-
     <span class="doccomment">/// Retrieves a [`Guild`]&#39;s member from the cache based on the guild&#39;s and user&#39;s given Ids.
     ///
     /// **Note**: This will clone the entire member. Instead, retrieve the guild and retrieve from
@@ -1583,7 +1363,7 @@
     /// # async fn run(http: Http, cache: Cache, message: Message) {
     /// #
     /// let member = {
-    ///     let channel = match cache.guild_channel(message.channel_id) {
+    ///     let channel = match cache.channel(message.channel_id) {
     ///         Some(channel) =&gt; channel,
     ///         None =&gt; {
     ///             if let Err(why) = message.channel_id.say(http, &quot;Error finding channel data&quot;).await {
@@ -1751,38 +1531,6 @@
         <span class="self">self</span>.messages.get(<span class="kw-2">&amp;</span>channel_id).and_then(|messages| messages.get(<span class="kw-2">&amp;</span>message_id).cloned())
     }
 
-    <span class="doccomment">/// Retrieves a [`PrivateChannel`] from the cache&#39;s [`Self::private_channels`] map, if it
-    /// exists.
-    ///
-    /// The only advantage of this method is that you can pass in anything that is indirectly a
-    /// [`ChannelId`].
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a private channel from the cache and print its recipient&#39;s name:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # let cache = Cache::default();
-    /// // assuming the cache has been unlocked
-    ///
-    /// if let Some(channel) = cache.private_channel(7) {
-    ///     println!(&quot;The recipient is {}&quot;, channel.recipient);
-    /// };
-    /// ```
-    </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>private_channel(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;PrivateChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="self">self</span>._private_channel(channel_id.into())
-    }
-
-    <span class="kw">fn </span>_private_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;PrivateChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="self">self</span>.private_channels.get(<span class="kw-2">&amp;</span>channel_id).map(CacheRef::from_ref)
-    }
-
     <span class="doccomment">/// Retrieves a [`Guild`]&#39;s role by their Ids.
     ///
     /// **Note**: This will clone the entire role. Instead, retrieve the guild and retrieve from
@@ -1902,7 +1650,7 @@
 
     <span class="doccomment">/// Returns a channel category matching the given ID
     </span><span class="kw">pub fn </span>category(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="kw">let </span>channel = <span class="self">self</span>.guild_channel(channel_id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>channel = <span class="self">self</span>.channel(channel_id)<span class="question-mark">?</span>;
         <span class="kw">if </span>channel.kind == ChannelType::Category {
             <span class="prelude-val">Some</span>(channel)
         } <span class="kw">else </span>{
@@ -1912,7 +1660,7 @@
 
     <span class="doccomment">/// Returns the parent category of the given channel ID.
     </span><span class="kw">pub fn </span>channel_category_id(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
-        <span class="self">self</span>.guild_channel(channel_id)<span class="question-mark">?</span>.parent_id
+        <span class="self">self</span>.channel(channel_id)<span class="question-mark">?</span>.parent_id
     }
 
     <span class="doccomment">/// Clones all channel categories in the given guild and returns them.
@@ -2022,10 +1770,10 @@
         <span class="comment">// Add a channel delete event to the cache, the cached messages for that channel should now
         // be gone.
         </span><span class="kw">let </span><span class="kw-2">mut </span>delete = ChannelDeleteEvent {
-            channel: Channel::Guild(channel.clone()),
+            channel: channel.clone(),
         };
         <span class="macro">assert!</span>(cache.update(<span class="kw-2">&amp;mut </span>delete).is_some());
-        <span class="macro">assert!</span>(!cache.messages.contains_key(<span class="kw-2">&amp;</span>delete.channel.id()));
+        <span class="macro">assert!</span>(!cache.messages.contains_key(<span class="kw-2">&amp;</span>delete.channel.id));
 
         <span class="comment">// Test deletion of a guild channel&#39;s message cache when a GuildDeleteEvent is received.
         </span><span class="kw">let </span><span class="kw-2">mut </span>guild_create = GuildCreateEvent {

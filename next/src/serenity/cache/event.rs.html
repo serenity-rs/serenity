@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (283170175 2023-11-17)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -576,71 +576,10 @@
 <a href="#576" id="576">576</a>
 <a href="#577" id="577">577</a>
 <a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
-<a href="#594" id="594">594</a>
-<a href="#595" id="595">595</a>
-<a href="#596" id="596">596</a>
-<a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
-<a href="#623" id="623">623</a>
-<a href="#624" id="624">624</a>
-<a href="#625" id="625">625</a>
-<a href="#626" id="626">626</a>
-<a href="#627" id="627">627</a>
-<a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
-<a href="#630" id="630">630</a>
-<a href="#631" id="631">631</a>
-<a href="#632" id="632">632</a>
-<a href="#633" id="633">633</a>
-<a href="#634" id="634">634</a>
-<a href="#635" id="635">635</a>
-<a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
-<a href="#639" id="639">639</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use super</span>::{Cache, CacheUpdate};
-<span class="kw">use </span><span class="kw">crate</span>::model::channel::{Channel, GuildChannel, Message};
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::{GuildChannel, Message};
 <span class="kw">use </span><span class="kw">crate</span>::model::event::{
     ChannelCreateEvent,
     ChannelDeleteEvent,
@@ -677,43 +616,16 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::voice::VoiceState;
 
 <span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ChannelCreateEvent {
-    <span class="kw">type </span>Output = Channel;
+    <span class="kw">type </span>Output = GuildChannel;
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
-        <span class="kw">match </span><span class="self">self</span>.channel {
-            Channel::Guild(<span class="kw-2">ref </span>channel) =&gt; {
-                <span class="kw">let </span>(guild_id, channel_id) = (channel.guild_id, channel.id);
+        <span class="kw">let </span>old_channel = cache
+            .guilds
+            .get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel.guild_id)
+            .and_then(|<span class="kw-2">mut </span>g| g.channels.insert(<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.clone()));
 
-                <span class="kw">let </span>old_channel = cache
-                    .guilds
-                    .get_mut(<span class="kw-2">&amp;</span>guild_id)
-                    .and_then(|<span class="kw-2">mut </span>g| g.channels.insert(channel_id, channel.clone()));
-
-                cache.channels.insert(channel_id, channel.guild_id);
-                old_channel.map(Channel::Guild)
-            },
-            Channel::Private(<span class="kw-2">ref mut </span>channel) =&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.private_channels.get(<span class="kw-2">&amp;</span>channel.id) {
-                    <span class="kw">return </span><span class="prelude-val">Some</span>(Channel::Private(channel.clone()));
-                }
-
-                <span class="kw">let </span>id = {
-                    <span class="kw">let </span>user_id = {
-                        cache.update_user_entry(<span class="kw-2">&amp;</span>channel.recipient);
-
-                        channel.recipient.id
-                    };
-
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(u) = cache.users.get(<span class="kw-2">&amp;</span>user_id) {
-                        channel.recipient = u.clone();
-                    }
-
-                    channel.id
-                };
-
-                cache.private_channels.insert(id, channel.clone()).map(Channel::Private)
-            },
-        }
+        cache.channels.insert(<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.guild_id);
+        old_channel
     }
 }
 
@@ -721,52 +633,26 @@
     <span class="kw">type </span>Output = Vec&lt;Message&gt;;
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;Message&gt;&gt; {
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.channel {
-            Channel::Guild(channel) =&gt; {
-                <span class="kw">let </span>(guild_id, channel_id) = (channel.guild_id, channel.id);
+        <span class="kw">let </span>(channel_id, guild_id) = (<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.guild_id);
 
-                cache.channels.remove(<span class="kw-2">&amp;</span>channel_id);
-
-                cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).map(|<span class="kw-2">mut </span>g| g.channels.remove(<span class="kw-2">&amp;</span>channel_id));
-            },
-            Channel::Private(channel) =&gt; {
-                <span class="kw">let </span>id = { channel.id };
-
-                cache.private_channels.remove(<span class="kw-2">&amp;</span>id);
-            },
-        };
+        cache.channels.remove(<span class="kw-2">&amp;</span>channel_id);
+        cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).map(|<span class="kw-2">mut </span>g| g.channels.remove(<span class="kw-2">&amp;</span>channel_id));
 
         <span class="comment">// Remove the cached messages for the channel.
-        </span>cache
-            .messages
-            .remove(<span class="kw-2">&amp;</span><span class="self">self</span>.channel.id())
-            .map(|(<span class="kw">_</span>, messages)| messages.into_values().collect())
+        </span>cache.messages.remove(<span class="kw-2">&amp;</span>channel_id).map(|(<span class="kw">_</span>, messages)| messages.into_values().collect())
     }
 }
 
 <span class="kw">impl </span>CacheUpdate <span class="kw">for </span>ChannelUpdateEvent {
-    <span class="kw">type </span>Output = Channel;
+    <span class="kw">type </span>Output = GuildChannel;
 
-    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;Channel&gt; {
-        <span class="kw">let </span>old_channel = cache.channel(<span class="self">self</span>.channel.id());
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannel&gt; {
+        cache.channels.insert(<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.guild_id);
 
-        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.channel {
-            Channel::Guild(channel) =&gt; {
-                cache.channels.insert(channel.id, channel.guild_id);
-
-                cache
-                    .guilds
-                    .get_mut(<span class="kw-2">&amp;</span>channel.guild_id)
-                    .map(|<span class="kw-2">mut </span>g| g.channels.insert(channel.id, channel.clone()));
-            },
-            Channel::Private(channel) =&gt; {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>c) = cache.private_channels.get_mut(<span class="kw-2">&amp;</span>channel.id) {
-                    c.clone_from(channel);
-                }
-            },
-        }
-
-        old_channel
+        cache
+            .guilds
+            .get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel.guild_id)
+            .and_then(|<span class="kw-2">mut </span>g| g.channels.insert(<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.clone()))
     }
 }
 
@@ -774,16 +660,8 @@
     <span class="kw">type </span>Output = ();
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.guild_channel_mut(<span class="self">self</span>.channel_id) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.channel_mut(<span class="self">self</span>.channel_id) {
             channel.last_pin_timestamp = <span class="self">self</span>.last_pin_timestamp;
-
-            <span class="kw">return </span><span class="prelude-val">None</span>;
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.private_channels.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel_id) {
-            channel.last_pin_timestamp = <span class="self">self</span>.last_pin_timestamp;
-
-            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
         <span class="prelude-val">None
@@ -1265,7 +1143,7 @@
     <span class="kw">type </span>Output = String;
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.guild_channel_mut(<span class="self">self</span>.id) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.channel_mut(<span class="self">self</span>.id) {
             <span class="kw">let </span>old = channel.status.clone();
             channel.status = <span class="self">self</span>.status.clone();
             <span class="comment">// Discord updates topic but doesn&#39;t fire ChannelUpdate.

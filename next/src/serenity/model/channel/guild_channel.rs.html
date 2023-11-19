@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (283170175 2023-11-17)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1248,17 +1248,6 @@
 <a href="#1248" id="1248">1248</a>
 <a href="#1249" id="1249">1249</a>
 <a href="#1250" id="1250">1250</a>
-<a href="#1251" id="1251">1251</a>
-<a href="#1252" id="1252">1252</a>
-<a href="#1253" id="1253">1253</a>
-<a href="#1254" id="1254">1254</a>
-<a href="#1255" id="1255">1255</a>
-<a href="#1256" id="1256">1256</a>
-<a href="#1257" id="1257">1257</a>
-<a href="#1258" id="1258">1258</a>
-<a href="#1259" id="1259">1259</a>
-<a href="#1260" id="1260">1260</a>
-<a href="#1261" id="1261">1261</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1507,12 +1496,8 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateInvite&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-        </span><span class="kw">let </span>invite = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span>;
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
-        </span><span class="kw">let </span>invite = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span>;
-        invite
-    }
+        builder.execute(cache_http, <span class="self">self</span>.id).<span class="kw">await
+    </span>}
 
     <span class="doccomment">/// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
     /// [`Role`] within a [`Channel`].
@@ -1546,7 +1531,7 @@
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&amp;http, overwrite).await?;
     /// # Ok(())
@@ -1578,7 +1563,7 @@
     ///     kind: PermissionOverwriteType::Role(role_id),
     /// };
     ///
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&amp;http, overwrite).await?;
     /// # Ok(())
@@ -1615,21 +1600,17 @@
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">crate</span>::utils::user_has_perms_cache(
-                    cache,
-                    <span class="self">self</span>.id,
-                    <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id),
-                    Permissions::MANAGE_CHANNELS,
-                )<span class="question-mark">?</span>;
+                <span class="kw">crate</span>::utils::user_has_perms_cache(cache, <span class="self">self</span>.id, Permissions::MANAGE_CHANNELS)<span class="question-mark">?</span>;
             }
         }
 
-        <span class="self">self</span>.id.delete(cache_http.http()).<span class="kw">await
-    </span>}
+        <span class="kw">let </span>channel = <span class="self">self</span>.id.delete(cache_http.http()).<span class="kw">await</span><span class="question-mark">?</span>;
+        channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
+    }
 
     <span class="doccomment">/// Deletes all messages by Ids from the given vector in the channel.
     ///
@@ -1747,10 +1728,7 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditChannel&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-        </span><span class="kw">let </span>channel = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
-        </span><span class="kw">let </span>channel = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>channel = builder.execute(cache_http, <span class="self">self</span>.id).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw-2">*</span><span class="self">self </span>= channel;
         <span class="prelude-val">Ok</span>(())
     }
@@ -1816,7 +1794,7 @@
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// let builder = EditVoiceState::new().suppress(false);
     /// channel.edit_voice_state(&amp;http, user_id, builder).await?;
@@ -1864,7 +1842,7 @@
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
     /// let builder = EditVoiceState::new().request_to_speak(true);
@@ -2004,7 +1982,7 @@
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, context: Context, msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
+    ///         let channel = match context.cache.channel(msg.channel_id) {
     ///             Some(channel) =&gt; channel,
     ///             None =&gt; return,
     ///         };
@@ -2040,7 +2018,7 @@
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, context: Context, mut msg: Message) {
     ///         let current_user_id = context.cache.current_user().id;
-    ///         let permissions = match context.cache.guild_channel(msg.channel_id) {
+    ///         let permissions = match context.cache.channel(msg.channel_id) {
     ///             Some(channel) =&gt; channel.permissions_for_user(&amp;context.cache, current_user_id),
     ///             None =&gt; return,
     ///         };
