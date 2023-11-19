@@ -224,7 +224,8 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
         },
         Event::GuildMemberUpdate(mut event) => {
             let before = if_cache!(update_cache(&ctx, &mut event));
-            let after: Option<Member> = if_cache!(ctx.cache.member(event.guild_id, event.user.id));
+            let after: Option<Member> =
+                if_cache!(ctx.cache.member(event.guild_id, event.user.id).map(|m| m.clone()));
 
             FullEvent::GuildMemberUpdate {
                 ctx,
@@ -316,7 +317,7 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
         },
         Event::MessageUpdate(mut event) => {
             let before = if_cache!(update_cache(&ctx, &mut event));
-            let after = if_cache!(ctx.cache.message(event.channel_id, event.id));
+            let after = if_cache!(ctx.cache.message(event.channel_id, event.id).map(|m| m.clone()));
 
             FullEvent::MessageUpdate {
                 ctx,
