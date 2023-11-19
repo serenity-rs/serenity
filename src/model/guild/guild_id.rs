@@ -1080,7 +1080,7 @@ impl GuildId {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Some(member) = cache.member(self, user_id) {
-                    return Ok(member);
+                    return Ok(member.clone());
                 }
             }
         }

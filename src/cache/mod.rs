@@ -112,6 +112,7 @@ impl<K: Eq + Hash, V, T> std::ops::Deref for CacheRef<'_, K, V, T> {
 pub type UserRef<'a> = CacheRef<'a, UserId, User>;
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
 pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
+pub type MemberRef<'a> = CacheRef<'a, GuildId, Member, Guild>;
 pub type GuildChannelRef<'a> = CacheRef<'a, GuildId, GuildChannel, Guild>;
 pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
 
@@ -446,9 +447,6 @@ impl Cache {
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and user's given Ids.
     ///
-    /// **Note**: This will clone the entire member. Instead, retrieve the guild and retrieve from
-    /// the guild's [`members`] map to avoid this.
-    ///
     /// # Examples
     ///
     /// Retrieving the member object of the user that posted a message, in a
@@ -461,7 +459,7 @@ impl Cache {
     /// #
     /// # async fn run(http: Http, cache: Cache, message: Message) {
     /// #
-    /// let member = {
+    /// let roles_len = {
     ///     let channel = match cache.channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
@@ -472,20 +470,17 @@ impl Cache {
     ///         },
     ///     };
     ///
-    ///     match cache.member(channel.guild_id, message.author.id) {
-    ///         Some(member) => member,
-    ///         None => {
-    ///             if let Err(why) = message.channel_id.say(&http, "Error finding member data").await {
-    ///                 println!("Error sending message: {:?}", why);
-    ///             }
-    ///             return;
-    ///         },
-    ///     }
+    ///     cache.member(channel.guild_id, message.author.id).map(|m| m.roles.len())
     /// };
     ///
-    /// let msg = format!("You have {} roles", member.roles.len());
+    /// let message_res = if let Some(roles_len) = roles_len {
+    ///     let msg = format!("You have {} roles", member.roles.len());
+    ///     message.channel_id.say(&http, &msg).await
+    /// } else {
+    ///     message.channel_id.say(&http, "Error finding member data").await
+    /// }
     ///
-    /// if let Err(why) = message.channel_id.say(&http, &msg).await {
+    /// if let Err(why) = message_res {
     ///     println!("Error sending message: {:?}", why);
     /// }
     /// # }
@@ -494,62 +489,17 @@ impl Cache {
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
     #[inline]
-    pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
-    where
-        G: Into<GuildId>,
-        U: Into<UserId>,
-    {
-        self._member(guild_id.into(), user_id.into())
-    }
-
-    fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<Member> {
-        match self.guilds.get(&guild_id) {
-            Some(guild) => guild.members.get(&user_id).cloned(),
-            None => None,
-        }
-    }
-
-    /// This method allows to only clone a field of a member instead of the entire member by
-    /// providing a `field_selector`-closure picking what you want to clone.
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let cache = Cache::default();
-    /// // We clone only the `name` instead of the entire channel.
-    /// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick.clone()) {
-    ///     println!("Member's nick: {}", nick);
-    /// }
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn member_field<Ret, Fun>(
+    pub fn member(
         &self,
         guild_id: impl Into<GuildId>,
         user_id: impl Into<UserId>,
-        field_selector: Fun,
-    ) -> Option<Ret>
-    where
-        Fun: FnOnce(&Member) -> Ret,
-    {
-        self._member_field(guild_id.into(), user_id.into(), field_selector)
+    ) -> Option<MemberRef<'_>> {
+        self._member(guild_id.into(), user_id.into())
     }
 
-    fn _member_field<Ret, Fun>(
-        &self,
-        guild_id: GuildId,
-        user_id: UserId,
-        field_selector: Fun,
-    ) -> Option<Ret>
-    where
-        Fun: FnOnce(&Member) -> Ret,
-    {
-        let guild = self.guilds.get(&guild_id)?;
-        let member = guild.members.get(&user_id)?;
-
-        Some(field_selector(member))
+    fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
+        let member = self.guilds.get(&guild_id)?.try_map(|g| g.members.get(&user_id)).ok()?;
+        Some(CacheRef::from_mapped_ref(member))
     }
 
     #[inline]
