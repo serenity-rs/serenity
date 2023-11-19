@@ -119,6 +119,23 @@
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>member;
 <span class="kw">pub use </span>member::<span class="kw-2">*</span>;
 
@@ -143,6 +160,7 @@
 <span class="kw">mod </span>emoji;
 <span class="kw">pub use </span>emoji::<span class="kw-2">*</span>;
 
+<span class="kw">use </span><span class="kw">super</span>::DOMAINS;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
@@ -230,14 +248,30 @@
 ///         MessageId::new(806164913558781963),
 ///     )),
 /// );
+/// assert_eq!(
+///     parse_message_url(
+///         &quot;https://canary.discord.com/channels/381880193251409931/381880193700069377/806164913558781963&quot;
+///     ),
+///     Some((
+///         GuildId::new(381880193251409931),
+///         ChannelId::new(381880193700069377),
+///         MessageId::new(806164913558781963),
+///     )),
+/// );
 /// assert_eq!(parse_message_url(&quot;https://google.com&quot;), None);
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_message_url(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(GuildId, ChannelId, MessageId)&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>parts = s.strip_prefix(<span class="string">&quot;https://discord.com/channels/&quot;</span>)<span class="question-mark">?</span>.splitn(<span class="number">3</span>, <span class="string">&#39;/&#39;</span>);
-    <span class="kw">let </span>guild_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
-    <span class="kw">let </span>channel_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
-    <span class="kw">let </span>message_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
-    <span class="prelude-val">Some</span>((guild_id, channel_id, message_id))
-}
+    <span class="kw">for </span>domain <span class="kw">in </span>DOMAINS {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(parts) = s.strip_prefix(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;https://{domain}/channels/&quot;</span>)) {
+            <span class="kw">let </span><span class="kw-2">mut </span>parts = parts.splitn(<span class="number">3</span>, <span class="string">&#39;/&#39;</span>);
+
+            <span class="kw">let </span>guild_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span>channel_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span>message_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Some</span>((guild_id, channel_id, message_id));
+        }
+    }
+    <span class="prelude-val">None
+</span>}
 </code></pre></div></section></main></body></html>
