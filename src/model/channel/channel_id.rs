@@ -452,7 +452,7 @@ impl ChannelId {
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
             if let Some(message) = cache.message(self, message_id) {
-                return Ok(message);
+                return Ok(message.clone());
             }
         }
 

@@ -71,7 +71,7 @@ impl ArgumentConvert for Message {
         #[cfg(feature = "cache")]
         if let Some(cache) = ctx.cache() {
             if let Some(msg) = cache.message(channel_id, message_id) {
-                return Ok(msg);
+                return Ok(msg.clone());
             }
         }
 

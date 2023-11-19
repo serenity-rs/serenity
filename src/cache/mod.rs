@@ -109,12 +109,19 @@ impl<K: Eq + Hash, V, T> std::ops::Deref for CacheRef<'_, K, V, T> {
     }
 }
 
+type MappedGuildRef<'a, T> = CacheRef<'a, GuildId, T, Guild>;
+
 pub type UserRef<'a> = CacheRef<'a, UserId, User>;
+pub type MemberRef<'a> = MappedGuildRef<'a, Member>;
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
+pub type GuildRoleRef<'a> = MappedGuildRef<'a, Role>;
+pub type SettingsRef<'a> = CacheRef<'a, (), Settings>;
 pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
-pub type MemberRef<'a> = CacheRef<'a, GuildId, Member, Guild>;
-pub type GuildChannelRef<'a> = CacheRef<'a, GuildId, GuildChannel, Guild>;
+pub type GuildChannelRef<'a> = MappedGuildRef<'a, GuildChannel>;
+pub type GuildRolesRef<'a> = MappedGuildRef<'a, HashMap<RoleId, Role>>;
+pub type GuildChannelsRef<'a> = MappedGuildRef<'a, HashMap<ChannelId, GuildChannel>>;
 pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
+pub type MessageRef<'a> = CacheRef<'a, ChannelId, Message, HashMap<MessageId, Message>>;
 
 #[derive(Debug)]
 pub(crate) struct CachedShardData {
@@ -474,11 +481,11 @@ impl Cache {
     /// };
     ///
     /// let message_res = if let Some(roles_len) = roles_len {
-    ///     let msg = format!("You have {} roles", member.roles.len());
+    ///     let msg = format!("You have {} roles", roles_len);
     ///     message.channel_id.say(&http, &msg).await
     /// } else {
     ///     message.channel_id.say(&http, "Error finding member data").await
-    /// }
+    /// };
     ///
     /// if let Err(why) = message_res {
     ///     println!("Error sending message: {:?}", why);
@@ -503,12 +510,13 @@ impl Cache {
     }
 
     #[inline]
-    pub fn guild_roles(&self, guild_id: impl Into<GuildId>) -> Option<HashMap<RoleId, Role>> {
+    pub fn guild_roles(&self, guild_id: impl Into<GuildId>) -> Option<GuildRolesRef<'_>> {
         self._guild_roles(guild_id.into())
     }
 
-    fn _guild_roles(&self, guild_id: GuildId) -> Option<HashMap<RoleId, Role>> {
-        self.guilds.get(&guild_id).map(|g| g.roles.clone())
+    fn _guild_roles(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
+        let roles = self.guilds.get(&guild_id)?.map(|g| &g.roles);
+        Some(CacheRef::from_mapped_ref(roles))
     }
 
     /// This method clones and returns all unavailable guilds.
@@ -519,18 +527,13 @@ impl Cache {
 
     /// This method returns all channels from a guild of with the given `guild_id`.
     #[inline]
-    pub fn guild_channels(
-        &self,
-        guild_id: impl Into<GuildId>,
-    ) -> Option<DashMap<ChannelId, GuildChannel, BuildHasher>> {
+    pub fn guild_channels(&self, guild_id: impl Into<GuildId>) -> Option<GuildChannelsRef<'_>> {
         self._guild_channels(guild_id.into())
     }
 
-    fn _guild_channels(
-        &self,
-        guild_id: GuildId,
-    ) -> Option<DashMap<ChannelId, GuildChannel, BuildHasher>> {
-        self.guilds.get(&guild_id).map(|g| g.channels.clone().into_iter().collect())
+    fn _guild_channels(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
+        let channels = self.guilds.get(&guild_id)?.map(|g| &g.channels);
+        Some(CacheRef::from_mapped_ref(channels))
     }
 
     /// Returns the number of guild channels in the cache.
@@ -568,7 +571,7 @@ impl Cache {
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     #[inline]
-    pub fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<Message>
+    pub fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<MessageRef<'_>>
     where
         C: Into<ChannelId>,
         M: Into<MessageId>,
@@ -576,8 +579,10 @@ impl Cache {
         self._message(channel_id.into(), message_id.into())
     }
 
-    fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<Message> {
-        self.messages.get(&channel_id).and_then(|messages| messages.get(&message_id).cloned())
+    fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
+        let channel_messages = self.messages.get(&channel_id)?;
+        let message = channel_messages.try_map(|messages| messages.get(&message_id)).ok()?;
+        Some(CacheRef::from_mapped_ref(message))
     }
 
     /// Retrieves a [`Guild`]'s role by their Ids.
@@ -596,13 +601,13 @@ impl Cache {
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(role) = cache.role(7, 77) {
     ///     println!("Role with Id 77 is called {}", role.name);
-    /// }
+    /// };
     /// ```
     ///
     /// [`Guild`]: crate::model::guild::Guild
     /// [`roles`]: crate::model::guild::Guild::roles
     #[inline]
-    pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
+    pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<GuildRoleRef<'_>>
     where
         G: Into<GuildId>,
         R: Into<RoleId>,
@@ -610,8 +615,9 @@ impl Cache {
         self._role(guild_id.into(), role_id.into())
     }
 
-    fn _role(&self, guild_id: GuildId, role_id: RoleId) -> Option<Role> {
-        self.guilds.get(&guild_id).and_then(|g| g.roles.get(&role_id).cloned())
+    fn _role(&self, guild_id: GuildId, role_id: RoleId) -> Option<GuildRoleRef<'_>> {
+        let role = self.guilds.get(&guild_id)?.try_map(|g| g.roles.get(&role_id)).ok()?;
+        Some(CacheRef::from_mapped_ref(role))
     }
 
     /// Returns the settings.
@@ -628,8 +634,8 @@ impl Cache {
     /// println!("Max settings: {}", cache.settings().max_messages);
     /// # }
     /// ```
-    pub fn settings(&self) -> Settings {
-        self.settings.read().clone()
+    pub fn settings(&self) -> SettingsRef<'_> {
+        CacheRef::from_guard(self.settings.read())
     }
 
     /// Sets the maximum amount of messages per channel to cache.
