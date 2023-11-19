@@ -30,8 +30,6 @@ use super::Framework;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::{Context, FullEvent};
-#[cfg(feature = "cache")]
-use crate::model::channel::Channel;
 use crate::model::channel::Message;
 #[cfg(feature = "cache")]
 use crate::model::guild::Member;
@@ -250,7 +248,7 @@ impl StandardFramework {
 
             #[cfg(feature = "cache")]
             {
-                if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(ctx) {
+                if let Some(channel) = msg.channel_id.to_channel_cached(&ctx.cache) {
                     let guild_id = channel.guild_id;
 
                     if config.blocked_guilds.contains(&guild_id) {

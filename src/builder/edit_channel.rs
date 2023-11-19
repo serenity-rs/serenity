@@ -294,10 +294,7 @@ impl<'a> EditChannel<'a> {
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 impl<'a> Builder for EditChannel<'a> {
-    #[cfg(feature = "cache")]
-    type Context<'ctx> = (ChannelId, Option<GuildId>);
-    #[cfg(not(feature = "cache"))]
-    type Context<'ctx> = (ChannelId,);
+    type Context<'ctx> = ChannelId;
     type Built = GuildChannel;
 
     /// Edits the channel's settings.
@@ -320,23 +317,13 @@ impl<'a> Builder for EditChannel<'a> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    ctx.0,
-                    ctx.1,
-                    Permissions::MANAGE_CHANNELS,
-                )?;
+                crate::utils::user_has_perms_cache(cache, ctx, Permissions::MANAGE_CHANNELS)?;
                 if self.permission_overwrites.is_some() {
-                    crate::utils::user_has_perms_cache(
-                        cache,
-                        ctx.0,
-                        ctx.1,
-                        Permissions::MANAGE_ROLES,
-                    )?;
+                    crate::utils::user_has_perms_cache(cache, ctx, Permissions::MANAGE_ROLES)?;
                 }
             }
         }
 
-        cache_http.http().edit_channel(ctx.0, &self, self.audit_log_reason).await
+        cache_http.http().edit_channel(ctx, &self, self.audit_log_reason).await
     }
 }

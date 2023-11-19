@@ -441,10 +441,9 @@ pub(crate) fn user_has_guild_perms(
 pub(crate) fn user_has_perms_cache(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
-    guild_id: Option<GuildId>,
     required_permissions: Permissions,
 ) -> Result<()> {
-    match user_perms(cache, channel_id, guild_id) {
+    match user_perms(cache, channel_id) {
         Ok(perms) => {
             if perms.contains(required_permissions) {
                 Ok(())
@@ -461,34 +460,14 @@ pub(crate) fn user_has_perms_cache(
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub(crate) fn user_perms(
-    cache: impl AsRef<Cache>,
-    channel_id: ChannelId,
-    guild_id: Option<GuildId>,
-) -> Result<Permissions> {
+pub(crate) fn user_perms(cache: impl AsRef<Cache>, channel_id: ChannelId) -> Result<Permissions> {
     let cache = cache.as_ref();
 
     let Some(channel) = cache.channel(channel_id) else {
         return Err(Error::Model(ModelError::ChannelNotFound));
     };
 
-    // Both users in DMs, all users in groups, and maybe all channels in categories will have the
-    // same permissions.
-    //
-    // The only exception to this is when the current user is blocked by the recipient in a DM
-    // channel, preventing the current user from sending messages.
-    //
-    // Since serenity can't _reasonably_ check and keep track of these, just assume that all
-    // permissions are granted and return `true`.
-    let (guild_id, guild_channel) = match channel {
-        Channel::Guild(channel) => (channel.guild_id, channel),
-        Channel::Private(_) => match guild_id {
-            Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
-            None => return Ok(Permissions::all()),
-        },
-    };
-
-    let Some(guild) = cache.guild(guild_id) else {
+    let Some(guild) = cache.guild(channel.guild_id) else {
         return Err(Error::Model(ModelError::GuildNotFound));
     };
 
@@ -496,7 +475,7 @@ pub(crate) fn user_perms(
         return Err(Error::Model(ModelError::MemberNotFound));
     };
 
-    Ok(guild.user_permissions_in(&guild_channel, member))
+    Ok(guild.user_permissions_in(&channel, member))
 }
 
 /// Calculates the Id of the shard responsible for a guild, given its Id and total number of shards

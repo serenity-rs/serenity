@@ -21,7 +21,7 @@ use crate::builder::{
     GetMessages,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::{Cache, GuildChannelRef};
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
@@ -81,11 +81,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        #[cfg(feature = "cache")]
-        let invite = builder.execute(cache_http, (self, None)).await;
-        #[cfg(not(feature = "cache"))]
-        let invite = builder.execute(cache_http, (self,)).await;
-        invite
+        builder.execute(cache_http, self).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
@@ -331,11 +327,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
     ) -> Result<GuildChannel> {
-        #[cfg(feature = "cache")]
-        let channel = builder.execute(cache_http, (self, None)).await;
-        #[cfg(not(feature = "cache"))]
-        let channel = builder.execute(cache_http, (self,)).await;
-        channel
+        builder.execute(cache_http, self).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -380,10 +372,10 @@ impl ChannelId {
         http.as_ref().follow_news_channel(self, target_channel_id.into()).await
     }
 
-    /// Attempts to find a [`Channel`] by its Id in the cache.
+    /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_channel_cached(self, cache: impl AsRef<Cache>) -> Option<Channel> {
+    pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
         cache.as_ref().channel(self)
     }
 
@@ -404,7 +396,7 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Some(channel) = cache.channel(self) {
-                    return Ok(channel);
+                    return Ok(Channel::Guild(channel.clone()));
                 }
             }
         }
@@ -415,7 +407,7 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Channel::Guild(guild_channel) = &channel {
-                    cache.temp_channels.insert(guild_channel.id, guild_channel.clone());
+                    cache.temp_channels.insert(guild_channel.id, Arc::new(guild_channel.clone()));
                 }
             }
         }

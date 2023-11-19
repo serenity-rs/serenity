@@ -705,19 +705,6 @@ impl UserId {
     ///
     /// [current user]: CurrentUser
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                for channel_entry in cache.private_channels().iter() {
-                    let channel = channel_entry.value();
-
-                    if channel.recipient.id == self {
-                        return Ok(channel.clone());
-                    }
-                }
-            }
-        }
-
         let map = json!({
             "recipient_id": self,
         });

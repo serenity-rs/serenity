@@ -69,8 +69,8 @@ impl PrivateChannel {
     /// closing a private channel on the client, which can be re-opened.
     #[allow(clippy::missing_errors_doc)]
     #[inline]
-    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> {
-        self.id.delete(http).await
+    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
+        self.id.delete(http).await?.private().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.

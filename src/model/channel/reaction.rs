@@ -108,7 +108,6 @@ impl Reaction {
                     crate::utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
-                        self.guild_id,
                         Permissions::MANAGE_MESSAGES,
                     )?;
                 }
@@ -140,7 +139,6 @@ impl Reaction {
                 crate::utils::user_has_perms_cache(
                     cache,
                     self.channel_id,
-                    self.guild_id,
                     Permissions::MANAGE_MESSAGES,
                 )?;
             }

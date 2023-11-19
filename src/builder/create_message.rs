@@ -321,7 +321,7 @@ impl Builder for CreateMessage {
                 req |= Permissions::ATTACH_FILES;
             }
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, channel_id, guild_id, req)?;
+                crate::utils::user_has_perms_cache(cache, channel_id, req)?;
             }
         }
 
@@ -344,7 +344,7 @@ impl Builder for CreateMessage {
             // Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
             // we already know our guild ID), and otherwise find the guild ID in cache
             message.guild_id = guild_id
-                .or_else(|| Some(cache_http.cache()?.guild_channel(message.channel_id)?.guild_id));
+                .or_else(|| Some(cache_http.cache()?.channel(message.channel_id)?.guild_id));
         }
 
         Ok(message)

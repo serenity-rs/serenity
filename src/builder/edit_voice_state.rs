@@ -93,7 +93,7 @@ impl Builder for EditVoiceState {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.guild_channel(channel_id) {
+                if let Some(channel) = cache.channel(channel_id) {
                     if channel.kind != ChannelType::Stage {
                         return Err(Error::from(ModelError::InvalidChannelType));
                     }

@@ -80,7 +80,7 @@ impl<'a> Builder for CreateWebhook<'a> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.guild_channel(ctx) {
+                if let Some(channel) = cache.channel(ctx) {
                     // forum channels are not text-based, but webhooks can be created in them
                     // and used to send messages in their posts
                     if !channel.is_text_based() && channel.kind != ChannelType::Forum {

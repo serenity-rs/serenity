@@ -29,7 +29,7 @@ use serenity::framework::standard::{
 };
 use serenity::gateway::ShardManager;
 use serenity::http::Http;
-use serenity::model::channel::{Channel, Message};
+use serenity::model::channel::Message;
 use serenity::model::gateway::{GatewayIntents, Ready};
 use serenity::model::id::UserId;
 use serenity::model::permissions::Permissions;
@@ -557,7 +557,7 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
         } else {
             format!("Successfully set slow mode rate to `{slow_mode_rate_seconds}` seconds.")
         }
-    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache) {
+    } else if let Some(channel) = msg.channel_id.to_channel_cached(&ctx.cache) {
         let slow_mode_rate = channel.rate_limit_per_user.unwrap_or(0);
         format!("Current slow mode rate is `{slow_mode_rate}` seconds.")
     } else {

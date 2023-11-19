@@ -100,11 +100,9 @@ impl Invite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let guild_id = self.guild.as_ref().map(|g| g.id);
                 crate::utils::user_has_perms_cache(
                     cache,
                     self.channel.id,
-                    guild_id,
                     Permissions::MANAGE_GUILD,
                 )?;
             }
@@ -325,11 +323,9 @@ impl RichInvite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let guild_id = self.guild.as_ref().map(|g| g.id);
                 crate::utils::user_has_perms_cache(
                     cache,
                     self.channel.id,
-                    guild_id,
                     Permissions::MANAGE_GUILD,
                 )?;
             }
