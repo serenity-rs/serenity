@@ -426,6 +426,12 @@ impl Context {
     }
 }
 
+impl AsRef<Context> for Context {
+    fn as_ref(&self) -> &Context {
+        &self
+    }
+}
+
 impl AsRef<Http> for Context {
     fn as_ref(&self) -> &Http {
         &self.http
