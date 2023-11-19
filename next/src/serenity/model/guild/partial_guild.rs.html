@@ -1630,6 +1630,19 @@
 <a href="#1630" id="1630">1630</a>
 <a href="#1631" id="1631">1631</a>
 <a href="#1632" id="1632">1632</a>
+<a href="#1633" id="1633">1633</a>
+<a href="#1634" id="1634">1634</a>
+<a href="#1635" id="1635">1635</a>
+<a href="#1636" id="1636">1636</a>
+<a href="#1637" id="1637">1637</a>
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2077,7 +2090,7 @@
     ///
     /// Refer to the documentation for [`Guild::create_emoji`] for more information.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Create Guild Expressions] permission.
     ///
     /// # Examples
     ///
@@ -2092,7 +2105,7 @@
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2282,14 +2295,14 @@
 
     <span class="doccomment">/// Creates a new sticker in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     </span><span class="kw">pub async fn </span>create_sticker&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2314,14 +2327,17 @@
 
     <span class="doccomment">/// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with that Id
-    /// does not exist in the guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with the given
+    /// id does not exist in the guild.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2373,13 +2389,17 @@
 
     <span class="doccomment">/// Deletes a [`Sticker`] by Id from the guild.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a sticker with that id
+    /// does not exist.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2421,14 +2441,17 @@
     ///
     /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features enabled.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with that Id
-    /// does not exist in the guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with the given
+    /// id does not exist.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2550,7 +2573,9 @@
 
     <span class="doccomment">/// Edits a sticker.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Examples
     ///
@@ -2576,7 +2601,8 @@
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,

@@ -1820,6 +1820,23 @@
 <a href="#1820" id="1820">1820</a>
 <a href="#1821" id="1821">1821</a>
 <a href="#1822" id="1822">1822</a>
+<a href="#1823" id="1823">1823</a>
+<a href="#1824" id="1824">1824</a>
+<a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
+<a href="#1829" id="1829">1829</a>
+<a href="#1830" id="1830">1830</a>
+<a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
+<a href="#1833" id="1833">1833</a>
+<a href="#1834" id="1834">1834</a>
+<a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2176,7 +2193,7 @@
     ///
     /// Refer to the documentation for [`Guild::create_emoji`] for more information.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Create Guild Expressions] permission.
     ///
     /// # Examples
     ///
@@ -2190,7 +2207,7 @@
     /// if the image is too big.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_emoji(
         <span class="self">self</span>,
@@ -2254,14 +2271,14 @@
 
     <span class="doccomment">/// Creates a new scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [Create Events] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [Manage Events]: Permissions::CREATE_EVENTS
     </span><span class="kw">pub async fn </span>create_scheduled_event(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2272,14 +2289,14 @@
 
     <span class="doccomment">/// Creates a new sticker in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_sticker(
         <span class="self">self</span>,
@@ -2306,14 +2323,17 @@
 
     <span class="doccomment">/// Deletes an [`Emoji`] from the guild.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an Emoji with that Id does not exist.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with the given
+    /// id does not exist in the guild.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_emoji(
         <span class="self">self</span>,
@@ -2365,12 +2385,14 @@
 
     <span class="doccomment">/// Deletes a specified scheduled event in the guild.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: If the event was created by the current user, requires either [Create Events] or
+    /// the [Manage Events] permission. Otherwise, the [Manage Events] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
+    /// [Create Events]: Permissions::CREATE_EVENTS
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_scheduled_event(
@@ -2381,16 +2403,19 @@
         http.as_ref().delete_scheduled_event(<span class="self">self</span>, event_id.into()).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Deletes a [`Sticker`] by Id from the guild.
+    <span class="doccomment">/// Deletes a [`Sticker`] by id from the guild.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if a sticker with that Id
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a sticker with that id
     /// does not exist.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_sticker(
         <span class="self">self</span>,
@@ -2423,13 +2448,17 @@
     ///
     /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features enabled.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with the given
+    /// id does not exist.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_emoji(
         <span class="self">self</span>,
@@ -2565,13 +2594,15 @@
 
     <span class="doccomment">/// Modifies a scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: If the event was created by the current user, requires either [Create Events] or
+    /// the [Manage Events] permission. Otherwise, the [Manage Events] permission is required.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
+    /// [Create Events]: Permissions::CREATE_EVENTS
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     </span><span class="kw">pub async fn </span>edit_scheduled_event(
         <span class="self">self</span>,
@@ -2584,7 +2615,9 @@
 
     <span class="doccomment">/// Edits a sticker.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Examples
     ///
@@ -2607,7 +2640,8 @@
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_sticker(
         <span class="self">self</span>,
@@ -2756,7 +2790,7 @@
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if an emoji with that Id does not exist.
+    /// Returns an [`Error::Http`] if an emoji with that id does not exist.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>emoji(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         http.as_ref().get_emoji(<span class="self">self</span>, emoji_id).<span class="kw">await
@@ -3063,14 +3097,14 @@
     /// `true`, then the `user_count` field will be populated, indicating the number of users
     /// interested in the event.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [View Channel] permission for the channel associated with the event.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided id is
     /// invalid.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_event(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3083,13 +3117,13 @@
     <span class="doccomment">/// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
     /// then each event returned will have its `user_count` field populated.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [View Channel] permission at the guild level.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_events(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3102,14 +3136,14 @@
     ///
     /// If `limit` is left unset, by default at most 100 users are returned.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [View Channel] permission for the channel associated with the event.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
     /// invalid.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_event_users(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3122,14 +3156,14 @@
     <span class="doccomment">/// Fetches a list of interested users for the specified event, with additional options and
     /// filtering. See [`Http::get_scheduled_event_users`] for details.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [View Channel] permission for the channel associated with the event.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
     /// invalid.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_event_users_optioned(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,

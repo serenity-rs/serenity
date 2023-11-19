@@ -211,6 +211,11 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
@@ -270,8 +275,9 @@
 </span><span class="kw">impl </span>Emoji {
     <span class="doccomment">/// Deletes the emoji. This method requires the cache to fetch the guild ID.
     ///
-    /// **Note**: The [Manage Emojis and Stickers] permission is required.
-    ///
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Examples
     ///
@@ -300,7 +306,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or may return
     /// [`ModelError::ItemMissing`] if the emoji is not in the cache.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     #[inline]
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -311,14 +318,17 @@
     <span class="doccomment">/// Edits the emoji by updating it with a new name. This method requires the cache to fetch the
     /// guild ID.
     ///
-    /// **Note**: The [Manage Emojis and Stickers] permission is required.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if an invalid name is
     /// given.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>guild_id = <span class="self">self</span>.try_find_guild_id(<span class="kw-2">&amp;</span>cache_http)<span class="question-mark">?</span>;

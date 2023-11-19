@@ -189,14 +189,14 @@
 
     <span class="doccomment">/// Creates a new sticker in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     </span><span class="kw">async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -206,7 +206,7 @@
         </span><span class="kw">crate</span>::utils::user_has_guild_perms(
             <span class="kw-2">&amp;</span>cache_http,
             ctx,
-            Permissions::MANAGE_EMOJIS_AND_STICKERS,
+            Permissions::CREATE_GUILD_EXPRESSIONS,
         )<span class="question-mark">?</span>;
 
         <span class="kw">let </span>map = <span class="macro">vec!</span>[(<span class="string">&quot;name&quot;</span>, <span class="self">self</span>.name), (<span class="string">&quot;tags&quot;</span>, <span class="self">self</span>.tags), (<span class="string">&quot;description&quot;</span>, <span class="self">self</span>.description)];

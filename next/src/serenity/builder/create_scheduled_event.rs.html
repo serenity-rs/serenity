@@ -281,21 +281,21 @@
 
     <span class="doccomment">/// Creates a new scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [Create Events] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [Create Events]: Permissions::CREATE_EVENTS
     </span><span class="kw">async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-        </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, ctx, Permissions::MANAGE_EVENTS)<span class="question-mark">?</span>;
+        </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, ctx, Permissions::CREATE_EVENTS)<span class="question-mark">?</span>;
 
         cache_http.http().create_scheduled_event(ctx, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}

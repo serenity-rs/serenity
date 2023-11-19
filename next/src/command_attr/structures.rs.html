@@ -637,6 +637,12 @@
 <a href="#637" id="637">637</a>
 <a href="#638" id="638">638</a>
 <a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">use </span>proc_macro2::{Span, TokenStream <span class="kw">as </span>TokenStream2};
@@ -973,8 +979,8 @@
             <span class="string">&quot;MANAGE_NICKNAMES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">27</span>,
             <span class="string">&quot;MANAGE_ROLES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">28</span>,
             <span class="string">&quot;MANAGE_WEBHOOKS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">29</span>,
-            <span class="string">&quot;MANAGE_EMOJIS_AND_STICKERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">30</span>,
-            <span class="string">&quot;USE_SLASH_COMMANDS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">31</span>,
+            <span class="string">&quot;MANAGE_EMOJIS_AND_STICKERS&quot; </span>| <span class="string">&quot;MANAGE_GUILD_EXPRESSIONS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">30</span>,
+            <span class="string">&quot;USE_SLASH_COMMANDS&quot; </span>| <span class="string">&quot;USE_APPLICATION_COMMANDS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">31</span>,
             <span class="string">&quot;REQUEST_TO_SPEAK&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">32</span>,
             <span class="string">&quot;MANAGE_EVENTS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">33</span>,
             <span class="string">&quot;MANAGE_THREADS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">34</span>,
@@ -984,6 +990,12 @@
             <span class="string">&quot;SEND_MESSAGES_IN_THREADS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">38</span>,
             <span class="string">&quot;USE_EMBEDDED_ACTIVITIES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">39</span>,
             <span class="string">&quot;MODERATE_MEMBERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">40</span>,
+            <span class="string">&quot;VIEW_CREATOR_MONETIZATION_ANALYTICS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">41</span>,
+            <span class="string">&quot;USE_SOUNDBOARD&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">42</span>,
+            <span class="string">&quot;CREATE_GUILD_EXPRESSIONS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">43</span>,
+            <span class="string">&quot;CREATE_EVENTS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">44</span>,
+            <span class="string">&quot;USE_EXTERNAL_SOUNDS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">45</span>,
+            <span class="string">&quot;SEND_VOICE_MESSAGES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">46</span>,
             <span class="string">&quot;SET_VOICE_CHANNEL_STATUS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">48</span>,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         }))
