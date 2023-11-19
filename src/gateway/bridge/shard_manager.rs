@@ -277,10 +277,12 @@ impl ShardManager {
 
         info!("Shutting down shard {}", shard_id);
 
-        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)));
-
         {
             let mut shard_shutdown = self.shard_shutdown.lock().await;
+
+            drop(
+                self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)),
+            );
             match timeout(TIMEOUT, shard_shutdown.next()).await {
                 Ok(Some(shutdown_shard_id)) => {
                     if shutdown_shard_id != shard_id {
