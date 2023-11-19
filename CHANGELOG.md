@@ -193,7 +193,7 @@ As a result, the trait now accomodates alternative frameworks more easily, such 
 * All remaining types found at `serenity::client::bridge::{gateway,voice}::*` have been moved into `serenity::gateway`. They are now gated behind the `gateway` feature instead of the `client` feature, however most users use these features in conjunction, and so should not see a change in required-enabled features.
 
 ### MSRV
-Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
+Serenity now uses Rust edition 2021, with an MSRV of Rust 1.74.
 
 ### Miscellaneous
 
@@ -235,6 +235,10 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2535](https://github.com/serenity-rs/serenity/pull/2535) - Add pagination support to the Get Guild Bans endpoint.
 * [#2565](https://github.com/serenity-rs/serenity/pull/2565) - Add support for the `VOICE_CHANNEL_STATUS_UPDATE` gateway event.
 * [#2576](https://github.com/serenity-rs/serenity/pull/2576) - Add a `GuildId::everyone_role` method.
+* [#2588](https://github.com/serenity-rs/serenity/pull/2588) - Add audit log events for creator monetization.
+* [#2595](https://github.com/serenity-rs/serenity/pull/2595) - Add the `CREATE_EVENTS` and `CREATE_GUILD_EXPRESSIONS` permissions, and rename `MANAGE_EMOJIS_AND_STICKERS` to `MANAGE_GUILD_EXPRESSIONS` (the old name is still present but deprecated).
+* [#2600](https://github.com/serenity-rs/serenity/pull/2600) - Add the `FormattedTimestamp` utility struct for representing a combination of a timestamp and a formatting style.
+* [#2601](https://github.com/serenity-rs/serenity/pull/2601) - Add support for more Discord subdomains in `utils::argument_convert::parse_message_url`.
 
 #### Changed
 
@@ -332,7 +336,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
     - `model::misc::EmojiIdentifier`
 * [#2428](https://github.com/serenity-rs/serenity/pull/2428) - Change `CacheUpdate::Output` for `ChannelUpdateEvent` from `()` to `Channel`. Also, make `{Guild,PartialGuild}::user_permissions_in` infallible and change `Error::InvalidPermissions` into a struct variant containing both the the `required` permissions as well as the `present` permissions.
 * [#2460](https://github.com/serenity-rs/serenity/pull/2460) - Wrap secret tokens in `secrecy::SecretString` to prevent them being leaked through `Debug` implementations, and so that they are zeroed when dropped.
-* [#2462](https://github.com/serenity-rs/serenity/pull/2462), [#2467](https://github.com/serenity-rs/serenity/pull/2467) - Change image hashes from `String`s to a dedicated `ImageHash` type which saves on space by storing the hash directly as bytes.
+* [#2462](https://github.com/serenity-rs/serenity/pull/2462), [#2467](https://github.com/serenity-rs/serenity/pull/2467), [#2586](https://github.com/serenity-rs/serenity/pull/2586) - Change image hashes from `String`s to a dedicated `ImageHash` type which saves on space by storing the hash directly as bytes.
 * [#2464](https://github.com/serenity-rs/serenity/pull/2464) - Optimize the size of many model structs by changing the types of their fields:
     - All `rate_limit_per_user` fields are now counted using a `u16`.
     - Channel `position` fields now hold a `u16`.
@@ -355,6 +359,8 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.72.
 * [#2553](https://github.com/serenity-rs/serenity/pull/2553) - The `ThreadUpdate` event now provides the old thread's `GuildChannel` object if it is present in the cache.
 * [#2554](https://github.com/serenity-rs/serenity/pull/2554) - The `Webhook::source_guild` and `Webhook::source_channel` fields have had their types changed from `Option<PartialGuild>`/`Option<PartialChannel>` to their own `Option<WebhookGuild>`/`Option<WebhookChannel>` types in order to avoid deserialization errors. These new types contain very few fields, but have methods for converting into `PartialGuild`s or `Channel`s by querying the API.
 * [#2569](https://github.com/serenity-rs/serenity/pull/2569) - Replaced the `json::prelude` module with public wrapper functions that abstract over both `serde_json` and `simd-json`.
+* [#2593](https://github.com/serenity-rs/serenity/pull/2593) - Rename `GatewayIntents::GUILD_BANS` to `GUILD_MODERATION` (the old name is still present but is deprecated).
+* [#2598](https://github.com/serenity-rs/serenity/pull/2598) - Change `CreateInteractionResponseMessage::flags` to take `InteractionResponseFlags` instead of `MessageFlags`.
 
 
 #### Removed
