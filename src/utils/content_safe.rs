@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
 use crate::cache::Cache;
-use crate::model::channel::Channel;
 use crate::model::id::GuildId;
 use crate::model::mention::Mention;
 use crate::model::user::User;
@@ -223,7 +222,7 @@ fn clean_mention(
     let cache = cache.as_ref();
     match mention {
         Mention::Channel(id) => {
-            if let Some(Channel::Guild(channel)) = id.to_channel_cached(cache) {
+            if let Some(channel) = id.to_channel_cached(cache) {
                 format!("#{}", channel.name).into()
             } else {
                 "#deleted-channel".into()

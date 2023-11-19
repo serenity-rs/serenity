@@ -75,7 +75,7 @@ impl<'a> Builder for CreateStageInstance<'a> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.guild_channel(ctx) {
+                if let Some(channel) = cache.channel(ctx) {
                     if channel.kind != ChannelType::Stage {
                         return Err(Error::Model(ModelError::InvalidChannelType));
                     }

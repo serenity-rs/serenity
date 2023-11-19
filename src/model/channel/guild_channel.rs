@@ -246,11 +246,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        #[cfg(feature = "cache")]
-        let invite = builder.execute(cache_http, (self.id, Some(self.guild_id))).await;
-        #[cfg(not(feature = "cache"))]
-        let invite = builder.execute(cache_http, (self.id,)).await;
-        invite
+        builder.execute(cache_http, self.id).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
@@ -285,7 +281,7 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, overwrite).await?;
     /// # Ok(())
@@ -317,7 +313,7 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Role(role_id),
     /// };
     ///
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, overwrite).await?;
     /// # Ok(())
@@ -354,20 +350,16 @@ impl GuildChannel {
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Channel> {
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    self.id,
-                    Some(self.guild_id),
-                    Permissions::MANAGE_CHANNELS,
-                )?;
+                crate::utils::user_has_perms_cache(cache, self.id, Permissions::MANAGE_CHANNELS)?;
             }
         }
 
-        self.id.delete(cache_http.http()).await
+        let channel = self.id.delete(cache_http.http()).await?;
+        channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.
@@ -486,10 +478,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
     ) -> Result<()> {
-        #[cfg(feature = "cache")]
-        let channel = builder.execute(cache_http, (self.id, Some(self.guild_id))).await?;
-        #[cfg(not(feature = "cache"))]
-        let channel = builder.execute(cache_http, (self.id,)).await?;
+        let channel = builder.execute(cache_http, self.id).await?;
         *self = channel;
         Ok(())
     }
@@ -555,7 +544,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// let builder = EditVoiceState::new().suppress(false);
     /// channel.edit_voice_state(&http, user_id, builder).await?;
@@ -603,7 +592,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
     /// let builder = EditVoiceState::new().request_to_speak(true);
@@ -743,7 +732,7 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
+    ///         let channel = match context.cache.channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
@@ -779,7 +768,7 @@ impl GuildChannel {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
     ///         let current_user_id = context.cache.current_user().id;
-    ///         let permissions = match context.cache.guild_channel(msg.channel_id) {
+    ///         let permissions = match context.cache.channel(msg.channel_id) {
     ///             Some(channel) => channel.permissions_for_user(&context.cache, current_user_id),
     ///             None => return,
     ///         };

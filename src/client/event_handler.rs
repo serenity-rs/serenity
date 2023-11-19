@@ -138,7 +138,7 @@ event_handler! {
     /// Dispatched when a channel is updated.
     ///
     /// The old channel data is only provided when the cache feature is enabled.
-    async fn channel_update(&self, ChannelUpdate { ctx: Context, old: Option<Channel>, new: Channel });
+    async fn channel_update(&self, ChannelUpdate { ctx: Context, old: Option<GuildChannel>, new: GuildChannel });
 
     /// Dispatched when a new audit log entry is created.
     ///

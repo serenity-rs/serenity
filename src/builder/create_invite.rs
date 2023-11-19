@@ -28,7 +28,7 @@ use crate::model::prelude::*;
 /// impl EventHandler for Handler {
 ///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
-///             let channel_opt = context.cache.guild_channel(msg.channel_id).as_deref().cloned();
+///             let channel_opt = context.cache.channel(msg.channel_id).as_deref().cloned();
 ///             let channel = match channel_opt {
 ///                 Some(channel) => channel,
 ///                 None => {
@@ -118,7 +118,7 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().max_age(3600);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())
@@ -150,7 +150,7 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().max_uses(5);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())
@@ -180,7 +180,7 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().temporary(true);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())
@@ -210,7 +210,7 @@ impl<'a> CreateInvite<'a> {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
-    /// # let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
+    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
     /// let builder = CreateInvite::new().unique(true);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())
@@ -265,10 +265,7 @@ impl<'a> CreateInvite<'a> {
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 impl<'a> Builder for CreateInvite<'a> {
-    #[cfg(feature = "cache")]
-    type Context<'ctx> = (ChannelId, Option<GuildId>);
-    #[cfg(not(feature = "cache"))]
-    type Context<'ctx> = (ChannelId,);
+    type Context<'ctx> = ChannelId;
     type Built = RichInvite;
 
     /// Creates an invite for the given channel.
@@ -289,15 +286,10 @@ impl<'a> Builder for CreateInvite<'a> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    ctx.0,
-                    ctx.1,
-                    Permissions::CREATE_INSTANT_INVITE,
-                )?;
+                crate::utils::user_has_perms_cache(cache, ctx, Permissions::CREATE_INSTANT_INVITE)?;
             }
         }
 
-        cache_http.http().create_invite(ctx.0, &self, self.audit_log_reason).await
+        cache_http.http().create_invite(ctx, &self, self.audit_log_reason).await
     }
 }

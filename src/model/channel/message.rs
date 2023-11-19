@@ -167,7 +167,6 @@ impl Message {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
-                        self.guild_id,
                         Permissions::MANAGE_MESSAGES,
                     )?;
                 }
@@ -226,7 +225,6 @@ impl Message {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
-                        self.guild_id,
                         Permissions::MANAGE_MESSAGES,
                     )?;
                 }
@@ -250,12 +248,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
-                    cache,
-                    self.channel_id,
-                    self.guild_id,
-                    Permissions::MANAGE_MESSAGES,
-                )?;
+                utils::user_has_perms_cache(cache, self.channel_id, Permissions::MANAGE_MESSAGES)?;
             }
         }
 
@@ -301,12 +294,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
-                    cache,
-                    self.channel_id,
-                    self.guild_id,
-                    Permissions::MANAGE_MESSAGES,
-                )?;
+                utils::user_has_perms_cache(cache, self.channel_id, Permissions::MANAGE_MESSAGES)?;
             }
         }
 
@@ -512,7 +500,6 @@ impl Message {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
-                        self.guild_id,
                         Permissions::MANAGE_MESSAGES,
                     )?;
                 }
@@ -557,7 +544,6 @@ impl Message {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
-                        self.guild_id,
                         Permissions::ADD_REACTIONS,
                     )?;
                 }
@@ -669,7 +655,6 @@ impl Message {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
-                        self.guild_id,
                         Permissions::SEND_MESSAGES,
                     )?;
                 }
@@ -740,7 +725,6 @@ impl Message {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
-                        self.guild_id,
                         Permissions::MANAGE_MESSAGES,
                     )?;
                 }

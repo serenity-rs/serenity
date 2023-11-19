@@ -112,7 +112,6 @@ impl<K: Eq + Hash, V, T> std::ops::Deref for CacheRef<'_, K, V, T> {
 pub type UserRef<'a> = CacheRef<'a, UserId, User>;
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
 pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
-pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
 pub type GuildChannelRef<'a> = CacheRef<'a, GuildId, GuildChannel, Guild>;
 pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
 
@@ -130,7 +129,6 @@ pub(crate) struct CachedShardData {
 ///
 /// This is the list of cached resources and the events that populate them:
 /// - channels: [`ChannelCreateEvent`], [`ChannelUpdateEvent`], [`GuildCreateEvent`]
-/// - private_channels: [`ChannelCreateEvent`]
 /// - guilds: [`GuildCreateEvent`]
 /// - unavailable_guilds: [`ReadyEvent`], [`GuildDeleteEvent`]
 /// - users: [`GuildMemberAddEvent`], [`GuildMemberRemoveEvent`], [`GuildMembersChunkEvent`],
@@ -151,7 +149,7 @@ pub struct Cache {
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_channels: MokaCache<ChannelId, GuildChannel, BuildHasher>,
+    pub(crate) temp_channels: MokaCache<ChannelId, Arc<GuildChannel>, BuildHasher>,
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
@@ -161,8 +159,6 @@ pub struct Cache {
     // Channels cache:
     /// A map of channel ids to the guilds in which the channel data is stored.
     pub(crate) channels: MaybeMap<ChannelId, GuildId>,
-    /// A map of direct message channels that the current user has open with other users.
-    pub(crate) private_channels: MaybeMap<ChannelId, PrivateChannel>,
 
     // Guilds cache:
     // ---
@@ -258,7 +254,6 @@ impl Cache {
             temp_users: temp_cache(settings.time_to_live),
 
             channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
-            private_channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
 
             guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
@@ -331,26 +326,6 @@ impl Cache {
         total
     }
 
-    /// Fetches a vector of all [`PrivateChannel`] Ids that are stored in the cache.
-    ///
-    /// # Examples
-    ///
-    /// If there are 6 private channels and 2 groups in the cache, then `8` Ids will be returned.
-    ///
-    /// Printing the count of all private channels and groups:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # let cache = Cache::default();
-    /// let amount = cache.private_channels().len();
-    ///
-    /// println!("There are {} private channels", amount);
-    /// ```
-    pub fn private_channels(&self) -> ReadOnlyMapRef<'_, ChannelId, PrivateChannel> {
-        self.private_channels.as_read_only()
-    }
-
     /// Fetches a vector of all [`Guild`]s' Ids that are stored in the cache.
     ///
     /// Note that if you are utilizing multiple [`Shard`]s, then the guilds retrieved over all
@@ -387,37 +362,37 @@ impl Cache {
         self.guilds.iter().map(|i| *i.key()).chain(unavailable_guild_ids).collect()
     }
 
-    /// Retrieves a [`Channel`] from the cache based on the given Id.
-    ///
-    /// This will search the `channels` map, then the [`Self::private_channels`] map.
-    ///
-    /// If you know what type of channel you're looking for, you should instead manually retrieve
-    /// from one of the respective methods:
-    ///
-    /// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::guild_channels`]
-    /// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]
+    /// Retrieves a [`GuildChannel`] from the cache based on the given Id.
     #[inline]
-    pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
+    pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannelRef<'_>> {
         self._channel(id.into())
     }
 
-    fn _channel(&self, id: ChannelId) -> Option<Channel> {
-        if let Some(channel) = self.guild_channel(id) {
-            return Some(Channel::Guild(channel.clone()));
+    fn _channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
+        let guild_id = *self.channels.get(&id)?;
+        let guild_ref = self.guilds.get(&guild_id)?;
+        let channel = guild_ref.try_map(|g| g.channels.get(&id)).ok();
+        if let Some(channel) = channel {
+            return Some(CacheRef::from_mapped_ref(channel));
         }
 
         #[cfg(feature = "temp_cache")]
         {
             if let Some(channel) = self.temp_channels.get(&id) {
-                return Some(Channel::Guild(channel));
+                return Some(CacheRef::from_arc(channel));
             }
         }
 
-        if let Some(private_channel) = self.private_channels.get(&id) {
-            return Some(Channel::Private(private_channel.clone()));
-        }
-
         None
+    }
+
+    pub(super) fn channel_mut(
+        &self,
+        id: ChannelId,
+    ) -> Option<MappedRefMut<'_, GuildId, Guild, GuildChannel, BuildHasher>> {
+        let guild_id = *self.channels.get(&id)?;
+        let guild_ref = self.guilds.get_mut(&guild_id)?;
+        guild_ref.try_map(|g| g.channels.get_mut(&id)).ok()
     }
 
     /// Get a reference to the cached messages for a channel based on the given `Id`.
@@ -469,75 +444,6 @@ impl Cache {
         self.guilds.len()
     }
 
-    /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`Self::channel`], this will only
-    /// search guilds for the given channel.
-    ///
-    /// The only advantage of this method is that you can pass in anything that is indirectly a
-    /// [`ChannelId`].
-    ///
-    /// # Examples
-    ///
-    /// Getting a guild's channel via the Id of the message received through a
-    /// [`EventHandler::message`] event dispatch:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::prelude::*;
-    /// #
-    /// struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: Context, message: Message) {
-    ///         let channel_opt = context.cache.guild_channel(message.channel_id).as_deref().cloned();
-    ///         let channel = match channel_opt {
-    ///             Some(channel) => channel,
-    ///             None => {
-    ///                 let result = message
-    ///                     .channel_id
-    ///                     .say(&context, "Could not find guild's channel data")
-    ///                     .await;
-    ///                 if let Err(why) = result {
-    ///                     println!("Error sending message: {:?}", why);
-    ///                 }
-    ///
-    ///                 return;
-    ///             },
-    ///         };
-    ///     }
-    /// }
-    ///
-    /// # #[cfg(feature = "client")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// [`EventHandler::message`]: crate::client::EventHandler::message
-    #[inline]
-    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannelRef<'_>> {
-        self._guild_channel(id.into())
-    }
-
-    fn _guild_channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
-        let guild_id = *self.channels.get(&id)?;
-        let guild_ref = self.guilds.get(&guild_id)?;
-        guild_ref.try_map(|g| g.channels.get(&id)).ok().map(CacheRef::from_mapped_ref)
-    }
-
-    pub(super) fn guild_channel_mut(
-        &self,
-        id: ChannelId,
-    ) -> Option<MappedRefMut<'_, GuildId, Guild, GuildChannel, BuildHasher>> {
-        let guild_id = *self.channels.get(&id)?;
-        let guild_ref = self.guilds.get_mut(&guild_id)?;
-        guild_ref.try_map(|g| g.channels.get_mut(&id)).ok()
-    }
-
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and user's given Ids.
     ///
     /// **Note**: This will clone the entire member. Instead, retrieve the guild and retrieve from
@@ -556,7 +462,7 @@ impl Cache {
     /// # async fn run(http: Http, cache: Cache, message: Message) {
     /// #
     /// let member = {
-    ///     let channel = match cache.guild_channel(message.channel_id) {
+    ///     let channel = match cache.channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
     ///             if let Err(why) = message.channel_id.say(http, "Error finding channel data").await {
@@ -724,38 +630,6 @@ impl Cache {
         self.messages.get(&channel_id).and_then(|messages| messages.get(&message_id).cloned())
     }
 
-    /// Retrieves a [`PrivateChannel`] from the cache's [`Self::private_channels`] map, if it
-    /// exists.
-    ///
-    /// The only advantage of this method is that you can pass in anything that is indirectly a
-    /// [`ChannelId`].
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a private channel from the cache and print its recipient's name:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # let cache = Cache::default();
-    /// // assuming the cache has been unlocked
-    ///
-    /// if let Some(channel) = cache.private_channel(7) {
-    ///     println!("The recipient is {}", channel.recipient);
-    /// };
-    /// ```
-    #[inline]
-    pub fn private_channel(
-        &self,
-        channel_id: impl Into<ChannelId>,
-    ) -> Option<PrivateChannelRef<'_>> {
-        self._private_channel(channel_id.into())
-    }
-
-    fn _private_channel(&self, channel_id: ChannelId) -> Option<PrivateChannelRef<'_>> {
-        self.private_channels.get(&channel_id).map(CacheRef::from_ref)
-    }
-
     /// Retrieves a [`Guild`]'s role by their Ids.
     ///
     /// **Note**: This will clone the entire role. Instead, retrieve the guild and retrieve from
@@ -875,7 +749,7 @@ impl Cache {
 
     /// Returns a channel category matching the given ID
     pub fn category(&self, channel_id: ChannelId) -> Option<GuildChannelRef<'_>> {
-        let channel = self.guild_channel(channel_id)?;
+        let channel = self.channel(channel_id)?;
         if channel.kind == ChannelType::Category {
             Some(channel)
         } else {
@@ -885,7 +759,7 @@ impl Cache {
 
     /// Returns the parent category of the given channel ID.
     pub fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
-        self.guild_channel(channel_id)?.parent_id
+        self.channel(channel_id)?.parent_id
     }
 
     /// Clones all channel categories in the given guild and returns them.
@@ -995,10 +869,10 @@ mod test {
         // Add a channel delete event to the cache, the cached messages for that channel should now
         // be gone.
         let mut delete = ChannelDeleteEvent {
-            channel: Channel::Guild(channel.clone()),
+            channel: channel.clone(),
         };
         assert!(cache.update(&mut delete).is_some());
-        assert!(!cache.messages.contains_key(&delete.channel.id()));
+        assert!(!cache.messages.contains_key(&delete.channel.id));
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
         let mut guild_create = GuildCreateEvent {

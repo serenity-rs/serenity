@@ -1,5 +1,8 @@
 //! Webhook model and implementations.
 
+#[cfg(all(feature = "model", feature = "temp_cache"))]
+use std::sync::Arc;
+
 #[cfg(feature = "model")]
 use secrecy::ExposeSecret;
 use secrecy::SecretString;
@@ -12,7 +15,7 @@ use super::utils::secret;
 #[cfg(feature = "model")]
 use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "cache")]
-use crate::cache::{Cache, GuildRef};
+use crate::cache::{Cache, GuildChannelRef, GuildRef};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
@@ -172,10 +175,10 @@ pub struct WebhookChannel {
 
 #[cfg(feature = "model")]
 impl WebhookChannel {
-    /// Attempts to find a [`Channel`] by its Id in the cache.
+    /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_channel_cached(self, cache: impl AsRef<Cache>) -> Option<Channel> {
+    pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
         cache.as_ref().channel(self.id)
     }
 
@@ -191,28 +194,27 @@ impl WebhookChannel {
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
     #[inline]
-    pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
+    pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 if let Some(channel) = cache.channel(self.id) {
-                    return Ok(channel);
+                    return Ok(channel.clone());
                 }
             }
         }
 
         let channel = cache_http.http().get_channel(self.id).await?;
+        let guild_channel = channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Channel::Guild(guild_channel) = &channel {
-                    cache.temp_channels.insert(guild_channel.id, guild_channel.clone());
-                }
+                cache.temp_channels.insert(guild_channel.id, Arc::new(guild_channel.clone()));
             }
         }
 
-        Ok(channel)
+        Ok(guild_channel)
     }
 }
 
