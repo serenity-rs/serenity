@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BLACK","BLURPLE","FUCHSIA","GREEN","RED","WHITE","YELLOW"]};

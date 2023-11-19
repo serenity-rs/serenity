@@ -1,52 +1,45 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A macro that transforms `async` functions (and closures) into plain functions, whose return type is a boxed `Future`."><meta name="keywords" content="rust, rustlang, rust-lang, hook"><title>hook in command_attr - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="sidebar-items.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../command_attr/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../command_attr/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div>
-        </a><div class="sidebar-elems"><h2 class="location"><a href="index.html">In command_attr</a></h2></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../command_attr/index.html"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">command_attr</a>::<wbr><a class="attr" href="#">hook</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/command_attr/lib.rs.html#901-943">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="docblock item-decl"><pre class="rust attr"><code>#[hook]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A macro that transforms <code>async</code> functions (and closures) into plain functions, whose
-return type is a boxed <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html"><code>Future</code></a>.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A macro that transforms `async` functions (and closures) into plain functions, whose return type is a boxed `Future`."><title>hook in command_attr - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../command_attr/index.html">command_attr</a><span class="version">0.5.0</span></h2></div><div class="sidebar-elems"></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Attribute Macro <a href="index.html">command_attr</a>::<wbr><a class="attr" href="#">hook</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/command_attr/lib.rs.html#916-958">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[hook]</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A macro that transforms <code>async</code> functions (and closures) into plain functions, whose return
+type is a boxed <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future"><code>Future</code></a>.</p>
 <h2 id="transformation"><a href="#transformation">Transformation</a></h2>
 <p>The macro transforms an <code>async</code> function, which may look like this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">async</span> <span class="kw">fn</span> <span class="ident">foo</span>(<span class="ident">n</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
-    <span class="ident">n</span> <span class="op">+</span> <span class="number">4</span>
-}</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">async fn </span>foo(n: i32) -&gt; i32 {
+    n + <span class="number">4
+</span>}</code></pre></div>
 <p>into this (some details omitted):</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::pin::Pin;
 
-<span class="kw">fn</span> <span class="ident">foo</span>(<span class="ident">n</span>: <span class="ident">i32</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">n</span> <span class="op">+</span> <span class="number">4</span> })
+<span class="kw">fn </span>foo(n: i32) -&gt; Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = i32&gt;&gt;&gt; {
+    Box::pin(<span class="kw">async move </span>{ n + <span class="number">4 </span>})
 }</code></pre></div>
 <p>This transformation also applies to closures, which are converted more simply. For instance,
 this closure:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">async</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">x</span>: <span class="ident">i32</span><span class="op">|</span> <span class="ident">x</span> <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">4</span></code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">async move </span>|x: i32| x * <span class="number">2 </span>+ <span class="number">4</span></code></pre></div>
 <p>is changed to:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="op">|</span><span class="ident">x</span>: <span class="ident">i32</span><span class="op">|</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">x</span> <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">4</span> })</code></pre></div>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code>|x: i32| Box::pin(<span class="kw">async move </span>{ x * <span class="number">2 </span>+ <span class="number">4 </span>})</code></pre></div>
 <h3 id="how-references-are-handled"><a href="#how-references-are-handled">How references are handled</a></h3>
 <p>When a function contains references, their lifetimes are constrained to the returned
-<a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html"><code>Future</code></a>. If the above <code>foo</code> function had <code>&amp;i32</code> as a parameter, the transformation would be
+<a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future"><code>Future</code></a>. If the above <code>foo</code> function had <code>&amp;i32</code> as a parameter, the transformation would be
 instead this:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::pin::Pin;
 
-<span class="kw">fn</span> <span class="ident">foo</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">i32</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;fut</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="kw-2">*</span><span class="ident">n</span> <span class="op">+</span> <span class="number">4</span> })
+<span class="kw">fn </span>foo&lt;<span class="lifetime">&#39;fut</span>&gt;(n: <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>i32) -&gt; Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = i32&gt; + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+    Box::pin(<span class="kw">async move </span>{ <span class="kw-2">*</span>n + <span class="number">4 </span>})
 }</code></pre></div>
 <p>Explicitly specifying lifetimes (in the parameters or in the return type) or complex usage of
 lifetimes (e.g. <code>'a: 'b</code>) is not supported.</p>
 <h2 id="necessity-for-the-macro"><a href="#necessity-for-the-macro">Necessity for the macro</a></h2>
 <p>The macro performs the transformation to permit the framework to store and invoke the functions.</p>
-<p>Functions marked with the <code>async</code> keyword will wrap their return type with the <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html"><code>Future</code></a> trait,
-which a state-machine generated by the compiler for the function will implement. This complicates
-matters for the framework, as <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html"><code>Future</code></a> is a trait. Depending on a type that implements a trait
-is done with two methods in Rust:</p>
+<p>Functions marked with the <code>async</code> keyword will wrap their return type with the <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future"><code>Future</code></a>
+trait, which a state-machine generated by the compiler for the function will implement. This
+complicates matters for the framework, as <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future"><code>Future</code></a> is a trait. Depending on a type that
+implements a trait is done with two methods in Rust:</p>
 <ol>
 <li>static dispatch - generics</li>
 <li>dynamic dispatch - trait objects</li>
@@ -55,13 +48,13 @@ is done with two methods in Rust:</p>
 of different commands that will be stored in a single list. And due to the nature of generics,
 generic types can only resolve to a single concrete type. If commands had a generic type for
 their function’s return type, the framework would be unable to store commands, as only a single
-<a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html"><code>Future</code></a> type from one of the commands would get resolved, preventing other commands from being
-stored.</p>
+<a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future"><code>Future</code></a> type from one of the commands would get resolved, preventing other commands from
+being stored.</p>
 <p>Second method involves heap allocations, but is the only working solution. If a trait is
-object-safe (which <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html"><code>Future</code></a> is), the compiler can generate a table of function pointers
-(a vtable) that correspond to certain implementations of the trait. This allows to decide
-which implementation to use at runtime. Thus, we can use the interface for the <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html"><code>Future</code></a> trait,
-and avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
+object-safe (which <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future"><code>Future</code></a> is), the compiler can generate a table of function pointers
+(a vtable) that correspond to certain implementations of the trait. This allows to decide which
+implementation to use at runtime. Thus, we can use the interface for the <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future"><code>Future</code></a> trait, and
+avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
 trait objects must be used with a pointer, like references (<code>&amp;</code> and <code>&amp;mut</code>) or <code>Box</code>. The
 latter is what’s used by the macro, as the ownership of the value (the state-machine) must be
 given to the caller, the framework in this case.</p>
@@ -70,7 +63,6 @@ granting the user the ability to pass those functions to the framework, like com
 and hooks (<code>before</code>, <code>after</code>, <code>on_dispatch_error</code>, etc.).</p>
 <h2 id="notes"><a href="#notes">Notes</a></h2>
 <p>If applying the macro on an <code>async</code> closure, you will need to enable the <code>async_closure</code>
-feature. Inputs to procedural macro attributes must be valid Rust code, and <code>async</code>
-closures are not stable yet.</p>
-</div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+feature. Inputs to procedural macro attributes must be valid Rust code, and <code>async</code> closures
+are not stable yet.</p>
+</div></details></section></div></main></body></html>

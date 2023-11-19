@@ -1,78 +1,65 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The framework is a customizable method of separating commands."><meta name="keywords" content="rust, rustlang, rust-lang, framework"><title>serenity::framework - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"><a href="#">Module framework</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#traits">Traits</a></li></ul></div></section></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serenity/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../index.html">serenity</a>::<wbr><a class="mod" href="#">framework</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../src/serenity/framework/mod.rs.html#1-126">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>framework</code></strong> only.</div></span><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The framework is a customizable method of separating commands.</p>
-<p>This is used in combination with <a href="../client/struct.ClientBuilder.html#method.framework"><code>ClientBuilder::framework</code></a>.</p>
-<p>The framework has a number of configurations, and can have any number of
-commands bound to it. The primary purpose of it is to offer the utility of
-not needing to manually match message content strings to determine if a
-message is a command.</p>
-<p>Additionally, “checks” can be added to commands, to ensure that a certain
-condition is met prior to calling a command; this could be a check that the
-user who posted a message owns the bot, for example.</p>
-<p>Each command has a given name, and an associated function/closure. For
-example, you might have two commands: <code>&quot;ping&quot;</code> and <code>&quot;weather&quot;</code>. These each
-have an associated function that are called if the framework determines
-that a message is of that command.</p>
-<p>Assuming a command prefix of <code>&quot;~&quot;</code>, then the following would occur with the
-two previous commands:</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The framework is a customizable method of separating commands."><title>serenity::framework - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../serenity/index.html">serenity</a><span class="version">0.12.0-rc</span></h2></div><h2 class="location"><a href="#">Module framework</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#traits">Traits</a></li></ul></section><h2><a href="../index.html">In crate serenity</a></h2></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">serenity</a>::<wbr><a class="mod" href="#">framework</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/serenity/framework/mod.rs.html#1-131">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>framework</code></strong> only.</div></span><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The framework is a customizable method of separating commands.</p>
+<p>This is used in combination with <a href="../client/struct.ClientBuilder.html#method.framework" title="method serenity::client::ClientBuilder::framework"><code>ClientBuilder::framework</code></a>.</p>
+<p>The framework has a number of configurations, and can have any number of commands bound to it.
+The primary purpose of it is to offer the utility of not needing to manually match message
+content strings to determine if a message is a command.</p>
+<p>Additionally, “checks” can be added to commands, to ensure that a certain condition is met
+prior to calling a command; this could be a check that the user who posted a message owns the
+bot, for example.</p>
+<p>Each command has a given name, and an associated function/closure. For example, you might have
+two commands: <code>&quot;ping&quot;</code> and <code>&quot;weather&quot;</code>. These each have an associated function that are called
+if the framework determines that a message is of that command.</p>
+<p>Assuming a command prefix of <code>&quot;~&quot;</code>, then the following would occur with the two previous
+commands:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code>~<span class="ident">ping</span> <span class="comment">// calls the ping command&#39;s function</span>
-~<span class="ident">pin</span> <span class="comment">// does not</span>
-~ <span class="ident">ping</span> <span class="comment">// _does_ call it _if_ the `allow_whitespace` option is enabled</span>
-~~<span class="ident">ping</span> <span class="comment">// does not</span></code></pre></div>
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>~ping <span class="comment">// calls the ping command&#39;s function
+</span>~pin <span class="comment">// does not
+</span>~ ping <span class="comment">// _does_ call it _if_ the `allow_whitespace` option is enabled
+</span>~~ping <span class="comment">// does not</span></code></pre></div>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
-<p>Configuring a Client with a framework, which has a prefix of <code>&quot;~&quot;</code> and a
-ping and about command:</p>
+<p>Configuring a Client with a framework, which has a prefix of <code>&quot;~&quot;</code> and a ping and about
+command:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::framework::standard::macros</span>::{<span class="ident">command</span>, <span class="ident">group</span>};
-<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">CommandResult</span>, <span class="ident">StandardFramework</span>};
-<span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident">serenity::prelude</span>::<span class="kw-2">*</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serenity::framework::standard::macros::{command, group};
+<span class="kw">use </span>serenity::framework::standard::{CommandResult, StandardFramework};
+<span class="kw">use </span>serenity::model::channel::Message;
+<span class="kw">use </span>serenity::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">command</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">about</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">CommandResult</span> {
-    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;A simple test bot&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-    <span class="prelude-val">Ok</span>(())
-}
-
-<span class="attribute">#[<span class="ident">command</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ping</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">CommandResult</span> {
-    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;pong!&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="attr">#[command]
+</span><span class="kw">async fn </span>about(ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) -&gt; CommandResult {
+    msg.channel_id.say(<span class="kw-2">&amp;</span>ctx.http, <span class="string">&quot;A simple test bot&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">group</span>]</span>
-<span class="attribute">#[<span class="ident">commands</span>(<span class="ident">about</span>, <span class="ident">ping</span>)]</span>
-<span class="kw">struct</span> <span class="ident">General</span>;
+<span class="attr">#[command]
+</span><span class="kw">async fn </span>ping(ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) -&gt; CommandResult {
+    msg.channel_id.say(<span class="kw-2">&amp;</span>ctx.http, <span class="string">&quot;pong!&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="kw">struct</span> <span class="ident">Handler</span>;
+    <span class="prelude-val">Ok</span>(())
+}
 
-<span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {}
+<span class="attr">#[group]
+#[commands(about, ping)]
+</span><span class="kw">struct </span>General;
 
-<span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;DISCORD_TOKEN&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">struct </span>Handler;
 
-<span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">StandardFramework::new</span>()
-    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">prefix</span>(<span class="string">&quot;~&quot;</span>))
-    <span class="comment">// The `#[group]` (and similarly, `#[command]`) macro generates static instances</span>
-    <span class="comment">// containing any options you gave it. For instance, the group `name` and its `commands`.</span>
-    <span class="comment">// Their identifiers, names you can use to refer to these instances in code, are an</span>
-    <span class="comment">// all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.</span>
-    .<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">GENERAL_GROUP</span>);
+<span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {}
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>, <span class="ident">GatewayIntents::default</span>())
-    .<span class="ident">event_handler</span>(<span class="ident">Handler</span>)
-    .<span class="ident">framework</span>(<span class="ident">framework</span>)
+<span class="kw">let </span>token = std::env::var(<span class="string">&quot;DISCORD_TOKEN&quot;</span>)<span class="question-mark">?</span>;
+
+<span class="kw">let </span>framework = StandardFramework::new()
+    <span class="comment">// The `#[group]` (and similarly, `#[command]`) macro generates static instances
+    // containing any options you gave it. For instance, the group `name` and its `commands`.
+    // Their identifiers, names you can use to refer to these instances in code, are an
+    // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
+    </span>.group(<span class="kw-2">&amp;</span>GENERAL_GROUP);
+
+framework.configure(|c| c.prefix(<span class="string">&quot;~&quot;</span>));
+
+<span class="kw">let </span><span class="kw-2">mut </span>client = Client::builder(<span class="kw-2">&amp;</span>token, GatewayIntents::default())
+    .event_handler(Handler)
+    .framework(framework)
     .<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
-</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left import-item" id="reexport.StandardFramework"><code>pub use self::standard::<a class="struct" href="standard/struct.StandardFramework.html" title="struct serenity::framework::standard::StandardFramework">StandardFramework</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="standard/index.html" title="serenity::framework::standard mod">standard</a><span class="stab portability" title="Available on crate feature `standard_framework` only"><code>standard_framework</code></span></div><div class="item-right docblock-short"></div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Framework.html" title="serenity::framework::Framework trait">Framework</a></div><div class="item-right docblock-short"><p>A trait for defining your own framework for serenity to use.</p>
-</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
-</body></html>
+</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2><ul class="item-table"><li><div class="item-name" id="reexport.StandardFramework"><code>pub use self::standard::<a class="struct" href="standard/struct.StandardFramework.html" title="struct serenity::framework::standard::StandardFramework">StandardFramework</a>;</code></div></li></ul><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="standard/index.html" title="mod serenity::framework::standard">standard</a><span class="stab portability" title="Available on crate feature `standard_framework` only"><code>standard_framework</code></span></div></li></ul><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.Framework.html" title="trait serenity::framework::Framework">Framework</a></div><div class="desc docblock-short">A trait for defining your own framework for serenity to use.</div></li></ul></section></div></main></body></html>
