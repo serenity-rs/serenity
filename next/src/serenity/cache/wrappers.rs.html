@@ -80,6 +80,12 @@
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Wrappers around library types for easier use.
 
 </span><span class="kw">use </span>std::hash::Hash;
@@ -118,6 +124,12 @@
 
     <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.<span class="number">0</span>.as_ref().map_or(<span class="number">0</span>, |map| map.len())
+    }
+
+    <span class="kw">pub fn </span>shrink_to_fit(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = <span class="self">self</span>.<span class="number">0</span>.as_ref() {
+            map.shrink_to_fit();
+        }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_read_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">&#39;_</span>, K, V&gt; {
