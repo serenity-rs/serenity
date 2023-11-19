@@ -1358,7 +1358,7 @@
     ///
     /// This field is only present when `with_member` is set to `true` when calling
     /// List Thread Members or Get Thread Member, or inside [`ThreadMembersUpdateEvent`].
-    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
+    </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;Member&gt;&gt;,
     <span class="doccomment">/// ID of the guild.
     ///
     /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
