@@ -667,7 +667,7 @@ pub struct ThreadMember {
     ///
     /// This field is only present when `with_member` is set to `true` when calling
     /// List Thread Members or Get Thread Member, or inside [`ThreadMembersUpdateEvent`].
-    pub member: Option<Member>,
+    pub member: Option<Box<Member>>,
     /// ID of the guild.
     ///
     /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
