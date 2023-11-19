@@ -127,6 +127,7 @@ Finally, the `{GuildId,Guild,PartialGuild}::create_command_permission` method ha
 
 * Cache methods now (mostly) return a `CacheRef` type that wraps a reference into the cache. Other methods that returned a map, now return a wrapper type around a reference to the map, with a limited API to prevent accidental deadlocks. This all helps reduce the number of clones when querying the cache. Those wishing to replicate the old behavior can simply call `.clone()` on the return type to obtain the wrapped data.
 * `CacheSettings` has new fields `time_to_live`, `cache_guilds`, `cache_channels`, and `cache_users`, allowing cache configuration on systems with memory requirements; whereas previously, memory-constrained systems were forced to disable caching altogether.
+* One notable behavioral change is that `PrivateChannel`s (aka DM channels) are no longer cached, as they are never sent across the gateway by Discord. Therefore, the `Cache::{private_channel, private_channels}` methods have been removed, and `Cache::guild_channel` has been renamed to just `Cache::channel`. Additionally, some uses of the `Channel` enum in return types have been replaced with either `GuildChannel` or `PrivateChannel` as seen fit.
 
 ### IDs
 
