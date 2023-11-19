@@ -3,16 +3,13 @@
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
 //! Issuing too many requests will lead to ratelimits.
 //!
-//! Following a policy to never hand out locks, the cache will clone all values when calling its
-//! methods.
-//!
 //! # Use by Models
 //!
 //! Most models of Discord objects, such as the [`Message`], [`GuildChannel`], or [`Emoji`], have
-//! methods for interacting with that single instance. This feature is only compiled if the
-//! `methods` feature is enabled. An example of this is [`Guild::edit`], which performs a check to
-//! ensure that the current user is the owner of the guild, prior to actually performing the HTTP
-//! request. The cache is involved due to the function's use of unlocking the cache and retrieving
+//! methods for interacting with that single instance. This feature is only compiled if the `model`
+//! feature is enabled. An example of this is [`Guild::edit`], which performs a check to ensure that
+//! the current user is the owner of the guild, prior to actually performing the HTTP request.
+//! The cache is involved due to the function's use of unlocking the cache and retrieving
 //! the Id of the current user, and comparing it to the Id of the user that owns the guild. This is
 //! an inexpensive method of being able to access data required by these sugary methods.
 //!
