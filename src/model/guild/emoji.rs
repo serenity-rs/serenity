@@ -57,8 +57,9 @@ pub struct Emoji {
 impl Emoji {
     /// Deletes the emoji. This method requires the cache to fetch the guild ID.
     ///
-    /// **Note**: The [Manage Emojis and Stickers] permission is required.
-    ///
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Examples
     ///
@@ -87,7 +88,8 @@ impl Emoji {
     /// Returns [`Error::Http`] if the current user lacks permission, or may return
     /// [`ModelError::ItemMissing`] if the emoji is not in the cache.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
@@ -98,14 +100,17 @@ impl Emoji {
     /// Edits the emoji by updating it with a new name. This method requires the cache to fetch the
     /// guild ID.
     ///
-    /// **Note**: The [Manage Emojis and Stickers] permission is required.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if an invalid name is
     /// given.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
     #[cfg(feature = "cache")]
     pub async fn edit(&mut self, cache_http: impl CacheHttp, name: &str) -> Result<()> {
         let guild_id = self.try_find_guild_id(&cache_http)?;

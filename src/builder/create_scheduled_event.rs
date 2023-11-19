@@ -130,21 +130,21 @@ impl<'a> Builder for CreateScheduledEvent<'a> {
 
     /// Creates a new scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [Create Events] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [Create Events]: Permissions::CREATE_EVENTS
     async fn execute(
         self,
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_EVENTS)?;
+        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::CREATE_EVENTS)?;
 
         cache_http.http().create_scheduled_event(ctx, &self, self.audit_log_reason).await
     }

@@ -313,16 +313,17 @@ bitflags::bitflags! {
         const MANAGE_ROLES = 1 << 28;
         /// Allows management of webhooks.
         const MANAGE_WEBHOOKS = 1 << 29;
-        /// Allows management of emojis and stickers created without the use of an [`Integration`].
-        ///
-        /// [`Integration`]: super::guild::Integration
+        /// Allows for editing and deleting emojis, stickers, and soundboard sounds created by all
+        /// users.
+        const MANAGE_GUILD_EXPRESSIONS = 1 << 30;
+        #[deprecated = "use `Permissions::MANAGE_GUILD_EXPRESSIONS` instead"]
         const MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
         /// Allows members to use application commands, including slash commands and context menu
         /// commands.
         const USE_APPLICATION_COMMANDS = 1 << 31;
         /// Allows for requesting to speak in stage channels.
         const REQUEST_TO_SPEAK = 1 << 32;
-        /// Allows for creating, editing, and deleting scheduled events
+        /// Allows for editing, and deleting scheduled events created by all users.
         const MANAGE_EVENTS = 1 << 33;
         /// Allows for deleting and archiving threads, and viewing all private threads.
         const MANAGE_THREADS = 1 << 34;
@@ -343,6 +344,12 @@ bitflags::bitflags! {
         const VIEW_CREATOR_MONETIZATION_ANALYTICS = 1 << 41;
         /// Allows for using soundboard in a voice channel.
         const USE_SOUNDBOARD = 1 << 42;
+        /// Allows for creating emojis, stickers, and soundboard sounds, and editing and deleting
+        /// those created by the current user.
+        const CREATE_GUILD_EXPRESSIONS = 1 << 43;
+        /// Allows for creating scheduled events, and editing and deleting those created by the
+        /// current user.
+        const CREATE_EVENTS = 1 << 44;
         /// Allows the usage of custom soundboard sounds from other servers.
         const USE_EXTERNAL_SOUNDS = 1 << 45;
         /// Allows sending voice messages.
@@ -361,6 +368,8 @@ generate_get_permission_names! {
     ban_members: "Ban Members",
     change_nickname: "Change Nickname",
     connect: "Connect",
+    create_events: "Create Events",
+    create_guild_expressions: "Create Guild Expressions",
     create_instant_invite: "Create Instant Invite",
     create_private_threads: "Create Private Threads",
     create_public_threads: "Create Public Threads",
@@ -369,9 +378,9 @@ generate_get_permission_names! {
     external_emojis: "Use External Emojis",
     kick_members: "Kick Members",
     manage_channels: "Manage Channels",
-    manage_emojis_and_stickers: "Manage Emojis and Stickers",
     manage_events: "Manage Events",
     manage_guild: "Manage Guilds",
+    manage_guild_expressions: "Manage Guild Expressions",
     manage_messages: "Manage Messages",
     manage_nicknames: "Manage Nicknames",
     manage_roles: "Manage Roles",
@@ -449,6 +458,23 @@ impl Permissions {
     #[must_use]
     pub const fn connect(self) -> bool {
         self.contains(Self::CONNECT)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the [Create Events] permission.
+    ///
+    /// [Create Events]: Self::CREATE_EVENTS
+    #[must_use]
+    pub const fn create_events(self) -> bool {
+        self.contains(Self::CREATE_EVENTS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the [Create Guild Expressions]
+    /// permission.
+    ///
+    /// [Create Guild Expressions]: Self::CREATE_GUILD_EXPRESSIONS
+    #[must_use]
+    pub const fn create_guild_expressions(self) -> bool {
+        self.contains(Self::CREATE_GUILD_EXPRESSIONS)
     }
 
     /// Shorthand for checking that the set of permissions contains the [View Audit Log]
@@ -564,12 +590,10 @@ impl Permissions {
         self.contains(Self::MANAGE_CHANNELS)
     }
 
-    /// Shorthand for checking that the set of permissions contains the [Manage Emojis and
-    /// Stickers] permission.
-    ///
-    /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
+    #[deprecated = "use `manage_guild_expressions` instead"]
     #[must_use]
     pub const fn manage_emojis_and_stickers(self) -> bool {
+        #[allow(deprecated)]
         self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
     }
 
@@ -587,6 +611,15 @@ impl Permissions {
     #[must_use]
     pub const fn manage_guild(self) -> bool {
         self.contains(Self::MANAGE_GUILD)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the [Manage Guild Expressions]
+    /// permission.
+    ///
+    /// [Manage Guild Expressions]: Self::MANAGE_GUILD_EXPRESSIONS
+    #[must_use]
+    pub const fn manage_guild_expressions(self) -> bool {
+        self.contains(Self::MANAGE_GUILD_EXPRESSIONS)
     }
 
     /// Shorthand for checking that the set of permissions contains the [Manage Messages]

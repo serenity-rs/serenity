@@ -81,14 +81,14 @@ impl<'a> Builder for CreateSticker<'a> {
 
     /// Creates a new sticker in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     async fn execute(
         self,
         cache_http: impl CacheHttp,
@@ -98,7 +98,7 @@ impl<'a> Builder for CreateSticker<'a> {
         crate::utils::user_has_guild_perms(
             &cache_http,
             ctx,
-            Permissions::MANAGE_EMOJIS_AND_STICKERS,
+            Permissions::CREATE_GUILD_EXPRESSIONS,
         )?;
 
         let map = vec![("name", self.name), ("tags", self.tags), ("description", self.description)];

@@ -442,9 +442,9 @@ impl Http {
     ///
     /// View the source code for [`Guild::create_emoji`] method to see what fields this requires.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     pub async fn create_emoji(
         &self,
         guild_id: GuildId,
@@ -821,9 +821,9 @@ impl Http {
     ///
     /// Refer to Discord's docs for field information.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [Create Events] permission.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [Create Events]: Permissions::CREATE_EVENTS
     pub async fn create_scheduled_event(
         &self,
         guild_id: GuildId,
@@ -846,9 +846,9 @@ impl Http {
 
     /// Creates a sticker.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     pub async fn create_sticker<'a>(
         &self,
         guild_id: GuildId,
@@ -959,6 +959,8 @@ impl Http {
     }
 
     /// Deletes an emoji from a server.
+    ///
+    /// See [`GuildId::edit_emoji`] for permissions requirements.
     pub async fn delete_emoji(
         &self,
         guild_id: GuildId,
@@ -1326,9 +1328,7 @@ impl Http {
 
     /// Deletes a sticker from a server.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
-    ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// See [`GuildId::delete_sticker`] for permissions requirements.
     pub async fn delete_sticker(
         &self,
         guild_id: GuildId,
@@ -1470,6 +1470,8 @@ impl Http {
     }
 
     /// Changes emoji information.
+    ///
+    /// See [`GuildId::edit_emoji`] for permissions requirements.
     pub async fn edit_emoji(
         &self,
         guild_id: GuildId,
@@ -2076,9 +2078,7 @@ impl Http {
 
     /// Changes a sticker in a guild.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
-    ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// See [`GuildId::edit_sticker`] for permissions requirements.
     pub async fn edit_sticker(
         &self,
         guild_id: GuildId,
@@ -3456,9 +3456,9 @@ impl Http {
 
     /// Gets a scheduled event by Id.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [View Channel] permission for the channel associated with the event.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn get_scheduled_event(
         &self,
         guild_id: GuildId,
@@ -3481,9 +3481,9 @@ impl Http {
 
     /// Gets a list of all scheduled events for the corresponding guild.
     ///
-    /// **Note**: Requires the [Manage Events] permission.
+    /// **Note**: Requires the [View Channel] permission at the guild level.
     ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn get_scheduled_events(
         &self,
         guild_id: GuildId,
@@ -3514,7 +3514,8 @@ impl Http {
     /// be populated with [`Guild Member`] information, if the interested user is a member of the
     /// guild the event takes place in.
     ///
-    /// [`UserId`]: crate::model::id::UserId
+    /// **Note**: Requires the [View Channel] permission for the channel associated with the event.
+    ///
     /// [`member`]: ScheduledEventUser::member
     /// [`Guild Member`]: crate::model::guild::Member
     pub async fn get_scheduled_event_users(

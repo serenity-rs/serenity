@@ -445,7 +445,7 @@ impl PartialGuild {
     ///
     /// Refer to the documentation for [`Guild::create_emoji`] for more information.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Create Guild Expressions] permission.
     ///
     /// # Examples
     ///
@@ -460,7 +460,7 @@ impl PartialGuild {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn create_emoji(
         &self,
@@ -650,14 +650,14 @@ impl PartialGuild {
 
     /// Creates a new sticker in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     pub async fn create_sticker<'a>(
         &self,
         cache_http: impl CacheHttp,
@@ -682,14 +682,17 @@ impl PartialGuild {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with that Id
-    /// does not exist in the guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with the given
+    /// id does not exist in the guild.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn delete_emoji(
         &self,
@@ -741,13 +744,17 @@ impl PartialGuild {
 
     /// Deletes a [`Sticker`] by Id from the guild.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission to delete the sticker.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a sticker with that id
+    /// does not exist.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn delete_sticker(
         &self,
@@ -789,14 +796,17 @@ impl PartialGuild {
     ///
     /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features enabled.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with that Id
-    /// does not exist in the guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if an emoji with the given
+    /// id does not exist.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn edit_emoji(
         &self,
@@ -918,7 +928,9 @@ impl PartialGuild {
 
     /// Edits a sticker.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
+    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
+    /// Expressions] permission is required.
     ///
     /// # Examples
     ///
@@ -944,7 +956,8 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn edit_sticker(
         &self,
