@@ -2919,7 +2919,7 @@
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = cache.member(<span class="self">self</span>, user_id) {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(member);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(member.clone());
                 }
             }
         }

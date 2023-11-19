@@ -524,6 +524,7 @@
 <a href="#524" id="524">524</a>
 <a href="#525" id="525">525</a>
 <a href="#526" id="526">526</a>
+<a href="#527" id="527">527</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>tracing::debug;
@@ -750,7 +751,8 @@
         },
         Event::GuildMemberUpdate(<span class="kw-2">mut </span>event) =&gt; {
             <span class="kw">let </span>before = <span class="macro">if_cache!</span>(update_cache(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>event));
-            <span class="kw">let </span>after: <span class="prelude-ty">Option</span>&lt;Member&gt; = <span class="macro">if_cache!</span>(ctx.cache.member(event.guild_id, event.user.id));
+            <span class="kw">let </span>after: <span class="prelude-ty">Option</span>&lt;Member&gt; =
+                <span class="macro">if_cache!</span>(ctx.cache.member(event.guild_id, event.user.id).map(|m| m.clone()));
 
             FullEvent::GuildMemberUpdate {
                 ctx,
@@ -842,7 +844,7 @@
         },
         Event::MessageUpdate(<span class="kw-2">mut </span>event) =&gt; {
             <span class="kw">let </span>before = <span class="macro">if_cache!</span>(update_cache(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;mut </span>event));
-            <span class="kw">let </span>after = <span class="macro">if_cache!</span>(ctx.cache.message(event.channel_id, event.id));
+            <span class="kw">let </span>after = <span class="macro">if_cache!</span>(ctx.cache.message(event.channel_id, event.id).map(|m| m.clone()));
 
             FullEvent::MessageUpdate {
                 ctx,

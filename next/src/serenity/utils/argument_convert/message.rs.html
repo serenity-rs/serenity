@@ -155,7 +155,7 @@
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = ctx.cache() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(msg) = cache.message(channel_id, message_id) {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(msg);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(msg.clone());
             }
         }
 

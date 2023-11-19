@@ -1661,7 +1661,7 @@
         <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = cache.message(<span class="self">self</span>, message_id) {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(message);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(message.clone());
             }
         }
 
