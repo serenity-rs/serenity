@@ -15,6 +15,8 @@ Thanks to the following for their contributions:
 - [@Bloectasy]
 - [@campbellcole]
 - [@cheesycod]
+- [@crivasr]
+- [@darkyeg]
 - [@fenhl]
 - [@GnomedDev]
 - [@jamesbt365]
@@ -5456,9 +5458,11 @@ Initial commit.
 [@casey]: https://github.com/casey
 [@cheesycod]: https://github.com/cheesycod
 [@chocological00]: https://github.com/chocological00
+[@crivasr]: https://github.com/crivasr
 [@cyril-marpaud]: https://github.com/cyril-marpaud
 [@Daggy1234]: https://github.com/Daggy1234
 [@DarkKirb]: https://github.com/DarkKirb
+[@darkyeg]: https://github.com/darkyeg
 [@Dean-Coakley]: https://github.com/Dean-Coakley
 [@dclamage]: https://github.com/dclamage
 [@Deebster]: https://github.com/Deebster
