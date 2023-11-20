@@ -5,8 +5,6 @@
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
-#[cfg(feature = "gateway")]
-use serde::de::Deserialize;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 
@@ -62,19 +60,19 @@ where
 }
 
 #[cfg(all(feature = "gateway", not(feature = "simd_json")))]
-pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
+pub(crate) fn from_str<'a, T>(s: &'a str) -> Result<T>
 where
-    T: Deserialize<'a>,
+    T: serde::de::Deserialize<'a>,
 {
     Ok(serde_json::from_str(s)?)
 }
 
 #[cfg(all(feature = "gateway", feature = "simd_json"))]
-pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
+pub(crate) fn from_str<T>(s: &str) -> Result<T>
 where
-    T: Deserialize<'a>,
+    T: DeserializeOwned,
 {
-    Ok(simd_json::from_str(s)?)
+    Ok(simd_json::from_slice(&mut s.to_owned().into_bytes())?)
 }
 
 #[cfg(not(feature = "simd_json"))]
