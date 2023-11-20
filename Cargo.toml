@@ -54,7 +54,7 @@ command_attr = { version = "0.5.0", path = "./command_attr", optional = true }
 serenity-voice-model = { version = "0.1.1", path = "./voice-model", optional = true }
 
 [dev-dependencies.http_crate]
-version = "0.2.11"
+version = "1.0.0"
 package = "http"
 
 [features]
