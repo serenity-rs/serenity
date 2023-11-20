@@ -124,7 +124,7 @@ pub struct GuildChannel {
     pub thread_metadata: Option<ThreadMetadata>,
     /// Thread member object for the current user, if they have joined the thread, only included on
     /// certain API endpoints.
-    pub member: Option<ThreadMember>,
+    pub member: Option<PartialThreadMember>,
     /// Default duration for newly created threads, in minutes, to automatically archive the thread
     /// after recent activity.
     pub default_auto_archive_duration: Option<AutoArchiveDuration>,
