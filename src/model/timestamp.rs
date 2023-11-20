@@ -39,7 +39,7 @@ const DISCORD_EPOCH: u64 = 1_420_070_400_000;
 
 cfg_if::cfg_if! {
     if #[cfg(all(feature = "chrono", not(feature = "time")))] {
-        use chrono::{DateTime, NaiveDateTime, ParseError as InnerError, SecondsFormat, TimeZone, Utc};
+        use chrono::{DateTime, ParseError as InnerError, SecondsFormat, TimeZone, Utc};
 
         /// Representation of a Unix timestamp.
         ///
@@ -75,8 +75,7 @@ cfg_if::cfg_if! {
             ///
             /// Returns `Err` if the value is invalid.
             pub fn from_unix_timestamp(secs: i64) -> Result<Self, InvalidTimestamp> {
-                let dt = NaiveDateTime::from_timestamp_opt(secs, 0).ok_or(InvalidTimestamp)?;
-                Ok(Self(DateTime::from_utc(dt, Utc)))
+                Ok(Self(DateTime::from_timestamp(secs, 0).ok_or(InvalidTimestamp)?))
             }
 
             /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC

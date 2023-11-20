@@ -457,10 +457,8 @@ impl CacheUpdate for MessageCreateEvent {
             return None;
         }
 
-        let messages =
-            cache.messages.entry(self.message.channel_id).or_insert_with(Default::default);
-        let mut queue =
-            cache.message_queue.entry(self.message.channel_id).or_insert_with(Default::default);
+        let messages = cache.messages.entry(self.message.channel_id).or_default();
+        let mut queue = cache.message_queue.entry(self.message.channel_id).or_default();
 
         let mut removed_msg = None;
 
@@ -594,7 +592,7 @@ impl CacheUpdate for ReadyEvent {
         let ready_guilds_hashset =
             self.ready.guilds.iter().map(|status| status.id).collect::<HashSet<_>>();
         let shard_data = self.ready.shard.unwrap_or([1, 1]);
-        for guild_entry in cache.guilds.iter() {
+        for guild_entry in &cache.guilds {
             let guild = guild_entry.key();
             // Only handle data for our shard.
             if crate::utils::shard_id(guild.0, shard_data[1]) == shard_data[0]

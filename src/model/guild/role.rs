@@ -235,7 +235,7 @@ impl RoleId {
     /// Tries to find the [`Role`] by its Id in the cache.
     #[cfg(feature = "cache")]
     pub fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
-        for guild_entry in cache.as_ref().guilds.iter() {
+        for guild_entry in &cache.as_ref().guilds {
             let guild = guild_entry.value();
 
             if !guild.roles.contains_key(&self) {

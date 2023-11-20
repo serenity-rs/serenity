@@ -67,7 +67,7 @@ impl fmt::Debug for VoiceState {
             .field("suppress", &self.suppress)
             .field("user_id", &self.user_id)
             .field("request_to_speak_timestamp", &self.request_to_speak_timestamp)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 

@@ -212,7 +212,7 @@ impl fmt::Debug for Http {
             .field("ratelimiter", &self.ratelimiter)
             .field("ratelimiter_disabled", &self.ratelimiter_disabled)
             .field("proxy", &self.proxy)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 

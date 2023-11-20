@@ -103,7 +103,7 @@ impl fmt::Debug for Ratelimiter {
             .field("client", &self.client)
             .field("global", &self.global)
             .field("routes", &self.routes)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 

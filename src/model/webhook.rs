@@ -103,7 +103,7 @@ impl fmt::Debug for Webhook {
             .field("guild_id", &self.guild_id)
             .field("name", &self.name)
             .field("user", &self.user)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
