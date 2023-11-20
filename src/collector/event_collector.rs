@@ -295,7 +295,7 @@ impl Stream for EventCollector {
     fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
         if let Some(ref mut timeout) = self.timeout {
             match timeout.as_mut().poll(ctx) {
-                Poll::Ready(_) => {
+                Poll::Ready(()) => {
                     return Poll::Ready(None);
                 },
                 Poll::Pending => (),
@@ -354,21 +354,17 @@ mod test {
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
 
-        assert!(matches!(
-            EventCollectorBuilder::new(&msg)
-                .add_event_type(EventType::GuildBanAdd)
-                .add_user_id(UserId::default())
-                .build(),
-            Ok(_)
-        ));
-        assert!(matches!(
-            EventCollectorBuilder::new(&msg)
-                .add_event_type(EventType::GuildBanAdd)
-                .add_event_type(EventType::GuildCreate)
-                .add_user_id(UserId::default())
-                .build(),
-            Ok(_)
-        ));
+        assert!(EventCollectorBuilder::new(&msg)
+            .add_event_type(EventType::GuildBanAdd)
+            .add_user_id(UserId::default())
+            .build()
+            .is_ok());
+        assert!(EventCollectorBuilder::new(&msg)
+            .add_event_type(EventType::GuildBanAdd)
+            .add_event_type(EventType::GuildCreate)
+            .add_user_id(UserId::default())
+            .build()
+            .is_ok());
     }
 
     #[test]
@@ -384,13 +380,11 @@ mod test {
                 .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
-        assert!(matches!(
-            EventCollectorBuilder::new(&msg)
-                .add_event_type(EventType::UserUpdate)
-                .add_user_id(UserId::default())
-                .build(),
-            Ok(_)
-        ));
+        assert!(EventCollectorBuilder::new(&msg)
+            .add_event_type(EventType::UserUpdate)
+            .add_user_id(UserId::default())
+            .build()
+            .is_ok());
     }
 
     #[test]
@@ -400,14 +394,12 @@ mod test {
 
         // If at least one event type has the filtered ID type(s), we go ahead and build the
         // collector, even though one or more of the event types may never be yielded.
-        assert!(matches!(
-            EventCollectorBuilder::new(&msg)
-                .add_event_type(EventType::GuildCreate)
-                .add_event_type(EventType::GuildMemberAdd)
-                .add_user_id(UserId::default())
-                .build(),
-            Ok(_)
-        ));
+        assert!(EventCollectorBuilder::new(&msg)
+            .add_event_type(EventType::GuildCreate)
+            .add_event_type(EventType::GuildMemberAdd)
+            .add_user_id(UserId::default())
+            .build()
+            .is_ok());
         // But if none of the events have that ID type, that's an error.
         assert!(matches!(
             EventCollectorBuilder::new(&msg)
