@@ -300,7 +300,7 @@ async fn before_hook(ctx: &Context, _: &Message, cmd_name: &str) -> bool {
 
     let command_count_value = {
         let mut count_write = elements.command_usage_values.lock().await;
-        let mut command_count_value = count_write.get_mut(cmd_name).unwrap();
+        let command_count_value = count_write.get_mut(cmd_name).unwrap();
         command_count_value.use_count += 1;
         command_count_value.clone()
     };

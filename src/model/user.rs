@@ -1118,7 +1118,7 @@ impl UserId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                for channel_entry in cache.private_channels().iter() {
+                for channel_entry in &cache.private_channels() {
                     let channel = channel_entry.value();
 
                     if channel.recipient.id == self {

@@ -260,7 +260,7 @@ impl fmt::Debug for FilterOptions {
             .field("channel_id", &self.channel_id)
             .field("guild_id", &self.guild_id)
             .field("author_id", &self.author_id)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
@@ -286,7 +286,7 @@ impl Stream for MessageCollector {
     fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
         if let Some(ref mut timeout) = self.timeout {
             match timeout.as_mut().poll(ctx) {
-                Poll::Ready(_) => {
+                Poll::Ready(()) => {
                     return Poll::Ready(None);
                 },
                 Poll::Pending => (),

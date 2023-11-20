@@ -67,7 +67,7 @@ impl Typing {
         spawn_named("typing::start", async move {
             loop {
                 match rx.try_recv() {
-                    Ok(_) | Err(TryRecvError::Closed) => break,
+                    Ok(()) | Err(TryRecvError::Closed) => break,
                     _ => (),
                 }
 

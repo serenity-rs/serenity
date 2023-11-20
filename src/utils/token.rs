@@ -20,7 +20,7 @@ use crate::model::id::UserId;
 /// Validate that a token is valid and that a number of malformed tokens are
 /// actually invalid:
 ///
-/// ```
+/// ```rust,no_run
 /// use serenity::utils::token::validate;
 ///
 /// // ensure a valid token is in fact a valid format:

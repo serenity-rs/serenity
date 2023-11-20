@@ -82,7 +82,7 @@ pub struct Command {
 
 impl fmt::Debug for Command {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Command").field("options", &self.options).finish()
+        f.debug_struct("Command").field("options", &self.options).finish_non_exhaustive()
     }
 }
 

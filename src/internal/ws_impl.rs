@@ -64,7 +64,7 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
                 why
             })?
         },
-        Some(Message::Text(mut payload)) => from_str(&mut payload).map(Some).map_err(|why| {
+        Some(Message::Text(payload)) => from_str(&payload).map(Some).map_err(|why| {
             warn!("Err deserializing text: {:?}; text: {}", why, payload,);
 
             why

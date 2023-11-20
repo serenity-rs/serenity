@@ -276,7 +276,7 @@ impl Cache {
     pub fn unknown_members(&self) -> u64 {
         let mut total = 0;
 
-        for guild_entry in self.guilds.iter() {
+        for guild_entry in &self.guilds {
             let guild = guild_entry.value();
 
             let members = guild.members.len() as u64;

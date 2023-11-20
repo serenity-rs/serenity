@@ -531,7 +531,7 @@ impl fmt::Debug for VoiceServerUpdateEvent {
             .field("channel_id", &self.channel_id)
             .field("endpoint", &self.endpoint)
             .field("guild_id", &self.guild_id)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 

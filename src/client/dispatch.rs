@@ -212,12 +212,12 @@ pub(crate) fn dispatch<'rec>(
                     #[cfg(not(feature = "framework"))]
                     {
                         // Avoid cloning if there will be no framework dispatch.
-                        dispatch_message(context, event.message, h).await;
+                        dispatch_message(context, event.message, h);
                     }
 
                     #[cfg(feature = "framework")]
                     {
-                        dispatch_message(context.clone(), event.message.clone(), h).await;
+                        dispatch_message(context.clone(), event.message.clone(), h);
 
                         let framework = Arc::clone(framework);
 
@@ -290,12 +290,12 @@ pub(crate) fn dispatch<'rec>(
                         #[cfg(not(feature = "framework"))]
                         {
                             // Avoid cloning if there will be no framework dispatch.
-                            dispatch_message(context, event.message, handler).await;
+                            dispatch_message(context, event.message, handler);
                         }
 
                         #[cfg(feature = "framework")]
                         {
-                            dispatch_message(context.clone(), event.message.clone(), handler).await;
+                            dispatch_message(context.clone(), event.message.clone(), handler);
 
                             let framework = Arc::clone(framework);
                             let message = event.message;
@@ -315,11 +315,7 @@ pub(crate) fn dispatch<'rec>(
     .boxed()
 }
 
-async fn dispatch_message(
-    context: Context,
-    mut message: Message,
-    event_handler: &Arc<dyn EventHandler>,
-) {
+fn dispatch_message(context: Context, mut message: Message, event_handler: &Arc<dyn EventHandler>) {
     #[cfg(feature = "model")]
     {
         message.transform_content();

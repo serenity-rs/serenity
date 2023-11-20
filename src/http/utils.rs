@@ -21,7 +21,7 @@ pub fn deserialize_errors<'de, D: Deserializer<'de>>(
 }
 
 fn loop_errors(value: &Value, errors: &mut Vec<DiscordJsonSingleError>, path: &[String]) {
-    for (key, looped) in value.as_object().expect("expected object").iter() {
+    for (key, looped) in value.as_object().expect("expected object") {
         let object = looped.as_object().expect("expected object");
         if object.contains_key("_errors") {
             let found_errors = object

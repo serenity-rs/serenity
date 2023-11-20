@@ -76,7 +76,7 @@ cfg_if::cfg_if! {
             /// Returns `Err` if the value is invalid.
             pub fn from_unix_timestamp(secs: i64) -> Result<Self, InvalidTimestamp> {
                 let dt = NaiveDateTime::from_timestamp_opt(secs, 0).ok_or(InvalidTimestamp)?;
-                Ok(Self(DateTime::from_utc(dt, Utc)))
+                Ok(Self(Utc.from_utc_datetime(&dt)))
             }
 
             /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
