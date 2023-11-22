@@ -17,11 +17,6 @@ pub fn is_false(v: &bool) -> bool {
     !v
 }
 
-#[allow(clippy::unnecessary_wraps)]
-pub fn ignore_input<'de, D: Deserializer<'de>>(_: D) -> StdResult<(), D::Error> {
-    Ok(())
-}
-
 #[cfg(feature = "model")]
 pub(super) fn avatar_url(
     guild_id: Option<GuildId>,
