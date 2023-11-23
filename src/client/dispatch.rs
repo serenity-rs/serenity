@@ -390,8 +390,8 @@ fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Opt
             ctx,
             event,
         },
-        Event::Unknown => {
-            debug!("An unknown event was received");
+        Event::Unknown(event) => {
+            debug!("An unknown event was received: {event:?}");
             return None;
         },
         Event::UserUpdate(mut event) => {

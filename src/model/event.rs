@@ -13,14 +13,7 @@ use serde::Serialize;
 
 use super::application::ActionRow;
 use super::prelude::*;
-use super::utils::{
-    deserialize_val,
-    emojis,
-    ignore_input,
-    remove_from_map,
-    remove_from_map_opt,
-    stickers,
-};
+use super::utils::{deserialize_val, emojis, remove_from_map, remove_from_map_opt, stickers};
 use crate::constants::Opcode;
 use crate::model::application::{CommandPermissions, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;
@@ -695,7 +688,9 @@ pub struct TypingStartEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct UnknownEvent {
+    #[serde(rename = "t")]
     pub kind: String,
+    #[serde(rename = "d")]
     pub value: Value,
 }
 
@@ -1201,8 +1196,8 @@ pub enum Event {
     /// A guild member has unsubscribed from a scheduled event.
     GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
     /// An event type not covered by the above
-    #[serde(other, deserialize_with = "ignore_input")]
-    Unknown,
+    #[serde(untagged)]
+    Unknown(UnknownEvent),
 }
 
 impl Event {
@@ -1210,7 +1205,7 @@ impl Event {
     /// [`Unknown`](Event::Unknown).
     #[must_use]
     pub fn name(&self) -> Option<String> {
-        if let Self::Unknown = self {
+        if let Self::Unknown(_) = self {
             None
         } else {
             let map = serde_json::to_value(self).ok()?;
