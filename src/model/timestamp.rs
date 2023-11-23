@@ -45,7 +45,7 @@ use serde::{Deserialize, Serialize};
 /// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
 const DISCORD_EPOCH: u64 = 1_420_070_400_000;
 
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(transparent)]
 pub struct Timestamp(

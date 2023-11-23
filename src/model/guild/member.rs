@@ -647,31 +647,32 @@ impl From<Member> for PartialMember {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PartialThreadMember {
+    /// The time the current user last joined the thread.
+    pub join_timestamp: Timestamp,
+    /// Any user-thread settings, currently only used for notifications
+    pub flags: ThreadMemberFlags,
+}
+
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object),
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadMember {
+    #[serde(flatten)]
+    pub inner: PartialThreadMember,
     /// The id of the thread.
-    ///
-    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
-    pub id: Option<ChannelId>,
+    pub id: ChannelId,
     /// The id of the user.
-    ///
-    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
-    pub user_id: Option<UserId>,
-    /// The time the current user last joined the thread.
-    pub join_timestamp: Timestamp,
-    /// Any user-thread settings, currently only used for notifications
-    pub flags: ThreadMemberFlags,
+    pub user_id: UserId,
     /// Additional information about the user.
-    ///
-    /// This field is omitted on the member sent within each thread in the GUILD_CREATE event.
     ///
     /// This field is only present when `with_member` is set to `true` when calling
     /// List Thread Members or Get Thread Member, or inside [`ThreadMembersUpdateEvent`].
-    pub member: Option<Box<Member>>,
+    pub member: Option<Member>,
     /// ID of the guild.
     ///
     /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
