@@ -19,9 +19,11 @@ use serenity::framework::standard::macros::{check, command, group, help, hook};
 use serenity::framework::standard::{
     help_commands,
     Args,
+    BucketBuilder,
     CommandGroup,
     CommandOptions,
     CommandResult,
+    Configuration,
     DispatchError,
     HelpOptions,
     Reason,
@@ -256,12 +258,12 @@ async fn main() {
         // only be performed by the bot owner.
         .on_dispatch_error(dispatch_error)
         // Can't be used more than once per 5 seconds:
-        .bucket("emoji", |b| b.delay(5)).await
+        .bucket("emoji", BucketBuilder::default().delay(5)).await
         // Can't be used more than 2 times per 30 seconds, with a 5 second delay applying per
         // channel. Optionally `await_ratelimits` will delay until the command can be executed
         // instead of cancelling the command invocation.
-        .bucket("complicated", |b| {
-            b.limit(2).time_span(30).delay(5)
+        .bucket("complicated",
+            BucketBuilder::default().limit(2).time_span(30).delay(5)
                 // The target each bucket will apply to.
                 .limit_for(LimitedFor::Channel)
                 // The maximum amount of command invocations that can be delayed per target.
@@ -269,7 +271,7 @@ async fn main() {
                 .await_ratelimits(1)
                 // A function to call when a rate limit leads to a delay.
                 .delay_action(delay_action)
-        }).await
+        ).await
         // The `#[group]` macro generates `static` instances of the options set for the group.
         // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
         // #name is turned all uppercase
@@ -279,8 +281,8 @@ async fn main() {
         .group(&MATH_GROUP)
         .group(&OWNER_GROUP);
 
-    framework.configure(|c| {
-        c.with_whitespace(true)
+    framework.configure(
+        Configuration::new().with_whitespace(true)
             .on_mention(Some(bot_id))
             .prefix("~")
             // In this case, if "," would be first, a message would never be delimited at ", ",
@@ -288,8 +290,8 @@ async fn main() {
             // each.
             .delimiters(vec![", ", ","])
             // Sets the bot's owners. These will be used for commands that are owners only.
-            .owners(owners)
-    });
+            .owners(owners),
+    );
 
     // For this example to run properly, the "Presence Intent" and "Server Members Intent" options
     // need to be enabled.

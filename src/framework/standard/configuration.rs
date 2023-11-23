@@ -80,7 +80,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 ///
 /// impl EventHandler for Handler {}
 ///
-/// use serenity::framework::StandardFramework;
+/// use serenity::framework::standard::{Configuration, StandardFramework};
 /// use serenity::model::id::UserId;
 /// use serenity::Client;
 ///
@@ -88,7 +88,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
 ///
 /// let framework = StandardFramework::new();
-/// framework.configure(|c| c.on_mention(Some(UserId::new(5))).prefix("~"));
+/// framework.configure(Configuration::new().on_mention(Some(UserId::new(5))).prefix("~"));
 ///
 /// let mut client = Client::builder(&token, GatewayIntents::default())
 ///     .event_handler(Handler)
@@ -103,47 +103,37 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// [default implementation]: Self::default
 #[derive(Clone)]
 pub struct Configuration {
-    #[doc(hidden)]
-    pub allow_dm: bool,
-    #[doc(hidden)]
-    pub with_whitespace: WithWhiteSpace,
-    #[doc(hidden)]
-    pub by_space: bool,
-    #[doc(hidden)]
-    pub blocked_guilds: HashSet<GuildId>,
-    #[doc(hidden)]
-    pub blocked_users: HashSet<UserId>,
-    #[doc(hidden)]
-    pub allowed_channels: HashSet<ChannelId>,
-    #[doc(hidden)]
-    pub disabled_commands: HashSet<String>,
-    #[doc(hidden)]
-    pub dynamic_prefixes: Vec<DynamicPrefixHook>,
-    #[doc(hidden)]
-    pub ignore_bots: bool,
-    #[doc(hidden)]
-    pub ignore_webhooks: bool,
-    #[doc(hidden)]
-    pub on_mention: Option<String>,
-    #[doc(hidden)]
-    pub owners: HashSet<UserId>,
-    #[doc(hidden)]
-    pub prefixes: Vec<String>,
-    #[doc(hidden)]
-    pub no_dm_prefix: bool,
-    #[doc(hidden)]
-    pub delimiters: Vec<Delimiter>,
-    #[doc(hidden)]
-    pub case_insensitive: bool,
+    pub(crate) allow_dm: bool,
+    pub(crate) with_whitespace: WithWhiteSpace,
+    pub(crate) by_space: bool,
+    pub(crate) blocked_guilds: HashSet<GuildId>,
+    pub(crate) blocked_users: HashSet<UserId>,
+    pub(crate) allowed_channels: HashSet<ChannelId>,
+    pub(crate) disabled_commands: HashSet<String>,
+    pub(crate) dynamic_prefixes: Vec<DynamicPrefixHook>,
+    pub(crate) ignore_bots: bool,
+    pub(crate) ignore_webhooks: bool,
+    pub(crate) on_mention: Option<String>,
+    pub(crate) owners: HashSet<UserId>,
+    pub(crate) prefixes: Vec<String>,
+    pub(crate) no_dm_prefix: bool,
+    pub(crate) delimiters: Vec<Delimiter>,
+    pub(crate) case_insensitive: bool,
 }
 
 impl Configuration {
+    /// Alias for Configuration::default
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// If set to false, bot will ignore any private messages.
     ///
     /// **Note**: Defaults to `true`.
-    pub fn allow_dm(&mut self, allow_dm: bool) -> &mut Self {
+    #[must_use]
+    pub fn allow_dm(mut self, allow_dm: bool) -> Self {
         self.allow_dm = allow_dm;
-
         self
     }
 
@@ -169,9 +159,9 @@ impl Configuration {
     ///
     /// // bot processes and executes the "about" command if it exists
     /// ```
-    pub fn with_whitespace<I: Into<WithWhiteSpace>>(&mut self, with: I) -> &mut Self {
+    #[must_use]
+    pub fn with_whitespace(mut self, with: impl Into<WithWhiteSpace>) -> Self {
         self.with_whitespace = with.into();
-
         self
     }
 
@@ -180,9 +170,9 @@ impl Configuration {
     /// group's or command's names.
     ///
     /// **Note**: Defaults to `true`
-    pub fn by_space(&mut self, b: bool) -> &mut Self {
+    #[must_use]
+    pub fn by_space(mut self, b: bool) -> Self {
         self.by_space = b;
-
         self
     }
 
@@ -196,17 +186,18 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::ChannelId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect())
-    /// });
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect()),
+    /// );
     /// ```
-    pub fn allowed_channels(&mut self, channels: HashSet<ChannelId>) -> &mut Self {
+    #[must_use]
+    pub fn allowed_channels(mut self, channels: HashSet<ChannelId>) -> Self {
         self.allowed_channels = channels;
-
         self
     }
 
@@ -220,17 +211,18 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::GuildId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect())
-    /// });
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect()),
+    /// );
     /// ```
-    pub fn blocked_guilds(&mut self, guilds: HashSet<GuildId>) -> &mut Self {
+    #[must_use]
+    pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
         self.blocked_guilds = guilds;
-
         self
     }
 
@@ -246,17 +238,18 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::UserId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect())
-    /// });
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect()),
+    /// );
     /// ```
-    pub fn blocked_users(&mut self, users: HashSet<UserId>) -> &mut Self {
+    #[must_use]
+    pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
         self.blocked_users = users;
-
         self
     }
 
@@ -271,7 +264,7 @@ impl Configuration {
     /// ```rust,no_run
     /// use serenity::client::Context;
     /// use serenity::framework::standard::macros::{command, group};
-    /// use serenity::framework::standard::CommandResult;
+    /// use serenity::framework::standard::{CommandResult, Configuration};
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::channel::Message;
     ///
@@ -288,12 +281,12 @@ impl Configuration {
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
     /// let framework = StandardFramework::new().group(&PENG_GROUP);
-    /// framework.configure(|c| c.disabled_commands(disabled));
+    /// framework.configure(Configuration::new().disabled_commands(disabled));
     /// ```
     #[inline]
-    pub fn disabled_commands(&mut self, commands: HashSet<String>) -> &mut Self {
+    #[must_use]
+    pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
         self.disabled_commands = commands;
-
         self
     }
 
@@ -321,15 +314,14 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
-    /// let framework = StandardFramework::new().configure(|c| {
-    ///     c.dynamic_prefix(|_, msg| {
+    /// let framework =
+    ///     StandardFramework::new().configure(Configuration::new().dynamic_prefix(|_, msg| {
     ///         Box::pin(async move {
     ///             Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
     ///         })
-    ///     })
-    /// });
+    ///     }));
     /// ```
     ///
     /// This will only use the prefix `"!"` or `"*"` depending on channel ID,
@@ -337,24 +329,25 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.dynamic_prefix(|_, msg| {
-    ///         Box::pin(async move {
-    ///             Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .dynamic_prefix(|_, msg| {
+    ///             Box::pin(async move {
+    ///                 Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
+    ///             })
     ///         })
-    ///     })
-    ///     .prefix("") // This disables the default prefix "~"
-    /// });
+    ///         .prefix(""), // This disables the default prefix "~"
+    /// );
     /// ```
     ///
     /// [`Context::data`]: crate::client::Context::data
     #[inline]
-    pub fn dynamic_prefix(&mut self, dynamic_prefix: DynamicPrefixHook) -> &mut Self {
+    #[must_use]
+    pub fn dynamic_prefix(mut self, dynamic_prefix: DynamicPrefixHook) -> Self {
         self.dynamic_prefixes.push(dynamic_prefix);
-
         self
     }
 
@@ -364,18 +357,18 @@ impl Configuration {
     /// itself.
     ///
     /// **Note**: Defaults to `true`.
-    pub fn ignore_bots(&mut self, ignore_bots: bool) -> &mut Self {
+    #[must_use]
+    pub fn ignore_bots(mut self, ignore_bots: bool) -> Self {
         self.ignore_bots = ignore_bots;
-
         self
     }
 
     /// If set to true, bot will ignore all commands called by webhooks.
     ///
     /// **Note**: Defaults to `true`.
-    pub fn ignore_webhooks(&mut self, ignore_webhooks: bool) -> &mut Self {
+    #[must_use]
+    pub fn ignore_webhooks(mut self, ignore_webhooks: bool) -> Self {
         self.ignore_webhooks = ignore_webhooks;
-
         self
     }
 
@@ -397,9 +390,9 @@ impl Configuration {
     /// The former is a direct mention, while the latter is a nickname mention, which aids mobile
     /// devices in determining whether to display a user's nickname. It has no real meaning for
     /// your bot, and the library encourages you to ignore differentiating between the two.
-    pub fn on_mention(&mut self, id_to_mention: Option<UserId>) -> &mut Self {
+    #[must_use]
+    pub fn on_mention(mut self, id_to_mention: Option<UserId>) -> Self {
         self.on_mention = id_to_mention.map(|id| id.to_string());
-
         self
     }
 
@@ -412,11 +405,13 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::UserId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
+    /// framework.configure(
+    ///     Configuration::new().owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()),
+    /// );
     /// ```
     ///
     /// Create a HashSet beforehand:
@@ -424,7 +419,7 @@ impl Configuration {
     /// ```rust,no_run
     /// use std::collections::HashSet;
     ///
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::UserId;
     ///
     /// let mut set = HashSet::new();
@@ -432,11 +427,11 @@ impl Configuration {
     /// set.insert(UserId::new(77));
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.owners(set));
+    /// framework.configure(Configuration::new().owners(set));
     /// ```
-    pub fn owners(&mut self, user_ids: HashSet<UserId>) -> &mut Self {
+    #[must_use]
+    pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
         self.owners = user_ids;
-
         self
     }
 
@@ -454,15 +449,15 @@ impl Configuration {
     /// Assign a basic prefix:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.prefix("!"));
+    /// framework.configure(Configuration::new().prefix("!"));
     /// ```
-    pub fn prefix(&mut self, prefix: impl Into<String>) -> &mut Self {
+    #[must_use]
+    pub fn prefix(mut self, prefix: impl Into<String>) -> Self {
         let p = prefix.into();
         self.prefixes = if p.is_empty() { vec![] } else { vec![p] };
-
         self
     }
 
@@ -478,16 +473,15 @@ impl Configuration {
     /// Assign a set of prefixes the bot can respond to:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.prefixes(vec!["!", ">", "+"]));
+    /// framework.configure(Configuration::new().prefixes(vec!["!", ">", "+"]));
     /// ```
     #[inline]
-    pub fn prefixes<T: ToString>(&mut self, prefixes: impl IntoIterator<Item = T>) -> &mut Self {
-        self.prefixes =
-            prefixes.into_iter().map(|p| p.to_string()).filter(|p| !p.is_empty()).collect();
-
+    #[must_use]
+    pub fn prefixes(mut self, prefixes: impl IntoIterator<Item = impl Into<String>>) -> Self {
+        self.prefixes = prefixes.into_iter().map(Into::into).filter(|p| !p.is_empty()).collect();
         self
     }
 
@@ -499,9 +493,9 @@ impl Configuration {
     ///
     /// The `cache` feature is required. If disabled this does absolutely nothing.
     #[inline]
-    pub fn no_dm_prefix(&mut self, b: bool) -> &mut Self {
+    #[must_use]
+    pub fn no_dm_prefix(mut self, b: bool) -> Self {
         self.no_dm_prefix = b;
-
         self
     }
 
@@ -514,12 +508,12 @@ impl Configuration {
     /// Have the args be separated by a comma and a space:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.delimiter(", "));
+    /// let framework = StandardFramework::new().configure(Configuration::new().delimiter(", "));
     /// ```
-    pub fn delimiter<I: Into<Delimiter>>(&mut self, delimiter: I) -> &mut Self {
+    #[must_use]
+    pub fn delimiter(mut self, delimiter: impl Into<Delimiter>) -> Self {
         self.delimiters.clear();
         self.delimiters.push(delimiter.into());
 
@@ -536,15 +530,16 @@ impl Configuration {
     /// Have the args be separated by a comma and a space; and a regular space:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.delimiters(vec![", ", " "]));
+    /// framework.configure(Configuration::new().delimiters(vec![", ", " "]));
     /// ```
-    pub fn delimiters<T: Into<Delimiter>>(
-        &mut self,
-        delimiters: impl IntoIterator<Item = T>,
-    ) -> &mut Self {
+    #[must_use]
+    pub fn delimiters(
+        mut self,
+        delimiters: impl IntoIterator<Item = impl Into<Delimiter>>,
+    ) -> Self {
         self.delimiters.clear();
         self.delimiters.extend(delimiters.into_iter().map(Into::into));
 
@@ -558,7 +553,8 @@ impl Configuration {
     /// insensitive.
     ///
     /// **Note**: Defaults to `false`.
-    pub fn case_insensitivity(&mut self, cs: bool) -> &mut Self {
+    #[must_use]
+    pub fn case_insensitivity(mut self, cs: bool) -> Self {
         self.case_insensitive = cs;
 
         for prefix in &mut self.prefixes {

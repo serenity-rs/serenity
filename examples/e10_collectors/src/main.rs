@@ -12,6 +12,7 @@ use serenity::framework::standard::{
     Args,
     CommandGroup,
     CommandResult,
+    Configuration,
     HelpOptions,
     StandardFramework,
 };
@@ -62,9 +63,13 @@ async fn main() {
 
     let framework = StandardFramework::new().help(&MY_HELP).group(&COLLECTOR_GROUP);
 
-    framework.configure(|c| {
-        c.with_whitespace(true).on_mention(Some(bot_id)).prefix("~").delimiters(vec![", ", ","])
-    });
+    framework.configure(
+        Configuration::new()
+            .with_whitespace(true)
+            .on_mention(Some(bot_id))
+            .prefix("~")
+            .delimiters(vec![", ", ","]),
+    );
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
