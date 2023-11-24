@@ -58,6 +58,8 @@
     clippy::non_ascii_literal,
     clippy::fallible_impl_from,
     clippy::let_underscore_must_use,
+    clippy::format_collect,
+    clippy::format_push_string,
     clippy::pedantic
 )]
 #![allow(
