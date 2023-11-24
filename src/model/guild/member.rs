@@ -647,6 +647,7 @@ impl From<Member> for PartialMember {
     }
 }
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialThreadMember {
