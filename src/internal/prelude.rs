@@ -4,7 +4,5 @@
 
 pub use std::result::Result as StdResult;
 
-#[cfg(feature = "client")]
-pub use crate::client::ClientError;
 pub use crate::error::{Error, Result};
 pub use crate::json::{JsonMap, Value};
