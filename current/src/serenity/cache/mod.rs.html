@@ -852,6 +852,10 @@
 <a href="#852" id="852">852</a>
 <a href="#853" id="853">853</a>
 <a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -901,6 +905,8 @@
 <span class="kw">mod </span>settings;
 <span class="kw">mod </span>wrappers;
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>wrappers::MaybeOwnedArc;
 <span class="kw">use </span>wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
 
 <span class="kw">type </span>MessageCache = DashMap&lt;ChannelId, HashMap&lt;MessageId, Message&gt;, BuildHasher&gt;;
@@ -929,8 +935,8 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-    </span><span class="kw">fn </span>from_arc(inner: Arc&lt;V&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(CacheRefInner::Arc(inner))
+    </span><span class="kw">fn </span>from_arc(inner: MaybeOwnedArc&lt;V&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(CacheRefInner::Arc(inner.get_inner()))
     }
 
     <span class="kw">fn </span>from_ref(inner: Ref&lt;<span class="lifetime">&#39;a</span>, K, V, BuildHasher&gt;) -&gt; <span class="self">Self </span>{
@@ -974,7 +980,8 @@
 <span class="kw">pub type </span>ChannelMessagesRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, ChannelId, HashMap&lt;MessageId, Message&gt;&gt;;
 <span class="kw">pub type </span>MessageRef&lt;<span class="lifetime">&#39;a</span>&gt; = CacheRef&lt;<span class="lifetime">&#39;a</span>, ChannelId, Message, HashMap&lt;MessageId, Message&gt;&gt;;
 
-<span class="attr">#[derive(Debug)]
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CachedShardData {
     <span class="kw">pub </span>total: u32,
     <span class="kw">pub </span>connected: HashSet&lt;ShardId&gt;,
@@ -999,7 +1006,8 @@
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
-</span><span class="attr">#[derive(Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Cache {
     <span class="comment">// Temp cache:
@@ -1008,12 +1016,12 @@
     ///
     /// The TTL for each value is configured in CacheSettings.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_channels: MokaCache&lt;ChannelId, Arc&lt;GuildChannel&gt;, BuildHasher&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_channels: MokaCache&lt;ChannelId, MaybeOwnedArc&lt;GuildChannel&gt;, BuildHasher&gt;,
     <span class="doccomment">/// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_users: MokaCache&lt;UserId, Arc&lt;User&gt;, BuildHasher&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_users: MokaCache&lt;UserId, MaybeOwnedArc&lt;User&gt;, BuildHasher&gt;,
 
     <span class="comment">// Channels cache:
     </span><span class="doccomment">/// A map of channel ids to the guilds in which the channel data is stored.

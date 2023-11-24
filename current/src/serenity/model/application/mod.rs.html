@@ -169,6 +169,8 @@
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
 <a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.
 
 </span><span class="kw">mod </span>command;
@@ -196,7 +198,8 @@
 <span class="doccomment">/// Partial information about the given application.
 ///
 /// Discord docs: [application field of Ready](https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields)
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialCurrentApplicationInfo {
     <span class="doccomment">/// The unique Id of the user.
@@ -300,7 +303,8 @@
     <span class="doccomment">/// The flags of the application.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-flags).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>ApplicationFlags: u64 {
         <span class="doccomment">/// Indicates if an app uses the Auto Moderation API
         </span><span class="kw">const </span>APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;

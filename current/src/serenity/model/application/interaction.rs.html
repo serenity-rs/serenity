@@ -296,6 +296,9 @@
 <a href="#296" id="296">296</a>
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -309,7 +312,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Interaction {
     Ping(PingInteraction),
@@ -544,6 +548,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>InteractionType {
@@ -561,7 +566,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)
     /// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>InteractionResponseFlags: u64 {
         <span class="doccomment">/// Do not include any embeds when serializing this message.
         </span><span class="kw">const </span>SUPPRESS_EMBEDS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
@@ -576,7 +581,8 @@
 /// [`Message`]: crate::model::channel::Message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageInteraction {
     <span class="doccomment">/// The id of the interaction.

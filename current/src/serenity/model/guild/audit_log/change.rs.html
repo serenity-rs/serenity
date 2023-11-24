@@ -281,6 +281,9 @@
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::json::Value;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::PermissionOverwrite;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
@@ -296,14 +299,16 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::sticker::StickerFormatType;
 <span class="kw">use </span><span class="kw">crate</span>::model::{Permissions, Timestamp};
 
-<span class="attr">#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AffectedRole {
     <span class="kw">pub </span>id: RoleId,
     <span class="kw">pub </span>name: String,
 }
 
-<span class="attr">#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[serde(untagged)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>EntityType {
@@ -317,6 +322,7 @@
         </span><span class="macro-nonterminal">$key</span>:literal =&gt; <span class="macro-nonterminal">$name</span>:ident (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>),
     )* ) =&gt; {
         <span class="attr">#[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
+        #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
         #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
         </span><span class="comment">// serde_json&#39;s Value impls Eq, simd-json&#39;s Value doesn&#39;t
         </span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;simd_json&quot;</span>), derive(Eq))]

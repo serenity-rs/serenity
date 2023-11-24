@@ -211,6 +211,7 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of macros for easily working with internals.
 
 </span><span class="attr">#[cfg(any(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
@@ -370,10 +371,11 @@
             )*
         }
     ) =&gt; {
+        $(<span class="attr">#[<span class="macro-nonterminal">$outer</span>]</span>)*
+        <span class="macro-nonterminal">$vis </span><span class="kw">struct </span><span class="macro-nonterminal">$BitFlags</span>(<span class="macro-nonterminal">$T</span>);
+
         <span class="macro">bitflags::bitflags! </span>{
-            <span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-            </span>$(<span class="attr">#[<span class="macro-nonterminal">$outer</span>]</span>)*
-            <span class="macro-nonterminal">$vis </span><span class="kw">struct </span><span class="macro-nonterminal">$BitFlags</span>: <span class="macro-nonterminal">$T </span>{
+            <span class="kw">impl </span><span class="macro-nonterminal">$BitFlags</span>: <span class="macro-nonterminal">$T </span>{
                 $(
                     $(<span class="attr">#[<span class="macro-nonterminal">$inner </span>$(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>]</span>)*
                     <span class="kw">const </span><span class="macro-nonterminal">$Flag </span>= <span class="macro-nonterminal">$value</span>;

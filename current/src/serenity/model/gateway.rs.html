@@ -757,6 +757,22 @@
 <a href="#757" id="757">757</a>
 <a href="#758" id="758">758</a>
 <a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -790,7 +806,8 @@
 <span class="doccomment">/// Representation of an activity that a [`User`] is performing.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Activity {
     <span class="doccomment">/// The ID of the application for the activity.
@@ -838,7 +855,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
-</span><span class="attr">#[derive(Clone, Debug, Serialize, Deserialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityButton {
     <span class="doccomment">/// The text shown on the button.
@@ -853,7 +871,8 @@
 <span class="doccomment">/// The assets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityAssets {
     <span class="doccomment">/// The ID for a large asset of the activity, usually a snowflake.
@@ -870,7 +889,8 @@
     <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>ActivityFlags: u64 {
         <span class="doccomment">/// Whether the activity is an instance activity.
         </span><span class="kw">const </span>INSTANCE = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -896,7 +916,8 @@
 <span class="doccomment">/// Information about an activity&#39;s party.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activityparty-struct).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityParty {
     <span class="doccomment">/// The ID of the party.
@@ -908,7 +929,8 @@
 <span class="doccomment">/// Secrets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivitySecrets {
     <span class="doccomment">/// The secret for joining a party.
@@ -923,7 +945,8 @@
 <span class="doccomment">/// Representation of an emoji used in a custom status
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityEmoji {
     <span class="doccomment">/// The name of the emoji.
@@ -937,6 +960,7 @@
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ActivityType {
@@ -972,7 +996,8 @@
 <span class="doccomment">/// Information detailing the current active status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ClientStatus {
     <span class="kw">pub </span>desktop: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
@@ -987,7 +1012,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object),
 /// [modification description](https://discord.com/developers/docs/topics/gateway-events#presence-update).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PresenceUser {
     <span class="kw">pub </span>id: UserId,
@@ -1058,7 +1084,8 @@
 <span class="doccomment">/// Information detailing the current online status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Presence {
     <span class="doccomment">/// Data about the associated user.
@@ -1077,7 +1104,8 @@
 <span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Ready {
     <span class="doccomment">/// API version
@@ -1113,7 +1141,8 @@
     </span><span class="kw">pub </span>max_concurrency: u64,
 }
 
-<span class="attr">#[derive(Clone, Copy, Debug)]
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 </span><span class="kw">pub struct </span>ShardInfo {
     <span class="kw">pub </span>id: ShardId,
     <span class="kw">pub </span>total: u32,
@@ -1151,7 +1180,8 @@
 <span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityTimestamps {
     <span class="kw">pub </span>end: <span class="prelude-ty">Option</span>&lt;u64&gt;,
@@ -1183,6 +1213,8 @@
     /// [Gateway Intents]: https://discord.com/developers/docs/topics/gateway#gateway-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>GatewayIntents: u64 {
         <span class="doccomment">/// Enables the following gateway events:
         ///  - GUILD_CREATE

@@ -846,6 +846,9 @@
 <a href="#846" id="846">846</a>
 <a href="#847" id="847">847</a>
 <a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
 //! channel&#39;s permission overrides.
 //!
@@ -1056,19 +1059,22 @@
     Permissions::CONNECT.bits() | Permissions::SPEAK.bits() | Permissions::USE_VAD.bits(),
 );
 
+<span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
+/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
+///
+/// [`Guild`]: super::guild::Guild
+/// [`GuildChannel`]: super::channel::GuildChannel
+/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
+/// [`Role`]: super::guild::Role
+/// [`User`]: super::user::User
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub struct </span>Permissions(u64);
+
 <span class="macro">bitflags::bitflags! </span>{
-    <span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
-    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
-    ///
-    /// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
-    ///
-    /// [`Guild`]: super::guild::Guild
-    /// [`GuildChannel`]: super::channel::GuildChannel
-    /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
-    /// [`Role`]: super::guild::Role
-    /// [`User`]: super::user::User
-    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
-    </span><span class="kw">pub struct </span>Permissions: u64 {
+    <span class="kw">impl </span>Permissions: u64 {
         <span class="doccomment">/// Allows for the creation of [`RichInvite`]s.
         ///
         /// [`RichInvite`]: super::invite::RichInvite

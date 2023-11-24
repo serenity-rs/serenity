@@ -690,6 +690,11 @@
 <a href="#690" id="690">690</a>
 <a href="#691" id="691">691</a>
 <a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
 </span><span class="kw">use </span>std::cmp::Reverse;
 <span class="kw">use </span>std::fmt;
@@ -712,7 +717,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Member {
     <span class="doccomment">/// Attached User struct.
@@ -758,7 +764,8 @@
     <span class="doccomment">/// Flags for a guild member.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>GuildMemberFlags: u32 {
         <span class="doccomment">/// Member has left and rejoined the guild. Not editable
         </span><span class="kw">const </span>DID_REJOIN = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -1263,7 +1270,8 @@
 /// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialMember {
     <span class="doccomment">/// Indicator of whether the member can hear in voice channels.
@@ -1347,7 +1355,8 @@
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object),
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadMember {
     <span class="attr">#[serde(flatten)]
@@ -1376,7 +1385,8 @@
     <span class="doccomment">/// Describes extra features of the message.
     ///
     /// Discord docs: flags field on [Thread Member](https://discord.com/developers/docs/resources/channel#thread-member-object).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>ThreadMemberFlags: u64 {
         <span class="comment">// Not documented.
         </span><span class="kw">const </span>NOTIFICATIONS = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;

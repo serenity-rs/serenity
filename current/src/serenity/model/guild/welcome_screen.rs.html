@@ -96,6 +96,9 @@
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, EmojiId};
@@ -103,7 +106,8 @@
 <span class="doccomment">/// Information relating to a guild&#39;s welcome screen.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildWelcomeScreen {
     <span class="doccomment">/// The server description shown in the welcome screen.
@@ -117,7 +121,8 @@
 <span class="doccomment">/// A channel shown in the [`GuildWelcomeScreen`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildWelcomeChannel {
     <span class="doccomment">/// The channel Id.
@@ -186,7 +191,8 @@
 <span class="doccomment">/// A [`GuildWelcomeScreen`] emoji.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
-</span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>GuildWelcomeChannelEmoji {
     <span class="doccomment">/// A custom emoji.

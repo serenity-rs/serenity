@@ -451,6 +451,7 @@
 <a href="#451" id="451">451</a>
 <a href="#452" id="452">452</a>
 <a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
 </pre></div><pre class="rust"><code><span class="comment">// Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.
 </span><span class="attr">#![allow(clippy::unreadable_literal)]
 
@@ -520,6 +521,7 @@
 ///
 /// [`Role`]: crate::model::guild::Role
 </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
 </span><span class="kw">pub struct </span>Colour(<span class="kw">pub </span>u32);
 
 <span class="kw">pub type </span>Color = Colour;

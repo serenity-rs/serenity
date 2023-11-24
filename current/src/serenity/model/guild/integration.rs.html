@@ -74,6 +74,10 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::Timestamp;
 
@@ -82,7 +86,8 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object),
 /// [extra fields 1](https://discord.com/developers/docs/topics/gateway-events#integration-create),
 /// [extra fields 2](https://discord.com/developers/docs/topics/gateway-events#integration-update),
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Integration {
     <span class="kw">pub </span>id: IntegrationId,
@@ -112,6 +117,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object-integration-expire-behaviors).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>IntegrationExpireBehaviour {
@@ -131,7 +137,8 @@
 <span class="doccomment">/// Integration account object.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-account-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IntegrationAccount {
     <span class="kw">pub </span>id: String,
@@ -141,7 +148,8 @@
 <span class="doccomment">/// Integration application object.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-application-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IntegrationApplication {
     <span class="kw">pub </span>id: ApplicationId,

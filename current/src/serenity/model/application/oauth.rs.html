@@ -110,6 +110,7 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -117,8 +118,9 @@
 <span class="doccomment">/// The available OAuth2 Scopes.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
-</span><span class="attr">#[non_exhaustive]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
 </span><span class="kw">pub enum </span>Scope {
     <span class="doccomment">/// For oauth2 bots, this puts the bot in the user&#39;s selected guild by default.
     </span><span class="attr">#[serde(rename = <span class="string">&quot;bot&quot;</span>)]

@@ -608,6 +608,20 @@
 <a href="#608" id="608">608</a>
 <a href="#609" id="609">609</a>
 <a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
 </span><span class="kw">mod </span>attachment;
@@ -643,7 +657,8 @@
 </span><span class="kw">pub type </span>AttachmentType&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">crate</span>::builder::CreateAttachment;
 
 <span class="doccomment">/// A container for any channel.
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 #[non_exhaustive]
 #[allow(clippy::large_enum_variant)] </span><span class="comment">// https://github.com/rust-lang/rust-clippy/issues/9798
@@ -827,6 +842,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ChannelType {
@@ -940,7 +956,8 @@
 <span class="doccomment">/// A channel-specific permission overwrite for a member or role.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
-</span><span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(try_from = <span class="string">&quot;PermissionOverwriteData&quot;</span>, into = <span class="string">&quot;PermissionOverwriteData&quot;</span>)]
 </span><span class="kw">pub struct </span>PermissionOverwrite {
     <span class="kw">pub </span>allow: Permissions,
@@ -956,7 +973,8 @@
 /// from [`GuildId::everyone_role`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>PermissionOverwriteType {
     <span class="doccomment">/// A member which is having its permission overwrites edited.
@@ -970,6 +988,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>VideoQualityMode {
@@ -987,6 +1006,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level).
     </span><span class="attr">#[derive(Clone, Copy, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>StageInstancePrivacyLevel {
@@ -1004,6 +1024,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object)
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u16&quot;</span>, into = <span class="string">&quot;u16&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>AutoArchiveDuration {
@@ -1017,7 +1038,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>StageInstance {
     <span class="doccomment">/// The Id of the stage instance.
@@ -1039,7 +1061,8 @@
 <span class="doccomment">/// A thread data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
-</span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadMetadata {
     <span class="doccomment">/// Whether the thread is archived.
@@ -1070,7 +1093,8 @@
 /// [2](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body),
 /// [3](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body),
 /// [4](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body)
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadsData {
     <span class="doccomment">/// The threads channels.
@@ -1124,7 +1148,8 @@
 ///
 /// See [Discord](https://discord.com/developers/docs/resources/channel#default-reaction-object)
 /// [docs]()
-</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ForumEmoji {
     <span class="doccomment">/// The id of a guild&#39;s custom emoji.
@@ -1174,7 +1199,8 @@
 <span class="doccomment">/// An object that represents a tag able to be applied to a thread in a `GUILD_FORUM` channel.
 ///
 /// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
-</span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ForumTag {
     <span class="doccomment">/// The id of the tag.
@@ -1193,7 +1219,8 @@
     <span class="doccomment">/// The sort order for threads in a forum.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).
-    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>SortOrder {
@@ -1209,7 +1236,8 @@
     <span class="doccomment">/// Describes extra features of the channel.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-flags).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>ChannelFlags: u64 {
         <span class="doccomment">/// This thread is pinned to the top of its parent GUILD_FORUM channel
         </span><span class="kw">const </span>PINNED = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;

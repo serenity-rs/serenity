@@ -563,12 +563,13 @@
 <a href="#563" id="563">563</a>
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
-</span><span class="kw">use </span>std::sync::Arc;
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>secrecy::ExposeSecret;
 <span class="kw">use </span>secrecy::SecretString;
 
@@ -594,6 +595,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>WebhookType {
@@ -625,7 +627,8 @@
 /// not necessarily require a bot user or authentication to use.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
-</span><span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Webhook {
     <span class="doccomment">/// The unique Id.
@@ -668,7 +671,8 @@
 }
 
 <span class="doccomment">/// The guild object returned by a [`Webhook`], of type [`WebhookType::ChannelFollower`].
-</span><span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>WebhookGuild {
     <span class="doccomment">/// The unique Id identifying the guild.
@@ -729,7 +733,8 @@
     </span>}
 }
 
-<span class="attr">#[derive(Debug, Clone, Deserialize, Serialize)]
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>WebhookChannel {
     <span class="doccomment">/// The unique Id of the channel.
@@ -775,7 +780,10 @@
         <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                cache.temp_channels.insert(guild_channel.id, Arc::new(guild_channel.clone()));
+                <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+
+                <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(guild_channel.clone());
+                cache.temp_channels.insert(cached_channel.id, cached_channel);
             }
         }
 

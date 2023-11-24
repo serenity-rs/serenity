@@ -243,6 +243,7 @@
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Utilities for parsing and formatting RFC 3339 timestamps.
 //!
 //! The [`Timestamp`] newtype wraps `chrono::DateTime&lt;Utc&gt;` or `time::OffsetDateTime` if the `time`
@@ -291,6 +292,7 @@
 </span><span class="kw">const </span>DISCORD_EPOCH: u64 = <span class="number">1_420_070_400_000</span>;
 
 <span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
 #[serde(transparent)]
 </span><span class="kw">pub struct </span>Timestamp(
     <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)] </span>DateTime&lt;Utc&gt;,

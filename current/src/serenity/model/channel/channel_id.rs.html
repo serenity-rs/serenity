@@ -1207,6 +1207,9 @@
 <a href="#1207" id="1207">1207</a>
 <a href="#1208" id="1208">1208</a>
 <a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -1616,7 +1619,10 @@
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span>Channel::Guild(guild_channel) = <span class="kw-2">&amp;</span>channel {
-                    cache.temp_channels.insert(guild_channel.id, Arc::new(guild_channel.clone()));
+                    <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+
+                    <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(guild_channel.clone());
+                    cache.temp_channels.insert(cached_channel.id, cached_channel);
                 }
             }
         }

@@ -909,6 +909,12 @@
 <a href="#909" id="909">909</a>
 <a href="#910" id="910">910</a>
 <a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -916,8 +922,6 @@
 </span><span class="kw">use </span>std::fmt::Write;
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::ops::{Deref, DerefMut};
-<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-</span><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
@@ -1039,7 +1043,8 @@
 <span class="doccomment">/// Information about the current user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(transparent)]
 </span><span class="kw">pub struct </span>CurrentUser(User);
 
@@ -1102,7 +1107,8 @@
 <span class="doccomment">/// The representation of a user&#39;s status.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types).
-</span><span class="attr">#[derive(
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
 #[non_exhaustive]
@@ -1137,7 +1143,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
 /// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>User {
     <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s creation date.
@@ -1209,6 +1216,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>PremiumType {
@@ -1225,7 +1233,8 @@
     <span class="doccomment">/// User&#39;s public flags
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-flags).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>UserPublicFlags: u32 {
         <span class="doccomment">/// User&#39;s flag as discord employee
         </span><span class="kw">const </span>DISCORD_EMPLOYEE = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -1660,7 +1669,10 @@
         <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                cache.temp_users.insert(user.id, Arc::new(user.clone()));
+                <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+
+                <span class="kw">let </span>cached_user = MaybeOwnedArc::new(user.clone());
+                cache.temp_users.insert(cached_user.id, cached_user);
             }
         }
 

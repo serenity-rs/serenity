@@ -399,6 +399,10 @@
 <a href="#399" id="399">399</a>
 <a href="#400" id="400">400</a>
 <a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
@@ -519,6 +523,9 @@
                     <span class="prelude-val">Ok</span>(<span class="self">Self</span>(s.parse()<span class="question-mark">?</span>))
                 }
             }
+
+            <span class="attr">#[cfg(feature = <span class="string">&quot;typesize&quot;</span>)]
+            </span><span class="kw">impl </span>typesize::TypeSize <span class="kw">for </span><span class="macro-nonterminal">$name </span>{}
         )*
     }
 }
@@ -681,7 +688,8 @@
 ///
 /// This identifier is special, it simply models internal IDs for type safety,
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
-</span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 </span><span class="kw">pub struct </span>ShardId(<span class="kw">pub </span>u32);
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ShardId {

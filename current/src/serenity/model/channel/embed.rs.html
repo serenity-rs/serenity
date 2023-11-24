@@ -211,6 +211,14 @@
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
 <a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::{Colour, Timestamp};
 
 <span class="doccomment">/// Represents a rich embed which allows using richer markdown, multiple fields and more. This was
@@ -224,7 +232,8 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object).
 ///
 /// [slack&#39;s attachments]: https://api.slack.com/docs/message-attachments
-</span><span class="attr">#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Embed {
     <span class="doccomment">/// The title of the embed.
@@ -284,7 +293,8 @@
 <span class="doccomment">/// An author object in an embed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>EmbedAuthor {
     <span class="doccomment">/// The name of the author.
@@ -305,7 +315,8 @@
 <span class="doccomment">/// A field object in an embed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>EmbedField {
     <span class="doccomment">/// The name of the field.
@@ -346,7 +357,8 @@
 <span class="doccomment">/// Footer information for an embed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>EmbedFooter {
     <span class="doccomment">/// The associated text with the footer.
@@ -364,7 +376,8 @@
 <span class="doccomment">/// An image object in an embed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>EmbedImage {
     <span class="doccomment">/// Source URL of the image.
@@ -382,7 +395,8 @@
 <span class="doccomment">/// The provider of an embed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>EmbedProvider {
     <span class="doccomment">/// The name of the provider.
@@ -394,7 +408,8 @@
 <span class="doccomment">/// The dimensions and URL of an embed thumbnail.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>EmbedThumbnail {
     <span class="doccomment">/// The source URL of the thumbnail.
@@ -412,7 +427,8 @@
 <span class="doccomment">/// Video information for an embed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>EmbedVideo {
     <span class="doccomment">/// The source URL of the video.

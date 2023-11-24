@@ -1121,6 +1121,17 @@
 <a href="#1121" id="1121">1121</a>
 <a href="#1122" id="1122">1122</a>
 <a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1153,7 +1164,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Message {
     <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date of the message.
@@ -1969,7 +1981,8 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-object).
 ///
 /// [reaction type]: ReactionType
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageReaction {
     <span class="doccomment">/// The amount of the type of reaction that have been sent for the associated message.
@@ -1986,6 +1999,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>MessageType {
@@ -2052,6 +2066,7 @@
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>MessageActivityKind {
@@ -2067,7 +2082,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object),
 /// [subset undocumented](https://discord.com/developers/docs/resources/channel#message-object-message-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageApplication {
     <span class="doccomment">/// ID of the application.
@@ -2085,7 +2101,8 @@
 <span class="doccomment">/// Rich Presence activity information.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageActivity {
     <span class="doccomment">/// Kind of message activity.
@@ -2098,7 +2115,8 @@
 <span class="doccomment">/// Reference data sent with crossposted messages.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageReference {
     <span class="doccomment">/// ID of the originating message.
@@ -2135,7 +2153,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ChannelMention {
     <span class="doccomment">/// ID of the channel.
@@ -2153,7 +2172,8 @@
     <span class="doccomment">/// Describes extra features of the message.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>MessageFlags: u64 {
         <span class="doccomment">/// This message has been published to subscribed channels (via Channel Following).
         </span><span class="kw">const </span>CROSSPOSTED = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -2225,7 +2245,8 @@
     }
 }
 
-<span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>Nonce {
     String(String),
@@ -2233,7 +2254,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#role-subscription-data-object)
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>RoleSubscriptionData {
     <span class="doccomment">/// The id of the sku and listing that the user is subscribed to.
     </span><span class="kw">pub </span>role_subscription_listing_id: SkuId,

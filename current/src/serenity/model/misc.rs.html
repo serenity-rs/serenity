@@ -273,6 +273,8 @@
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.
 
 </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
@@ -287,7 +289,8 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
 <span class="doccomment">/// Hides the implementation detail of ImageHash as an enum.
-</span><span class="attr">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">enum </span>ImageHashInner {
     Normal { hash: [u8; <span class="number">16</span>], is_animated: bool },
     Clyde,
@@ -306,7 +309,8 @@
 /// assert_eq!(image_hash.to_string(), String::from(&quot;f1eff024d9c85339c877985229ed8fec&quot;));
 /// ```
 
-</span><span class="attr">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>ImageHash(ImageHashInner);
 
 <span class="kw">impl </span>ImageHash {
