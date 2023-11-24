@@ -983,7 +983,7 @@ impl<'a> Iterator for RawArguments<'a> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let (start, end) = self.tokens.get(0)?.span;
+        let (start, end) = self.tokens.first()?.span;
 
         self.tokens = &self.tokens[1..];
 

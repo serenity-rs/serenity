@@ -4,7 +4,7 @@ use serenity::model::application::{CommandOptionType, ResolvedOption, ResolvedVa
 pub fn run(options: &[ResolvedOption]) -> String {
     if let Some(ResolvedOption {
         value: ResolvedValue::User(user, _), ..
-    }) = options.get(0)
+    }) = options.first()
     {
         format!("{}'s id is {}", user.tag(), user.id)
     } else {
