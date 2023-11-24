@@ -878,13 +878,6 @@
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
-<a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>help_commands;
 <span class="kw">pub mod </span>macros {
     <span class="kw">pub use </span>command_attr::{check, command, group, help, hook};
@@ -1026,12 +1019,12 @@
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));
+    /// framework.configure(Configuration::new().with_whitespace(true).prefix(&quot;~&quot;));
     ///
     /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default())
@@ -1045,8 +1038,8 @@
     /// [`Client`]: crate::Client
     /// [`prefix`]: Configuration::prefix
     /// [allowing whitespace between prefixes]: Configuration::with_whitespace
-    </span><span class="kw">pub fn </span>configure(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>Configuration) -&gt; <span class="kw-2">&amp;mut </span>Configuration) {
-        f(<span class="kw-2">&amp;mut </span><span class="self">self</span>.config.write());
+    </span><span class="kw">pub fn </span>configure(<span class="kw-2">&amp;</span><span class="self">self</span>, config: Configuration) {
+        <span class="kw-2">*</span><span class="self">self</span>.config.write() = config;
     }
 
     <span class="doccomment">/// Defines a bucket with `delay` between each command, and the `limit` of uses per
@@ -1059,7 +1052,7 @@
     ///
     /// ```rust,no_run
     /// use serenity::framework::standard::macros::command;
-    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    /// use serenity::framework::standard::{BucketBuilder, CommandResult, StandardFramework};
     ///
     /// #[command]
     /// // Registers the bucket `basic` to this command.
@@ -1069,21 +1062,14 @@
     /// }
     ///
     /// # async fn run() {
-    /// let framework =
-    ///     StandardFramework::new().bucket(&quot;basic&quot;, |b| b.delay(2).time_span(10).limit(3)).await;
+    /// let framework = StandardFramework::new()
+    ///     .bucket(&quot;basic&quot;, BucketBuilder::default().delay(2).time_span(10).limit(3))
+    ///     .await;
     /// # }
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub async fn </span>bucket&lt;F&gt;(<span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, f: F) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>BucketBuilder) -&gt; <span class="kw-2">&amp;mut </span>BucketBuilder,
-    {
-        <span class="kw">let </span><span class="kw-2">mut </span>builder = BucketBuilder::default();
-
-        f(<span class="kw-2">&amp;mut </span>builder);
-
-        <span class="self">self</span>.buckets.lock().<span class="kw">await</span>.insert(name.to_string(), builder.construct());
-
+    </span><span class="kw">pub async fn </span>bucket(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, builder: BucketBuilder) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.buckets.lock().<span class="kw">await</span>.insert(name.into(), builder.construct());
         <span class="self">self
     </span>}
 

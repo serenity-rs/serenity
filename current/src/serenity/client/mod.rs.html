@@ -951,10 +951,6 @@
 <a href="#951" id="951">951</a>
 <a href="#952" id="952">952</a>
 <a href="#953" id="953">953</a>
-<a href="#954" id="954">954</a>
-<a href="#955" id="955">955</a>
-<a href="#956" id="956">956</a>
-<a href="#957" id="957">957</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards&#39; connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -1125,12 +1121,8 @@
     ///
     /// [`Settings`]: CacheSettings
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-    </span><span class="kw">pub fn </span>cache_settings&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, f: F) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>CacheSettings) -&gt; <span class="kw-2">&amp;mut </span>CacheSettings,
-    {
-        f(<span class="kw-2">&amp;mut </span><span class="self">self</span>.cache_settings);
-
+    </span><span class="kw">pub fn </span>cache_settings(<span class="kw-2">mut </span><span class="self">self</span>, settings: CacheSettings) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.cache_settings = settings;
         <span class="self">self
     </span>}
 

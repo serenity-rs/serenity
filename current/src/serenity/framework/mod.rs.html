@@ -162,7 +162,7 @@
 //!
 //! ```rust,no_run
 //! use serenity::framework::standard::macros::{command, group};
-//! use serenity::framework::standard::{CommandResult, StandardFramework};
+//! use serenity::framework::standard::{CommandResult, Configuration, StandardFramework};
 //! use serenity::model::channel::Message;
 //! use serenity::prelude::*;
 //!
@@ -198,7 +198,7 @@
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
 //!     .group(&amp;GENERAL_GROUP);
 //!
-//! framework.configure(|c| c.prefix(&quot;~&quot;));
+//! framework.configure(Configuration::new().prefix(&quot;~&quot;));
 //!
 //! let mut client = Client::builder(&amp;token, GatewayIntents::default())
 //!     .event_handler(Handler)
