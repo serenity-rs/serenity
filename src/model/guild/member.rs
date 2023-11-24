@@ -83,7 +83,7 @@ bitflags! {
 
 #[cfg(feature = "model")]
 impl Member {
-    /// Adds a [`Role`] to the member, editing its roles in-place if the request was successful.
+    /// Adds a [`Role`] to the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -94,16 +94,11 @@ impl Member {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn add_role(
-        &mut self,
-        cache_http: impl CacheHttp,
-        role_id: impl Into<RoleId>,
-    ) -> Result<()> {
-        self.add_roles(cache_http, &[role_id.into()]).await
+    pub async fn add_role(&self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
+        http.as_ref().add_member_role(self.guild_id, self.user.id, role_id.into(), None).await
     }
 
-    /// Adds one or multiple [`Role`]s to the member, editing its roles in-place if the request was
-    /// successful.
+    /// Adds one or multiple [`Role`]s to the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -113,16 +108,12 @@ impl Member {
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_roles(
-        &mut self,
-        cache_http: impl CacheHttp,
-        role_ids: &[RoleId],
-    ) -> Result<()> {
-        let mut target_roles = self.roles.clone();
-        target_roles.extend_from_slice(role_ids);
+    pub async fn add_roles(&self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+        for role_id in role_ids {
+            self.add_role(http.as_ref(), role_id).await?;
+        }
 
-        let builder = EditMember::new().roles(target_roles);
-        self.edit(cache_http, builder).await
+        Ok(())
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -449,8 +440,7 @@ impl Member {
         Ok(guild.member_permissions(self))
     }
 
-    /// Removes a [`Role`] from the member, editing its roles in-place if the request was
-    /// successful.
+    /// Removes a [`Role`] from the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -461,15 +451,14 @@ impl Member {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_role(
-        &mut self,
-        cache_http: impl CacheHttp,
+        &self,
+        http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        self.remove_roles(cache_http, &[role_id.into()]).await
+        http.as_ref().remove_member_role(self.guild_id, self.user.id, role_id.into(), None).await
     }
 
-    /// Removes one or multiple [`Role`]s from the member, editing its roles in-place if the
-    /// request was successful.
+    /// Removes one or multiple [`Role`]s from the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -479,16 +468,12 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_roles(
-        &mut self,
-        cache_http: impl CacheHttp,
-        role_ids: &[RoleId],
-    ) -> Result<()> {
-        let mut target_roles = self.roles.clone();
-        target_roles.retain(|r| !role_ids.contains(r));
+    pub async fn remove_roles(&self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+        for role_id in role_ids {
+            self.remove_role(http.as_ref(), role_id).await?;
+        }
 
-        let builder = EditMember::new().roles(target_roles);
-        self.edit(cache_http, builder).await
+        Ok(())
     }
 
     /// Retrieves the full role data for the user's roles.
