@@ -139,12 +139,12 @@ impl StandardFramework {
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.with_whitespace(true).prefix("~"));
+    /// framework.configure(Configuration::new().with_whitespace(true).prefix("~"));
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&token, GatewayIntents::default())
@@ -158,8 +158,8 @@ impl StandardFramework {
     /// [`Client`]: crate::Client
     /// [`prefix`]: Configuration::prefix
     /// [allowing whitespace between prefixes]: Configuration::with_whitespace
-    pub fn configure(&self, f: impl FnOnce(&mut Configuration) -> &mut Configuration) {
-        f(&mut self.config.write());
+    pub fn configure(&self, config: Configuration) {
+        *self.config.write() = config;
     }
 
     /// Defines a bucket with `delay` between each command, and the `limit` of uses per
@@ -172,7 +172,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// use serenity::framework::standard::macros::command;
-    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    /// use serenity::framework::standard::{BucketBuilder, CommandResult, StandardFramework};
     ///
     /// #[command]
     /// // Registers the bucket `basic` to this command.
@@ -182,21 +182,14 @@ impl StandardFramework {
     /// }
     ///
     /// # async fn run() {
-    /// let framework =
-    ///     StandardFramework::new().bucket("basic", |b| b.delay(2).time_span(10).limit(3)).await;
+    /// let framework = StandardFramework::new()
+    ///     .bucket("basic", BucketBuilder::default().delay(2).time_span(10).limit(3))
+    ///     .await;
     /// # }
     /// ```
     #[inline]
-    pub async fn bucket<F>(self, name: &str, f: F) -> Self
-    where
-        F: FnOnce(&mut BucketBuilder) -> &mut BucketBuilder,
-    {
-        let mut builder = BucketBuilder::default();
-
-        f(&mut builder);
-
-        self.buckets.lock().await.insert(name.to_string(), builder.construct());
-
+    pub async fn bucket(self, name: impl Into<String>, builder: BucketBuilder) -> Self {
+        self.buckets.lock().await.insert(name.into(), builder.construct());
         self
     }
 

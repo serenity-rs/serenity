@@ -22,7 +22,7 @@ use rillrate::prime::*;
 use serenity::async_trait;
 use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::macros::{command, group, hook};
-use serenity::framework::standard::{CommandResult, StandardFramework};
+use serenity::framework::standard::{CommandResult, Configuration, StandardFramework};
 use serenity::gateway::ShardManager;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -340,8 +340,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let _ = webbrowser::open("http://localhost:6361");
 
     let framework = StandardFramework::new().before(before_hook).group(&GENERAL_GROUP);
-
-    framework.configure(|c| c.prefix("~"));
+    framework.configure(Configuration::new().prefix("~"));
 
     let token = env::var("DISCORD_TOKEN")?;
 

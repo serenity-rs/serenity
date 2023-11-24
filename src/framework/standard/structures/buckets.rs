@@ -420,9 +420,9 @@ impl BucketBuilder {
     ///
     /// Expressed in seconds.
     #[inline]
-    pub fn delay(&mut self, secs: u64) -> &mut Self {
+    #[must_use]
+    pub fn delay(mut self, secs: u64) -> Self {
         self.delay = Duration::from_secs(secs);
-
         self
     }
 
@@ -430,26 +430,26 @@ impl BucketBuilder {
     ///
     /// Expressed in seconds.
     #[inline]
-    pub fn time_span(&mut self, secs: u64) -> &mut Self {
+    #[must_use]
+    pub fn time_span(mut self, secs: u64) -> Self {
         self.time_span = Duration::from_secs(secs);
-
         self
     }
 
     /// Number of invocations allowed per [`Self::time_span`].
     #[inline]
-    pub fn limit(&mut self, n: u32) -> &mut Self {
+    #[must_use]
+    pub fn limit(mut self, n: u32) -> Self {
         self.limit = n;
-
         self
     }
 
     /// Middleware confirming (or denying) that the bucket is eligible to apply. For instance, to
     /// limit the bucket to just one user.
     #[inline]
-    pub fn check(&mut self, check: Check) -> &mut Self {
+    #[must_use]
+    pub fn check(mut self, check: Check) -> Self {
         self.check = Some(check);
-
         self
     }
 
@@ -468,7 +468,7 @@ impl BucketBuilder {
     /// ```rust
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::framework::standard::macros::{command, group};
-    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    /// use serenity::framework::standard::{BucketBuilder, Configuration, CommandResult, StandardFramework};
     /// use serenity::model::channel::Message;
     /// use serenity::prelude::*;
     ///
@@ -491,18 +491,18 @@ impl BucketBuilder {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     ///
     /// let framework = StandardFramework::new()
-    ///     .bucket("example_bucket", |b| {
+    ///     .bucket("example_bucket", BucketBuilder::default()
     ///         // We initialise the bucket with the function we want to run
-    ///         b.delay_action(|ctx, msg| {
+    ///         .delay_action(|ctx, msg| {
     ///             Box::pin(example_overuse_response(ctx, msg))
     ///         })
     ///         .delay(10) // We set the delay to 10 seconds
     ///         .await_ratelimits(1) // We override the default behavior so that the function actually gets run
-    ///     })
+    ///     )
     ///     .await
     ///     .group(&GENERAL_GROUP);
     ///
-    /// framework.configure(|c| c.prefix("~"));
+    /// framework.configure(Configuration::new().prefix("~"));
     ///
     /// let mut client = Client::builder(&token, GatewayIntents::default())
     /// .framework(framework)
@@ -513,7 +513,8 @@ impl BucketBuilder {
     /// # }
     /// ```
     #[inline]
-    pub fn delay_action(&mut self, action: DelayHook) -> &mut Self {
+    #[must_use]
+    pub fn delay_action(mut self, action: DelayHook) -> Self {
         self.delay_action = Some(action);
         if self.await_ratelimits == 0 {
             self.await_ratelimits = 1;
@@ -524,9 +525,9 @@ impl BucketBuilder {
 
     /// Limit the bucket for a specific type of `target`.
     #[inline]
-    pub fn limit_for(&mut self, target: LimitedFor) -> &mut Self {
+    #[must_use]
+    pub fn limit_for(mut self, target: LimitedFor) -> Self {
         self.limited_for = target;
-
         self
     }
 
@@ -535,9 +536,9 @@ impl BucketBuilder {
     ///
     /// By default this value is `0` and rate limits will cancel instead.
     #[inline]
-    pub fn await_ratelimits(&mut self, amount: u32) -> &mut Self {
+    #[must_use]
+    pub fn await_ratelimits(mut self, amount: u32) -> Self {
         self.await_ratelimits = amount;
-
         self
     }
 

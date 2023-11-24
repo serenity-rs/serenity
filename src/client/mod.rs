@@ -168,12 +168,8 @@ impl ClientBuilder {
     ///
     /// [`Settings`]: CacheSettings
     #[cfg(feature = "cache")]
-    pub fn cache_settings<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(&mut CacheSettings) -> &mut CacheSettings,
-    {
-        f(&mut self.cache_settings);
-
+    pub fn cache_settings(mut self, settings: CacheSettings) -> Self {
+        self.cache_settings = settings;
         self
     }
 

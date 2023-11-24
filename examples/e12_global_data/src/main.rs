@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::framework::standard::macros::{command, group, hook};
-use serenity::framework::standard::{Args, CommandResult, StandardFramework};
+use serenity::framework::standard::{Args, CommandResult, Configuration, StandardFramework};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
@@ -108,7 +108,7 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     let framework = StandardFramework::new().before(before).group(&GENERAL_GROUP);
-    framework.configure(|c| c.with_whitespace(true).prefix("~"));
+    framework.configure(Configuration::new().with_whitespace(true).prefix("~"));
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES

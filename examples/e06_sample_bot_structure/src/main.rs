@@ -15,6 +15,7 @@ use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::framework::standard::macros::group;
+use serenity::framework::standard::Configuration;
 use serenity::framework::StandardFramework;
 use serenity::gateway::ShardManager;
 use serenity::http::Http;
@@ -80,7 +81,7 @@ async fn main() {
 
     // Create the framework
     let framework = StandardFramework::new().group(&GENERAL_GROUP);
-    framework.configure(|c| c.owners(owners).prefix("~"));
+    framework.configure(Configuration::new().owners(owners).prefix("~"));
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
