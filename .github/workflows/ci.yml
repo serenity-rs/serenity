@@ -45,8 +45,8 @@ jobs:
             features: model http rustls_backend
           - name: chrono
             features: chrono
-          - name: unstable Discord API features
-            features: default unstable_discord_api
+          - name: unstable API + typesize
+            features: default unstable_discord_api typesize
             dont-test: true
           - name: builder without model
             features: builder
