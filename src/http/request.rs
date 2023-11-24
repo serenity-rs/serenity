@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 use reqwest::header::{
     HeaderMap as Headers,
     HeaderValue,
@@ -78,7 +80,7 @@ impl<'a> Request<'a> {
         if let Some(params) = self.params {
             path += "?";
             for (param, value) in params {
-                path += &format!("&{param}={value}");
+                write!(path, "&{param}={value}").unwrap();
             }
         }
 

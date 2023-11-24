@@ -995,23 +995,22 @@ pub struct Content {
     pub spoiler: bool,
 }
 
-impl<T: Into<String>> Add<T> for Content {
+impl<T: AsRef<str>> Add<T> for Content {
     type Output = Content;
 
     fn add(mut self, rhs: T) -> Content {
-        self.inner += &rhs.into();
+        self.inner += rhs.as_ref();
 
         self
     }
 }
 
-impl<T: Into<String>> Add<T> for ContentModifier {
+impl<T: AsRef<str>> Add<T> for ContentModifier {
     type Output = Content;
 
     fn add(self, rhs: T) -> Content {
         let mut nc = self.to_content();
-        nc.inner += &rhs.into();
-
+        nc.inner += rhs.as_ref();
         nc
     }
 }
