@@ -20,6 +20,7 @@ use crate::model::prelude::*;
 /// An emoji reaction to a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-add-message-reaction-add-event-fields).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
 #[non_exhaustive]
@@ -253,6 +254,7 @@ impl Reaction {
 }
 
 /// The type of a [`Reaction`] sent.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
 pub enum ReactionType {

@@ -11,6 +11,7 @@ use crate::model::utils::deserialize_val;
 use crate::model::Permissions;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Interaction {
@@ -246,6 +247,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InteractionType {
@@ -263,7 +265,7 @@ bitflags! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)
     /// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))
-    #[derive(Default)]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct InteractionResponseFlags: u64 {
         /// Do not include any embeds when serializing this message.
         const SUPPRESS_EMBEDS = 1 << 2;
@@ -278,6 +280,7 @@ bitflags! {
 /// [`Message`]: crate::model::channel::Message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageInteraction {

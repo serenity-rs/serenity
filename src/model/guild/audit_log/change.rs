@@ -13,6 +13,7 @@ use crate::model::misc::ImageHash;
 use crate::model::sticker::StickerFormatType;
 use crate::model::{Permissions, Timestamp};
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 pub struct AffectedRole {
@@ -20,6 +21,7 @@ pub struct AffectedRole {
     pub name: String,
 }
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[serde(untagged)]
 #[non_exhaustive]
@@ -34,6 +36,7 @@ macro_rules! generate_change {
         $key:literal => $name:ident ($type:ty),
     )* ) => {
         #[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
+        #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
         #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
         // serde_json's Value impls Eq, simd-json's Value doesn't
         #[cfg_attr(not(feature = "simd_json"), derive(Eq))]

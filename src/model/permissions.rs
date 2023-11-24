@@ -208,19 +208,22 @@ pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
     Permissions::CONNECT.bits() | Permissions::SPEAK.bits() | Permissions::USE_VAD.bits(),
 );
 
+/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
+/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
+///
+/// [`Guild`]: super::guild::Guild
+/// [`GuildChannel`]: super::channel::GuildChannel
+/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
+/// [`Role`]: super::guild::Role
+/// [`User`]: super::user::User
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+pub struct Permissions(u64);
+
 bitflags::bitflags! {
-    /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
-    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
-    ///
-    /// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
-    ///
-    /// [`Guild`]: super::guild::Guild
-    /// [`GuildChannel`]: super::channel::GuildChannel
-    /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
-    /// [`Role`]: super::guild::Role
-    /// [`User`]: super::user::User
-    #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
-    pub struct Permissions: u64 {
+    impl Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///
         /// [`RichInvite`]: super::invite::RichInvite

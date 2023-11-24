@@ -80,6 +80,7 @@ pub struct Ban {
     pub user: User,
 }
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct AfkMetadata {
     /// Id of a voice channel that's considered the AFK channel.
@@ -93,6 +94,7 @@ pub struct AfkMetadata {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
 /// [extension](https://discord.com/developers/docs/topics/gateway-events#guild-create).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Guild {
@@ -2594,6 +2596,7 @@ pub struct GuildWidget {
 /// Representation of the number of members that would be pruned by a guild prune operation.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildPrune {
@@ -2605,6 +2608,7 @@ pub struct GuildPrune {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object),
 /// [subset example](https://discord.com/developers/docs/resources/user#get-current-user-guilds-example-partial-guild).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildInfo {
@@ -2649,6 +2653,7 @@ impl InviteGuild {
 /// Data for an unavailable guild.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#unavailable-guild-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct UnavailableGuild {
@@ -2664,6 +2669,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum DefaultMessageNotificationLevel {
@@ -2681,6 +2687,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ExplicitContentFilter {
@@ -2700,6 +2707,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-mfa-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MfaLevel {
@@ -2718,6 +2726,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-verification-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum VerificationLevel {
@@ -2741,6 +2750,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum NsfwLevel {
@@ -2762,6 +2772,7 @@ enum_number! {
     ///
     /// See [AfkMetadata::afk_timeout].
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u16", into = "u16")]
     #[non_exhaustive]
     pub enum AfkTimeout {

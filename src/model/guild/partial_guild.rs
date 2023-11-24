@@ -34,6 +34,7 @@ use crate::model::utils::{emojis, roles, stickers};
 /// Partial information about a [`Guild`]. This does not include information like member data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
 #[non_exhaustive]

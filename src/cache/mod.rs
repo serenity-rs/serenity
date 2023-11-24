@@ -47,6 +47,8 @@ mod event;
 mod settings;
 mod wrappers;
 
+#[cfg(feature = "temp_cache")]
+pub(crate) use wrappers::MaybeOwnedArc;
 use wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
 
 type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, BuildHasher>;
@@ -75,8 +77,8 @@ impl<'a, K, V, T> CacheRef<'a, K, V, T> {
     }
 
     #[cfg(feature = "temp_cache")]
-    fn from_arc(inner: Arc<V>) -> Self {
-        Self::new(CacheRefInner::Arc(inner))
+    fn from_arc(inner: MaybeOwnedArc<V>) -> Self {
+        Self::new(CacheRefInner::Arc(inner.get_inner()))
     }
 
     fn from_ref(inner: Ref<'a, K, V, BuildHasher>) -> Self {
@@ -120,6 +122,7 @@ pub type GuildChannelsRef<'a> = MappedGuildRef<'a, HashMap<ChannelId, GuildChann
 pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
 pub type MessageRef<'a> = CacheRef<'a, ChannelId, Message, HashMap<MessageId, Message>>;
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
 pub(crate) struct CachedShardData {
     pub total: u32,
@@ -145,6 +148,7 @@ pub(crate) struct CachedShardData {
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
 #[non_exhaustive]
 pub struct Cache {
@@ -154,12 +158,12 @@ pub struct Cache {
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_channels: MokaCache<ChannelId, Arc<GuildChannel>, BuildHasher>,
+    pub(crate) temp_channels: MokaCache<ChannelId, MaybeOwnedArc<GuildChannel>, BuildHasher>,
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_users: MokaCache<UserId, Arc<User>, BuildHasher>,
+    pub(crate) temp_users: MokaCache<UserId, MaybeOwnedArc<User>, BuildHasher>,
 
     // Channels cache:
     /// A map of channel ids to the guilds in which the channel data is stored.

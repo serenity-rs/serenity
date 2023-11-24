@@ -28,6 +28,7 @@ pub struct VoiceRegion {
 /// A user's state within a voice channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/voice#voice-state-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
 #[non_exhaustive]

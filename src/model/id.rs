@@ -118,6 +118,9 @@ macro_rules! id_u64 {
                     Ok(Self(s.parse()?))
                 }
             }
+
+            #[cfg(feature = "typesize")]
+            impl typesize::TypeSize for $name {}
         )*
     }
 }
@@ -280,6 +283,7 @@ id_u64! {
 ///
 /// This identifier is special, it simply models internal IDs for type safety,
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct ShardId(pub u32);
 

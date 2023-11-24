@@ -20,6 +20,7 @@ use crate::model::Timestamp;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Member {
@@ -66,7 +67,8 @@ bitflags! {
     /// Flags for a guild member.
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags).
-    #[derive(Default)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct GuildMemberFlags: u32 {
         /// Member has left and rejoined the guild. Not editable
         const DID_REJOIN = 1 << 0;
@@ -571,6 +573,7 @@ impl fmt::Display for Member {
 /// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialMember {
@@ -655,6 +658,7 @@ pub struct PartialThreadMember {
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object),
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadMember {
@@ -684,7 +688,8 @@ bitflags! {
     /// Describes extra features of the message.
     ///
     /// Discord docs: flags field on [Thread Member](https://discord.com/developers/docs/resources/channel#thread-member-object).
-    #[derive(Default)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ThreadMemberFlags: u64 {
         // Not documented.
         const NOTIFICATIONS = 1 << 0;

@@ -20,6 +20,7 @@ use crate::model::ModelError;
 /// integration. Emojis created using the API only work within the guild it was created in.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/emoji#emoji-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Emoji {

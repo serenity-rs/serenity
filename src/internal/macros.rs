@@ -157,10 +157,11 @@ macro_rules! bitflags {
             )*
         }
     ) => {
+        $(#[$outer])*
+        $vis struct $BitFlags($T);
+
         bitflags::bitflags! {
-            #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-            $(#[$outer])*
-            $vis struct $BitFlags: $T {
+            impl $BitFlags: $T {
                 $(
                     $(#[$inner $($args)*])*
                     const $Flag = $value;

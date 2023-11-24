@@ -14,6 +14,7 @@ use crate::model::id::*;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
 // TODO: should be renamed to a less ambiguous name
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Rule {
@@ -48,6 +49,7 @@ pub struct Rule {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-event-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
 pub enum EventType {
@@ -78,6 +80,7 @@ impl From<EventType> for u8 {
 /// Discord docs:
 /// [type](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types),
 /// [metadata](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Trigger {
@@ -217,6 +220,7 @@ impl Trigger {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
 pub enum TriggerType {
@@ -259,6 +263,7 @@ impl From<TriggerType> for u8 {
 /// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct TriggerMetadata {
@@ -278,6 +283,7 @@ pub struct TriggerMetadata {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-preset-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
 pub enum KeywordPresetType {
@@ -315,6 +321,7 @@ impl From<KeywordPresetType> for u8 {
 /// An action which will execute whenever a rule is triggered.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Action {
@@ -344,6 +351,7 @@ pub enum Action {
 /// blocked).
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActionExecution {

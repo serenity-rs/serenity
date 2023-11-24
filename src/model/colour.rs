@@ -67,6 +67,7 @@
 ///
 /// [`Role`]: crate::model::guild::Role
 #[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 pub struct Colour(pub u32);
 
 pub type Color = Colour;
