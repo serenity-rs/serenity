@@ -772,7 +772,6 @@
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
 <a href="#774" id="774">774</a>
-<a href="#775" id="775">775</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -1149,8 +1148,7 @@
 }
 
 <span class="kw">impl </span>ShardInfo {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
-    #[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(id: ShardId, total: u32) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             id,
