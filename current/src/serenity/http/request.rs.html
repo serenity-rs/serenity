@@ -144,7 +144,11 @@
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>reqwest::header::{
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::Write;
+
+<span class="kw">use </span>reqwest::header::{
     HeaderMap <span class="kw">as </span>Headers,
     HeaderValue,
     AUTHORIZATION,
@@ -224,7 +228,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(params) = <span class="self">self</span>.params {
             path += <span class="string">&quot;?&quot;</span>;
             <span class="kw">for </span>(param, value) <span class="kw">in </span>params {
-                path += <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;{param}={value}&quot;</span>);
+                <span class="macro">write!</span>(path, <span class="string">&quot;&amp;{param}={value}&quot;</span>).unwrap();
             }
         }
 
