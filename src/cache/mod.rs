@@ -159,6 +159,11 @@ pub struct Cache {
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
     pub(crate) temp_channels: MokaCache<ChannelId, MaybeOwnedArc<GuildChannel>, BuildHasher>,
+    /// Cache of messages that have been fetched via message.
+    ///
+    /// The TTL for each value is configured in CacheSettings.
+    #[cfg(feature = "temp_cache")]
+    pub(crate) temp_messages: MokaCache<MessageId, MaybeOwnedArc<Message>, BuildHasher>,
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// The TTL for each value is configured in CacheSettings.
@@ -259,6 +264,8 @@ impl Cache {
         Self {
             #[cfg(feature = "temp_cache")]
             temp_channels: temp_cache(settings.time_to_live),
+            #[cfg(feature = "temp_cache")]
+            temp_messages: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_users: temp_cache(settings.time_to_live),
 
@@ -581,6 +588,11 @@ impl Cache {
     }
 
     fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
+        #[cfg(feature = "temp_cache")]
+        if let Some(message) = self.temp_messages.get(&message_id) {
+            return Some(CacheRef::from_arc(message));
+        }
+
         let channel_messages = self.messages.get(&channel_id)?;
         let message = channel_messages.try_map(|messages| messages.get(&message_id)).ok()?;
         Some(CacheRef::from_mapped_ref(message))
