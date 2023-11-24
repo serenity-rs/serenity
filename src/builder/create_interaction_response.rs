@@ -308,6 +308,14 @@ impl AutocompleteChoice {
     }
 }
 
+impl<S: Into<String>> From<S> for AutocompleteChoice {
+    fn from(value: S) -> Self {
+        let value = value.into();
+        let name = value.clone();
+        Self::new(name, value)
+    }
+}
+
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
