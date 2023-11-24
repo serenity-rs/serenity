@@ -590,7 +590,7 @@ impl Guild {
     pub async fn audit_logs(
         &self,
         http: impl AsRef<Http>,
-        action_type: Option<u8>,
+        action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
         limit: Option<u8>,
