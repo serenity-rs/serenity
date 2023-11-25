@@ -1616,19 +1616,10 @@ impl Guild {
 
     /// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
-    #[must_use]
-    pub fn members_with_status(&self, status: OnlineStatus) -> Vec<&Member> {
-        let mut members = vec![];
-
-        for (&id, member) in &self.members {
-            if let Some(presence) = self.presences.get(&id) {
-                if status == presence.status {
-                    members.push(member);
-                }
-            }
-        }
-
-        members
+    pub fn members_with_status(&self, status: OnlineStatus) -> impl Iterator<Item = &Member> {
+        self.members.values().filter(move |m| {
+            self.presences.get(&m.user.id).filter(|presence| presence.status == status).is_some()
+        })
     }
 
     /// Retrieves the first [`Member`] found that matches the name - with an optional discriminator
