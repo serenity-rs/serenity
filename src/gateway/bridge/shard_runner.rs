@@ -168,7 +168,7 @@ impl ShardRunner {
 
                 dispatch_model(
                     event,
-                    self.make_context(),
+                    &self.make_context(),
                     #[cfg(feature = "framework")]
                     self.framework.clone(),
                     self.event_handlers.clone(),

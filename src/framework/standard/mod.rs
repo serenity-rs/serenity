@@ -603,9 +603,8 @@ impl StandardFramework {
 #[async_trait]
 impl Framework for StandardFramework {
     #[instrument(skip(self, event))]
-    async fn dispatch(&self, event: FullEvent) {
+    async fn dispatch(&self, mut ctx: Context, event: FullEvent) {
         let FullEvent::Message {
-            mut ctx,
             new_message: msg,
         } = event
         else {
