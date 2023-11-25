@@ -1617,8 +1617,9 @@ impl Guild {
     /// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
     pub fn members_with_status(&self, status: OnlineStatus) -> impl Iterator<Item = &Member> {
-        self.members.values().filter(move |m| {
-            self.presences.get(&m.user.id).filter(|presence| presence.status == status).is_some()
+        self.members.iter().filter_map(move |(id, member)| match self.presences.get(id) {
+            Some(presence) if presence.status == status => Some(member),
+            _ => None,
         })
     }
 
