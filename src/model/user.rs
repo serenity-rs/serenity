@@ -431,61 +431,28 @@ impl User {
     ///
     /// # Examples
     ///
-    /// When a user sends a message with a content of `"~help"`, DM the author a help message, and
-    /// then react with `'👌'` to verify message sending:
+    /// When a user sends a message with a content of `"~help"`, DM the author a help message
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
-    /// #
-    /// use serenity::builder::{CreateBotAuthParameters, CreateMessage};
-    ///
-    /// struct Handler;
+    /// # struct Handler;
+    /// use serenity::builder::CreateMessage;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = "client")]
     /// impl EventHandler for Handler {
-    /// #   #[cfg(feature = "cache")]
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match CreateBotAuthParameters::new()
-    ///                 .permissions(Permissions::empty())
-    ///                 .scopes(&[Scope::Bot])
-    ///                 .auto_client_id(&ctx)
-    ///                 .await
-    ///             {
-    ///                 Ok(v) => v.build(),
-    ///                 Err(why) => {
-    ///                     println!("Error creating invite url: {:?}", why);
-    ///                     return;
-    ///                 },
-    ///             };
+    ///             let builder = CreateMessage::new().content("Helpful info here.");
     ///
-    ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url);
-    ///
-    ///             let builder = CreateMessage::new().content(help);
-    ///             let dm = msg.author.direct_message(&ctx, builder).await;
-    ///
-    ///             match dm {
-    ///                 Ok(_) => {
-    ///                     let _ = msg.react(&ctx, '👌').await;
-    ///                 },
-    ///                 Err(why) => {
-    ///                     println!("Err sending help: {:?}", why);
-    ///
-    ///                     let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
-    ///                 },
+    ///             if let Err(why) = msg.author.direct_message(&ctx, builder).await {
+    ///                 println!("Err sending help: {why:?}");
+    ///                 let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
     ///             };
     ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    /// # Ok(())
-    /// # }
-    /// # }
     /// ```
     ///
     /// # Errors
@@ -591,35 +558,20 @@ impl User {
     /// Make a command to tell the user what their tag is:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
-    /// #
-    /// use serenity::utils::ContentModifier::Bold;
-    /// use serenity::utils::MessageBuilder;
-    ///
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = "client")]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
-    ///             let content = MessageBuilder::new()
-    ///                 .push("Your tag is ")
-    ///                 .push(Bold + msg.author.tag())
-    ///                 .build();
-    ///
+    ///             let content = format!("Your tag is: {}", msg.author.tag());
     ///             let _ = msg.channel_id.say(&context.http, &content).await;
     ///         }
     ///     }
     /// }
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     #[inline]
     #[must_use]

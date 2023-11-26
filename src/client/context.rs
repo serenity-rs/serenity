@@ -90,7 +90,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// #
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
@@ -100,14 +100,6 @@ impl Context {
     ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// [`Online`]: OnlineStatus::Online
@@ -127,7 +119,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// #
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
@@ -137,14 +129,6 @@ impl Context {
     ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// [`Idle`]: OnlineStatus::Idle
@@ -164,7 +148,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// #
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
@@ -174,14 +158,6 @@ impl Context {
     ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
@@ -195,31 +171,24 @@ impl Context {
     ///
     /// # Examples
     ///
-    /// Set the current user to being invisible on the shard when an [`Event::Ready`] is received:
+    /// Set the current user to being invisible on the shard:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
+    /// # use serenity::model::channel::Message;
     /// #
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&self, ctx: Context, _: Ready) {
-    ///         ctx.invisible();
+    ///     async fn message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "!invisible" {
+    ///             ctx.invisible();
+    ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
-    /// [`Event::Ready`]: crate::model::event::Event::Ready
     /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
     #[inline]
@@ -234,28 +203,22 @@ impl Context {
     ///
     /// # Examples
     ///
-    /// Reset the presence when an [`Event::Resumed`] is received:
+    /// Reset the current user's presence on the shard:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::model::event::ResumedEvent;
+    /// # use serenity::model::channel::Message;
     /// #
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn resume(&self, ctx: Context, _: ResumedEvent) {
-    ///         ctx.reset_presence();
+    ///     async fn message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "!reset_presence" {
+    ///             ctx.reset_presence();
+    ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
@@ -275,10 +238,9 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
-    /// #
-    /// use serenity::gateway::ActivityData;
+    /// # struct Handler;
     ///
-    /// struct Handler;
+    /// use serenity::gateway::ActivityData;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
@@ -290,14 +252,6 @@ impl Context {
     ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     #[cfg(feature = "gateway")]
     #[inline]
@@ -314,8 +268,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
-    /// #
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
@@ -325,14 +278,6 @@ impl Context {
     ///         ctx.set_presence(None, OnlineStatus::Idle);
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// Setting the current user as playing `"Heroes of the Storm"`, while being [`DoNotDisturb`]:
@@ -340,8 +285,7 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
-    /// #
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
@@ -355,14 +299,6 @@ impl Context {
     ///         context.set_presence(Some(activity), status);
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb

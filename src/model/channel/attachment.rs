@@ -91,8 +91,6 @@ impl Attachment {
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use std::io::Write;
     /// use std::path::Path;
     ///
@@ -101,9 +99,10 @@ impl Attachment {
     /// use tokio::fs::File;
     /// use tokio::io::AsyncWriteExt;
     ///
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = "client")]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut message: Message) {
     ///         for attachment in message.attachments {
@@ -140,18 +139,7 @@ impl Attachment {
     ///                 .await;
     ///         }
     ///     }
-    ///
-    ///     async fn ready(&self, _: Context, ready: Ready) {
-    ///         println!("{} is connected!", ready.user.name);
-    ///     }
     /// }
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// # Errors

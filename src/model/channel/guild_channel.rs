@@ -727,9 +727,9 @@ impl GuildChannel {
     /// Calculate the permissions of a [`User`] who posted a [`Message`] in a channel:
     ///
     /// ```rust,no_run
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
-    /// struct Handler;
+    /// # use serenity::model::prelude::*;
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
@@ -744,57 +744,6 @@ impl GuildChannel {
     ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// Check if the current user has the [Attach Files] and [Send Messages] permissions (note:
-    /// serenity will automatically check this for; this is for demonstrative purposes):
-    ///
-    /// ```rust,no_run
-    /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::channel::Channel;
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
-    /// use tokio::fs::File;
-    ///
-    /// struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         let current_user_id = context.cache.current_user().id;
-    ///         let permissions = match context.cache.channel(msg.channel_id) {
-    ///             Some(channel) => channel.permissions_for_user(&context.cache, current_user_id),
-    ///             None => return,
-    ///         };
-    ///
-    ///         if let Ok(permissions) = permissions {
-    ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
-    ///                 return;
-    ///             }
-    ///
-    ///             let file = CreateAttachment::path("cat.png").await.unwrap();
-    ///
-    ///             let builder = CreateMessage::new().content("here's a cat");
-    ///             let _ = msg.channel_id.send_files(&context.http, [file], builder).await;
-    ///         }
-    ///     }
-    /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// # Errors

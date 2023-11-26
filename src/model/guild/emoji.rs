@@ -67,14 +67,10 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::json::{json, from_value};
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
-    /// # use serenity::model::prelude::{EmojiId, Emoji};
+    /// # use serenity::model::prelude::Emoji;
     /// #
-    /// # #[command]
-    /// # async fn example(ctx: &Context) -> CommandResult {
-    /// # let mut emoji: Emoji = unimplemented!();
+    /// # async fn example(ctx: &Context, emoji: Emoji) -> Result<(), Box<dyn std::error::Error>> {
     /// // assuming emoji has been set already
     /// match emoji.delete(&ctx).await {
     ///     Ok(()) => println!("Emoji deleted."),

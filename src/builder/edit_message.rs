@@ -25,15 +25,9 @@ use crate::model::prelude::*;
 /// # use serenity::builder::EditMessage;
 /// # use serenity::model::channel::Message;
 /// # use serenity::model::id::ChannelId;
-/// # #[cfg(feature = "client")]
-/// # use serenity::client::Context;
-/// # #[cfg(feature = "framework")]
-/// # use serenity::framework::standard::{CommandResult, macros::command};
-/// #
-/// # #[cfg(all(feature = "model", feature = "utils", feature = "framework"))]
-/// # #[command]
-/// # async fn example(ctx: &Context) -> CommandResult {
-/// # let mut message: Message = unimplemented!();
+/// # use serenity::http::CacheHttp;
+///
+/// # async fn example(ctx: impl CacheHttp, mut message: Message) -> Result<(), Box<dyn std::error::Error>> {
 /// let builder = EditMessage::new().content("hello");
 /// message.edit(ctx, builder).await?;
 /// # Ok(())
