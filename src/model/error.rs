@@ -12,20 +12,18 @@ use super::Permissions;
 /// # Examples
 ///
 /// Matching an [`Error`] with this variant would look something like the following for the
-/// [`GuildId::ban`] method, which in this example is used to re-ban all members with an odd
-/// discriminator:
+/// [`GuildId::ban`] method, which in this example is used to re-ban all members.
 ///
 /// ```rust,no_run
-/// # #[cfg(all(feature = "client", feature = "model"))]
-/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// use serenity::model::prelude::*;
 /// use serenity::model::ModelError;
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///
-/// struct Handler;
+/// # struct Handler;
 ///
 /// #[serenity::async_trait]
+/// #[cfg(feature = "client")]
 /// impl EventHandler for Handler {
 ///     async fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
 ///         match guild_id.ban(&context, user, 8).await {
@@ -41,13 +39,6 @@ use super::Permissions;
 ///         }
 ///     }
 /// }
-/// let token = std::env::var("DISCORD_BOT_TOKEN")?;
-/// let mut client =
-///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
-///
-/// client.start().await?;
-/// # Ok(())
-/// # }
 /// ```
 ///
 /// [`Error`]: crate::Error

@@ -138,51 +138,6 @@ impl CreateEmbed {
     /// let timestamp: Timestamp = "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
     /// let embed = CreateEmbed::new().title("hello").timestamp(timestamp);
     /// ```
-    ///
-    /// Creating a join-log:
-    ///
-    /// Note: this example isn't efficient and is for demonstrative purposes.
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(all(feature = "cache", feature = "client"))]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::builder::{CreateEmbed, CreateEmbedAuthor, CreateMessage};
-    /// use serenity::model::guild::Member;
-    /// use serenity::model::id::GuildId;
-    /// use serenity::prelude::*;
-    ///
-    /// struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn guild_member_addition(&self, context: Context, member: Member) {
-    ///         let guild_id = member.guild_id;
-    ///         if let Ok(guild) = guild_id.to_partial_guild(&context).await {
-    ///             let channels = guild.channels(&context).await.unwrap();
-    ///
-    ///             let channel_search = channels.values().find(|c| c.name == "join-log");
-    ///
-    ///             if let Some(channel) = channel_search {
-    ///                 let icon_url = member.user.face();
-    ///                 let author = CreateEmbedAuthor::new(member.user.name).icon_url(icon_url);
-    ///                 let mut embed = CreateEmbed::new().title("Member Join").author(author);
-    ///                 if let Some(joined_at) = member.joined_at {
-    ///                     embed = embed.timestamp(joined_at);
-    ///                 }
-    ///                 let builder = CreateMessage::new().embed(embed);
-    ///                 let _ = channel.send_message(&context, builder).await;
-    ///             }
-    ///         }
-    ///     }
-    /// }
-    ///
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
         self.0.timestamp = Some(timestamp.into());

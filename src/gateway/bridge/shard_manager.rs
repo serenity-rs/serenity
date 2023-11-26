@@ -217,29 +217,15 @@ impl ShardManager {
     ///
     /// # Examples
     ///
-    /// Creating a client and then restarting a shard by ID:
-    ///
-    /// _(note: in reality this precise code doesn't have an effect since the shard would not yet
-    /// have been initialized via [`Self::initialize`], but the concept is the same)_
+    /// Restarting a shard by ID:
     ///
     /// ```rust,no_run
-    /// use std::env;
-    ///
     /// use serenity::model::id::ShardId;
     /// use serenity::prelude::*;
     ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
+    /// # async fn run(client: Client) {
     /// // restart shard ID 7
     /// client.shard_manager.restart(ShardId(7)).await;
-    /// # Ok(())
     /// # }
     /// ```
     ///

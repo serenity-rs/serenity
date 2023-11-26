@@ -1509,14 +1509,12 @@ impl PartialGuild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "cache"))]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
-    ///
-    /// struct Handler;
+    /// # use serenity::model::prelude::*;
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// #[cfg(all(feature = "cache", feature = "client"))]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
@@ -1528,13 +1526,6 @@ impl PartialGuild {
     ///         }
     ///     }
     /// }
-    ///
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     #[inline]
     #[must_use]

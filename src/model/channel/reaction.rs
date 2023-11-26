@@ -382,18 +382,13 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
-    /// # use serenity::client::Context;
-    /// # #[cfg(feature = "framework")]
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # #[cfg(feature = "http")]
+    /// # use serenity::http::CacheHttp;
     /// # use serenity::model::channel::Message;
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
-    /// # #[command]
-    /// # async fn example(ctx: &Context) -> CommandResult {
-    /// # let message: Message = unimplemented!();
-    /// #
+    /// # #[cfg(feature = "http")]
+    /// # async fn example(ctx: impl CacheHttp, message: Message) -> Result<(), Box<dyn std::error::Error>> {
     /// message.react(ctx, '🍎').await?;
     /// # Ok(())
     /// # }

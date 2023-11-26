@@ -295,27 +295,15 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// #
-    /// # #[cfg(feature = "client")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use std::thread;
-    /// use std::time::Duration;
-    ///
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = "client")]
     /// impl EventHandler for Handler {
     ///     async fn cache_ready(&self, ctx: Context, _: Vec<GuildId>) {
     ///         println!("{} unknown members", ctx.cache.unknown_members());
     ///     }
     /// }
-    ///
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild
@@ -657,10 +645,8 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::client::Context;
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// #
-    /// # #[command]
-    /// # async fn test(context: &Context) -> CommandResult {
+    /// # async fn test(context: &Context) -> Result<(), Box<dyn std::error::Error>> {
     /// if let Some(user) = context.cache.user(7) {
     ///     println!("User with Id 7 is currently named {}", user.name);
     /// }

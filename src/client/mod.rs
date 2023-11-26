@@ -567,15 +567,8 @@ pub struct Client {
     /// # use serenity::prelude::*;
     /// # use std::time::Duration;
     /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
+    /// # fn run(client: Client) {
+    /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
     /// tokio::spawn(async move {
@@ -586,26 +579,16 @@ pub struct Client {
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
     ///     }
     /// });
-    /// # Ok(())
     /// # }
     /// ```
     ///
     /// Shutting down all connections after one minute of operation:
     ///
     /// ```rust,no_run
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use std::time::Duration;
-    ///
-    /// use serenity::prelude::*;
-    ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
+    /// # use serenity::prelude::*;
+    /// # use std::time::Duration;
+    /// #
+    /// # fn run(client: Client) {
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
@@ -618,9 +601,6 @@ pub struct Client {
     ///
     ///     println!("Shutdown shard manager!");
     /// });
-    ///
-    /// println!("Client shutdown: {:?}", client.start().await);
-    /// # Ok(())
     /// # }
     /// ```
     pub shard_manager: Arc<ShardManager>,
@@ -670,14 +650,9 @@ impl Client {
     /// # use serenity::prelude::*;
     /// use serenity::Client;
     ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start().await {
     ///     println!("Err with client: {:?}", why);
@@ -712,14 +687,9 @@ impl Client {
     /// # use serenity::prelude::*;
     /// use serenity::Client;
     ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_autosharded().await {
     ///     println!("Err with client: {:?}", why);
@@ -763,14 +733,9 @@ impl Client {
     /// # use serenity::prelude::*;
     /// use serenity::Client;
     ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(3, 5).await {
     ///     println!("Err with client: {:?}", why);
@@ -787,14 +752,9 @@ impl Client {
     /// # use serenity::prelude::*;
     /// use serenity::Client;
     ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(0, 1).await {
     ///     println!("Err with client: {:?}", why);
@@ -833,14 +793,9 @@ impl Client {
     /// # use serenity::prelude::*;
     /// use serenity::Client;
     ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shards(8).await {
     ///     println!("Err with client: {:?}", why);
@@ -879,14 +834,9 @@ impl Client {
     /// # use serenity::prelude::*;
     /// use serenity::Client;
     ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client =
-    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard_range(4..7, 10).await {
     ///     println!("Err with client: {:?}", why);
