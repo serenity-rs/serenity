@@ -2576,14 +2576,14 @@ impl Http {
     pub async fn get_audit_logs(
         &self,
         guild_id: GuildId,
-        action_type: Option<u8>,
+        action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
-        before: Option<u64>,
+        before: Option<AuditLogEntryId>,
         limit: Option<u8>,
     ) -> Result<AuditLogs> {
         let mut params = vec![];
         if let Some(action_type) = action_type {
-            params.push(("action_type", action_type.to_string()));
+            params.push(("action_type", action_type.num().to_string()));
         }
         if let Some(before) = before {
             params.push(("before", before.to_string()));

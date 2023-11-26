@@ -287,14 +287,12 @@ impl GuildId {
     pub async fn audit_logs(
         self,
         http: impl AsRef<Http>,
-        action_type: Option<u8>,
+        action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
         limit: Option<u8>,
     ) -> Result<AuditLogs> {
-        http.as_ref()
-            .get_audit_logs(self, action_type, user_id, before.map(AuditLogEntryId::get), limit)
-            .await
+        http.as_ref().get_audit_logs(self, action_type, user_id, before, limit).await
     }
 
     /// Gets all of the guild's channels over the REST API.
