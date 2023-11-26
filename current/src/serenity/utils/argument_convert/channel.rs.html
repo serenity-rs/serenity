@@ -222,16 +222,16 @@
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(channel.clone()));
             }
         }
-    } <span class="kw">else </span>{
-        <span class="kw">let </span>channels = ctx.http().get_channels(guild_id).<span class="kw">await</span>.map_err(ChannelParseError::Http)<span class="question-mark">?</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) =
-            channels.into_iter().find(|channel| channel.name.eq_ignore_ascii_case(s))
-        {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(channel));
-        }
+
+        <span class="kw">return </span><span class="prelude-val">Err</span>(ChannelParseError::NotFoundOrMalformed);
     }
 
-    <span class="prelude-val">Err</span>(ChannelParseError::NotFoundOrMalformed)
+    <span class="kw">let </span>channels = ctx.http().get_channels(guild_id).<span class="kw">await</span>.map_err(ChannelParseError::Http)<span class="question-mark">?</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = channels.into_iter().find(|c| c.name.eq_ignore_ascii_case(s)) {
+        <span class="prelude-val">Ok</span>(Channel::Guild(channel))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(ChannelParseError::NotFoundOrMalformed)
+    }
 }
 
 <span class="doccomment">/// Look up a Channel by a string case-insensitively.
