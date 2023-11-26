@@ -59,16 +59,11 @@ macro_rules! event_handler {
             }
 
             /// Runs the given [`EventHandler`]'s code for this event.
-            ///
-            /// # Panics
-            /// Panics if the event requires [`Context`] and `ctx` is None.
-            pub async fn dispatch(self, handler: &dyn EventHandler, ctx: Option<Context>) {
+            pub async fn dispatch(self, ctx: Context, handler: &dyn EventHandler) {
                 match self { $(
                     $( #[cfg(feature = $feature)] )?
                     Self::$variant_name { $( $arg_name ),* } => {
-                        $(let Some($context) = ctx else {
-                            panic!("Missing Context for dispatch call!");
-                        };)?
+                        $( let $context = ctx; )?
                         handler.$method_name($($context,)? $( $arg_name ),* ).await;
                     }
                 )* }

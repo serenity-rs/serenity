@@ -67,7 +67,7 @@ pub(crate) fn dispatch_model(
                 let context = context.clone();
                 let handler = Arc::clone(&handler);
                 spawn_named(event.snake_case_name(), async move {
-                    event.dispatch(&*handler, Some(context)).await;
+                    event.dispatch(context, &*handler).await;
                 });
             }
         }
