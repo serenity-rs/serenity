@@ -127,7 +127,7 @@ Cargo.toml:
 [dependencies.serenity]
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
-version = "0.11"
+version = "0.12"
 ```
 
 The default features are: `builder`, `cache`, `chrono`, `client`, `framework`, `gateway`,
@@ -200,7 +200,7 @@ features = [
     "utils",
     "rustls_backend",
 ]
-version = "0.11"
+version = "0.12"
 ```
 
 # Dependencies
