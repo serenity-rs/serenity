@@ -59,16 +59,16 @@ async fn lookup_channel_global(
                 return Ok(Channel::Guild(channel.clone()));
             }
         }
-    } else {
-        let channels = ctx.http().get_channels(guild_id).await.map_err(ChannelParseError::Http)?;
-        if let Some(channel) =
-            channels.into_iter().find(|channel| channel.name.eq_ignore_ascii_case(s))
-        {
-            return Ok(Channel::Guild(channel));
-        }
+
+        return Err(ChannelParseError::NotFoundOrMalformed);
     }
 
-    Err(ChannelParseError::NotFoundOrMalformed)
+    let channels = ctx.http().get_channels(guild_id).await.map_err(ChannelParseError::Http)?;
+    if let Some(channel) = channels.into_iter().find(|c| c.name.eq_ignore_ascii_case(s)) {
+        Ok(Channel::Guild(channel))
+    } else {
+        Err(ChannelParseError::NotFoundOrMalformed)
+    }
 }
 
 /// Look up a Channel by a string case-insensitively.
