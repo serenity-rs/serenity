@@ -23,6 +23,7 @@ Thanks to the following for their contributions:
 - [@Joshument]
 - [@kangalio]
 - [@Kneemund]
+- [@LaytonGB]
 - [@marcantoinem]
 - [@Miezhiko]
 - [@Milo123459]
@@ -5558,6 +5559,7 @@ Initial commit.
 [@kyranet]: https://github.com/kyranet
 [@Lakelezz]: https://github.com/Lakelezz
 [@LavaToaster]: https://github.com/LavaToaster
+[@LaytonGB]: https://github.com/LaytonGB
 [@LeSeulArtichaut]: https://github.com/LeSeulArtichaut
 [@Licenser]: https://github.com/Licenser
 [@LikeLakers2]: https://github.com/LikeLakers2
