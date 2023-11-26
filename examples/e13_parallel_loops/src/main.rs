@@ -12,12 +12,16 @@ use serenity::model::gateway::Ready;
 use serenity::model::id::{ChannelId, GuildId};
 use serenity::prelude::*;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 struct Handler {
     is_loop_running: AtomicBool,
 }
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content.starts_with("!ping") {
             if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
@@ -112,7 +116,8 @@ async fn main() {
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::GUILDS
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(&token, intents)
+
+    let mut client = Client::builder(&token, intents, ())
         .event_handler(Handler {
             is_loop_running: AtomicBool::new(false),
         })

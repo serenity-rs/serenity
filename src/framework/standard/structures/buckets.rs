@@ -8,9 +8,9 @@ use crate::client::Context;
 use crate::internal::tokio::spawn_named;
 use crate::model::channel::Message;
 
-type Check = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, bool>;
+type Check<D> = for<'fut> fn(&'fut Context<D>, &'fut Message) -> BoxFuture<'fut, bool>;
 
-type DelayHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
+type DelayHook<D> = for<'fut> fn(&'fut Context<D>, &'fut Message) -> BoxFuture<'fut, ()>;
 
 pub(crate) struct Ratelimit {
     pub delay: Duration,
@@ -37,26 +37,26 @@ impl UnitRatelimit {
 }
 
 /// A bucket offers fine-grained control over the execution of commands.
-pub(crate) enum Bucket {
+pub(crate) enum Bucket<D: Send + Sync + 'static> {
     /// The bucket will collect tickets for every invocation of a command.
-    Global(TicketCounter),
+    Global(TicketCounter<D>),
     /// The bucket will collect tickets per user.
-    User(TicketCounter),
+    User(TicketCounter<D>),
     /// The bucket will collect tickets per guild.
-    Guild(TicketCounter),
+    Guild(TicketCounter<D>),
     /// The bucket will collect tickets per channel.
-    Channel(TicketCounter),
+    Channel(TicketCounter<D>),
     /// The bucket will collect tickets per category.
     ///
     /// This requires the cache, as messages do not contain their channel's category and retrieving
     /// channel data via HTTP is costly.
     #[cfg(feature = "cache")]
-    Category(TicketCounter),
+    Category(TicketCounter<D>),
 }
 
-impl Bucket {
+impl<D: Send + Sync + 'static> Bucket<D> {
     #[inline]
-    pub async fn take(&mut self, ctx: &Context, msg: &Message) -> Option<RateLimitInfo> {
+    pub async fn take(&mut self, ctx: &Context<D>, msg: &Message) -> Option<RateLimitInfo> {
         match self {
             Self::Global(counter) => counter.take(ctx, msg, 0).await,
             Self::User(counter) => counter.take(ctx, msg, msg.author.id.get()).await,
@@ -81,7 +81,7 @@ impl Bucket {
     }
 
     #[inline]
-    pub async fn give(&mut self, ctx: &Context, msg: &Message) {
+    pub async fn give(&mut self, ctx: &Context<D>, msg: &Message) {
         match self {
             Self::Global(counter) => counter.give(ctx, msg, 0).await,
             Self::User(counter) => counter.give(ctx, msg, msg.author.id.get()).await,
@@ -103,11 +103,11 @@ impl Bucket {
 }
 
 /// Keeps track of who owns how many tickets and when they accessed the last time.
-pub(crate) struct TicketCounter {
+pub(crate) struct TicketCounter<D: Send + Sync + 'static> {
     pub ratelimit: Ratelimit,
     pub tickets_for: HashMap<u64, UnitRatelimit>,
-    pub check: Option<Check>,
-    pub delay_action: Option<DelayHook>,
+    pub check: Option<Check<D>>,
+    pub delay_action: Option<DelayHook<D>>,
     pub await_ratelimits: u32,
 }
 
@@ -161,7 +161,7 @@ impl RateLimitInfo {
     }
 }
 
-impl TicketCounter {
+impl<D: Send + Sync + 'static> TicketCounter<D> {
     /// Tries to check whether the invocation is permitted by the ticket counter and if a ticket
     /// can be taken; it does not return a a ticket but a duration until a ticket can be taken.
     ///
@@ -170,7 +170,12 @@ impl TicketCounter {
     ///
     /// However there is no contract: It does not matter what the caller ends up doing, receiving
     /// some action eventually means no ticket can be taken and the duration must elapse.
-    pub async fn take(&mut self, ctx: &Context, msg: &Message, id: u64) -> Option<RateLimitInfo> {
+    pub async fn take(
+        &mut self,
+        ctx: &Context<D>,
+        msg: &Message,
+        id: u64,
+    ) -> Option<RateLimitInfo> {
         if let Some(check) = &self.check {
             if !(check)(ctx, msg).await {
                 return None;
@@ -282,7 +287,7 @@ impl TicketCounter {
     /// Reverts the last ticket step performed by returning a ticket for the matching ticket
     /// holder. Only call this if the mutable owner already took a ticket in this atomic execution
     /// of calling `take` and `give`.
-    pub async fn give(&mut self, ctx: &Context, msg: &Message, id: u64) {
+    pub async fn give(&mut self, ctx: &Context<D>, msg: &Message, id: u64) {
         if let Some(check) = &self.check {
             if !(check)(ctx, msg).await {
                 return;
@@ -343,17 +348,17 @@ impl Default for LimitedFor {
     }
 }
 
-pub struct BucketBuilder {
+pub struct BucketBuilder<D: Send + Sync + 'static> {
     pub(crate) delay: Duration,
     pub(crate) time_span: Duration,
     pub(crate) limit: u32,
-    pub(crate) check: Option<Check>,
-    pub(crate) delay_action: Option<DelayHook>,
+    pub(crate) check: Option<Check<D>>,
+    pub(crate) delay_action: Option<DelayHook<D>>,
     pub(crate) limited_for: LimitedFor,
     pub(crate) await_ratelimits: u32,
 }
 
-impl Default for BucketBuilder {
+impl<D: Send + Sync + 'static> Default for BucketBuilder<D> {
     fn default() -> Self {
         Self {
             delay: Duration::default(),
@@ -367,7 +372,7 @@ impl Default for BucketBuilder {
     }
 }
 
-impl BucketBuilder {
+impl<D: Send + Sync + 'static> BucketBuilder<D> {
     /// A bucket collecting tickets per command invocation.
     #[must_use]
     pub fn new_global() -> Self {
@@ -448,7 +453,7 @@ impl BucketBuilder {
     /// limit the bucket to just one user.
     #[inline]
     #[must_use]
-    pub fn check(mut self, check: Check) -> Self {
+    pub fn check(mut self, check: Check<D>) -> Self {
         self.check = Some(check);
         self
     }
@@ -467,6 +472,8 @@ impl BucketBuilder {
     ///
     /// ```rust
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// use serenity::framework::standard::macros::{command, group};
     /// use serenity::framework::standard::{BucketBuilder, Configuration, CommandResult, StandardFramework};
     /// use serenity::model::channel::Message;
@@ -474,7 +481,7 @@ impl BucketBuilder {
     ///
     /// #[command]
     /// #[bucket = "example_bucket"]
-    /// async fn example_command(ctx: &Context, msg: &Message) -> CommandResult {
+    /// async fn example_command<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.reply(ctx, "Example message, You can only repeat this once every 10 seconds").await?;
     ///
     ///     Ok(())
@@ -486,7 +493,7 @@ impl BucketBuilder {
     ///
     /// #[group]
     /// #[commands(example_command)]
-    /// struct General;
+    /// struct General<Data>;
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
     ///
@@ -504,9 +511,9 @@ impl BucketBuilder {
     ///
     /// framework.configure(Configuration::new().prefix("~"));
     ///
-    /// let mut client = Client::builder(&token, GatewayIntents::default())
-    /// .framework(framework)
-    /// .await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), ())
+    ///     .framework(framework)
+    ///     .await?;
     ///
     /// client.start().await?;
     /// # Ok(())
@@ -514,7 +521,7 @@ impl BucketBuilder {
     /// ```
     #[inline]
     #[must_use]
-    pub fn delay_action(mut self, action: DelayHook) -> Self {
+    pub fn delay_action(mut self, action: DelayHook<D>) -> Self {
         self.delay_action = Some(action);
         if self.await_ratelimits == 0 {
             self.await_ratelimits = 1;
@@ -544,7 +551,7 @@ impl BucketBuilder {
 
     /// Constructs the bucket.
     #[inline]
-    pub(crate) fn construct(self) -> Bucket {
+    pub(crate) fn construct(self) -> Bucket<D> {
         let counter = TicketCounter {
             ratelimit: Ratelimit {
                 delay: self.delay,

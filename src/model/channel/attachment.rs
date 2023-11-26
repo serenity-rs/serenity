@@ -98,12 +98,14 @@ impl Attachment {
     /// use serenity::prelude::*;
     /// use tokio::fs::File;
     /// use tokio::io::AsyncWriteExt;
-    ///
+    /// # type Data = ();
+    /// # #[cfg(feature = "client")]
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// # #[cfg(feature = "client")]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, context: Context, mut message: Message) {
     ///         for attachment in message.attachments {
     ///             let content = match attachment.download().await {

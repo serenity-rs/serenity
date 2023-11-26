@@ -5,10 +5,9 @@ use std::sync::OnceLock;
 
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::StreamExt;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::Mutex;
 use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, instrument, warn};
-use typemap_rev::TypeMap;
 
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
@@ -38,22 +37,22 @@ const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 ///
 /// A shard queuer instance _should_ be run in its own thread, due to the blocking nature of the
 /// loop itself as well as a 5 second thread sleep between shard starts.
-pub struct ShardQueuer {
+pub struct ShardQueuer<D: Send + Sync + 'static> {
     /// A copy of [`Client::data`] to be given to runners for contextual dispatching.
     ///
     /// [`Client::data`]: crate::Client::data
-    pub data: Arc<RwLock<TypeMap>>,
+    pub data: Arc<D>,
     /// A reference to an [`EventHandler`], such as the one given to the [`Client`].
     ///
     /// [`Client`]: crate::Client
-    pub event_handlers: Vec<Arc<dyn EventHandler>>,
+    pub event_handlers: Vec<Arc<dyn EventHandler<D>>>,
     /// A reference to an [`RawEventHandler`], such as the one given to the [`Client`].
     ///
     /// [`Client`]: crate::Client
-    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler<D>>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
+    pub framework: Arc<OnceLock<Arc<dyn Framework<D>>>>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
@@ -80,7 +79,7 @@ pub struct ShardQueuer {
     pub presence: Option<PresenceData>,
 }
 
-impl ShardQueuer {
+impl<D: Send + Sync + 'static> ShardQueuer<D> {
     /// Begins the shard queuer loop.
     ///
     /// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s, blocking for

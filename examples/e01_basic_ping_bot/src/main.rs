@@ -5,10 +5,14 @@ use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     // Set a handler for the `message` event - so that whenever a new message is received - the
     // closure (or function) passed will be called.
     //
@@ -46,8 +50,10 @@ async fn main() {
 
     // Create a new instance of the Client, logging in as a bot. This will automatically prepend
     // your bot token with "Bot ", which is a requirement by Discord for bot users.
-    let mut client =
-        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token, intents, ())
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
 
     // Finally, start a single shard, and start listening to events.
     //

@@ -230,9 +230,9 @@ impl CommandInteraction {
     ///
     /// See [`CreateQuickModal::execute()`].
     #[cfg(all(feature = "collector", feature = "utils"))]
-    pub async fn quick_modal(
+    pub async fn quick_modal<D: Send + Sync + 'static>(
         &self,
-        ctx: &Context,
+        ctx: &Context<D>,
         builder: CreateQuickModal,
     ) -> Result<Option<QuickModalResponse>> {
         builder.execute(ctx, self.id, &self.token).await

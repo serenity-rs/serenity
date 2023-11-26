@@ -1,23 +1,15 @@
 use serenity::framework::standard::macros::command;
 use serenity::framework::standard::CommandResult;
 use serenity::model::prelude::*;
-use serenity::prelude::*;
 
-use crate::ShardManagerContainer;
+use crate::{Context, Data};
 
 #[command]
 #[owners_only]
-async fn quit(ctx: &Context, msg: &Message) -> CommandResult {
-    let data = ctx.data.read().await;
-
-    if let Some(manager) = data.get::<ShardManagerContainer>() {
-        msg.reply(ctx, "Shutting down!").await?;
-        manager.shutdown_all().await;
-    } else {
-        msg.reply(ctx, "There was a problem getting the shard manager").await?;
-
-        return Ok(());
-    }
+async fn quit<Data>(ctx: &Context, msg: &Message) -> CommandResult {
+    let shard_manager = ctx.data.shard_manager.get().unwrap();
+    msg.reply(ctx, "Shutting down!").await?;
+    shard_manager.shutdown_all().await;
 
     Ok(())
 }

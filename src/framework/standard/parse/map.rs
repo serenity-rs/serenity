@@ -1,12 +1,15 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use derivative::Derivative;
+
 use crate::framework::standard::*;
 
-#[derive(Debug)]
-pub enum Map {
-    WithPrefixes(GroupMap),
-    Prefixless(GroupMap, CommandMap),
+#[derive(derivative::Derivative)]
+#[derivative(Debug(bound = ""))]
+pub enum Map<D: Send + Sync + 'static> {
+    WithPrefixes(GroupMap<D>),
+    Prefixless(GroupMap<D>, CommandMap<D>),
 }
 
 pub trait ParseMap {
@@ -18,15 +21,16 @@ pub trait ParseMap {
     fn is_empty(&self) -> bool;
 }
 
-#[derive(Debug, Default)]
-pub struct CommandMap {
-    cmds: HashMap<String, (&'static Command, Arc<CommandMap>)>,
+#[derive(Derivative)]
+#[derivative(Debug(bound = ""), Default(bound = ""))]
+pub struct CommandMap<D: Send + Sync + 'static> {
+    cmds: HashMap<String, (&'static Command<D>, Arc<CommandMap<D>>)>,
     min_length: usize,
     max_length: usize,
 }
 
-impl CommandMap {
-    pub fn new(cmds: &[&'static Command], conf: &Configuration) -> Self {
+impl<D: Send + Sync + 'static> CommandMap<D> {
+    pub fn new(cmds: &[&'static Command<D>], conf: &Configuration<D>) -> Self {
         let mut map = Self::default();
 
         for cmd in cmds {
@@ -48,8 +52,8 @@ impl CommandMap {
     }
 }
 
-impl ParseMap for CommandMap {
-    type Storage = (&'static Command, Arc<CommandMap>);
+impl<D: Send + Sync + 'static> ParseMap for CommandMap<D> {
+    type Storage = (&'static Command<D>, Arc<CommandMap<D>>);
 
     #[inline]
     fn min_length(&self) -> usize {
@@ -72,15 +76,17 @@ impl ParseMap for CommandMap {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct GroupMap {
-    groups: HashMap<&'static str, (&'static CommandGroup, Arc<GroupMap>, Arc<CommandMap>)>,
+#[derive(Derivative)]
+#[derivative(Debug(bound = ""), Default(bound = ""))]
+#[allow(clippy::type_complexity)]
+pub struct GroupMap<D: Send + Sync + 'static> {
+    groups: HashMap<&'static str, (&'static CommandGroup<D>, Arc<GroupMap<D>>, Arc<CommandMap<D>>)>,
     min_length: usize,
     max_length: usize,
 }
 
-impl GroupMap {
-    pub fn new(groups: &[&'static CommandGroup], conf: &Configuration) -> Self {
+impl<D: Send + Sync + 'static> GroupMap<D> {
+    pub fn new(groups: &[&'static CommandGroup<D>], conf: &Configuration<D>) -> Self {
         let mut map = Self::default();
 
         for group in groups {
@@ -103,8 +109,8 @@ impl GroupMap {
     }
 }
 
-impl ParseMap for GroupMap {
-    type Storage = (&'static CommandGroup, Arc<GroupMap>, Arc<CommandMap>);
+impl<D: Send + Sync + 'static> ParseMap for GroupMap<D> {
+    type Storage = (&'static CommandGroup<D>, Arc<GroupMap<D>>, Arc<CommandMap<D>>);
 
     #[inline]
     fn min_length(&self) -> usize {

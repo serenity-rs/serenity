@@ -302,11 +302,13 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
     /// # #[cfg(feature = "client")]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn cache_ready(&self, ctx: Context, _: Vec<GuildId>) {
     ///         println!("{} unknown members", ctx.cache.unknown_members());
     ///     }
@@ -343,11 +345,12 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// #
-    /// struct Handler;
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn ready(&self, context: Context, _: Ready) {
     ///         let guilds = context.cache.guilds().len();
     ///
@@ -658,7 +661,7 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::client::Context;
     /// #
-    /// # async fn test(context: &Context) -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn test(context: &Context<()>) -> Result<(), Box<dyn std::error::Error>> {
     /// if let Some(user) = context.cache.user(7) {
     ///     println!("User with Id 7 is currently named {}", user.name);
     /// }

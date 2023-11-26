@@ -27,39 +27,31 @@ pub enum Reason {
 
 impl Error for Reason {}
 
-pub type CheckFunction = for<'fut> fn(
-    &'fut Context,
+pub type CheckFunction<D> = for<'fut> fn(
+    &'fut Context<D>,
     &'fut Message,
     &'fut mut Args,
-    &'fut CommandOptions,
+    &'fut CommandOptions<D>,
 ) -> BoxFuture<'fut, Result<(), Reason>>;
 
 /// A check can be part of a command or group and will be executed to determine whether a user is
 /// permitted to use related item.
 ///
 /// Additionally, a check may hold additional settings.
-pub struct Check {
+#[derive(derivative::Derivative)]
+#[derivative(Debug(bound = ""), PartialEq(bound = ""))]
+pub struct Check<D: Send + Sync + 'static> {
     /// Name listed in help-system.
     pub name: &'static str,
     /// Function that will be executed.
-    pub function: CheckFunction,
+    #[derivative(Debug = "ignore", PartialEq = "ignore")]
+    pub function: CheckFunction<D>,
     /// Whether a check should be evaluated in the help-system. `false` will ignore check and won't
     /// fail execution.
     pub check_in_help: bool,
     /// Whether a check shall be listed in the help-system. `false` won't affect whether the check
     /// will be evaluated help, solely [`Self::check_in_help`] sets this.
     pub display_in_help: bool,
-}
-
-impl fmt::Debug for Check {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Check")
-            .field("name", &self.name)
-            .field("function", &"<fn>")
-            .field("check_in_help", &self.check_in_help)
-            .field("display_in_help", &self.display_in_help)
-            .finish()
-    }
 }
 
 impl fmt::Display for Reason {
@@ -75,11 +67,5 @@ impl fmt::Display for Reason {
                 write!(f, "UserAndLog {{user: {user}, log: {log}}}")
             },
         }
-    }
-}
-
-impl PartialEq for Check {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
     }
 }

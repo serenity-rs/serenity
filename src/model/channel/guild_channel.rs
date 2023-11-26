@@ -729,10 +729,12 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         let channel = match context.cache.channel(msg.channel_id) {
     ///             Some(channel) => channel,

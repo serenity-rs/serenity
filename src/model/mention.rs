@@ -25,8 +25,8 @@ pub trait Mentionable {
     /// # use serenity::model::guild::Member;
     /// # use serenity::model::channel::GuildChannel;
     /// # use serenity::model::id::ChannelId;
-    /// # use serenity::prelude::Context;
     /// # use serenity::Error;
+    /// # type Context = serenity::client::Context<()>;
     /// use serenity::model::mention::Mentionable;
     /// async fn greet(
     ///     ctx: Context,

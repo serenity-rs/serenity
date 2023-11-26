@@ -12,7 +12,7 @@ use serenity::builder::{
     CreateSelectMenuKind,
     CreateSelectMenuOption,
 };
-use serenity::client::{Context, EventHandler};
+use serenity::client::EventHandler;
 use serenity::futures::StreamExt;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -24,10 +24,14 @@ fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
     CreateButton::new(name).emoji(emoji)
 }
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content != "animal" {
             return;
@@ -143,7 +147,7 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(token, intents)
+    let mut client = Client::builder(token, intents, ())
         .event_handler(Handler)
         .await
         .expect("Error creating client");

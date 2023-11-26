@@ -42,12 +42,12 @@ macro_rules! update_cache {
     ($cache:ident, $event:ident) => {};
 }
 
-pub(crate) fn dispatch_model(
+pub(crate) fn dispatch_model<D: Send + Sync + 'static>(
     event: Event,
-    context: &Context,
-    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
-    event_handlers: Vec<Arc<dyn EventHandler>>,
-    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    context: &Context<D>,
+    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework<D>>>,
+    event_handlers: Vec<Arc<dyn EventHandler<D>>>,
+    raw_event_handlers: Vec<Arc<dyn RawEventHandler<D>>>,
 ) {
     for raw_handler in raw_event_handlers {
         let (context, event) = (context.clone(), event.clone());

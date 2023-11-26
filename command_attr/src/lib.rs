@@ -185,8 +185,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let cooked = fun.cooked.clone();
 
-    let options_path = quote!(serenity::framework::standard::CommandOptions);
-    let command_path = quote!(serenity::framework::standard::Command);
+    let data_generic = &fun.data_generic;
+    let options_path = quote!(serenity::framework::standard::CommandOptions::<#data_generic>);
+    let command_path = quote!(serenity::framework::standard::Command::<#data_generic>);
 
     populate_fut_lifetimes_on_refs(&mut fun.args);
     let args = fun.args;
@@ -464,8 +465,9 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let cooked = fun.cooked.clone();
 
+    let data_generic = &fun.data_generic;
     let options_path = quote!(serenity::framework::standard::HelpOptions);
-    let command_path = quote!(serenity::framework::standard::HelpCommand);
+    let command_path = quote!(serenity::framework::standard::HelpCommand::<#data_generic>);
 
     let body = fun.body;
     let ret = fun.ret;
@@ -698,9 +700,10 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let sub_groups = sub_groups.into_iter().map(|c| c.with_suffix(GROUP)).collect::<Vec<_>>();
 
+    let data_generic = &group.data_generic;
     let options = group.name.with_suffix(GROUP_OPTIONS);
-    let options_path = quote!(serenity::framework::standard::GroupOptions);
-    let group_path = quote!(serenity::framework::standard::CommandGroup);
+    let options_path = quote!(serenity::framework::standard::GroupOptions::<#data_generic>);
+    let group_path = quote!(serenity::framework::standard::CommandGroup::<#data_generic>);
 
     (quote! {
         #(#cooked)*
@@ -785,13 +788,14 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let name = if name == "<fn>" { fun.name.clone() } else { Ident::new(&name, Span::call_site()) };
     let name = name.with_suffix(CHECK);
 
-    let check = quote!(serenity::framework::standard::Check);
+    let data_generic = fun.data_generic;
     let cooked = fun.cooked;
     let body = fun.body;
     let ret = fun.ret;
     populate_fut_lifetimes_on_refs(&mut fun.args);
     let args = fun.args;
 
+    let check = quote!(serenity::framework::standard::Check::<#data_generic>);
     (quote! {
         #[allow(missing_docs)]
         pub static #name: #check = #check {

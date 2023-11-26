@@ -6,10 +6,14 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn message(&self, context: Context, msg: Message) {
         if msg.content == "!ping" {
             let channel = match msg.channel_id.to_channel(&context).await {
@@ -50,8 +54,10 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client =
-        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token, intents, ())
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
 
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");

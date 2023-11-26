@@ -22,8 +22,12 @@ use serenity::prelude::*;
 // console. This confirms that guild sharding works.
 struct Handler;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!ping" {
             println!("Shard {}", ctx.shard_id);
@@ -46,8 +50,10 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client =
-        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token, intents, ())
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
 
     // The total number of shards to use. The "current shard number" of a shard - that is, the
     // shard it is assigned to - is indexed at 0, while the total shard count is indexed at 1.

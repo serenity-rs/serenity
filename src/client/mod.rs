@@ -30,9 +30,8 @@ use std::sync::OnceLock;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::Mutex;
 use tracing::{debug, error, info, instrument};
-use typemap_rev::{TypeMap, TypeMapKey};
 
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
@@ -61,26 +60,26 @@ use crate::model::user::OnlineStatus;
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 #[must_use = "Builders do nothing unless they are awaited"]
-pub struct ClientBuilder {
-    data: TypeMap,
+pub struct ClientBuilder<D: Send + Sync + 'static = ()> {
     http: Http,
+    data: Arc<D>,
     intents: GatewayIntents,
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
     #[cfg(feature = "framework")]
-    framework: Option<Box<dyn Framework>>,
+    framework: Option<Box<dyn Framework<D>>>,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
-    event_handlers: Vec<Arc<dyn EventHandler>>,
-    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    event_handlers: Vec<Arc<dyn EventHandler<D>>>,
+    raw_event_handlers: Vec<Arc<dyn RawEventHandler<D>>>,
     presence: PresenceData,
 }
 
 #[cfg(feature = "gateway")]
-impl ClientBuilder {
-    fn _new(http: Http, intents: GatewayIntents) -> Self {
+impl<D: Send + Sync + 'static> ClientBuilder<D> {
+    fn _new(http: Http, intents: GatewayIntents, data: Arc<D>) -> Self {
         Self {
-            data: TypeMap::new(),
+            data,
             http,
             intents,
             #[cfg(feature = "cache")]
@@ -101,8 +100,8 @@ impl ClientBuilder {
     /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
-    pub fn new(token: impl AsRef<str>, intents: GatewayIntents) -> Self {
-        Self::_new(Http::new(token.as_ref()), intents)
+    pub fn new(token: impl AsRef<str>, intents: GatewayIntents, data: impl Into<Arc<D>>) -> Self {
+        Self::_new(Http::new(token.as_ref()), intents, data.into())
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on for the client
@@ -111,8 +110,8 @@ impl ClientBuilder {
     /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
-    pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
-        Self::_new(http, intents)
+    pub fn new_with_http(http: Http, intents: GatewayIntents, data: impl Into<Arc<D>>) -> Self {
+        Self::_new(http, intents, data.into())
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
@@ -141,27 +140,9 @@ impl ClientBuilder {
         self.http.application_id()
     }
 
-    /// Sets the entire [`TypeMap`] that will be available in [`Context`]s. A [`TypeMap`] must not
-    /// be constructed manually: [`Self::type_map_insert`] can be used to insert one type at a
-    /// time.
-    pub fn type_map(mut self, type_map: TypeMap) -> Self {
-        self.data = type_map;
-
-        self
-    }
-
-    /// Gets the type map. See [`Self::type_map`] for more info.
-    pub fn get_type_map(&self) -> &TypeMap {
-        &self.data
-    }
-
-    /// Insert a single `value` into the internal [`TypeMap`] that will be available in
-    /// [`Context::data`]. This method can be called multiple times in order to populate the
-    /// [`TypeMap`] with `value`s.
-    pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
-        self.data.insert::<T>(value);
-
-        self
+    /// Gets the data. See [`Self::data`] for more info.
+    pub fn get_data(&mut self) -> &mut D {
+        Arc::get_mut(&mut self.data).expect("Data Arc hasn't been cloned before building")
     }
 
     /// Sets the settings of the cache. Refer to [`Settings`] for more information.
@@ -187,7 +168,7 @@ impl ClientBuilder {
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
     where
-        F: Framework + 'static,
+        F: Framework<D> + 'static,
     {
         self.framework = Some(Box::new(framework));
 
@@ -196,7 +177,7 @@ impl ClientBuilder {
 
     /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     #[cfg(feature = "framework")]
-    pub fn get_framework(&self) -> Option<&dyn Framework> {
+    pub fn get_framework(&self) -> Option<&dyn Framework<D>> {
         self.framework.as_deref()
     }
 
@@ -268,14 +249,14 @@ impl ClientBuilder {
     }
 
     /// Adds an event handler with multiple methods for each possible event.
-    pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
+    pub fn event_handler<H: EventHandler<D> + 'static>(mut self, event_handler: H) -> Self {
         self.event_handlers.push(Arc::new(event_handler));
 
         self
     }
 
     /// Adds an event handler with multiple methods for each possible event. Passed by Arc.
-    pub fn event_handler_arc<H: EventHandler + 'static>(
+    pub fn event_handler_arc<H: EventHandler<D> + 'static>(
         mut self,
         event_handler_arc: Arc<H>,
     ) -> Self {
@@ -285,20 +266,23 @@ impl ClientBuilder {
     }
 
     /// Gets the added event handlers. See [`Self::event_handler`] for more info.
-    pub fn get_event_handlers(&self) -> &[Arc<dyn EventHandler>] {
+    pub fn get_event_handlers(&self) -> &[Arc<dyn EventHandler<D>>] {
         &self.event_handlers
     }
 
     /// Adds an event handler with a single method where all received gateway events will be
     /// dispatched.
-    pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
+    pub fn raw_event_handler<H: RawEventHandler<D> + 'static>(
+        mut self,
+        raw_event_handler: H,
+    ) -> Self {
         self.raw_event_handlers.push(Arc::new(raw_event_handler));
 
         self
     }
 
     /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
-    pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler>] {
+    pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler<D>>] {
         &self.raw_event_handlers
     }
 
@@ -323,14 +307,13 @@ impl ClientBuilder {
 }
 
 #[cfg(feature = "gateway")]
-impl IntoFuture for ClientBuilder {
-    type Output = Result<Client>;
-
-    type IntoFuture = BoxFuture<'static, Result<Client>>;
+impl<D: Send + Sync + 'static> IntoFuture for ClientBuilder<D> {
+    type Output = Result<Client<D>>;
+    type IntoFuture = BoxFuture<'static, Result<Client<D>>>;
 
     #[instrument(skip(self))]
     fn into_future(self) -> Self::IntoFuture {
-        let data = Arc::new(RwLock::new(self.data));
+        let data = self.data;
         #[cfg(feature = "framework")]
         let framework = self.framework;
         let event_handlers = self.event_handlers;
@@ -433,10 +416,13 @@ impl IntoFuture for ClientBuilder {
 /// use serenity::prelude::*;
 /// use serenity::Client;
 ///
+/// type Data = ();
+/// type Context = serenity::client::Context<Data>;
+///
 /// struct Handler;
 ///
 /// #[serenity::async_trait]
-/// impl EventHandler for Handler {
+/// impl EventHandler<Data> for Handler {
 ///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say(&context, "Pong!");
@@ -445,8 +431,9 @@ impl IntoFuture for ClientBuilder {
 /// }
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// let mut client =
-///     Client::builder("my token here", GatewayIntents::default()).event_handler(Handler).await?;
+/// let mut client = Client::builder("my token here", GatewayIntents::default(), ())
+///     .event_handler(Handler)
+///     .await?;
 ///
 /// client.start().await?;
 /// # Ok(())
@@ -457,9 +444,8 @@ impl IntoFuture for ClientBuilder {
 /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 /// [sharding docs]: crate::gateway#sharding
 #[cfg(feature = "gateway")]
-pub struct Client {
-    /// A TypeMap which requires types to be Send + Sync. This is a map that can be safely shared
-    /// across contexts.
+pub struct Client<D: Send + Sync + 'static> {
+    /// Generic type to be shared between contexts.
     ///
     /// The purpose of the data field is to be accessible and persistent across contexts; that is,
     /// data can be modified by one context, and will persist through the future and be accessible
@@ -478,37 +464,35 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```rust,ignore
-    /// use std::collections::HashMap;
     /// use std::env;
     ///
+    /// use dashmap::DashMap;
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
-    /// struct MessageEventCounter;
+    /// struct Data {
+    ///     counter: DashMap<String, u64>,
+    /// };
     ///
-    /// impl TypeMapKey for MessageEventCounter {
-    ///     type Value = HashMap<String, u64>;
-    /// }
+    /// type Context = serenity::client::Context<Data>;
     ///
-    /// async fn reg<S: Into<String>>(ctx: Context, name: S) {
-    ///     let mut data = ctx.data.write().await;
-    ///     let counter = data.get_mut::<MessageEventCounter>().unwrap();
-    ///     let entry = counter.entry(name.into()).or_insert(0);
+    /// fn reg<S: Into<String>>(ctx: Context, name: S) {
+    ///     let entry = ctx.data.entry(name.into()).or_insert(0);
     ///     *entry += 1;
     /// }
     ///
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, _: Message) {
-    ///         reg(ctx, "MessageCreate").await
+    ///         reg(ctx, "MessageCreate")
     ///     }
     ///     async fn message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
-    ///         reg(ctx, "MessageDelete").await
+    ///         reg(ctx, "MessageDelete")
     ///     }
     ///     async fn message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
-    ///         reg(ctx, "MessageDeleteBulk").await
+    ///         reg(ctx, "MessageDeleteBulk")
     ///     }
     ///
     ///     #[cfg(feature = "cache")]
@@ -519,22 +503,21 @@ pub struct Client {
     ///         _new: Option<Message>,
     ///         _: MessageUpdateEvent,
     ///     ) {
-    ///         reg(ctx, "MessageUpdate").await
+    ///         reg(ctx, "MessageUpdate")
     ///     }
     ///
     ///     #[cfg(not(feature = "cache"))]
     ///     async fn message_update(&self, ctx: Context, _new_data: MessageUpdateEvent) {
-    ///         reg(ctx, "MessageUpdate").await
+    ///         reg(ctx, "MessageUpdate")
     ///     }
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
-    /// {
-    ///     let mut data = client.data.write().await;
-    ///     data.insert::<MessageEventCounter>(HashMap::default());
-    /// }
+    /// let data = Data { counter: DashMap::new() };
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), data)
+    ///     .event_handler(Handler)
+    ///     .await?;
     ///
     /// client.start().await?;
     /// # Ok(())
@@ -548,7 +531,7 @@ pub struct Client {
     /// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk
     /// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework
-    pub data: Arc<RwLock<TypeMap>>,
+    pub data: Arc<D>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -567,7 +550,7 @@ pub struct Client {
     /// # use serenity::prelude::*;
     /// # use std::time::Duration;
     /// #
-    /// # fn run(client: Client) {
+    /// # fn run(client: Client<()>) {
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
@@ -588,7 +571,7 @@ pub struct Client {
     /// # use serenity::prelude::*;
     /// # use std::time::Duration;
     /// #
-    /// # fn run(client: Client) {
+    /// # fn run(client: Client<()>) {
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
@@ -624,9 +607,13 @@ pub struct Client {
     pub http: Arc<Http>,
 }
 
-impl Client {
-    pub fn builder(token: impl AsRef<str>, intents: GatewayIntents) -> ClientBuilder {
-        ClientBuilder::new(token, intents)
+impl<D: Send + Sync + 'static> Client<D> {
+    pub fn builder(
+        token: impl AsRef<str>,
+        intents: GatewayIntents,
+        data: impl Into<Arc<D>>,
+    ) -> ClientBuilder<D> {
+        ClientBuilder::new(token, intents, data)
     }
 
     /// Establish the connection and start listening for events.
@@ -652,7 +639,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), ()).await?;
     ///
     /// if let Err(why) = client.start().await {
     ///     println!("Err with client: {:?}", why);
@@ -689,7 +676,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), ()).await?;
     ///
     /// if let Err(why) = client.start_autosharded().await {
     ///     println!("Err with client: {:?}", why);
@@ -735,7 +722,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), ()).await?;
     ///
     /// if let Err(why) = client.start_shard(3, 5).await {
     ///     println!("Err with client: {:?}", why);
@@ -754,7 +741,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), ()).await?;
     ///
     /// if let Err(why) = client.start_shard(0, 1).await {
     ///     println!("Err with client: {:?}", why);
@@ -795,7 +782,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), ()).await?;
     ///
     /// if let Err(why) = client.start_shards(8).await {
     ///     println!("Err with client: {:?}", why);
@@ -836,7 +823,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default(), ()).await?;
     ///
     /// if let Err(why) = client.start_shard_range(4..7, 10).await {
     ///     println!("Err with client: {:?}", why);

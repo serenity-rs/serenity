@@ -10,7 +10,6 @@ use serenity::framework::standard::macros::{command, group, help};
 use serenity::framework::standard::{
     help_commands,
     Args,
-    CommandGroup,
     CommandResult,
     Configuration,
     HelpOptions,
@@ -22,12 +21,17 @@ use serenity::http::Http;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<Data>;
+type CommandGroup = serenity::framework::standard::CommandGroup<Data>;
+
 #[group("collector")]
 #[commands(challenge)]
-struct Collector;
+struct Collector<Data>;
 
 #[help]
-async fn my_help(
+async fn my_help<Data>(
     context: &Context,
     msg: &Message,
     args: Args,
@@ -42,7 +46,7 @@ async fn my_help(
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
@@ -76,7 +80,7 @@ async fn main() {
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::GUILD_MESSAGE_REACTIONS;
 
-    let mut client = Client::builder(&token, intents)
+    let mut client = Client::builder(&token, intents, ())
         .event_handler(Handler)
         .framework(framework)
         .await
@@ -88,7 +92,7 @@ async fn main() {
 }
 
 #[command]
-async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
+async fn challenge<Data>(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let mut score = 0u32;
     let _ = msg.reply(ctx, "How was that crusty crab called again? 10 seconds time!").await;
 

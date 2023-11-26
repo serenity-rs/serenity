@@ -7,10 +7,9 @@ use std::time::Duration;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::{SinkExt, StreamExt};
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tracing::{info, instrument, warn};
-use typemap_rev::TypeMap;
 
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
@@ -59,16 +58,18 @@ use crate::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
 /// use tokio::sync::{Mutex, RwLock};
 ///
+/// type Data = ();
+///
 /// struct Handler;
 ///
-/// impl EventHandler for Handler {}
-/// impl RawEventHandler for Handler {}
+/// impl EventHandler<Data> for Handler {}
+/// impl RawEventHandler<Data> for Handler {}
 ///
 /// # let http: Arc<Http> = unimplemented!();
 /// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
-/// let data = Arc::new(RwLock::new(TypeMap::new()));
-/// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
-/// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + 'static>;
+/// let data = Arc::new(());
+/// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler<Data>>;
+/// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework<Data> + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data,
@@ -122,7 +123,9 @@ impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor for usage in a
     /// separate thread.
     #[must_use]
-    pub fn new(opt: ShardManagerOptions) -> (Arc<Self>, Receiver<Result<(), GatewayError>>) {
+    pub fn new<D: Send + Sync + 'static>(
+        opt: ShardManagerOptions<D>,
+    ) -> (Arc<Self>, Receiver<Result<(), GatewayError>>) {
         let (return_value_tx, return_value_rx) = mpsc::unbounded();
         let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
@@ -223,7 +226,7 @@ impl ShardManager {
     /// use serenity::model::id::ShardId;
     /// use serenity::prelude::*;
     ///
-    /// # async fn run(client: Client) {
+    /// # async fn run(client: Client<()>) {
     /// // restart shard ID 7
     /// client.shard_manager.restart(ShardId(7)).await;
     /// # }
@@ -383,12 +386,12 @@ impl Drop for ShardManager {
     }
 }
 
-pub struct ShardManagerOptions {
-    pub data: Arc<RwLock<TypeMap>>,
-    pub event_handlers: Vec<Arc<dyn EventHandler>>,
-    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+pub struct ShardManagerOptions<D: Send + Sync + 'static> {
+    pub data: Arc<D>,
+    pub event_handlers: Vec<Arc<dyn EventHandler<D>>>,
+    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler<D>>>,
     #[cfg(feature = "framework")]
-    pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
+    pub framework: Arc<OnceLock<Arc<dyn Framework<D>>>>,
     pub shard_index: u32,
     pub shard_init: u32,
     pub shard_total: u32,

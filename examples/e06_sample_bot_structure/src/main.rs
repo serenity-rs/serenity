@@ -28,16 +28,18 @@ use crate::commands::math::*;
 use crate::commands::meta::*;
 use crate::commands::owner::*;
 
-pub struct ShardManagerContainer;
-
-impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<ShardManager>;
+#[derive(Default)]
+struct Data {
+    shard_manager: std::sync::OnceLock<Arc<ShardManager>>,
 }
+
+// Set up our aliases for common types that require Data generics.
+type Context = serenity::client::Context<Data>;
 
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
         info!("Connected as {}", ready.user.name);
     }
@@ -49,7 +51,7 @@ impl EventHandler for Handler {
 
 #[group]
 #[commands(multiply, ping, quit)]
-struct General;
+struct General<Data>;
 
 #[tokio::main]
 async fn main() {
@@ -86,16 +88,14 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(&token, intents)
+
+    let mut client = Client::builder(&token, intents, Data::default())
         .framework(framework)
         .event_handler(Handler)
         .await
         .expect("Err creating client");
 
-    {
-        let mut data = client.data.write().await;
-        data.insert::<ShardManagerContainer>(client.shard_manager.clone());
-    }
+    client.data.shard_manager.set(client.shard_manager.clone()).unwrap();
 
     let shard_manager = client.shard_manager.clone();
 

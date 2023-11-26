@@ -68,7 +68,7 @@ impl Emoji {
     /// # use serenity::client::Context;
     /// # use serenity::model::prelude::Emoji;
     /// #
-    /// # async fn example(ctx: &Context, emoji: Emoji) -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn example(ctx: &Context<()>, emoji: Emoji) -> Result<(), Box<dyn std::error::Error>> {
     /// // assuming emoji has been set already
     /// match emoji.delete(&ctx).await {
     ///     Ok(()) => println!("Emoji deleted."),

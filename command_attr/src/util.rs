@@ -202,13 +202,16 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
         ));
     }
 
-    let context: Type = parse_quote!(&serenity::client::Context);
+    let data_generic = &fun.data_generic;
+    let context: Type = parse_quote!(&serenity::client::Context::<#data_generic>);
     let message: Type = parse_quote!(&serenity::model::channel::Message);
     let args: Type = parse_quote!(serenity::framework::standard::Args);
     let args2: Type = parse_quote!(&mut serenity::framework::standard::Args);
-    let options: Type = parse_quote!(&serenity::framework::standard::CommandOptions);
+    let options: Type =
+        parse_quote!(&serenity::framework::standard::CommandOptions::<#data_generic>);
     let hoptions: Type = parse_quote!(&'static serenity::framework::standard::HelpOptions);
-    let groups: Type = parse_quote!(&[&'static serenity::framework::standard::CommandGroup]);
+    let groups: Type =
+        parse_quote!(&[&'static serenity::framework::standard::CommandGroup::<#data_generic>]);
     let owners: Type = parse_quote!(std::collections::HashSet<serenity::model::id::UserId>);
 
     let mut index = 0;

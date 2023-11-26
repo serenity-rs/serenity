@@ -26,8 +26,8 @@ use uwl::Stream;
 // To avoid defaulting to permissions of everyone, we fetch the member from HTTP if it is missing
 // in the guild's members list.
 #[cfg(feature = "cache")]
-fn permissions_in(
-    ctx: &Context,
+fn permissions_in<D: Send + Sync + 'static>(
+    ctx: &Context<D>,
     guild_id: GuildId,
     channel_id: ChannelId,
     member: &Member,
@@ -98,8 +98,8 @@ fn permissions_in(
 }
 
 #[inline]
-fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
-    if config.case_insensitive {
+fn to_lowercase(case_insensitive: bool, s: &str) -> Cow<'_, str> {
+    if case_insensitive {
         Cow::Owned(s.to_lowercase())
     } else {
         Cow::Borrowed(s)
@@ -109,9 +109,7 @@ fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
 /// Parse a mention in the message that is of either the direct (`<@id>`) or nickname (`<@!id>`)
 /// syntax, and compare the encoded `id` with the id from [`Configuration::on_mention`] for a
 /// match. Returns `Some(<id>)` on success, [`None`] otherwise.
-pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'a str> {
-    let on_mention = config.on_mention.as_deref()?;
-
+pub fn mention<'a>(stream: &mut Stream<'a>, on_mention: &str) -> Option<&'a str> {
     let start = stream.offset();
 
     if !stream.eat("<@") {
@@ -139,21 +137,21 @@ pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'
     }
 }
 
-async fn find_prefix<'a>(
-    ctx: &Context,
+async fn find_prefix<'a, D: Send + Sync + 'static>(
+    ctx: &Context<D>,
     msg: &Message,
-    config: &Configuration,
+    config: &Configuration<D>,
     stream: &Stream<'a>,
 ) -> Option<Cow<'a, str>> {
     let try_match = |prefix: &str| {
         let peeked = stream.peek_for_char(prefix.chars().count());
-        let peeked = to_lowercase(config, peeked);
+        let peeked = to_lowercase(config.case_insensitive, peeked);
         (prefix == peeked).then_some(peeked)
     };
 
     for f in &config.dynamic_prefixes {
         if let Some(p) = f(ctx, msg).await {
-            let p = to_lowercase(config, &p);
+            let p = to_lowercase(config.case_insensitive, &p);
             if let Some(p) = try_match(&p) {
                 return Some(p);
             }
@@ -173,13 +171,13 @@ async fn find_prefix<'a>(
 ///
 /// In all cases, whitespace after the prefix is cleared.
 #[allow(clippy::needless_lifetimes)] // Clippy and the compiler disagree
-pub async fn prefix<'a>(
-    ctx: &Context,
+pub async fn prefix<'a, D: Send + Sync + 'static>(
+    ctx: &Context<D>,
     msg: &Message,
     stream: &mut Stream<'a>,
-    config: &Configuration,
+    config: &Configuration<D>,
 ) -> Option<Cow<'a, str>> {
-    if let Some(id) = mention(stream, config) {
+    if let Some(id) = config.on_mention.as_deref().and_then(|m| mention(stream, m)) {
         stream.take_while_char(char::is_whitespace);
 
         return Some(Cow::Borrowed(id));
@@ -199,11 +197,11 @@ pub async fn prefix<'a>(
 }
 
 /// Checked per valid group or command in the message.
-async fn check_discrepancy(
-    #[allow(unused_variables)] ctx: &Context,
+async fn check_discrepancy<D: Send + Sync + 'static>(
+    #[allow(unused_variables)] ctx: &Context<D>,
     msg: &Message,
-    config: &Configuration,
-    options: &impl CommonOptions,
+    config: &Configuration<D>,
+    options: &impl CommonOptions<D>,
 ) -> Result<(), DispatchError> {
     if options.owners_only() && !config.owners.contains(&msg.author.id) {
         return Err(DispatchError::OnlyForOwners);
@@ -273,16 +271,17 @@ fn try_parse<M: ParseMap>(
     }
 }
 
-fn parse_cmd<'a>(
+fn parse_cmd<'a, D: Send + Sync + 'static>(
     stream: &'a mut Stream<'_>,
-    ctx: &'a Context,
+    ctx: &'a Context<D>,
     msg: &'a Message,
-    config: &'a Configuration,
-    map: &'a CommandMap,
-) -> BoxFuture<'a, Result<&'static Command, ParseError>> {
+    config: &'a Configuration<D>,
+    map: &'a CommandMap<D>,
+) -> BoxFuture<'a, Result<&'static Command<D>, ParseError>> {
     async move {
-        let (n, r) =
-            try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).into_owned());
+        let (n, r) = try_parse(stream, map, config.by_space, |s| {
+            to_lowercase(config.case_insensitive, s).into_owned()
+        });
 
         if config.disabled_commands.contains(&n) {
             return Err(ParseError::Dispatch {
@@ -320,13 +319,14 @@ fn parse_cmd<'a>(
     .boxed()
 }
 
-fn parse_group<'a>(
+#[allow(clippy::type_complexity)]
+fn parse_group<'a, D: Send + Sync + 'static>(
     stream: &'a mut Stream<'_>,
-    ctx: &'a Context,
+    ctx: &'a Context<D>,
     msg: &'a Message,
-    config: &'a Configuration,
-    map: &'a GroupMap,
-) -> BoxFuture<'a, Result<(&'static CommandGroup, Arc<CommandMap>), ParseError>> {
+    config: &'a Configuration<D>,
+    map: &'a GroupMap<D>,
+) -> BoxFuture<'a, Result<(&'static CommandGroup<D>, Arc<CommandMap<D>>), ParseError>> {
     async move {
         let (n, o) = try_parse(stream, map, config.by_space, ToString::to_string);
 
@@ -360,14 +360,14 @@ fn parse_group<'a>(
 }
 
 #[inline]
-async fn handle_command<'a>(
+async fn handle_command<'a, D: Send + Sync + 'static>(
     stream: &'a mut Stream<'_>,
-    ctx: &'a Context,
+    ctx: &'a Context<D>,
     msg: &'a Message,
-    config: &'a Configuration,
-    map: &'a CommandMap,
-    group: &'static CommandGroup,
-) -> Result<Invoke, ParseError> {
+    config: &'a Configuration<D>,
+    map: &'a CommandMap<D>,
+    group: &'static CommandGroup<D>,
+) -> Result<Invoke<D>, ParseError> {
     match parse_cmd(stream, ctx, msg, config, map).await {
         Ok(command) => Ok(Invoke::Command {
             group,
@@ -393,13 +393,13 @@ async fn handle_command<'a>(
 }
 
 #[inline]
-async fn handle_group<'a>(
+async fn handle_group<'a, D: Send + Sync + 'static>(
     stream: &mut Stream<'_>,
-    ctx: &'a Context,
+    ctx: &'a Context<D>,
     msg: &'a Message,
-    config: &'a Configuration,
-    map: &'a GroupMap,
-) -> Result<Invoke, ParseError> {
+    config: &'a Configuration<D>,
+    map: &'a GroupMap<D>,
+) -> Result<Invoke<D>, ParseError> {
     match parse_group(stream, ctx, msg, config, map).await {
         Ok((group, map)) => handle_command(stream, ctx, msg, config, &map, group).await,
         Err(error) => Err(error),
@@ -426,18 +426,19 @@ fn is_unrecognised<T>(res: &Result<T, ParseError>) -> bool {
 /// 2. A command defined under another command or a group, which may also belong to another group
 ///    and so on. To invoke this command, all names and prefixes of its parent commands and groups
 ///    must be specified before it.
-pub async fn command(
-    ctx: &Context,
+pub async fn command<D: Send + Sync + 'static>(
+    ctx: &Context<D>,
     msg: &Message,
     stream: &mut Stream<'_>,
-    groups: &[(&'static CommandGroup, Map)],
-    config: &Configuration,
+    groups: &[(&'static CommandGroup<D>, Map<D>)],
+    config: &Configuration<D>,
     help_was_set: Option<&[&'static str]>,
-) -> Result<Invoke, ParseError> {
+) -> Result<Invoke<D>, ParseError> {
     // Precedence is taken over commands named as one of the help names.
     if let Some(names) = help_was_set {
         for name in names {
-            let n = to_lowercase(config, stream.peek_for_char(name.chars().count()));
+            let n =
+                to_lowercase(config.case_insensitive, stream.peek_for_char(name.chars().count()));
 
             if name == &n {
                 stream.increment(n.len());
@@ -449,7 +450,7 @@ pub async fn command(
         }
     }
 
-    let mut last = Err::<Invoke, _>(ParseError::UnrecognisedCommand(None));
+    let mut last = Err(ParseError::UnrecognisedCommand(None));
     let mut is_prefixless = false;
 
     for (group, map) in groups {
@@ -467,7 +468,9 @@ pub async fn command(
                 }
             },
             Map::Prefixless(subgroups, commands) => {
-                fn command_name_if_recognised(res: &Result<Invoke, ParseError>) -> Option<&str> {
+                fn command_name_if_recognised<D: Send + Sync + 'static>(
+                    res: &Result<Invoke<D>, ParseError>,
+                ) -> Option<&str> {
                     match res {
                         Ok(Invoke::Command {
                             command, ..
@@ -515,7 +518,7 @@ pub async fn command(
 }
 
 #[derive(Debug)]
-pub enum Invoke {
-    Command { group: &'static CommandGroup, command: &'static Command },
+pub enum Invoke<D: Send + Sync + 'static> {
+    Command { group: &'static CommandGroup<D>, command: &'static Command<D> },
     Help(&'static str),
 }

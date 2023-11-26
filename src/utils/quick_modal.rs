@@ -19,7 +19,7 @@ pub struct QuickModalResponse {
 ///
 /// ```rust
 /// # use serenity::{builder::*, model::prelude::*, prelude::*, utils::CreateQuickModal, Result};
-/// # async fn _foo(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
+/// # async fn _foo(ctx: &Context<()>, interaction: &CommandInteraction) -> Result<()> {
 /// let modal = CreateQuickModal::new("About you")
 ///     .timeout(std::time::Duration::from_secs(600))
 ///     .short_field("First name")
@@ -84,9 +84,9 @@ impl CreateQuickModal {
     /// # Errors
     ///
     /// See [`CreateInteractionResponse::execute()`].
-    pub async fn execute(
+    pub async fn execute<D: Send + Sync + 'static>(
         self,
-        ctx: &Context,
+        ctx: &Context<D>,
         interaction_id: InteractionId,
         token: &str,
     ) -> Result<Option<QuickModalResponse>, crate::Error> {

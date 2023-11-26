@@ -19,12 +19,14 @@ use super::Permissions;
 /// use serenity::model::ModelError;
 /// use serenity::prelude::*;
 /// use serenity::Error;
-///
+/// # type Data = ();
+/// # #[cfg(feature = "client")]
+/// # type Context = serenity::client::Context<Data>;
 /// # struct Handler;
 ///
 /// #[serenity::async_trait]
 /// #[cfg(feature = "client")]
-/// impl EventHandler for Handler {
+/// impl EventHandler<Data> for Handler {
 ///     async fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
 ///         match guild_id.ban(&context, user, 8).await {
 ///             Ok(()) => {

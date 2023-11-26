@@ -7,7 +7,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::env;
 use std::fmt::Write;
 use std::sync::Arc;
@@ -20,8 +20,6 @@ use serenity::framework::standard::{
     help_commands,
     Args,
     BucketBuilder,
-    CommandGroup,
-    CommandOptions,
     CommandResult,
     Configuration,
     DispatchError,
@@ -41,22 +39,23 @@ use serenity::utils::{content_safe, ContentSafeOptions};
 // A container type is created for inserting into the Client's `data`, which allows for data to be
 // accessible across all events and framework commands, or anywhere else that has a copy of the
 // `data` Arc.
-struct ShardManagerContainer;
-
-impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<ShardManager>;
+#[derive(Default)]
+struct Data {
+    // We have to define this as a OnceLock, as it cannot be created before the client.
+    shard_manager: std::sync::OnceLock<Arc<ShardManager>>,
+    // We use the `dashmap` crate, used inside serenity for caching,
+    // to avoid locking and unlocking a HashMap ourselves.
+    command_counter: dashmap::DashMap<String, u64>,
 }
 
-struct CommandCounter;
-
-impl TypeMapKey for CommandCounter {
-    type Value = HashMap<String, u64>;
-}
+type Context = serenity::client::Context<Data>;
+type CommandGroup = serenity::framework::standard::CommandGroup<Data>;
+type CommandOptions = serenity::framework::standard::CommandOptions<Data>;
 
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
@@ -64,7 +63,7 @@ impl EventHandler for Handler {
 
 #[group]
 #[commands(about, am_i_admin, say, commands, ping, latency, some_long_command, upper_command)]
-struct General;
+struct General<Data>;
 
 #[group]
 // Sets multiple prefixes for a group.
@@ -78,14 +77,14 @@ struct General;
 // Sets a command that will be executed if only a group-prefix was passed.
 #[default_command(bird)]
 #[commands(cat, dog)]
-struct Emoji;
+struct Emoji<Data>;
 
 #[group]
 // Sets a single prefix for this group.
 // So one has to call commands in this group via `~math` instead of just `~`.
 #[prefix = "math"]
 #[commands(multiply)]
-struct Math;
+struct Math<Data>;
 
 #[group]
 #[owners_only]
@@ -94,7 +93,7 @@ struct Math;
 // Summary only appears when listing multiple groups.
 #[summary = "Commands for server owners"]
 #[commands(slow_mode)]
-struct Owner;
+struct Owner<Data>;
 
 // The framework provides two built-in help commands for you to use. But you can also make your own
 // customized help command that forwards to the behaviour of either of them.
@@ -124,7 +123,7 @@ If you want more information about a specific command, just pass the command as 
 // Serenity will automatically analyse and generate a hint/tip explaining the possible cases of
 // ~~strikethrough-commands~~, but only if `strikethrough_commands_tip_in_{dm, guild}` aren't
 // specified. If you pass in a value, it will be displayed instead.
-async fn my_help(
+async fn my_help<Data>(
     context: &Context,
     msg: &Message,
     args: Args,
@@ -142,9 +141,8 @@ async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
 
     // Increment the number of times this command has been run once. If the command's name does not
     // exist in the counter, add a default value of 0.
-    let mut data = ctx.data.write().await;
-    let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
-    let entry = counter.entry(command_name.to_string()).or_insert(0);
+    let counter = &ctx.data.command_counter;
+    let mut entry = counter.entry(command_name.to_string()).or_insert(0);
     *entry += 1;
 
     true // if `before` returns false, command processing doesn't happen.
@@ -300,18 +298,13 @@ async fn main() {
     // You will need to enable these 2 options on the bot application, and possibly wait up to 5
     // minutes.
     let intents = GatewayIntents::all();
-    let mut client = Client::builder(&token, intents)
+    let mut client = Client::builder(&token, intents, Data::default())
         .event_handler(Handler)
         .framework(framework)
-        .type_map_insert::<CommandCounter>(HashMap::default())
         .await
         .expect("Err creating client");
 
-    {
-        let mut data = client.data.write().await;
-        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
-    }
-
+    client.data.shard_manager.set(Arc::clone(&client.shard_manager)).unwrap();
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");
     }
@@ -322,13 +315,11 @@ async fn main() {
 // Options are passed via subsequent attributes.
 // Make this command use the "complicated" bucket.
 #[bucket = "complicated"]
-async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
+async fn commands<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     let mut contents = "Commands used:\n".to_string();
 
-    let data = ctx.data.read().await;
-    let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
-
-    for (name, amount) in counter {
+    for entry in &ctx.data.command_counter {
+        let (name, amount) = entry.pair();
         writeln!(contents, "- {name}: {amount}")?;
     }
 
@@ -341,7 +332,7 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
 // with a safe textual alternative.
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
 #[command]
-async fn say(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn say<Data>(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     match args.single_quoted::<String>() {
         Ok(x) => {
             let settings = if let Some(guild_id) = msg.guild_id {
@@ -376,7 +367,7 @@ async fn say(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 #[check]
 #[name = "Owner"]
 #[rustfmt::skip]
-async fn owner_check(
+async fn owner_check<Data>(
     _: &Context,
     msg: &Message,
     _: &mut Args,
@@ -403,7 +394,7 @@ async fn owner_check(
 }
 
 #[command]
-async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn some_long_command<Data>(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())).await?;
 
     Ok(())
@@ -412,7 +403,7 @@ async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandR
 #[command]
 // Limits the usage of this command to roles named:
 #[allowed_roles("mods", "ultimate neko")]
-async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn about_role<Data>(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let role_name = args.rest();
     let to_send = match msg.guild(&ctx.cache).as_deref().and_then(|g| g.role_by_name(role_name)) {
         Some(role_id) => format!("Role-ID: {role_id}"),
@@ -429,7 +420,7 @@ async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 // Lets us also call `~math *` instead of just `~math multiply`.
 #[aliases("*")]
-async fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn multiply<Data>(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let first = args.single::<f64>()?;
     let second = args.single::<f64>()?;
 
@@ -441,27 +432,17 @@ async fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult
 }
 
 #[command]
-async fn about(ctx: &Context, msg: &Message) -> CommandResult {
+async fn about<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, "This is a small test-bot! : )").await?;
 
     Ok(())
 }
 
 #[command]
-async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
+async fn latency<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     // The shard manager is an interface for mutating, stopping, restarting, and retrieving
     // information about shards.
-    let data = ctx.data.read().await;
-
-    let shard_manager = match data.get::<ShardManagerContainer>() {
-        Some(v) => v,
-        None => {
-            msg.reply(ctx, "There was a problem getting the shard manager").await?;
-
-            return Ok(());
-        },
-    };
-
+    let shard_manager = ctx.data.shard_manager.get().unwrap();
     let runners = shard_manager.runners.lock().await;
 
     // Shards are backed by a "shard runner" responsible for processing events over the shard, so
@@ -484,7 +465,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 // Limit command usage to guilds.
 #[only_in(guilds)]
 #[checks(Owner)]
-async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+async fn ping<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, "Pong! : )").await?;
 
     Ok(())
@@ -497,7 +478,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 #[bucket = "emoji"]
 // Allow only administrators to call this:
 #[required_permissions("ADMINISTRATOR")]
-async fn cat(ctx: &Context, msg: &Message) -> CommandResult {
+async fn cat<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, ":cat:").await?;
 
     // We can return one ticket to the bucket undoing the ratelimit.
@@ -507,14 +488,14 @@ async fn cat(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 #[description = "Sends an emoji with a dog."]
 #[bucket = "emoji"]
-async fn dog(ctx: &Context, msg: &Message) -> CommandResult {
+async fn dog<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, ":dog:").await?;
 
     Ok(())
 }
 
 #[command]
-async fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn bird<Data>(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let say_content = if args.is_empty() {
         ":bird: can find animals for you.".to_string()
     } else {
@@ -529,7 +510,7 @@ async fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 // We could also use #[required_permissions(ADMINISTRATOR)] but that would not let us reply when it
 // fails.
 #[command]
-async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+async fn am_i_admin<Data>(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     let is_admin = if let (Some(member), Some(guild)) = (&msg.member, msg.guild(&ctx.cache)) {
         member.roles.iter().any(|role| {
             guild.roles.get(role).is_some_and(|r| r.has_permission(Permissions::ADMINISTRATOR))
@@ -548,7 +529,7 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
 }
 
 #[command]
-async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn slow_mode<Data>(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u16>() {
         let builder = EditChannel::new().rate_limit_per_user(slow_mode_rate_seconds);
         if let Err(why) = msg.channel_id.edit(&ctx.http, builder).await {
@@ -574,7 +555,7 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
 // `cargo help run`.
 #[command("upper")]
 #[sub_commands(sub)]
-async fn upper_command(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+async fn upper_command<Data>(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     msg.reply(&ctx.http, "This is the main function!").await?;
 
     Ok(())
@@ -584,7 +565,7 @@ async fn upper_command(ctx: &Context, msg: &Message, _args: Args) -> CommandResu
 #[command]
 #[aliases("sub-command", "secret")]
 #[description("This is `upper`'s sub-command.")]
-async fn sub(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+async fn sub<Data>(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     msg.reply(&ctx.http, "This is a sub function!").await?;
 
     Ok(())

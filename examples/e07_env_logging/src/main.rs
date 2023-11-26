@@ -9,10 +9,14 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use tracing::{debug, error, info, instrument};
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<Data>;
+
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
         // Log at the INFO level. This is a macro from the `tracing` crate.
         info!("{} is connected!", ready.user.name);
@@ -47,7 +51,7 @@ async fn before(_: &Context, msg: &Message, command_name: &str) -> bool {
 
 #[group]
 #[commands(ping)]
-struct General;
+struct General<Data>;
 
 #[tokio::main]
 #[instrument]
@@ -70,7 +74,7 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(&token, intents)
+    let mut client = Client::builder(&token, intents, ())
         .event_handler(Handler)
         .framework(framework)
         .await
@@ -84,7 +88,7 @@ async fn main() {
 // Currently, the instrument macro doesn't work with commands.
 // If you wish to instrument commands, use it on the before function.
 #[command]
-async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+async fn ping<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )").await {
         error!("Error sending message: {:?}", why);
     }

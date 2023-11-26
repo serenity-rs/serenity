@@ -4,6 +4,10 @@ use serenity::prelude::*;
 
 mod model_type_sizes;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png";
 const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
@@ -356,7 +360,7 @@ async fn interaction(
 
 struct Handler;
 #[serenity::async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         message(&ctx, msg).await.unwrap();
     }
@@ -390,5 +394,5 @@ async fn main() -> Result<(), serenity::Error> {
     env_logger::init();
     let token = std::env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
-    Client::builder(token, intents).event_handler(Handler).await?.start().await
+    Client::builder(token, intents, ()).event_handler(Handler).await?.start().await
 }

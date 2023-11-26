@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use derivative::Derivative;
 use futures::future::BoxFuture;
 
 use super::Delimiter;
@@ -7,8 +8,8 @@ use crate::client::Context;
 use crate::model::channel::Message;
 use crate::model::id::{ChannelId, GuildId, UserId};
 
-type DynamicPrefixHook =
-    for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
+type DynamicPrefixHook<D> =
+    for<'fut> fn(&'fut Context<D>, &'fut Message) -> BoxFuture<'fut, Option<String>>;
 
 /// A configuration struct for deciding whether the framework should allow optional whitespace
 /// between prefixes, group prefixes and command names.
@@ -78,7 +79,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// # use serenity::prelude::*;
 /// struct Handler;
 ///
-/// impl EventHandler for Handler {}
+/// impl EventHandler<()> for Handler {}
 ///
 /// use serenity::framework::standard::{Configuration, StandardFramework};
 /// use serenity::model::id::UserId;
@@ -90,7 +91,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// let framework = StandardFramework::new();
 /// framework.configure(Configuration::new().on_mention(Some(UserId::new(5))).prefix("~"));
 ///
-/// let mut client = Client::builder(&token, GatewayIntents::default())
+/// let mut client = Client::builder(&token, GatewayIntents::default(), ())
 ///     .event_handler(Handler)
 ///     .framework(framework)
 ///     .await?;
@@ -101,8 +102,9 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// [`Client`]: crate::Client
 /// [`StandardFramework`]: super::StandardFramework
 /// [default implementation]: Self::default
-#[derive(Clone)]
-pub struct Configuration {
+#[derive(Derivative)]
+#[derivative(Clone(bound = ""))]
+pub struct Configuration<D: Send + Sync + 'static> {
     pub(crate) allow_dm: bool,
     pub(crate) with_whitespace: WithWhiteSpace,
     pub(crate) by_space: bool,
@@ -110,7 +112,7 @@ pub struct Configuration {
     pub(crate) blocked_users: HashSet<UserId>,
     pub(crate) allowed_channels: HashSet<ChannelId>,
     pub(crate) disabled_commands: HashSet<String>,
-    pub(crate) dynamic_prefixes: Vec<DynamicPrefixHook>,
+    pub(crate) dynamic_prefixes: Vec<DynamicPrefixHook<D>>,
     pub(crate) ignore_bots: bool,
     pub(crate) ignore_webhooks: bool,
     pub(crate) on_mention: Option<String>,
@@ -121,7 +123,7 @@ pub struct Configuration {
     pub(crate) case_insensitive: bool,
 }
 
-impl Configuration {
+impl<D: Send + Sync + 'static> Configuration<D> {
     /// Alias for Configuration::default
     #[must_use]
     pub fn new() -> Self {
@@ -189,11 +191,9 @@ impl Configuration {
     /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::ChannelId;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(
-    ///     Configuration::new()
-    ///         .allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect()),
-    /// );
+    /// # let config: Configuration<()> =
+    /// Configuration::new()
+    ///     .allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect());
     /// ```
     #[must_use]
     pub fn allowed_channels(mut self, channels: HashSet<ChannelId>) -> Self {
@@ -214,11 +214,9 @@ impl Configuration {
     /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::GuildId;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(
-    ///     Configuration::new()
-    ///         .blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect()),
-    /// );
+    /// # let config: Configuration<()> =
+    /// Configuration::new()
+    ///     .blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect());
     /// ```
     #[must_use]
     pub fn blocked_guilds(mut self, guilds: HashSet<GuildId>) -> Self {
@@ -241,11 +239,8 @@ impl Configuration {
     /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::UserId;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(
-    ///     Configuration::new()
-    ///         .blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect()),
-    /// );
+    /// # let config: Configuration<()> =
+    /// Configuration::new().blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect());
     /// ```
     #[must_use]
     pub fn blocked_users(mut self, users: HashSet<UserId>) -> Self {
@@ -262,21 +257,22 @@ impl Configuration {
     /// Ignore a set of commands, assuming they exist:
     ///
     /// ```rust,no_run
-    /// use serenity::client::Context;
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// use serenity::framework::standard::macros::{command, group};
     /// use serenity::framework::standard::{CommandResult, Configuration};
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::channel::Message;
     ///
     /// #[command]
-    /// async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+    /// async fn ping<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "Pong!").await?;
     ///     Ok(())
     /// }
     ///
     /// #[group]
     /// #[commands(ping)]
-    /// struct Peng;
+    /// struct Peng<Data>;
     ///
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
@@ -314,14 +310,14 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     ///
-    /// let framework =
-    ///     StandardFramework::new().configure(Configuration::new().dynamic_prefix(|_, msg| {
-    ///         Box::pin(async move {
-    ///             Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
-    ///         })
-    ///     }));
+    /// # let config: Configuration<()> =
+    /// Configuration::new().dynamic_prefix(|_, msg| {
+    ///     Box::pin(
+    ///         async move { Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string()) },
+    ///     )
+    /// });
     /// ```
     ///
     /// This will only use the prefix `"!"` or `"*"` depending on channel ID,
@@ -329,24 +325,22 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(
-    ///     Configuration::new()
-    ///         .dynamic_prefix(|_, msg| {
-    ///             Box::pin(async move {
-    ///                 Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
-    ///             })
+    /// # let config: Configuration<()> =
+    /// Configuration::new()
+    ///     .dynamic_prefix(|_, msg| {
+    ///         Box::pin(async move {
+    ///             Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
     ///         })
-    ///         .prefix(""), // This disables the default prefix "~"
-    /// );
+    ///     })
+    ///     .prefix(""); // This disables the default prefix "~"
     /// ```
     ///
     /// [`Context::data`]: crate::client::Context::data
     #[inline]
     #[must_use]
-    pub fn dynamic_prefix(mut self, dynamic_prefix: DynamicPrefixHook) -> Self {
+    pub fn dynamic_prefix(mut self, dynamic_prefix: DynamicPrefixHook<D>) -> Self {
         self.dynamic_prefixes.push(dynamic_prefix);
         self
     }
@@ -405,13 +399,11 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     /// use serenity::model::id::UserId;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(
-    ///     Configuration::new().owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()),
-    /// );
+    /// # let config: Configuration<()> =
+    /// Configuration::new().owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect());
     /// ```
     ///
     /// Create a HashSet beforehand:
@@ -419,15 +411,15 @@ impl Configuration {
     /// ```rust,no_run
     /// use std::collections::HashSet;
     ///
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     /// use serenity::model::id::UserId;
     ///
     /// let mut set = HashSet::new();
     /// set.insert(UserId::new(7));
     /// set.insert(UserId::new(77));
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().owners(set));
+    /// # let config: Configuration<()> =
+    /// Configuration::new().owners(set);
     /// ```
     #[must_use]
     pub fn owners(mut self, user_ids: HashSet<UserId>) -> Self {
@@ -449,10 +441,10 @@ impl Configuration {
     /// Assign a basic prefix:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().prefix("!"));
+    /// # let config: Configuration<()> =
+    /// Configuration::new().prefix("!");
     /// ```
     #[must_use]
     pub fn prefix(mut self, prefix: impl Into<String>) -> Self {
@@ -473,10 +465,10 @@ impl Configuration {
     /// Assign a set of prefixes the bot can respond to:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().prefixes(vec!["!", ">", "+"]));
+    /// # let config: Configuration<()> =
+    /// Configuration::new().prefixes(vec!["!", ">", "+"]);
     /// ```
     #[inline]
     #[must_use]
@@ -508,9 +500,10 @@ impl Configuration {
     /// Have the args be separated by a comma and a space:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     ///
-    /// let framework = StandardFramework::new().configure(Configuration::new().delimiter(", "));
+    /// # let config: Configuration<()> =
+    /// Configuration::new().delimiter(", ");
     /// ```
     #[must_use]
     pub fn delimiter(mut self, delimiter: impl Into<Delimiter>) -> Self {
@@ -530,10 +523,10 @@ impl Configuration {
     /// Have the args be separated by a comma and a space; and a regular space:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::standard::{Configuration, StandardFramework};
+    /// use serenity::framework::standard::Configuration;
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().delimiters(vec![", ", " "]));
+    /// # let config: Configuration<()> =
+    /// Configuration::new().delimiters(vec![", ", " "]);
     /// ```
     #[must_use]
     pub fn delimiters(
@@ -565,7 +558,7 @@ impl Configuration {
     }
 }
 
-impl Default for Configuration {
+impl<D: Send + Sync + 'static> Default for Configuration<D> {
     /// Builds a default framework configuration, setting the following:
     ///
     /// - **allow_dm** to `true`
@@ -584,8 +577,8 @@ impl Default for Configuration {
     /// - **on_mention** to `false`
     /// - **owners** to an empty HashSet
     /// - **prefix** to "~"
-    fn default() -> Configuration {
-        Configuration {
+    fn default() -> Self {
+        Self {
             allow_dm: true,
             with_whitespace: WithWhiteSpace::default(),
             by_space: true,

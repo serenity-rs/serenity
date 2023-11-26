@@ -436,12 +436,15 @@ impl User {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
+    /// # type Data = ();
+    /// # #[cfg(feature = "client")]
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
     /// use serenity::builder::CreateMessage;
     ///
     /// #[serenity::async_trait]
     /// # #[cfg(feature = "client")]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
     ///             let builder = CreateMessage::new().content("Helpful info here.");
@@ -560,11 +563,14 @@ impl User {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
+    /// # type Data = ();
+    /// # #[cfg(feature = "client")]
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// # #[cfg(feature = "client")]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = format!("Your tag is: {}", msg.author.tag());

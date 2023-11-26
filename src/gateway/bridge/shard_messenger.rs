@@ -32,7 +32,7 @@ impl ShardMessenger {
     /// [`Client`]: crate::Client
     #[inline]
     #[must_use]
-    pub fn new(shard: &ShardRunner) -> Self {
+    pub fn new<D: Send + Sync + 'static>(shard: &ShardRunner<D>) -> Self {
         Self {
             tx: shard.runner_tx(),
             #[cfg(feature = "collector")]

@@ -6,12 +6,16 @@ use serenity::async_trait;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 struct Bot {
     database: sqlx::SqlitePool,
 }
 
 #[async_trait]
-impl EventHandler for Bot {
+impl EventHandler<Data> for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
         let user_id = msg.author.id.get() as i64;
 
@@ -96,6 +100,6 @@ async fn main() {
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client =
-        Client::builder(&token, intents).event_handler(bot).await.expect("Err creating client");
+        Client::builder(&token, intents, ()).event_handler(bot).await.expect("Err creating client");
     client.start().await.unwrap();
 }

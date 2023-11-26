@@ -5,5 +5,6 @@ authors = ["my name <my@email.address>"]
 edition = "2018"
 
 [dependencies]
+dashmap = "5"
 serenity = { path = "../../" }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }

@@ -1500,11 +1500,14 @@ impl PartialGuild {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
+    /// # type Data = ();
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
     /// #[cfg(all(feature = "cache", feature = "client"))]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
     ///             if let Some(guild) = guild_id.to_guild_cached(&context) {

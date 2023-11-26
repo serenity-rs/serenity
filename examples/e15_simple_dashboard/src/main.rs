@@ -20,12 +20,11 @@ use std::time::Instant;
 use rillrate::prime::table::{Col, Row};
 use rillrate::prime::*;
 use serenity::async_trait;
-use serenity::client::{Client, Context, EventHandler};
+use serenity::client::{Client, EventHandler};
 use serenity::framework::standard::macros::{command, group, hook};
 use serenity::framework::standard::{CommandResult, Configuration, StandardFramework};
 use serenity::gateway::ShardManager;
 use serenity::model::prelude::*;
-use serenity::prelude::*;
 use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
 
@@ -64,32 +63,27 @@ struct Components {
     command_usage_values: Mutex<HashMap<&'static str, CommandUsageValue>>,
 }
 
-struct RillRateComponents;
-
-impl TypeMapKey for RillRateComponents {
+struct Data {
     // RillRate element types have internal mutability, so we don't need RwLock nor Mutex!
     // We do still want to Arc the type so it can be cloned out of `ctx.data`.
     // If you wanna bind data between RillRate and the bot that doesn't have Atomics, use fields
     // that use RwLock or Mutex, rather than making the enirety of Components one of them, like
     // it's being done with `command_usage_values` this will make it considerably less likely to
     // deadlock.
-    type Value = Arc<Components>;
+    rillrate_components: Components,
+    shard_manager: std::sync::OnceLock<Arc<ShardManager>>,
 }
 
-struct ShardManagerContainer;
-
-impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<ShardManager>;
-}
+type Context = serenity::client::Context<Data>;
 
 #[group]
 #[commands(ping, switch)]
-struct General;
+struct General<Data>;
 
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn ready(&self, _ctx: Context, ready: Ready) {
         info!("{} is connected!", ready.user.name);
     }
@@ -109,17 +103,12 @@ impl EventHandler for Handler {
             // There's currently no way to read the current data stored on RillRate types, so we
             // use our own external method of storage, in this case since a switch is essentially
             // just a boolean, we use an AtomicBool, stored on the same Components structure.
-            let elements = {
-                let data_read = ctx_clone.data.read().await;
-                data_read.get::<RillRateComponents>().unwrap().clone()
-            };
-
             switch.sync_callback(move |envelope| {
                 if let Some(action) = envelope.action {
                     debug!("Switch action: {:?}", action);
 
                     // Here we toggle our internal state for the switch.
-                    elements.data_switch.swap(action, Ordering::Relaxed);
+                    ctx_clone.data.rillrate_components.data_switch.swap(action, Ordering::Relaxed);
 
                     // If you click the switch, it won't turn on by itself, it will just send an
                     // event about it's new status.
@@ -168,11 +157,6 @@ impl EventHandler for Handler {
         let ctx_clone = ctx.clone();
 
         tokio::spawn(async move {
-            let elements = {
-                let data_read = ctx_clone.data.read().await;
-                data_read.get::<RillRateComponents>().unwrap().clone()
-            };
-
             selector.sync_callback(move |envelope| {
                 let mut value: Option<u8> = None;
 
@@ -182,6 +166,7 @@ impl EventHandler for Handler {
                 }
 
                 if let Some(val) = value {
+                    let elements = &ctx_clone.data.rillrate_components;
                     elements.double_link_value.swap(val, Ordering::Relaxed);
 
                     // This is the selector callback, yet we are switching the data from the
@@ -198,11 +183,6 @@ impl EventHandler for Handler {
         let ctx_clone = ctx.clone();
 
         tokio::spawn(async move {
-            let elements = {
-                let data_read = ctx_clone.data.read().await;
-                data_read.get::<RillRateComponents>().unwrap().clone()
-            };
-
             // Because sync_callback() waits for an action to happen to it's element, we cannot
             // have both in the same thread, rather we need to listen to them in parallel, but
             // still have both modify the same value in the end.
@@ -215,6 +195,7 @@ impl EventHandler for Handler {
                 }
 
                 if let Some(val) = value {
+                    let elements = &ctx_clone.data.rillrate_components;
                     elements.double_link_value.swap(val, Ordering::Relaxed);
 
                     selector_instance.apply(Some(val.to_string()));
@@ -227,11 +208,6 @@ impl EventHandler for Handler {
         let ctx_clone = ctx.clone();
 
         tokio::spawn(async move {
-            let elements = {
-                let data_read = ctx_clone.data.read().await;
-                data_read.get::<RillRateComponents>().unwrap().clone()
-            };
-
             loop {
                 // Get the REST GET latency by counting how long it takes to do a GET request.
                 let get_latency = {
@@ -263,9 +239,7 @@ impl EventHandler for Handler {
                 // Get the Gateway Heartbeat latency.
                 // See example 5 for more information about the ShardManager latency.
                 let ws_latency = {
-                    let data_read = ctx.data.read().await;
-                    let shard_manager = data_read.get::<ShardManagerContainer>().unwrap();
-
+                    let shard_manager = &ctx_clone.data.shard_manager.get().unwrap();
                     let runners = shard_manager.runners.lock().await;
 
                     let runner = runners.get(&ctx.shard_id).unwrap();
@@ -276,6 +250,8 @@ impl EventHandler for Handler {
                         f64::NAN // effectively 0.0ms, it won't display on the graph.
                     }
                 };
+
+                let elements = &ctx_clone.data.rillrate_components;
 
                 elements.ws_ping_history.push(ws_latency);
                 elements.get_ping_history.push(get_latency);
@@ -291,10 +267,7 @@ impl EventHandler for Handler {
 
 #[hook]
 async fn before_hook(ctx: &Context, _: &Message, cmd_name: &str) -> bool {
-    let elements = {
-        let data_read = ctx.data.read().await;
-        data_read.get::<RillRateComponents>().unwrap().clone()
-    };
+    let elements = &ctx.data.rillrate_components;
 
     let command_count_value = {
         let mut count_write = elements.command_usage_values.lock().await;
@@ -400,7 +373,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         });
     }
 
-    let components = Arc::new(Components {
+    let components = Components {
         ws_ping_history: ws_ping_tracer,
         get_ping_history: get_ping_tracer,
         #[cfg(feature = "post-ping")]
@@ -409,23 +382,21 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         double_link_value: AtomicU8::new(0),
         command_usage_table,
         command_usage_values: Mutex::new(command_usage_values),
-    });
+    };
+
+    let data = Data {
+        rillrate_components: components,
+        shard_manager: std::sync::OnceLock::new(),
+    };
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(token, intents)
-        .event_handler(Handler)
-        .framework(framework)
-        .type_map_insert::<RillRateComponents>(components)
-        .await?;
 
-    {
-        let mut data = client.data.write().await;
+    let mut client =
+        Client::builder(token, intents, data).event_handler(Handler).framework(framework).await?;
 
-        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
-    }
-
+    client.data.shard_manager.set(Arc::clone(&client.shard_manager)).unwrap();
     client.start().await?;
 
     Ok(())
@@ -433,11 +404,8 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
 /// You can use this command to read the current value of the Switch, Slider and Selector.
 #[command]
-async fn switch(ctx: &Context, msg: &Message) -> CommandResult {
-    let elements = {
-        let data_read = ctx.data.read().await;
-        data_read.get::<RillRateComponents>().unwrap().clone()
-    };
+async fn switch<Data>(ctx: &Context, msg: &Message) -> CommandResult {
+    let elements = &ctx.data.rillrate_components;
 
     msg.reply(
         ctx,
@@ -454,11 +422,9 @@ async fn switch(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 #[aliases("latency", "pong")]
-async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+async fn ping<Data>(ctx: &Context, msg: &Message) -> CommandResult {
     let latency = {
-        let data_read = ctx.data.read().await;
-        let shard_manager = data_read.get::<ShardManagerContainer>().unwrap();
-
+        let shard_manager = &ctx.data.shard_manager.get().unwrap();
         let runners = shard_manager.runners.lock().await;
 
         let runner = runners.get(&ctx.shard_id).unwrap();

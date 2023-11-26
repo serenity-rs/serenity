@@ -5,10 +5,14 @@ use serenity::model::channel::Message;
 use serenity::model::gateway::{GatewayIntents, Presence, Ready};
 use serenity::prelude::*;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     // This event will be dispatched for guilds, but not for direct messages.
     async fn message(&self, _ctx: Context, msg: Message) {
         println!("Received message: {}", msg.content);
@@ -34,7 +38,7 @@ async fn main() {
     let intents =
         GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
     // Build our client.
-    let mut client = Client::builder(token, intents)
+    let mut client = Client::builder(token, intents, ())
         .event_handler(Handler)
         .await
         .expect("Error creating client");

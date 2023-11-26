@@ -136,6 +136,7 @@ pub struct CommandFun {
     pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,
+    pub data_generic: Ident,
     pub args: Vec<Argument>,
     pub ret: Type,
     pub body: Vec<Stmt>,
@@ -156,6 +157,10 @@ impl Parse for CommandFun {
 
         input.parse::<Token![fn]>()?;
         let name = input.parse()?;
+
+        input.parse::<Token![<]>()?;
+        let data_generic = input.parse()?;
+        input.parse::<Token![>]>()?;
 
         // (...)
         let Parenthesised(args) = input.parse::<Parenthesised<FnArg>>()?;
@@ -180,6 +185,7 @@ impl Parse for CommandFun {
             cooked,
             visibility,
             name,
+            data_generic,
             args,
             ret,
             body,
@@ -194,6 +200,7 @@ impl ToTokens for CommandFun {
             cooked,
             visibility,
             name,
+            data_generic: _,
             args,
             ret,
             body,
@@ -574,6 +581,7 @@ pub struct GroupStruct {
     pub cooked: Vec<Attribute>,
     pub attributes: Vec<Attribute>,
     pub name: Ident,
+    pub data_generic: Ident,
 }
 
 impl Parse for GroupStruct {
@@ -590,6 +598,10 @@ impl Parse for GroupStruct {
 
         let name = input.parse()?;
 
+        input.parse::<Token![<]>()?;
+        let data_generic = input.parse()?;
+        input.parse::<Token![>]>()?;
+
         input.parse::<Token![;]>()?;
 
         Ok(Self {
@@ -597,6 +609,7 @@ impl Parse for GroupStruct {
             cooked,
             attributes,
             name,
+            data_generic,
         })
     }
 }
@@ -608,6 +621,7 @@ impl ToTokens for GroupStruct {
             cooked,
             attributes: _,
             name,
+            data_generic: _,
         } = self;
 
         stream.extend(quote! {

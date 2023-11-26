@@ -1,9 +1,6 @@
 use std::fmt;
 use std::sync::Arc;
 
-use tokio::sync::RwLock;
-use typemap_rev::TypeMap;
-
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 use crate::gateway::ActivityData;
@@ -26,12 +23,13 @@ use crate::model::prelude::*;
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
-#[derive(Clone)]
-pub struct Context {
+#[derive(derivative::Derivative)]
+#[derivative(Clone(bound = ""))]
+pub struct Context<D: Send + Sync + 'static> {
     /// A clone of [`Client::data`]. Refer to its documentation for more information.
     ///
     /// [`Client::data`]: super::Client::data
-    pub data: Arc<RwLock<TypeMap>>,
+    pub data: Arc<D>,
     /// The messenger to communicate with the shard runner.
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
@@ -42,7 +40,7 @@ pub struct Context {
 }
 
 // Used by the #[instrument] macro on client::dispatch::handle_event
-impl fmt::Debug for Context {
+impl<D: Send + Sync + 'static> fmt::Debug for Context<D> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Context")
             .field("shard", &self.shard)
@@ -51,17 +49,17 @@ impl fmt::Debug for Context {
     }
 }
 
-impl Context {
+impl<D: Send + Sync + 'static> Context<D> {
     /// Create a new Context to be passed to an event handler.
     #[cfg(feature = "gateway")]
     pub(crate) fn new(
-        data: Arc<RwLock<TypeMap>>,
-        runner: &ShardRunner,
+        data: Arc<D>,
+        runner: &ShardRunner<D>,
         shard_id: ShardId,
         http: Arc<Http>,
         #[cfg(feature = "cache")] cache: Arc<Cache>,
-    ) -> Context {
-        Context {
+    ) -> Self {
+        Self {
             shard: ShardMessenger::new(runner),
             shard_id,
             data,
@@ -72,7 +70,7 @@ impl Context {
     }
 
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
-    pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u32, http: Arc<Http>) -> Context {
+    pub fn easy(data: Arc<D>, shard_id: u32, http: Arc<Http>) -> Self {
         Context {
             shard_id,
             data,
@@ -89,11 +87,12 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
-    /// #
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!online" {
     ///             ctx.online();
@@ -118,11 +117,12 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
-    /// #
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!idle" {
     ///             ctx.idle();
@@ -147,11 +147,12 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
-    /// #
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!dnd" {
     ///             ctx.dnd();
@@ -176,11 +177,12 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
-    /// #
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!invisible" {
     ///             ctx.invisible();
@@ -208,11 +210,12 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
-    /// #
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!reset_presence" {
     ///             ctx.reset_presence();
@@ -239,11 +242,13 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// # struct Handler;
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     ///
     /// use serenity::gateway::ActivityData;
     ///
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         let mut args = msg.content.splitn(2, ' ');
     ///
@@ -268,10 +273,12 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn ready(&self, ctx: Context, _: Ready) {
     ///         use serenity::model::user::OnlineStatus;
     ///
@@ -285,10 +292,12 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
+    /// # type Data = ();
+    /// # type Context = serenity::client::Context<Data>;
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
+    /// impl EventHandler<Data> for Handler {
     ///     async fn ready(&self, context: Context, _: Ready) {
     ///         use serenity::gateway::ActivityData;
     ///         use serenity::model::user::OnlineStatus;
@@ -310,40 +319,40 @@ impl Context {
     }
 }
 
-impl AsRef<Http> for Context {
+impl<D: Send + Sync + 'static> AsRef<Http> for Context<D> {
     fn as_ref(&self) -> &Http {
         &self.http
     }
 }
 
-impl AsRef<Http> for Arc<Context> {
+impl<D: Send + Sync + 'static> AsRef<Http> for Arc<Context<D>> {
     fn as_ref(&self) -> &Http {
         &self.http
     }
 }
 
-impl AsRef<Arc<Http>> for Context {
+impl<D: Send + Sync + 'static> AsRef<Arc<Http>> for Context<D> {
     fn as_ref(&self) -> &Arc<Http> {
         &self.http
     }
 }
 
 #[cfg(feature = "cache")]
-impl AsRef<Cache> for Context {
+impl<D: Send + Sync + 'static> AsRef<Cache> for Context<D> {
     fn as_ref(&self) -> &Cache {
         &self.cache
     }
 }
 
 #[cfg(feature = "cache")]
-impl AsRef<Cache> for Arc<Context> {
+impl<D: Send + Sync + 'static> AsRef<Cache> for Arc<Context<D>> {
     fn as_ref(&self) -> &Cache {
         &self.cache
     }
 }
 
 #[cfg(feature = "cache")]
-impl AsRef<Arc<Cache>> for Context {
+impl<D: Send + Sync + 'static> AsRef<Arc<Cache>> for Context<D> {
     fn as_ref(&self) -> &Arc<Cache> {
         &self.cache
     }
@@ -357,7 +366,7 @@ impl AsRef<Cache> for Cache {
 }
 
 #[cfg(feature = "gateway")]
-impl AsRef<ShardMessenger> for Context {
+impl<D: Send + Sync + 'static> AsRef<ShardMessenger> for Context<D> {
     fn as_ref(&self) -> &ShardMessenger {
         &self.shard
     }

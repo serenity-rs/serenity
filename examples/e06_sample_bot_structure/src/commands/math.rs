@@ -1,10 +1,11 @@
 use serenity::framework::standard::macros::command;
 use serenity::framework::standard::{Args, CommandResult};
 use serenity::model::prelude::*;
-use serenity::prelude::*;
+
+use crate::{Context, Data};
 
 #[command]
-pub async fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+pub async fn multiply<Data>(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let one = args.single::<f64>()?;
     let two = args.single::<f64>()?;
 

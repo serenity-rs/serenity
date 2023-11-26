@@ -2,6 +2,7 @@ use std::collections::HashSet;
 use std::error::Error as StdError;
 use std::fmt;
 
+use derivative::Derivative;
 use futures::future::BoxFuture;
 
 use super::Args;
@@ -30,11 +31,12 @@ impl Default for OnlyIn {
     }
 }
 
-#[derive(Debug, Default, PartialEq)]
-pub struct CommandOptions {
+#[derive(Derivative)]
+#[derivative(Debug(bound = ""), Default(bound = ""), PartialEq(bound = ""))]
+pub struct CommandOptions<D: Send + Sync + 'static> {
     /// A set of checks to be called prior to executing the command. The checks will short-circuit
     /// on the first check that returns `false`.
-    pub checks: &'static [&'static Check],
+    pub checks: &'static [&'static Check<D>],
     /// Ratelimit bucket.
     pub bucket: Option<&'static str>,
     /// Names that the command can be referred to.
@@ -67,47 +69,42 @@ pub struct CommandOptions {
     /// Whether the command treats owners as normal users.
     pub owner_privilege: bool,
     /// Other commands belonging to this command.
-    pub sub_commands: &'static [&'static Command],
+    pub sub_commands: &'static [&'static Command<D>],
 }
 
 pub type CommandError = Box<dyn StdError + Send + Sync>;
 pub type CommandResult<T = ()> = std::result::Result<T, CommandError>;
-pub type CommandFn =
-    for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
+pub type CommandFn<D> =
+    for<'fut> fn(&'fut Context<D>, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
-pub struct Command {
-    pub fun: CommandFn,
-    pub options: &'static CommandOptions,
+#[allow(clippy::trivially_copy_pass_by_ref)]
+fn cmp_command_fn<D: Send + Sync>(a: &CommandFn<D>, b: &CommandFn<D>) -> bool {
+    *a as usize == *b as usize
 }
 
-impl fmt::Debug for Command {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Command").field("options", &self.options).finish_non_exhaustive()
-    }
+#[derive(Derivative)]
+#[derivative(Debug(bound = ""), PartialEq(bound = ""))]
+pub struct Command<D: Send + Sync + 'static> {
+    #[derivative(PartialEq(compare_with = "cmp_command_fn"))]
+    pub fun: CommandFn<D>,
+    pub options: &'static CommandOptions<D>,
 }
 
-impl PartialEq for Command {
-    #[inline]
-    fn eq(&self, other: &Command) -> bool {
-        (self.fun as usize == other.fun as usize) && (self.options == other.options)
-    }
-}
-
-pub type HelpCommandFn = for<'fut> fn(
-    &'fut Context,
+pub type HelpCommandFn<D> = for<'fut> fn(
+    &'fut Context<D>,
     &'fut Message,
     Args,
     &'fut HelpOptions,
-    &'fut [&'static CommandGroup],
+    &'fut [&'static CommandGroup<D>],
     HashSet<UserId>,
 ) -> BoxFuture<'fut, CommandResult>;
 
-pub struct HelpCommand {
-    pub fun: HelpCommandFn,
+pub struct HelpCommand<D: Send + Sync + 'static> {
+    pub fun: HelpCommandFn<D>,
     pub options: &'static HelpOptions,
 }
 
-impl fmt::Debug for HelpCommand {
+impl<D: Send + Sync + 'static> fmt::Debug for HelpCommand<D> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HelpCommand")
             .field("fun", &"<function>")
@@ -116,9 +113,9 @@ impl fmt::Debug for HelpCommand {
     }
 }
 
-impl PartialEq for HelpCommand {
+impl<D: Send + Sync + 'static> PartialEq for HelpCommand<D> {
     #[inline]
-    fn eq(&self, other: &HelpCommand) -> bool {
+    fn eq(&self, other: &HelpCommand<D>) -> bool {
         (self.fun as usize == other.fun as usize) && (self.options == other.options)
     }
 }
@@ -217,8 +214,9 @@ pub struct HelpOptions {
     pub indention_prefix: &'static str,
 }
 
-#[derive(Debug, Default, PartialEq)]
-pub struct GroupOptions {
+#[derive(Derivative)]
+#[derivative(Debug(bound = ""), Default(bound = ""), PartialEq(bound = ""))]
+pub struct GroupOptions<D: Send + Sync + 'static> {
     pub prefixes: &'static [&'static str],
     pub only_in: OnlyIn,
     pub owners_only: bool,
@@ -226,18 +224,19 @@ pub struct GroupOptions {
     pub help_available: bool,
     pub allowed_roles: &'static [&'static str],
     pub required_permissions: Permissions,
-    pub checks: &'static [&'static Check],
-    pub default_command: Option<&'static Command>,
+    pub checks: &'static [&'static Check<D>],
+    pub default_command: Option<&'static Command<D>>,
     pub description: Option<&'static str>,
     pub summary: Option<&'static str>,
-    pub commands: &'static [&'static Command],
-    pub sub_groups: &'static [&'static CommandGroup],
+    pub commands: &'static [&'static Command<D>],
+    pub sub_groups: &'static [&'static CommandGroup<D>],
 }
 
-#[derive(Debug, PartialEq)]
-pub struct CommandGroup {
+#[derive(Derivative)]
+#[derivative(Debug(bound = ""), PartialEq(bound = ""))]
+pub struct CommandGroup<D: Send + Sync + 'static> {
     pub name: &'static str,
-    pub options: &'static GroupOptions,
+    pub options: &'static GroupOptions<D>,
 }
 
 #[cfg(test)]

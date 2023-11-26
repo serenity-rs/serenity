@@ -2,12 +2,10 @@ use std::borrow::Cow;
 use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use tokio::sync::RwLock;
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
-use typemap_rev::TypeMap;
 
 use super::event::ShardStageUpdateEvent;
 #[cfg(feature = "collector")]
@@ -28,12 +26,12 @@ use crate::internal::tokio::spawn_named;
 use crate::model::event::{Event, GatewayEvent};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
-pub struct ShardRunner {
-    data: Arc<RwLock<TypeMap>>,
-    event_handlers: Vec<Arc<dyn EventHandler>>,
-    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+pub struct ShardRunner<D: Send + Sync + 'static> {
+    data: Arc<D>,
+    event_handlers: Vec<Arc<dyn EventHandler<D>>>,
+    raw_event_handlers: Vec<Arc<dyn RawEventHandler<D>>>,
     #[cfg(feature = "framework")]
-    framework: Option<Arc<dyn Framework>>,
+    framework: Option<Arc<dyn Framework<D>>>,
     manager: Arc<ShardManager>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<ShardRunnerMessage>,
@@ -49,9 +47,9 @@ pub struct ShardRunner {
     pub(crate) collectors: Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
 }
 
-impl ShardRunner {
+impl<D: Send + Sync + 'static> ShardRunner<D> {
     /// Creates a new runner for a Shard.
-    pub fn new(opt: ShardRunnerOptions) -> Self {
+    pub fn new(opt: ShardRunnerOptions<D>) -> Self {
         let (tx, rx) = mpsc::unbounded();
 
         Self {
@@ -252,7 +250,7 @@ impl ShardRunner {
         false
     }
 
-    fn make_context(&self) -> Context {
+    fn make_context(&self) -> Context<D> {
         Context::new(
             Arc::clone(&self.data),
             self,
@@ -482,12 +480,12 @@ impl ShardRunner {
 }
 
 /// Options to be passed to [`ShardRunner::new`].
-pub struct ShardRunnerOptions {
-    pub data: Arc<RwLock<TypeMap>>,
-    pub event_handlers: Vec<Arc<dyn EventHandler>>,
-    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+pub struct ShardRunnerOptions<D: Send + Sync + 'static> {
+    pub data: Arc<D>,
+    pub event_handlers: Vec<Arc<dyn EventHandler<D>>>,
+    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler<D>>>,
     #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework>>,
+    pub framework: Option<Arc<dyn Framework<D>>>,
     pub manager: Arc<ShardManager>,
     pub shard: Shard,
     #[cfg(feature = "voice")]

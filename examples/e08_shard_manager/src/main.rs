@@ -27,10 +27,14 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use tokio::time::sleep;
 
+// We don't need to store any state, so we define our `D`ata generic as `()`.
+type Data = ();
+type Context = serenity::client::Context<()>;
+
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler<Data> for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
         if let Some(shard) = ready.shard {
             // Note that array index 0 is 0-indexed, while index 1 is 1-indexed.
@@ -49,8 +53,10 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client =
-        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token, intents, ())
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
 
     // Here we clone a lock to the Shard Manager, and then move it into a new thread. The thread
     // will unlock the manager and print shards' status on a loop.

@@ -35,15 +35,18 @@
 //! use serenity::model::channel::Message;
 //! use serenity::prelude::*;
 //!
+//! type Data = ();
+//! type Context = serenity::client::Context<Data>;
+//!
 //! #[command]
-//! async fn about(ctx: &Context, msg: &Message) -> CommandResult {
+//! async fn about<Data>(ctx: &Context, msg: &Message) -> CommandResult {
 //!     msg.channel_id.say(&ctx.http, "A simple test bot").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[command]
-//! async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+//! async fn ping<Data>(ctx: &Context, msg: &Message) -> CommandResult {
 //!     msg.channel_id.say(&ctx.http, "pong!").await?;
 //!
 //!     Ok(())
@@ -51,11 +54,11 @@
 //!
 //! #[group]
 //! #[commands(about, ping)]
-//! struct General;
+//! struct General<Data>;
 //!
 //! struct Handler;
 //!
-//! impl EventHandler for Handler {}
+//! impl EventHandler<Data> for Handler {}
 //!
 //! # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 //! let token = std::env::var("DISCORD_TOKEN")?;
@@ -69,7 +72,7 @@
 //!
 //! framework.configure(Configuration::new().prefix("~"));
 //!
-//! let mut client = Client::builder(&token, GatewayIntents::default())
+//! let mut client = Client::builder(&token, GatewayIntents::default(), ())
 //!     .event_handler(Handler)
 //!     .framework(framework)
 //!     .await?;
@@ -95,37 +98,39 @@ use crate::client::{Client, Context, FullEvent};
 ///
 /// [`EventHandler`]: crate::client::EventHandler
 #[async_trait]
-pub trait Framework: Send + Sync {
+pub trait Framework<D: Send + Sync + 'static>: Send + Sync {
     /// Called directly after the `Client` is created.
-    async fn init(&mut self, client: &Client) {
-        let _: &Client = client;
+    async fn init(&mut self, client: &Client<D>) {
+        let _ = client;
     }
     /// Called on every incoming event.
-    async fn dispatch(&self, ctx: Context, event: FullEvent);
+    async fn dispatch(&self, ctx: Context<D>, event: FullEvent);
 }
 
 #[async_trait]
-impl<F> Framework for Box<F>
+impl<D, F> Framework<D> for Box<F>
 where
-    F: Framework + ?Sized,
+    D: Send + Sync + 'static,
+    F: Framework<D> + ?Sized,
 {
-    async fn init(&mut self, client: &Client) {
+    async fn init(&mut self, client: &Client<D>) {
         (**self).init(client).await;
     }
-    async fn dispatch(&self, ctx: Context, event: FullEvent) {
+    async fn dispatch(&self, ctx: Context<D>, event: FullEvent) {
         (**self).dispatch(ctx, event).await;
     }
 }
 
 #[async_trait]
-impl<'a, F> Framework for &'a mut F
+impl<'a, D, F> Framework<D> for &'a mut F
 where
-    F: Framework + ?Sized,
+    D: Send + Sync + 'static,
+    F: Framework<D> + ?Sized,
 {
-    async fn init(&mut self, client: &Client) {
+    async fn init(&mut self, client: &Client<D>) {
         (**self).init(client).await;
     }
-    async fn dispatch(&self, ctx: Context, event: FullEvent) {
+    async fn dispatch(&self, ctx: Context<D>, event: FullEvent) {
         (**self).dispatch(ctx, event).await;
     }
 }
