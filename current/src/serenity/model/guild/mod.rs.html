@@ -3424,7 +3424,7 @@
     </span><span class="kw">pub async fn </span>audit_logs(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        action_type: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+        action_type: <span class="prelude-ty">Option</span>&lt;audit_log::Action&gt;,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
         before: <span class="prelude-ty">Option</span>&lt;AuditLogEntryId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
