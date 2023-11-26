@@ -849,10 +849,10 @@ impl Http {
     /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_sticker<'a>(
+    pub async fn create_sticker(
         &self,
         guild_id: GuildId,
-        map: Vec<(&'static str, String)>,
+        map: impl IntoIterator<Item = (&'static str, String)>,
         file: CreateAttachment,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {

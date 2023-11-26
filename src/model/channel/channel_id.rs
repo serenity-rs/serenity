@@ -662,7 +662,7 @@ impl ChannelId {
     ///
     /// let channel_id = ChannelId::new(7);
     ///
-    /// let paths = vec![
+    /// let paths = [
     ///     CreateAttachment::path("/path/to/file.jpg").await?,
     ///     CreateAttachment::path("path/to/file2.jpg").await?,
     /// ];
@@ -689,7 +689,7 @@ impl ChannelId {
     /// let f1 = File::open("my_file.jpg").await?;
     /// let f2 = File::open("my_file2.jpg").await?;
     ///
-    /// let files = vec![
+    /// let files = [
     ///     CreateAttachment::file(&f1, "my_file.jpg").await?,
     ///     CreateAttachment::file(&f2, "my_file2.jpg").await?,
     /// ];

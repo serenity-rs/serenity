@@ -1,3 +1,4 @@
+use arrayvec::ArrayVec;
 use url::Url;
 
 #[cfg(feature = "http")]
@@ -27,7 +28,7 @@ impl CreateBotAuthParameters {
     /// Builds the url with the provided data.
     #[must_use]
     pub fn build(self) -> String {
-        let mut valid_data = vec![];
+        let mut valid_data = ArrayVec::<_, 5>::new();
         let bits = self.permissions.bits();
 
         if let Some(client_id) = self.client_id {
