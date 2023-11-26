@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.12.0] - 2023-11-19
+## [0.12.0] - 2023-11-26
 
 This release turned out to be one of serenity's largest ever, with well over 300 PRs in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
 
@@ -250,6 +250,9 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.74.
 * [#2595](https://github.com/serenity-rs/serenity/pull/2595) - Add the `CREATE_EVENTS` and `CREATE_GUILD_EXPRESSIONS` permissions, and rename `MANAGE_EMOJIS_AND_STICKERS` to `MANAGE_GUILD_EXPRESSIONS` (the old name is still present but deprecated).
 * [#2600](https://github.com/serenity-rs/serenity/pull/2600) - Add the `FormattedTimestamp` utility struct for representing a combination of a timestamp and a formatting style.
 * [#2601](https://github.com/serenity-rs/serenity/pull/2601) - Add support for more Discord subdomains in `utils::argument_convert::parse_message_url`.
+* [#2614](https://github.com/serenity-rs/serenity/pull/2614) - Add `Hash` to `Timestamp`'s derive list
+* [#2592](https://github.com/serenity-rs/serenity/pull/2592) - Add experimental `typesize` support
+* [#2618](https://github.com/serenity-rs/serenity/pull/2618) - Implement `From<Into<String>>` for `AutocompleteChoice`
 
 #### Changed
 
@@ -372,7 +375,12 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.74.
 * [#2569](https://github.com/serenity-rs/serenity/pull/2569) - Replaced the `json::prelude` module with public wrapper functions that abstract over both `serde_json` and `simd-json`.
 * [#2593](https://github.com/serenity-rs/serenity/pull/2593) - Rename `GatewayIntents::GUILD_BANS` to `GUILD_MODERATION` (the old name is still present but is deprecated).
 * [#2598](https://github.com/serenity-rs/serenity/pull/2598) - Change `CreateInteractionResponseMessage::flags` to take `InteractionResponseFlags` instead of `MessageFlags`.
-
+* [#2609](https://github.com/serenity-rs/serenity/pull/2609) - Split parts of `ThreadMember` into `PartialThreadMember`
+* [#2612](https://github.com/serenity-rs/serenity/pull/2612) - Make `Event::Unknown` wrap `UnknownEvent` again
+* [#2615](https://github.com/serenity-rs/serenity/pull/2615) - Rework framework builders to not use closures
+* [#2622](https://github.com/serenity-rs/serenity/pull/2622) - Implement role addition/removal using dedicated endpoints
+* [#2623](https://github.com/serenity-rs/serenity/pull/2623) - Use dedicated types for `GuildId::audit_logs`
+* [#2625](https://github.com/serenity-rs/serenity/pull/2625) - Remove some miscellaneous vectors
 
 #### Removed
 
@@ -5325,7 +5333,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
-[0.12.0]: https://github.com/serenity-rs/serenity/compare/v0.11.7...v0.12.0-rc
+[0.12.0]: https://github.com/serenity-rs/serenity/compare/v0.11.7...v0.12.0
 [0.11.7]: https://github.com/serenity-rs/serenity/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/serenity-rs/serenity/compare/v0.11.5...v0.11.6
 [0.11.5]: https://github.com/serenity-rs/serenity/compare/v0.11.4...v0.11.5
