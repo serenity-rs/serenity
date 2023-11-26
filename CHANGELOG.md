@@ -180,7 +180,7 @@ Method names on interaction types have been shortened in the following way:
 
 ### Framework
 
-The standard framework is now configurable at runtime, as the `configure` method now takes `self` by reference. Also, the `Framework` trait has been reworked to accomodate more use cases than just text commands:
+The standard framework is now configurable at runtime, as the `configure` method now takes `self` by reference. In line with the builder changes, the standard framework builders instead of closures must now be passed directly. Also, the `Framework` trait has been reworked to accomodate more use cases than just text commands:
 * The `dispatch` method now takes a `FullEvent` as argument instead of just a `Message`. This enum contains all the data that is passed to the `EventHandler`.
 * An optional `init` method has been added, that allows for more complex framework initialization, which can include executing HTTP requests, or accessing cache or shard data.
 
@@ -251,9 +251,9 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.74.
 * [#2595](https://github.com/serenity-rs/serenity/pull/2595) - Add the `CREATE_EVENTS` and `CREATE_GUILD_EXPRESSIONS` permissions, and rename `MANAGE_EMOJIS_AND_STICKERS` to `MANAGE_GUILD_EXPRESSIONS` (the old name is still present but deprecated).
 * [#2600](https://github.com/serenity-rs/serenity/pull/2600) - Add the `FormattedTimestamp` utility struct for representing a combination of a timestamp and a formatting style.
 * [#2601](https://github.com/serenity-rs/serenity/pull/2601) - Add support for more Discord subdomains in `utils::argument_convert::parse_message_url`.
-* [#2614](https://github.com/serenity-rs/serenity/pull/2614) - Add `Hash` to `Timestamp`'s derive list
-* [#2592](https://github.com/serenity-rs/serenity/pull/2592) - Add experimental `typesize` support
-* [#2618](https://github.com/serenity-rs/serenity/pull/2618) - Implement `From<Into<String>>` for `AutocompleteChoice`
+* [#2614](https://github.com/serenity-rs/serenity/pull/2614) - Add `Hash` to `Timestamp`'s derive list.
+* [#2592](https://github.com/serenity-rs/serenity/pull/2592) - Add experimental `typesize` support.
+* [#2618](https://github.com/serenity-rs/serenity/pull/2618) - Implement `From<Into<String>>` for `AutocompleteChoice`.
 
 #### Changed
 
@@ -376,12 +376,10 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.74.
 * [#2569](https://github.com/serenity-rs/serenity/pull/2569) - Replaced the `json::prelude` module with public wrapper functions that abstract over both `serde_json` and `simd-json`.
 * [#2593](https://github.com/serenity-rs/serenity/pull/2593) - Rename `GatewayIntents::GUILD_BANS` to `GUILD_MODERATION` (the old name is still present but is deprecated).
 * [#2598](https://github.com/serenity-rs/serenity/pull/2598) - Change `CreateInteractionResponseMessage::flags` to take `InteractionResponseFlags` instead of `MessageFlags`.
-* [#2609](https://github.com/serenity-rs/serenity/pull/2609) - Split parts of `ThreadMember` into `PartialThreadMember`
-* [#2612](https://github.com/serenity-rs/serenity/pull/2612) - Make `Event::Unknown` wrap `UnknownEvent` again
-* [#2615](https://github.com/serenity-rs/serenity/pull/2615) - Rework framework builders to not use closures
-* [#2622](https://github.com/serenity-rs/serenity/pull/2622) - Implement role addition/removal using dedicated endpoints
-* [#2623](https://github.com/serenity-rs/serenity/pull/2623) - Use dedicated types for `GuildId::audit_logs`
-* [#2625](https://github.com/serenity-rs/serenity/pull/2625) - Remove some miscellaneous vectors
+* [#2609](https://github.com/serenity-rs/serenity/pull/2609) - Split parts of `ThreadMember` into `PartialThreadMember`.
+* [#2622](https://github.com/serenity-rs/serenity/pull/2622) - Implement role addition/removal using dedicated endpoints.
+* [#2623](https://github.com/serenity-rs/serenity/pull/2623) - Use dedicated types for `GuildId::audit_logs`.
+* [#2625](https://github.com/serenity-rs/serenity/pull/2625) - Remove some miscellaneous vectors.
 
 #### Removed
 
