@@ -155,18 +155,6 @@
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>reqwest::Client <span class="kw">as </span>ReqwestClient;
 
@@ -260,8 +248,6 @@
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = &quot;client&quot;)]
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// use std::io::Write;
     /// use std::path::Path;
     ///
@@ -270,9 +256,10 @@
     /// use tokio::fs::File;
     /// use tokio::io::AsyncWriteExt;
     ///
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = &quot;client&quot;)]
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, context: Context, mut message: Message) {
     ///         for attachment in message.attachments {
@@ -309,18 +296,7 @@
     ///                 .await;
     ///         }
     ///     }
-    ///
-    ///     async fn ready(&amp;self, _: Context, ready: Ready) {
-    ///         println!(&quot;{} is connected!&quot;, ready.user.name);
-    ///     }
     /// }
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
-    /// let mut client =
-    ///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// # Errors

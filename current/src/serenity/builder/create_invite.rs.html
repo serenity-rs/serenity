@@ -227,72 +227,6 @@
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -310,55 +244,11 @@
 /// Create an invite with a max age of 3600 seconds and 10 max uses:
 ///
 /// ```rust,no_run
-/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
-/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-/// # use serenity::prelude::*;
-/// # use serenity::model::prelude::*;
-/// # use serenity::model::channel::Channel;
+/// # use serenity::{prelude::*, model::prelude::*};
 /// use serenity::builder::CreateInvite;
-///
-/// struct Handler;
-///
-/// #[serenity::async_trait]
-/// impl EventHandler for Handler {
-///     async fn message(&amp;self, context: Context, msg: Message) {
-///         if msg.content == &quot;!createinvite&quot; {
-///             let channel_opt = context.cache.channel(msg.channel_id).as_deref().cloned();
-///             let channel = match channel_opt {
-///                 Some(channel) =&gt; channel,
-///                 None =&gt; {
-///                     let _ = msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await;
-///                     return;
-///                 },
-///             };
-///
-///             let builder = CreateInvite::new().max_age(3600).max_uses(10);
-///             let creation = channel.create_invite(&amp;context, builder).await;
-///
-///             let invite = match creation {
-///                 Ok(invite) =&gt; invite,
-///                 Err(why) =&gt; {
-///                     println!(&quot;Err creating invite: {:?}&quot;, why);
-///                     if let Err(why) =
-///                         msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await
-///                     {
-///                         println!(&quot;Err sending err msg: {:?}&quot;, why);
-///                     }
-///
-///                     return;
-///                 },
-///             };
-///
-///             let content = format!(&quot;Here&#39;s your invite: {}&quot;, invite.url());
-///             let _ = msg.channel_id.say(&amp;context, &amp;content).await;
-///         }
-///     }
-/// }
-///
-/// let mut client =
-///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-///
-/// client.start().await?;
+/// # async fn run(context: impl CacheHttp, channel: GuildChannel) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// let builder = CreateInvite::new().max_age(3600).max_uses(10);
+/// let creation = channel.create_invite(&amp;context, builder).await?;
 /// # Ok(())
 /// # }
 /// ```
@@ -403,17 +293,11 @@
     /// Create an invite with a max age of `3600` seconds, or 1 hour:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
-    /// # use serenity::client::Context;
-    /// # #[cfg(feature = &quot;framework&quot;)]
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
+    /// # use serenity::http::CacheHttp;
     /// #
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
-    /// # #[command]
-    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
-    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
+    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// let builder = CreateInvite::new().max_age(3600);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())
@@ -434,18 +318,14 @@
     ///
     /// Create an invite with a max use limit of `5`:
     ///
+    /// Create an invite with a max age of `3600` seconds, or 1 hour:
+    ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
-    /// # use serenity::client::Context;
-    /// # #[cfg(feature = &quot;framework&quot;)]
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
+    /// # use serenity::http::CacheHttp;
     /// #
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
-    /// # #[command]
-    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
-    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
+    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// let builder = CreateInvite::new().max_uses(5);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())
@@ -465,17 +345,11 @@
     /// Create an invite which is temporary:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
-    /// # use serenity::client::Context;
-    /// # #[cfg(feature = &quot;framework&quot;)]
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
+    /// # use serenity::http::CacheHttp;
     /// #
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
-    /// # #[command]
-    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
-    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
+    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// let builder = CreateInvite::new().temporary(true);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())
@@ -495,17 +369,11 @@
     /// Create an invite which is unique:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
-    /// # use serenity::client::Context;
-    /// # #[cfg(feature = &quot;framework&quot;)]
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
+    /// # use serenity::http::CacheHttp;
     /// #
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
-    /// # #[command]
-    /// # async fn example(context: &amp;Context) -&gt; CommandResult {
-    /// # let channel = context.cache.channel(81384788765712384).unwrap().clone();
+    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// let builder = CreateInvite::new().unique(true);
     /// let invite = channel.create_invite(context, builder).await?;
     /// # Ok(())

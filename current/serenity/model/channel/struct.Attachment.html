@@ -35,8 +35,8 @@ datapoint. Clients sample the recording at most once per 100 milliseconds, but w
 downsample so that no more than 256 datapoints are in the waveform.</p>
 <p>The waveform details are a Discord implementation detail and may change without warning or
 documentation.</p>
-</div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor">§</a></h2><div id="implementations-list"><details class="toggle implementors-toggle" open><summary><section id="impl-Attachment" class="impl"><a class="src rightside" href="../../../src/serenity/model/channel/attachment.rs.html#80-169">source</a><a href="#impl-Attachment" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.Attachment.html" title="struct serenity::model::channel::Attachment">Attachment</a></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.dimensions" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/attachment.rs.html#83-85">source</a><h4 class="code-header">pub fn <a href="#method.dimensions" class="fn">dimensions</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>If this attachment is an image, then a tuple of the width and height in pixels is returned.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.download" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/attachment.rs.html#164-168">source</a><h4 class="code-header">pub async fn <a href="#method.download" class="fn">download</a>(&amp;self) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Downloads the attachment, returning back a vector of bytes.</p>
+</div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor">§</a></h2><div id="implementations-list"><details class="toggle implementors-toggle" open><summary><section id="impl-Attachment" class="impl"><a class="src rightside" href="../../../src/serenity/model/channel/attachment.rs.html#80-157">source</a><a href="#impl-Attachment" class="anchor">§</a><h3 class="code-header">impl <a class="struct" href="struct.Attachment.html" title="struct serenity::model::channel::Attachment">Attachment</a></h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.dimensions" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/attachment.rs.html#83-85">source</a><h4 class="code-header">pub fn <a href="#method.dimensions" class="fn">dimensions</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>If this attachment is an image, then a tuple of the width and height in pixels is returned.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.download" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/attachment.rs.html#152-156">source</a><h4 class="code-header">pub async fn <a href="#method.download" class="fn">download</a>(&amp;self) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Downloads the attachment, returning back a vector of bytes.</p>
 <h5 id="examples"><a href="#examples">Examples</a></h5>
 <p>Download all of the attachments associated with a <a href="struct.Message.html" title="struct serenity::model::channel::Message"><code>Message</code></a>:</p>
 
@@ -48,7 +48,6 @@ documentation.</p>
 <span class="kw">use </span>tokio::fs::File;
 <span class="kw">use </span>tokio::io::AsyncWriteExt;
 
-<span class="kw">struct </span>Handler;
 
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
@@ -87,16 +86,7 @@ documentation.</p>
                 .<span class="kw">await</span>;
         }
     }
-
-    <span class="kw">async fn </span>ready(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: Context, ready: Ready) {
-        <span class="macro">println!</span>(<span class="string">&quot;{} is connected!&quot;</span>, ready.user.name);
-    }
-}
-<span class="kw">let </span>token = std::env::var(<span class="string">&quot;DISCORD_TOKEN&quot;</span>)<span class="question-mark">?</span>;
-<span class="kw">let </span><span class="kw-2">mut </span>client =
-    Client::builder(<span class="kw-2">&amp;</span>token, GatewayIntents::default()).event_handler(Handler).<span class="kw">await</span><span class="question-mark">?</span>;
-
-client.start().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
+}</code></pre></div>
 <h5 id="errors"><a href="#errors">Errors</a></h5>
 <p>Returns an <a href="../../prelude/enum.SerenityError.html#variant.Io" title="variant serenity::prelude::SerenityError::Io"><code>Error::Io</code></a> when there is a problem reading the contents of the HTTP response.</p>
 <p>Returns an <a href="../../prelude/enum.SerenityError.html#variant.Http" title="variant serenity::prelude::SerenityError::Http"><code>Error::Http</code></a> when there is a problem retrieving the attachment.</p>

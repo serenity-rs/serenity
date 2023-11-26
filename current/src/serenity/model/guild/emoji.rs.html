@@ -213,10 +213,6 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
@@ -286,14 +282,10 @@
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::json::{json, from_value};
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
-    /// # use serenity::model::prelude::{EmojiId, Emoji};
+    /// # use serenity::model::prelude::Emoji;
     /// #
-    /// # #[command]
-    /// # async fn example(ctx: &amp;Context) -&gt; CommandResult {
-    /// # let mut emoji: Emoji = unimplemented!();
+    /// # async fn example(ctx: &amp;Context, emoji: Emoji) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// // assuming emoji has been set already
     /// match emoji.delete(&amp;ctx).await {
     ///     Ok(()) =&gt; println!(&quot;Emoji deleted.&quot;),

@@ -1633,15 +1633,6 @@
 <a href="#1633" id="1633">1633</a>
 <a href="#1634" id="1634">1634</a>
 <a href="#1635" id="1635">1635</a>
-<a href="#1636" id="1636">1636</a>
-<a href="#1637" id="1637">1637</a>
-<a href="#1638" id="1638">1638</a>
-<a href="#1639" id="1639">1639</a>
-<a href="#1640" id="1640">1640</a>
-<a href="#1641" id="1641">1641</a>
-<a href="#1642" id="1642">1642</a>
-<a href="#1643" id="1643">1643</a>
-<a href="#1644" id="1644">1644</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -3153,14 +3144,12 @@
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;cache&quot;))]
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
-    ///
-    /// struct Handler;
+    /// # use serenity::model::prelude::*;
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, context: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
@@ -3172,13 +3161,6 @@
     ///         }
     ///     }
     /// }
-    ///
-    /// let mut client =
-    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     </span><span class="attr">#[inline]
     #[must_use]

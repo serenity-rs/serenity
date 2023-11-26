@@ -2815,15 +2815,6 @@
 <a href="#2815" id="2815">2815</a>
 <a href="#2816" id="2816">2816</a>
 <a href="#2817" id="2817">2817</a>
-<a href="#2818" id="2818">2818</a>
-<a href="#2819" id="2819">2819</a>
-<a href="#2820" id="2820">2820</a>
-<a href="#2821" id="2821">2821</a>
-<a href="#2822" id="2822">2822</a>
-<a href="#2823" id="2823">2823</a>
-<a href="#2824" id="2824">2824</a>
-<a href="#2825" id="2825">2825</a>
-<a href="#2826" id="2826">2826</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -5212,14 +5203,12 @@
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
-    ///
-    /// struct Handler;
+    /// # use serenity::model::prelude::*;
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
@@ -5231,13 +5220,6 @@
     ///         }
     ///     }
     /// }
-    ///
-    /// let mut client =
-    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>role_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, role_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {

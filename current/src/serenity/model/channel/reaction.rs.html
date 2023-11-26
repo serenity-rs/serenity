@@ -569,11 +569,6 @@
 <a href="#569" id="569">569</a>
 <a href="#570" id="570">570</a>
 <a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
-<a href="#575" id="575">575</a>
-<a href="#576" id="576">576</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="attr">#[cfg(doc)]
@@ -958,18 +953,13 @@
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = &quot;client&quot;)]
-    /// # use serenity::client::Context;
-    /// # #[cfg(feature = &quot;framework&quot;)]
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # #[cfg(feature = &quot;http&quot;)]
+    /// # use serenity::http::CacheHttp;
     /// # use serenity::model::channel::Message;
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]
-    /// # #[command]
-    /// # async fn example(ctx: &amp;Context) -&gt; CommandResult {
-    /// # let message: Message = unimplemented!();
-    /// #
+    /// # #[cfg(feature = &quot;http&quot;)]
+    /// # async fn example(ctx: impl CacheHttp, message: Message) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// message.react(ctx, &#39;🍎&#39;).await?;
     /// # Ok(())
     /// # }

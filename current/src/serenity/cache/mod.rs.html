@@ -842,20 +842,6 @@
 <a href="#842" id="842">842</a>
 <a href="#843" id="843">843</a>
 <a href="#844" id="844">844</a>
-<a href="#845" id="845">845</a>
-<a href="#846" id="846">846</a>
-<a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
-<a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -1153,27 +1139,15 @@
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// #
-    /// # #[cfg(feature = &quot;client&quot;)]
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// use std::thread;
-    /// use std::time::Duration;
-    ///
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = &quot;client&quot;)]
     /// impl EventHandler for Handler {
     ///     async fn cache_ready(&amp;self, ctx: Context, _: Vec&lt;GuildId&gt;) {
     ///         println!(&quot;{} unknown members&quot;, ctx.cache.unknown_members());
     ///     }
     /// }
-    ///
-    /// let mut client =
-    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     /// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild
@@ -1515,10 +1489,8 @@
     ///
     /// ```rust,no_run
     /// # use serenity::client::Context;
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// #
-    /// # #[command]
-    /// # async fn test(context: &amp;Context) -&gt; CommandResult {
+    /// # async fn test(context: &amp;Context) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// if let Some(user) = context.cache.user(7) {
     ///     println!(&quot;User with Id 7 is currently named {}&quot;, user.name);
     /// }

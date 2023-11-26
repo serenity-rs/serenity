@@ -204,15 +204,6 @@
 <a href="#204" id="204">204</a>
 <a href="#205" id="205">205</a>
 <a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Error enum definition wrapping potential model implementation errors.
 
 </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
@@ -227,20 +218,18 @@
 /// # Examples
 ///
 /// Matching an [`Error`] with this variant would look something like the following for the
-/// [`GuildId::ban`] method, which in this example is used to re-ban all members with an odd
-/// discriminator:
+/// [`GuildId::ban`] method, which in this example is used to re-ban all members.
 ///
 /// ```rust,no_run
-/// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;model&quot;))]
-/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
 /// use serenity::model::prelude::*;
 /// use serenity::model::ModelError;
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///
-/// struct Handler;
+/// # struct Handler;
 ///
 /// #[serenity::async_trait]
+/// #[cfg(feature = &quot;client&quot;)]
 /// impl EventHandler for Handler {
 ///     async fn guild_ban_removal(&amp;self, context: Context, guild_id: GuildId, user: User) {
 ///         match guild_id.ban(&amp;context, user, 8).await {
@@ -256,13 +245,6 @@
 ///         }
 ///     }
 /// }
-/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;
-/// let mut client =
-///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
-///
-/// client.start().await?;
-/// # Ok(())
-/// # }
 /// ```
 ///
 /// [`Error`]: crate::Error

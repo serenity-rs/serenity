@@ -259,12 +259,6 @@
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
@@ -292,15 +286,9 @@
 /// # use serenity::builder::EditMessage;
 /// # use serenity::model::channel::Message;
 /// # use serenity::model::id::ChannelId;
-/// # #[cfg(feature = &quot;client&quot;)]
-/// # use serenity::client::Context;
-/// # #[cfg(feature = &quot;framework&quot;)]
-/// # use serenity::framework::standard::{CommandResult, macros::command};
-/// #
-/// # #[cfg(all(feature = &quot;model&quot;, feature = &quot;utils&quot;, feature = &quot;framework&quot;))]
-/// # #[command]
-/// # async fn example(ctx: &amp;Context) -&gt; CommandResult {
-/// # let mut message: Message = unimplemented!();
+/// # use serenity::http::CacheHttp;
+///
+/// # async fn example(ctx: impl CacheHttp, mut message: Message) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
 /// let builder = EditMessage::new().content(&quot;hello&quot;);
 /// message.edit(ctx, builder).await?;
 /// # Ok(())
