@@ -2036,7 +2036,7 @@
     ///             let file = CreateAttachment::path(&quot;cat.png&quot;).await.unwrap();
     ///
     ///             let builder = CreateMessage::new().content(&quot;here&#39;s a cat&quot;);
-    ///             let _ = msg.channel_id.send_files(&amp;context.http, vec![file], builder).await;
+    ///             let _ = msg.channel_id.send_files(&amp;context.http, [file], builder).await;
     ///         }
     ///     }
     /// }

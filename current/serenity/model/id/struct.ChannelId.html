@@ -272,7 +272,7 @@ restrictions and requirements.</p>
 
 <span class="kw">let </span>channel_id = ChannelId::new(<span class="number">7</span>);
 
-<span class="kw">let </span>paths = <span class="macro">vec!</span>[
+<span class="kw">let </span>paths = [
     CreateAttachment::path(<span class="string">&quot;/path/to/file.jpg&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>,
     CreateAttachment::path(<span class="string">&quot;path/to/file2.jpg&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>,
 ];
@@ -290,7 +290,7 @@ channel_id.send_files(<span class="kw-2">&amp;</span>http, paths, builder).<span
 <span class="kw">let </span>f1 = File::open(<span class="string">&quot;my_file.jpg&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 <span class="kw">let </span>f2 = File::open(<span class="string">&quot;my_file2.jpg&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="kw">let </span>files = <span class="macro">vec!</span>[
+<span class="kw">let </span>files = [
     CreateAttachment::file(<span class="kw-2">&amp;</span>f1, <span class="string">&quot;my_file.jpg&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>,
     CreateAttachment::file(<span class="kw-2">&amp;</span>f2, <span class="string">&quot;my_file2.jpg&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>,
 ];

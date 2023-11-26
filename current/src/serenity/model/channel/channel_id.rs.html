@@ -1874,7 +1874,7 @@
     ///
     /// let channel_id = ChannelId::new(7);
     ///
-    /// let paths = vec![
+    /// let paths = [
     ///     CreateAttachment::path(&quot;/path/to/file.jpg&quot;).await?,
     ///     CreateAttachment::path(&quot;path/to/file2.jpg&quot;).await?,
     /// ];
@@ -1901,7 +1901,7 @@
     /// let f1 = File::open(&quot;my_file.jpg&quot;).await?;
     /// let f2 = File::open(&quot;my_file2.jpg&quot;).await?;
     ///
-    /// let files = vec![
+    /// let files = [
     ///     CreateAttachment::file(&amp;f1, &quot;my_file.jpg&quot;).await?,
     ///     CreateAttachment::file(&amp;f2, &quot;my_file2.jpg&quot;).await?,
     /// ];

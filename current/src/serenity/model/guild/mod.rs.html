@@ -2824,14 +2824,6 @@
 <a href="#2824" id="2824">2824</a>
 <a href="#2825" id="2825">2825</a>
 <a href="#2826" id="2826">2826</a>
-<a href="#2827" id="2827">2827</a>
-<a href="#2828" id="2828">2828</a>
-<a href="#2829" id="2829">2829</a>
-<a href="#2830" id="2830">2830</a>
-<a href="#2831" id="2831">2831</a>
-<a href="#2832" id="2832">2832</a>
-<a href="#2833" id="2833">2833</a>
-<a href="#2834" id="2834">2834</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4450,19 +4442,11 @@
 
     <span class="doccomment">/// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>members_with_status(<span class="kw-2">&amp;</span><span class="self">self</span>, status: OnlineStatus) -&gt; Vec&lt;<span class="kw-2">&amp;</span>Member&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>members = <span class="macro">vec!</span>[];
-
-        <span class="kw">for </span>(<span class="kw-2">&amp;</span>id, member) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.members {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(presence) = <span class="self">self</span>.presences.get(<span class="kw-2">&amp;</span>id) {
-                <span class="kw">if </span>status == presence.status {
-                    members.push(member);
-                }
-            }
-        }
-
-        members
+    </span><span class="kw">pub fn </span>members_with_status(<span class="kw-2">&amp;</span><span class="self">self</span>, status: OnlineStatus) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>Member&gt; {
+        <span class="self">self</span>.members.iter().filter_map(<span class="kw">move </span>|(id, member)| <span class="kw">match </span><span class="self">self</span>.presences.get(id) {
+            <span class="prelude-val">Some</span>(presence) <span class="kw">if </span>presence.status == status =&gt; <span class="prelude-val">Some</span>(member),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        })
     }
 
     <span class="doccomment">/// Retrieves the first [`Member`] found that matches the name - with an optional discriminator
