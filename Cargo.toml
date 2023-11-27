@@ -52,7 +52,7 @@ typesize = { version = "0.1.2", optional = true, features = ["url", "time", "ser
 # serde feature only allows for serialisation,
 # Serenity workspace crates
 command_attr = { version = "0.5.1", path = "./command_attr", optional = true }
-serenity-voice-model = { version = "0.1.1", path = "./voice-model", optional = true }
+serenity-voice-model = { version = "0.2.0", path = "./voice-model", optional = true }
 
 [dev-dependencies.http_crate]
 version = "0.2.11"
