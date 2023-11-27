@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.12.0] - 2023-11-26
+## [0.12.0] - 2023-11-27
 
 This release turned out to be one of serenity's largest ever, with well over 300 PRs in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
 
@@ -180,7 +180,7 @@ Method names on interaction types have been shortened in the following way:
 
 ### Framework
 
-The standard framework is now configurable at runtime, as the `configure` method now takes `self` by reference. In line with the builder changes, the standard framework builders instead of closures must now be passed directly. Also, the `Framework` trait has been reworked to accomodate more use cases than just text commands:
+The standard framework is now configurable at runtime, as the `configure` method now takes `self` by reference. In line with the builder changes, the `Configuration` and `BucketBuilder` builders are no longer closure-based and must be passed in directly. Also, the `Framework` trait has been reworked to accomodate more use cases than just text commands:
 * The `dispatch` method now takes a `FullEvent` as argument instead of just a `Message`. This enum contains all the data that is passed to the `EventHandler`.
 * An optional `init` method has been added, that allows for more complex framework initialization, which can include executing HTTP requests, or accessing cache or shard data.
 
@@ -379,8 +379,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.74.
 * [#2609](https://github.com/serenity-rs/serenity/pull/2609) - Split parts of `ThreadMember` into `PartialThreadMember`.
 * [#2622](https://github.com/serenity-rs/serenity/pull/2622) - Implement role addition/removal using dedicated endpoints.
 * [#2623](https://github.com/serenity-rs/serenity/pull/2623) - Use dedicated types for `GuildId::audit_logs`.
-* [#2625](https://github.com/serenity-rs/serenity/pull/2625) - Remove some miscellaneous vectors.
-
+* [#2625](https://github.com/serenity-rs/serenity/pull/2625) - Change `Guild::members_with_status` to return `impl Iterator<Item = &Member>` instead of `Vec<Member>`.
 #### Removed
 
 * [#1864](https://github.com/serenity-rs/serenity/pull/1864), [#1902](https://github.com/serenity-rs/serenity/pull/1902) - Remove all deprecated types, fields, and methods.
