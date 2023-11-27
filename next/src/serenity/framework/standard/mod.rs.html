@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6cf088810 2023-11-26)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-e1c03aa593074e71.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -877,14 +877,6 @@
 <a href="#877" id="877">877</a>
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
-<a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
-<a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>help_commands;
 <span class="kw">pub mod </span>macros {
     <span class="kw">pub use </span>command_attr::{check, command, group, help, hook};
@@ -1026,12 +1018,12 @@
     /// # use serenity::prelude::*;
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));
+    /// framework.configure(Configuration::new().with_whitespace(true).prefix(&quot;~&quot;));
     ///
     /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default())
@@ -1045,8 +1037,8 @@
     /// [`Client`]: crate::Client
     /// [`prefix`]: Configuration::prefix
     /// [allowing whitespace between prefixes]: Configuration::with_whitespace
-    </span><span class="kw">pub fn </span>configure(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>Configuration) -&gt; <span class="kw-2">&amp;mut </span>Configuration) {
-        f(<span class="kw-2">&amp;mut </span><span class="self">self</span>.config.write());
+    </span><span class="kw">pub fn </span>configure(<span class="kw-2">&amp;</span><span class="self">self</span>, config: Configuration) {
+        <span class="kw-2">*</span><span class="self">self</span>.config.write() = config;
     }
 
     <span class="doccomment">/// Defines a bucket with `delay` between each command, and the `limit` of uses per
@@ -1059,7 +1051,7 @@
     ///
     /// ```rust,no_run
     /// use serenity::framework::standard::macros::command;
-    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    /// use serenity::framework::standard::{BucketBuilder, CommandResult, StandardFramework};
     ///
     /// #[command]
     /// // Registers the bucket `basic` to this command.
@@ -1069,21 +1061,14 @@
     /// }
     ///
     /// # async fn run() {
-    /// let framework =
-    ///     StandardFramework::new().bucket(&quot;basic&quot;, |b| b.delay(2).time_span(10).limit(3)).await;
+    /// let framework = StandardFramework::new()
+    ///     .bucket(&quot;basic&quot;, BucketBuilder::default().delay(2).time_span(10).limit(3))
+    ///     .await;
     /// # }
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub async fn </span>bucket&lt;F&gt;(<span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, f: F) -&gt; <span class="self">Self
-    </span><span class="kw">where
-        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>BucketBuilder) -&gt; <span class="kw-2">&amp;mut </span>BucketBuilder,
-    {
-        <span class="kw">let </span><span class="kw-2">mut </span>builder = BucketBuilder::default();
-
-        f(<span class="kw-2">&amp;mut </span>builder);
-
-        <span class="self">self</span>.buckets.lock().<span class="kw">await</span>.insert(name.to_string(), builder.construct());
-
+    </span><span class="kw">pub async fn </span>bucket(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, builder: BucketBuilder) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.buckets.lock().<span class="kw">await</span>.insert(name.into(), builder.construct());
         <span class="self">self
     </span>}
 
@@ -1497,9 +1482,8 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Framework <span class="kw">for </span>StandardFramework {
     <span class="attr">#[instrument(skip(<span class="self">self</span>, event))]
-    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, event: FullEvent) {
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>ctx: Context, event: FullEvent) {
         <span class="kw">let </span>FullEvent::Message {
-            <span class="kw-2">mut </span>ctx,
             new_message: msg,
         } = event
         <span class="kw">else </span>{

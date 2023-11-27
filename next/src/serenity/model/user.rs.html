@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6cf088810 2023-11-26)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-e1c03aa593074e71.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -867,48 +867,6 @@
 <a href="#867" id="867">867</a>
 <a href="#868" id="868">868</a>
 <a href="#869" id="869">869</a>
-<a href="#870" id="870">870</a>
-<a href="#871" id="871">871</a>
-<a href="#872" id="872">872</a>
-<a href="#873" id="873">873</a>
-<a href="#874" id="874">874</a>
-<a href="#875" id="875">875</a>
-<a href="#876" id="876">876</a>
-<a href="#877" id="877">877</a>
-<a href="#878" id="878">878</a>
-<a href="#879" id="879">879</a>
-<a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
-<a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
-<a href="#888" id="888">888</a>
-<a href="#889" id="889">889</a>
-<a href="#890" id="890">890</a>
-<a href="#891" id="891">891</a>
-<a href="#892" id="892">892</a>
-<a href="#893" id="893">893</a>
-<a href="#894" id="894">894</a>
-<a href="#895" id="895">895</a>
-<a href="#896" id="896">896</a>
-<a href="#897" id="897">897</a>
-<a href="#898" id="898">898</a>
-<a href="#899" id="899">899</a>
-<a href="#900" id="900">900</a>
-<a href="#901" id="901">901</a>
-<a href="#902" id="902">902</a>
-<a href="#903" id="903">903</a>
-<a href="#904" id="904">904</a>
-<a href="#905" id="905">905</a>
-<a href="#906" id="906">906</a>
-<a href="#907" id="907">907</a>
-<a href="#908" id="908">908</a>
-<a href="#909" id="909">909</a>
-<a href="#910" id="910">910</a>
-<a href="#911" id="911">911</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -916,8 +874,6 @@
 </span><span class="kw">use </span>std::fmt::Write;
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::ops::{Deref, DerefMut};
-<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
-</span><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
@@ -1039,7 +995,8 @@
 <span class="doccomment">/// Information about the current user.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(transparent)]
 </span><span class="kw">pub struct </span>CurrentUser(User);
 
@@ -1102,7 +1059,8 @@
 <span class="doccomment">/// The representation of a user&#39;s status.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types).
-</span><span class="attr">#[derive(
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
 #[non_exhaustive]
@@ -1137,7 +1095,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
 /// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>User {
     <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s creation date.
@@ -1209,6 +1168,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>PremiumType {
@@ -1225,7 +1185,8 @@
     <span class="doccomment">/// User&#39;s public flags
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-flags).
-    </span><span class="attr">#[derive(Default)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>UserPublicFlags: u32 {
         <span class="doccomment">/// User&#39;s flag as discord employee
         </span><span class="kw">const </span>DISCORD_EMPLOYEE = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
@@ -1339,61 +1300,28 @@
     ///
     /// # Examples
     ///
-    /// When a user sends a message with a content of `&quot;~help&quot;`, DM the author a help message, and
-    /// then react with `&#39;👌&#39;` to verify message sending:
+    /// When a user sends a message with a content of `&quot;~help&quot;`, DM the author a help message
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = &quot;client&quot;)] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
-    /// #
-    /// use serenity::builder::{CreateBotAuthParameters, CreateMessage};
-    ///
-    /// struct Handler;
+    /// # struct Handler;
+    /// use serenity::builder::CreateMessage;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = &quot;client&quot;)]
     /// impl EventHandler for Handler {
-    /// #   #[cfg(feature = &quot;cache&quot;)]
     ///     async fn message(&amp;self, ctx: Context, msg: Message) {
     ///         if msg.content == &quot;~help&quot; {
-    ///             let url = match CreateBotAuthParameters::new()
-    ///                 .permissions(Permissions::empty())
-    ///                 .scopes(&amp;[Scope::Bot])
-    ///                 .auto_client_id(&amp;ctx)
-    ///                 .await
-    ///             {
-    ///                 Ok(v) =&gt; v.build(),
-    ///                 Err(why) =&gt; {
-    ///                     println!(&quot;Error creating invite url: {:?}&quot;, why);
-    ///                     return;
-    ///                 },
-    ///             };
+    ///             let builder = CreateMessage::new().content(&quot;Helpful info here.&quot;);
     ///
-    ///             let help = format!(&quot;Helpful info here. Invite me with this link: &lt;{}&gt;&quot;, url);
-    ///
-    ///             let builder = CreateMessage::new().content(help);
-    ///             let dm = msg.author.direct_message(&amp;ctx, builder).await;
-    ///
-    ///             match dm {
-    ///                 Ok(_) =&gt; {
-    ///                     let _ = msg.react(&amp;ctx, &#39;👌&#39;).await;
-    ///                 },
-    ///                 Err(why) =&gt; {
-    ///                     println!(&quot;Err sending help: {:?}&quot;, why);
-    ///
-    ///                     let _ = msg.reply(&amp;ctx, &quot;There was an error DMing you help.&quot;).await;
-    ///                 },
+    ///             if let Err(why) = msg.author.direct_message(&amp;ctx, builder).await {
+    ///                 println!(&quot;Err sending help: {why:?}&quot;);
+    ///                 let _ = msg.reply(&amp;ctx, &quot;There was an error DMing you help.&quot;).await;
     ///             };
     ///         }
     ///     }
     /// }
-    ///
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// let mut client =
-    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    /// # Ok(())
-    /// # }
-    /// # }
     /// ```
     ///
     /// # Errors
@@ -1499,35 +1427,20 @@
     /// Make a command to tell the user what their tag is:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = &quot;client&quot;)]
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
-    /// #
-    /// use serenity::utils::ContentModifier::Bold;
-    /// use serenity::utils::MessageBuilder;
-    ///
-    /// struct Handler;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// # #[cfg(feature = &quot;client&quot;)]
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, context: Context, msg: Message) {
     ///         if msg.content == &quot;!mytag&quot; {
-    ///             let content = MessageBuilder::new()
-    ///                 .push(&quot;Your tag is &quot;)
-    ///                 .push(Bold + msg.author.tag())
-    ///                 .build();
-    ///
+    ///             let content = format!(&quot;Your tag is: {}&quot;, msg.author.tag());
     ///             let _ = msg.channel_id.say(&amp;context.http, &amp;content).await;
     ///         }
     ///     }
     /// }
-    /// let mut client =
-    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     </span><span class="attr">#[inline]
     #[must_use]
@@ -1660,7 +1573,10 @@
         <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                cache.temp_users.insert(user.id, Arc::new(user.clone()));
+                <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+
+                <span class="kw">let </span>cached_user = MaybeOwnedArc::new(user.clone());
+                cache.temp_users.insert(cached_user.id, cached_user);
             }
         }
 

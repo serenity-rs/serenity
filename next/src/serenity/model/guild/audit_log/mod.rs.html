@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6cf088810 2023-11-26)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-e1c03aa593074e71.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -468,6 +468,27 @@
 <a href="#468" id="468">468</a>
 <a href="#469" id="469">469</a>
 <a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -487,7 +508,8 @@
 <span class="doccomment">/// Determines the action that was done on a target.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Action {
     GuildUpdate,
@@ -575,7 +597,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ChannelAction {
@@ -585,7 +608,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ChannelOverwriteAction {
@@ -595,7 +619,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>MemberAction {
@@ -611,7 +636,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>RoleAction {
@@ -621,7 +647,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>InviteAction {
@@ -631,7 +658,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>WebhookAction {
@@ -641,7 +669,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>EmojiAction {
@@ -651,7 +680,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>MessageAction {
@@ -662,7 +692,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>IntegrationAction {
@@ -672,7 +703,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>StageInstanceAction {
@@ -682,7 +714,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>StickerAction {
@@ -692,7 +725,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ScheduledEventAction {
@@ -702,7 +736,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>ThreadAction {
@@ -712,7 +747,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Copy, Clone, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>AutoModAction {
@@ -725,7 +761,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[derive(Copy, Clone, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>CreatorMonetizationAction {
@@ -734,7 +771,8 @@
 }
 
 <span class="doccomment">/// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
-</span><span class="attr">#[derive(Copy, Clone, Debug)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>VoiceChannelStatusAction {
@@ -743,7 +781,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
-</span><span class="attr">#[derive(Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AuditLogs {
     <span class="doccomment">/// List of audit log entries, sorted from most to least recent.
@@ -773,7 +812,8 @@
 <span class="doccomment">/// Partial version of [`Integration`], used in [`AuditLogs::integrations`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object-example-partial-integration-object).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialIntegration {
     <span class="kw">pub </span>id: IntegrationId,
@@ -785,7 +825,8 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
-</span><span class="attr">#[derive(Debug, Deserialize, Serialize, Clone)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AuditLogEntry {
     <span class="doccomment">/// Determines to what entity an [`Self::action`] was used on.
@@ -807,7 +848,8 @@
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
 </span><span class="comment">// TODO: should be renamed to a less ambiguous name
-</span><span class="attr">#[derive(Debug, Deserialize, Serialize, Clone)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Options {
     <span class="doccomment">/// Name of the Auto Moderation rule that was triggered.

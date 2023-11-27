@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/configuration.rs`."><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/configuration.rs`."><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6cf088810 2023-11-26)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-e1c03aa593074e71.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -605,10 +605,6 @@
 <a href="#605" id="605">605</a>
 <a href="#606" id="606">606</a>
 <a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use </span>futures::future::BoxFuture;
@@ -691,7 +687,7 @@
 ///
 /// impl EventHandler for Handler {}
 ///
-/// use serenity::framework::StandardFramework;
+/// use serenity::framework::standard::{Configuration, StandardFramework};
 /// use serenity::model::id::UserId;
 /// use serenity::Client;
 ///
@@ -699,7 +695,7 @@
 /// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;
 ///
 /// let framework = StandardFramework::new();
-/// framework.configure(|c| c.on_mention(Some(UserId::new(5))).prefix(&quot;~&quot;));
+/// framework.configure(Configuration::new().on_mention(Some(UserId::new(5))).prefix(&quot;~&quot;));
 ///
 /// let mut client = Client::builder(&amp;token, GatewayIntents::default())
 ///     .event_handler(Handler)
@@ -714,47 +710,37 @@
 /// [default implementation]: Self::default
 </span><span class="attr">#[derive(Clone)]
 </span><span class="kw">pub struct </span>Configuration {
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>allow_dm: bool,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>with_whitespace: WithWhiteSpace,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>by_space: bool,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>blocked_guilds: HashSet&lt;GuildId&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>blocked_users: HashSet&lt;UserId&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>allowed_channels: HashSet&lt;ChannelId&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>disabled_commands: HashSet&lt;String&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>dynamic_prefixes: Vec&lt;DynamicPrefixHook&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>ignore_bots: bool,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>ignore_webhooks: bool,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>on_mention: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>owners: HashSet&lt;UserId&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>prefixes: Vec&lt;String&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>no_dm_prefix: bool,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>delimiters: Vec&lt;Delimiter&gt;,
-    <span class="attr">#[doc(hidden)]
-    </span><span class="kw">pub </span>case_insensitive: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) allow_dm: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) with_whitespace: WithWhiteSpace,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) by_space: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) blocked_guilds: HashSet&lt;GuildId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) blocked_users: HashSet&lt;UserId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) allowed_channels: HashSet&lt;ChannelId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) disabled_commands: HashSet&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) dynamic_prefixes: Vec&lt;DynamicPrefixHook&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ignore_bots: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ignore_webhooks: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) on_mention: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) owners: HashSet&lt;UserId&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) prefixes: Vec&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) no_dm_prefix: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) delimiters: Vec&lt;Delimiter&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) case_insensitive: bool,
 }
 
 <span class="kw">impl </span>Configuration {
+    <span class="doccomment">/// Alias for Configuration::default
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
+    }
+
     <span class="doccomment">/// If set to false, bot will ignore any private messages.
     ///
     /// **Note**: Defaults to `true`.
-    </span><span class="kw">pub fn </span>allow_dm(<span class="kw-2">&amp;mut </span><span class="self">self</span>, allow_dm: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>allow_dm(<span class="kw-2">mut </span><span class="self">self</span>, allow_dm: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.allow_dm = allow_dm;
-
         <span class="self">self
     </span>}
 
@@ -780,9 +766,9 @@
     ///
     /// // bot processes and executes the &quot;about&quot; command if it exists
     /// ```
-    </span><span class="kw">pub fn </span>with_whitespace&lt;I: Into&lt;WithWhiteSpace&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, with: I) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>with_whitespace(<span class="kw-2">mut </span><span class="self">self</span>, with: <span class="kw">impl </span>Into&lt;WithWhiteSpace&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.with_whitespace = with.into();
-
         <span class="self">self
     </span>}
 
@@ -791,9 +777,9 @@
     /// group&#39;s or command&#39;s names.
     ///
     /// **Note**: Defaults to `true`
-    </span><span class="kw">pub fn </span>by_space(<span class="kw-2">&amp;mut </span><span class="self">self</span>, b: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>by_space(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.by_space = b;
-
         <span class="self">self
     </span>}
 
@@ -807,17 +793,18 @@
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::ChannelId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect())
-    /// });
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect()),
+    /// );
     /// ```
-    </span><span class="kw">pub fn </span>allowed_channels(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channels: HashSet&lt;ChannelId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>allowed_channels(<span class="kw-2">mut </span><span class="self">self</span>, channels: HashSet&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.allowed_channels = channels;
-
         <span class="self">self
     </span>}
 
@@ -831,17 +818,18 @@
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::GuildId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect())
-    /// });
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect()),
+    /// );
     /// ```
-    </span><span class="kw">pub fn </span>blocked_guilds(<span class="kw-2">&amp;mut </span><span class="self">self</span>, guilds: HashSet&lt;GuildId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>blocked_guilds(<span class="kw-2">mut </span><span class="self">self</span>, guilds: HashSet&lt;GuildId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.blocked_guilds = guilds;
-
         <span class="self">self
     </span>}
 
@@ -857,17 +845,18 @@
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::UserId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect())
-    /// });
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect()),
+    /// );
     /// ```
-    </span><span class="kw">pub fn </span>blocked_users(<span class="kw-2">&amp;mut </span><span class="self">self</span>, users: HashSet&lt;UserId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>blocked_users(<span class="kw-2">mut </span><span class="self">self</span>, users: HashSet&lt;UserId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.blocked_users = users;
-
         <span class="self">self
     </span>}
 
@@ -882,7 +871,7 @@
     /// ```rust,no_run
     /// use serenity::client::Context;
     /// use serenity::framework::standard::macros::{command, group};
-    /// use serenity::framework::standard::CommandResult;
+    /// use serenity::framework::standard::{CommandResult, Configuration};
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::channel::Message;
     ///
@@ -899,12 +888,12 @@
     /// let disabled = vec![&quot;ping&quot;].into_iter().map(|x| x.to_string()).collect();
     ///
     /// let framework = StandardFramework::new().group(&amp;PENG_GROUP);
-    /// framework.configure(|c| c.disabled_commands(disabled));
+    /// framework.configure(Configuration::new().disabled_commands(disabled));
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>disabled_commands(<span class="kw-2">&amp;mut </span><span class="self">self</span>, commands: HashSet&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>disabled_commands(<span class="kw-2">mut </span><span class="self">self</span>, commands: HashSet&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.disabled_commands = commands;
-
         <span class="self">self
     </span>}
 
@@ -932,15 +921,14 @@
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
-    /// let framework = StandardFramework::new().configure(|c| {
-    ///     c.dynamic_prefix(|_, msg| {
+    /// let framework =
+    ///     StandardFramework::new().configure(Configuration::new().dynamic_prefix(|_, msg| {
     ///         Box::pin(async move {
     ///             Some(if msg.channel_id.get() % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string())
     ///         })
-    ///     })
-    /// });
+    ///     }));
     /// ```
     ///
     /// This will only use the prefix `&quot;!&quot;` or `&quot;*&quot;` depending on channel ID,
@@ -948,24 +936,25 @@
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| {
-    ///     c.dynamic_prefix(|_, msg| {
-    ///         Box::pin(async move {
-    ///             Some(if msg.channel_id.get() % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string())
+    /// framework.configure(
+    ///     Configuration::new()
+    ///         .dynamic_prefix(|_, msg| {
+    ///             Box::pin(async move {
+    ///                 Some(if msg.channel_id.get() % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string())
+    ///             })
     ///         })
-    ///     })
-    ///     .prefix(&quot;&quot;) // This disables the default prefix &quot;~&quot;
-    /// });
+    ///         .prefix(&quot;&quot;), // This disables the default prefix &quot;~&quot;
+    /// );
     /// ```
     ///
     /// [`Context::data`]: crate::client::Context::data
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>dynamic_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dynamic_prefix: DynamicPrefixHook) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>dynamic_prefix(<span class="kw-2">mut </span><span class="self">self</span>, dynamic_prefix: DynamicPrefixHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.dynamic_prefixes.push(dynamic_prefix);
-
         <span class="self">self
     </span>}
 
@@ -975,18 +964,18 @@
     /// itself.
     ///
     /// **Note**: Defaults to `true`.
-    </span><span class="kw">pub fn </span>ignore_bots(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ignore_bots: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>ignore_bots(<span class="kw-2">mut </span><span class="self">self</span>, ignore_bots: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.ignore_bots = ignore_bots;
-
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// If set to true, bot will ignore all commands called by webhooks.
     ///
     /// **Note**: Defaults to `true`.
-    </span><span class="kw">pub fn </span>ignore_webhooks(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ignore_webhooks: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>ignore_webhooks(<span class="kw-2">mut </span><span class="self">self</span>, ignore_webhooks: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.ignore_webhooks = ignore_webhooks;
-
         <span class="self">self
     </span>}
 
@@ -1008,9 +997,9 @@
     /// The former is a direct mention, while the latter is a nickname mention, which aids mobile
     /// devices in determining whether to display a user&#39;s nickname. It has no real meaning for
     /// your bot, and the library encourages you to ignore differentiating between the two.
-    </span><span class="kw">pub fn </span>on_mention(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id_to_mention: <span class="prelude-ty">Option</span>&lt;UserId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>on_mention(<span class="kw-2">mut </span><span class="self">self</span>, id_to_mention: <span class="prelude-ty">Option</span>&lt;UserId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.on_mention = id_to_mention.map(|id| id.to_string());
-
         <span class="self">self
     </span>}
 
@@ -1023,11 +1012,13 @@
     /// Create a HashSet in-place:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::UserId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
+    /// framework.configure(
+    ///     Configuration::new().owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()),
+    /// );
     /// ```
     ///
     /// Create a HashSet beforehand:
@@ -1035,7 +1026,7 @@
     /// ```rust,no_run
     /// use std::collections::HashSet;
     ///
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     /// use serenity::model::id::UserId;
     ///
     /// let mut set = HashSet::new();
@@ -1043,11 +1034,11 @@
     /// set.insert(UserId::new(77));
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.owners(set));
+    /// framework.configure(Configuration::new().owners(set));
     /// ```
-    </span><span class="kw">pub fn </span>owners(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user_ids: HashSet&lt;UserId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>owners(<span class="kw-2">mut </span><span class="self">self</span>, user_ids: HashSet&lt;UserId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.owners = user_ids;
-
         <span class="self">self
     </span>}
 
@@ -1065,15 +1056,15 @@
     /// Assign a basic prefix:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.prefix(&quot;!&quot;));
+    /// framework.configure(Configuration::new().prefix(&quot;!&quot;));
     /// ```
-    </span><span class="kw">pub fn </span>prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>prefix(<span class="kw-2">mut </span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>p = prefix.into();
         <span class="self">self</span>.prefixes = <span class="kw">if </span>p.is_empty() { <span class="macro">vec!</span>[] } <span class="kw">else </span>{ <span class="macro">vec!</span>[p] };
-
         <span class="self">self
     </span>}
 
@@ -1089,16 +1080,15 @@
     /// Assign a set of prefixes the bot can respond to:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));
+    /// framework.configure(Configuration::new().prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>prefixes&lt;T: ToString&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefixes: <span class="kw">impl </span>IntoIterator&lt;Item = T&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.prefixes =
-            prefixes.into_iter().map(|p| p.to_string()).filter(|p| !p.is_empty()).collect();
-
+    #[must_use]
+    </span><span class="kw">pub fn </span>prefixes(<span class="kw-2">mut </span><span class="self">self</span>, prefixes: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;String&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.prefixes = prefixes.into_iter().map(Into::into).filter(|p| !p.is_empty()).collect();
         <span class="self">self
     </span>}
 
@@ -1110,9 +1100,9 @@
     ///
     /// The `cache` feature is required. If disabled this does absolutely nothing.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>no_dm_prefix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, b: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>no_dm_prefix(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.no_dm_prefix = b;
-
         <span class="self">self
     </span>}
 
@@ -1125,12 +1115,12 @@
     /// Have the args be separated by a comma and a space:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
-    /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.delimiter(&quot;, &quot;));
+    /// let framework = StandardFramework::new().configure(Configuration::new().delimiter(&quot;, &quot;));
     /// ```
-    </span><span class="kw">pub fn </span>delimiter&lt;I: Into&lt;Delimiter&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, delimiter: I) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>delimiter(<span class="kw-2">mut </span><span class="self">self</span>, delimiter: <span class="kw">impl </span>Into&lt;Delimiter&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.delimiters.clear();
         <span class="self">self</span>.delimiters.push(delimiter.into());
 
@@ -1147,15 +1137,16 @@
     /// Have the args be separated by a comma and a space; and a regular space:
     ///
     /// ```rust,no_run
-    /// use serenity::framework::StandardFramework;
+    /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.delimiters(vec![&quot;, &quot;, &quot; &quot;]));
+    /// framework.configure(Configuration::new().delimiters(vec![&quot;, &quot;, &quot; &quot;]));
     /// ```
-    </span><span class="kw">pub fn </span>delimiters&lt;T: Into&lt;Delimiter&gt;&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        delimiters: <span class="kw">impl </span>IntoIterator&lt;Item = T&gt;,
-    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>delimiters(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        delimiters: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;Delimiter&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.delimiters.clear();
         <span class="self">self</span>.delimiters.extend(delimiters.into_iter().map(Into::into));
 
@@ -1169,7 +1160,8 @@
     /// insensitive.
     ///
     /// **Note**: Defaults to `false`.
-    </span><span class="kw">pub fn </span>case_insensitivity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cs: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>case_insensitivity(<span class="kw-2">mut </span><span class="self">self</span>, cs: bool) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.case_insensitive = cs;
 
         <span class="kw">for </span>prefix <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.prefixes {

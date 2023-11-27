@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6cf088810 2023-11-26)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-e1c03aa593074e71.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2815,12 +2815,6 @@
 <a href="#2815" id="2815">2815</a>
 <a href="#2816" id="2816">2816</a>
 <a href="#2817" id="2817">2817</a>
-<a href="#2818" id="2818">2818</a>
-<a href="#2819" id="2819">2819</a>
-<a href="#2820" id="2820">2820</a>
-<a href="#2821" id="2821">2821</a>
-<a href="#2822" id="2822">2822</a>
-<a href="#2823" id="2823">2823</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2903,7 +2897,8 @@
     </span><span class="kw">pub </span>user: User,
 }
 
-<span class="attr">#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>AfkMetadata {
     <span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.
     </span><span class="kw">pub </span>afk_channel_id: ChannelId,
@@ -2916,7 +2911,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
 /// [extension](https://discord.com/developers/docs/topics/gateway-events#guild-create).
-</span><span class="attr">#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Guild {
     <span class="doccomment">/// The unique Id identifying the guild.
@@ -3411,7 +3407,7 @@
     </span><span class="kw">pub async fn </span>audit_logs(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        action_type: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+        action_type: <span class="prelude-ty">Option</span>&lt;audit_log::Action&gt;,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
         before: <span class="prelude-ty">Option</span>&lt;AuditLogEntryId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
@@ -4437,19 +4433,11 @@
 
     <span class="doccomment">/// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>members_with_status(<span class="kw-2">&amp;</span><span class="self">self</span>, status: OnlineStatus) -&gt; Vec&lt;<span class="kw-2">&amp;</span>Member&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>members = <span class="macro">vec!</span>[];
-
-        <span class="kw">for </span>(<span class="kw-2">&amp;</span>id, member) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.members {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(presence) = <span class="self">self</span>.presences.get(<span class="kw-2">&amp;</span>id) {
-                <span class="kw">if </span>status == presence.status {
-                    members.push(member);
-                }
-            }
-        }
-
-        members
+    </span><span class="kw">pub fn </span>members_with_status(<span class="kw-2">&amp;</span><span class="self">self</span>, status: OnlineStatus) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>Member&gt; {
+        <span class="self">self</span>.members.iter().filter_map(<span class="kw">move </span>|(id, member)| <span class="kw">match </span><span class="self">self</span>.presences.get(id) {
+            <span class="prelude-val">Some</span>(presence) <span class="kw">if </span>presence.status == status =&gt; <span class="prelude-val">Some</span>(member),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        })
     }
 
     <span class="doccomment">/// Retrieves the first [`Member`] found that matches the name - with an optional discriminator
@@ -5215,14 +5203,12 @@
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
-    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
-    ///
-    /// struct Handler;
+    /// # use serenity::model::prelude::*;
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
     ///
     /// #[serenity::async_trait]
+    /// #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
@@ -5234,13 +5220,6 @@
     ///         }
     ///     }
     /// }
-    ///
-    /// let mut client =
-    ///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>role_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, role_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
@@ -5417,7 +5396,8 @@
 <span class="doccomment">/// Representation of the number of members that would be pruned by a guild prune operation.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
-</span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildPrune {
     <span class="doccomment">/// The number of members that would be pruned by the operation.
@@ -5428,7 +5408,8 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object),
 /// [subset example](https://discord.com/developers/docs/resources/user#get-current-user-guilds-example-partial-guild).
-</span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildInfo {
     <span class="doccomment">/// The unique Id of the guild.
@@ -5472,7 +5453,8 @@
 <span class="doccomment">/// Data for an unavailable guild.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#unavailable-guild-object).
-</span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>UnavailableGuild {
     <span class="doccomment">/// The Id of the [`Guild`] that may be unavailable.
@@ -5487,6 +5469,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>DefaultMessageNotificationLevel {
@@ -5504,6 +5487,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ExplicitContentFilter {
@@ -5523,6 +5507,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-mfa-level).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>MfaLevel {
@@ -5541,6 +5526,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-verification-level).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>VerificationLevel {
@@ -5564,6 +5550,7 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>NsfwLevel {
@@ -5585,6 +5572,7 @@
     ///
     /// See [AfkMetadata::afk_timeout].
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
     #[serde(from = <span class="string">&quot;u16&quot;</span>, into = <span class="string">&quot;u16&quot;</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>AfkTimeout {

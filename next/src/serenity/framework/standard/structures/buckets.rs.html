@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (6cf088810 2023-11-26)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-e1c03aa593074e71.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -566,6 +566,7 @@
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
 <a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::time::{Duration, Instant};
@@ -988,9 +989,9 @@
     ///
     /// Expressed in seconds.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>delay(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>delay(<span class="kw-2">mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.delay = Duration::from_secs(secs);
-
         <span class="self">self
     </span>}
 
@@ -998,26 +999,26 @@
     ///
     /// Expressed in seconds.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>time_span(<span class="kw-2">&amp;mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>time_span(<span class="kw-2">mut </span><span class="self">self</span>, secs: u64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.time_span = Duration::from_secs(secs);
-
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Number of invocations allowed per [`Self::time_span`].
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>limit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>limit(<span class="kw-2">mut </span><span class="self">self</span>, n: u32) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.limit = n;
-
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Middleware confirming (or denying) that the bucket is eligible to apply. For instance, to
     /// limit the bucket to just one user.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>, check: Check) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>check(<span class="kw-2">mut </span><span class="self">self</span>, check: Check) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.check = <span class="prelude-val">Some</span>(check);
-
         <span class="self">self
     </span>}
 
@@ -1036,7 +1037,7 @@
     /// ```rust
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// use serenity::framework::standard::macros::{command, group};
-    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    /// use serenity::framework::standard::{BucketBuilder, Configuration, CommandResult, StandardFramework};
     /// use serenity::model::channel::Message;
     /// use serenity::prelude::*;
     ///
@@ -1059,18 +1060,18 @@
     /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
     ///
     /// let framework = StandardFramework::new()
-    ///     .bucket(&quot;example_bucket&quot;, |b| {
+    ///     .bucket(&quot;example_bucket&quot;, BucketBuilder::default()
     ///         // We initialise the bucket with the function we want to run
-    ///         b.delay_action(|ctx, msg| {
+    ///         .delay_action(|ctx, msg| {
     ///             Box::pin(example_overuse_response(ctx, msg))
     ///         })
     ///         .delay(10) // We set the delay to 10 seconds
     ///         .await_ratelimits(1) // We override the default behavior so that the function actually gets run
-    ///     })
+    ///     )
     ///     .await
     ///     .group(&amp;GENERAL_GROUP);
     ///
-    /// framework.configure(|c| c.prefix(&quot;~&quot;));
+    /// framework.configure(Configuration::new().prefix(&quot;~&quot;));
     ///
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default())
     /// .framework(framework)
@@ -1081,7 +1082,8 @@
     /// # }
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>delay_action(<span class="kw-2">&amp;mut </span><span class="self">self</span>, action: DelayHook) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>delay_action(<span class="kw-2">mut </span><span class="self">self</span>, action: DelayHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.delay_action = <span class="prelude-val">Some</span>(action);
         <span class="kw">if </span><span class="self">self</span>.await_ratelimits == <span class="number">0 </span>{
             <span class="self">self</span>.await_ratelimits = <span class="number">1</span>;
@@ -1092,9 +1094,9 @@
 
     <span class="doccomment">/// Limit the bucket for a specific type of `target`.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>limit_for(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: LimitedFor) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>limit_for(<span class="kw-2">mut </span><span class="self">self</span>, target: LimitedFor) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.limited_for = target;
-
         <span class="self">self
     </span>}
 
@@ -1103,9 +1105,9 @@
     ///
     /// By default this value is `0` and rate limits will cancel instead.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>await_ratelimits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, amount: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    #[must_use]
+    </span><span class="kw">pub fn </span>await_ratelimits(<span class="kw-2">mut </span><span class="self">self</span>, amount: u32) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.await_ratelimits = amount;
-
         <span class="self">self
     </span>}
 
