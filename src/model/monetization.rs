@@ -40,6 +40,7 @@ bitflags! {
     /// Differentates between user and server subscriptions.
     ///
     /// [Discord docs](https://discord.com/developers/docs/monetization/skus#sku-object-sku-flags).
+    #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
     pub struct SkuFlags: u64 {
         /// SKU is available for purchase.
         const AVAILABLE = 1 << 2;
