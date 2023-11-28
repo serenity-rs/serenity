@@ -55,8 +55,6 @@ impl CreateButton {
 
     /// Creates a normal button with the given custom ID. You must also set [`Self::label`] and/or
     /// [`Self::emoji`] after this.
-    ///
-    /// Clicking this button will not trigger an interaction event in your bot.
     pub fn new(custom_id: impl Into<String>) -> Self {
         Self(Button {
             kind: ComponentType::Button,
