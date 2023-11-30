@@ -175,6 +175,13 @@ impl EmojiIdentifier {
     }
 }
 
+#[cfg(all(feature = "model", feature = "utils"))]
+impl fmt::Display for EmojiIdentifier {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<:{}:{}>", self.name, self.id)
+    }
+}
+
 #[derive(Debug)]
 #[cfg(all(feature = "model", feature = "utils"))]
 pub struct EmojiIdentifierParseError {
