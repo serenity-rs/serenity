@@ -178,7 +178,17 @@ impl EmojiIdentifier {
 #[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for EmojiIdentifier {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "<:{}:{}>", self.name, self.id)
+        if self.animated {
+            f.write_str("<a:")?;
+        } else {
+            f.write_str("<:")?;
+        }
+
+        f.write_str(&self.name)?;
+
+        f.write_char(':')?;
+        fmt::Display::fmt(&self.id, f)?;
+        f.write_char('>')
     }
 }
 
