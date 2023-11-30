@@ -3116,6 +3116,7 @@ impl Http {
         .await
     }
 
+    #[allow(clippy::too_many_arguments)]
     /// Gets all entitlements for the current app, active and expired.
     pub async fn get_entitlements(
         &self,
