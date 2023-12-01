@@ -216,6 +216,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
     /// can have up to 25 subcommands. A subcommand can have up to 25 options.
+    ///
     /// [`SubCommandGroup`]: crate::model::application::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
     /// [`add_sub_option`]: Self::add_sub_option
