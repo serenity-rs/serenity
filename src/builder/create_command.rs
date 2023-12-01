@@ -219,7 +219,10 @@ impl CreateCommandOption {
     ///
     /// [`SubCommandGroup`]: crate::model::application::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
-    pub fn set_sub_options(mut self, sub_options: impl IntoIterator<CreateCommandOption>) -> Self {
+    pub fn set_sub_options(
+        mut self,
+        sub_options: impl IntoIterator<Item = CreateCommandOption>,
+    ) -> Self {
         self.0.options = sub_options.into_iter().map(|o| o.0).collect();
         self
     }
