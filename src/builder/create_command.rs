@@ -211,6 +211,21 @@ impl CreateCommandOption {
 
     /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
     ///
+    /// This will overwrite any existing sub-options. To add a sub-option to the existing list, use
+    /// [`add_sub_option`].
+    ///
+    /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
+    /// can have up to 25 subcommands. A subcommand can have up to 25 options.
+    /// [`SubCommandGroup`]: crate::model::application::CommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
+    /// [`add_sub_option`]: Self::add_sub_option
+    pub fn set_sub_options(mut self, sub_options: impl IntoIterator<CreateCommandOption>) -> Self {
+        self.0.options = sub_options.into_iter().map(|o| o.0).collect();
+        self
+    }
+
+    /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
+    ///
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
     /// can have up to 25 subcommands. A subcommand can have up to 25 options.
     ///
