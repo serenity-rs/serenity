@@ -41,7 +41,7 @@ impl<'a> CreateSticker<'a> {
         self
     }
 
-    /// Set the description of the sticker, replacing the current value as set in [`Self::new`].
+    /// Set the description of the sticker.
     ///
     /// **Note**: Must be empty or 2-100 characters.
     pub fn description(mut self, description: impl Into<String>) -> Self {
@@ -49,8 +49,7 @@ impl<'a> CreateSticker<'a> {
         self
     }
 
-    /// The Discord name of a unicode emoji representing the sticker's expression. Replaces the
-    /// current value as set in [`Self::new`].
+    /// The Discord name of a unicode emoji representing the sticker's expression.
     ///
     /// **Note**: Max 200 characters long.
     pub fn tags(mut self, tags: impl Into<String>) -> Self {
