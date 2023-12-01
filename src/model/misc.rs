@@ -4,6 +4,8 @@
 use std::error::Error as StdError;
 use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
+use std::fmt::Write;
+#[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
@@ -172,6 +174,23 @@ impl EmojiIdentifier {
         let ext = if self.animated { "gif" } else { "png" };
 
         cdn!("/emojis/{}.{}", self.id, ext)
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl fmt::Display for EmojiIdentifier {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.animated {
+            f.write_str("<a:")?;
+        } else {
+            f.write_str("<:")?;
+        }
+
+        f.write_str(&self.name)?;
+
+        f.write_char(':')?;
+        fmt::Display::fmt(&self.id, f)?;
+        f.write_char('>')
     }
 }
 
