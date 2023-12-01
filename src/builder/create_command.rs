@@ -75,7 +75,7 @@ impl CreateCommandOption {
         self
     }
 
-    /// Sets the description for the option, replacing the current value as set in [`Self::new]`.
+    /// Sets the description for the option, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 1 and 100 characters.
     pub fn description(mut self, description: impl Into<String>) -> Self {
@@ -212,14 +212,13 @@ impl CreateCommandOption {
     /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
     ///
     /// This will overwrite any existing sub-options. To add a sub-option to the existing list, use
-    /// [`add_sub_option`].
+    /// [`Self::add_sub_option`].
     ///
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
     /// can have up to 25 subcommands. A subcommand can have up to 25 options.
     ///
     /// [`SubCommandGroup`]: crate::model::application::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
-    /// [`add_sub_option`]: Self::add_sub_option
     pub fn set_sub_options(mut self, sub_options: impl IntoIterator<CreateCommandOption>) -> Self {
         self.0.options = sub_options.into_iter().map(|o| o.0).collect();
         self
@@ -335,7 +334,7 @@ impl CreateCommand {
     }
 
     /// Specifies the name of the application command, replacing the current value as set in
-    /// [`Self::new]`.
+    /// [`Self::new`].
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two
     /// global commands of the same app cannot have the same name. Two guild-specific commands of
