@@ -104,7 +104,6 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
@@ -148,7 +147,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Set the description of the sticker, replacing the current value as set in [`Self::new`].
+    <span class="doccomment">/// Set the description of the sticker.
     ///
     /// **Note**: Must be empty or 2-100 characters.
     </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
@@ -156,8 +155,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// The Discord name of a unicode emoji representing the sticker&#39;s expression. Replaces the
-    /// current value as set in [`Self::new`].
+    <span class="doccomment">/// The Discord name of a unicode emoji representing the sticker&#39;s expression.
     ///
     /// **Note**: Max 200 characters long.
     </span><span class="kw">pub fn </span>tags(<span class="kw-2">mut </span><span class="self">self</span>, tags: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{

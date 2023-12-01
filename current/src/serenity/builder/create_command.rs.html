@@ -445,7 +445,6 @@
 <a href="#445" id="445">445</a>
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
@@ -749,7 +748,7 @@
 }
 
 <span class="kw">impl </span>CreateCommand {
-    <span class="doccomment">/// Creates a new builder with the given name and description, leaving all other fields empty.
+    <span class="doccomment">/// Creates a new builder with the given name, leaving all other fields empty.
     </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             kind: <span class="prelude-val">None</span>,
@@ -809,8 +808,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Specifies the description of the application command, replacing the current value as set in
-    /// [`Self::new`].
+    <span class="doccomment">/// Specifies the description of the application command.
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
