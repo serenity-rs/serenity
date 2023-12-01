@@ -4,6 +4,8 @@
 use std::error::Error as StdError;
 use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
+use std::fmt::Write;
+#[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
