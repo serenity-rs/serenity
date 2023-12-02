@@ -285,7 +285,7 @@ Serenity now uses Rust edition 2021, with an MSRV of Rust 1.74.
     - Change the various `set_activity` methods to take an `Option<ActivityData>` to allow for clearing the current presence by passing in `None`.
     - Add support for setting a presence when first identifying to the gateway by adding presence methods to `ClientBuilder`, and adding an optional `presence` parameter to `Shard::new`.
 * [#2008](https://github.com/serenity-rs/serenity/pull/2008) - Unknown values for enum variants are now preserved for debugging purposes. Any `Unknown` variants on enums are now changed to `Unknown(u8)`. Also, the `num` method for those enums is removed; users should call `u8::from` instead.
-* [#2017](https://github.com/serenity-rs/serenity/pull/2017) - Change `Member::edit` to edit in place, and return `Result<()>` instead of `Result<Message>`.
+* [#2017](https://github.com/serenity-rs/serenity/pull/2017) - Change `Member::edit` to edit in place, and return `Result<()>` instead of `Result<Member>`.
 * [#2023](https://github.com/serenity-rs/serenity/pull/2023), [#2170](https://github.com/serenity-rs/serenity/pull/2170), [#2459](https://github.com/serenity-rs/serenity/pull/2459) - Use Id types everywhere instead of `u32`, `u64`, or `NonZeroU64`.
 * [#2030](https://github.com/serenity-rs/serenity/pull/2030) - Change `{GuildId, Guild, PartialGuild}::delete` to return `Result<()>`.
 * [#2032](https://github.com/serenity-rs/serenity/pull/2032) - Replace `impl From<String> for Timestamp` with `impl TryFrom<&str>`.
@@ -673,7 +673,7 @@ Thanks to the following for their contributions:
 - [@squili]
 - [@TheBlackfurGuy]
 - [@tylerd008]
-- [@vaporox]
+- [@vaporoxx]
 - [@vicky5124]
 - [@xMAC94x]
 - [@xfix]
@@ -690,7 +690,7 @@ Thanks to the following for their contributions:
 - [builder] Add function to `CreateInteractionResponseData` to set or unset the ephemeral flag ([@pascalharp]) [c:283af98]
 - [model] Add method to create `model::Timestamp` from a UNIX timestamp ([@nickelc]) [c:66f8be7]
 - [model] Add new message flag `FAILED_TO_MENTION_SOME_ROLES_IN_THREAD` ([@nickelc]) [c:a75ac69]
-- [model] Add missing stuff for `GatewayIntents` ([@vaporox]) [c:14fc9c6]
+- [model] Add missing stuff for `GatewayIntents` ([@vaporoxx]) [c:14fc9c6]
 - [model] Add shorthand for checking the `GUILD_MESSAGES` intent bitflag ([@Bloectasy]) [c:6f28486]
 - [model] Add `Webhook::get_message` for retrieving messages sent by a webhook ([@GnomedDev]) [c:a2b388f]
 - [builder/model] Enable compilation of builder/interaction code without a backend ([@FallenWarrior2k]) [c:4cd6caa]
@@ -728,7 +728,7 @@ Thanks to the following for their contributions:
 - [model] Add Modal Interactions and Input Text ([@pascalharp]) [c:92fe5bb]
 - [builder] Add `set_components` to `EditMessage` ([@Chronophylos]) [c:57c0826]
 - [model] Add `message_id` field to audit log options for pinned/unpinned messages ([@nickelc]) [c:3a64da1]
-- [model] Add `add_member` to `Guild` and `GuildId` ([@vaporox]) [c:82c2415]
+- [model] Add `add_member` to `Guild` and `GuildId` ([@vaporoxx]) [c:82c2415]
 - [builder] Add support for `allowed_mentions` in `EditMessage` ([@acdenisSK]) [c:86dbaee]
 
 ### Changed
@@ -738,13 +738,13 @@ Thanks to the following for their contributions:
 - [model] Move `misc::Mention{able}` into their own `model/mention` module ([@mkrasnitski]) [c:f5458f1]
 - [client] Require setting gateway intents explicitly ([@kangalio]) [c:d245e67]
 - [model] Update methods and properties of `Permissions` ([@devtomio]) [c:10410a2]
-- [http] Pass parsed token to `Ratelimiter::new()` ([@vaporox]) [c:f4f310d]
-- [http] Simplify constructor functions for `Http` ([@vaporox]) [c:f8bc937]
-- [model] Remove unnecessary `CacheHttp` requirements ([@vaporox]) [c:a36353b]
+- [http] Pass parsed token to `Ratelimiter::new()` ([@vaporoxx]) [c:f4f310d]
+- [http] Simplify constructor functions for `Http` ([@vaporoxx]) [c:f8bc937]
+- [model] Remove unnecessary `CacheHttp` requirements ([@vaporoxx]) [c:a36353b]
 - [model] Update documentation around webhook components ([@mkrasnitski]) [c:6028072]
 - [misc] Format imports with module granularity ([@nickelc]) [c:4c97810]
-- [gateway] Set `Http::application_id` in ready event handler ([@vaporox]) [c:c5f9cbe]
-- [misc] Switch to using URL over URI ([@vaporox]) [c:81a9bc2]
+- [gateway] Set `Http::application_id` in ready event handler ([@vaporoxx]) [c:c5f9cbe]
+- [misc] Switch to using URL over URI ([@vaporoxx]) [c:81a9bc2]
 - [model] Deserialize the interaction data's `target_id` unconditionally ([@nickelc]) [c:c5dc80b]
 - [model] Reduce size of the `ResolvedTarget` enum variants ([@nickelc]) [c:404ab03]
 - [model] Change matches where the match expression is a bool to be more idiomatic ([@nickelc]) [c:977946f]
@@ -754,7 +754,7 @@ Thanks to the following for their contributions:
 - [model] Alter `Guild::member_named`'s implementation to use `utils::parse_user_tag` ([@mkrasnitski]) [c:8c9670f]
 - [utils] Make `ArgumentConvert` compatible without the `cache` feature ([@kangalio]) [c:cdaa70c]
 - [model] Document that the `MESSAGE_CONTENT` intent is now privileged ([@kangalio]) [c:63a1000]
-- [client] Use `Option` in more places in the `ClientBuilder` ([@vaporox]) [c:8bca94a]
+- [client] Use `Option` in more places in the `ClientBuilder` ([@vaporoxx]) [c:8bca94a]
 - [misc] Simplify the hidden preparation code in doc examples ([@nickelc]) [c:d67a21d]
 - [model] Remove kind check for sending webhook components ([@GnomedDev]) [c:a292c2f]
 - [model] Remove the `unstable_discord_api` feature guard from the application commands ([@nickelc]) [c:1ce8060]
@@ -774,7 +774,7 @@ Thanks to the following for their contributions:
 - [cache] Temporarily cache users and channels in the `to_user` and `to_channel` functions ([@Milo123459]) [c:1be625b]
 - [model] Rename the enum sub types of the audit log actions ([@nickelc]) [c:56c40fc]
 - [model] Make the `model::guild::audit_log` module public ([@nickelc]) [c:7d99bcb]
-- [collector] Make collector builders synchronous ([@vaporox]) [c:d640238]
+- [collector] Make collector builders synchronous ([@vaporoxx]) [c:d640238]
 - [model] Change the data mapping of `AuditLogs` ([@nickelc]) [c:7823b6e]
 - [model] Move the audit log serde modules into a separate `utils` module ([@nickelc]) [c:5a4fd2a]
 - [model] Change the audit log `Change` struct into an enum with the actual types ([@nickelc]) [c:594a00d]
@@ -782,7 +782,7 @@ Thanks to the following for their contributions:
 - [misc] Update `dashmap` to v5.1.0 ([@acdenisSK] [@vicky5124] [@Some-Dood]) [c:6298f67] [c:342fdbb] [c:28e0311]
 - [model] Replace deserialization helper functions with the required types ([@nickelc]) [c:938936e]
 - [model] Implement `serde` traits for the audit `Action` enum directly ([@nickelc]) [c:0f77d31]
-- [http] Refactor `HttpBuilder` to avoid `unwrap` calls ([@vaporox]) [c:89499b2]
+- [http] Refactor `HttpBuilder` to avoid `unwrap` calls ([@vaporoxx]) [c:89499b2]
 - [utils] Move token parse and validate functions into the `utils::token` module ([@nickelc]) [c:97ea22f]
 - [model] Make certain embed fields optional  ([@Chronophylos]) [c:daa9434]
 - [utils] Move `utils::content_safe` and dependants into its own module ([@nickelc]) [c:ab4e7fe]
@@ -886,9 +886,9 @@ Thanks to the following for their contributions:
 - [misc] Remove the `Error::Num` enum variant ([@nickelc]) [c:2596927]
 - [any] Remove redundant `ClientBuilder::application_id` field ([@nickelc]) [c:d7ef273]
 - [misc] Remove the `Error::Rustls` enum variant ([@nickelc]) [c:8d3a079]
-- [framework] Remove unused `found_group_prefix` parameter ([@vaporox]) [c:e283b51]
-- [misc] Remove unused `update_cache_timeout` from `CacheAndHttp` ([@vaporox]) [c:c2b9445]
-- [misc] Remove `*tls_backend_marker` features ([@vaporox]) [c:16661a3]
+- [framework] Remove unused `found_group_prefix` parameter ([@vaporoxx]) [c:e283b51]
+- [misc] Remove unused `update_cache_timeout` from `CacheAndHttp` ([@vaporoxx]) [c:c2b9445]
+- [misc] Remove `*tls_backend_marker` features ([@vaporoxx]) [c:16661a3]
 - [client] Remove unused `client::Extras` struct ([@nickelc]) [c:1ed7ac5]
 - [model] Remove sunsetted store channel type ([@nickelc]) [c:1976428] [c:8b21193]
 - [misc] Remove superfluous error heading ([@nickelc]) [c:c92acfd]
@@ -898,7 +898,7 @@ Thanks to the following for their contributions:
 - [model] Remove unused `model::guild::Target` enum ([@nickelc]) [c:b767215]
 - [model] Remove manual deserialization of `AuditLogs` ([@nickelc]) [c:16dcc69]
 - [misc] Remove deprecated `Error::description` implementation ([@nickelc]) [c:63cdeec]
-- [http] Remove usage of `Arc` for `reqwest::Client` ([@vaporox]) [c:a1cdd7f]
+- [http] Remove usage of `Arc` for `reqwest::Client` ([@vaporoxx]) [c:a1cdd7f]
 - [model] Remove the unused `Component` enum ([@nickelc]) [c:1e11fb4]
 - [misc] Remove deprecated fields, gateway events, endpoints and traits ([@nickelc]) [c:75062ae]
 - [model] Remove workaround for serde_json's `arbitrary_precision` feature ([@nickelc]) [c:bc77218]
@@ -5667,7 +5667,6 @@ Initial commit.
 [@Unoqwy]: https://github.com/Unoqwy
 [@u5surf]: https://github.com/u5surf
 [@Vaimer9]: https://github.com/Vaimer9
-[@vaporox]: https://github.com/vaporoxx
 [@vaporoxx]: https://github.com/vaporoxx
 [@vicky5124]: https://github.com/vicky5124
 [@vityafx]: https://github.com/vityafx
