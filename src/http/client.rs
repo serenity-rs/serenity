@@ -2437,7 +2437,7 @@ impl Http {
     ) -> Result<Message> {
         let mut params = ArrayVec::<_, 1>::new();
         if let Some(thread_id) = thread_id {
-            params.push(("thread_id", thread_id.to_string()))
+            params.push(("thread_id", thread_id.to_string()));
         }
 
         self.fire(Request {
@@ -2467,7 +2467,7 @@ impl Http {
     ) -> Result<Message> {
         let mut params = ArrayVec::<_, 1>::new();
         if let Some(thread_id) = thread_id {
-            params.push(("thread_id", thread_id.to_string()))
+            params.push(("thread_id", thread_id.to_string()));
         }
 
         let mut request = Request {
@@ -2506,7 +2506,7 @@ impl Http {
     ) -> Result<()> {
         let mut params = ArrayVec::<_, 1>::new();
         if let Some(thread_id) = thread_id {
-            params.push(("thread_id", thread_id.to_string()))
+            params.push(("thread_id", thread_id.to_string()));
         }
 
         self.wind(204, Request {
