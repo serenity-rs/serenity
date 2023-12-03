@@ -463,19 +463,23 @@ pub(crate) fn user_has_perms_cache(
 pub(crate) fn user_perms(cache: impl AsRef<Cache>, channel_id: ChannelId) -> Result<Permissions> {
     let cache = cache.as_ref();
 
-    let Some(channel) = cache.channel(channel_id) else {
+    let Some(guild_id) = cache.channels.get(&channel_id).map(|c| *c) else {
         return Err(Error::Model(ModelError::ChannelNotFound));
     };
 
-    let Some(guild) = cache.guild(channel.guild_id) else {
+    let Some(guild) = cache.guild(guild_id) else {
         return Err(Error::Model(ModelError::GuildNotFound));
+    };
+
+    let Some(channel) = guild.channels.get(&channel_id) else {
+        return Err(Error::Model(ModelError::ChannelNotFound));
     };
 
     let Some(member) = guild.members.get(&cache.current_user().id) else {
         return Err(Error::Model(ModelError::MemberNotFound));
     };
 
-    Ok(guild.user_permissions_in(&channel, member))
+    Ok(guild.user_permissions_in(channel, member))
 }
 
 /// Calculates the Id of the shard responsible for a guild, given its Id and total number of shards
