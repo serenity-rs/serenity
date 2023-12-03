@@ -1,6 +1,3 @@
-// Or we'll get deprecation warnings from our own deprecated type (seriously Rust?)
-#![allow(deprecated)]
-
 use futures::future::pending;
 use futures::{Stream, StreamExt as _};
 
@@ -127,12 +124,6 @@ macro_rules! make_specific_collector {
                 stream.take_until(Box::pin(timeout))
             }
 
-            /// Deprecated, use [`Self::stream()`] instead.
-            #[deprecated = "use `.stream()` instead"]
-            pub fn build(self) -> impl Stream<Item = $item_type> {
-                self.stream()
-            }
-
             #[doc = concat!("Returns the next [`", stringify!($item_type), "`] which passes the filters.")]
             #[doc = concat!("You can also call `.await` on the [`", stringify!($collector_type), "`] directly.")]
             pub async fn next(self) -> Option<$item_type> {
@@ -194,9 +185,4 @@ make_specific_collector!(
     author_id: UserId => message.author.id == *author_id,
     channel_id: ChannelId => message.channel_id == *channel_id,
     guild_id: GuildId => message.guild_id.map_or(true, |g| g == *guild_id),
-);
-make_specific_collector!(
-    #[deprecated = "prefer the stand-alone collect() function to collect arbitrary events"]
-    EventCollector, Event,
-    event => event,
 );

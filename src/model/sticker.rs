@@ -22,23 +22,6 @@ impl StickerPackId {
 
 #[cfg(feature = "model")]
 impl StickerId {
-    /// Delete a guild sticker.
-    ///
-    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
-    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
-    /// Expressions] permission is required.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    #[deprecated = "use `GuildId::delete_sticker` instead"]
-    pub async fn delete(self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
-        guild_id.into().delete_sticker(http, self).await
-    }
-
     /// Requests the sticker via the REST API to get a [`Sticker`] with all details.
     ///
     /// # Errors
@@ -47,28 +30,6 @@ impl StickerId {
     /// otherwise unavailable.
     pub async fn to_sticker(self, http: impl AsRef<Http>) -> Result<Sticker> {
         http.as_ref().get_sticker(self).await
-    }
-
-    /// Edits the sticker.
-    ///
-    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
-    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
-    /// Expressions] permission is required.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    ///
-    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    #[deprecated = "use `GuildId::edit_sticker` instead"]
-    pub async fn edit(
-        self,
-        cache_http: impl CacheHttp,
-        guild_id: impl Into<GuildId>,
-        builder: EditSticker<'_>,
-    ) -> Result<Sticker> {
-        guild_id.into().edit_sticker(cache_http, self, builder).await
     }
 }
 
