@@ -18,20 +18,22 @@ use crate::constants;
 use crate::internal::prelude::*;
 
 #[deprecated = "use Request directly now"]
-pub type RequestBuilder<'a> = Request<'a>;
+pub type RequestBuilder<'a, Params> = Request<'a, Params>;
+
+pub type NoParams = std::iter::Empty<(&'static str, String)>;
 
 #[derive(Clone, Debug)]
 #[must_use]
-pub struct Request<'a> {
+pub struct Request<'a, Params> {
     pub(super) body: Option<Vec<u8>>,
     pub(super) multipart: Option<Multipart>,
     pub(super) headers: Option<Headers>,
     pub(super) method: LightMethod,
     pub(super) route: Route<'a>,
-    pub(super) params: Option<Vec<(&'static str, String)>>,
+    pub(super) params: Option<Params>,
 }
 
-impl<'a> Request<'a> {
+impl<'a> Request<'a, Vec<(&'static str, String)>> {
     pub const fn new(route: Route<'a>, method: LightMethod) -> Self {
         Self {
             body: None,
@@ -42,7 +44,9 @@ impl<'a> Request<'a> {
             params: None,
         }
     }
+}
 
+impl<'a, Params> Request<'a, Params> {
     pub fn body(mut self, body: Option<Vec<u8>>) -> Self {
         self.body = body;
         self
@@ -58,9 +62,56 @@ impl<'a> Request<'a> {
         self
     }
 
-    pub fn params(mut self, params: Option<Vec<(&'static str, String)>>) -> Self {
+    #[must_use]
+    pub fn body_ref(&self) -> Option<&[u8]> {
+        self.body.as_deref()
+    }
+
+    #[must_use]
+    pub fn body_mut(&mut self) -> Option<&mut [u8]> {
+        self.body.as_deref_mut()
+    }
+
+    #[must_use]
+    pub fn headers_ref(&self) -> &Option<Headers> {
+        &self.headers
+    }
+
+    #[must_use]
+    pub fn headers_mut(&mut self) -> &mut Option<Headers> {
+        &mut self.headers
+    }
+
+    #[must_use]
+    pub fn method_ref(&self) -> &LightMethod {
+        &self.method
+    }
+
+    #[must_use]
+    pub fn route_ref(&self) -> &Route<'_> {
+        &self.route
+    }
+}
+
+// Makes sure only methods that use the params actually need to bound on them.
+impl<'a, Params> Request<'a, Params>
+where
+    Params: IntoIterator<Item = (&'static str, String)>,
+    Params: std::fmt::Debug + Clone,
+{
+    pub fn params(mut self, params: Option<Params>) -> Self {
         self.params = params;
         self
+    }
+
+    #[must_use]
+    pub fn params_ref(&self) -> Option<&Params> {
+        self.params.as_ref()
+    }
+
+    #[must_use]
+    pub fn params_mut(&mut self) -> Option<&mut Params> {
+        self.params.as_mut()
     }
 
     #[instrument(skip(token))]
@@ -104,45 +155,5 @@ impl<'a> Request<'a> {
         }
 
         Ok(builder.headers(headers))
-    }
-
-    #[must_use]
-    pub fn body_ref(&self) -> Option<&[u8]> {
-        self.body.as_deref()
-    }
-
-    #[must_use]
-    pub fn body_mut(&mut self) -> Option<&mut [u8]> {
-        self.body.as_deref_mut()
-    }
-
-    #[must_use]
-    pub fn headers_ref(&self) -> &Option<Headers> {
-        &self.headers
-    }
-
-    #[must_use]
-    pub fn headers_mut(&mut self) -> &mut Option<Headers> {
-        &mut self.headers
-    }
-
-    #[must_use]
-    pub fn method_ref(&self) -> &LightMethod {
-        &self.method
-    }
-
-    #[must_use]
-    pub fn route_ref(&self) -> &Route<'_> {
-        &self.route
-    }
-
-    #[must_use]
-    pub fn params_ref(&self) -> Option<&[(&'static str, String)]> {
-        self.params.as_deref()
-    }
-
-    #[must_use]
-    pub fn params_mut(&mut self) -> Option<&mut [(&'static str, String)]> {
-        self.params.as_deref_mut()
     }
 }

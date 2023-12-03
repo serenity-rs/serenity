@@ -179,7 +179,11 @@ impl Ratelimiter {
     ///
     /// Only error kind that may be returned is [`Error::Http`].
     #[instrument]
-    pub async fn perform(&self, req: Request<'_>) -> Result<Response> {
+    pub async fn perform<Params>(&self, req: Request<'_, Params>) -> Result<Response>
+    where
+        Params: IntoIterator<Item = (&'static str, String)>,
+        Params: std::fmt::Debug + Clone,
+    {
         loop {
             // This will block if another thread hit the global ratelimit.
             drop(self.global.lock().await);
@@ -278,9 +282,9 @@ pub struct Ratelimit {
 
 impl Ratelimit {
     #[instrument(skip(ratelimit_callback))]
-    pub async fn pre_hook(
+    pub async fn pre_hook<Params: std::fmt::Debug>(
         &mut self,
-        req: &Request<'_>,
+        req: &Request<'_, Params>,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
     ) {
         if self.limit() == 0 {
@@ -324,10 +328,10 @@ impl Ratelimit {
     }
 
     #[instrument(skip(ratelimit_callback))]
-    pub async fn post_hook(
+    pub async fn post_hook<Params: std::fmt::Debug>(
         &mut self,
         response: &Response,
-        req: &Request<'_>,
+        req: &Request<'_, Params>,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
         absolute_ratelimits: bool,
     ) -> Result<bool> {
