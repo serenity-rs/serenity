@@ -17,9 +17,6 @@ use super::{HttpError, LightMethod};
 use crate::constants;
 use crate::internal::prelude::*;
 
-#[deprecated = "use Request directly now"]
-pub type RequestBuilder<'a, Params> = Request<'a, Params>;
-
 pub type NoParams = std::iter::Empty<(&'static str, String)>;
 
 #[derive(Clone, Debug)]

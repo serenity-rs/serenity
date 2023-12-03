@@ -28,10 +28,6 @@ use crate::model::prelude::*;
 use crate::model::utils::is_false;
 use crate::model::Timestamp;
 
-#[deprecated = "use CreateAttachment instead"]
-#[cfg(feature = "model")]
-pub type AttachmentType<'a> = crate::builder::CreateAttachment;
-
 /// A container for any channel.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
