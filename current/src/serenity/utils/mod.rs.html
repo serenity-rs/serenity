@@ -554,6 +554,10 @@
 <a href="#554" id="554">554</a>
 <a href="#555" id="555">555</a>
 <a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
@@ -1019,19 +1023,23 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_perms(cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
     <span class="kw">let </span>cache = cache.as_ref();
 
-    <span class="kw">let </span><span class="prelude-val">Some</span>(channel) = cache.channel(channel_id) <span class="kw">else </span>{
+    <span class="kw">let </span><span class="prelude-val">Some</span>(guild_id) = cache.channels.get(<span class="kw-2">&amp;</span>channel_id).map(|c| <span class="kw-2">*</span>c) <span class="kw">else </span>{
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::ChannelNotFound));
     };
 
-    <span class="kw">let </span><span class="prelude-val">Some</span>(guild) = cache.guild(channel.guild_id) <span class="kw">else </span>{
+    <span class="kw">let </span><span class="prelude-val">Some</span>(guild) = cache.guild(guild_id) <span class="kw">else </span>{
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::GuildNotFound));
+    };
+
+    <span class="kw">let </span><span class="prelude-val">Some</span>(channel) = guild.channels.get(<span class="kw-2">&amp;</span>channel_id) <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::ChannelNotFound));
     };
 
     <span class="kw">let </span><span class="prelude-val">Some</span>(member) = guild.members.get(<span class="kw-2">&amp;</span>cache.current_user().id) <span class="kw">else </span>{
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MemberNotFound));
     };
 
-    <span class="prelude-val">Ok</span>(guild.user_permissions_in(<span class="kw-2">&amp;</span>channel, member))
+    <span class="prelude-val">Ok</span>(guild.user_permissions_in(channel, member))
 }
 
 <span class="doccomment">/// Calculates the Id of the shard responsible for a guild, given its Id and total number of shards
