@@ -27,7 +27,6 @@ use super::{
     HttpError,
     LightMethod,
     MessagePagination,
-    NoParams,
     UserPagination,
 };
 use crate::builder::CreateAttachment;
@@ -228,7 +227,7 @@ impl Http {
         let body = to_vec(map)?;
 
         let response = self
-            .request(Request::<NoParams> {
+            .request(Request {
                 body: Some(body),
                 multipart: None,
                 headers: None,
@@ -237,7 +236,7 @@ impl Http {
                     guild_id,
                     user_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -260,7 +259,7 @@ impl Http {
         role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -270,7 +269,7 @@ impl Http {
                 role_id,
                 user_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -300,7 +299,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: Some([("delete_message_days", delete_message_days.to_string())]),
+            params: [("delete_message_days", delete_message_days.to_string())].into(),
         })
         .await
     }
@@ -313,7 +312,7 @@ impl Http {
     /// This should rarely be used for bots, although it is a good indicator that a long-running
     /// command is still being processed.
     pub async fn broadcast_typing(&self, channel_id: ChannelId) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -321,7 +320,7 @@ impl Http {
             route: Route::ChannelTyping {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -342,7 +341,7 @@ impl Http {
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -350,7 +349,7 @@ impl Http {
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -361,13 +360,13 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<StageInstance> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
             route: Route::StageInstances,
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -382,7 +381,7 @@ impl Http {
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -391,7 +390,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -405,7 +404,7 @@ impl Http {
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -413,7 +412,7 @@ impl Http {
             route: Route::ChannelThreads {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -427,7 +426,7 @@ impl Http {
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -435,7 +434,7 @@ impl Http {
             route: Route::ChannelForumPosts {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -453,7 +452,7 @@ impl Http {
         map: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -461,7 +460,7 @@ impl Http {
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -475,7 +474,7 @@ impl Http {
         map: &impl serde::Serialize,
         files: Vec<CreateAttachment>,
     ) -> Result<Message> {
-        let mut request = Request::<NoParams> {
+        let mut request = Request {
             body: None,
             multipart: None,
             headers: None,
@@ -484,7 +483,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: None,
+            params: [].into(),
         };
 
         if files.is_empty() {
@@ -511,7 +510,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     pub async fn create_global_command(&self, map: &impl serde::Serialize) -> Result<Command> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -519,7 +518,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -529,7 +528,7 @@ impl Http {
         &self,
         map: &impl serde::Serialize,
     ) -> Result<Vec<Command>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -537,7 +536,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -548,7 +547,7 @@ impl Http {
         guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<Vec<Command>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -557,7 +556,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -596,13 +595,13 @@ impl Http {
     /// https://discord.com/developers/docs/resources/guild#create-guild
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub async fn create_guild(&self, map: &Value) -> Result<PartialGuild> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             method: LightMethod::Post,
             route: Route::Guilds,
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -619,7 +618,7 @@ impl Http {
         guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<Command> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -628,7 +627,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -648,7 +647,7 @@ impl Http {
         map: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -657,7 +656,7 @@ impl Http {
                 guild_id,
                 integration_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -675,7 +674,7 @@ impl Http {
         map: &impl serde::Serialize,
         files: Vec<CreateAttachment>,
     ) -> Result<()> {
-        let mut request = Request::<NoParams> {
+        let mut request = Request {
             body: None,
             multipart: None,
             headers: None,
@@ -684,7 +683,7 @@ impl Http {
                 interaction_id,
                 token: interaction_token,
             },
-            params: None,
+            params: [].into(),
         };
 
         if files.is_empty() {
@@ -718,7 +717,7 @@ impl Http {
     ) -> Result<RichInvite> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -726,7 +725,7 @@ impl Http {
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -741,7 +740,7 @@ impl Http {
     ) -> Result<()> {
         let body = to_vec(map)?;
 
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -750,7 +749,7 @@ impl Http {
                 channel_id,
                 target_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -759,13 +758,13 @@ impl Http {
     pub async fn create_private_channel(&self, map: &Value) -> Result<PrivateChannel> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: None,
             method: LightMethod::Post,
             route: Route::UserMeDmChannels,
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -777,7 +776,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -787,7 +786,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -800,7 +799,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: Some(to_vec(body)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -808,7 +807,7 @@ impl Http {
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -833,7 +832,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent> {
         let body = to_vec(map)?;
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -841,7 +840,7 @@ impl Http {
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -858,7 +857,7 @@ impl Http {
         file: CreateAttachment,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 upload: MultipartUpload::File(file),
@@ -870,7 +869,7 @@ impl Http {
             route: Route::GuildStickers {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -909,7 +908,7 @@ impl Http {
     ) -> Result<Webhook> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -917,7 +916,7 @@ impl Http {
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -928,7 +927,7 @@ impl Http {
         channel_id: ChannelId,
         audit_log_reason: Option<&str>,
     ) -> Result<Channel> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -936,7 +935,7 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -947,7 +946,7 @@ impl Http {
         channel_id: ChannelId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -955,7 +954,7 @@ impl Http {
             route: Route::StageInstance {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -969,7 +968,7 @@ impl Http {
         emoji_id: EmojiId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -978,7 +977,7 @@ impl Http {
                 guild_id,
                 emoji_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -989,7 +988,7 @@ impl Http {
         interaction_token: &str,
         message_id: MessageId,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -999,14 +998,14 @@ impl Http {
                 token: interaction_token,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Deletes a global command.
     pub async fn delete_global_command(&self, command_id: CommandId) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1015,14 +1014,14 @@ impl Http {
                 application_id: self.try_application_id()?,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Deletes a guild, only if connected account owns it.
     pub async fn delete_guild(&self, guild_id: GuildId) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1030,7 +1029,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1041,7 +1040,7 @@ impl Http {
         guild_id: GuildId,
         command_id: CommandId,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1051,7 +1050,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1063,7 +1062,7 @@ impl Http {
         integration_id: IntegrationId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1072,7 +1071,7 @@ impl Http {
                 guild_id,
                 integration_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1083,7 +1082,7 @@ impl Http {
         code: &str,
         audit_log_reason: Option<&str>,
     ) -> Result<Invite> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1091,7 +1090,7 @@ impl Http {
             route: Route::Invite {
                 code,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1103,7 +1102,7 @@ impl Http {
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1112,7 +1111,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1124,7 +1123,7 @@ impl Http {
         map: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1132,7 +1131,7 @@ impl Http {
             route: Route::ChannelMessagesBulkDelete {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1160,7 +1159,7 @@ impl Http {
         channel_id: ChannelId,
         message_id: MessageId,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1169,7 +1168,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1181,7 +1180,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1191,7 +1190,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1201,7 +1200,7 @@ impl Http {
         &self,
         interaction_token: &str,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1210,7 +1209,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1222,7 +1221,7 @@ impl Http {
         target_id: TargetId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1231,7 +1230,7 @@ impl Http {
                 channel_id,
                 target_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1244,7 +1243,7 @@ impl Http {
         user_id: UserId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1255,7 +1254,7 @@ impl Http {
                 user_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1267,7 +1266,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1277,7 +1276,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1289,7 +1288,7 @@ impl Http {
         role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1298,7 +1297,7 @@ impl Http {
                 guild_id,
                 role_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1314,7 +1313,7 @@ impl Http {
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1323,7 +1322,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1337,7 +1336,7 @@ impl Http {
         sticker_id: StickerId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1346,7 +1345,7 @@ impl Http {
                 guild_id,
                 sticker_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1375,7 +1374,7 @@ impl Http {
         webhook_id: WebhookId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1383,7 +1382,7 @@ impl Http {
             route: Route::Webhook {
                 webhook_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1415,7 +1414,7 @@ impl Http {
         token: &str,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1424,7 +1423,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1438,7 +1437,7 @@ impl Http {
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1446,7 +1445,7 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1458,7 +1457,7 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<StageInstance> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1466,7 +1465,7 @@ impl Http {
             route: Route::StageInstance {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1483,7 +1482,7 @@ impl Http {
     ) -> Result<Emoji> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1492,7 +1491,7 @@ impl Http {
                 guild_id,
                 emoji_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1509,7 +1508,7 @@ impl Http {
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
-        let mut request = Request::<NoParams> {
+        let mut request = Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1519,7 +1518,7 @@ impl Http {
                 token: interaction_token,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         };
 
         if new_attachments.is_empty() {
@@ -1545,7 +1544,7 @@ impl Http {
         interaction_token: &str,
         message_id: MessageId,
     ) -> Result<Message> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1555,7 +1554,7 @@ impl Http {
                 token: interaction_token,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1572,7 +1571,7 @@ impl Http {
         command_id: CommandId,
         map: &impl serde::Serialize,
     ) -> Result<Command> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -1581,7 +1580,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1595,7 +1594,7 @@ impl Http {
     ) -> Result<PartialGuild> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1603,7 +1602,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1621,7 +1620,7 @@ impl Http {
         command_id: CommandId,
         map: &impl serde::Serialize,
     ) -> Result<Command> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -1631,7 +1630,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1649,7 +1648,7 @@ impl Http {
         command_id: CommandId,
         map: &impl serde::Serialize,
     ) -> Result<CommandPermissions> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -1659,7 +1658,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1672,7 +1671,7 @@ impl Http {
     ) -> Result<()> {
         let body = to_vec(value)?;
 
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: Some(body),
             multipart: None,
             headers: None,
@@ -1680,7 +1679,7 @@ impl Http {
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1699,7 +1698,7 @@ impl Http {
 
         let body = to_vec(value)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1707,7 +1706,7 @@ impl Http {
             route: Route::GuildMfa {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
         .map(|mfa: GuildMfaLevel| mfa.level)
@@ -1722,7 +1721,7 @@ impl Http {
     ) -> Result<GuildWidget> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1730,7 +1729,7 @@ impl Http {
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1744,7 +1743,7 @@ impl Http {
     ) -> Result<GuildWelcomeScreen> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1752,7 +1751,7 @@ impl Http {
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1768,7 +1767,7 @@ impl Http {
         let body = to_vec(map)?;
 
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -1777,7 +1776,7 @@ impl Http {
                     guild_id,
                     user_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -1798,7 +1797,7 @@ impl Http {
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
-        let mut request = Request::<NoParams> {
+        let mut request = Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1807,7 +1806,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         };
 
         if new_attachments.is_empty() {
@@ -1831,7 +1830,7 @@ impl Http {
         channel_id: ChannelId,
         message_id: MessageId,
     ) -> Result<Message> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1840,7 +1839,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1854,7 +1853,7 @@ impl Http {
     ) -> Result<Member> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1862,7 +1861,7 @@ impl Http {
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1879,7 +1878,7 @@ impl Http {
         let map = json!({ "nick": new_nickname });
         let body = to_vec(&map)?;
 
-        self.wind(200, Request::<NoParams> {
+        self.wind(200, Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1887,7 +1886,7 @@ impl Http {
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1901,7 +1900,7 @@ impl Http {
         let map = json!({ "webhook_channel_id": target_channel_id });
         let body = to_vec(&map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: None,
@@ -1909,7 +1908,7 @@ impl Http {
             route: Route::ChannelFollowNews {
                 channel_id: news_channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1919,7 +1918,7 @@ impl Http {
         &self,
         interaction_token: &str,
     ) -> Result<Message> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1928,7 +1927,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1944,7 +1943,7 @@ impl Http {
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
-        let mut request = Request::<NoParams> {
+        let mut request = Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1953,7 +1952,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: None,
+            params: [].into(),
         };
 
         if new_attachments.is_empty() {
@@ -1973,13 +1972,13 @@ impl Http {
     pub async fn edit_profile(&self, map: &impl serde::Serialize) -> Result<CurrentUser> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: None,
             method: LightMethod::Patch,
             route: Route::UserMe,
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1993,7 +1992,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: Some(to_vec(map)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -2002,7 +2001,7 @@ impl Http {
                     guild_id,
                     role_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -2028,7 +2027,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -2036,7 +2035,7 @@ impl Http {
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -2064,7 +2063,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent> {
         let body = to_vec(map)?;
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2073,7 +2072,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2091,7 +2090,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -2100,7 +2099,7 @@ impl Http {
                     guild_id,
                     sticker_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -2118,7 +2117,7 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2126,7 +2125,7 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2167,7 +2166,7 @@ impl Http {
         user_id: UserId,
         map: &impl serde::Serialize,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -2176,7 +2175,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2219,7 +2218,7 @@ impl Http {
         guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -2227,7 +2226,7 @@ impl Http {
             route: Route::GuildVoiceStateMe {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2270,7 +2269,7 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2278,7 +2277,7 @@ impl Http {
             route: Route::Webhook {
                 webhook_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2317,7 +2316,7 @@ impl Http {
     ) -> Result<Webhook> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2326,7 +2325,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2397,7 +2396,7 @@ impl Http {
             params.push(("thread_id", thread_id.to_string()));
         }
 
-        let mut request = Request::<ArrayVec<_, 2>> {
+        let mut request = Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2406,7 +2405,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: Some(params),
+            params,
         };
 
         if files.is_empty() {
@@ -2436,6 +2435,11 @@ impl Http {
         token: &str,
         message_id: MessageId,
     ) -> Result<Message> {
+        let mut params = ArrayVec::<_, 1>::new();
+        if let Some(thread_id) = thread_id {
+            params.push(("thread_id", thread_id.to_string()))
+        }
+
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2446,7 +2450,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| [("thread_id", thread_id.to_string())]),
+            params,
         })
         .await
     }
@@ -2461,6 +2465,11 @@ impl Http {
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment>,
     ) -> Result<Message> {
+        let mut params = ArrayVec::<_, 1>::new();
+        if let Some(thread_id) = thread_id {
+            params.push(("thread_id", thread_id.to_string()))
+        }
+
         let mut request = Request {
             body: None,
             multipart: None,
@@ -2471,7 +2480,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| [("thread_id", thread_id.to_string())]),
+            params,
         };
 
         if new_attachments.is_empty() {
@@ -2495,6 +2504,11 @@ impl Http {
         token: &str,
         message_id: MessageId,
     ) -> Result<()> {
+        let mut params = ArrayVec::<_, 1>::new();
+        if let Some(thread_id) = thread_id {
+            params.push(("thread_id", thread_id.to_string()))
+        }
+
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -2505,7 +2519,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| [("thread_id", thread_id.to_string())]),
+            params,
         })
         .await
     }
@@ -2521,13 +2535,13 @@ impl Http {
         }
 
         let status: StatusResponse = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesActive,
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -2571,7 +2585,7 @@ impl Http {
             route: Route::GuildBans {
                 guild_id,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -2607,7 +2621,7 @@ impl Http {
             route: Route::GuildAuditLogs {
                 guild_id,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -2616,7 +2630,7 @@ impl Http {
     ///
     /// This method requires `MANAGE_GUILD` permissions.
     pub async fn get_automod_rules(&self, guild_id: GuildId) -> Result<Vec<Rule>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2624,7 +2638,7 @@ impl Http {
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2633,7 +2647,7 @@ impl Http {
     ///
     /// This method requires `MANAGE_GUILD` permissions.
     pub async fn get_automod_rule(&self, guild_id: GuildId, rule_id: RuleId) -> Result<Rule> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2642,7 +2656,7 @@ impl Http {
                 guild_id,
                 rule_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2658,7 +2672,7 @@ impl Http {
     ) -> Result<Rule> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2666,7 +2680,7 @@ impl Http {
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2683,7 +2697,7 @@ impl Http {
     ) -> Result<Rule> {
         let body = to_vec(map)?;
 
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2692,7 +2706,7 @@ impl Http {
                 guild_id,
                 rule_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2706,7 +2720,7 @@ impl Http {
         rule_id: RuleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2715,27 +2729,27 @@ impl Http {
                 guild_id,
                 rule_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets current bot gateway.
     pub async fn get_bot_gateway(&self) -> Result<BotGateway> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::GatewayBot,
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets all invites for a channel.
     pub async fn get_channel_invites(&self, channel_id: ChannelId) -> Result<Vec<RichInvite>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2743,7 +2757,7 @@ impl Http {
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2753,7 +2767,7 @@ impl Http {
         &self,
         channel_id: ChannelId,
     ) -> Result<Vec<ThreadMember>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2761,14 +2775,14 @@ impl Http {
             route: Route::ChannelThreadMembers {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets all active threads from a guild.
     pub async fn get_guild_active_threads(&self, guild_id: GuildId) -> Result<ThreadsData> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2776,7 +2790,7 @@ impl Http {
             route: Route::GuildThreadsActive {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2804,7 +2818,7 @@ impl Http {
             route: Route::ChannelArchivedPublicThreads {
                 channel_id,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -2832,7 +2846,7 @@ impl Http {
             route: Route::ChannelArchivedPrivateThreads {
                 channel_id,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -2860,14 +2874,14 @@ impl Http {
             route: Route::ChannelJoinedPrivateThreads {
                 channel_id,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
 
     /// Joins a thread channel.
     pub async fn join_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2875,14 +2889,14 @@ impl Http {
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Leaves a thread channel.
     pub async fn leave_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2890,7 +2904,7 @@ impl Http {
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2901,7 +2915,7 @@ impl Http {
         channel_id: ChannelId,
         user_id: UserId,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2910,7 +2924,7 @@ impl Http {
                 channel_id,
                 user_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2921,7 +2935,7 @@ impl Http {
         channel_id: ChannelId,
         user_id: UserId,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2930,7 +2944,7 @@ impl Http {
                 channel_id,
                 user_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -2956,7 +2970,7 @@ impl Http {
     /// # }
     /// ```
     pub async fn get_channel_webhooks(&self, channel_id: ChannelId) -> Result<Vec<Webhook>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2964,14 +2978,14 @@ impl Http {
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets channel information.
     pub async fn get_channel(&self, channel_id: ChannelId) -> Result<Channel> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2979,14 +2993,14 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets all channels in a guild.
     pub async fn get_channels(&self, guild_id: GuildId) -> Result<Vec<GuildChannel>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2994,14 +3008,14 @@ impl Http {
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets a stage instance.
     pub async fn get_stage_instance(&self, channel_id: ChannelId) -> Result<StageInstance> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3009,7 +3023,7 @@ impl Http {
             route: Route::StageInstance {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3018,33 +3032,33 @@ impl Http {
     ///
     /// **Note**: Only applications may use this endpoint.
     pub async fn get_current_application_info(&self) -> Result<CurrentApplicationInfo> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::Oauth2ApplicationCurrent,
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets information about the user we're connected with.
     pub async fn get_current_user(&self) -> Result<CurrentUser> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMe,
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets all emojis of a guild.
     pub async fn get_emojis(&self, guild_id: GuildId) -> Result<Vec<Emoji>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3052,14 +3066,14 @@ impl Http {
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets information about an emoji in a guild.
     pub async fn get_emoji(&self, guild_id: GuildId, emoji_id: EmojiId) -> Result<Emoji> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3068,27 +3082,27 @@ impl Http {
                 guild_id,
                 emoji_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets current gateway.
     pub async fn get_gateway(&self) -> Result<Gateway> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::Gateway,
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Fetches all of the global commands for your application.
     pub async fn get_global_commands(&self) -> Result<Vec<Command>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3096,7 +3110,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3111,14 +3125,14 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: Some([("with_localizations", String::from("true"))]),
+            params: [("with_localizations", String::from("true"))].into(),
         })
         .await
     }
 
     /// Fetches a global commands for your application by its Id.
     pub async fn get_global_command(&self, command_id: CommandId) -> Result<Command> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3127,14 +3141,14 @@ impl Http {
                 application_id: self.try_application_id()?,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets guild information.
     pub async fn get_guild(&self, guild_id: GuildId) -> Result<PartialGuild> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3142,7 +3156,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3157,14 +3171,14 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: Some([("with_counts", String::from("true"))]),
+            params: [("with_counts", String::from("true"))].into(),
         })
         .await
     }
 
     /// Fetches all of the guild commands for your application for a specific guild.
     pub async fn get_guild_commands(&self, guild_id: GuildId) -> Result<Vec<Command>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3173,7 +3187,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3193,7 +3207,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: Some([("with_localizations", String::from("true"))]),
+            params: [("with_localizations", String::from("true"))].into(),
         })
         .await
     }
@@ -3204,7 +3218,7 @@ impl Http {
         guild_id: GuildId,
         command_id: CommandId,
     ) -> Result<Command> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3214,7 +3228,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3224,7 +3238,7 @@ impl Http {
         &self,
         guild_id: GuildId,
     ) -> Result<Vec<CommandPermissions>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3233,7 +3247,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3244,7 +3258,7 @@ impl Http {
         guild_id: GuildId,
         command_id: CommandId,
     ) -> Result<CommandPermissions> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3254,7 +3268,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3263,7 +3277,7 @@ impl Http {
     // TODO: according to Discord, this returns different data; namely https://discord.com/developers/docs/resources/guild#guild-widget-object-guild-widget-structure.
     // Should investigate if this endpoint actually works
     pub async fn get_guild_widget(&self, guild_id: GuildId) -> Result<GuildWidget> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3271,14 +3285,14 @@ impl Http {
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets a guild preview.
     pub async fn get_guild_preview(&self, guild_id: GuildId) -> Result<GuildPreview> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3286,14 +3300,14 @@ impl Http {
             route: Route::GuildPreview {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets a guild welcome screen information.
     pub async fn get_guild_welcome_screen(&self, guild_id: GuildId) -> Result<GuildWelcomeScreen> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3301,14 +3315,14 @@ impl Http {
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets integrations that a guild has.
     pub async fn get_guild_integrations(&self, guild_id: GuildId) -> Result<Vec<Integration>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3316,14 +3330,14 @@ impl Http {
             route: Route::GuildIntegrations {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets all invites to a guild.
     pub async fn get_guild_invites(&self, guild_id: GuildId) -> Result<Vec<RichInvite>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3331,7 +3345,7 @@ impl Http {
             route: Route::GuildInvites {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3343,7 +3357,7 @@ impl Http {
             code: String,
         }
 
-        self.fire::<NoParams, GuildVanityUrl>(Request {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3351,10 +3365,10 @@ impl Http {
             route: Route::GuildVanityUrl {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
-        .map(|x| x.code)
+        .map(|x: GuildVanityUrl| x.code)
     }
 
     /// Gets the members of a guild. Optionally pass a `limit` and the Id of the user to offset the
@@ -3386,7 +3400,7 @@ impl Http {
                 route: Route::GuildMembers {
                     guild_id,
                 },
-                params: Some(params),
+                params,
             })
             .await?;
 
@@ -3411,7 +3425,7 @@ impl Http {
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: Some([("days", days.to_string())]),
+            params: [("days", days.to_string())].into(),
         })
         .await
     }
@@ -3419,7 +3433,7 @@ impl Http {
     /// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature enabled, then
     /// additional VIP-only regions are returned.
     pub async fn get_guild_regions(&self, guild_id: GuildId) -> Result<Vec<VoiceRegion>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3427,7 +3441,7 @@ impl Http {
             route: Route::GuildRegions {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3435,7 +3449,7 @@ impl Http {
     /// Retrieves a list of roles in a [`Guild`].
     pub async fn get_guild_roles(&self, guild_id: GuildId) -> Result<Vec<Role>> {
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3443,7 +3457,7 @@ impl Http {
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -3478,7 +3492,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: Some([("with_user_count", with_user_count.to_string())]),
+            params: [("with_user_count", with_user_count.to_string())].into(),
         })
         .await
     }
@@ -3501,7 +3515,7 @@ impl Http {
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: Some([("with_user_count", with_user_count.to_string())]),
+            params: [("with_user_count", with_user_count.to_string())].into(),
         })
         .await
     }
@@ -3553,7 +3567,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -3561,7 +3575,7 @@ impl Http {
     /// Retrieves a list of stickers in a [`Guild`].
     pub async fn get_guild_stickers(&self, guild_id: GuildId) -> Result<Vec<Sticker>> {
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3569,7 +3583,7 @@ impl Http {
                 route: Route::GuildStickers {
                     guild_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -3591,7 +3605,7 @@ impl Http {
         sticker_id: StickerId,
     ) -> Result<Sticker> {
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3600,7 +3614,7 @@ impl Http {
                     guild_id,
                     sticker_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -3632,7 +3646,7 @@ impl Http {
     /// # }
     /// ```
     pub async fn get_guild_webhooks(&self, guild_id: GuildId) -> Result<Vec<Webhook>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3640,7 +3654,7 @@ impl Http {
             route: Route::GuildWebhooks {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3693,7 +3707,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMeGuilds,
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -3729,7 +3743,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
     pub async fn get_current_user_guild_member(&self, guild_id: GuildId) -> Result<Member> {
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3737,7 +3751,7 @@ impl Http {
                 route: Route::UserMeGuildMember {
                     guild_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -3784,7 +3798,7 @@ impl Http {
             route: Route::Invite {
                 code,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -3792,7 +3806,7 @@ impl Http {
     /// Gets member of a guild.
     pub async fn get_member(&self, guild_id: GuildId, user_id: UserId) -> Result<Member> {
         let mut value: Value = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3801,7 +3815,7 @@ impl Http {
                     guild_id,
                     user_id,
                 },
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -3818,7 +3832,7 @@ impl Http {
         channel_id: ChannelId,
         message_id: MessageId,
     ) -> Result<Message> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3827,7 +3841,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3859,7 +3873,7 @@ impl Http {
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -3871,21 +3885,21 @@ impl Http {
             sticker_packs: Vec<StickerPack>,
         }
 
-        self.fire::<NoParams, StickerPacks>(Request {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::StickerPacks,
-            params: None,
+            params: [].into(),
         })
         .await
-        .map(|s| s.sticker_packs)
+        .map(|s: StickerPacks| s.sticker_packs)
     }
 
     /// Gets all pins of a channel.
     pub async fn get_pins(&self, channel_id: ChannelId) -> Result<Vec<Message>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3893,7 +3907,7 @@ impl Http {
             route: Route::ChannelPins {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3922,14 +3936,14 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: Some(params),
+            params,
         })
         .await
     }
 
     /// Gets a sticker.
     pub async fn get_sticker(&self, sticker_id: StickerId) -> Result<Sticker> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3937,7 +3951,7 @@ impl Http {
             route: Route::Sticker {
                 sticker_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3953,13 +3967,13 @@ impl Http {
         }
 
         let status: StatusResponse = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
                 method: LightMethod::Get,
                 route: Route::StatusIncidentsUnresolved,
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -3977,13 +3991,13 @@ impl Http {
         }
 
         let status: StatusResponse = self
-            .fire(Request::<NoParams> {
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesUpcoming,
-                params: None,
+                params: [].into(),
             })
             .await?;
 
@@ -3992,7 +4006,7 @@ impl Http {
 
     /// Gets a user by Id.
     pub async fn get_user(&self, user_id: UserId) -> Result<User> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4000,7 +4014,7 @@ impl Http {
             route: Route::User {
                 user_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4011,39 +4025,39 @@ impl Http {
     ///
     /// [`Connections`]: crate::model::application::Scope::Connections
     pub async fn get_user_connections(&self) -> Result<Vec<Connection>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMeConnections,
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets our DM channels.
     pub async fn get_user_dm_channels(&self) -> Result<Vec<PrivateChannel>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMeDmChannels,
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Gets all voice regions.
     pub async fn get_voice_regions(&self) -> Result<Vec<VoiceRegion>> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Get,
             route: Route::VoiceRegions,
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4069,7 +4083,7 @@ impl Http {
     /// # }
     /// ```
     pub async fn get_webhook(&self, webhook_id: WebhookId) -> Result<Webhook> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4077,7 +4091,7 @@ impl Http {
             route: Route::Webhook {
                 webhook_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4108,7 +4122,7 @@ impl Http {
         webhook_id: WebhookId,
         token: &str,
     ) -> Result<Webhook> {
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4117,7 +4131,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4145,7 +4159,7 @@ impl Http {
         let url = Url::parse(url).map_err(HttpError::Url)?;
         let (webhook_id, token) =
             crate::utils::parse_webhook(&url).ok_or(HttpError::InvalidWebhook)?;
-        self.fire(Request::<NoParams> {
+        self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4154,7 +4168,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4166,7 +4180,7 @@ impl Http {
         user_id: UserId,
         reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: reason.map(reason_into_header),
@@ -4175,14 +4189,14 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
 
     /// Leaves a guild.
     pub async fn leave_guild(&self, guild_id: GuildId) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4190,7 +4204,7 @@ impl Http {
             route: Route::UserMeGuild {
                 guild_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4206,7 +4220,7 @@ impl Http {
         files: Vec<CreateAttachment>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
-        let mut request = Request::<NoParams> {
+        let mut request = Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4214,7 +4228,7 @@ impl Http {
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params: None,
+            params: [].into(),
         };
 
         if files.is_empty() {
@@ -4237,7 +4251,7 @@ impl Http {
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4246,7 +4260,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4258,7 +4272,7 @@ impl Http {
         user_id: UserId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4267,7 +4281,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4284,7 +4298,7 @@ impl Http {
         role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4294,7 +4308,7 @@ impl Http {
                 user_id,
                 role_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4316,10 +4330,11 @@ impl Http {
                 route: Route::GuildMembersSearch {
                     guild_id,
                 },
-                params: Some([
+                params: [
                     ("query", query.to_string()),
                     ("limit", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()),
-                ]),
+                ]
+                .into(),
             })
             .await?;
 
@@ -4349,7 +4364,7 @@ impl Http {
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: Some([("days", days.to_string())]),
+            params: [("days", days.to_string())].into(),
         })
         .await
     }
@@ -4360,7 +4375,7 @@ impl Http {
         guild_id: GuildId,
         integration_id: IntegrationId,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4369,7 +4384,7 @@ impl Http {
                 guild_id,
                 integration_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4421,7 +4436,7 @@ impl Http {
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request::<NoParams> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4430,7 +4445,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -4472,11 +4487,10 @@ impl Http {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn fire<Params, T: DeserializeOwned>(&self, req: Request<'_, Params>) -> Result<T>
-    where
-        Params: IntoIterator<Item = (&'static str, String)>,
-        Params: std::fmt::Debug + Clone,
-    {
+    pub async fn fire<T: DeserializeOwned, const N: usize>(
+        &self,
+        req: Request<'_, N>,
+    ) -> Result<T> {
         let response = self.request(req).await?;
         decode_resp(response).await
     }
@@ -4513,11 +4527,7 @@ impl Http {
     /// # }
     /// ```
     #[instrument]
-    pub async fn request<Params>(&self, req: Request<'_, Params>) -> Result<ReqwestResponse>
-    where
-        Params: IntoIterator<Item = (&'static str, String)>,
-        Params: std::fmt::Debug + Clone,
-    {
+    pub async fn request<const N: usize>(&self, req: Request<'_, N>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
@@ -4540,11 +4550,11 @@ impl Http {
     ///
     /// This is a function that performs a light amount of work and returns an empty tuple, so it's
     /// called "self.wind" to denote that it's lightweight.
-    pub(super) async fn wind<Params>(&self, expected: u16, req: Request<'_, Params>) -> Result<()>
-    where
-        Params: IntoIterator<Item = (&'static str, String)>,
-        Params: std::fmt::Debug + Clone,
-    {
+    pub(super) async fn wind<const N: usize>(
+        &self,
+        expected: u16,
+        req: Request<'_, N>,
+    ) -> Result<()> {
         let method = req.method.reqwest_method();
         let response = self.request(req).await?;
 
