@@ -4560,6 +4560,22 @@
 <a href="#4560" id="4560">4560</a>
 <a href="#4561" id="4561">4561</a>
 <a href="#4562" id="4562">4562</a>
+<a href="#4563" id="4563">4563</a>
+<a href="#4564" id="4564">4564</a>
+<a href="#4565" id="4565">4565</a>
+<a href="#4566" id="4566">4566</a>
+<a href="#4567" id="4567">4567</a>
+<a href="#4568" id="4568">4568</a>
+<a href="#4569" id="4569">4569</a>
+<a href="#4570" id="4570">4570</a>
+<a href="#4571" id="4571">4571</a>
+<a href="#4572" id="4572">4572</a>
+<a href="#4573" id="4573">4573</a>
+<a href="#4574" id="4574">4574</a>
+<a href="#4575" id="4575">4575</a>
+<a href="#4576" id="4576">4576</a>
+<a href="#4577" id="4577">4577</a>
+<a href="#4578" id="4578">4578</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4568,6 +4584,7 @@
 <span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 <span class="kw">use </span>std::sync::Arc;
 
+<span class="kw">use </span>arrayvec::ArrayVec;
 <span class="kw">use </span>percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 <span class="kw">use </span>reqwest::header::{HeaderMap <span class="kw">as </span>Headers, HeaderValue};
 <span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
@@ -4588,6 +4605,7 @@
     HttpError,
     LightMethod,
     MessagePagination,
+    NoParams,
     UserPagination,
 };
 <span class="kw">use </span><span class="kw">crate</span>::builder::CreateAttachment;
@@ -4788,7 +4806,7 @@
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>response = <span class="self">self
-            </span>.request(Request {
+            </span>.request(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -4820,7 +4838,7 @@
         role_id: RoleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4860,7 +4878,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;delete_message_days&quot;</span>, delete_message_days.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;delete_message_days&quot;</span>, delete_message_days.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -4873,7 +4891,7 @@
     /// This should rarely be used for bots, although it is a good indicator that a long-running
     /// command is still being processed.
     </span><span class="kw">pub async fn </span>broadcast_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -4902,7 +4920,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4921,7 +4939,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4942,7 +4960,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4965,7 +4983,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4987,7 +5005,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5013,7 +5031,7 @@
         map: <span class="kw-2">&amp;</span>Value,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5035,7 +5053,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         files: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5071,7 +5089,7 @@
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     </span><span class="kw">pub async fn </span>create_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5089,7 +5107,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5108,7 +5126,7 @@
         guild_id: GuildId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5156,7 +5174,7 @@
     /// https://discord.com/developers/docs/resources/guild#create-guild
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     </span><span class="kw">pub async fn </span>create_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span>Value) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5179,7 +5197,7 @@
         guild_id: GuildId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5208,7 +5226,7 @@
         map: <span class="kw-2">&amp;</span>Value,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5235,7 +5253,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         files: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5278,7 +5296,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5301,7 +5319,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5319,7 +5337,7 @@
     </span><span class="kw">pub async fn </span>create_private_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span>Value) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5337,7 +5355,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5360,7 +5378,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">Some</span>(to_vec(body)<span class="question-mark">?</span>),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -5393,7 +5411,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5418,7 +5436,7 @@
         file: CreateAttachment,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">Some</span>(Multipart {
                 upload: MultipartUpload::File(file),
@@ -5469,7 +5487,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5488,7 +5506,7 @@
         channel_id: ChannelId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5507,7 +5525,7 @@
         channel_id: ChannelId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5529,7 +5547,7 @@
         emoji_id: EmojiId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5549,7 +5567,7 @@
         interaction_token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5566,7 +5584,7 @@
 
     <span class="doccomment">/// Deletes a global command.
     </span><span class="kw">pub async fn </span>delete_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>, command_id: CommandId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5582,7 +5600,7 @@
 
     <span class="doccomment">/// Deletes a guild, only if connected account owns it.
     </span><span class="kw">pub async fn </span>delete_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5601,7 +5619,7 @@
         guild_id: GuildId,
         command_id: CommandId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5623,7 +5641,7 @@
         integration_id: IntegrationId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5643,7 +5661,7 @@
         code: <span class="kw-2">&amp;</span>str,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5663,7 +5681,7 @@
         message_id: MessageId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5684,7 +5702,7 @@
         map: <span class="kw-2">&amp;</span>Value,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5720,7 +5738,7 @@
         channel_id: ChannelId,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5741,7 +5759,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5761,7 +5779,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interaction_token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5782,7 +5800,7 @@
         target_id: TargetId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5804,7 +5822,7 @@
         user_id: UserId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5827,7 +5845,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5849,7 +5867,7 @@
         role_id: RoleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5874,7 +5892,7 @@
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5897,7 +5915,7 @@
         sticker_id: StickerId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5935,7 +5953,7 @@
         webhook_id: WebhookId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5975,7 +5993,7 @@
         token: <span class="kw-2">&amp;</span>str,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5998,7 +6016,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6018,7 +6036,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6043,7 +6061,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6069,7 +6087,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6105,7 +6123,7 @@
         interaction_token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6132,7 +6150,7 @@
         command_id: CommandId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6155,7 +6173,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6181,7 +6199,7 @@
         command_id: CommandId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6209,7 +6227,7 @@
         command_id: CommandId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6232,7 +6250,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>body = to_vec(value)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6259,7 +6277,7 @@
 
         <span class="kw">let </span>body = to_vec(value)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6282,7 +6300,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWidget&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6304,7 +6322,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWelcomeScreen&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6328,7 +6346,7 @@
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6358,7 +6376,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6391,7 +6409,7 @@
         channel_id: ChannelId,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6414,7 +6432,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6439,7 +6457,7 @@
         <span class="kw">let </span>map = <span class="macro">json!</span>({ <span class="string">&quot;nick&quot;</span>: new_nickname });
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.wind(<span class="number">200</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">200</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6461,7 +6479,7 @@
         <span class="kw">let </span>map = <span class="macro">json!</span>({ <span class="string">&quot;webhook_channel_id&quot;</span>: target_channel_id });
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6479,7 +6497,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interaction_token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6504,7 +6522,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6533,7 +6551,7 @@
     </span><span class="kw">pub async fn </span>edit_profile(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize) -&gt; <span class="prelude-ty">Result</span>&lt;CurrentUser&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6553,7 +6571,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6588,7 +6606,7 @@
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6624,7 +6642,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6651,7 +6669,7 @@
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6678,7 +6696,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6727,7 +6745,7 @@
         user_id: UserId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6779,7 +6797,7 @@
         guild_id: GuildId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6830,7 +6848,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6877,7 +6895,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6950,12 +6968,14 @@
         files: Vec&lt;CreateAttachment&gt;,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Message&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[(<span class="string">&quot;wait&quot;</span>, wait.to_string())];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
+
+        params.push((<span class="string">&quot;wait&quot;</span>, wait.to_string()));
         <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
             params.push((<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string()));
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;ArrayVec&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7004,7 +7024,7 @@
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| <span class="macro">vec!</span>[(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
+            params: thread_id.map(|thread_id| [(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -7029,7 +7049,7 @@
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| <span class="macro">vec!</span>[(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
+            params: thread_id.map(|thread_id| [(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -7063,7 +7083,7 @@
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| <span class="macro">vec!</span>[(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
+            params: thread_id.map(|thread_id| [(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -7079,7 +7099,7 @@
         }
 
         <span class="kw">let </span>status: StatusResponse = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -7108,7 +7128,7 @@
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
             params.push((<span class="string">&quot;limit&quot;</span>, limit.to_string()));
@@ -7143,7 +7163,7 @@
         before: <span class="prelude-ty">Option</span>&lt;AuditLogEntryId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;AuditLogs&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">4</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(action_type) = action_type {
             params.push((<span class="string">&quot;action_type&quot;</span>, action_type.num().to_string()));
         }
@@ -7174,7 +7194,7 @@
     ///
     /// This method requires `MANAGE_GUILD` permissions.
     </span><span class="kw">pub async fn </span>get_automod_rules(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Rule&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7191,7 +7211,7 @@
     ///
     /// This method requires `MANAGE_GUILD` permissions.
     </span><span class="kw">pub async fn </span>get_automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7216,7 +7236,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -7241,7 +7261,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -7264,7 +7284,7 @@
         rule_id: RuleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -7280,7 +7300,7 @@
 
     <span class="doccomment">/// Gets current bot gateway.
     </span><span class="kw">pub async fn </span>get_bot_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;BotGateway&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7293,7 +7313,7 @@
 
     <span class="doccomment">/// Gets all invites for a channel.
     </span><span class="kw">pub async fn </span>get_channel_invites(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7311,7 +7331,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ThreadMember&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7326,7 +7346,7 @@
 
     <span class="doccomment">/// Gets all active threads from a guild.
     </span><span class="kw">pub async fn </span>get_guild_active_threads(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7346,7 +7366,7 @@
         before: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
             params.push((<span class="string">&quot;before&quot;</span>, before.to_string()));
         }
@@ -7374,7 +7394,7 @@
         before: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
             params.push((<span class="string">&quot;before&quot;</span>, before.to_string()));
         }
@@ -7402,7 +7422,7 @@
         before: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
             params.push((<span class="string">&quot;before&quot;</span>, before.to_string()));
         }
@@ -7425,7 +7445,7 @@
 
     <span class="doccomment">/// Joins a thread channel.
     </span><span class="kw">pub async fn </span>join_thread_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7440,7 +7460,7 @@
 
     <span class="doccomment">/// Leaves a thread channel.
     </span><span class="kw">pub async fn </span>leave_thread_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7459,7 +7479,7 @@
         channel_id: ChannelId,
         user_id: UserId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7479,7 +7499,7 @@
         channel_id: ChannelId,
         user_id: UserId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7514,7 +7534,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_channel_webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7529,7 +7549,7 @@
 
     <span class="doccomment">/// Gets channel information.
     </span><span class="kw">pub async fn </span>get_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7544,7 +7564,7 @@
 
     <span class="doccomment">/// Gets all channels in a guild.
     </span><span class="kw">pub async fn </span>get_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;GuildChannel&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7559,7 +7579,7 @@
 
     <span class="doccomment">/// Gets a stage instance.
     </span><span class="kw">pub async fn </span>get_stage_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7576,7 +7596,7 @@
     ///
     /// **Note**: Only applications may use this endpoint.
     </span><span class="kw">pub async fn </span>get_current_application_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;CurrentApplicationInfo&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7589,7 +7609,7 @@
 
     <span class="doccomment">/// Gets information about the user we&#39;re connected with.
     </span><span class="kw">pub async fn </span>get_current_user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;CurrentUser&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7602,7 +7622,7 @@
 
     <span class="doccomment">/// Gets all emojis of a guild.
     </span><span class="kw">pub async fn </span>get_emojis(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Emoji&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7617,7 +7637,7 @@
 
     <span class="doccomment">/// Gets information about an emoji in a guild.
     </span><span class="kw">pub async fn </span>get_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7633,7 +7653,7 @@
 
     <span class="doccomment">/// Gets current gateway.
     </span><span class="kw">pub async fn </span>get_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Gateway&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7646,7 +7666,7 @@
 
     <span class="doccomment">/// Fetches all of the global commands for your application.
     </span><span class="kw">pub async fn </span>get_global_commands(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7669,14 +7689,14 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;with_localizations&quot;</span>, <span class="bool-val">true</span>.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_localizations&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))]),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Fetches a global commands for your application by its Id.
     </span><span class="kw">pub async fn </span>get_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>, command_id: CommandId) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7692,7 +7712,7 @@
 
     <span class="doccomment">/// Gets guild information.
     </span><span class="kw">pub async fn </span>get_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7715,14 +7735,14 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;with_counts&quot;</span>, <span class="bool-val">true</span>.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_counts&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))]),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Fetches all of the guild commands for your application for a specific guild.
     </span><span class="kw">pub async fn </span>get_guild_commands(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7751,7 +7771,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;with_localizations&quot;</span>, <span class="bool-val">true</span>.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_localizations&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))]),
         })
         .<span class="kw">await
     </span>}
@@ -7762,7 +7782,7 @@
         guild_id: GuildId,
         command_id: CommandId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7782,7 +7802,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermissions&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7802,7 +7822,7 @@
         guild_id: GuildId,
         command_id: CommandId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7821,7 +7841,7 @@
     </span><span class="comment">// TODO: according to Discord, this returns different data; namely https://discord.com/developers/docs/resources/guild#guild-widget-object-guild-widget-structure.
     // Should investigate if this endpoint actually works
     </span><span class="kw">pub async fn </span>get_guild_widget(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWidget&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7836,7 +7856,7 @@
 
     <span class="doccomment">/// Gets a guild preview.
     </span><span class="kw">pub async fn </span>get_guild_preview(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPreview&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7851,7 +7871,7 @@
 
     <span class="doccomment">/// Gets a guild welcome screen information.
     </span><span class="kw">pub async fn </span>get_guild_welcome_screen(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWelcomeScreen&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7866,7 +7886,7 @@
 
     <span class="doccomment">/// Gets integrations that a guild has.
     </span><span class="kw">pub async fn </span>get_guild_integrations(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Integration&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7881,7 +7901,7 @@
 
     <span class="doccomment">/// Gets all invites to a guild.
     </span><span class="kw">pub async fn </span>get_guild_invites(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7901,7 +7921,7 @@
             code: String,
         }
 
-        <span class="self">self</span>.fire::&lt;GuildVanityUrl&gt;(Request {
+        <span class="self">self</span>.fire::&lt;NoParams, GuildVanityUrl&gt;(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7929,8 +7949,8 @@
             }
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>params =
-            <span class="macro">vec!</span>[(<span class="string">&quot;limit&quot;</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string())];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
+        params.push((<span class="string">&quot;limit&quot;</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()));
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
             params.push((<span class="string">&quot;after&quot;</span>, after.to_string()));
         }
@@ -7969,7 +7989,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;days&quot;</span>, days.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;days&quot;</span>, days.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -7977,7 +7997,7 @@
     <span class="doccomment">/// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature enabled, then
     /// additional VIP-only regions are returned.
     </span><span class="kw">pub async fn </span>get_guild_regions(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;VoiceRegion&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7993,7 +8013,7 @@
     <span class="doccomment">/// Retrieves a list of roles in a [`Guild`].
     </span><span class="kw">pub async fn </span>get_guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8036,7 +8056,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -8059,7 +8079,7 @@
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -8088,7 +8108,7 @@
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
         with_member: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEventUser&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">3</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
             params.push((<span class="string">&quot;limit&quot;</span>, limit.to_string()));
         }
@@ -8119,7 +8139,7 @@
     <span class="doccomment">/// Retrieves a list of stickers in a [`Guild`].
     </span><span class="kw">pub async fn </span>get_guild_stickers(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Sticker&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8149,7 +8169,7 @@
         sticker_id: StickerId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8190,7 +8210,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_guild_webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8234,7 +8254,7 @@
         target: <span class="prelude-ty">Option</span>&lt;GuildPagination&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;GuildInfo&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
             params.push((<span class="string">&quot;limit&quot;</span>, limit.to_string()));
         }
@@ -8287,7 +8307,7 @@
     /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
     </span><span class="kw">pub async fn </span>get_current_user_guild_member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8327,10 +8347,9 @@
         <span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
         </span><span class="kw">let </span>code = <span class="kw">crate</span>::utils::parse_invite(code);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[
-            (<span class="string">&quot;member_counts&quot;</span>, member_counts.to_string()),
-            (<span class="string">&quot;expiration&quot;</span>, expiration.to_string()),
-        ];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">3</span>&gt;::new();
+        params.push((<span class="string">&quot;member_counts&quot;</span>, member_counts.to_string()));
+        params.push((<span class="string">&quot;expiration&quot;</span>, expiration.to_string()));
         <span class="kw">if let </span><span class="prelude-val">Some</span>(event_id) = event_id {
             params.push((<span class="string">&quot;event_id&quot;</span>, event_id.to_string()));
         }
@@ -8351,7 +8370,7 @@
     <span class="doccomment">/// Gets member of a guild.
     </span><span class="kw">pub async fn </span>get_member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8377,7 +8396,7 @@
         channel_id: ChannelId,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8398,7 +8417,7 @@
         target: <span class="prelude-ty">Option</span>&lt;MessagePagination&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
             params.push((<span class="string">&quot;limit&quot;</span>, limit.to_string()));
         }
@@ -8430,7 +8449,7 @@
             sticker_packs: Vec&lt;StickerPack&gt;,
         }
 
-        <span class="self">self</span>.fire::&lt;StickerPacks&gt;(Request {
+        <span class="self">self</span>.fire::&lt;NoParams, StickerPacks&gt;(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8444,7 +8463,7 @@
 
     <span class="doccomment">/// Gets all pins of a channel.
     </span><span class="kw">pub async fn </span>get_pins(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8466,7 +8485,8 @@
         limit: u8,
         after: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[(<span class="string">&quot;limit&quot;</span>, limit.to_string())];
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
+        params.push((<span class="string">&quot;limit&quot;</span>, limit.to_string()));
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
             params.push((<span class="string">&quot;after&quot;</span>, after.to_string()));
         }
@@ -8487,7 +8507,7 @@
 
     <span class="doccomment">/// Gets a sticker.
     </span><span class="kw">pub async fn </span>get_sticker(<span class="kw-2">&amp;</span><span class="self">self</span>, sticker_id: StickerId) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8511,7 +8531,7 @@
         }
 
         <span class="kw">let </span>status: StatusResponse = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8535,7 +8555,7 @@
         }
 
         <span class="kw">let </span>status: StatusResponse = <span class="self">self
-            </span>.fire(Request {
+            </span>.fire(Request::&lt;NoParams&gt; {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8550,7 +8570,7 @@
 
     <span class="doccomment">/// Gets a user by Id.
     </span><span class="kw">pub async fn </span>get_user(<span class="kw-2">&amp;</span><span class="self">self</span>, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;User&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8569,7 +8589,7 @@
     ///
     /// [`Connections`]: crate::model::application::Scope::Connections
     </span><span class="kw">pub async fn </span>get_user_connections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Connection&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8582,7 +8602,7 @@
 
     <span class="doccomment">/// Gets our DM channels.
     </span><span class="kw">pub async fn </span>get_user_dm_channels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;PrivateChannel&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8595,7 +8615,7 @@
 
     <span class="doccomment">/// Gets all voice regions.
     </span><span class="kw">pub async fn </span>get_voice_regions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;VoiceRegion&gt;&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8627,7 +8647,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_webhook(<span class="kw-2">&amp;</span><span class="self">self</span>, webhook_id: WebhookId) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8666,7 +8686,7 @@
         webhook_id: WebhookId,
         token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8703,7 +8723,7 @@
         <span class="kw">let </span>url = Url::parse(url).map_err(HttpError::Url)<span class="question-mark">?</span>;
         <span class="kw">let </span>(webhook_id, token) =
             <span class="kw">crate</span>::utils::parse_webhook(<span class="kw-2">&amp;</span>url).ok_or(HttpError::InvalidWebhook)<span class="question-mark">?</span>;
-        <span class="self">self</span>.fire(Request {
+        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8724,7 +8744,7 @@
         user_id: UserId,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: reason.map(reason_into_header),
@@ -8740,7 +8760,7 @@
 
     <span class="doccomment">/// Leaves a guild.
     </span><span class="kw">pub async fn </span>leave_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8764,7 +8784,7 @@
         files: Vec&lt;CreateAttachment&gt;,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8795,7 +8815,7 @@
         message_id: MessageId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -8816,7 +8836,7 @@
         user_id: UserId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -8842,7 +8862,7 @@
         role_id: RoleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -8874,7 +8894,7 @@
                 route: Route::GuildMembersSearch {
                     guild_id,
                 },
-                params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
+                params: <span class="prelude-val">Some</span>([
                     (<span class="string">&quot;query&quot;</span>, query.to_string()),
                     (<span class="string">&quot;limit&quot;</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()),
                 ]),
@@ -8907,7 +8927,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">&quot;days&quot;</span>, days.to_string())]),
+            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;days&quot;</span>, days.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -8918,7 +8938,7 @@
         guild_id: GuildId,
         integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8979,7 +8999,7 @@
         message_id: MessageId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -9020,7 +9040,7 @@
     ///
     /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
     ///
-    /// let message = http.fire::&lt;Message&gt;(request).await?;
+    /// let message = http.fire::&lt;_, Message&gt;(request).await?;
     ///
     /// println!(&quot;Message content: {}&quot;, message.content);
     /// # Ok(())
@@ -9030,7 +9050,11 @@
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    </span><span class="kw">pub async fn </span>fire&lt;T: DeserializeOwned&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
+    </span><span class="kw">pub async fn </span>fire&lt;Params, T: DeserializeOwned&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+    <span class="kw">where
+        </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
+        Params: std::fmt::Debug + Clone,
+    {
         <span class="kw">let </span>response = <span class="self">self</span>.request(req).<span class="kw">await</span><span class="question-mark">?</span>;
         decode_resp(response).<span class="kw">await
     </span>}
@@ -9067,7 +9091,11 @@
     /// # }
     /// ```
     </span><span class="attr">#[instrument]
-    </span><span class="kw">pub async fn </span>request(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ReqwestResponse&gt; {
+    </span><span class="kw">pub async fn </span>request&lt;Params&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ReqwestResponse&gt;
+    <span class="kw">where
+        </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
+        Params: std::fmt::Debug + Clone,
+    {
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimiter {
             ratelimiter.perform(req).<span class="kw">await</span><span class="question-mark">?
@@ -9090,7 +9118,11 @@
     ///
     /// This is a function that performs a light amount of work and returns an empty tuple, so it&#39;s
     /// called &quot;self.wind&quot; to denote that it&#39;s lightweight.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>wind(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: u16, req: Request&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>wind&lt;Params&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: u16, req: Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
+        Params: std::fmt::Debug + Clone,
+    {
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="self">self</span>.request(req).<span class="kw">await</span><span class="question-mark">?</span>;
 

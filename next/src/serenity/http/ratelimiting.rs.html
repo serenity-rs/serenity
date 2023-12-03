@@ -493,6 +493,10 @@
 <a href="#493" id="493">493</a>
 <a href="#494" id="494">494</a>
 <a href="#495" id="495">495</a>
+<a href="#496" id="496">496</a>
+<a href="#497" id="497">497</a>
+<a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
 //! routes - such as getting the current user&#39;s channels - for the most part, with the exception
 //! being major parameters.
@@ -674,7 +678,11 @@
     ///
     /// Only error kind that may be returned is [`Error::Http`].
     </span><span class="attr">#[instrument]
-    </span><span class="kw">pub async fn </span>perform(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&gt; {
+    </span><span class="kw">pub async fn </span>perform&lt;Params&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Response&gt;
+    <span class="kw">where
+        </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
+        Params: std::fmt::Debug + Clone,
+    {
         <span class="kw">loop </span>{
             <span class="comment">// This will block if another thread hit the global ratelimit.
             </span>drop(<span class="self">self</span>.global.lock().<span class="kw">await</span>);
@@ -773,9 +781,9 @@
 
 <span class="kw">impl </span>Ratelimit {
     <span class="attr">#[instrument(skip(ratelimit_callback))]
-    </span><span class="kw">pub async fn </span>pre_hook(
+    </span><span class="kw">pub async fn </span>pre_hook&lt;Params: std::fmt::Debug&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        req: <span class="kw-2">&amp;</span>Request&lt;<span class="lifetime">&#39;_</span>&gt;,
+        req: <span class="kw-2">&amp;</span>Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;,
         ratelimit_callback: <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync),
     ) {
         <span class="kw">if </span><span class="self">self</span>.limit() == <span class="number">0 </span>{
@@ -819,10 +827,10 @@
     }
 
     <span class="attr">#[instrument(skip(ratelimit_callback))]
-    </span><span class="kw">pub async fn </span>post_hook(
+    </span><span class="kw">pub async fn </span>post_hook&lt;Params: std::fmt::Debug&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         response: <span class="kw-2">&amp;</span>Response,
-        req: <span class="kw-2">&amp;</span>Request&lt;<span class="lifetime">&#39;_</span>&gt;,
+        req: <span class="kw-2">&amp;</span>Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;,
         ratelimit_callback: <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync),
         absolute_ratelimits: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {

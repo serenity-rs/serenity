@@ -146,6 +146,17 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::Write;
 
 <span class="kw">use </span>reqwest::header::{
@@ -166,20 +177,22 @@
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[deprecated = <span class="string">&quot;use Request directly now&quot;</span>]
-</span><span class="kw">pub type </span>RequestBuilder&lt;<span class="lifetime">&#39;a</span>&gt; = Request&lt;<span class="lifetime">&#39;a</span>&gt;;
+</span><span class="kw">pub type </span>RequestBuilder&lt;<span class="lifetime">&#39;a</span>, Params&gt; = Request&lt;<span class="lifetime">&#39;a</span>, Params&gt;;
+
+<span class="kw">pub type </span>NoParams = std::iter::Empty&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;;
 
 <span class="attr">#[derive(Clone, Debug)]
 #[must_use]
-</span><span class="kw">pub struct </span>Request&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Request&lt;<span class="lifetime">&#39;a</span>, Params&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) body: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) multipart: <span class="prelude-ty">Option</span>&lt;Multipart&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) headers: <span class="prelude-ty">Option</span>&lt;Headers&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) method: LightMethod,
     <span class="kw">pub</span>(<span class="kw">super</span>) route: Route&lt;<span class="lifetime">&#39;a</span>&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) params: <span class="prelude-ty">Option</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) params: <span class="prelude-ty">Option</span>&lt;Params&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Request&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Request&lt;<span class="lifetime">&#39;a</span>, Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;&gt; {
     <span class="kw">pub const fn </span>new(route: Route&lt;<span class="lifetime">&#39;a</span>&gt;, method: LightMethod) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             body: <span class="prelude-val">None</span>,
@@ -190,7 +203,9 @@
             params: <span class="prelude-val">None</span>,
         }
     }
+}
 
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Params&gt; Request&lt;<span class="lifetime">&#39;a</span>, Params&gt; {
     <span class="kw">pub fn </span>body(<span class="kw-2">mut </span><span class="self">self</span>, body: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.body = body;
         <span class="self">self
@@ -206,10 +221,57 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>params(<span class="kw-2">mut </span><span class="self">self</span>, params: <span class="prelude-ty">Option</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;&gt;) -&gt; <span class="self">Self </span>{
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>body_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
+        <span class="self">self</span>.body.as_deref()
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>body_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[u8]&gt; {
+        <span class="self">self</span>.body.as_deref_mut()
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>headers_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Headers&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.headers
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>headers_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Headers&gt; {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.headers
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>method_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>LightMethod {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.method
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>route_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Route&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.route
+    }
+}
+
+<span class="comment">// Makes sure only methods that use the params actually need to bound on them.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Params&gt; Request&lt;<span class="lifetime">&#39;a</span>, Params&gt;
+<span class="kw">where
+    </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
+    Params: std::fmt::Debug + Clone,
+{
+    <span class="kw">pub fn </span>params(<span class="kw-2">mut </span><span class="self">self</span>, params: <span class="prelude-ty">Option</span>&lt;Params&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.params = params;
         <span class="self">self
     </span>}
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>params_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Params&gt; {
+        <span class="self">self</span>.params.as_ref()
+    }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>params_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Params&gt; {
+        <span class="self">self</span>.params.as_mut()
+    }
 
     <span class="attr">#[instrument(skip(token))]
     </span><span class="kw">pub fn </span>build(
@@ -252,46 +314,6 @@
         </span>}
 
         <span class="prelude-val">Ok</span>(builder.headers(headers))
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>body_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
-        <span class="self">self</span>.body.as_deref()
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>body_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[u8]&gt; {
-        <span class="self">self</span>.body.as_deref_mut()
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>headers_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Headers&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.headers
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>headers_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Headers&gt; {
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>.headers
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>method_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>LightMethod {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.method
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>route_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Route&lt;<span class="lifetime">&#39;_</span>&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.route
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>params_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)]&gt; {
-        <span class="self">self</span>.params.as_deref()
-    }
-
-    <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>params_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)]&gt; {
-        <span class="self">self</span>.params.as_deref_mut()
     }
 }
 </code></pre></div></section></main></body></html>
