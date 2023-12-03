@@ -4487,9 +4487,9 @@ impl Http {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn fire<T: DeserializeOwned, const N: usize>(
+    pub async fn fire<T: DeserializeOwned, const MAX_PARAMS: usize>(
         &self,
-        req: Request<'_, N>,
+        req: Request<'_, MAX_PARAMS>,
     ) -> Result<T> {
         let response = self.request(req).await?;
         decode_resp(response).await
@@ -4527,7 +4527,10 @@ impl Http {
     /// # }
     /// ```
     #[instrument]
-    pub async fn request<const N: usize>(&self, req: Request<'_, N>) -> Result<ReqwestResponse> {
+    pub async fn request<const MAX_PARAMS: usize>(
+        &self,
+        req: Request<'_, MAX_PARAMS>,
+    ) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
@@ -4550,10 +4553,10 @@ impl Http {
     ///
     /// This is a function that performs a light amount of work and returns an empty tuple, so it's
     /// called "self.wind" to denote that it's lightweight.
-    pub(super) async fn wind<const N: usize>(
+    pub(super) async fn wind<const MAX_PARAMS: usize>(
         &self,
         expected: u16,
-        req: Request<'_, N>,
+        req: Request<'_, MAX_PARAMS>,
     ) -> Result<()> {
         let method = req.method.reqwest_method();
         let response = self.request(req).await?;

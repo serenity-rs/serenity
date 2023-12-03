@@ -18,21 +18,23 @@ use super::{HttpError, LightMethod};
 use crate::constants;
 use crate::internal::prelude::*;
 
-/// Represents an http request to be sent to the Discord API. The const parameter `N` represents
-/// the maximum number of query [`params`](Request::params) able to be set for the request.
 #[derive(Clone, Debug)]
 #[must_use]
-pub struct Request<'a, const N: usize> {
+pub struct Request<'a, const MAX_PARAMS: usize> {
     pub(super) body: Option<Vec<u8>>,
     pub(super) multipart: Option<Multipart>,
     pub(super) headers: Option<Headers>,
     pub(super) method: LightMethod,
     pub(super) route: Route<'a>,
-    pub(super) params: ArrayVec<(&'static str, String), N>,
+    pub(super) params: ArrayVec<(&'static str, String), MAX_PARAMS>,
 }
 
-impl<'a, const N: usize> Request<'a, N> {
-    pub fn new(route: Route<'a>, method: LightMethod, params: [(&'static str, String); N]) -> Self {
+impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
+    pub fn new(
+        route: Route<'a>,
+        method: LightMethod,
+        params: [(&'static str, String); MAX_PARAMS],
+    ) -> Self {
         Self {
             body: None,
             multipart: None,
@@ -42,9 +44,7 @@ impl<'a, const N: usize> Request<'a, N> {
             params: params.into(),
         }
     }
-}
 
-impl<'a, const N: usize> Request<'a, N> {
     pub fn body(mut self, body: Option<Vec<u8>>) -> Self {
         self.body = body;
         self
@@ -61,7 +61,7 @@ impl<'a, const N: usize> Request<'a, N> {
     }
 
     /// # Panics
-    /// Panics if the length of the slice exceeds the value of the const parameter `N`.
+    /// Panics if the length of the slice exceeds the value of `MAX_PARAMS`.
     pub fn params(mut self, params: &[(&'static str, String)]) -> Self {
         self.params = params.try_into().expect("number of params exceeded capacity");
         self
