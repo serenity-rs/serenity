@@ -22,7 +22,7 @@ use crate::internal::prelude::*;
 /// the maximum number of query [`params`](Request::params) able to be set for the request.
 #[derive(Clone, Debug)]
 #[must_use]
-pub struct Request<'a, const N: usize = 0> {
+pub struct Request<'a, const N: usize> {
     pub(super) body: Option<Vec<u8>>,
     pub(super) multipart: Option<Multipart>,
     pub(super) headers: Option<Headers>,
@@ -32,14 +32,14 @@ pub struct Request<'a, const N: usize = 0> {
 }
 
 impl<'a, const N: usize> Request<'a, N> {
-    pub const fn new(route: Route<'a>, method: LightMethod) -> Self {
+    pub fn new(route: Route<'a>, method: LightMethod, params: [(&'static str, String); N]) -> Self {
         Self {
             body: None,
             multipart: None,
             headers: None,
             method,
             route,
-            params: ArrayVec::new_const(),
+            params: params.into(),
         }
     }
 }
