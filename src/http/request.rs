@@ -60,10 +60,8 @@ impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
         self
     }
 
-    /// # Panics
-    /// Panics if the length of the slice exceeds the value of `MAX_PARAMS`.
-    pub fn params(mut self, params: &[(&'static str, String)]) -> Self {
-        self.params = params.try_into().expect("number of params exceeded capacity");
+    pub fn params(mut self, params: [(&'static str, String); MAX_PARAMS]) -> Self {
+        self.params = params.into();
         self
     }
 
