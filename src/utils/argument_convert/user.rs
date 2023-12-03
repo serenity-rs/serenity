@@ -59,7 +59,7 @@ fn lookup_by_global_cache(ctx: impl CacheHttp, s: &str) -> Option<User> {
 ///
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by ID.
-/// 2. [Lookup by mention](`crate::utils::parse_username`).
+/// 2. [Lookup by mention](`crate::utils::parse_user_mention`).
 /// 3. [Lookup by name#discrim](`crate::utils::parse_user_tag`).
 /// 4. Lookup by name
 #[async_trait::async_trait]
