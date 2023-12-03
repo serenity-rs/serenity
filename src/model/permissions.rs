@@ -319,8 +319,6 @@ bitflags::bitflags! {
         /// Allows for editing and deleting emojis, stickers, and soundboard sounds created by all
         /// users.
         const MANAGE_GUILD_EXPRESSIONS = 1 << 30;
-        #[deprecated = "use `Permissions::MANAGE_GUILD_EXPRESSIONS` instead"]
-        const MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
         /// Allows members to use application commands, including slash commands and context menu
         /// commands.
         const USE_APPLICATION_COMMANDS = 1 << 31;
@@ -591,13 +589,6 @@ impl Permissions {
     #[must_use]
     pub const fn manage_channels(self) -> bool {
         self.contains(Self::MANAGE_CHANNELS)
-    }
-
-    #[deprecated = "use `manage_guild_expressions` instead"]
-    #[must_use]
-    pub const fn manage_emojis_and_stickers(self) -> bool {
-        #[allow(deprecated)]
-        self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
     }
 
     /// Shorthand for checking that the set of permissions contains the [Manage Events] permission.
