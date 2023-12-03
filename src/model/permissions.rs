@@ -364,8 +364,6 @@ generate_permissions! {
     /// Allows for editing and deleting emojis, stickers, and soundboard sounds created by all
     /// users.
     MANAGE_GUILD_EXPRESSIONS, manage_guild_expressions, "Manage Guild Expressions" = 1 << 30;
-    #[deprecated = "use `Permissions::MANAGE_GUILD_EXPRESSIONS` instead"]
-    MANAGE_EMOJIS_AND_STICKERS, manage_emojis_and_stickers, "Manage Emojis and Stickers" = 1 << 30;
     /// Allows members to use application commands, including slash commands and context menu
     /// commands.
     USE_APPLICATION_COMMANDS, use_application_commands, "Use Application Commands" = 1 << 31;

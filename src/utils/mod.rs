@@ -113,22 +113,22 @@ pub fn parse_user_tag(s: &str) -> Option<(&str, Option<NonZeroU16>)> {
 ///
 /// ```rust
 /// use serenity::model::id::UserId;
-/// use serenity::utils::parse_username;
+/// use serenity::utils::parse_user_mention;
 ///
 /// // regular username mention
-/// assert_eq!(parse_username("<@114941315417899012>"), Some(UserId::new(114941315417899012)));
+/// assert_eq!(parse_user_mention("<@114941315417899012>"), Some(UserId::new(114941315417899012)));
 ///
 /// // nickname mention
-/// assert_eq!(parse_username("<@!114941315417899012>"), Some(UserId::new(114941315417899012)));
+/// assert_eq!(parse_user_mention("<@!114941315417899012>"), Some(UserId::new(114941315417899012)));
 /// ```
 ///
 /// Asserting that an invalid username or nickname mention returns [`None`]:
 ///
 /// ```rust
-/// use serenity::utils::parse_username;
+/// use serenity::utils::parse_user_mention;
 ///
-/// assert!(parse_username("<@1149413154aa17899012").is_none());
-/// assert!(parse_username("<@!11494131541789a90b1c2").is_none());
+/// assert!(parse_user_mention("<@1149413154aa17899012").is_none());
+/// assert!(parse_user_mention("<@!11494131541789a90b1c2").is_none());
 /// ```
 ///
 /// [`User`]: crate::model::user::User
@@ -148,11 +148,6 @@ pub fn parse_user_mention(mention: &str) -> Option<UserId> {
     }
 }
 
-#[deprecated = "use `utils::parse_user_mention` instead"]
-pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
-    parse_user_mention(mention.as_ref())
-}
-
 /// Retrieves an Id from a role mention.
 ///
 /// If the mention is invalid, then [`None`] is returned.
@@ -163,17 +158,17 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
 ///
 /// ```rust
 /// use serenity::model::id::RoleId;
-/// use serenity::utils::parse_role;
+/// use serenity::utils::parse_role_mention;
 ///
-/// assert_eq!(parse_role("<@&136107769680887808>"), Some(RoleId::new(136107769680887808)));
+/// assert_eq!(parse_role_mention("<@&136107769680887808>"), Some(RoleId::new(136107769680887808)));
 /// ```
 ///
 /// Asserting that an invalid role mention returns [`None`]:
 ///
 /// ```rust
-/// use serenity::utils::parse_role;
+/// use serenity::utils::parse_role_mention;
 ///
-/// assert!(parse_role("<@&136107769680887808").is_none());
+/// assert!(parse_role_mention("<@&136107769680887808").is_none());
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
@@ -191,11 +186,6 @@ pub fn parse_role_mention(mention: &str) -> Option<RoleId> {
     }
 }
 
-#[deprecated = "use `utils::parse_role_mention` instead"]
-pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
-    parse_role_mention(mention.as_ref())
-}
-
 /// Retrieves an Id from a channel mention.
 ///
 /// If the channel mention is invalid, then [`None`] is returned.
@@ -206,18 +196,21 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
 ///
 /// ```rust
 /// use serenity::model::id::ChannelId;
-/// use serenity::utils::parse_channel;
+/// use serenity::utils::parse_channel_mention;
 ///
-/// assert_eq!(parse_channel("<#81384788765712384>"), Some(ChannelId::new(81384788765712384)));
+/// assert_eq!(
+///     parse_channel_mention("<#81384788765712384>"),
+///     Some(ChannelId::new(81384788765712384))
+/// );
 /// ```
 ///
 /// Asserting that an invalid channel mention returns [`None`]:
 ///
 /// ```rust
-/// use serenity::utils::parse_channel;
+/// use serenity::utils::parse_channel_mention;
 ///
-/// assert!(parse_channel("<#!81384788765712384>").is_none());
-/// assert!(parse_channel("<#81384788765712384").is_none());
+/// assert!(parse_channel_mention("<#!81384788765712384>").is_none());
+/// assert!(parse_channel_mention("<#81384788765712384").is_none());
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
@@ -233,11 +226,6 @@ pub fn parse_channel_mention(mention: &str) -> Option<ChannelId> {
     } else {
         None
     }
-}
-
-#[deprecated = "use `utils::parse_channel_mention` instead"]
-pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
-    parse_channel_mention(mention.as_ref())
 }
 
 /// Retrieves the animated state, name and Id from an emoji mention, in the form of an
