@@ -45,7 +45,7 @@ impl fmt::Display for RoleParseError {
 ///
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by ID
-/// 2. [Lookup by mention](`crate::utils::parse_role`).
+/// 2. [Lookup by mention](`crate::utils::parse_role_mention`).
 /// 3. Lookup by name (case-insensitive)
 #[async_trait::async_trait]
 impl ArgumentConvert for Role {

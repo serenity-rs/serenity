@@ -18,9 +18,6 @@ use super::{HttpError, LightMethod};
 use crate::constants;
 use crate::internal::prelude::*;
 
-#[deprecated = "use Request directly now"]
-pub type RequestBuilder<'a, const MAX_PARAMS: usize> = Request<'a, MAX_PARAMS>;
-
 #[derive(Clone, Debug)]
 #[must_use]
 pub struct Request<'a, const MAX_PARAMS: usize> {
