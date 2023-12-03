@@ -2083,49 +2083,6 @@ impl Guild {
         })
     }
 
-    /// Calculate a [`Role`]'s permissions in a given channel in the guild.
-    ///
-    /// # Errors
-    ///
-    /// Will return an [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
-    #[inline]
-    #[deprecated = "this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead"]
-    pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
-        Self::role_permissions_in_(channel, role, self.id)
-    }
-
-    /// Helper function that can also be used from [`PartialGuild`].
-    pub(crate) fn role_permissions_in_(
-        channel: &GuildChannel,
-        role: &Role,
-        guild_id: GuildId,
-    ) -> Result<Permissions> {
-        // Fail if the role or channel is not from this guild.
-        if role.guild_id != guild_id || channel.guild_id != guild_id {
-            return Err(Error::Model(ModelError::WrongGuild));
-        }
-
-        let mut permissions = role.permissions;
-
-        if permissions.contains(Permissions::ADMINISTRATOR) {
-            return Ok(Self::remove_unnecessary_voice_permissions(channel, Permissions::all()));
-        }
-
-        for overwrite in &channel.permission_overwrites {
-            if let PermissionOverwriteType::Role(permissions_role_id) = overwrite.kind {
-                if permissions_role_id == role.id {
-                    permissions = (permissions & !overwrite.deny) | overwrite.allow;
-
-                    break;
-                }
-            }
-        }
-
-        Self::remove_unusable_permissions(&mut permissions);
-
-        Ok(permissions)
-    }
-
     /// Retrieves the count of the number of [`Member`]s that would be pruned with the number of
     /// given days.
     ///
@@ -2153,47 +2110,6 @@ impl Guild {
         }
 
         self.id.prune_count(cache_http.http(), days).await
-    }
-
-    pub(crate) fn remove_unusable_permissions(permissions: &mut Permissions) {
-        // No SEND_MESSAGES => no message-sending-related actions
-        // If the member does not have the `SEND_MESSAGES` permission, then throw out message-able
-        // permissions.
-        if !permissions.contains(Permissions::SEND_MESSAGES) {
-            *permissions &= !(Permissions::SEND_TTS_MESSAGES
-                | Permissions::MENTION_EVERYONE
-                | Permissions::EMBED_LINKS
-                | Permissions::ATTACH_FILES);
-        }
-
-        // If the permission does not have the `VIEW_CHANNEL` permission, then throw out actionable
-        // permissions.
-        if !permissions.contains(Permissions::VIEW_CHANNEL) {
-            *permissions &= !(Permissions::KICK_MEMBERS
-                | Permissions::BAN_MEMBERS
-                | Permissions::ADMINISTRATOR
-                | Permissions::MANAGE_GUILD
-                | Permissions::CHANGE_NICKNAME
-                | Permissions::MANAGE_NICKNAMES);
-        }
-    }
-
-    pub(crate) fn remove_unnecessary_voice_permissions(
-        channel: &GuildChannel,
-        mut permissions: Permissions,
-    ) -> Permissions {
-        // If this is a text channel, then throw out voice permissions.
-        if channel.kind == ChannelType::Text {
-            permissions &= !(Permissions::CONNECT
-                | Permissions::SPEAK
-                | Permissions::MUTE_MEMBERS
-                | Permissions::DEAFEN_MEMBERS
-                | Permissions::MOVE_MEMBERS
-                | Permissions::USE_VAD
-                | Permissions::STREAM);
-        }
-
-        permissions
     }
 
     /// Re-orders the channels of the guild.
