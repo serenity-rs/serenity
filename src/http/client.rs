@@ -4475,9 +4475,9 @@ impl Http {
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
+    /// let mut request = Request::<'_, 0>::new(route, LightMethod::Post).body(Some(bytes));
     ///
-    /// let message = http.fire::<_, Message>(request).await?;
+    /// let message: Message = http.fire(request).await?;
     ///
     /// println!("Message content: {}", message.content);
     /// # Ok(())
@@ -4518,7 +4518,7 @@ impl Http {
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
+    /// let mut request = Request::<'_, 0>::new(route, LightMethod::Post).body(Some(bytes));
     ///
     /// let response = http.request(request).await?;
     ///
