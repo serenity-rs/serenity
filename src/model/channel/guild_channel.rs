@@ -774,32 +774,6 @@ impl GuildChannel {
         Ok(guild.user_permissions_in(self, member))
     }
 
-    /// Calculates the permissions of a role.
-    ///
-    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the channel is in.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could not be found in the
-    /// [`Cache`].
-    ///
-    /// Returns a [`ModelError::RoleNotFound`] if the given role could not be found in the
-    /// [`Cache`].
-    #[cfg(feature = "cache")]
-    #[inline]
-    #[deprecated = "this function ignores other roles the user may have as well as user-specific permissions; use Guild::user_permissions_in instead"]
-    #[allow(deprecated)]
-    pub fn permissions_for_role(
-        &self,
-        cache: impl AsRef<Cache>,
-        role_id: impl Into<RoleId>,
-    ) -> Result<Permissions> {
-        let guild = self.guild(&cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
-        let role =
-            guild.roles.get(&role_id.into()).ok_or(Error::Model(ModelError::RoleNotFound))?;
-        guild.role_permissions_in(self, role)
-    }
-
     /// Pins a [`Message`] to the channel.
     ///
     /// **Note**: Requires the [Manage Messages] permission.

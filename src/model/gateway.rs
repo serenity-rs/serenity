@@ -487,9 +487,6 @@ bitflags! {
         /// - GUILD_BAN_ADD
         /// - GUILD_BAN_REMOVE
         const GUILD_MODERATION = 1 << 2;
-        /// Backwards compatibility with old gateway event name. Same as GUILD_MODERATION
-        #[deprecated = "Use [`Self::GUILD_MODERATION`] instead"]
-        const GUILD_BANS = 1 << 2;
 
         /// Enables the following gateway events:
         /// - GUILD_EMOJIS_UPDATE
@@ -629,18 +626,6 @@ impl GatewayIntents {
     #[must_use]
     pub const fn guild_members(self) -> bool {
         self.contains(Self::GUILD_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of intents contains the [GUILD_BANS] intent.
-    ///
-    /// [GUILD_BANS]: Self::GUILD_BANS
-    ///
-    /// This is the same as calling guild_moderation since Discord changed the name
-    #[must_use]
-    #[deprecated = "Use [`Self::guild_moderation`] instead"]
-    pub const fn guild_bans(self) -> bool {
-        #[allow(deprecated)] // this is a deprecated method itself
-        self.contains(Self::GUILD_BANS)
     }
 
     /// Shorthand for checking that the set of intents contains the [GUILD_MODERATION] intent.
