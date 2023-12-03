@@ -70,7 +70,7 @@ macro_rules! event_handler {
                     $(
                         $( #[cfg(feature = $feature)] )?
                         Self::$variant_name { $( $arg_name ),* } => {
-                            $(let $context = ctx;)?
+                            $( let $context = ctx; )?
                             handler.$method_name( $($context,)? $( $arg_name ),* ).await;
                         }
                     )*
