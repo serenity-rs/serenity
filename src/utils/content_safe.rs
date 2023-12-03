@@ -228,9 +228,11 @@ fn clean_mention(
                 "#deleted-channel".into()
             }
         },
-        Mention::Role(id) => id
-            .to_role_cached(cache)
-            .map_or(Cow::Borrowed("@deleted-role"), |role| format!("@{}", role.name).into()),
+        Mention::Role(id) => options
+            .guild_reference
+            .and_then(|id| cache.guild(id))
+            .and_then(|g| g.roles.get(&id).map(|role| format!("@{}", role.name).into()))
+            .unwrap_or(Cow::Borrowed("@deleted-role")),
         Mention::User(id) => {
             if let Some(guild_id) = options.guild_reference {
                 if let Some(guild) = cache.guild(guild_id) {
