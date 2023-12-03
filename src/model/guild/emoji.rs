@@ -7,8 +7,6 @@ use crate::http::CacheHttp;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::model::id::GuildId;
 use crate::model::id::{EmojiId, RoleId};
 use crate::model::user::User;
@@ -87,11 +85,13 @@ impl Emoji {
     ///
     /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
+    #[deprecated = "Use Guild(Id)::delete_emoji, this performs a loop over all guilds!"]
     #[cfg(feature = "cache")]
+    #[allow(deprecated)]
     #[inline]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         let guild_id = self.try_find_guild_id(&cache_http)?;
-        cache_http.http().delete_emoji(guild_id, self.id, None).await
+        guild_id.delete_emoji(cache_http.http(), self).await
     }
 
     /// Edits the emoji by updating it with a new name. This method requires the cache to fetch the
@@ -108,13 +108,12 @@ impl Emoji {
     ///
     /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
+    #[deprecated = "Use Guild(Id)::edit_emoji, this performs a loop over all guilds!"]
     #[cfg(feature = "cache")]
+    #[allow(deprecated)]
     pub async fn edit(&mut self, cache_http: impl CacheHttp, name: &str) -> Result<()> {
         let guild_id = self.try_find_guild_id(&cache_http)?;
-        let map = json!({ "name": name });
-
-        *self = cache_http.http().edit_emoji(guild_id, self.id, &map, None).await?;
-
+        *self = guild_id.edit_emoji(cache_http.http(), self.id, name).await?;
         Ok(())
     }
 
@@ -137,7 +136,9 @@ impl Emoji {
     /// }
     /// # }
     /// ```
+    #[deprecated = "This performs a loop over all guilds and should not be used."]
     #[cfg(feature = "cache")]
+    #[allow(deprecated)]
     #[must_use]
     pub fn find_guild_id(&self, cache: impl AsRef<Cache>) -> Option<GuildId> {
         for guild_entry in cache.as_ref().guilds.iter() {
@@ -151,7 +152,9 @@ impl Emoji {
         None
     }
 
+    #[deprecated = "This performs a loop over all guilds and should not be used."]
     #[cfg(feature = "cache")]
+    #[allow(deprecated)]
     #[inline]
     fn try_find_guild_id(&self, cache_http: impl CacheHttp) -> Result<GuildId> {
         cache_http
