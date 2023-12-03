@@ -68,17 +68,6 @@ impl ArgumentConvert for Message {
             .or_else(extract_from_message_url)
             .ok_or(MessageParseError::Malformed)?;
 
-        #[cfg(feature = "cache")]
-        if let Some(cache) = ctx.cache() {
-            if let Some(msg) = cache.message(channel_id, message_id) {
-                return Ok(msg.clone());
-            }
-        }
-
-        if cfg!(feature = "http") {
-            ctx.http().get_message(channel_id, message_id).await.map_err(MessageParseError::Http)
-        } else {
-            Err(MessageParseError::HttpNotAvailable)
-        }
+        channel_id.message(ctx, message_id).await.map_err(MessageParseError::Http)
     }
 }

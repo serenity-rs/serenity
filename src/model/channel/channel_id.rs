@@ -459,7 +459,17 @@ impl ChannelId {
             }
         }
 
-        cache_http.http().get_message(self, message_id).await
+        let message = cache_http.http().get_message(self, message_id).await?;
+
+        #[cfg(feature = "temp_cache")]
+        if let Some(cache) = cache_http.cache() {
+            use crate::cache::MaybeOwnedArc;
+
+            let message = MaybeOwnedArc::new(message.clone());
+            cache.temp_messages.insert(message_id, message);
+        }
+
+        Ok(message)
     }
 
     /// Gets messages from the channel.
