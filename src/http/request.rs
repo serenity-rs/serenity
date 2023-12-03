@@ -61,7 +61,7 @@ impl<'a, const N: usize> Request<'a, N> {
     }
 
     /// # Panics
-    /// Panics if the length of the slice exceeds the value of the const paramter `N`.
+    /// Panics if the length of the slice exceeds the value of the const parameter `N`.
     pub fn params(mut self, params: &[(&'static str, String)]) -> Self {
         self.params = params.try_into().expect("number of params exceeded capacity");
         self
