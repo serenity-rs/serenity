@@ -1622,17 +1622,6 @@
 <a href="#1622" id="1622">1622</a>
 <a href="#1623" id="1623">1623</a>
 <a href="#1624" id="1624">1624</a>
-<a href="#1625" id="1625">1625</a>
-<a href="#1626" id="1626">1626</a>
-<a href="#1627" id="1627">1627</a>
-<a href="#1628" id="1628">1628</a>
-<a href="#1629" id="1629">1629</a>
-<a href="#1630" id="1630">1630</a>
-<a href="#1631" id="1631">1631</a>
-<a href="#1632" id="1632">1632</a>
-<a href="#1633" id="1633">1633</a>
-<a href="#1634" id="1634">1634</a>
-<a href="#1635" id="1635">1635</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -2994,17 +2983,6 @@
     #[must_use]
     </span><span class="kw">pub fn </span>user_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
         Guild::_user_permissions_in(<span class="prelude-val">Some</span>(channel), member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
-    }
-
-    <span class="doccomment">/// Calculate a [`Role`]&#39;s permissions in a given channel in the guild.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
-    </span><span class="attr">#[inline]
-    #[deprecated = <span class="string">&quot;this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead&quot;</span>]
-    </span><span class="kw">pub fn </span>role_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, role: <span class="kw-2">&amp;</span>Role) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
-        Guild::_role_permissions_in(channel, role, <span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Gets the number of [`Member`]s that would be pruned with the given number of days.

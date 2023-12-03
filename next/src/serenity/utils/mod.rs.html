@@ -542,18 +542,6 @@
 <a href="#542" id="542">542</a>
 <a href="#543" id="543">543</a>
 <a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
-<a href="#550" id="550">550</a>
-<a href="#551" id="551">551</a>
-<a href="#552" id="552">552</a>
-<a href="#553" id="553">553</a>
-<a href="#554" id="554">554</a>
-<a href="#555" id="555">555</a>
-<a href="#556" id="556">556</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
@@ -669,22 +657,22 @@
 ///
 /// ```rust
 /// use serenity::model::id::UserId;
-/// use serenity::utils::parse_username;
+/// use serenity::utils::parse_user_mention;
 ///
 /// // regular username mention
-/// assert_eq!(parse_username(&quot;&lt;@114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
+/// assert_eq!(parse_user_mention(&quot;&lt;@114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
 ///
 /// // nickname mention
-/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
+/// assert_eq!(parse_user_mention(&quot;&lt;@!114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
 /// ```
 ///
 /// Asserting that an invalid username or nickname mention returns [`None`]:
 ///
 /// ```rust
-/// use serenity::utils::parse_username;
+/// use serenity::utils::parse_user_mention;
 ///
-/// assert!(parse_username(&quot;&lt;@1149413154aa17899012&quot;).is_none());
-/// assert!(parse_username(&quot;&lt;@!11494131541789a90b1c2&quot;).is_none());
+/// assert!(parse_user_mention(&quot;&lt;@1149413154aa17899012&quot;).is_none());
+/// assert!(parse_user_mention(&quot;&lt;@!11494131541789a90b1c2&quot;).is_none());
 /// ```
 ///
 /// [`User`]: crate::model::user::User
@@ -704,11 +692,6 @@
     </span>}
 }
 
-<span class="attr">#[deprecated = <span class="string">&quot;use `utils::parse_user_mention` instead&quot;</span>]
-</span><span class="kw">pub fn </span>parse_username(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
-    parse_user_mention(mention.as_ref())
-}
-
 <span class="doccomment">/// Retrieves an Id from a role mention.
 ///
 /// If the mention is invalid, then [`None`] is returned.
@@ -719,17 +702,17 @@
 ///
 /// ```rust
 /// use serenity::model::id::RoleId;
-/// use serenity::utils::parse_role;
+/// use serenity::utils::parse_role_mention;
 ///
-/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(RoleId::new(136107769680887808)));
+/// assert_eq!(parse_role_mention(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(RoleId::new(136107769680887808)));
 /// ```
 ///
 /// Asserting that an invalid role mention returns [`None`]:
 ///
 /// ```rust
-/// use serenity::utils::parse_role;
+/// use serenity::utils::parse_role_mention;
 ///
-/// assert!(parse_role(&quot;&lt;@&amp;136107769680887808&quot;).is_none());
+/// assert!(parse_role_mention(&quot;&lt;@&amp;136107769680887808&quot;).is_none());
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
@@ -747,11 +730,6 @@
     </span>}
 }
 
-<span class="attr">#[deprecated = <span class="string">&quot;use `utils::parse_role_mention` instead&quot;</span>]
-</span><span class="kw">pub fn </span>parse_role(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;RoleId&gt; {
-    parse_role_mention(mention.as_ref())
-}
-
 <span class="doccomment">/// Retrieves an Id from a channel mention.
 ///
 /// If the channel mention is invalid, then [`None`] is returned.
@@ -762,18 +740,21 @@
 ///
 /// ```rust
 /// use serenity::model::id::ChannelId;
-/// use serenity::utils::parse_channel;
+/// use serenity::utils::parse_channel_mention;
 ///
-/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(ChannelId::new(81384788765712384)));
+/// assert_eq!(
+///     parse_channel_mention(&quot;&lt;#81384788765712384&gt;&quot;),
+///     Some(ChannelId::new(81384788765712384))
+/// );
 /// ```
 ///
 /// Asserting that an invalid channel mention returns [`None`]:
 ///
 /// ```rust
-/// use serenity::utils::parse_channel;
+/// use serenity::utils::parse_channel_mention;
 ///
-/// assert!(parse_channel(&quot;&lt;#!81384788765712384&gt;&quot;).is_none());
-/// assert!(parse_channel(&quot;&lt;#81384788765712384&quot;).is_none());
+/// assert!(parse_channel_mention(&quot;&lt;#!81384788765712384&gt;&quot;).is_none());
+/// assert!(parse_channel_mention(&quot;&lt;#81384788765712384&quot;).is_none());
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
@@ -789,11 +770,6 @@
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
-}
-
-<span class="attr">#[deprecated = <span class="string">&quot;use `utils::parse_channel_mention` instead&quot;</span>]
-</span><span class="kw">pub fn </span>parse_channel(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
-    parse_channel_mention(mention.as_ref())
 }
 
 <span class="doccomment">/// Retrieves the animated state, name and Id from an emoji mention, in the form of an

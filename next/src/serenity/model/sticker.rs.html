@@ -269,45 +269,6 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::EditSticker;
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -319,23 +280,6 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">impl </span>StickerId {
-    <span class="doccomment">/// Delete a guild sticker.
-    ///
-    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
-    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
-    /// Expressions] permission is required.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[deprecated = <span class="string">&quot;use `GuildId::delete_sticker` instead&quot;</span>]
-    </span><span class="kw">pub async fn </span>delete(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        guild_id.into().delete_sticker(http, <span class="self">self</span>).<span class="kw">await
-    </span>}
-
     <span class="doccomment">/// Requests the sticker via the REST API to get a [`Sticker`] with all details.
     ///
     /// # Errors
@@ -344,28 +288,6 @@
     /// otherwise unavailable.
     </span><span class="kw">pub async fn </span>to_sticker(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
         http.as_ref().get_sticker(<span class="self">self</span>).<span class="kw">await
-    </span>}
-
-    <span class="doccomment">/// Edits the sticker.
-    ///
-    /// **Note**: If the sticker was created by the current user, requires either the [Create Guild
-    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
-    /// Expressions] permission is required.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    ///
-    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[deprecated = <span class="string">&quot;use `GuildId::edit_sticker` instead&quot;</span>]
-    </span><span class="kw">pub async fn </span>edit(
-        <span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
-        builder: EditSticker&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        guild_id.into().edit_sticker(cache_http, <span class="self">self</span>, builder).<span class="kw">await
     </span>}
 }
 

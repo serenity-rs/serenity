@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["collect"],"struct":["ComponentInteractionCollector","EventCollector","MessageCollector","ModalInteractionCollector","ReactionCollector"]};
+window.SIDEBAR_ITEMS = {"fn":["collect"],"struct":["ComponentInteractionCollector","MessageCollector","ModalInteractionCollector","ReactionCollector"]};

@@ -757,21 +757,6 @@
 <a href="#757" id="757">757</a>
 <a href="#758" id="758">758</a>
 <a href="#759" id="759">759</a>
-<a href="#760" id="760">760</a>
-<a href="#761" id="761">761</a>
-<a href="#762" id="762">762</a>
-<a href="#763" id="763">763</a>
-<a href="#764" id="764">764</a>
-<a href="#765" id="765">765</a>
-<a href="#766" id="766">766</a>
-<a href="#767" id="767">767</a>
-<a href="#768" id="768">768</a>
-<a href="#769" id="769">769</a>
-<a href="#770" id="770">770</a>
-<a href="#771" id="771">771</a>
-<a href="#772" id="772">772</a>
-<a href="#773" id="773">773</a>
-<a href="#774" id="774">774</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -1259,9 +1244,6 @@
         /// - GUILD_BAN_ADD
         /// - GUILD_BAN_REMOVE
         </span><span class="kw">const </span>GUILD_MODERATION = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
-        <span class="doccomment">/// Backwards compatibility with old gateway event name. Same as GUILD_MODERATION
-        </span><span class="attr">#[deprecated = <span class="string">&quot;Use [`Self::GUILD_MODERATION`] instead&quot;</span>]
-        </span><span class="kw">const </span>GUILD_BANS = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
 
         <span class="doccomment">/// Enables the following gateway events:
         /// - GUILD_EMOJIS_UPDATE
@@ -1392,18 +1374,6 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>guild_members(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_MEMBERS)
-    }
-
-    <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_BANS] intent.
-    ///
-    /// [GUILD_BANS]: Self::GUILD_BANS
-    ///
-    /// This is the same as calling guild_moderation since Discord changed the name
-    </span><span class="attr">#[must_use]
-    #[deprecated = <span class="string">&quot;Use [`Self::guild_moderation`] instead&quot;</span>]
-    </span><span class="kw">pub const fn </span>guild_bans(<span class="self">self</span>) -&gt; bool {
-        <span class="attr">#[allow(deprecated)] </span><span class="comment">// this is a deprecated method itself
-        </span><span class="self">self</span>.contains(<span class="self">Self</span>::GUILD_BANS)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the [GUILD_MODERATION] intent.

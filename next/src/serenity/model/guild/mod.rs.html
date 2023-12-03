@@ -2731,90 +2731,6 @@
 <a href="#2731" id="2731">2731</a>
 <a href="#2732" id="2732">2732</a>
 <a href="#2733" id="2733">2733</a>
-<a href="#2734" id="2734">2734</a>
-<a href="#2735" id="2735">2735</a>
-<a href="#2736" id="2736">2736</a>
-<a href="#2737" id="2737">2737</a>
-<a href="#2738" id="2738">2738</a>
-<a href="#2739" id="2739">2739</a>
-<a href="#2740" id="2740">2740</a>
-<a href="#2741" id="2741">2741</a>
-<a href="#2742" id="2742">2742</a>
-<a href="#2743" id="2743">2743</a>
-<a href="#2744" id="2744">2744</a>
-<a href="#2745" id="2745">2745</a>
-<a href="#2746" id="2746">2746</a>
-<a href="#2747" id="2747">2747</a>
-<a href="#2748" id="2748">2748</a>
-<a href="#2749" id="2749">2749</a>
-<a href="#2750" id="2750">2750</a>
-<a href="#2751" id="2751">2751</a>
-<a href="#2752" id="2752">2752</a>
-<a href="#2753" id="2753">2753</a>
-<a href="#2754" id="2754">2754</a>
-<a href="#2755" id="2755">2755</a>
-<a href="#2756" id="2756">2756</a>
-<a href="#2757" id="2757">2757</a>
-<a href="#2758" id="2758">2758</a>
-<a href="#2759" id="2759">2759</a>
-<a href="#2760" id="2760">2760</a>
-<a href="#2761" id="2761">2761</a>
-<a href="#2762" id="2762">2762</a>
-<a href="#2763" id="2763">2763</a>
-<a href="#2764" id="2764">2764</a>
-<a href="#2765" id="2765">2765</a>
-<a href="#2766" id="2766">2766</a>
-<a href="#2767" id="2767">2767</a>
-<a href="#2768" id="2768">2768</a>
-<a href="#2769" id="2769">2769</a>
-<a href="#2770" id="2770">2770</a>
-<a href="#2771" id="2771">2771</a>
-<a href="#2772" id="2772">2772</a>
-<a href="#2773" id="2773">2773</a>
-<a href="#2774" id="2774">2774</a>
-<a href="#2775" id="2775">2775</a>
-<a href="#2776" id="2776">2776</a>
-<a href="#2777" id="2777">2777</a>
-<a href="#2778" id="2778">2778</a>
-<a href="#2779" id="2779">2779</a>
-<a href="#2780" id="2780">2780</a>
-<a href="#2781" id="2781">2781</a>
-<a href="#2782" id="2782">2782</a>
-<a href="#2783" id="2783">2783</a>
-<a href="#2784" id="2784">2784</a>
-<a href="#2785" id="2785">2785</a>
-<a href="#2786" id="2786">2786</a>
-<a href="#2787" id="2787">2787</a>
-<a href="#2788" id="2788">2788</a>
-<a href="#2789" id="2789">2789</a>
-<a href="#2790" id="2790">2790</a>
-<a href="#2791" id="2791">2791</a>
-<a href="#2792" id="2792">2792</a>
-<a href="#2793" id="2793">2793</a>
-<a href="#2794" id="2794">2794</a>
-<a href="#2795" id="2795">2795</a>
-<a href="#2796" id="2796">2796</a>
-<a href="#2797" id="2797">2797</a>
-<a href="#2798" id="2798">2798</a>
-<a href="#2799" id="2799">2799</a>
-<a href="#2800" id="2800">2800</a>
-<a href="#2801" id="2801">2801</a>
-<a href="#2802" id="2802">2802</a>
-<a href="#2803" id="2803">2803</a>
-<a href="#2804" id="2804">2804</a>
-<a href="#2805" id="2805">2805</a>
-<a href="#2806" id="2806">2806</a>
-<a href="#2807" id="2807">2807</a>
-<a href="#2808" id="2808">2808</a>
-<a href="#2809" id="2809">2809</a>
-<a href="#2810" id="2810">2810</a>
-<a href="#2811" id="2811">2811</a>
-<a href="#2812" id="2812">2812</a>
-<a href="#2813" id="2813">2813</a>
-<a href="#2814" id="2814">2814</a>
-<a href="#2815" id="2815">2815</a>
-<a href="#2816" id="2816">2816</a>
-<a href="#2817" id="2817">2817</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4807,49 +4723,6 @@
         })
     }
 
-    <span class="doccomment">/// Calculate a [`Role`]&#39;s permissions in a given channel in the guild.
-    ///
-    /// # Errors
-    ///
-    /// Will return an [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
-    </span><span class="attr">#[inline]
-    #[deprecated = <span class="string">&quot;this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead&quot;</span>]
-    </span><span class="kw">pub fn </span>role_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, role: <span class="kw-2">&amp;</span>Role) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
-        <span class="self">Self</span>::_role_permissions_in(channel, role, <span class="self">self</span>.id)
-    }
-
-    <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>_role_permissions_in(
-        channel: <span class="kw-2">&amp;</span>GuildChannel,
-        role: <span class="kw-2">&amp;</span>Role,
-        guild_id: GuildId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
-        <span class="comment">// Fail if the role or channel is not from this guild.
-        </span><span class="kw">if </span>role.guild_id != guild_id || channel.guild_id != guild_id {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::WrongGuild));
-        }
-
-        <span class="kw">let </span><span class="kw-2">mut </span>permissions = role.permissions;
-
-        <span class="kw">if </span>permissions.contains(Permissions::ADMINISTRATOR) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::remove_unnecessary_voice_permissions(channel, Permissions::all()));
-        }
-
-        <span class="kw">for </span>overwrite <span class="kw">in </span><span class="kw-2">&amp;</span>channel.permission_overwrites {
-            <span class="kw">if let </span>PermissionOverwriteType::Role(permissions_role_id) = overwrite.kind {
-                <span class="kw">if </span>permissions_role_id == role.id {
-                    permissions = (permissions &amp; !overwrite.deny) | overwrite.allow;
-
-                    <span class="kw">break</span>;
-                }
-            }
-        }
-
-        <span class="self">Self</span>::remove_unusable_permissions(<span class="kw-2">&amp;mut </span>permissions);
-
-        <span class="prelude-val">Ok</span>(permissions)
-    }
-
     <span class="doccomment">/// Retrieves the count of the number of [`Member`]s that would be pruned with the number of
     /// given days.
     ///
@@ -4878,47 +4751,6 @@
 
         <span class="self">self</span>.id.prune_count(cache_http.http(), days).<span class="kw">await
     </span>}
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove_unusable_permissions(permissions: <span class="kw-2">&amp;mut </span>Permissions) {
-        <span class="comment">// No SEND_MESSAGES =&gt; no message-sending-related actions
-        // If the member does not have the `SEND_MESSAGES` permission, then throw out message-able
-        // permissions.
-        </span><span class="kw">if </span>!permissions.contains(Permissions::SEND_MESSAGES) {
-            <span class="kw-2">*</span>permissions &amp;= !(Permissions::SEND_TTS_MESSAGES
-                | Permissions::MENTION_EVERYONE
-                | Permissions::EMBED_LINKS
-                | Permissions::ATTACH_FILES);
-        }
-
-        <span class="comment">// If the permission does not have the `VIEW_CHANNEL` permission, then throw out actionable
-        // permissions.
-        </span><span class="kw">if </span>!permissions.contains(Permissions::VIEW_CHANNEL) {
-            <span class="kw-2">*</span>permissions &amp;= !(Permissions::KICK_MEMBERS
-                | Permissions::BAN_MEMBERS
-                | Permissions::ADMINISTRATOR
-                | Permissions::MANAGE_GUILD
-                | Permissions::CHANGE_NICKNAME
-                | Permissions::MANAGE_NICKNAMES);
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove_unnecessary_voice_permissions(
-        channel: <span class="kw-2">&amp;</span>GuildChannel,
-        <span class="kw-2">mut </span>permissions: Permissions,
-    ) -&gt; Permissions {
-        <span class="comment">// If this is a text channel, then throw out voice permissions.
-        </span><span class="kw">if </span>channel.kind == ChannelType::Text {
-            permissions &amp;= !(Permissions::CONNECT
-                | Permissions::SPEAK
-                | Permissions::MUTE_MEMBERS
-                | Permissions::DEAFEN_MEMBERS
-                | Permissions::MOVE_MEMBERS
-                | Permissions::USE_VAD
-                | Permissions::STREAM);
-        }
-
-        permissions
-    }
 
     <span class="doccomment">/// Re-orders the channels of the guild.
     ///

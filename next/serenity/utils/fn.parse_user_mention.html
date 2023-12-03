@@ -4,17 +4,17 @@
 <p>Retrieving an Id from a valid <a href="../model/user/struct.User.html" title="struct serenity::model::user::User"><code>User</code></a> mention:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serenity::model::id::UserId;
-<span class="kw">use </span>serenity::utils::parse_username;
+<span class="kw">use </span>serenity::utils::parse_user_mention;
 
 <span class="comment">// regular username mention
-</span><span class="macro">assert_eq!</span>(parse_username(<span class="string">&quot;&lt;@114941315417899012&gt;&quot;</span>), <span class="prelude-val">Some</span>(UserId::new(<span class="number">114941315417899012</span>)));
+</span><span class="macro">assert_eq!</span>(parse_user_mention(<span class="string">&quot;&lt;@114941315417899012&gt;&quot;</span>), <span class="prelude-val">Some</span>(UserId::new(<span class="number">114941315417899012</span>)));
 
 <span class="comment">// nickname mention
-</span><span class="macro">assert_eq!</span>(parse_username(<span class="string">&quot;&lt;@!114941315417899012&gt;&quot;</span>), <span class="prelude-val">Some</span>(UserId::new(<span class="number">114941315417899012</span>)));</code></pre></div>
+</span><span class="macro">assert_eq!</span>(parse_user_mention(<span class="string">&quot;&lt;@!114941315417899012&gt;&quot;</span>), <span class="prelude-val">Some</span>(UserId::new(<span class="number">114941315417899012</span>)));</code></pre></div>
 <p>Asserting that an invalid username or nickname mention returns <a href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None" title="variant core::option::Option::None"><code>None</code></a>:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serenity::utils::parse_username;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>serenity::utils::parse_user_mention;
 
-<span class="macro">assert!</span>(parse_username(<span class="string">&quot;&lt;@1149413154aa17899012&quot;</span>).is_none());
-<span class="macro">assert!</span>(parse_username(<span class="string">&quot;&lt;@!11494131541789a90b1c2&quot;</span>).is_none());</code></pre></div>
+<span class="macro">assert!</span>(parse_user_mention(<span class="string">&quot;&lt;@1149413154aa17899012&quot;</span>).is_none());
+<span class="macro">assert!</span>(parse_user_mention(<span class="string">&quot;&lt;@!11494131541789a90b1c2&quot;</span>).is_none());</code></pre></div>
 </div></details></section></div></main></body></html>

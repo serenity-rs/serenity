@@ -840,15 +840,6 @@
 <a href="#840" id="840">840</a>
 <a href="#841" id="841">841</a>
 <a href="#842" id="842">842</a>
-<a href="#843" id="843">843</a>
-<a href="#844" id="844">844</a>
-<a href="#845" id="845">845</a>
-<a href="#846" id="846">846</a>
-<a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
 //! channel&#39;s permission overrides.
 //!
@@ -1170,8 +1161,6 @@
         <span class="doccomment">/// Allows for editing and deleting emojis, stickers, and soundboard sounds created by all
         /// users.
         </span><span class="kw">const </span>MANAGE_GUILD_EXPRESSIONS = <span class="number">1 </span>&lt;&lt; <span class="number">30</span>;
-        <span class="attr">#[deprecated = <span class="string">&quot;use `Permissions::MANAGE_GUILD_EXPRESSIONS` instead&quot;</span>]
-        </span><span class="kw">const </span>MANAGE_EMOJIS_AND_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">30</span>;
         <span class="doccomment">/// Allows members to use application commands, including slash commands and context menu
         /// commands.
         </span><span class="kw">const </span>USE_APPLICATION_COMMANDS = <span class="number">1 </span>&lt;&lt; <span class="number">31</span>;
@@ -1442,13 +1431,6 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>manage_channels(<span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_CHANNELS)
-    }
-
-    <span class="attr">#[deprecated = <span class="string">&quot;use `manage_guild_expressions` instead&quot;</span>]
-    #[must_use]
-    </span><span class="kw">pub const fn </span>manage_emojis_and_stickers(<span class="self">self</span>) -&gt; bool {
-        <span class="attr">#[allow(deprecated)]
-        </span><span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_EMOJIS_AND_STICKERS)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Manage Events] permission.

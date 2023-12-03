@@ -1279,7 +1279,6 @@
 <a href="#1279" id="1279">1279</a>
 <a href="#1280" id="1280">1280</a>
 <a href="#1281" id="1281">1281</a>
-<a href="#1282" id="1282">1282</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1823,7 +1822,6 @@
     </span><span class="kw">pub fn </span>apply_to_message(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;mut </span>Message) {
         <span class="comment">// Destructure, so we get an `unused` warning when we forget to process one of the fields
         // in this method
-        </span><span class="attr">#[allow(deprecated)] </span><span class="comment">// yes rust, exhaustive means exhaustive, even the deprecated ones
         </span><span class="kw">let </span><span class="self">Self </span>{
             id,
             channel_id,

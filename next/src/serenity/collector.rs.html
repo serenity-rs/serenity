@@ -186,24 +186,7 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-</pre></div><pre class="rust"><code><span class="comment">// Or we&#39;ll get deprecation warnings from our own deprecated type (seriously Rust?)
-</span><span class="attr">#![allow(deprecated)]
-
-</span><span class="kw">use </span>futures::future::pending;
+</pre></div><pre class="rust"><code><span class="kw">use </span>futures::future::pending;
 <span class="kw">use </span>futures::{Stream, StreamExt <span class="kw">as _</span>};
 
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{CollectorCallback, ShardMessenger};
@@ -329,12 +312,6 @@
                 </span>stream.take_until(Box::pin(timeout))
             }
 
-            <span class="doccomment">/// Deprecated, use [`Self::stream()`] instead.
-            </span><span class="attr">#[deprecated = <span class="string">&quot;use `.stream()` instead&quot;</span>]
-            </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="macro-nonterminal">$item_type</span>&gt; {
-                <span class="self">self</span>.stream()
-            }
-
             <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Returns the next [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$item_type</span>), <span class="string">&quot;`] which passes the filters.&quot;</span>)]
             #[doc = <span class="macro">concat!</span>(<span class="string">&quot;You can also call `.await` on the [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$collector_type</span>), <span class="string">&quot;`] directly.&quot;</span>)]
             </span><span class="kw">pub async fn </span>next(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$item_type</span>&gt; {
@@ -396,10 +373,5 @@
     author_id: UserId =&gt; message.author.id == <span class="kw-2">*</span>author_id,
     channel_id: ChannelId =&gt; message.channel_id == <span class="kw-2">*</span>channel_id,
     guild_id: GuildId =&gt; message.guild_id.map_or(<span class="bool-val">true</span>, |g| g == <span class="kw-2">*</span>guild_id),
-);
-<span class="macro">make_specific_collector!</span>(
-    <span class="attr">#[deprecated = <span class="string">&quot;prefer the stand-alone collect() function to collect arbitrary events&quot;</span>]
-    </span>EventCollector, Event,
-    event =&gt; event,
 );
 </code></pre></div></section></main></body></html>
