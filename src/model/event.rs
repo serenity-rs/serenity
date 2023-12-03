@@ -546,7 +546,6 @@ impl MessageUpdateEvent {
     pub fn apply_to_message(&self, message: &mut Message) {
         // Destructure, so we get an `unused` warning when we forget to process one of the fields
         // in this method
-        #[allow(deprecated)] // yes rust, exhaustive means exhaustive, even the deprecated ones
         let Self {
             id,
             channel_id,

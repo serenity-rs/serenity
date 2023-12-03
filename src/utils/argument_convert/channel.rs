@@ -79,7 +79,7 @@ async fn lookup_channel_global(
 ///
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by ID.
-/// 2. [Lookup by mention](`crate::utils::parse_channel`).
+/// 2. [Lookup by mention](`crate::utils::parse_channel_mention`).
 /// 3. Lookup by name.
 #[async_trait::async_trait]
 impl ArgumentConvert for Channel {
