@@ -1210,6 +1210,16 @@
 <a href="#1210" id="1210">1210</a>
 <a href="#1211" id="1211">1211</a>
 <a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -1671,8 +1681,18 @@
             }
         }
 
-        cache_http.http().get_message(<span class="self">self</span>, message_id).<span class="kw">await
-    </span>}
+        <span class="kw">let </span>message = cache_http.http().get_message(<span class="self">self</span>, message_id).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+
+            <span class="kw">let </span>message = MaybeOwnedArc::new(message.clone());
+            cache.temp_messages.insert(message_id, message);
+        }
+
+        <span class="prelude-val">Ok</span>(message)
+    }
 
     <span class="doccomment">/// Gets messages from the channel.
     ///
