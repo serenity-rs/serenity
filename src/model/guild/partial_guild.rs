@@ -1321,17 +1321,6 @@ impl PartialGuild {
         )
     }
 
-    /// Calculate a [`Role`]'s permissions in a given channel in the guild.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
-    #[inline]
-    #[deprecated = "this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead"]
-    pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
-        Guild::role_permissions_in_(channel, role, self.id)
-    }
-
     /// Gets the number of [`Member`]s that would be pruned with the given number of days.
     ///
     /// Requires the [Kick Members] permission.
