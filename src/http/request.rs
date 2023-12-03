@@ -1,5 +1,6 @@
 use std::fmt::Write;
 
+use arrayvec::ArrayVec;
 use reqwest::header::{
     HeaderMap as Headers,
     HeaderValue,
@@ -18,28 +19,32 @@ use crate::constants;
 use crate::internal::prelude::*;
 
 #[deprecated = "use Request directly now"]
-pub type RequestBuilder<'a> = Request<'a>;
+pub type RequestBuilder<'a, const MAX_PARAMS: usize> = Request<'a, MAX_PARAMS>;
 
 #[derive(Clone, Debug)]
 #[must_use]
-pub struct Request<'a> {
+pub struct Request<'a, const MAX_PARAMS: usize> {
     pub(super) body: Option<Vec<u8>>,
     pub(super) multipart: Option<Multipart>,
     pub(super) headers: Option<Headers>,
     pub(super) method: LightMethod,
     pub(super) route: Route<'a>,
-    pub(super) params: Option<Vec<(&'static str, String)>>,
+    pub(super) params: ArrayVec<(&'static str, String), MAX_PARAMS>,
 }
 
-impl<'a> Request<'a> {
-    pub const fn new(route: Route<'a>, method: LightMethod) -> Self {
+impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
+    pub fn new(
+        route: Route<'a>,
+        method: LightMethod,
+        params: [(&'static str, String); MAX_PARAMS],
+    ) -> Self {
         Self {
             body: None,
             multipart: None,
             headers: None,
             method,
             route,
-            params: None,
+            params: params.into(),
         }
     }
 
@@ -58,8 +63,8 @@ impl<'a> Request<'a> {
         self
     }
 
-    pub fn params(mut self, params: Option<Vec<(&'static str, String)>>) -> Self {
-        self.params = params;
+    pub fn params(mut self, params: [(&'static str, String); MAX_PARAMS]) -> Self {
+        self.params = params.into();
         self
     }
 
@@ -77,9 +82,9 @@ impl<'a> Request<'a> {
             path = path.replace("https://discord.com", proxy.trim_end_matches('/'));
         }
 
-        if let Some(params) = self.params {
+        if !self.params.is_empty() {
             path += "?";
-            for (param, value) in params {
+            for (param, value) in self.params {
                 write!(path, "&{param}={value}").unwrap();
             }
         }
@@ -138,11 +143,19 @@ impl<'a> Request<'a> {
 
     #[must_use]
     pub fn params_ref(&self) -> Option<&[(&'static str, String)]> {
-        self.params.as_deref()
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(&self.params)
+        }
     }
 
     #[must_use]
     pub fn params_mut(&mut self) -> Option<&mut [(&'static str, String)]> {
-        self.params.as_deref_mut()
+        if self.params.is_empty() {
+            None
+        } else {
+            Some(&mut self.params)
+        }
     }
 }
