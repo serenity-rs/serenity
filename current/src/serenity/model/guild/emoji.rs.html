@@ -213,6 +213,9 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
@@ -221,8 +224,6 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
-</span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::id::GuildId;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{EmojiId, RoleId};
@@ -302,11 +303,13 @@
     ///
     /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[deprecated = <span class="string">&quot;Use Guild(Id)::delete_emoji, this performs a loop over all guilds!&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[allow(deprecated)]
     #[inline]
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>guild_id = <span class="self">self</span>.try_find_guild_id(<span class="kw-2">&amp;</span>cache_http)<span class="question-mark">?</span>;
-        cache_http.http().delete_emoji(guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
+        guild_id.delete_emoji(cache_http.http(), <span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the emoji by updating it with a new name. This method requires the cache to fetch the
@@ -323,13 +326,12 @@
     ///
     /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[deprecated = <span class="string">&quot;Use Guild(Id)::edit_emoji, this performs a loop over all guilds!&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>guild_id = <span class="self">self</span>.try_find_guild_id(<span class="kw-2">&amp;</span>cache_http)<span class="question-mark">?</span>;
-        <span class="kw">let </span>map = <span class="macro">json!</span>({ <span class="string">&quot;name&quot;</span>: name });
-
-        <span class="kw-2">*</span><span class="self">self </span>= cache_http.http().edit_emoji(guild_id, <span class="self">self</span>.id, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
+        <span class="kw-2">*</span><span class="self">self </span>= guild_id.edit_emoji(cache_http.http(), <span class="self">self</span>.id, name).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -352,7 +354,9 @@
     /// }
     /// # }
     /// ```
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[deprecated = <span class="string">&quot;This performs a loop over all guilds and should not be used.&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[allow(deprecated)]
     #[must_use]
     </span><span class="kw">pub fn </span>find_guild_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildId&gt; {
         <span class="kw">for </span>guild_entry <span class="kw">in </span>cache.as_ref().guilds.iter() {
@@ -366,7 +370,9 @@
         <span class="prelude-val">None
     </span>}
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[deprecated = <span class="string">&quot;This performs a loop over all guilds and should not be used.&quot;</span>]
+    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[allow(deprecated)]
     #[inline]
     </span><span class="kw">fn </span>try_find_guild_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildId&gt; {
         cache_http
