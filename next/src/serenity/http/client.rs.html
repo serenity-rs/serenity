@@ -4576,6 +4576,19 @@
 <a href="#4576" id="4576">4576</a>
 <a href="#4577" id="4577">4577</a>
 <a href="#4578" id="4578">4578</a>
+<a href="#4579" id="4579">4579</a>
+<a href="#4580" id="4580">4580</a>
+<a href="#4581" id="4581">4581</a>
+<a href="#4582" id="4582">4582</a>
+<a href="#4583" id="4583">4583</a>
+<a href="#4584" id="4584">4584</a>
+<a href="#4585" id="4585">4585</a>
+<a href="#4586" id="4586">4586</a>
+<a href="#4587" id="4587">4587</a>
+<a href="#4588" id="4588">4588</a>
+<a href="#4589" id="4589">4589</a>
+<a href="#4590" id="4590">4590</a>
+<a href="#4591" id="4591">4591</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4605,7 +4618,6 @@
     HttpError,
     LightMethod,
     MessagePagination,
-    NoParams,
     UserPagination,
 };
 <span class="kw">use </span><span class="kw">crate</span>::builder::CreateAttachment;
@@ -4806,7 +4818,7 @@
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>response = <span class="self">self
-            </span>.request(Request::&lt;NoParams&gt; {
+            </span>.request(Request {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -4815,7 +4827,7 @@
                     guild_id,
                     user_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -4838,7 +4850,7 @@
         role_id: RoleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4848,7 +4860,7 @@
                 role_id,
                 user_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -4878,7 +4890,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;delete_message_days&quot;</span>, delete_message_days.to_string())]),
+            params: [(<span class="string">&quot;delete_message_days&quot;</span>, delete_message_days.to_string())].into(),
         })
         .<span class="kw">await
     </span>}
@@ -4891,7 +4903,7 @@
     /// This should rarely be used for bots, although it is a good indicator that a long-running
     /// command is still being processed.
     </span><span class="kw">pub async fn </span>broadcast_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -4899,7 +4911,7 @@
             route: Route::ChannelTyping {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -4920,7 +4932,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4928,7 +4940,7 @@
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -4939,13 +4951,13 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
             route: Route::StageInstances,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -4960,7 +4972,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4969,7 +4981,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -4983,7 +4995,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -4991,7 +5003,7 @@
             route: Route::ChannelThreads {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5005,7 +5017,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5013,7 +5025,7 @@
             route: Route::ChannelForumPosts {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5031,7 +5043,7 @@
         map: <span class="kw-2">&amp;</span>Value,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5039,7 +5051,7 @@
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5053,7 +5065,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         files: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5062,7 +5074,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -5089,7 +5101,7 @@
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     </span><span class="kw">pub async fn </span>create_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5097,7 +5109,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5107,7 +5119,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5115,7 +5127,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5126,7 +5138,7 @@
         guild_id: GuildId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5135,7 +5147,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5174,13 +5186,13 @@
     /// https://discord.com/developers/docs/resources/guild#create-guild
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     </span><span class="kw">pub async fn </span>create_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span>Value) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Post,
             route: Route::Guilds,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5197,7 +5209,7 @@
         guild_id: GuildId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5206,7 +5218,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5226,7 +5238,7 @@
         map: <span class="kw-2">&amp;</span>Value,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5235,7 +5247,7 @@
                 guild_id,
                 integration_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5253,7 +5265,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         files: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5262,7 +5274,7 @@
                 interaction_id,
                 token: interaction_token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -5296,7 +5308,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5304,7 +5316,7 @@
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5319,7 +5331,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5328,7 +5340,7 @@
                 channel_id,
                 target_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5337,13 +5349,13 @@
     </span><span class="kw">pub async fn </span>create_private_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span>Value) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Post,
             route: Route::UserMeDmChannels,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5355,7 +5367,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5365,7 +5377,7 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5378,7 +5390,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">Some</span>(to_vec(body)<span class="question-mark">?</span>),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -5386,7 +5398,7 @@
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -5411,7 +5423,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5419,7 +5431,7 @@
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5436,7 +5448,7 @@
         file: CreateAttachment,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">Some</span>(Multipart {
                 upload: MultipartUpload::File(file),
@@ -5448,7 +5460,7 @@
             route: Route::GuildStickers {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5487,7 +5499,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5495,7 +5507,7 @@
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5506,7 +5518,7 @@
         channel_id: ChannelId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5514,7 +5526,7 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5525,7 +5537,7 @@
         channel_id: ChannelId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5533,7 +5545,7 @@
             route: Route::StageInstance {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5547,7 +5559,7 @@
         emoji_id: EmojiId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5556,7 +5568,7 @@
                 guild_id,
                 emoji_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5567,7 +5579,7 @@
         interaction_token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5577,14 +5589,14 @@
                 token: interaction_token,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a global command.
     </span><span class="kw">pub async fn </span>delete_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>, command_id: CommandId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5593,14 +5605,14 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a guild, only if connected account owns it.
     </span><span class="kw">pub async fn </span>delete_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5608,7 +5620,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5619,7 +5631,7 @@
         guild_id: GuildId,
         command_id: CommandId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5629,7 +5641,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5641,7 +5653,7 @@
         integration_id: IntegrationId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5650,7 +5662,7 @@
                 guild_id,
                 integration_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5661,7 +5673,7 @@
         code: <span class="kw-2">&amp;</span>str,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5669,7 +5681,7 @@
             route: Route::Invite {
                 code,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5681,7 +5693,7 @@
         message_id: MessageId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5690,7 +5702,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5702,7 +5714,7 @@
         map: <span class="kw-2">&amp;</span>Value,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5710,7 +5722,7 @@
             route: Route::ChannelMessagesBulkDelete {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5738,7 +5750,7 @@
         channel_id: ChannelId,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5747,7 +5759,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5759,7 +5771,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5769,7 +5781,7 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5779,7 +5791,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interaction_token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5788,7 +5800,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5800,7 +5812,7 @@
         target_id: TargetId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5809,7 +5821,7 @@
                 channel_id,
                 target_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5822,7 +5834,7 @@
         user_id: UserId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5833,7 +5845,7 @@
                 user_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5845,7 +5857,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5855,7 +5867,7 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5867,7 +5879,7 @@
         role_id: RoleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5876,7 +5888,7 @@
                 guild_id,
                 role_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5892,7 +5904,7 @@
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -5901,7 +5913,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5915,7 +5927,7 @@
         sticker_id: StickerId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5924,7 +5936,7 @@
                 guild_id,
                 sticker_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5953,7 +5965,7 @@
         webhook_id: WebhookId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -5961,7 +5973,7 @@
             route: Route::Webhook {
                 webhook_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -5993,7 +6005,7 @@
         token: <span class="kw-2">&amp;</span>str,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6002,7 +6014,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6016,7 +6028,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6024,7 +6036,7 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6036,7 +6048,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6044,7 +6056,7 @@
             route: Route::StageInstance {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6061,7 +6073,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6070,7 +6082,7 @@
                 guild_id,
                 emoji_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6087,7 +6099,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6097,7 +6109,7 @@
                 token: interaction_token,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -6123,7 +6135,7 @@
         interaction_token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6133,7 +6145,7 @@
                 token: interaction_token,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6150,7 +6162,7 @@
         command_id: CommandId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6159,7 +6171,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6173,7 +6185,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6181,7 +6193,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6199,7 +6211,7 @@
         command_id: CommandId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6209,7 +6221,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6227,7 +6239,7 @@
         command_id: CommandId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6237,7 +6249,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6250,7 +6262,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>body = to_vec(value)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6258,7 +6270,7 @@
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6277,7 +6289,7 @@
 
         <span class="kw">let </span>body = to_vec(value)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6285,7 +6297,7 @@
             route: Route::GuildMfa {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
         </span>.map(|mfa: GuildMfaLevel| mfa.level)
@@ -6300,7 +6312,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWidget&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6308,7 +6320,7 @@
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6322,7 +6334,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWelcomeScreen&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6330,7 +6342,7 @@
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6346,7 +6358,7 @@
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6355,7 +6367,7 @@
                     guild_id,
                     user_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6376,7 +6388,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6385,7 +6397,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -6409,7 +6421,7 @@
         channel_id: ChannelId,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6418,7 +6430,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6432,7 +6444,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6440,7 +6452,7 @@
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6457,7 +6469,7 @@
         <span class="kw">let </span>map = <span class="macro">json!</span>({ <span class="string">&quot;nick&quot;</span>: new_nickname });
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.wind(<span class="number">200</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">200</span>, Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6465,7 +6477,7 @@
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6479,7 +6491,7 @@
         <span class="kw">let </span>map = <span class="macro">json!</span>({ <span class="string">&quot;webhook_channel_id&quot;</span>: target_channel_id });
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6487,7 +6499,7 @@
             route: Route::ChannelFollowNews {
                 channel_id: news_channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6497,7 +6509,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interaction_token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6506,7 +6518,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6522,7 +6534,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6531,7 +6543,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -6551,13 +6563,13 @@
     </span><span class="kw">pub async fn </span>edit_profile(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize) -&gt; <span class="prelude-ty">Result</span>&lt;CurrentUser&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Patch,
             route: Route::UserMe,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6571,7 +6583,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6580,7 +6592,7 @@
                     guild_id,
                     role_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6606,7 +6618,7 @@
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6614,7 +6626,7 @@
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6642,7 +6654,7 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6651,7 +6663,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6669,7 +6681,7 @@
         <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
@@ -6678,7 +6690,7 @@
                     guild_id,
                     sticker_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6696,7 +6708,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6704,7 +6716,7 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6745,7 +6757,7 @@
         user_id: UserId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6754,7 +6766,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6797,7 +6809,7 @@
         guild_id: GuildId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6805,7 +6817,7 @@
             route: Route::GuildVoiceStateMe {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6848,7 +6860,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6856,7 +6868,7 @@
             route: Route::Webhook {
                 webhook_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6895,7 +6907,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -6904,7 +6916,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -6975,7 +6987,7 @@
             params.push((<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string()));
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;ArrayVec&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -6984,7 +6996,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -7014,6 +7026,11 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">1</span>&gt;::new();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
+            params.push((<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string()));
+        }
+
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7024,7 +7041,7 @@
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| [(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -7039,6 +7056,11 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">1</span>&gt;::new();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
+            params.push((<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string()));
+        }
+
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7049,7 +7071,7 @@
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| [(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
+            params,
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -7073,6 +7095,11 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">1</span>&gt;::new();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
+            params.push((<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string()));
+        }
+
         <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7083,7 +7110,7 @@
                 token,
                 message_id,
             },
-            params: thread_id.map(|thread_id| [(<span class="string">&quot;thread_id&quot;</span>, thread_id.to_string())]),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -7099,13 +7126,13 @@
         }
 
         <span class="kw">let </span>status: StatusResponse = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesActive,
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -7149,7 +7176,7 @@
             route: Route::GuildBans {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -7185,7 +7212,7 @@
             route: Route::GuildAuditLogs {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -7194,7 +7221,7 @@
     ///
     /// This method requires `MANAGE_GUILD` permissions.
     </span><span class="kw">pub async fn </span>get_automod_rules(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Rule&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7202,7 +7229,7 @@
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7211,7 +7238,7 @@
     ///
     /// This method requires `MANAGE_GUILD` permissions.
     </span><span class="kw">pub async fn </span>get_automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7220,7 +7247,7 @@
                 guild_id,
                 rule_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7236,7 +7263,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -7244,7 +7271,7 @@
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7261,7 +7288,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(body),
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -7270,7 +7297,7 @@
                 guild_id,
                 rule_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7284,7 +7311,7 @@
         rule_id: RuleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -7293,27 +7320,27 @@
                 guild_id,
                 rule_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets current bot gateway.
     </span><span class="kw">pub async fn </span>get_bot_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;BotGateway&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::GatewayBot,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all invites for a channel.
     </span><span class="kw">pub async fn </span>get_channel_invites(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7321,7 +7348,7 @@
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7331,7 +7358,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ThreadMember&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7339,14 +7366,14 @@
             route: Route::ChannelThreadMembers {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all active threads from a guild.
     </span><span class="kw">pub async fn </span>get_guild_active_threads(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7354,7 +7381,7 @@
             route: Route::GuildThreadsActive {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7382,7 +7409,7 @@
             route: Route::ChannelArchivedPublicThreads {
                 channel_id,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -7410,7 +7437,7 @@
             route: Route::ChannelArchivedPrivateThreads {
                 channel_id,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -7438,14 +7465,14 @@
             route: Route::ChannelJoinedPrivateThreads {
                 channel_id,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Joins a thread channel.
     </span><span class="kw">pub async fn </span>join_thread_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7453,14 +7480,14 @@
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Leaves a thread channel.
     </span><span class="kw">pub async fn </span>leave_thread_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7468,7 +7495,7 @@
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7479,7 +7506,7 @@
         channel_id: ChannelId,
         user_id: UserId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7488,7 +7515,7 @@
                 channel_id,
                 user_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7499,7 +7526,7 @@
         channel_id: ChannelId,
         user_id: UserId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7508,7 +7535,7 @@
                 channel_id,
                 user_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7534,7 +7561,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_channel_webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7542,14 +7569,14 @@
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets channel information.
     </span><span class="kw">pub async fn </span>get_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7557,14 +7584,14 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all channels in a guild.
     </span><span class="kw">pub async fn </span>get_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;GuildChannel&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7572,14 +7599,14 @@
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a stage instance.
     </span><span class="kw">pub async fn </span>get_stage_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7587,7 +7614,7 @@
             route: Route::StageInstance {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7596,33 +7623,33 @@
     ///
     /// **Note**: Only applications may use this endpoint.
     </span><span class="kw">pub async fn </span>get_current_application_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;CurrentApplicationInfo&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::Oauth2ApplicationCurrent,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets information about the user we&#39;re connected with.
     </span><span class="kw">pub async fn </span>get_current_user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;CurrentUser&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMe,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all emojis of a guild.
     </span><span class="kw">pub async fn </span>get_emojis(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Emoji&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7630,14 +7657,14 @@
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets information about an emoji in a guild.
     </span><span class="kw">pub async fn </span>get_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7646,27 +7673,27 @@
                 guild_id,
                 emoji_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets current gateway.
     </span><span class="kw">pub async fn </span>get_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Gateway&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::Gateway,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Fetches all of the global commands for your application.
     </span><span class="kw">pub async fn </span>get_global_commands(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7674,7 +7701,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7689,14 +7716,14 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_localizations&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))]),
+            params: [(<span class="string">&quot;with_localizations&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Fetches a global commands for your application by its Id.
     </span><span class="kw">pub async fn </span>get_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>, command_id: CommandId) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7705,14 +7732,14 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets guild information.
     </span><span class="kw">pub async fn </span>get_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7720,7 +7747,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7735,14 +7762,14 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_counts&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))]),
+            params: [(<span class="string">&quot;with_counts&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Fetches all of the guild commands for your application for a specific guild.
     </span><span class="kw">pub async fn </span>get_guild_commands(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7751,7 +7778,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7771,7 +7798,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_localizations&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))]),
+            params: [(<span class="string">&quot;with_localizations&quot;</span>, String::from(<span class="string">&quot;true&quot;</span>))].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7782,7 +7809,7 @@
         guild_id: GuildId,
         command_id: CommandId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7792,7 +7819,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7802,7 +7829,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermissions&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7811,7 +7838,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7822,7 +7849,7 @@
         guild_id: GuildId,
         command_id: CommandId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7832,7 +7859,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7841,7 +7868,7 @@
     </span><span class="comment">// TODO: according to Discord, this returns different data; namely https://discord.com/developers/docs/resources/guild#guild-widget-object-guild-widget-structure.
     // Should investigate if this endpoint actually works
     </span><span class="kw">pub async fn </span>get_guild_widget(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWidget&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7849,14 +7876,14 @@
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a guild preview.
     </span><span class="kw">pub async fn </span>get_guild_preview(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPreview&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7864,14 +7891,14 @@
             route: Route::GuildPreview {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a guild welcome screen information.
     </span><span class="kw">pub async fn </span>get_guild_welcome_screen(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWelcomeScreen&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7879,14 +7906,14 @@
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets integrations that a guild has.
     </span><span class="kw">pub async fn </span>get_guild_integrations(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Integration&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7894,14 +7921,14 @@
             route: Route::GuildIntegrations {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all invites to a guild.
     </span><span class="kw">pub async fn </span>get_guild_invites(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7909,7 +7936,7 @@
             route: Route::GuildInvites {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7921,7 +7948,7 @@
             code: String,
         }
 
-        <span class="self">self</span>.fire::&lt;NoParams, GuildVanityUrl&gt;(Request {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -7929,10 +7956,10 @@
             route: Route::GuildVanityUrl {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
-        </span>.map(|x| x.code)
+        </span>.map(|x: GuildVanityUrl| x.code)
     }
 
     <span class="doccomment">/// Gets the members of a guild. Optionally pass a `limit` and the Id of the user to offset the
@@ -7964,7 +7991,7 @@
                 route: Route::GuildMembers {
                     guild_id,
                 },
-                params: <span class="prelude-val">Some</span>(params),
+                params,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -7989,7 +8016,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;days&quot;</span>, days.to_string())]),
+            params: [(<span class="string">&quot;days&quot;</span>, days.to_string())].into(),
         })
         .<span class="kw">await
     </span>}
@@ -7997,7 +8024,7 @@
     <span class="doccomment">/// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature enabled, then
     /// additional VIP-only regions are returned.
     </span><span class="kw">pub async fn </span>get_guild_regions(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;VoiceRegion&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8005,7 +8032,7 @@
             route: Route::GuildRegions {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8013,7 +8040,7 @@
     <span class="doccomment">/// Retrieves a list of roles in a [`Guild`].
     </span><span class="kw">pub async fn </span>get_guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8021,7 +8048,7 @@
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8056,7 +8083,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())]),
+            params: [(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8079,7 +8106,7 @@
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())]),
+            params: [(<span class="string">&quot;with_user_count&quot;</span>, with_user_count.to_string())].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8131,7 +8158,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -8139,7 +8166,7 @@
     <span class="doccomment">/// Retrieves a list of stickers in a [`Guild`].
     </span><span class="kw">pub async fn </span>get_guild_stickers(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Sticker&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8147,7 +8174,7 @@
                 route: Route::GuildStickers {
                     guild_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8169,7 +8196,7 @@
         sticker_id: StickerId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8178,7 +8205,7 @@
                     guild_id,
                     sticker_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8210,7 +8237,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_guild_webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8218,7 +8245,7 @@
             route: Route::GuildWebhooks {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8271,7 +8298,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMeGuilds,
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -8307,7 +8334,7 @@
     /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
     </span><span class="kw">pub async fn </span>get_current_user_guild_member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8315,7 +8342,7 @@
                 route: Route::UserMeGuildMember {
                     guild_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8362,7 +8389,7 @@
             route: Route::Invite {
                 code,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -8370,7 +8397,7 @@
     <span class="doccomment">/// Gets member of a guild.
     </span><span class="kw">pub async fn </span>get_member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
@@ -8379,7 +8406,7 @@
                     guild_id,
                     user_id,
                 },
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8396,7 +8423,7 @@
         channel_id: ChannelId,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8405,7 +8432,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8437,7 +8464,7 @@
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
@@ -8449,21 +8476,21 @@
             sticker_packs: Vec&lt;StickerPack&gt;,
         }
 
-        <span class="self">self</span>.fire::&lt;NoParams, StickerPacks&gt;(Request {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::StickerPacks,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
-        </span>.map(|s| s.sticker_packs)
+        </span>.map(|s: StickerPacks| s.sticker_packs)
     }
 
     <span class="doccomment">/// Gets all pins of a channel.
     </span><span class="kw">pub async fn </span>get_pins(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8471,7 +8498,7 @@
             route: Route::ChannelPins {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8500,14 +8527,14 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="prelude-val">Some</span>(params),
+            params,
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a sticker.
     </span><span class="kw">pub async fn </span>get_sticker(<span class="kw-2">&amp;</span><span class="self">self</span>, sticker_id: StickerId) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8515,7 +8542,7 @@
             route: Route::Sticker {
                 sticker_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8531,13 +8558,13 @@
         }
 
         <span class="kw">let </span>status: StatusResponse = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
                 method: LightMethod::Get,
                 route: Route::StatusIncidentsUnresolved,
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8555,13 +8582,13 @@
         }
 
         <span class="kw">let </span>status: StatusResponse = <span class="self">self
-            </span>.fire(Request::&lt;NoParams&gt; {
+            </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
                 multipart: <span class="prelude-val">None</span>,
                 headers: <span class="prelude-val">None</span>,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesUpcoming,
-                params: <span class="prelude-val">None</span>,
+                params: [].into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8570,7 +8597,7 @@
 
     <span class="doccomment">/// Gets a user by Id.
     </span><span class="kw">pub async fn </span>get_user(<span class="kw-2">&amp;</span><span class="self">self</span>, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;User&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8578,7 +8605,7 @@
             route: Route::User {
                 user_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8589,39 +8616,39 @@
     ///
     /// [`Connections`]: crate::model::application::Scope::Connections
     </span><span class="kw">pub async fn </span>get_user_connections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Connection&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMeConnections,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets our DM channels.
     </span><span class="kw">pub async fn </span>get_user_dm_channels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;PrivateChannel&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMeDmChannels,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all voice regions.
     </span><span class="kw">pub async fn </span>get_voice_regions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;VoiceRegion&gt;&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::VoiceRegions,
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8647,7 +8674,7 @@
     /// # }
     /// ```
     </span><span class="kw">pub async fn </span>get_webhook(<span class="kw-2">&amp;</span><span class="self">self</span>, webhook_id: WebhookId) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8655,7 +8682,7 @@
             route: Route::Webhook {
                 webhook_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8686,7 +8713,7 @@
         webhook_id: WebhookId,
         token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8695,7 +8722,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8723,7 +8750,7 @@
         <span class="kw">let </span>url = Url::parse(url).map_err(HttpError::Url)<span class="question-mark">?</span>;
         <span class="kw">let </span>(webhook_id, token) =
             <span class="kw">crate</span>::utils::parse_webhook(<span class="kw-2">&amp;</span>url).ok_or(HttpError::InvalidWebhook)<span class="question-mark">?</span>;
-        <span class="self">self</span>.fire(Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8732,7 +8759,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8744,7 +8771,7 @@
         user_id: UserId,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: reason.map(reason_into_header),
@@ -8753,14 +8780,14 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Leaves a guild.
     </span><span class="kw">pub async fn </span>leave_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8768,7 +8795,7 @@
             route: Route::UserMeGuild {
                 guild_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8784,7 +8811,7 @@
         files: Vec&lt;CreateAttachment&gt;,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>request = Request::&lt;NoParams&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8792,7 +8819,7 @@
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -8815,7 +8842,7 @@
         message_id: MessageId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -8824,7 +8851,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8836,7 +8863,7 @@
         user_id: UserId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -8845,7 +8872,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8862,7 +8889,7 @@
         role_id: RoleId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -8872,7 +8899,7 @@
                 user_id,
                 role_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8894,10 +8921,11 @@
                 route: Route::GuildMembersSearch {
                     guild_id,
                 },
-                params: <span class="prelude-val">Some</span>([
+                params: [
                     (<span class="string">&quot;query&quot;</span>, query.to_string()),
                     (<span class="string">&quot;limit&quot;</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()),
-                ]),
+                ]
+                .into(),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8927,7 +8955,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>([(<span class="string">&quot;days&quot;</span>, days.to_string())]),
+            params: [(<span class="string">&quot;days&quot;</span>, days.to_string())].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8938,7 +8966,7 @@
         guild_id: GuildId,
         integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
@@ -8947,7 +8975,7 @@
                 guild_id,
                 integration_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -8999,7 +9027,7 @@
         message_id: MessageId,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.wind(<span class="number">204</span>, Request::&lt;NoParams&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: audit_log_reason.map(reason_into_header),
@@ -9008,7 +9036,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="prelude-val">None</span>,
+            params: [].into(),
         })
         .<span class="kw">await
     </span>}
@@ -9038,9 +9066,9 @@
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
+    /// let mut request = Request::new(route, LightMethod::Post, []).body(Some(bytes));
     ///
-    /// let message = http.fire::&lt;_, Message&gt;(request).await?;
+    /// let message: Message = http.fire(request).await?;
     ///
     /// println!(&quot;Message content: {}&quot;, message.content);
     /// # Ok(())
@@ -9050,11 +9078,10 @@
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    </span><span class="kw">pub async fn </span>fire&lt;Params, T: DeserializeOwned&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
-    <span class="kw">where
-        </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
-        Params: std::fmt::Debug + Clone,
-    {
+    </span><span class="kw">pub async fn </span>fire&lt;T: DeserializeOwned, <span class="kw">const </span>MAX_PARAMS: usize&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        req: Request&lt;<span class="lifetime">&#39;_</span>, MAX_PARAMS&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
         <span class="kw">let </span>response = <span class="self">self</span>.request(req).<span class="kw">await</span><span class="question-mark">?</span>;
         decode_resp(response).<span class="kw">await
     </span>}
@@ -9082,7 +9109,7 @@
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
+    /// let mut request = Request::new(route, LightMethod::Post, []).body(Some(bytes));
     ///
     /// let response = http.request(request).await?;
     ///
@@ -9091,11 +9118,10 @@
     /// # }
     /// ```
     </span><span class="attr">#[instrument]
-    </span><span class="kw">pub async fn </span>request&lt;Params&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ReqwestResponse&gt;
-    <span class="kw">where
-        </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
-        Params: std::fmt::Debug + Clone,
-    {
+    </span><span class="kw">pub async fn </span>request&lt;<span class="kw">const </span>MAX_PARAMS: usize&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        req: Request&lt;<span class="lifetime">&#39;_</span>, MAX_PARAMS&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ReqwestResponse&gt; {
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimiter {
             ratelimiter.perform(req).<span class="kw">await</span><span class="question-mark">?
@@ -9118,11 +9144,11 @@
     ///
     /// This is a function that performs a light amount of work and returns an empty tuple, so it&#39;s
     /// called &quot;self.wind&quot; to denote that it&#39;s lightweight.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>wind&lt;Params&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: u16, req: Request&lt;<span class="lifetime">&#39;_</span>, Params&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
-    <span class="kw">where
-        </span>Params: IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, String)&gt;,
-        Params: std::fmt::Debug + Clone,
-    {
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>wind&lt;<span class="kw">const </span>MAX_PARAMS: usize&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        expected: u16,
+        req: Request&lt;<span class="lifetime">&#39;_</span>, MAX_PARAMS&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="self">self</span>.request(req).<span class="kw">await</span><span class="question-mark">?</span>;
 
