@@ -392,12 +392,17 @@ impl Message {
         }
 
         // Then replace all role mentions.
-        for id in &self.mention_roles {
-            let mention = id.mention().to_string();
+        if let Some(guild_id) = self.guild_id {
+            for id in &self.mention_roles {
+                let mention = id.mention().to_string();
 
-            if let Some(role) = id.to_role_cached(&cache) {
-                result = result.replace(&mention, &format!("@{}", role.name));
-            } else {
+                if let Some(guild) = cache.as_ref().guild(guild_id) {
+                    if let Some(role) = guild.roles.get(id) {
+                        result = result.replace(&mention, &format!("@{}", role.name));
+                        continue;
+                    }
+                }
+
                 result = result.replace(&mention, "@deleted-role");
             }
         }

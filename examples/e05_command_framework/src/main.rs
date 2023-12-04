@@ -530,20 +530,19 @@ async fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 // fails.
 #[command]
 async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
-    if let Some(member) = &msg.member {
-        for role in &member.roles {
-            if role
-                .to_role_cached(&ctx.cache)
-                .is_some_and(|r| r.has_permission(Permissions::ADMINISTRATOR))
-            {
-                msg.channel_id.say(&ctx.http, "Yes, you are.").await?;
+    let is_admin = if let (Some(member), Some(guild)) = (&msg.member, msg.guild(&ctx.cache)) {
+        member.roles.iter().any(|role| {
+            guild.roles.get(role).is_some_and(|r| r.has_permission(Permissions::ADMINISTRATOR))
+        })
+    } else {
+        false
+    };
 
-                return Ok(());
-            }
-        }
+    if is_admin {
+        msg.channel_id.say(&ctx.http, "Yes, you are.").await?;
+    } else {
+        msg.channel_id.say(&ctx.http, "No, you are not.").await?;
     }
-
-    msg.channel_id.say(&ctx.http, "No, you are not.").await?;
 
     Ok(())
 }

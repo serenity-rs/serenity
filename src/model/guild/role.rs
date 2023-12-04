@@ -164,6 +164,7 @@ impl PartialOrd for Role {
 impl RoleId {
     /// Tries to find the [`Role`] by its Id in the cache.
     #[cfg(feature = "cache")]
+    #[deprecated = "Use Guild::roles. This performs a loop over the entire cache!"]
     pub fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
         for guild_entry in cache.as_ref().guilds.iter() {
             let guild = guild_entry.value();
