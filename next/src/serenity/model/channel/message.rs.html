@@ -1132,6 +1132,11 @@
 <a href="#1132" id="1132">1132</a>
 <a href="#1133" id="1133">1133</a>
 <a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
@@ -1526,12 +1531,17 @@
         }
 
         <span class="comment">// Then replace all role mentions.
-        </span><span class="kw">for </span>id <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.mention_roles {
-            <span class="kw">let </span>mention = id.mention().to_string();
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.guild_id {
+            <span class="kw">for </span>id <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.mention_roles {
+                <span class="kw">let </span>mention = id.mention().to_string();
 
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = id.to_role_cached(<span class="kw-2">&amp;</span>cache) {
-                result = result.replace(<span class="kw-2">&amp;</span>mention, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, role.name));
-            } <span class="kw">else </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.as_ref().guild(guild_id) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild.roles.get(id) {
+                        result = result.replace(<span class="kw-2">&amp;</span>mention, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, role.name));
+                        <span class="kw">continue</span>;
+                    }
+                }
+
                 result = result.replace(<span class="kw-2">&amp;</span>mention, <span class="string">&quot;@deleted-role&quot;</span>);
             }
         }

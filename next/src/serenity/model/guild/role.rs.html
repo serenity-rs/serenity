@@ -294,6 +294,7 @@
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
 <a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::fmt;
 
@@ -460,6 +461,7 @@
 </span><span class="kw">impl </span>RoleId {
     <span class="doccomment">/// Tries to find the [`Role`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    #[deprecated = <span class="string">&quot;Use Guild::roles. This performs a loop over the entire cache!&quot;</span>]
     </span><span class="kw">pub fn </span>to_role_cached(<span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Role&gt; {
         <span class="kw">for </span>guild_entry <span class="kw">in </span>cache.as_ref().guilds.iter() {
             <span class="kw">let </span>guild = guild_entry.value();

@@ -438,6 +438,8 @@
 <a href="#438" id="438">438</a>
 <a href="#439" id="439">439</a>
 <a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
@@ -668,9 +670,11 @@
                 <span class="string">&quot;#deleted-channel&quot;</span>.into()
             }
         },
-        Mention::Role(id) =&gt; id
-            .to_role_cached(cache)
-            .map_or(Cow::Borrowed(<span class="string">&quot;@deleted-role&quot;</span>), |role| <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, role.name).into()),
+        Mention::Role(id) =&gt; options
+            .guild_reference
+            .and_then(|id| cache.guild(id))
+            .and_then(|g| g.roles.get(<span class="kw-2">&amp;</span>id).map(|role| <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, role.name).into()))
+            .unwrap_or(Cow::Borrowed(<span class="string">&quot;@deleted-role&quot;</span>)),
         Mention::User(id) =&gt; {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = options.guild_reference {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.guild(guild_id) {
