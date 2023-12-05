@@ -458,12 +458,12 @@ impl ShardRunner {
 
         self.update_manager().await;
 
-        let shard_id = self.shard.shard_info().id;
-        self.manager.restart_shard(shard_id).await;
+        let shard_info = self.shard.shard_info();
+        self.manager.restart_shard(shard_info).await;
 
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
-            voice_manager.deregister_shard(shard_id.0).await;
+            voice_manager.deregister_shard(shard_info.id.0).await;
         }
 
         Ok(())

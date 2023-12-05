@@ -61,6 +61,7 @@ pub use self::shard_runner_message::ShardRunnerMessage;
 #[cfg(feature = "voice")]
 pub use self::voice::VoiceGatewayManager;
 use super::ChunkGuildFilter;
+use crate::all::ShardInfo;
 use crate::gateway::ConnectionStage;
 use crate::model::event::Event;
 use crate::model::id::ShardId;
@@ -68,9 +69,8 @@ use crate::model::id::ShardId;
 /// A message to be sent to the [`ShardQueuer`].
 #[derive(Clone, Debug)]
 pub enum ShardQueuerMessage {
-    /// Message to start a shard, where the 0-index element is the ID of the Shard to start and the
-    /// 1-index element is the total shards in use.
-    Start(ShardId, ShardId),
+    /// Message to start a shard.
+    Start(ShardInfo),
     /// Message to shutdown the shard queuer.
     Shutdown,
     /// Message to dequeue/shutdown a shard.

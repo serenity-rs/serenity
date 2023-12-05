@@ -116,14 +116,19 @@ impl ShardQueuer {
                     debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
                     self.shutdown(shard, code).await;
                 },
-                Ok(Some(ShardQueuerMessage::Start(id, total))) => {
-                    debug!("[Shard Queuer] Received to start shard {} of {}.", id.0, total.0);
-                    self.checked_start(id, total.0).await;
+                Ok(Some(ShardQueuerMessage::Start(shard_info))) => {
+                    debug!(
+                        "[Shard Queuer] Received to start shard {} of {}.",
+                        shard_info.id, shard_info.total
+                    );
+
+                    self.check_last_start().await;
+                    self.checked_start(shard_info).await;
                 },
                 Ok(None) => break,
                 Err(_) => {
                     if let Some(shard) = self.queue.pop_front() {
-                        self.checked_start(shard.id, shard.total).await;
+                        self.checked_start(shard).await;
                     }
                 },
             }
@@ -148,24 +153,25 @@ impl ShardQueuer {
     }
 
     #[instrument(skip(self))]
-    async fn checked_start(&mut self, id: ShardId, total: u32) {
-        debug!("[Shard Queuer] Checked start for shard {} out of {}", id, total);
+    async fn checked_start(&mut self, shard_info: ShardInfo) {
+        debug!(
+            "[Shard Queuer] Checked start for shard {} out of {}",
+            shard_info.id, shard_info.total
+        );
+
         self.check_last_start().await;
+        if let Err(why) = self.start(shard_info).await {
+            warn!("[Shard Queuer] Err starting shard {}: {:?}", shard_info.id, why);
+            info!("[Shard Queuer] Re-queueing start of shard {}", shard_info.id);
 
-        if let Err(why) = self.start(id, total).await {
-            warn!("[Shard Queuer] Err starting shard {}: {:?}", id, why);
-            info!("[Shard Queuer] Re-queueing start of shard {}", id);
-
-            self.queue.push_back(ShardInfo::new(id, total));
+            self.queue.push_back(shard_info);
         }
 
         self.last_start = Some(Instant::now());
     }
 
     #[instrument(skip(self))]
-    async fn start(&mut self, id: ShardId, total: u32) -> Result<()> {
-        let shard_info = ShardInfo::new(id, total);
-
+    async fn start(&mut self, shard_info: ShardInfo) -> Result<()> {
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
             self.http.token(),
@@ -204,7 +210,7 @@ impl ShardQueuer {
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
-        self.runners.lock().await.insert(id, runner_info);
+        self.runners.lock().await.insert(shard_info.id, runner_info);
 
         Ok(())
     }

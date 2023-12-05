@@ -362,7 +362,7 @@ impl IntoFuture for ClientBuilder {
             let ws_url = Arc::new(Mutex::new(match http.get_gateway().await {
                 Ok(response) => response.url,
                 Err(err) => {
-                    tracing::warn!("HTTP request to get gateway URL failed: {}", err);
+                    tracing::warn!("HTTP request to get gateway URL failed: {err}");
                     "wss://gateway.discord.gg".to_string()
                 },
             }));
@@ -375,9 +375,6 @@ impl IntoFuture for ClientBuilder {
                 raw_event_handlers,
                 #[cfg(feature = "framework")]
                 framework: Arc::clone(&framework_cell),
-                shard_index: 0,
-                shard_init: 0,
-                shard_total: 0,
                 #[cfg(feature = "voice")]
                 voice_manager: voice_manager.as_ref().map(Arc::clone),
                 ws_url: Arc::clone(&ws_url),
@@ -855,16 +852,6 @@ impl Client {
         self.start_connection(range.start, range.end, total_shards).await
     }
 
-    /// Shard data layout is:
-    /// 0: first shard number to initialize
-    /// 1: shard number to initialize up to and including
-    /// 2: total number of shards the bot is sharding for
-    ///
-    /// Not all shards need to be initialized in this process.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     #[instrument(skip(self))]
     async fn start_connection(
         &mut self,
@@ -881,11 +868,9 @@ impl Client {
 
         let init = end_shard - start_shard + 1;
 
-        self.shard_manager.set_shards(start_shard, init, total_shards).await;
-
         debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
 
-        if let Err(why) = self.shard_manager.initialize() {
+        if let Err(why) = self.shard_manager.initialize(start_shard, init, total_shards) {
             error!("Failed to boot a shard: {:?}", why);
             info!("Shutting down all shards");
 
