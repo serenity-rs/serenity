@@ -65,7 +65,7 @@ use crate::model::gateway::GatewayIntents;
 /// impl RawEventHandler for Handler {}
 ///
 /// # let http: Arc<Http> = unimplemented!();
-/// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+/// let ws_url = Arc::from(http.get_gateway().await?.url);
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + 'static>;
@@ -75,12 +75,6 @@ use crate::model::gateway::GatewayIntents;
 ///     event_handlers: vec![event_handler],
 ///     raw_event_handlers: vec![],
 ///     framework: Arc::new(OnceLock::from(framework)),
-///     // the shard index to start initiating from
-///     shard_index: 0,
-///     // the number of shards to initiate (this initiates 0, 1, and 2)
-///     shard_init: 3,
-///     // the total number of shards in use
-///     shard_total: 5,
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
 ///     ws_url,
@@ -195,12 +189,13 @@ impl ShardManager {
     /// Restarting a shard by ID:
     ///
     /// ```rust,no_run
+    /// use serenity::model::gateway::ShardInfo;
     /// use serenity::model::id::ShardId;
     /// use serenity::prelude::*;
     ///
     /// # async fn run(client: Client) {
     /// // restart shard ID 7
-    /// client.shard_manager.restart(ShardId(7)).await;
+    /// client.shard_manager.restart(ShardInfo::new(ShardId(7), 10)).await;
     /// # }
     /// ```
     ///
