@@ -363,7 +363,7 @@ pub struct ShardManagerOptions {
     pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
-    pub ws_url: Arc<Mutex<String>>,
+    pub ws_url: Arc<str>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,

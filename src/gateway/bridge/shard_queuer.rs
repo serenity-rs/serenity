@@ -72,7 +72,7 @@ pub struct ShardQueuer {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
-    pub ws_url: Arc<Mutex<String>>,
+    pub ws_url: Arc<str>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,

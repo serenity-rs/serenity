@@ -30,7 +30,7 @@ use std::sync::OnceLock;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 use tracing::{debug, error, info, instrument};
 use typemap_rev::{TypeMap, TypeMapKey};
 
@@ -359,13 +359,13 @@ impl IntoFuture for ClientBuilder {
         let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
-            let ws_url = Arc::new(Mutex::new(match http.get_gateway().await {
-                Ok(response) => response.url,
+            let ws_url = match http.get_gateway().await {
+                Ok(response) => Arc::from(response.url),
                 Err(err) => {
                     tracing::warn!("HTTP request to get gateway URL failed: {err}");
-                    "wss://gateway.discord.gg".to_string()
+                    Arc::from("wss://gateway.discord.gg")
                 },
-            }));
+            };
 
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceLock::new());
@@ -609,11 +609,7 @@ pub struct Client {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// URL that the client's shards will use to connect to the gateway.
-    ///
-    /// This is likely not important for production usage and is, at best, used for debugging.
-    ///
-    /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated value available.
-    pub ws_url: Arc<Mutex<String>>,
+    pub ws_url: Arc<str>,
     /// The cache for the client.
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,

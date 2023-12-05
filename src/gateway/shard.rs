@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
-use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
@@ -73,7 +72,7 @@ pub struct Shard {
     // a decent amount of time.
     pub started: Instant,
     pub token: String,
-    ws_url: Arc<Mutex<String>>,
+    ws_url: Arc<str>,
     pub intents: GatewayIntents,
 }
 
@@ -119,14 +118,13 @@ impl Shard {
     /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`] or a Rustls/native
     /// TLS error.
     pub async fn new(
-        ws_url: Arc<Mutex<String>>,
+        ws_url: Arc<str>,
         token: &str,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
     ) -> Result<Shard> {
-        let url = ws_url.lock().await.clone();
-        let client = connect(&url).await?;
+        let client = connect(&ws_url).await?;
 
         let presence = presence.unwrap_or_default();
         let last_heartbeat_sent = None;
@@ -702,8 +700,7 @@ impl Shard {
         // Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
-        let url = &self.ws_url.lock().await.clone();
-        let client = connect(url).await?;
+        let client = connect(&self.ws_url).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)
