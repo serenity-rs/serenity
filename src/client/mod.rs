@@ -22,6 +22,7 @@ mod error;
 mod event_handler;
 
 use std::future::IntoFuture;
+use std::num::NonZeroU16;
 use std::ops::Range;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
@@ -359,11 +360,13 @@ impl IntoFuture for ClientBuilder {
         let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
-            let ws_url = match http.get_gateway().await {
-                Ok(response) => Arc::from(response.url),
+            let (ws_url, max_concurrency) = match http.get_bot_gateway().await {
+                Ok(response) => {
+                    (Arc::from(response.url), response.session_start_limit.max_concurrency)
+                },
                 Err(err) => {
                     tracing::warn!("HTTP request to get gateway URL failed: {err}");
-                    Arc::from("wss://gateway.discord.gg")
+                    (Arc::from("wss://gateway.discord.gg"), NonZeroU16::new(1).expect("1 != 0"))
                 },
             };
 
@@ -383,6 +386,7 @@ impl IntoFuture for ClientBuilder {
                 http: Arc::clone(&http),
                 intents,
                 presence: Some(presence),
+                max_concurrency,
             });
 
             let client = Client {

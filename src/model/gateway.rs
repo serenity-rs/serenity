@@ -363,7 +363,7 @@ pub struct SessionStartLimit {
     /// The total number of session starts within the ratelimit period allowed.
     pub total: u64,
     /// The number of identify requests allowed per 5 seconds.
-    pub max_concurrency: u64,
+    pub max_concurrency: NonZeroU16,
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]

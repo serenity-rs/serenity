@@ -1,4 +1,5 @@
 use std::collections::{HashMap, VecDeque};
+use std::num::NonZeroU16;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
 use std::sync::OnceLock;
@@ -68,6 +69,7 @@ use crate::model::gateway::GatewayIntents;
 /// let ws_url = Arc::from(http.get_gateway().await?.url);
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
+/// let max_concurrency = std::num::NonZeroU16::new(1).expect("1 != 0");
 /// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
@@ -83,6 +85,7 @@ use crate::model::gateway::GatewayIntents;
 ///     # http,
 ///     intents: GatewayIntents::non_privileged(),
 ///     presence: None,
+///     max_concurrency,
 /// });
 /// # Ok(())
 /// # }
@@ -144,6 +147,7 @@ impl ShardManager {
             http: opt.http,
             intents: opt.intents,
             presence: opt.presence,
+            max_concurrency: opt.max_concurrency,
         };
 
         spawn_named("shard_queuer::run", async move {
@@ -364,4 +368,5 @@ pub struct ShardManagerOptions {
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
+    pub max_concurrency: NonZeroU16,
 }

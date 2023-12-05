@@ -1,4 +1,5 @@
 use std::collections::{HashMap, VecDeque};
+use std::num::NonZeroU16;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
 use std::sync::OnceLock;
@@ -6,7 +7,7 @@ use std::sync::OnceLock;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::StreamExt;
 use tokio::sync::{Mutex, RwLock};
-use tokio::time::{sleep, timeout, Duration, Instant};
+use tokio::time::{timeout, Duration, Instant};
 use tracing::{debug, info, instrument, warn};
 use typemap_rev::TypeMap;
 
@@ -78,6 +79,10 @@ pub struct ShardQueuer {
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
+    /// The maximum amount of shards that can be started at once.
+    ///
+    /// This is almost always 1, but for bots in more than 150,000 servers this can be more.
+    pub max_concurrency: NonZeroU16,
 }
 
 impl ShardQueuer {
@@ -116,62 +121,39 @@ impl ShardQueuer {
                     debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
                     self.shutdown(shard, code).await;
                 },
-                Ok(Some(ShardQueuerMessage::Start(shard_info))) => {
-                    debug!(
-                        "[Shard Queuer] Received to start shard {} of {}.",
-                        shard_info.id, shard_info.total
-                    );
-
-                    self.check_last_start().await;
-                    self.checked_start(shard_info).await;
+                Ok(Some(ShardQueuerMessage::Start(info))) => {
+                    self.queue.push_back(info);
                 },
                 Ok(None) => break,
-                Err(_) => {
-                    if let Some(shard) = self.queue.pop_front() {
-                        self.checked_start(shard).await;
-                    }
-                },
+                Err(_) => self.start_batch().await,
             }
         }
     }
 
     #[instrument(skip(self))]
-    async fn check_last_start(&mut self) {
-        let Some(instant) = self.last_start else { return };
-
-        // We must wait 5 seconds between IDENTIFYs to avoid session invalidations.
-        let duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
-        let elapsed = instant.elapsed();
-
-        if elapsed >= duration {
+    async fn start_batch(&mut self) {
+        if self.queue.is_empty() {
             return;
         }
 
-        let to_sleep = duration - elapsed;
+        let batch_size = (self.max_concurrency.get() as usize).min(self.queue.len());
+        debug!("[Shard Queuer] Starting batch of {batch_size} shards.");
 
-        sleep(to_sleep).await;
-    }
+        for shard_info in self.queue.drain(..batch_size).collect::<Vec<_>>() {
+            if let Err(why) = self.start(shard_info).await {
+                warn!("[Shard Queuer] Err starting shard {}: {:?}", shard_info.id, why);
+                info!("[Shard Queuer] Re-queueing start of shard {}", shard_info.id);
 
-    #[instrument(skip(self))]
-    async fn checked_start(&mut self, shard_info: ShardInfo) {
-        debug!(
-            "[Shard Queuer] Checked start for shard {} out of {}",
-            shard_info.id, shard_info.total
-        );
-
-        self.check_last_start().await;
-        if let Err(why) = self.start(shard_info).await {
-            warn!("[Shard Queuer] Err starting shard {}: {:?}", shard_info.id, why);
-            info!("[Shard Queuer] Re-queueing start of shard {}", shard_info.id);
-
-            self.queue.push_back(shard_info);
+                // Try again, must be in same batch so in push_front.
+                self.queue.push_front(shard_info);
+            }
         }
 
         self.last_start = Some(Instant::now());
     }
 
     #[instrument(skip(self))]
-    async fn start(&mut self, shard_info: ShardInfo) -> Result<()> {
+    async fn start(&self, shard_info: ShardInfo) -> Result<()> {
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
             self.http.token(),
