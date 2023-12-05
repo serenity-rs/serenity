@@ -202,31 +202,12 @@ impl ClientBuilder {
 
     /// Sets the voice gateway handler to be used. It will receive voice events sent over the
     /// gateway and then consider - based on its settings - whether to dispatch a command.
-    ///
-    /// *Info*: If a reference to the voice_manager is required for manual dispatch, use the
-    /// [`Self::voice_manager_arc`]-method instead.
     #[cfg(feature = "voice")]
-    pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
+    pub fn voice_manager_arc<V>(mut self, voice_manager: impl Into<Arc<V>>) -> Self
     where
         V: VoiceGatewayManager + 'static,
     {
-        self.voice_manager = Some(Arc::new(voice_manager));
-
-        self
-    }
-
-    /// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is done for you in the
-    /// [`voice_manager`]-method, if you don't need the extra control. You can provide a clone and
-    /// keep the original to manually dispatch.
-    ///
-    /// [`voice_manager`]: Self::voice_manager
-    #[cfg(feature = "voice")]
-    pub fn voice_manager_arc(
-        mut self,
-        voice_manager: Arc<dyn VoiceGatewayManager + 'static>,
-    ) -> Self {
-        self.voice_manager = Some(voice_manager);
-
+        self.voice_manager = Some(voice_manager.into());
         self
     }
 
