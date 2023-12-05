@@ -268,18 +268,11 @@ impl ClientBuilder {
     }
 
     /// Adds an event handler with multiple methods for each possible event.
-    pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
-        self.event_handlers.push(Arc::new(event_handler));
-
-        self
-    }
-
-    /// Adds an event handler with multiple methods for each possible event. Passed by Arc.
-    pub fn event_handler_arc<H: EventHandler + 'static>(
-        mut self,
-        event_handler_arc: Arc<H>,
-    ) -> Self {
-        self.event_handlers.push(event_handler_arc);
+    pub fn event_handler<H>(mut self, event_handler: impl Into<Arc<H>>) -> Self
+    where
+        H: EventHandler + 'static,
+    {
+        self.event_handlers.push(event_handler.into());
 
         self
     }
