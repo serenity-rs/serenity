@@ -1139,8 +1139,6 @@ impl Guild {
 
     /// Edits an [`Emoji`]'s name in the guild.
     ///
-    /// Also see [`Emoji::edit`] if you have the `cache` and `model` features enabled.
-    ///
     /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
     /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
     /// Expressions] permission is required.
