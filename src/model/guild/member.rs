@@ -274,9 +274,8 @@ impl Member {
     /// Retrieves the ID and position of the member's highest role in the hierarchy, if they have
     /// one.
     ///
-    /// This _may_ return [`None`] if:
-    /// - the user has roles, but they are not present in the cache for cache inconsistency reasons
-    /// - you already have a write lock to the member's guild
+    /// This _may_ return [`None`] if the user has roles, but they are not present in the cache for
+    /// cache inconsistency reasons.
     ///
     /// The "highest role in hierarchy" is defined as the role with the highest position. If two or
     /// more roles have the same highest position, then the role with the lowest ID is the highest.
