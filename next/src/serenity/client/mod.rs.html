@@ -875,32 +875,6 @@
 <a href="#875" id="875">875</a>
 <a href="#876" id="876">876</a>
 <a href="#877" id="877">877</a>
-<a href="#878" id="878">878</a>
-<a href="#879" id="879">879</a>
-<a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
-<a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
-<a href="#888" id="888">888</a>
-<a href="#889" id="889">889</a>
-<a href="#890" id="890">890</a>
-<a href="#891" id="891">891</a>
-<a href="#892" id="892">892</a>
-<a href="#893" id="893">893</a>
-<a href="#894" id="894">894</a>
-<a href="#895" id="895">895</a>
-<a href="#896" id="896">896</a>
-<a href="#897" id="897">897</a>
-<a href="#898" id="898">898</a>
-<a href="#899" id="899">899</a>
-<a href="#900" id="900">900</a>
-<a href="#901" id="901">901</a>
-<a href="#902" id="902">902</a>
-<a href="#903" id="903">903</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -1105,31 +1079,12 @@
 
     <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent over the
     /// gateway and then consider - based on its settings - whether to dispatch a command.
-    ///
-    /// *Info*: If a reference to the voice_manager is required for manual dispatch, use the
-    /// [`Self::voice_manager_arc`]-method instead.
     </span><span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
-    </span><span class="kw">pub fn </span>voice_manager&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, voice_manager: V) -&gt; <span class="self">Self
+    </span><span class="kw">pub fn </span>voice_manager&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, voice_manager: <span class="kw">impl </span>Into&lt;Arc&lt;V&gt;&gt;) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>V: VoiceGatewayManager + <span class="lifetime">'static</span>,
     {
-        <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(Arc::new(voice_manager));
-
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is done for you in the
-    /// [`voice_manager`]-method, if you don't need the extra control. You can provide a clone and
-    /// keep the original to manually dispatch.
-    ///
-    /// [`voice_manager`]: Self::voice_manager
-    </span><span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
-    </span><span class="kw">pub fn </span>voice_manager_arc(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        voice_manager: Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">'static</span>&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(voice_manager);
-
+        <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(voice_manager.into());
         <span class="self">self
     </span>}
 
@@ -1171,18 +1126,11 @@
     }
 
     <span class="doccomment">/// Adds an event handler with multiple methods for each possible event.
-    </span><span class="kw">pub fn </span>event_handler&lt;H: EventHandler + <span class="lifetime">'static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, event_handler: H) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.event_handlers.push(Arc::new(event_handler));
-
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Adds an event handler with multiple methods for each possible event. Passed by Arc.
-    </span><span class="kw">pub fn </span>event_handler_arc&lt;H: EventHandler + <span class="lifetime">'static</span>&gt;(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        event_handler_arc: Arc&lt;H&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.event_handlers.push(event_handler_arc);
+    </span><span class="kw">pub fn </span>event_handler&lt;H&gt;(<span class="kw-2">mut </span><span class="self">self</span>, event_handler: <span class="kw">impl </span>Into&lt;Arc&lt;H&gt;&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>H: EventHandler + <span class="lifetime">'static</span>,
+    {
+        <span class="self">self</span>.event_handlers.push(event_handler.into());
 
         <span class="self">self
     </span>}
