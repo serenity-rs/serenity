@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/dispatch.rs`."><title>dispatch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/dispatch.rs`."><title>dispatch.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -485,42 +485,42 @@
 
 <span class="kw">use </span>tracing::debug;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::event_handler::{EventHandler, RawEventHandler};
 <span class="kw">use super</span>::{Context, FullEvent};
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, CacheUpdate};
-<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
 <span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::ChannelType;
 <span class="kw">use </span><span class="kw">crate</span>::model::event::Event;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::Member;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::id::GuildId;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="macro">macro_rules! </span>if_cache {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
         <span class="macro-nonterminal">$e
     </span>};
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
 </span><span class="macro">macro_rules! </span>if_cache {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
         <span class="prelude-val">None
     </span>};
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="macro">macro_rules! </span>update_cache {
     (<span class="macro-nonterminal">$cache</span>:ident, <span class="macro-nonterminal">$event</span>:ident) =&gt; {
         <span class="macro-nonterminal">$event</span>.update(<span class="macro-nonterminal">$cache</span>)
     };
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
 </span><span class="macro">macro_rules! </span>update_cache {
     (<span class="macro-nonterminal">$cache</span>:ident, <span class="macro-nonterminal">$event</span>:ident) =&gt; {};
 }
@@ -528,7 +528,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dispatch_model(
     event: Event,
     context: <span class="kw-2">&amp;</span>Context,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)] </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)] </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
 ) {
@@ -538,7 +538,7 @@
     }
 
     <span class="kw">let </span>full_events = update_cache_with_event(
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw-2">&amp;</span>context.cache,
         event,
     );
@@ -555,12 +555,12 @@
             }
         }
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(framework) = framework {
             <span class="kw">for </span>event <span class="kw">in </span>iter {
                 <span class="kw">let </span>context = context.clone();
                 <span class="kw">let </span>framework = Arc::clone(<span class="kw-2">&amp;</span>framework);
-                spawn_named(<span class="string">&quot;dispatch::framework::dispatch&quot;</span>, <span class="kw">async move </span>{
+                spawn_named(<span class="string">"dispatch::framework::dispatch"</span>, <span class="kw">async move </span>{
                     framework.dispatch(context, event).<span class="kw">await</span>;
                 });
             }
@@ -570,13 +570,13 @@
 
 <span class="doccomment">/// Updates the cache with the incoming event data and builds the full event data out of it.
 ///
-/// Can return a secondary [`FullEvent`] for &quot;virtual&quot; events like [`FullEvent::CacheReady`] or
+/// Can return a secondary [`FullEvent`] for "virtual" events like [`FullEvent::CacheReady`] or
 /// [`FullEvent::ShardsReady`]. Secondary events are traditionally dispatched first.
 ///
 /// Can return `None` if an event is unknown.
-</span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
+</span><span class="attr">#[cfg_attr(not(feature = <span class="string">"cache"</span>), allow(unused_mut))]
 </span><span class="kw">fn </span>update_cache_with_event(
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span>cache: <span class="kw-2">&amp;</span>Cache,
+    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)] </span>cache: <span class="kw-2">&amp;</span>Cache,
     event: Event,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;(FullEvent, <span class="prelude-ty">Option</span>&lt;FullEvent&gt;)&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>extra_event = <span class="prelude-val">None</span>;
@@ -653,7 +653,7 @@
 
             <span class="macro">update_cache!</span>(cache, event);
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
             </span>{
                 <span class="kw">if </span>cache.unavailable_guilds.len() == <span class="number">0 </span>{
                     cache.unavailable_guilds.shrink_to_fit();
@@ -828,7 +828,7 @@
         Event::Ready(<span class="kw-2">mut </span>event) =&gt; {
             <span class="macro">update_cache!</span>(cache, event);
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
             </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>shards = cache.shard_data.write();
                 <span class="kw">if </span>shards.connected.len() <span class="kw">as </span>u32 == shards.total &amp;&amp; !shards.has_sent_shards_ready {
@@ -853,7 +853,7 @@
             event,
         },
         Event::Unknown(event) =&gt; {
-            <span class="macro">debug!</span>(<span class="string">&quot;An unknown event was received: {event:?}&quot;</span>);
+            <span class="macro">debug!</span>(<span class="string">"An unknown event was received: {event:?}"</span>);
             <span class="kw">return </span><span class="prelude-val">None</span>;
         },
         Event::UserUpdate(<span class="kw-2">mut </span>event) =&gt; {

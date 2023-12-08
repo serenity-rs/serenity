@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/structures.rs`."><title>structures.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/structures.rs`."><title>structures.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -682,9 +682,9 @@
     <span class="attr">#[inline]
     </span><span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str, span: Span) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">match </span>s {
-            <span class="string">&quot;guilds&quot; </span>| <span class="string">&quot;guild&quot; </span>=&gt; <span class="prelude-val">Ok</span>(OnlyIn::Guild),
-            <span class="string">&quot;dms&quot; </span>| <span class="string">&quot;dm&quot; </span>=&gt; <span class="prelude-val">Ok</span>(OnlyIn::Dm),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(span, <span class="string">&quot;invalid restriction type&quot;</span>)),
+            <span class="string">"guilds" </span>| <span class="string">"guild" </span>=&gt; <span class="prelude-val">Ok</span>(OnlyIn::Guild),
+            <span class="string">"dms" </span>| <span class="string">"dm" </span>=&gt; <span class="prelude-val">Ok</span>(OnlyIn::Dm),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(span, <span class="string">"invalid restriction type"</span>)),
         }
     }
 }
@@ -720,7 +720,7 @@
                 Pat::Wild(wild) =&gt; {
                     <span class="kw">let </span>token = wild.underscore_token;
 
-                    <span class="kw">let </span>name = Ident::new(<span class="string">&quot;_&quot;</span>, token.spans[<span class="number">0</span>]);
+                    <span class="kw">let </span>name = Ident::new(<span class="string">"_"</span>, token.spans[<span class="number">0</span>]);
 
                     <span class="prelude-val">Ok</span>(Argument {
                         mutable: <span class="prelude-val">None</span>,
@@ -728,11 +728,11 @@
                         kind: <span class="kw-2">*</span>kind,
                     })
                 },
-                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(pat.span(), <span class="macro">format_args!</span>(<span class="string">&quot;unsupported pattern: {pat:?}&quot;</span>))),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::new(pat.span(), <span class="macro">format_args!</span>(<span class="string">"unsupported pattern: {pat:?}"</span>))),
             }
         },
         FnArg::Receiver(<span class="kw">_</span>) =&gt; {
-            <span class="prelude-val">Err</span>(Error::new(arg.span(), <span class="macro">format_args!</span>(<span class="string">&quot;`self` arguments are prohibited: {arg:?}&quot;</span>)))
+            <span class="prelude-val">Err</span>(Error::new(arg.span(), <span class="macro">format_args!</span>(<span class="string">"`self` arguments are prohibited: {arg:?}"</span>)))
         },
     }
 }
@@ -740,13 +740,13 @@
 <span class="doccomment">/// Test if the attribute is cooked.
 </span><span class="kw">fn </span>is_cooked(attr: <span class="kw-2">&amp;</span>Attribute) -&gt; bool {
     <span class="kw">const </span>COOKED_ATTRIBUTE_NAMES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] =
-        <span class="kw-2">&amp;</span>[<span class="string">&quot;cfg&quot;</span>, <span class="string">&quot;cfg_attr&quot;</span>, <span class="string">&quot;derive&quot;</span>, <span class="string">&quot;inline&quot;</span>, <span class="string">&quot;allow&quot;</span>, <span class="string">&quot;warn&quot;</span>, <span class="string">&quot;deny&quot;</span>, <span class="string">&quot;forbid&quot;</span>];
+        <span class="kw-2">&amp;</span>[<span class="string">"cfg"</span>, <span class="string">"cfg_attr"</span>, <span class="string">"derive"</span>, <span class="string">"inline"</span>, <span class="string">"allow"</span>, <span class="string">"warn"</span>, <span class="string">"deny"</span>, <span class="string">"forbid"</span>];
 
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
 
 <span class="kw">pub fn </span>is_rustfmt_or_clippy_attr(path: <span class="kw-2">&amp;</span>Path) -&gt; bool {
-    path.segments.first().map_or(<span class="bool-val">false</span>, |s| s.ident == <span class="string">&quot;rustfmt&quot; </span>|| s.ident == <span class="string">&quot;clippy&quot;</span>)
+    path.segments.first().map_or(<span class="bool-val">false</span>, |s| s.ident == <span class="string">"rustfmt" </span>|| s.ident == <span class="string">"clippy"</span>)
 }
 
 <span class="doccomment">/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the
@@ -776,7 +776,7 @@
 </span><span class="kw">pub struct </span>CommandFun {
     <span class="doccomment">/// `#[...]`-style attributes.
     </span><span class="kw">pub </span>attributes: Vec&lt;Attribute&gt;,
-    <span class="doccomment">/// Populated cooked attributes. These are attributes outside of the realm of this crate&#39;s
+    <span class="doccomment">/// Populated cooked attributes. These are attributes outside of the realm of this crate's
     /// procedural macros and will appear in generated output.
     </span><span class="kw">pub </span>cooked: Vec&lt;Attribute&gt;,
     <span class="kw">pub </span>visibility: Visibility,
@@ -787,11 +787,11 @@
 }
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>CommandFun {
-    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>attributes = input.call(Attribute::parse_outer)<span class="question-mark">?</span>;
 
-        <span class="comment">// Rename documentation comment attributes (`#[doc = &quot;...&quot;]`) to `#[description = &quot;...&quot;]`.
-        </span>util::rename_attributes(<span class="kw-2">&amp;mut </span>attributes, <span class="string">&quot;doc&quot;</span>, <span class="string">&quot;description&quot;</span>);
+        <span class="comment">// Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
+        </span>util::rename_attributes(<span class="kw-2">&amp;mut </span>attributes, <span class="string">"doc"</span>, <span class="string">"description"</span>);
 
         <span class="kw">let </span>cooked = remove_cooked(<span class="kw-2">&amp;mut </span>attributes);
 
@@ -809,7 +809,7 @@
             ReturnType::Type(<span class="kw">_</span>, t) =&gt; (<span class="kw-2">*</span>t).clone(),
             ReturnType::Default =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(input
-                    .error(<span class="string">&quot;expected a result type of either `CommandResult` or `CheckResult`&quot;</span>))
+                    .error(<span class="string">"expected a result type of either `CommandResult` or `CheckResult`"</span>))
             },
         };
 
@@ -878,7 +878,7 @@
 }
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>Hook {
-    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>attributes = input.call(Attribute::parse_outer)<span class="question-mark">?</span>;
 
         <span class="kw">if </span>is_function(input) {
@@ -889,11 +889,11 @@
     }
 }
 
-<span class="kw">fn </span>is_function(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+<span class="kw">fn </span>is_function(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; bool {
     input.peek(<span class="macro">Token!</span>[<span class="kw">pub</span>]) || (input.peek(<span class="macro">Token!</span>[<span class="kw">async</span>]) &amp;&amp; input.peek2(<span class="macro">Token!</span>[<span class="kw">fn</span>]))
 }
 
-<span class="kw">fn </span>parse_function_hook(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;, attributes: Vec&lt;Attribute&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;FunctionHook&gt; {
+<span class="kw">fn </span>parse_function_hook(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;, attributes: Vec&lt;Attribute&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;FunctionHook&gt; {
     <span class="kw">let </span>visibility = input.parse::&lt;Visibility&gt;()<span class="question-mark">?</span>;
 
     input.parse::&lt;<span class="macro">Token!</span>[<span class="kw">async</span>]&gt;()<span class="question-mark">?</span>;
@@ -907,7 +907,7 @@
     <span class="kw">let </span>ret = <span class="kw">match </span>input.parse::&lt;ReturnType&gt;()<span class="question-mark">? </span>{
         ReturnType::Type(<span class="kw">_</span>, t) =&gt; (<span class="kw-2">*</span>t).clone(),
         ReturnType::Default =&gt; {
-            Type::Verbatim(TokenStream2::from_str(<span class="string">&quot;()&quot;</span>).expect(<span class="string">&quot;Invalid str to create `()`-type&quot;</span>))
+            Type::Verbatim(TokenStream2::from_str(<span class="string">"()"</span>).expect(<span class="string">"Invalid str to create `()`-type"</span>))
         },
     };
 
@@ -928,7 +928,7 @@
     })
 }
 
-<span class="kw">fn </span>parse_closure_hook(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;, attributes: Vec&lt;Attribute&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ClosureHook&gt; {
+<span class="kw">fn </span>parse_closure_hook(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;, attributes: Vec&lt;Attribute&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ClosureHook&gt; {
     input.parse::&lt;<span class="macro">Token!</span>[<span class="kw">async</span>]&gt;()<span class="question-mark">?</span>;
     <span class="kw">let </span>closure = input.parse::&lt;ExprClosure&gt;()<span class="question-mark">?</span>;
 
@@ -946,57 +946,57 @@
 <span class="kw">impl </span>Permissions {
     <span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Some</span>(Permissions(<span class="kw">match </span>s.to_uppercase().as_str() {
-            <span class="string">&quot;PRESET_GENERAL&quot; </span>=&gt; <span class="number">0b0000_0110_0011_0111_1101_1100_0100_0001</span>,
-            <span class="string">&quot;PRESET_TEXT&quot; </span>=&gt; <span class="number">0b0000_0000_0000_0111_1111_1100_0100_0000</span>,
-            <span class="string">&quot;PRESET_VOICE&quot; </span>=&gt; <span class="number">0b0000_0011_1111_0000_0000_0000_0000_0000</span>,
-            <span class="string">&quot;CREATE_INVITE&quot; </span>| <span class="string">&quot;CREATE_INSTANT_INVITE&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">0</span>,
-            <span class="string">&quot;KICK_MEMBERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">1</span>,
-            <span class="string">&quot;BAN_MEMBERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">2</span>,
-            <span class="string">&quot;ADMINISTRATOR&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">3</span>,
-            <span class="string">&quot;MANAGE_CHANNELS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">4</span>,
-            <span class="string">&quot;MANAGE_GUILD&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">5</span>,
-            <span class="string">&quot;ADD_REACTIONS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">6</span>,
-            <span class="string">&quot;VIEW_AUDIT_LOG&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">7</span>,
-            <span class="string">&quot;PRIORITY_SPEAKER&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">8</span>,
-            <span class="string">&quot;STREAM&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">9</span>,
-            <span class="string">&quot;VIEW_CHANNEL&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">10</span>,
-            <span class="string">&quot;SEND_MESSAGES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">11</span>,
-            <span class="string">&quot;SEND_TTS_MESSAGES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">12</span>,
-            <span class="string">&quot;MANAGE_MESSAGES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">13</span>,
-            <span class="string">&quot;EMBED_LINKS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">14</span>,
-            <span class="string">&quot;ATTACH_FILES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">15</span>,
-            <span class="string">&quot;READ_MESSAGE_HISTORY&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">16</span>,
-            <span class="string">&quot;MENTION_EVERYONE&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">17</span>,
-            <span class="string">&quot;USE_EXTERNAL_EMOJIS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">18</span>,
-            <span class="string">&quot;VIEW_GUILD_INSIGHTS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">19</span>,
-            <span class="string">&quot;CONNECT&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">20</span>,
-            <span class="string">&quot;SPEAK&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">21</span>,
-            <span class="string">&quot;MUTE_MEMBERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">22</span>,
-            <span class="string">&quot;DEAFEN_MEMBERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">23</span>,
-            <span class="string">&quot;MOVE_MEMBERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">24</span>,
-            <span class="string">&quot;USE_VAD&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">25</span>,
-            <span class="string">&quot;CHANGE_NICKNAME&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">26</span>,
-            <span class="string">&quot;MANAGE_NICKNAMES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">27</span>,
-            <span class="string">&quot;MANAGE_ROLES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">28</span>,
-            <span class="string">&quot;MANAGE_WEBHOOKS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">29</span>,
-            <span class="string">&quot;MANAGE_EMOJIS_AND_STICKERS&quot; </span>| <span class="string">&quot;MANAGE_GUILD_EXPRESSIONS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">30</span>,
-            <span class="string">&quot;USE_SLASH_COMMANDS&quot; </span>| <span class="string">&quot;USE_APPLICATION_COMMANDS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">31</span>,
-            <span class="string">&quot;REQUEST_TO_SPEAK&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">32</span>,
-            <span class="string">&quot;MANAGE_EVENTS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">33</span>,
-            <span class="string">&quot;MANAGE_THREADS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">34</span>,
-            <span class="string">&quot;CREATE_PUBLIC_THREADS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">35</span>,
-            <span class="string">&quot;CREATE_PRIVATE_THREADS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">36</span>,
-            <span class="string">&quot;USE_EXTERNAL_STICKERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">37</span>,
-            <span class="string">&quot;SEND_MESSAGES_IN_THREADS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">38</span>,
-            <span class="string">&quot;USE_EMBEDDED_ACTIVITIES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">39</span>,
-            <span class="string">&quot;MODERATE_MEMBERS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">40</span>,
-            <span class="string">&quot;VIEW_CREATOR_MONETIZATION_ANALYTICS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">41</span>,
-            <span class="string">&quot;USE_SOUNDBOARD&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">42</span>,
-            <span class="string">&quot;CREATE_GUILD_EXPRESSIONS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">43</span>,
-            <span class="string">&quot;CREATE_EVENTS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">44</span>,
-            <span class="string">&quot;USE_EXTERNAL_SOUNDS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">45</span>,
-            <span class="string">&quot;SEND_VOICE_MESSAGES&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">46</span>,
-            <span class="string">&quot;SET_VOICE_CHANNEL_STATUS&quot; </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">48</span>,
+            <span class="string">"PRESET_GENERAL" </span>=&gt; <span class="number">0b0000_0110_0011_0111_1101_1100_0100_0001</span>,
+            <span class="string">"PRESET_TEXT" </span>=&gt; <span class="number">0b0000_0000_0000_0111_1111_1100_0100_0000</span>,
+            <span class="string">"PRESET_VOICE" </span>=&gt; <span class="number">0b0000_0011_1111_0000_0000_0000_0000_0000</span>,
+            <span class="string">"CREATE_INVITE" </span>| <span class="string">"CREATE_INSTANT_INVITE" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">0</span>,
+            <span class="string">"KICK_MEMBERS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">1</span>,
+            <span class="string">"BAN_MEMBERS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">2</span>,
+            <span class="string">"ADMINISTRATOR" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">3</span>,
+            <span class="string">"MANAGE_CHANNELS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">4</span>,
+            <span class="string">"MANAGE_GUILD" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">5</span>,
+            <span class="string">"ADD_REACTIONS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">6</span>,
+            <span class="string">"VIEW_AUDIT_LOG" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">7</span>,
+            <span class="string">"PRIORITY_SPEAKER" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">8</span>,
+            <span class="string">"STREAM" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">9</span>,
+            <span class="string">"VIEW_CHANNEL" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">10</span>,
+            <span class="string">"SEND_MESSAGES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">11</span>,
+            <span class="string">"SEND_TTS_MESSAGES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">12</span>,
+            <span class="string">"MANAGE_MESSAGES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">13</span>,
+            <span class="string">"EMBED_LINKS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">14</span>,
+            <span class="string">"ATTACH_FILES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">15</span>,
+            <span class="string">"READ_MESSAGE_HISTORY" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">16</span>,
+            <span class="string">"MENTION_EVERYONE" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">17</span>,
+            <span class="string">"USE_EXTERNAL_EMOJIS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">18</span>,
+            <span class="string">"VIEW_GUILD_INSIGHTS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">19</span>,
+            <span class="string">"CONNECT" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">20</span>,
+            <span class="string">"SPEAK" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">21</span>,
+            <span class="string">"MUTE_MEMBERS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">22</span>,
+            <span class="string">"DEAFEN_MEMBERS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">23</span>,
+            <span class="string">"MOVE_MEMBERS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">24</span>,
+            <span class="string">"USE_VAD" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">25</span>,
+            <span class="string">"CHANGE_NICKNAME" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">26</span>,
+            <span class="string">"MANAGE_NICKNAMES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">27</span>,
+            <span class="string">"MANAGE_ROLES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">28</span>,
+            <span class="string">"MANAGE_WEBHOOKS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">29</span>,
+            <span class="string">"MANAGE_EMOJIS_AND_STICKERS" </span>| <span class="string">"MANAGE_GUILD_EXPRESSIONS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">30</span>,
+            <span class="string">"USE_SLASH_COMMANDS" </span>| <span class="string">"USE_APPLICATION_COMMANDS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">31</span>,
+            <span class="string">"REQUEST_TO_SPEAK" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">32</span>,
+            <span class="string">"MANAGE_EVENTS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">33</span>,
+            <span class="string">"MANAGE_THREADS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">34</span>,
+            <span class="string">"CREATE_PUBLIC_THREADS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">35</span>,
+            <span class="string">"CREATE_PRIVATE_THREADS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">36</span>,
+            <span class="string">"USE_EXTERNAL_STICKERS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">37</span>,
+            <span class="string">"SEND_MESSAGES_IN_THREADS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">38</span>,
+            <span class="string">"USE_EMBEDDED_ACTIVITIES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">39</span>,
+            <span class="string">"MODERATE_MEMBERS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">40</span>,
+            <span class="string">"VIEW_CREATOR_MONETIZATION_ANALYTICS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">41</span>,
+            <span class="string">"USE_SOUNDBOARD" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">42</span>,
+            <span class="string">"CREATE_GUILD_EXPRESSIONS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">43</span>,
+            <span class="string">"CREATE_EVENTS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">44</span>,
+            <span class="string">"USE_EXTERNAL_SOUNDS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">45</span>,
+            <span class="string">"SEND_VOICE_MESSAGES" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">46</span>,
+            <span class="string">"SET_VOICE_CHANNEL_STATUS" </span>=&gt; <span class="number">1 </span>&lt;&lt; <span class="number">48</span>,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         }))
     }
@@ -1020,36 +1020,36 @@
 <span class="kw">impl </span>Colour {
     <span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>hex = <span class="kw">match </span>s.to_uppercase().as_str() {
-            <span class="string">&quot;BLITZ_BLUE&quot; </span>=&gt; <span class="number">0x6FC6E2</span>,
-            <span class="string">&quot;BLUE&quot; </span>=&gt; <span class="number">0x3498DB</span>,
-            <span class="string">&quot;BLURPLE&quot; </span>=&gt; <span class="number">0x7289DA</span>,
-            <span class="string">&quot;DARK_BLUE&quot; </span>=&gt; <span class="number">0x206694</span>,
-            <span class="string">&quot;DARK_GOLD&quot; </span>=&gt; <span class="number">0xC27C0E</span>,
-            <span class="string">&quot;DARK_GREEN&quot; </span>=&gt; <span class="number">0x1F8B4C</span>,
-            <span class="string">&quot;DARK_GREY&quot; </span>=&gt; <span class="number">0x607D8B</span>,
-            <span class="string">&quot;DARK_MAGENTA&quot; </span>=&gt; <span class="number">0xAD14757</span>,
-            <span class="string">&quot;DARK_ORANGE&quot; </span>=&gt; <span class="number">0xA84300</span>,
-            <span class="string">&quot;DARK_PURPLE&quot; </span>=&gt; <span class="number">0x71368A</span>,
-            <span class="string">&quot;DARK_RED&quot; </span>=&gt; <span class="number">0x992D22</span>,
-            <span class="string">&quot;DARK_TEAL&quot; </span>=&gt; <span class="number">0x11806A</span>,
-            <span class="string">&quot;DARKER_GREY&quot; </span>=&gt; <span class="number">0x546E7A</span>,
-            <span class="string">&quot;FABLED_PINK&quot; </span>=&gt; <span class="number">0xFAB81ED</span>,
-            <span class="string">&quot;FADED_PURPLE&quot; </span>=&gt; <span class="number">0x8882C4</span>,
-            <span class="string">&quot;FOOYOO&quot; </span>=&gt; <span class="number">0x11CA80</span>,
-            <span class="string">&quot;GOLD&quot; </span>=&gt; <span class="number">0xF1C40F</span>,
-            <span class="string">&quot;KERBAL&quot; </span>=&gt; <span class="number">0xBADA55</span>,
-            <span class="string">&quot;LIGHT_GREY&quot; </span>=&gt; <span class="number">0x979C9F</span>,
-            <span class="string">&quot;LIGHTER_GREY&quot; </span>=&gt; <span class="number">0x95A5A6</span>,
-            <span class="string">&quot;MAGENTA&quot; </span>=&gt; <span class="number">0xE91E63</span>,
-            <span class="string">&quot;MEIBE_PINK&quot; </span>=&gt; <span class="number">0xE68397</span>,
-            <span class="string">&quot;ORANGE&quot; </span>=&gt; <span class="number">0xE67E22</span>,
-            <span class="string">&quot;PURPLE&quot; </span>=&gt; <span class="number">0x9B59B6</span>,
-            <span class="string">&quot;RED&quot; </span>=&gt; <span class="number">0xE74C3C</span>,
-            <span class="string">&quot;ROHRKATZE_BLUE&quot; </span>=&gt; <span class="number">0x7596FF</span>,
-            <span class="string">&quot;ROSEWATER&quot; </span>=&gt; <span class="number">0xF6DBD8</span>,
-            <span class="string">&quot;TEAL&quot; </span>=&gt; <span class="number">0x1ABC9C</span>,
+            <span class="string">"BLITZ_BLUE" </span>=&gt; <span class="number">0x6FC6E2</span>,
+            <span class="string">"BLUE" </span>=&gt; <span class="number">0x3498DB</span>,
+            <span class="string">"BLURPLE" </span>=&gt; <span class="number">0x7289DA</span>,
+            <span class="string">"DARK_BLUE" </span>=&gt; <span class="number">0x206694</span>,
+            <span class="string">"DARK_GOLD" </span>=&gt; <span class="number">0xC27C0E</span>,
+            <span class="string">"DARK_GREEN" </span>=&gt; <span class="number">0x1F8B4C</span>,
+            <span class="string">"DARK_GREY" </span>=&gt; <span class="number">0x607D8B</span>,
+            <span class="string">"DARK_MAGENTA" </span>=&gt; <span class="number">0xAD14757</span>,
+            <span class="string">"DARK_ORANGE" </span>=&gt; <span class="number">0xA84300</span>,
+            <span class="string">"DARK_PURPLE" </span>=&gt; <span class="number">0x71368A</span>,
+            <span class="string">"DARK_RED" </span>=&gt; <span class="number">0x992D22</span>,
+            <span class="string">"DARK_TEAL" </span>=&gt; <span class="number">0x11806A</span>,
+            <span class="string">"DARKER_GREY" </span>=&gt; <span class="number">0x546E7A</span>,
+            <span class="string">"FABLED_PINK" </span>=&gt; <span class="number">0xFAB81ED</span>,
+            <span class="string">"FADED_PURPLE" </span>=&gt; <span class="number">0x8882C4</span>,
+            <span class="string">"FOOYOO" </span>=&gt; <span class="number">0x11CA80</span>,
+            <span class="string">"GOLD" </span>=&gt; <span class="number">0xF1C40F</span>,
+            <span class="string">"KERBAL" </span>=&gt; <span class="number">0xBADA55</span>,
+            <span class="string">"LIGHT_GREY" </span>=&gt; <span class="number">0x979C9F</span>,
+            <span class="string">"LIGHTER_GREY" </span>=&gt; <span class="number">0x95A5A6</span>,
+            <span class="string">"MAGENTA" </span>=&gt; <span class="number">0xE91E63</span>,
+            <span class="string">"MEIBE_PINK" </span>=&gt; <span class="number">0xE68397</span>,
+            <span class="string">"ORANGE" </span>=&gt; <span class="number">0xE67E22</span>,
+            <span class="string">"PURPLE" </span>=&gt; <span class="number">0x9B59B6</span>,
+            <span class="string">"RED" </span>=&gt; <span class="number">0xE74C3C</span>,
+            <span class="string">"ROHRKATZE_BLUE" </span>=&gt; <span class="number">0x7596FF</span>,
+            <span class="string">"ROSEWATER" </span>=&gt; <span class="number">0xF6DBD8</span>,
+            <span class="string">"TEAL" </span>=&gt; <span class="number">0x1ABC9C</span>,
             <span class="kw">_ </span>=&gt; {
-                <span class="kw">let </span>s = s.strip_prefix(<span class="string">&#39;#&#39;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>s = s.strip_prefix(<span class="string">'#'</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if </span>s.len() != <span class="number">6 </span>{
                     <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -1125,9 +1125,9 @@
 <span class="kw">impl </span>HelpBehaviour {
     <span class="kw">pub fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Some</span>(<span class="kw">match </span>s.to_lowercase().as_str() {
-            <span class="string">&quot;strike&quot; </span>=&gt; HelpBehaviour::Strike,
-            <span class="string">&quot;hide&quot; </span>=&gt; HelpBehaviour::Hide,
-            <span class="string">&quot;nothing&quot; </span>=&gt; HelpBehaviour::Nothing,
+            <span class="string">"strike" </span>=&gt; HelpBehaviour::Strike,
+            <span class="string">"hide" </span>=&gt; HelpBehaviour::Hide,
+            <span class="string">"nothing" </span>=&gt; HelpBehaviour::Nothing,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         })
     }
@@ -1179,25 +1179,25 @@
 <span class="kw">impl </span>Default <span class="kw">for </span>HelpOptions {
     <span class="kw">fn </span>default() -&gt; HelpOptions {
         HelpOptions {
-            suggestion_text: <span class="string">&quot;Did you mean `{}`?&quot;</span>.to_string(),
-            no_help_available_text: <span class="string">&quot;**Error**: No help available.&quot;</span>.to_string(),
-            usage_label: <span class="string">&quot;Usage&quot;</span>.to_string(),
-            usage_sample_label: <span class="string">&quot;Sample usage&quot;</span>.to_string(),
-            ungrouped_label: <span class="string">&quot;Ungrouped&quot;</span>.to_string(),
-            grouped_label: <span class="string">&quot;Group&quot;</span>.to_string(),
-            aliases_label: <span class="string">&quot;Aliases&quot;</span>.to_string(),
-            description_label: <span class="string">&quot;Description&quot;</span>.to_string(),
-            guild_only_text: <span class="string">&quot;Only in servers&quot;</span>.to_string(),
-            checks_label: <span class="string">&quot;Checks&quot;</span>.to_string(),
-            sub_commands_label: <span class="string">&quot;Sub Commands&quot;</span>.to_string(),
-            dm_only_text: <span class="string">&quot;Only in DM&quot;</span>.to_string(),
-            dm_and_guild_text: <span class="string">&quot;In DM and servers&quot;</span>.to_string(),
-            available_text: <span class="string">&quot;Available&quot;</span>.to_string(),
-            command_not_found_text: <span class="string">&quot;**Error**: Command `{}` not found.&quot;</span>.to_string(),
-            individual_command_tip: <span class="string">&quot;To get help with an individual command, pass its \
-                                     name as an argument to this command.&quot;
+            suggestion_text: <span class="string">"Did you mean `{}`?"</span>.to_string(),
+            no_help_available_text: <span class="string">"**Error**: No help available."</span>.to_string(),
+            usage_label: <span class="string">"Usage"</span>.to_string(),
+            usage_sample_label: <span class="string">"Sample usage"</span>.to_string(),
+            ungrouped_label: <span class="string">"Ungrouped"</span>.to_string(),
+            grouped_label: <span class="string">"Group"</span>.to_string(),
+            aliases_label: <span class="string">"Aliases"</span>.to_string(),
+            description_label: <span class="string">"Description"</span>.to_string(),
+            guild_only_text: <span class="string">"Only in servers"</span>.to_string(),
+            checks_label: <span class="string">"Checks"</span>.to_string(),
+            sub_commands_label: <span class="string">"Sub Commands"</span>.to_string(),
+            dm_only_text: <span class="string">"Only in DM"</span>.to_string(),
+            dm_and_guild_text: <span class="string">"In DM and servers"</span>.to_string(),
+            available_text: <span class="string">"Available"</span>.to_string(),
+            command_not_found_text: <span class="string">"**Error**: Command `{}` not found."</span>.to_string(),
+            individual_command_tip: <span class="string">"To get help with an individual command, pass its \
+                                     name as an argument to this command."
                 </span>.to_string(),
-            group_prefix: <span class="string">&quot;Prefix&quot;</span>.to_string(),
+            group_prefix: <span class="string">"Prefix"</span>.to_string(),
             strikethrough_commands_tip_in_dm: <span class="prelude-val">None</span>,
             strikethrough_commands_tip_in_guild: <span class="prelude-val">None</span>,
             lacking_role: HelpBehaviour::Strike,
@@ -1205,10 +1205,10 @@
             lacking_ownership: HelpBehaviour::Hide,
             lacking_conditions: HelpBehaviour::Strike,
             wrong_channel: HelpBehaviour::Strike,
-            embed_error_colour: Colour::from_str(<span class="string">&quot;DARK_RED&quot;</span>).unwrap(),
-            embed_success_colour: Colour::from_str(<span class="string">&quot;ROSEWATER&quot;</span>).unwrap(),
+            embed_error_colour: Colour::from_str(<span class="string">"DARK_RED"</span>).unwrap(),
+            embed_success_colour: Colour::from_str(<span class="string">"ROSEWATER"</span>).unwrap(),
             max_levenshtein_distance: <span class="number">0</span>,
-            indention_prefix: <span class="string">&quot;-&quot;</span>.to_string(),
+            indention_prefix: <span class="string">"-"</span>.to_string(),
         }
     }
 }
@@ -1222,10 +1222,10 @@
 }
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>GroupStruct {
-    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>attributes = input.call(Attribute::parse_outer)<span class="question-mark">?</span>;
 
-        util::rename_attributes(<span class="kw-2">&amp;mut </span>attributes, <span class="string">&quot;doc&quot;</span>, <span class="string">&quot;description&quot;</span>);
+        util::rename_attributes(<span class="kw-2">&amp;mut </span>attributes, <span class="string">"doc"</span>, <span class="string">"description"</span>);
 
         <span class="kw">let </span>cooked = remove_cooked(<span class="kw-2">&amp;mut </span>attributes);
 

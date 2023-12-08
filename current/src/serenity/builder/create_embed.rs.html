@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_embed.rs`."><title>create_embed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_embed.rs`."><title>create_embed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -311,7 +311,7 @@
 //! as part of builders.
 //!
 //! The only builder that should be exposed is [`CreateEmbed`]. The rest of these have no real
-//! reason for being exposed, but are for completeness&#39; sake.
+//! reason for being exposed, but are for completeness' sake.
 //!
 //! Documentation for embeds can be found [here].
 //!
@@ -319,7 +319,7 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
@@ -361,7 +361,7 @@
 
     <span class="doccomment">/// Set the description of the embed.
     ///
-    /// **Note**: This can&#39;t be longer than 4096 characters.
+    /// **Note**: This can't be longer than 4096 characters.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.description = <span class="prelude-val">Some</span>(description.into());
@@ -440,8 +440,8 @@
     /// ```rust
     /// # use serenity::builder::CreateEmbed;
     /// # use serenity::model::Timestamp;
-    /// let timestamp: Timestamp = &quot;2004-06-08T16:04:23Z&quot;.parse().expect(&quot;Invalid timestamp!&quot;);
-    /// let embed = CreateEmbed::new().title(&quot;hello&quot;).timestamp(timestamp);
+    /// let timestamp: Timestamp = "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
+    /// let embed = CreateEmbed::new().title("hello").timestamp(timestamp);
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>timestamp&lt;T: Into&lt;Timestamp&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: T) -&gt; <span class="self">Self </span>{
@@ -463,20 +463,20 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Same as calling [`Self::image`] with &quot;attachment://filename.(jpg, png)&quot;.
+    <span class="doccomment">/// Same as calling [`Self::image`] with "attachment://filename.(jpg, png)".
     ///
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
-    /// with the provided filename. Or else this won&#39;t work.
+    /// with the provided filename. Or else this won't work.
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>attachment(<span class="self">self</span>, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>filename = filename.into();
-        filename.insert_str(<span class="number">0</span>, <span class="string">&quot;attachment://&quot;</span>);
+        filename.insert_str(<span class="number">0</span>, <span class="string">"attachment://"</span>);
         <span class="self">self</span>.image(filename)
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">0</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>author) = <span class="self">self</span>.<span class="number">0</span>.author {
@@ -513,7 +513,7 @@
             description: <span class="prelude-val">None</span>,
             thumbnail: <span class="prelude-val">None</span>,
             timestamp: <span class="prelude-val">None</span>,
-            kind: <span class="prelude-val">Some</span>(<span class="string">&quot;rich&quot;</span>.into()),
+            kind: <span class="prelude-val">Some</span>(<span class="string">"rich"</span>.into()),
             author: <span class="prelude-val">None</span>,
             colour: <span class="prelude-val">None</span>,
             footer: <span class="prelude-val">None</span>,
@@ -549,19 +549,19 @@
         })
     }
 
-    <span class="doccomment">/// Set the author&#39;s name, replacing the current value as set in [`Self::new`].
+    <span class="doccomment">/// Set the author's name, replacing the current value as set in [`Self::new`].
     </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.name = name.into();
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Set the URL of the author&#39;s icon.
+    <span class="doccomment">/// Set the URL of the author's icon.
     </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into());
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Set the author&#39;s URL.
+    <span class="doccomment">/// Set the author's URL.
     </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.url = <span class="prelude-val">Some</span>(url.into());
         <span class="self">self
@@ -590,13 +590,13 @@
         })
     }
 
-    <span class="doccomment">/// Set the footer&#39;s text, replacing the current value as set in [`Self::new`].
+    <span class="doccomment">/// Set the footer's text, replacing the current value as set in [`Self::new`].
     </span><span class="kw">pub fn </span>text(<span class="kw-2">mut </span><span class="self">self</span>, text: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.text = text.into();
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Set the icon URL&#39;s value. This only supports HTTP(S).
+    <span class="doccomment">/// Set the icon URL's value. This only supports HTTP(S).
     </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into());
         <span class="self">self

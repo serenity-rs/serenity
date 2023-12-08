@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -985,7 +985,7 @@
                 <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>) =&gt; <span class="macro-nonterminal">$options</span>.<span class="macro-nonterminal">$name </span>= <span class="macro">propagate_err!</span>(<span class="macro-nonterminal">$crate::attributes::parse</span>(<span class="macro-nonterminal">$values</span>)),
             )*
             <span class="kw">_ </span>=&gt; {
-                <span class="kw">return </span>Error::new(<span class="macro-nonterminal">$span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="macro-nonterminal">$v</span>))
+                <span class="kw">return </span>Error::new(<span class="macro-nonterminal">$span</span>, <span class="macro">format_args!</span>(<span class="string">"invalid attribute: {:?}"</span>, <span class="macro-nonterminal">$v</span>))
                     .to_compile_error()
                     .into();
             },
@@ -996,16 +996,16 @@
 <span class="attr">#[rustfmt::skip]
 </span><span class="doccomment">/// The heart of the attribute-based framework.
 ///
-/// This is a function attribute macro. Using this on other Rust constructs won&#39;t work.
+/// This is a function attribute macro. Using this on other Rust constructs won't work.
 ///
 /// ## Options
 ///
 /// To alter how the framework will interpret the command, you can provide options as attributes
 /// following this `#[command]` macro.
 ///
-/// Each option has its own kind of data to stock and manipulate with. They&#39;re given to the option
-/// either with the `#[option(...)]` or `#[option = ...]` syntaxes. If an option doesn&#39;t require
-/// for any data to be supplied, then it&#39;s simply an empty `#[option]`.
+/// Each option has its own kind of data to stock and manipulate with. They're given to the option
+/// either with the `#[option(...)]` or `#[option = ...]` syntaxes. If an option doesn't require
+/// for any data to be supplied, then it's simply an empty `#[option]`.
 ///
 /// If the input to the option is malformed, the macro will give you can error, describing the
 /// correct method for passing data, and what it should be.
@@ -1014,18 +1014,18 @@
 ///
 /// | Syntax                                                                         | Description                                                                                              | Argument explanation                                                                                                                                                                                                              |
 /// | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-/// | `#[checks(identifiers)]`                                                       | Preconditions that must met before the command&#39;s execution.                                              | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                                                                       |
+/// | `#[checks(identifiers)]`                                                       | Preconditions that must met before the command's execution.                                              | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                                                                       |
 /// | `#[aliases(names)]`                                                            | Alternative names to refer to this command.                                                              | `names` is a comma separated list of desired aliases.                                                                                                                                                                             |
-/// | `#[description(desc)]` &lt;br /&gt; `#[description = desc]`                          | The command&#39;s description or summary.                                                                    | `desc` is a string describing the command.                                                                                                                                                                                        |
-/// | `#[usage(use)]` &lt;br /&gt; `#[usage = use]`                                        | The command&#39;s intended usage.                                                                            | `use` is a string stating the schema for the command&#39;s usage.                                                                                                                                                                     |
-/// | `#[example(ex)]` &lt;br /&gt; `#[example = ex]`                                      | An example of the command&#39;s usage. May be called multiple times to add many examples at once.            | `ex` is a string                                                                                                                                                                                                                  |
+/// | `#[description(desc)]` &lt;br /&gt; `#[description = desc]`                          | The command's description or summary.                                                                    | `desc` is a string describing the command.                                                                                                                                                                                        |
+/// | `#[usage(use)]` &lt;br /&gt; `#[usage = use]`                                        | The command's intended usage.                                                                            | `use` is a string stating the schema for the command's usage.                                                                                                                                                                     |
+/// | `#[example(ex)]` &lt;br /&gt; `#[example = ex]`                                      | An example of the command's usage. May be called multiple times to add many examples at once.            | `ex` is a string                                                                                                                                                                                                                  |
 /// | `#[delimiters(delims)]`                                                        | Argument delimiters specific to this command. Overrides the global list of delimiters in the framework.  | `delims` is a comma separated list of strings                                                                                                                                                                                     |
 /// | `#[min_args(min)]` &lt;br /&gt; `#[max_args(max)]` &lt;br /&gt; `#[num_args(min_and_max)]` | The expected length of arguments that the command must receive in order to function correctly.           | `min`, `max` and `min_and_max` are 16-bit, unsigned integers.                                                                                                                                                                     |
-/// | `#[required_permissions(perms)]`                                               | Set of permissions the user must possess. &lt;br /&gt; In order for this attribute to work, &quot;Presence Intent&quot; and &quot;Server Member Intent&quot; options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;br /&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions).        |
+/// | `#[required_permissions(perms)]`                                               | Set of permissions the user must possess. &lt;br /&gt; In order for this attribute to work, "Presence Intent" and "Server Member Intent" options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;br /&gt; These can be found at [Discord's official documentation](https://discord.com/developers/docs/topics/permissions).        |
 /// | `#[allowed_roles(roles)]`                                                      | Set of roles the user must possess.                                                                      | `roles` is a comma separated list of role names.                                                                                                                                                                                  |
 /// | `#[help_available]` &lt;br /&gt; `#[help_available(b)]`                              | If the command should be displayed in the help message.                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                   |
 /// | `#[only_in(ctx)]`                                                              | Which environment the command can be executed in.                                                        | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/`dms` (Direct Message).                                                                                                                                      |
-/// | `#[bucket(name)]` &lt;br /&gt; `#[bucket = name]`                                    | What bucket will impact this command.                                                                    | `name` is a string containing the bucket&#39;s name.&lt;br /&gt; Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket) for its usage. |
+/// | `#[bucket(name)]` &lt;br /&gt; `#[bucket = name]`                                    | What bucket will impact this command.                                                                    | `name` is a string containing the bucket's name.&lt;br /&gt; Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket) for its usage. |
 /// | `#[owners_only]` &lt;br /&gt; `#[owners_only(b)]`                                    | If this command is exclusive to owners.                                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                   |
 /// | `#[owner_privilege]` &lt;br /&gt; `#[owner_privilege(b)]`                            | If owners can bypass certain options.                                                                    | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                   |
 /// | `#[sub_commands(commands)]`                                                    | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                       |
@@ -1033,19 +1033,19 @@
 /// Documentation comments (`///`) applied onto the function are interpreted as sugar for the
 /// `#[description]` option. When more than one application of the option is performed, the text is
 /// delimited by newlines. This mimics the behaviour of regular doc-comments, which are sugar for
-/// the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together, however, you have to end
+/// the `#[doc = "..."]` attribute. If you wish to join lines together, however, you have to end
 /// the previous lines with `\$`.
 ///
 /// # Notes
 ///
 /// The name of the command is parsed from the applied function, or may be specified inside the
-/// `#[command]` attribute, a lá `#[command(&quot;foobar&quot;)]`.
+/// `#[command]` attribute, a lá `#[command("foobar")]`.
 ///
 /// This macro attribute generates static instances of `Command` and `CommandOptions`, conserving
 /// the provided options.
 ///
 /// The names of the instances are all uppercased names of the command name. For example, with a
-/// name of &quot;foo&quot;:
+/// name of "foo":
 /// ```rust,ignore
 /// pub static FOO_COMMAND_OPTIONS: CommandOptions = CommandOptions { ... };
 /// pub static FOO_COMMAND: Command = Command { options: FOO_COMMAND_OPTIONS, ... };
@@ -1074,16 +1074,16 @@
         <span class="kw">let </span>name = <span class="kw-2">&amp;</span>name[..];
 
         <span class="kw">match </span>name {
-            <span class="string">&quot;num_args&quot; </span>=&gt; {
+            <span class="string">"num_args" </span>=&gt; {
                 <span class="kw">let </span>args = <span class="macro">propagate_err!</span>(u16::parse(values));
 
                 options.min_args = AsOption(<span class="prelude-val">Some</span>(args));
                 options.max_args = AsOption(<span class="prelude-val">Some</span>(args));
             },
-            <span class="string">&quot;example&quot; </span>=&gt; {
+            <span class="string">"example" </span>=&gt; {
                 options.examples.push(<span class="macro">propagate_err!</span>(attributes::parse(values)));
             },
-            <span class="string">&quot;description&quot; </span>=&gt; {
+            <span class="string">"description" </span>=&gt; {
                 <span class="kw">let </span>line: String = <span class="macro">propagate_err!</span>(attributes::parse(values));
                 util::append_line(<span class="kw-2">&amp;mut </span>options.description, line);
             },
@@ -1180,7 +1180,7 @@
 
         #(#cooked)*
         <span class="attr">#[allow(missing_docs)]
-        </span>#visibility <span class="kw">fn </span>#name&lt;<span class="lifetime">&#39;fut</span>&gt; (#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+        </span>#visibility <span class="kw">fn </span>#name&lt;<span class="lifetime">'fut</span>&gt; (#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">'fut</span>&gt;&gt; {
             Box::pin(<span class="kw">async move </span>{
                 <span class="kw">let </span>_output: #ret = { #(#body)* };
                 <span class="attr">#[allow(unreachable_code)]
@@ -1196,13 +1196,13 @@
 /// all the available commands the bot provides, and reading through specific information regarding
 /// a command.
 ///
-/// As such, the options here will pertain in the help command&#39;s **layout** than its functionality.
+/// As such, the options here will pertain in the help command's **layout** than its functionality.
 ///
 /// ## Options
 ///
 /// | Syntax                                                                                          | Description                                                                                                                                                                                                                                  | Argument explanation                                                                                    |
 /// | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-/// | `#[suggestion_text(s)]` &lt;br /&gt; `#[suggestion_text = s]`                                         | When suggesting a command&#39;s name                                                                                                                                                                                                             | `s` is a string                                                                                         |
+/// | `#[suggestion_text(s)]` &lt;br /&gt; `#[suggestion_text = s]`                                         | When suggesting a command's name                                                                                                                                                                                                             | `s` is a string                                                                                         |
 /// | `#[no_help_available_text(s)]` &lt;br /&gt; `#[no_help_available_text = s]`                           | When help is unavailable for a command.                                                                                                                                                                                                      | `s` is a string                                                                                         |
 /// | `#[usage_label(s)]` &lt;br /&gt; `#[usage_label = s]`                                                 | How should the command be used.                                                                                                                                                                                                              | `s` is a string                                                                                         |
 /// | `#[usage_sample_label(s)]` &lt;br /&gt; `#[usage_sample_label = s]`                                   | Actual sample label.                                                                                                                                                                                                                         | `s` is a string                                                                                         |
@@ -1210,17 +1210,17 @@
 /// | `#[grouped_label(s)]` &lt;br /&gt; `#[grouped_label = s]`                                             | Grouped commands label.                                                                                                                                                                                                                      | `s` is a string                                                                                         |
 /// | `#[sub_commands_label(s)]` &lt;br /&gt; `#[sub_commands_label = s]`                                   | Sub commands label.                                                                                                                                                                                                                          | `s` is a string                                                                                         |
 /// | `#[description_label(s)]` &lt;br /&gt; `#[description_label = s]`                                     | Label at the start of the description.                                                                                                                                                                                                       | `s` is a string                                                                                         |
-/// | `#[aliases_label(s)]` &lt;br /&gt; `#[aliases_label= s]`                                              | Label for a command&#39;s aliases.                                                                                                                                                                                                               | `s` is a string                                                                                         |
+/// | `#[aliases_label(s)]` &lt;br /&gt; `#[aliases_label= s]`                                              | Label for a command's aliases.                                                                                                                                                                                                               | `s` is a string                                                                                         |
 /// | `#[guild_only_text(s)]` &lt;br /&gt; `#[guild_only_text = s]`                                         | When a command is specific to guilds only.                                                                                                                                                                                                   | `s` is a string                                                                                         |
 /// | `#[checks_label(s)]` &lt;br /&gt; `#[checks_label = s]`                                               | The header text when showing checks in the help command.                                                                                                                                                                                     | `s` is a string                                                                                         |
 /// | `#[dm_only_text(s)]` &lt;br /&gt; `#[dm_only_text = s]`                                               | When a command is specific to dms only.                                                                                                                                                                                                      | `s` is a string                                                                                         |
 /// | `#[dm_and_guild_text(s)]` &lt;br /&gt; `#[dm_and_guild_text = s]`                                     | When a command is usable in both guilds and dms.                                                                                                                                                                                             | `s` is a string                                                                                         |
 /// | `#[available_text(s)]` &lt;br /&gt; `#[available_text = s]`                                           | When a command is available.                                                                                                                                                                                                                 | `s` is a string                                                                                         |
-/// | `#[command_not_found_text(s)]` &lt;br /&gt; `#[command_not_found_text = s]`                           | When a command wasn&#39;t found.                                                                                                                                                                                                                 | `s` is a string                                                                                         |
-/// | `#[individual_command_tip(s)]` &lt;br /&gt; `#[individual_command_tip = s]`                           | How the user should access a command&#39;s details.                                                                                                                                                                                              | `s` is a string                                                                                         |
+/// | `#[command_not_found_text(s)]` &lt;br /&gt; `#[command_not_found_text = s]`                           | When a command wasn't found.                                                                                                                                                                                                                 | `s` is a string                                                                                         |
+/// | `#[individual_command_tip(s)]` &lt;br /&gt; `#[individual_command_tip = s]`                           | How the user should access a command's details.                                                                                                                                                                                              | `s` is a string                                                                                         |
 /// | `#[strikethrough_commands_tip_in_dm(s)]` &lt;br /&gt;  `#[strikethrough_commands_tip_in_dm = s]`      | Reasoning behind strikethrough-commands.&lt;br /&gt; *Only used in dms.*                                                                                                                                                                           | `s` is a string. If not provided, default text will be used instead.                                    |
 /// | `#[strikethrough_commands_tip_in_guild(s)]` &lt;br /&gt; `#[strikethrough_commands_tip_in_guild = s]` | Reasoning behind strikethrough-commands.&lt;br /&gt; *Only used in guilds.*                                                                                                                                                                        | `s` is a string. If not provided, default text will be used instead.                                    |
-/// | `#[group_prefix(s)]` &lt;br /&gt; `#[group_prefix = s]`                                               | For introducing a group&#39;s prefix                                                                                                                                                                                                             | `s` is a string                                                                                         |
+/// | `#[group_prefix(s)]` &lt;br /&gt; `#[group_prefix = s]`                                               | For introducing a group's prefix                                                                                                                                                                                                             | `s` is a string                                                                                         |
 /// | `#[lacking_role(s)]` &lt;br /&gt; `#[lacking_role = s]`                                               | If a user lacks required roles, this will treat how commands will be displayed.                                                                                                                                                              | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be). |
 /// | `#[lacking_ownership(s)]` &lt;br /&gt; `#[lacking_ownership = s]`                                     | If a user lacks ownership, this will treat how these commands will be displayed.                                                                                                                                                             | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be). |
 /// | `#[lacking_permissions(s)]` &lt;br /&gt; `#[lacking_permissions = s]`                                 | If a user lacks permissions, this will treat how commands will be displayed.                                                                                                                                                                 | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be). |
@@ -1237,12 +1237,12 @@
     <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
     <span class="kw">let </span>names = <span class="kw">if </span>attr.is_empty() {
-        <span class="macro">vec!</span>[<span class="string">&quot;help&quot;</span>.to_string()]
+        <span class="macro">vec!</span>[<span class="string">"help"</span>.to_string()]
     } <span class="kw">else </span>{
         <span class="kw">struct </span>Names(Vec&lt;String&gt;);
 
         <span class="kw">impl </span>Parse <span class="kw">for </span>Names {
-            <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
                 <span class="kw">let </span>n: Punctuated&lt;Lit, <span class="macro">Token!</span>[,]&gt; = input.parse_terminated(Lit::parse)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(Names(n.into_iter().map(|l| l.to_str()).collect()))
             }
@@ -1254,14 +1254,14 @@
 
     <span class="comment">// Revert the change for the names of documentation attributes done when parsing the function
     // input with `CommandFun`.
-    </span>util::rename_attributes(<span class="kw-2">&amp;mut </span>fun.attributes, <span class="string">&quot;description&quot;</span>, <span class="string">&quot;doc&quot;</span>);
+    </span>util::rename_attributes(<span class="kw-2">&amp;mut </span>fun.attributes, <span class="string">"description"</span>, <span class="string">"doc"</span>);
 
     <span class="comment">// Additionally, place the documentation attributes to the `cooked` list to prevent the macro
     // from rejecting them as invalid attributes.
     </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
         <span class="kw">while </span>i &lt; fun.attributes.len() {
-            <span class="kw">if </span>fun.attributes[i].path.is_ident(<span class="string">&quot;doc&quot;</span>) {
+            <span class="kw">if </span>fun.attributes[i].path.is_ident(<span class="string">"doc"</span>) {
                 fun.cooked.push(fun.attributes.remove(i));
                 <span class="kw">continue</span>;
             }
@@ -1319,12 +1319,12 @@
         <span class="kw">use </span>std::fmt::Write;
 
         <span class="kw">let </span><span class="kw-2">mut </span>strike_text =
-            String::from(<span class="string">&quot;~~`Strikethrough commands`~~ are unavailable because they&quot;</span>);
+            String::from(<span class="string">"~~`Strikethrough commands`~~ are unavailable because they"</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>is_any_option_strike = <span class="bool-val">false</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>concat_with_comma = <span class="kw">if let </span>HelpBehaviour::Strike = options.lacking_permissions {
             is_any_option_strike = <span class="bool-val">true</span>;
-            strike_text.push_str(<span class="string">&quot; require permissions&quot;</span>);
+            strike_text.push_str(<span class="string">" require permissions"</span>);
 
             <span class="bool-val">true
         </span>} <span class="kw">else </span>{
@@ -1335,9 +1335,9 @@
             is_any_option_strike = <span class="bool-val">true</span>;
 
             <span class="kw">if </span>concat_with_comma {
-                strike_text.push_str(<span class="string">&quot;, require a specific role&quot;</span>);
+                strike_text.push_str(<span class="string">", require a specific role"</span>);
             } <span class="kw">else </span>{
-                strike_text.push_str(<span class="string">&quot; require a specific role&quot;</span>);
+                strike_text.push_str(<span class="string">" require a specific role"</span>);
                 concat_with_comma = <span class="bool-val">true</span>;
             }
         }
@@ -1346,9 +1346,9 @@
             is_any_option_strike = <span class="bool-val">true</span>;
 
             <span class="kw">if </span>concat_with_comma {
-                strike_text.push_str(<span class="string">&quot;, require certain conditions&quot;</span>);
+                strike_text.push_str(<span class="string">", require certain conditions"</span>);
             } <span class="kw">else </span>{
-                strike_text.push_str(<span class="string">&quot; require certain conditions&quot;</span>);
+                strike_text.push_str(<span class="string">" require certain conditions"</span>);
                 concat_with_comma = <span class="bool-val">true</span>;
             }
         }
@@ -1357,23 +1357,23 @@
             is_any_option_strike = <span class="bool-val">true</span>;
 
             <span class="kw">if </span>concat_with_comma {
-                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot;, or are limited to {dm_or_guild}&quot;</span>);
+                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">", or are limited to {dm_or_guild}"</span>);
             } <span class="kw">else </span>{
-                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">&quot; are limited to {dm_or_guild}&quot;</span>);
+                <span class="kw">let _ </span>= <span class="macro">write!</span>(strike_text, <span class="string">" are limited to {dm_or_guild}"</span>);
             }
         }
 
-        strike_text.push(<span class="string">&#39;.&#39;</span>);
+        strike_text.push(<span class="string">'.'</span>);
         is_any_option_strike.then_some(strike_text)
     }
 
     <span class="kw">if </span>options.strikethrough_commands_tip_in_dm.is_none() {
-        options.strikethrough_commands_tip_in_dm = produce_strike_text(<span class="kw-2">&amp;</span>options, <span class="string">&quot;server messages&quot;</span>);
+        options.strikethrough_commands_tip_in_dm = produce_strike_text(<span class="kw-2">&amp;</span>options, <span class="string">"server messages"</span>);
     }
 
     <span class="kw">if </span>options.strikethrough_commands_tip_in_guild.is_none() {
         options.strikethrough_commands_tip_in_guild =
-            produce_strike_text(<span class="kw-2">&amp;</span>options, <span class="string">&quot;direct messages&quot;</span>);
+            produce_strike_text(<span class="kw-2">&amp;</span>options, <span class="string">"direct messages"</span>);
     }
 
     <span class="kw">let </span>HelpOptions {
@@ -1474,7 +1474,7 @@
 
         #(#cooked)*
         <span class="attr">#[allow(missing_docs)]
-        </span><span class="kw">pub fn </span>#nn&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+        </span><span class="kw">pub fn </span>#nn&lt;<span class="lifetime">'fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">'fut</span>&gt;&gt; {
             Box::pin(<span class="kw">async move </span>{
                 <span class="kw">let </span>_output: #ret = { #(#body)* };
                 <span class="attr">#[allow(unreachable_code)]
@@ -1492,7 +1492,7 @@
 /// executed by a user.
 ///
 /// A group might have one or more *prefixes* set. This will necessitate for one of the prefixes to
-/// appear before the group&#39;s command. For example, for a general prefix `!`, a group prefix `foo`
+/// appear before the group's command. For example, for a general prefix `!`, a group prefix `foo`
 /// and a command `bar`, the invocation would be `!foo bar`.
 ///
 /// It might have some options apply to *all* of its commands. E.g. guild or dm only.
@@ -1508,21 +1508,21 @@
 ///
 /// #[command]
 /// fn bar() -&gt; CommandResult {
-///     println!(&quot;baz&quot;);
+///     println!("baz");
 ///
 ///     Ok(())
 /// }
 ///
 /// #[command]
 /// fn answer_to_life() -&gt; CommandResult {
-///     println!(&quot;42&quot;);
+///     println!("42");
 ///
 ///     Ok(())
 /// }
 ///
 /// #[group]
 /// // All sub-groups must own at least one prefix.
-/// #[prefix = &quot;baz&quot;]
+/// #[prefix = "baz"]
 /// #[commands(answer_to_life)]
 /// struct Baz;
 ///
@@ -1548,23 +1548,23 @@
 /// | `#[owners_only]` &lt;br /&gt; `#[owners_only(b)]`           | If this command is exclusive to owners.                                          | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                             |
 /// | `#[owner_privilege]` &lt;br /&gt; `#[owner_privilege(b)]`   | If owners can bypass certain options.                                            | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                             |
 /// | `#[help_available]` &lt;br /&gt; `#[help_available(b)]`     | If the group should be displayed in the help message.                            | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                             |
-/// | `#[checks(identifiers)]`                              | Preconditions that must met before the command&#39;s execution.                      | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro |
-/// | `#[required_permissions(perms)]`                      | Set of permissions the user must possess. &lt;br /&gt; In order for this attribute to work, &quot;Presence Intent&quot; and &quot;Server Member Intent&quot; options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;br /&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions). |
-/// | `#[default_command(cmd)]`                             | A command to execute if none of the group&#39;s prefixes are given.                  | `cmd` is an identifier referencing a function marked by the `#[command]` macro                              |
-/// | `#[description(desc)]` &lt;br /&gt; `#[description = desc]` | The group&#39;s description or summary.                                              | `desc` is a string describing the group.                                                                    |
+/// | `#[checks(identifiers)]`                              | Preconditions that must met before the command's execution.                      | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro |
+/// | `#[required_permissions(perms)]`                      | Set of permissions the user must possess. &lt;br /&gt; In order for this attribute to work, "Presence Intent" and "Server Member Intent" options in bot application must be enabled and all intent flags must be enabled during client creation. | `perms` is a comma separated list of permission names.&lt;br /&gt; These can be found at [Discord's official documentation](https://discord.com/developers/docs/topics/permissions). |
+/// | `#[default_command(cmd)]`                             | A command to execute if none of the group's prefixes are given.                  | `cmd` is an identifier referencing a function marked by the `#[command]` macro                              |
+/// | `#[description(desc)]` &lt;br /&gt; `#[description = desc]` | The group's description or summary.                                              | `desc` is a string describing the group.                                                                    |
 /// | `#[summary(desc)]` &lt;br /&gt; `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                | `desc` is a string summaryly describing the group.                                                          |
 ///
 /// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the
 /// `#[description]` option. When more than one application of the option is performed, the text is
 /// delimited by newlines. This mimics the behaviour of regular doc-comments, which are sugar for
-/// the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together, however, you have to end
+/// the `#[doc = "..."]` attribute. If you wish to join lines together, however, you have to end
 /// the previous lines with `\$`.
 ///
 /// Similarly to [`command`], this macro generates static instances of the group and its options.
 /// The identifiers of these instances are based off the name of the struct to differentiate this
-/// group from others. This name is given as the default value of the group&#39;s `name` field, used in
+/// group from others. This name is given as the default value of the group's `name` field, used in
 /// the help command for display and browsing of the group. It may also be passed as an argument to
-/// the macro. For example: `#[group(&quot;Banana Phone&quot;)]`.
+/// the macro. For example: `#[group("Banana Phone")]`.
 ///
 /// [`command`]: macro@command
 
@@ -1592,20 +1592,20 @@
         <span class="kw">let </span>name = <span class="kw-2">&amp;</span>name[..];
 
         <span class="kw">match </span>name {
-            <span class="string">&quot;prefix&quot; </span>=&gt; {
+            <span class="string">"prefix" </span>=&gt; {
                 options.prefixes = <span class="macro">vec!</span>[<span class="macro">propagate_err!</span>(attributes::parse(values))];
             },
-            <span class="string">&quot;description&quot; </span>=&gt; {
+            <span class="string">"description" </span>=&gt; {
                 <span class="kw">let </span>line: String = <span class="macro">propagate_err!</span>(attributes::parse(values));
                 util::append_line(<span class="kw-2">&amp;mut </span>options.description, line);
             },
-            <span class="string">&quot;summary&quot; </span>=&gt; {
+            <span class="string">"summary" </span>=&gt; {
                 <span class="kw">let </span>arg: String = <span class="macro">propagate_err!</span>(attributes::parse(values));
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(desc) = <span class="kw-2">&amp;mut </span>options.summary.<span class="number">0 </span>{
                     <span class="kw">use </span>std::fmt::Write;
 
-                    <span class="kw">let _ </span>= <span class="macro">write!</span>(desc, <span class="string">&quot;\n{}&quot;</span>, arg.trim_matches(<span class="string">&#39; &#39;</span>));
+                    <span class="kw">let _ </span>= <span class="macro">write!</span>(desc, <span class="string">"\n{}"</span>, arg.trim_matches(<span class="string">' '</span>));
                 } <span class="kw">else </span>{
                     options.summary = AsOption(<span class="prelude-val">Some</span>(arg));
                 }
@@ -1698,14 +1698,14 @@
 ///
 /// | Syntax                                              | Description                                                              | Argument explanation                                                                 |
 /// | --------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-/// | `#[name(s)]` &lt;br /&gt; `#[name = s]`                   | How the check should be listed in help.                                  | `s` is a string. If this option isn&#39;t provided, the value is assumed to be `&quot;&lt;fn&gt;&quot;`. |
+/// | `#[name(s)]` &lt;br /&gt; `#[name = s]`                   | How the check should be listed in help.                                  | `s` is a string. If this option isn't provided, the value is assumed to be `"&lt;fn&gt;"`. |
 /// | `#[display_in_help]` &lt;br /&gt; `#[display_in_help(b)]` | If the check should be listed in help. Has no effect on `check_in_help`. | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
 /// | `#[check_in_help]` &lt;br /&gt; `#[check_in_help(b)]`     | If the check should be evaluated in help.                                | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
 </span><span class="attr">#[proc_macro_attribute]
 </span><span class="kw">pub fn </span>check(_attr: TokenStream, input: TokenStream) -&gt; TokenStream {
     <span class="kw">let </span><span class="kw-2">mut </span>fun = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>CommandFun);
 
-    <span class="kw">let </span><span class="kw-2">mut </span>name = <span class="string">&quot;&lt;fn&gt;&quot;</span>.to_string();
+    <span class="kw">let </span><span class="kw-2">mut </span>name = <span class="string">"&lt;fn&gt;"</span>.to_string();
     <span class="kw">let </span><span class="kw-2">mut </span>display_in_help = <span class="bool-val">true</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>check_in_help = <span class="bool-val">true</span>;
 
@@ -1721,11 +1721,11 @@
         <span class="kw">let </span>n = <span class="kw-2">&amp;</span>n[..];
 
         <span class="kw">match </span>n {
-            <span class="string">&quot;name&quot; </span>=&gt; name = <span class="macro">propagate_err!</span>(attributes::parse(values)),
-            <span class="string">&quot;display_in_help&quot; </span>=&gt; display_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
-            <span class="string">&quot;check_in_help&quot; </span>=&gt; check_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
+            <span class="string">"name" </span>=&gt; name = <span class="macro">propagate_err!</span>(attributes::parse(values)),
+            <span class="string">"display_in_help" </span>=&gt; display_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
+            <span class="string">"check_in_help" </span>=&gt; check_in_help = <span class="macro">propagate_err!</span>(attributes::parse(values)),
             <span class="kw">_ </span>=&gt; {
-                <span class="kw">return </span>Error::new(span, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {n:?}&quot;</span>))
+                <span class="kw">return </span>Error::new(span, <span class="macro">format_args!</span>(<span class="string">"invalid attribute: {n:?}"</span>))
                     .to_compile_error()
                     .into();
             },
@@ -1740,7 +1740,7 @@
     <span class="kw">let </span>n = fun.name.clone();
     <span class="kw">let </span>n2 = name.clone();
     <span class="kw">let </span>visibility = fun.visibility;
-    <span class="kw">let </span>name = <span class="kw">if </span>name == <span class="string">&quot;&lt;fn&gt;&quot; </span>{ fun.name.clone() } <span class="kw">else </span>{ Ident::new(<span class="kw-2">&amp;</span>name, Span::call_site()) };
+    <span class="kw">let </span>name = <span class="kw">if </span>name == <span class="string">"&lt;fn&gt;" </span>{ fun.name.clone() } <span class="kw">else </span>{ Ident::new(<span class="kw-2">&amp;</span>name, Span::call_site()) };
     <span class="kw">let </span>name = name.with_suffix(CHECK);
 
     <span class="kw">let </span>check = <span class="macro">quote!</span>(serenity::framework::standard::Check);
@@ -1761,7 +1761,7 @@
 
         #(#cooked)*
         <span class="attr">#[allow(missing_docs)]
-        </span>#visibility <span class="kw">fn </span>#n&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+        </span>#visibility <span class="kw">fn </span>#n&lt;<span class="lifetime">'fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">'fut</span>&gt;&gt; {
             Box::pin(<span class="kw">async move </span>{
                 <span class="kw">let </span>_output: #ret = { #(#body)* };
                 <span class="attr">#[allow(unreachable_code)]
@@ -1823,13 +1823,13 @@
 /// use std::future::Future;
 /// use std::pin::Pin;
 ///
-/// fn foo&lt;&#39;fut&gt;(n: &amp;&#39;fut i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt; + &#39;fut&gt;&gt; {
+/// fn foo&lt;'fut&gt;(n: &amp;'fut i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt; + 'fut&gt;&gt; {
 ///     Box::pin(async move { *n + 4 })
 /// }
 /// ```
 ///
 /// Explicitly specifying lifetimes (in the parameters or in the return type) or complex usage of
-/// lifetimes (e.g. `&#39;a: &#39;b`) is not supported.
+/// lifetimes (e.g. `'a: 'b`) is not supported.
 ///
 /// # Necessity for the macro
 ///
@@ -1846,7 +1846,7 @@
 /// First method is infeasible for the framework. Typically, the framework will contain a plethora
 /// of different commands that will be stored in a single list. And due to the nature of generics,
 /// generic types can only resolve to a single concrete type. If commands had a generic type for
-/// their function&#39;s return type, the framework would be unable to store commands, as only a single
+/// their function's return type, the framework would be unable to store commands, as only a single
 /// [`Future`] type from one of the commands would get resolved, preventing other commands from
 /// being stored.
 ///
@@ -1856,7 +1856,7 @@
 /// implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait, and
 /// avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
 /// trait objects must be used with a pointer, like references (`&amp;` and `&amp;mut`) or `Box`. The
-/// latter is what&#39;s used by the macro, as the ownership of the value (the state-machine) must be
+/// latter is what's used by the macro, as the ownership of the value (the state-machine) must be
 /// given to the caller, the framework in this case.
 ///
 /// The macro exists to retain the normal syntax of `async` functions (and closures), while
@@ -1888,7 +1888,7 @@
             (<span class="macro">quote! </span>{
                 #(#attributes)*
                 <span class="attr">#[allow(missing_docs)]
-                </span>#visibility <span class="kw">fn </span>#fun_name&lt;<span class="lifetime">&#39;fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">&#39;fut</span>&gt;&gt; {
+                </span>#visibility <span class="kw">fn </span>#fun_name&lt;<span class="lifetime">'fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">'fut</span>&gt;&gt; {
                     Box::pin(<span class="kw">async move </span>{
                         <span class="kw">let </span>_output: #ret = { #(#body)* };
                         <span class="attr">#[allow(unreachable_code)]

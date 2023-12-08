@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/oauth.rs`."><title>oauth.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/oauth.rs`."><title>oauth.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -119,108 +119,108 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
 </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Scope {
-    <span class="doccomment">/// For oauth2 bots, this puts the bot in the user&#39;s selected guild by default.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;bot&quot;</span>)]
+    <span class="doccomment">/// For oauth2 bots, this puts the bot in the user's selected guild by default.
+    </span><span class="attr">#[serde(rename = <span class="string">"bot"</span>)]
     </span>Bot,
     <span class="doccomment">/// Allows your app to use Slash Commands in a guild.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.commands&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"applications.commands"</span>)]
     </span>ApplicationsCommands,
     <span class="doccomment">/// Allows your app to update its Slash Commands via this bearer token - client credentials
     /// grant only.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.commands.update&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"applications.commands.update"</span>)]
     </span>ApplicationsCommandsUpdate,
     <span class="doccomment">/// Allows your app to update permissions for its commands in a guild a user has permissions
     /// to.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.commands.permissions.update&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"applications.commands.permissions.update"</span>)]
     </span>ApplicationsCommandsPermissionsUpdate,
     <span class="doccomment">/// Allows `/users/@me` without [`Self::Email`].
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;identify&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"identify"</span>)]
     </span>Identify,
     <span class="doccomment">/// Enables `/users/@me` to return an `email` field.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;email&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"email"</span>)]
     </span>Email,
     <span class="doccomment">/// Allows `/users/@me/connections` to return linked third-party accounts.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;connections&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"connections"</span>)]
     </span>Connections,
-    <span class="doccomment">/// Allows `/users/@me/guilds` to return basic information about all of a user&#39;s guilds.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;guilds&quot;</span>)]
+    <span class="doccomment">/// Allows `/users/@me/guilds` to return basic information about all of a user's guilds.
+    </span><span class="attr">#[serde(rename = <span class="string">"guilds"</span>)]
     </span>Guilds,
     <span class="doccomment">/// Allows `/guilds/{guild.id}/members/{user.id}` to be used for joining users to a guild.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;guilds.join&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"guilds.join"</span>)]
     </span>GuildsJoin,
-    <span class="doccomment">/// Allows `/users/@me/guilds/{guild.id}/member` to return a user&#39;s member information in a
+    <span class="doccomment">/// Allows `/users/@me/guilds/{guild.id}/member` to return a user's member information in a
     /// guild.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;guilds.members.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"guilds.members.read"</span>)]
     </span>GuildsMembersRead,
     <span class="doccomment">/// Allows your app to join users to a group dm.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;gdm.join&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"gdm.join"</span>)]
     </span>GdmJoin,
-    <span class="doccomment">/// For local rpc server access, this allows you to control a user&#39;s local Discord client -
+    <span class="doccomment">/// For local rpc server access, this allows you to control a user's local Discord client -
     /// requires Discord approval.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;rpc&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"rpc"</span>)]
     </span>Rpc,
     <span class="doccomment">/// For local rpc server api access, this allows you to receive notifications pushed out to the
     /// user - requires Discord approval.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;rpc.notifications.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"rpc.notifications.read"</span>)]
     </span>RpcNotificationsRead,
-    <span class="attr">#[serde(rename = <span class="string">&quot;rpc.voice.read&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"rpc.voice.read"</span>)]
     </span>RpcVoiceRead,
-    <span class="attr">#[serde(rename = <span class="string">&quot;rpc.voice.write&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"rpc.voice.write"</span>)]
     </span>RpcVoiceWrite,
-    <span class="attr">#[serde(rename = <span class="string">&quot;rpc.activities.write&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"rpc.activities.write"</span>)]
     </span>RpcActivitiesWrite,
     <span class="doccomment">/// This generates a webhook that is returned in the oauth token response for authorization
     /// code grants.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;webhook.incoming&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"webhook.incoming"</span>)]
     </span>WebhookIncoming,
     <span class="doccomment">/// For local rpc server api access, this allows you to read messages from all client channels
     /// (otherwise restricted to channels/guilds your app creates).
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;messages.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"messages.read"</span>)]
     </span>MessagesRead,
-    <span class="doccomment">/// Allows your app to upload/update builds for a user&#39;s applications - requires Discord
+    <span class="doccomment">/// Allows your app to upload/update builds for a user's applications - requires Discord
     /// approval.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.builds.upload&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"applications.builds.upload"</span>)]
     </span>ApplicationsBuildsUpload,
-    <span class="doccomment">/// Allows your app to read build data for a user&#39;s applications.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.builds.read&quot;</span>)]
+    <span class="doccomment">/// Allows your app to read build data for a user's applications.
+    </span><span class="attr">#[serde(rename = <span class="string">"applications.builds.read"</span>)]
     </span>ApplicationsBuildsRead,
     <span class="doccomment">/// Allows your app to read and update store data (SKUs, store listings, achievements, etc.)
-    /// for a user&#39;s applications.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.store.update&quot;</span>)]
+    /// for a user's applications.
+    </span><span class="attr">#[serde(rename = <span class="string">"applications.store.update"</span>)]
     </span>ApplicationsStoreUpdate,
-    <span class="doccomment">/// Allows your app to read entitlements for a user&#39;s applications.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;applications.entitlements&quot;</span>)]
+    <span class="doccomment">/// Allows your app to read entitlements for a user's applications.
+    </span><span class="attr">#[serde(rename = <span class="string">"applications.entitlements"</span>)]
     </span>ApplicationsEntitlements,
-    <span class="doccomment">/// Allows your app to fetch data from a user&#39;s &quot;Now Playing/Recently Played&quot; list - requires
+    <span class="doccomment">/// Allows your app to fetch data from a user's "Now Playing/Recently Played" list - requires
     /// Discord approval.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;activities.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"activities.read"</span>)]
     </span>ActivitiesRead,
-    <span class="doccomment">/// Allows your app to update a user&#39;s activity - requires Discord approval (Not required for
+    <span class="doccomment">/// Allows your app to update a user's activity - requires Discord approval (Not required for
     /// gamesdk activity manager!).
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;activities.write&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"activities.write"</span>)]
     </span>ActivitiesWrite,
-    <span class="doccomment">/// Allows your app to know a user&#39;s friends and implicit relationships - requires Discord
+    <span class="doccomment">/// Allows your app to know a user's friends and implicit relationships - requires Discord
     /// approval.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;relationships.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"relationships.read"</span>)]
     </span>RelationshipsRead,
-    <span class="doccomment">/// Allows your app to see information about the user&#39;s DMs and group DMs - requires Discord
+    <span class="doccomment">/// Allows your app to see information about the user's DMs and group DMs - requires Discord
     /// approval.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;dm_channels.read&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"dm_channels.read"</span>)]
     </span>DmChannelsRead,
-    <span class="doccomment">/// Allows your app to connect to voice on user&#39;s behalf and see all the voice members -
+    <span class="doccomment">/// Allows your app to connect to voice on user's behalf and see all the voice members -
     /// requires Discord approval.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"voice"</span>)]
     </span>Voice,
-    <span class="doccomment">/// Allows your app to update a user&#39;s connection and metadata for the app.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;role_connections.write&quot;</span>)]
+    <span class="doccomment">/// Allows your app to update a user's connection and metadata for the app.
+    </span><span class="attr">#[serde(rename = <span class="string">"role_connections.write"</span>)]
     </span>RoleConnectionsWrite,
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Scope {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="self">self</span>.serialize(f)
     }
 }

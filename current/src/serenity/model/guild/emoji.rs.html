@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/emoji.rs`."><title>emoji.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/emoji.rs`."><title>emoji.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -218,25 +218,25 @@
 <a href="#218" id="218">218</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::id::GuildId;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{EmojiId, RoleId};
 <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 <span class="kw">use </span><span class="kw">crate</span>::model::utils::default_true;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::ModelError;
 
 <span class="doccomment">/// Represents a custom guild emoji, which can either be created using the API, or via an
 /// integration. Emojis created using the API only work within the guild it was created in.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/emoji#emoji-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Emoji {
@@ -245,7 +245,7 @@
     </span><span class="kw">pub </span>animated: bool,
     <span class="doccomment">/// Whether the emoji can be used. This may be false when the guild loses boosts, reducing the
     /// emoji limit.
-    </span><span class="attr">#[serde(default = <span class="string">&quot;default_true&quot;</span>)]
+    </span><span class="attr">#[serde(default = <span class="string">"default_true"</span>)]
     </span><span class="kw">pub </span>available: bool,
     <span class="doccomment">/// The Id of the emoji.
     </span><span class="kw">pub </span>id: EmojiId,
@@ -270,7 +270,7 @@
     </span><span class="kw">pub </span>user: <span class="prelude-ty">Option</span>&lt;User&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>Emoji {
     <span class="doccomment">/// Deletes the emoji. This method requires the cache to fetch the guild ID.
     ///
@@ -289,8 +289,8 @@
     /// # async fn example(ctx: &amp;Context, emoji: Emoji) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// // assuming emoji has been set already
     /// match emoji.delete(&amp;ctx).await {
-    ///     Ok(()) =&gt; println!(&quot;Emoji deleted.&quot;),
-    ///     Err(_) =&gt; println!(&quot;Could not delete emoji.&quot;),
+    ///     Ok(()) =&gt; println!("Emoji deleted."),
+    ///     Err(_) =&gt; println!("Could not delete emoji."),
     /// }
     /// # Ok(())
     /// # }
@@ -303,8 +303,8 @@
     ///
     /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[deprecated = <span class="string">&quot;Use Guild(Id)::delete_emoji, this performs a loop over all guilds!&quot;</span>]
-    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[deprecated = <span class="string">"Use Guild(Id)::delete_emoji, this performs a loop over all guilds!"</span>]
+    #[cfg(feature = <span class="string">"cache"</span>)]
     #[allow(deprecated)]
     #[inline]
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -326,8 +326,8 @@
     ///
     /// [Create Guild Expressions]: crate::model::Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: crate::model::Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[deprecated = <span class="string">&quot;Use Guild(Id)::edit_emoji, this performs a loop over all guilds!&quot;</span>]
-    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[deprecated = <span class="string">"Use Guild(Id)::edit_emoji, this performs a loop over all guilds!"</span>]
+    #[cfg(feature = <span class="string">"cache"</span>)]
     #[allow(deprecated)]
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>guild_id = <span class="self">self</span>.try_find_guild_id(<span class="kw-2">&amp;</span>cache_http)<span class="question-mark">?</span>;
@@ -350,12 +350,12 @@
     /// # fn run(cache: Cache, emoji: Emoji) {
     /// // assuming emoji has been set already
     /// if let Some(guild_id) = emoji.find_guild_id(&amp;cache) {
-    ///     println!(&quot;{} is owned by {}&quot;, emoji.name, guild_id);
+    ///     println!("{} is owned by {}", emoji.name, guild_id);
     /// }
     /// # }
     /// ```
-    </span><span class="attr">#[deprecated = <span class="string">&quot;This performs a loop over all guilds and should not be used.&quot;</span>]
-    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[deprecated = <span class="string">"This performs a loop over all guilds and should not be used."</span>]
+    #[cfg(feature = <span class="string">"cache"</span>)]
     #[allow(deprecated)]
     #[must_use]
     </span><span class="kw">pub fn </span>find_guild_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildId&gt; {
@@ -370,8 +370,8 @@
         <span class="prelude-val">None
     </span>}
 
-    <span class="attr">#[deprecated = <span class="string">&quot;This performs a loop over all guilds and should not be used.&quot;</span>]
-    #[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[deprecated = <span class="string">"This performs a loop over all guilds and should not be used."</span>]
+    #[cfg(feature = <span class="string">"cache"</span>)]
     #[allow(deprecated)]
     #[inline]
     </span><span class="kw">fn </span>try_find_guild_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildId&gt; {
@@ -381,7 +381,7 @@
             .ok_or(Error::Model(ModelError::ItemMissing))
     }
 
-    <span class="doccomment">/// Generates a URL to the emoji&#39;s image.
+    <span class="doccomment">/// Generates a URL to the emoji's image.
     ///
     /// # Examples
     ///
@@ -392,14 +392,14 @@
     /// #
     /// # fn run(emoji: Emoji) {
     /// // assuming emoji has been set already
-    /// println!(&quot;Direct link to emoji image: {}&quot;, emoji.url());
+    /// println!("Direct link to emoji image: {}", emoji.url());
     /// # }
     /// ```
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="kw">let </span>extension = <span class="kw">if </span><span class="self">self</span>.animated { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;png&quot; </span>};
-        <span class="macro">cdn!</span>(<span class="string">&quot;/emojis/{}.{}&quot;</span>, <span class="self">self</span>.id, extension)
+        <span class="kw">let </span>extension = <span class="kw">if </span><span class="self">self</span>.animated { <span class="string">"gif" </span>} <span class="kw">else </span>{ <span class="string">"png" </span>};
+        <span class="macro">cdn!</span>(<span class="string">"/emojis/{}.{}"</span>, <span class="self">self</span>.id, extension)
     }
 }
 
@@ -408,16 +408,16 @@
     ///
     /// This is in the format of either `&lt;:NAME:EMOJI_ID&gt;` for normal emojis, or
     /// `&lt;a:NAME:EMOJI_ID&gt;` for animated emojis.
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">if </span><span class="self">self</span>.animated {
-            f.write_str(<span class="string">&quot;&lt;a:&quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">"&lt;a:"</span>)<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
-            f.write_str(<span class="string">&quot;&lt;:&quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">"&lt;:"</span>)<span class="question-mark">?</span>;
         }
         f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.name)<span class="question-mark">?</span>;
-        fmt::Write::write_char(f, <span class="string">&#39;:&#39;</span>)<span class="question-mark">?</span>;
+        fmt::Write::write_char(f, <span class="string">':'</span>)<span class="question-mark">?</span>;
         fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.id, f)<span class="question-mark">?</span>;
-        fmt::Write::write_char(f, <span class="string">&#39;&gt;&#39;</span>)
+        fmt::Write::write_char(f, <span class="string">'&gt;'</span>)
     }
 }
 
@@ -428,7 +428,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Emoji&gt; <span class="kw">for </span>EmojiId {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Emoji&gt; <span class="kw">for </span>EmojiId {
     <span class="doccomment">/// Gets the Id of an [`Emoji`].
     </span><span class="kw">fn </span>from(emoji: <span class="kw-2">&amp;</span>Emoji) -&gt; EmojiId {
         emoji.id

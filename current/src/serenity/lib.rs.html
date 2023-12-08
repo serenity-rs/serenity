@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -194,16 +194,16 @@
 //! Once logged in, you may add handlers to your client to dispatch [`Event`]s, such as
 //! [`EventHandler::message`]. This will cause your handler to be called when a
 //! [`Event::MessageCreate`] is received. Each handler is given a [`Context`], giving information
-//! about the event. See the [client&#39;s module-level documentation].
+//! about the event. See the [client's module-level documentation].
 //!
 //! The [`Shard`] is transparently handled by the library, removing unnecessary complexity. Sharded
-//! connections are automatically handled for you. See the [gateway&#39;s documentation][gateway docs]
+//! connections are automatically handled for you. See the [gateway's documentation][gateway docs]
 //! for more information.
 //!
 //! A [`Cache`] is also provided for you. This will be updated automatically for you as data is
 //! received from the Discord API via events. When calling a method on a [`Context`], the cache
 //! will first be searched for relevant data to avoid unnecessary HTTP requests to the Discord API.
-//! For more information, see the [cache&#39;s module-level documentation][cache docs].
+//! For more information, see the [cache's module-level documentation][cache docs].
 //!
 //! Note that, although this documentation will try to be as up-to-date and accurate as possible,
 //! Discord hosts [official documentation][docs]. If you need to be sure that some information
@@ -220,7 +220,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = &quot;0.12&quot;
+//! serenity = "0.12"
 //! ```
 //!
 //! [`Cache`]: crate::cache::Cache
@@ -231,11 +231,11 @@
 //! [`Shard`]: crate::gateway::Shard
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 //! [cache docs]: crate::cache
-//! [client&#39;s module-level documentation]: crate::client
+//! [client's module-level documentation]: crate::client
 //! [docs]: https://discord.com/developers/docs/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: crate::gateway
-</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/serenity/*&quot;</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/serenity/*"</span>)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![warn(
     unused,
@@ -268,7 +268,7 @@
     </span>clippy::missing_panics_doc, <span class="comment">// clippy::unwrap_used
 </span>)]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
-#![type_length_limit = <span class="string">&quot;3294819&quot;</span>] </span><span class="comment">// needed so ShardRunner::run compiles with instrument.
+#![type_length_limit = <span class="string">"3294819"</span>] </span><span class="comment">// needed so ShardRunner::run compiles with instrument.
 
 </span><span class="attr">#[macro_use]
 </span><span class="kw">extern crate </span>serde;
@@ -281,23 +281,23 @@
 <span class="kw">pub mod </span>model;
 <span class="kw">pub mod </span>prelude;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"builder"</span>)]
 </span><span class="kw">pub mod </span>builder;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">pub mod </span>cache;
-<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">pub mod </span>client;
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">pub mod </span>collector;
-<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">pub mod </span>framework;
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">pub mod </span>gateway;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">pub mod </span>http;
-<span class="attr">#[cfg(feature = <span class="string">&quot;interactions_endpoint&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"interactions_endpoint"</span>)]
 </span><span class="kw">pub mod </span>interactions_endpoint;
-<span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
 </span><span class="kw">pub mod </span>utils;
 
 <span class="kw">mod </span>error;
@@ -306,57 +306,57 @@
 </span><span class="kw">pub use </span>async_trait::async_trait;
 <span class="kw">pub use </span>futures;
 <span class="kw">pub use </span>futures::future::FutureExt;
-<span class="attr">#[cfg(feature = <span class="string">&quot;standard_framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"standard_framework"</span>)]
 #[doc(hidden)]
 </span><span class="kw">pub use </span>static_assertions;
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;client&quot;</span>, feature = <span class="string">&quot;gateway&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"client"</span>, feature = <span class="string">"gateway"</span>))]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::client::Client;
 <span class="kw">pub use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;absolute_ratelimits&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"absolute_ratelimits"</span>)]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;The absolute_ratelimits feature has been removed.\n\
+    <span class="string">"The absolute_ratelimits feature has been removed.\n\
     Configure absolute ratelimits via Ratelimiter::set_absolute_ratelimits.\n\
-    You can set the Ratelimiter of Http via HttpBuilder::ratelimiter.&quot;
+    You can set the Ratelimiter of Http via HttpBuilder::ratelimiter."
 </span>);
 
 <span class="doccomment">/// Special module that re-exports most public items from this crate.
 ///
-/// Useful, because you don&#39;t have to remember the full paths of serenity items.
+/// Useful, because you don't have to remember the full paths of serenity items.
 ///
 /// Not exported:
-/// - [`crate::json`]: it&#39;s a general-purpose JSON wrapper, not intrinsic to serenity
+/// - [`crate::json`]: it's a general-purpose JSON wrapper, not intrinsic to serenity
 /// - [`crate::framework::standard`]: has many standard_framework-specific items that may collide
 /// with items from the rest of serenity
 </span><span class="kw">pub mod </span>all {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;builder&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"builder"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::builder::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::client::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::collector::<span class="kw-2">*</span>;
     <span class="attr">#[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::constants::{close_codes::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::framework::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::gateway::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::http::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;interactions_endpoint&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"interactions_endpoint"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::interactions_endpoint::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::utils::{
         token::{validate <span class="kw">as </span>validate_token, InvalidToken},
@@ -366,7 +366,7 @@
     // pub use crate::*;
     </span><span class="attr">#[doc(no_inline)]
     </span><span class="kw">pub use crate</span>::{
-        <span class="comment">// Need to re-export this manually or it can&#39;t be accessed for some reason
+        <span class="comment">// Need to re-export this manually or it can't be accessed for some reason
         </span>async_trait,
         model::prelude::<span class="kw-2">*</span>,
         <span class="kw-2">*</span>,

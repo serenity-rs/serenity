@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -213,7 +213,7 @@
 
 <span class="doccomment">/// An error returned from the [`model`] module.
 ///
-/// This is always wrapped within the library&#39;s [`Error::Model`] variant.
+/// This is always wrapped within the library's [`Error::Model`] variant.
 ///
 /// # Examples
 ///
@@ -229,7 +229,7 @@
 /// # struct Handler;
 ///
 /// #[serenity::async_trait]
-/// #[cfg(feature = &quot;client&quot;)]
+/// #[cfg(feature = "client")]
 /// impl EventHandler for Handler {
 ///     async fn guild_ban_removal(&amp;self, context: Context, guild_id: GuildId, user: User) {
 ///         match guild_id.ban(&amp;context, user, 8).await {
@@ -237,10 +237,10 @@
 ///                 // Ban successful.
 ///             },
 ///             Err(Error::Model(ModelError::DeleteMessageDaysAmount(amount))) =&gt; {
-///                 println!(&quot;Failed deleting {} days&#39; worth of messages&quot;, amount);
+///                 println!("Failed deleting {} days' worth of messages", amount);
 ///             },
 ///             Err(why) =&gt; {
-///                 println!(&quot;Unexpected error: {:?}&quot;, why);
+///                 println!("Unexpected error: {:?}", why);
 ///             },
 ///         }
 ///     }
@@ -256,7 +256,7 @@
 </span><span class="kw">pub enum </span>Error {
     <span class="doccomment">/// When attempting to delete below or above the minimum or maximum allowed number of messages.
     </span>BulkDeleteAmount,
-    <span class="doccomment">/// When attempting to delete a number of days&#39; worth of messages that is not allowed.
+    <span class="doccomment">/// When attempting to delete a number of days' worth of messages that is not allowed.
     </span>DeleteMessageDaysAmount(u8),
     <span class="doccomment">/// When attempting to send a message with over 10 embeds.
     </span>EmbedAmount,
@@ -303,7 +303,7 @@
     /// For example, when banning a user, if the other user has a role with an equal to or higher
     /// position, then they can not be banned.
     ///
-    /// When editing a role, if the role is higher in position than the current user&#39;s highest
+    /// When editing a role, if the role is higher in position than the current user's highest
     /// role, then the role can not be edited.
     </span>Hierarchy,
     <span class="doccomment">/// Indicates that you do not have the required permissions to perform an operation.
@@ -375,36 +375,36 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::BulkDeleteAmount =&gt; f.write_str(<span class="string">&quot;Too few/many messages to bulk delete.&quot;</span>),
-            <span class="self">Self</span>::DeleteMessageDaysAmount(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Invalid delete message days.&quot;</span>),
-            <span class="self">Self</span>::EmbedAmount =&gt; f.write_str(<span class="string">&quot;Too many embeds in a message.&quot;</span>),
-            <span class="self">Self</span>::EmbedTooLarge(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Embed too large.&quot;</span>),
-            <span class="self">Self</span>::GuildNotFound =&gt; f.write_str(<span class="string">&quot;Guild not found in the cache.&quot;</span>),
-            <span class="self">Self</span>::RoleNotFound =&gt; f.write_str(<span class="string">&quot;Role not found in the cache.&quot;</span>),
-            <span class="self">Self</span>::MemberNotFound =&gt; f.write_str(<span class="string">&quot;Member not found in the cache.&quot;</span>),
-            <span class="self">Self</span>::ChannelNotFound =&gt; f.write_str(<span class="string">&quot;Channel not found in the cache.&quot;</span>),
-            <span class="self">Self</span>::Hierarchy =&gt; f.write_str(<span class="string">&quot;Role hierarchy prevents this action.&quot;</span>),
-            <span class="self">Self</span>::InvalidChannelType =&gt; f.write_str(<span class="string">&quot;The channel cannot perform the action.&quot;</span>),
+            <span class="self">Self</span>::BulkDeleteAmount =&gt; f.write_str(<span class="string">"Too few/many messages to bulk delete."</span>),
+            <span class="self">Self</span>::DeleteMessageDaysAmount(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Invalid delete message days."</span>),
+            <span class="self">Self</span>::EmbedAmount =&gt; f.write_str(<span class="string">"Too many embeds in a message."</span>),
+            <span class="self">Self</span>::EmbedTooLarge(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Embed too large."</span>),
+            <span class="self">Self</span>::GuildNotFound =&gt; f.write_str(<span class="string">"Guild not found in the cache."</span>),
+            <span class="self">Self</span>::RoleNotFound =&gt; f.write_str(<span class="string">"Role not found in the cache."</span>),
+            <span class="self">Self</span>::MemberNotFound =&gt; f.write_str(<span class="string">"Member not found in the cache."</span>),
+            <span class="self">Self</span>::ChannelNotFound =&gt; f.write_str(<span class="string">"Channel not found in the cache."</span>),
+            <span class="self">Self</span>::Hierarchy =&gt; f.write_str(<span class="string">"Role hierarchy prevents this action."</span>),
+            <span class="self">Self</span>::InvalidChannelType =&gt; f.write_str(<span class="string">"The channel cannot perform the action."</span>),
             <span class="self">Self</span>::InvalidPermissions {
                 ..
-            } =&gt; f.write_str(<span class="string">&quot;Invalid permissions.&quot;</span>),
-            <span class="self">Self</span>::InvalidUser =&gt; f.write_str(<span class="string">&quot;The current user cannot perform the action.&quot;</span>),
-            <span class="self">Self</span>::ItemMissing =&gt; f.write_str(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
-            <span class="self">Self</span>::WrongGuild =&gt; f.write_str(<span class="string">&quot;Provided member or channel is from the wrong guild.&quot;</span>),
-            <span class="self">Self</span>::MessageTooLong(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Message too large.&quot;</span>),
-            <span class="self">Self</span>::MessageAlreadyCrossposted =&gt; f.write_str(<span class="string">&quot;Message already crossposted.&quot;</span>),
-            <span class="self">Self</span>::CannotCrosspostMessage =&gt; f.write_str(<span class="string">&quot;Cannot crosspost this message type.&quot;</span>),
-            <span class="self">Self</span>::MessagingBot =&gt; f.write_str(<span class="string">&quot;Attempted to message another bot user.&quot;</span>),
-            <span class="self">Self</span>::NameTooShort =&gt; f.write_str(<span class="string">&quot;Name is under the character limit.&quot;</span>),
-            <span class="self">Self</span>::NameTooLong =&gt; f.write_str(<span class="string">&quot;Name is over the character limit.&quot;</span>),
-            <span class="self">Self</span>::NotAuthor =&gt; f.write_str(<span class="string">&quot;The bot is not author of this message.&quot;</span>),
-            <span class="self">Self</span>::NoTokenSet =&gt; f.write_str(<span class="string">&quot;Token is not set.&quot;</span>),
-            <span class="self">Self</span>::DeleteNitroSticker =&gt; f.write_str(<span class="string">&quot;Cannot delete an official sticker.&quot;</span>),
-            <span class="self">Self</span>::NoStickerFileSet =&gt; f.write_str(<span class="string">&quot;Sticker file is not set.&quot;</span>),
-            <span class="self">Self</span>::StickerAmount =&gt; f.write_str(<span class="string">&quot;Too many stickers in a message.&quot;</span>),
-            <span class="self">Self</span>::CannotEditVoiceMessage =&gt; f.write_str(<span class="string">&quot;Cannot edit voice message.&quot;</span>),
+            } =&gt; f.write_str(<span class="string">"Invalid permissions."</span>),
+            <span class="self">Self</span>::InvalidUser =&gt; f.write_str(<span class="string">"The current user cannot perform the action."</span>),
+            <span class="self">Self</span>::ItemMissing =&gt; f.write_str(<span class="string">"The required item is missing from the cache."</span>),
+            <span class="self">Self</span>::WrongGuild =&gt; f.write_str(<span class="string">"Provided member or channel is from the wrong guild."</span>),
+            <span class="self">Self</span>::MessageTooLong(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Message too large."</span>),
+            <span class="self">Self</span>::MessageAlreadyCrossposted =&gt; f.write_str(<span class="string">"Message already crossposted."</span>),
+            <span class="self">Self</span>::CannotCrosspostMessage =&gt; f.write_str(<span class="string">"Cannot crosspost this message type."</span>),
+            <span class="self">Self</span>::MessagingBot =&gt; f.write_str(<span class="string">"Attempted to message another bot user."</span>),
+            <span class="self">Self</span>::NameTooShort =&gt; f.write_str(<span class="string">"Name is under the character limit."</span>),
+            <span class="self">Self</span>::NameTooLong =&gt; f.write_str(<span class="string">"Name is over the character limit."</span>),
+            <span class="self">Self</span>::NotAuthor =&gt; f.write_str(<span class="string">"The bot is not author of this message."</span>),
+            <span class="self">Self</span>::NoTokenSet =&gt; f.write_str(<span class="string">"Token is not set."</span>),
+            <span class="self">Self</span>::DeleteNitroSticker =&gt; f.write_str(<span class="string">"Cannot delete an official sticker."</span>),
+            <span class="self">Self</span>::NoStickerFileSet =&gt; f.write_str(<span class="string">"Sticker file is not set."</span>),
+            <span class="self">Self</span>::StickerAmount =&gt; f.write_str(<span class="string">"Too many stickers in a message."</span>),
+            <span class="self">Self</span>::CannotEditVoiceMessage =&gt; f.write_str(<span class="string">"Cannot edit voice message."</span>),
         }
     }
 }

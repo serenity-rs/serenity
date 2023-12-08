@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/util.rs`."><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/util.rs`."><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -322,7 +322,7 @@
             <span class="self">Self</span>::ByteStr(s) =&gt; <span class="kw">unsafe </span>{ String::from_utf8_unchecked(s.value()) },
             <span class="self">Self</span>::Char(c) =&gt; c.value().to_string(),
             <span class="self">Self</span>::Byte(b) =&gt; (b.value() <span class="kw">as </span>char).to_string(),
-            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;values must be a (byte)string or a char&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"values must be a (byte)string or a char"</span>),
         }
     }
 
@@ -330,7 +330,7 @@
         <span class="kw">if let </span>Lit::Bool(b) = <span class="self">self </span>{
             b.value
         } <span class="kw">else </span>{
-            <span class="self">self</span>.to_str().parse().unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;expected bool from {:?}&quot;</span>, <span class="self">self</span>))
+            <span class="self">self</span>.to_str().parse().unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">"expected bool from {:?}"</span>, <span class="self">self</span>))
         }
     }
 
@@ -350,18 +350,18 @@
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_string_non_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>ident_string = <span class="self">self</span>.to_string();
-        ident_string.trim_start_matches(<span class="string">&quot;r#&quot;</span>).into()
+        ident_string.trim_start_matches(<span class="string">"r#"</span>).into()
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_uppercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// This should be valid because keywords are lowercase.
-        </span><span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.to_string_non_raw().to_uppercase())
+        </span><span class="macro">format_ident!</span>(<span class="string">"{}"</span>, <span class="self">self</span>.to_string_non_raw().to_uppercase())
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>with_suffix(<span class="kw-2">&amp;</span><span class="self">self</span>, suffix: <span class="kw-2">&amp;</span>str) -&gt; Ident {
-        <span class="macro">format_ident!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="self">self</span>.to_uppercase(), suffix)
+        <span class="macro">format_ident!</span>(<span class="string">"{}_{}"</span>, <span class="self">self</span>.to_uppercase(), suffix)
     }
 }
 
@@ -383,7 +383,7 @@
 </span><span class="kw">pub struct </span>Bracketed&lt;T&gt;(<span class="kw">pub </span>Punctuated&lt;T, Comma&gt;);
 
 <span class="kw">impl</span>&lt;T: Parse&gt; Parse <span class="kw">for </span>Bracketed&lt;T&gt; {
-    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>content;
         <span class="macro">bracketed!</span>(content <span class="kw">in </span>input);
 
@@ -395,7 +395,7 @@
 </span><span class="kw">pub struct </span>Braced&lt;T&gt;(<span class="kw">pub </span>Punctuated&lt;T, Comma&gt;);
 
 <span class="kw">impl</span>&lt;T: Parse&gt; Parse <span class="kw">for </span>Braced&lt;T&gt; {
-    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>content;
         <span class="macro">braced!</span>(content <span class="kw">in </span>input);
 
@@ -407,7 +407,7 @@
 </span><span class="kw">pub struct </span>Parenthesised&lt;T&gt;(<span class="kw">pub </span>Punctuated&lt;T, Comma&gt;);
 
 <span class="kw">impl</span>&lt;T: Parse&gt; Parse <span class="kw">for </span>Parenthesised&lt;T&gt; {
-    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">'_</span>&gt;) -&gt; SynResult&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>content;
         <span class="macro">parenthesized!</span>(content <span class="kw">in </span>input);
 
@@ -486,7 +486,7 @@
     <span class="kw">if </span>fun.args.len() &gt; len {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
             fun.args.last().unwrap().span(),
-            <span class="macro">format_args!</span>(<span class="string">&quot;function&#39;s arity exceeds more than {len} arguments&quot;</span>),
+            <span class="macro">format_args!</span>(<span class="string">"function's arity exceeds more than {len} arguments"</span>),
         ));
     }
 
@@ -495,8 +495,8 @@
     <span class="kw">let </span>args: Type = <span class="macro">parse_quote!</span>(serenity::framework::standard::Args);
     <span class="kw">let </span>args2: Type = <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;mut </span>serenity::framework::standard::Args);
     <span class="kw">let </span>options: Type = <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span>serenity::framework::standard::CommandOptions);
-    <span class="kw">let </span>hoptions: Type = <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>serenity::framework::standard::HelpOptions);
-    <span class="kw">let </span>groups: Type = <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>serenity::framework::standard::CommandGroup]);
+    <span class="kw">let </span>hoptions: Type = <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>serenity::framework::standard::HelpOptions);
+    <span class="kw">let </span>groups: Type = <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>serenity::framework::standard::CommandGroup]);
     <span class="kw">let </span>owners: Type = <span class="macro">parse_quote!</span>(std::collections::HashSet&lt;serenity::model::id::UserId&gt;);
 
     <span class="kw">let </span><span class="kw-2">mut </span>index = <span class="number">0</span>;
@@ -514,22 +514,22 @@
         index += <span class="number">1</span>;
     };
 
-    spoof_or_check(context, <span class="string">&quot;_ctx&quot;</span>);
-    spoof_or_check(message, <span class="string">&quot;_msg&quot;</span>);
+    spoof_or_check(context, <span class="string">"_ctx"</span>);
+    spoof_or_check(message, <span class="string">"_msg"</span>);
 
     <span class="kw">if </span>dec_for == DeclarFor::Check {
-        spoof_or_check(args2, <span class="string">&quot;_args&quot;</span>);
-        spoof_or_check(options, <span class="string">&quot;_options&quot;</span>);
+        spoof_or_check(args2, <span class="string">"_args"</span>);
+        spoof_or_check(options, <span class="string">"_options"</span>);
 
         <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    spoof_or_check(args, <span class="string">&quot;_args&quot;</span>);
+    spoof_or_check(args, <span class="string">"_args"</span>);
 
     <span class="kw">if </span>dec_for == DeclarFor::Help {
-        spoof_or_check(hoptions, <span class="string">&quot;_hoptions&quot;</span>);
-        spoof_or_check(groups, <span class="string">&quot;_groups&quot;</span>);
-        spoof_or_check(owners, <span class="string">&quot;_owners&quot;</span>);
+        spoof_or_check(hoptions, <span class="string">"_hoptions"</span>);
+        spoof_or_check(groups, <span class="string">"_groups"</span>);
+        spoof_or_check(owners, <span class="string">"_owners"</span>);
     }
 
     <span class="prelude-val">Ok</span>(())
@@ -545,7 +545,7 @@
 </span><span class="kw">pub fn </span>populate_fut_lifetimes_on_refs(args: <span class="kw-2">&amp;mut </span>Vec&lt;Argument&gt;) {
     <span class="kw">for </span>arg <span class="kw">in </span>args {
         <span class="kw">if let </span>Type::Reference(reference) = <span class="kw-2">&amp;mut </span>arg.kind {
-            reference.lifetime = <span class="prelude-val">Some</span>(Lifetime::new(<span class="string">&quot;&#39;fut&quot;</span>, Span::call_site()));
+            reference.lifetime = <span class="prelude-val">Some</span>(Lifetime::new(<span class="string">"'fut"</span>, Span::call_site()));
         }
     }
 }
@@ -560,18 +560,18 @@
 }
 
 <span class="kw">pub fn </span>append_line(desc: <span class="kw-2">&amp;mut </span>AsOption&lt;String&gt;, <span class="kw-2">mut </span>line: String) {
-    <span class="kw">if </span>line.starts_with(<span class="string">&#39; &#39;</span>) {
+    <span class="kw">if </span>line.starts_with(<span class="string">' '</span>) {
         line.remove(<span class="number">0</span>);
     }
 
     <span class="kw">let </span>desc = desc.<span class="number">0</span>.get_or_insert_with(String::default);
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = line.rfind(<span class="string">&quot;\\$&quot;</span>) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = line.rfind(<span class="string">"\\$"</span>) {
         desc.push_str(line[..i].trim_end());
-        desc.push(<span class="string">&#39; &#39;</span>);
+        desc.push(<span class="string">' '</span>);
     } <span class="kw">else </span>{
         desc.push_str(<span class="kw-2">&amp;</span>line);
-        desc.push(<span class="string">&#39;\n&#39;</span>);
+        desc.push(<span class="string">'\n'</span>);
     }
 }
 </code></pre></div></section></main></body></html>

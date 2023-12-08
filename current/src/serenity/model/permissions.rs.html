@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/permissions.rs`."><title>permissions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/permissions.rs`."><title>permissions.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -850,13 +850,13 @@
 <a href="#850" id="850">850</a>
 <a href="#851" id="851">851</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
-//! channel&#39;s permission overrides.
+//! channel's permission overrides.
 //!
 //! For convenience, methods for each permission are available, which can be used to test if the
 //! set of permissions contains a single permission. This can simplify code and reduce a potential
 //! import.
 //!
-//! Additionally, presets equivalent to the official client&#39;s `@everyone` role presets are
+//! Additionally, presets equivalent to the official client's `@everyone` role presets are
 //! available. These are [`PRESET_GENERAL`], [`PRESET_TEXT`], and [`PRESET_VOICE`].
 //!
 //! Permissions follow a hierarchy:
@@ -886,7 +886,7 @@
 //! [Manage Roles]: Permissions::MANAGE_ROLES
 //! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
@@ -903,8 +903,8 @@
 ///
 /// ```ignore
 /// generate_get_permission_names! {
-///     add_reactions: &quot;Add Reactions&quot;,
-///     administrator: &quot;Administrator&quot;
+///     add_reactions: "Add Reactions",
+///     administrator: "Administrator"
 /// };
 /// ```
 ///
@@ -912,27 +912,27 @@
 ///
 /// ```ignore
 /// impl Permissions {
-///     fn get_permission_names(self) -&gt; Vec&lt;&amp;&#39;static str&gt; {
+///     fn get_permission_names(self) -&gt; Vec&lt;&amp;'static str&gt; {
 ///         let mut names = Vec::new();
 ///
 ///         if self.add_reactions() {
-///             names.push(&quot;Add Reactions&quot;);
+///             names.push("Add Reactions");
 ///         }
 ///         if self.administrator() {
-///             names.push(&quot;Administrator&quot;);
+///             names.push("Administrator");
 ///         }
 ///
 ///         names
 ///     }
 /// }
 /// ```
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="macro">macro_rules! </span>generate_get_permission_names {
     {$ (<span class="macro-nonterminal">$perm</span>:ident: <span class="macro-nonterminal">$name</span>:expr),<span class="kw-2">*</span>} =&gt; {
         <span class="kw">impl </span>Permissions {
             <span class="doccomment">/// Returns a list of names of all contained permissions.
             </span><span class="attr">#[must_use]
-            </span><span class="kw">pub fn </span>get_permission_names(<span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+            </span><span class="kw">pub fn </span>get_permission_names(<span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>names = Vec::new();
 
                 $(
@@ -1069,7 +1069,7 @@
 /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
 /// [`Role`]: super::guild::Role
 /// [`User`]: super::user::User
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
 </span><span class="kw">pub struct </span>Permissions(u64);
 
@@ -1106,7 +1106,7 @@
         /// [`Message`]: super::channel::Message
         /// [`Reaction`]: super::channel::Reaction
         </span><span class="kw">const </span>ADD_REACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
-        <span class="doccomment">/// Allows viewing a guild&#39;s audit logs.
+        <span class="doccomment">/// Allows viewing a guild's audit logs.
         </span><span class="kw">const </span>VIEW_AUDIT_LOG = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
         <span class="doccomment">/// Allows the use of priority speaking in voice channels.
         </span><span class="kw">const </span>PRIORITY_SPEAKER = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
@@ -1128,7 +1128,7 @@
         </span><span class="kw">const </span>EMBED_LINKS = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
         <span class="doccomment">/// Allows uploading of files.
         </span><span class="kw">const </span>ATTACH_FILES = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
-        <span class="doccomment">/// Allows the reading of a channel&#39;s message history.
+        <span class="doccomment">/// Allows the reading of a channel's message history.
         </span><span class="kw">const </span>READ_MESSAGE_HISTORY = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
         <span class="doccomment">/// Allows the usage of the `@everyone` mention, which will notify all users in a channel.
         /// The `@here` mention will also be available, and can be used to mention all non-offline
@@ -1161,7 +1161,7 @@
         </span><span class="kw">const </span>USE_VAD = <span class="number">1 </span>&lt;&lt; <span class="number">25</span>;
         <span class="doccomment">/// Allows members to change their own nickname in the guild.
         </span><span class="kw">const </span>CHANGE_NICKNAME = <span class="number">1 </span>&lt;&lt; <span class="number">26</span>;
-        <span class="doccomment">/// Allows members to change other members&#39; nicknames.
+        <span class="doccomment">/// Allows members to change other members' nicknames.
         </span><span class="kw">const </span>MANAGE_NICKNAMES = <span class="number">1 </span>&lt;&lt; <span class="number">27</span>;
         <span class="doccomment">/// Allows management and editing of roles below their own.
         </span><span class="kw">const </span>MANAGE_ROLES = <span class="number">1 </span>&lt;&lt; <span class="number">28</span>;
@@ -1170,7 +1170,7 @@
         <span class="doccomment">/// Allows for editing and deleting emojis, stickers, and soundboard sounds created by all
         /// users.
         </span><span class="kw">const </span>MANAGE_GUILD_EXPRESSIONS = <span class="number">1 </span>&lt;&lt; <span class="number">30</span>;
-        <span class="attr">#[deprecated = <span class="string">&quot;use `Permissions::MANAGE_GUILD_EXPRESSIONS` instead&quot;</span>]
+        <span class="attr">#[deprecated = <span class="string">"use `Permissions::MANAGE_GUILD_EXPRESSIONS` instead"</span>]
         </span><span class="kw">const </span>MANAGE_EMOJIS_AND_STICKERS = <span class="number">1 </span>&lt;&lt; <span class="number">30</span>;
         <span class="doccomment">/// Allows members to use application commands, including slash commands and context menu
         /// commands.
@@ -1214,56 +1214,56 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="macro">generate_get_permission_names! </span>{
-    add_reactions: <span class="string">&quot;Add Reactions&quot;</span>,
-    administrator: <span class="string">&quot;Administrator&quot;</span>,
-    attach_files: <span class="string">&quot;Attach Files&quot;</span>,
-    ban_members: <span class="string">&quot;Ban Members&quot;</span>,
-    change_nickname: <span class="string">&quot;Change Nickname&quot;</span>,
-    connect: <span class="string">&quot;Connect&quot;</span>,
-    create_events: <span class="string">&quot;Create Events&quot;</span>,
-    create_guild_expressions: <span class="string">&quot;Create Guild Expressions&quot;</span>,
-    create_instant_invite: <span class="string">&quot;Create Instant Invite&quot;</span>,
-    create_private_threads: <span class="string">&quot;Create Private Threads&quot;</span>,
-    create_public_threads: <span class="string">&quot;Create Public Threads&quot;</span>,
-    deafen_members: <span class="string">&quot;Deafen Members&quot;</span>,
-    embed_links: <span class="string">&quot;Embed Links&quot;</span>,
-    external_emojis: <span class="string">&quot;Use External Emojis&quot;</span>,
-    kick_members: <span class="string">&quot;Kick Members&quot;</span>,
-    manage_channels: <span class="string">&quot;Manage Channels&quot;</span>,
-    manage_events: <span class="string">&quot;Manage Events&quot;</span>,
-    manage_guild: <span class="string">&quot;Manage Guilds&quot;</span>,
-    manage_guild_expressions: <span class="string">&quot;Manage Guild Expressions&quot;</span>,
-    manage_messages: <span class="string">&quot;Manage Messages&quot;</span>,
-    manage_nicknames: <span class="string">&quot;Manage Nicknames&quot;</span>,
-    manage_roles: <span class="string">&quot;Manage Roles&quot;</span>,
-    manage_threads: <span class="string">&quot;Manage Threads&quot;</span>,
-    manage_webhooks: <span class="string">&quot;Manage Webhooks&quot;</span>,
-    mention_everyone: <span class="string">&quot;Mention Everyone&quot;</span>,
-    moderate_members: <span class="string">&quot;Moderate Members&quot;</span>,
-    move_members: <span class="string">&quot;Move Members&quot;</span>,
-    mute_members: <span class="string">&quot;Mute Members&quot;</span>,
-    priority_speaker: <span class="string">&quot;Priority Speaker&quot;</span>,
-    read_message_history: <span class="string">&quot;Read Message History&quot;</span>,
-    request_to_speak: <span class="string">&quot;Request To Speak&quot;</span>,
-    send_messages: <span class="string">&quot;Send Messages&quot;</span>,
-    send_messages_in_threads: <span class="string">&quot;Send Messages in Threads&quot;</span>,
-    send_tts_messages: <span class="string">&quot;Send TTS Messages&quot;</span>,
-    speak: <span class="string">&quot;Speak&quot;</span>,
-    stream: <span class="string">&quot;Stream&quot;</span>,
-    use_commands: <span class="string">&quot;Use Application Commands&quot;</span>,
-    use_embedded_activities: <span class="string">&quot;Use Embedded Activities&quot;</span>,
-    use_external_emojis: <span class="string">&quot;Use External Emojis&quot;</span>,
-    use_external_stickers: <span class="string">&quot;Use External Stickers&quot;</span>,
-    use_vad: <span class="string">&quot;Use Voice Activity&quot;</span>,
-    view_audit_log: <span class="string">&quot;View Audit Log&quot;</span>,
-    view_channel: <span class="string">&quot;View Channel&quot;</span>,
-    view_guild_insights: <span class="string">&quot;View Guild Insights&quot;
+    add_reactions: <span class="string">"Add Reactions"</span>,
+    administrator: <span class="string">"Administrator"</span>,
+    attach_files: <span class="string">"Attach Files"</span>,
+    ban_members: <span class="string">"Ban Members"</span>,
+    change_nickname: <span class="string">"Change Nickname"</span>,
+    connect: <span class="string">"Connect"</span>,
+    create_events: <span class="string">"Create Events"</span>,
+    create_guild_expressions: <span class="string">"Create Guild Expressions"</span>,
+    create_instant_invite: <span class="string">"Create Instant Invite"</span>,
+    create_private_threads: <span class="string">"Create Private Threads"</span>,
+    create_public_threads: <span class="string">"Create Public Threads"</span>,
+    deafen_members: <span class="string">"Deafen Members"</span>,
+    embed_links: <span class="string">"Embed Links"</span>,
+    external_emojis: <span class="string">"Use External Emojis"</span>,
+    kick_members: <span class="string">"Kick Members"</span>,
+    manage_channels: <span class="string">"Manage Channels"</span>,
+    manage_events: <span class="string">"Manage Events"</span>,
+    manage_guild: <span class="string">"Manage Guilds"</span>,
+    manage_guild_expressions: <span class="string">"Manage Guild Expressions"</span>,
+    manage_messages: <span class="string">"Manage Messages"</span>,
+    manage_nicknames: <span class="string">"Manage Nicknames"</span>,
+    manage_roles: <span class="string">"Manage Roles"</span>,
+    manage_threads: <span class="string">"Manage Threads"</span>,
+    manage_webhooks: <span class="string">"Manage Webhooks"</span>,
+    mention_everyone: <span class="string">"Mention Everyone"</span>,
+    moderate_members: <span class="string">"Moderate Members"</span>,
+    move_members: <span class="string">"Move Members"</span>,
+    mute_members: <span class="string">"Mute Members"</span>,
+    priority_speaker: <span class="string">"Priority Speaker"</span>,
+    read_message_history: <span class="string">"Read Message History"</span>,
+    request_to_speak: <span class="string">"Request To Speak"</span>,
+    send_messages: <span class="string">"Send Messages"</span>,
+    send_messages_in_threads: <span class="string">"Send Messages in Threads"</span>,
+    send_tts_messages: <span class="string">"Send TTS Messages"</span>,
+    speak: <span class="string">"Speak"</span>,
+    stream: <span class="string">"Stream"</span>,
+    use_commands: <span class="string">"Use Application Commands"</span>,
+    use_embedded_activities: <span class="string">"Use Embedded Activities"</span>,
+    use_external_emojis: <span class="string">"Use External Emojis"</span>,
+    use_external_stickers: <span class="string">"Use External Stickers"</span>,
+    use_vad: <span class="string">"Use Voice Activity"</span>,
+    view_audit_log: <span class="string">"View Audit Log"</span>,
+    view_channel: <span class="string">"View Channel"</span>,
+    view_guild_insights: <span class="string">"View Guild Insights"
 </span>}
 
 <span class="doccomment">/// TODO: use a macro to shorten this entire file lol
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>Permissions {
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the [Add Reactions] permission.
     ///
@@ -1444,7 +1444,7 @@
         <span class="self">self</span>.contains(<span class="self">Self</span>::MANAGE_CHANNELS)
     }
 
-    <span class="attr">#[deprecated = <span class="string">&quot;use `manage_guild_expressions` instead&quot;</span>]
+    <span class="attr">#[deprecated = <span class="string">"use `manage_guild_expressions` instead"</span>]
     #[must_use]
     </span><span class="kw">pub const fn </span>manage_emojis_and_stickers(<span class="self">self</span>) -&gt; bool {
         <span class="attr">#[allow(deprecated)]
@@ -1652,8 +1652,8 @@
 }
 
 <span class="comment">// Manual impl needed because Permissions are sent as a stringified integer
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Permissions {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Permissions {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span>permissions_str = String::deserialize(deserializer)<span class="question-mark">?</span>;
         <span class="kw">let </span>permissions_num = permissions_str.parse().map_err(DeError::custom)<span class="question-mark">?</span>;
 
@@ -1667,19 +1667,19 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>Permissions {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">let </span>names = <span class="self">self</span>.get_permission_names();
 
         <span class="kw">let </span>total = names.len();
         <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>name) <span class="kw">in </span>names.iter().enumerate() {
             <span class="kw">if </span>i &gt; <span class="number">0 </span>&amp;&amp; i != total - <span class="number">1 </span>{
-                f.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">", "</span>)<span class="question-mark">?</span>;
             }
 
             <span class="kw">if </span>total &gt; <span class="number">1 </span>&amp;&amp; i == total - <span class="number">1 </span>{
-                f.write_str(<span class="string">&quot; and &quot;</span>)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">" and "</span>)<span class="question-mark">?</span>;
             }
 
             f.write_str(name)<span class="question-mark">?</span>;
@@ -1697,7 +1697,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>permissions_serde() {
         <span class="kw">let </span>value = Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES;
-        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>(<span class="string">&quot;268435488&quot;</span>));
+        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>(<span class="string">"268435488"</span>));
     }
 }
 </code></pre></div></section></main></body></html>

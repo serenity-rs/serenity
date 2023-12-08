@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1285,7 +1285,7 @@
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
-</span><span class="comment">// Just for MessageUpdateEvent (for some reason the #[allow] doesn&#39;t work when placed directly)
+</span><span class="comment">// Just for MessageUpdateEvent (for some reason the #[allow] doesn't work when placed directly)
 </span><span class="attr">#![allow(clippy::option_option)]
 
 </span><span class="kw">use </span>std::collections::HashMap;
@@ -1304,7 +1304,7 @@
 <span class="doccomment">/// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#application-command-permissions-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1315,7 +1315,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1326,7 +1326,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1337,7 +1337,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1348,7 +1348,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::AUTO_MODERATION_EXECUTION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1364,7 +1364,7 @@
 /// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1376,7 +1376,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1387,7 +1387,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`] or [`GatewayIntents::DIRECT_MESSAGES`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-pins-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ChannelPinsUpdateEvent {
@@ -1399,7 +1399,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#channel-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1410,7 +1410,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MODERATION`] and [`Permissions::VIEW_AUDIT_LOG`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-audit-log-entry-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildAuditLogEntryCreateEvent {
@@ -1422,7 +1422,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MODERATION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-ban-add).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildBanAddEvent {
@@ -1433,7 +1433,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MODERATION`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-ban-remove).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildBanRemoveEvent {
@@ -1444,7 +1444,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1453,8 +1453,8 @@
 }
 
 <span class="comment">// Manual impl needed to insert guild_id fields in GuildChannel, Member, Role
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GuildCreateEvent {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>GuildCreateEvent {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>guild: Guild = Guild::deserialize(deserializer)<span class="question-mark">?</span>;
         guild.channels.values_mut().for_each(|x| x.guild_id = guild.id);
         guild.members.values_mut().for_each(|x| x.guild_id = guild.id);
@@ -1468,7 +1468,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1479,11 +1479,11 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_EMOJIS_AND_STICKERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-emojis-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildEmojisUpdateEvent {
-    <span class="attr">#[serde(with = <span class="string">&quot;emojis&quot;</span>)]
+    <span class="attr">#[serde(with = <span class="string">"emojis"</span>)]
     </span><span class="kw">pub </span>emojis: HashMap&lt;EmojiId, Emoji&gt;,
     <span class="kw">pub </span>guild_id: GuildId,
 }
@@ -1491,7 +1491,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-integrations-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildIntegrationsUpdateEvent {
@@ -1501,7 +1501,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-member-add).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1512,7 +1512,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-member-remove).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildMemberRemoveEvent {
@@ -1523,7 +1523,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-member-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildMemberUpdateEvent {
@@ -1546,9 +1546,9 @@
 <span class="doccomment">/// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-members-chunk).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(remote = <span class="string">&quot;Self&quot;</span>)]
+#[serde(remote = <span class="string">"Self"</span>)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildMembersChunkEvent {
     <span class="doccomment">/// ID of the guild.
@@ -1571,8 +1571,8 @@
 }
 
 <span class="comment">// Manual impl needed to insert guild_id fields in Member
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GuildMembersChunkEvent {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>GuildMembersChunkEvent {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>event = <span class="self">Self</span>::deserialize(deserializer)<span class="question-mark">?</span>; <span class="comment">// calls #[serde(remote)]-generated inherent method
         </span>event.members.values_mut().for_each(|m| m.guild_id = event.guild_id);
         <span class="prelude-val">Ok</span>(event)
@@ -1586,7 +1586,7 @@
 }
 
 <span class="doccomment">/// Helper to deserialize `GuildRoleCreateEvent` and `GuildRoleUpdateEvent`.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Deserialize)]
 </span><span class="kw">struct </span>RoleEventHelper {
     guild_id: GuildId,
@@ -1596,7 +1596,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-role-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildRoleCreateEvent {
@@ -1604,8 +1604,8 @@
 }
 
 <span class="comment">// Manual impl needed to insert guild_id field in Role
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GuildRoleCreateEvent {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>GuildRoleCreateEvent {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>event = RoleEventHelper::deserialize(deserializer)<span class="question-mark">?</span>;
         event.role.guild_id = event.guild_id;
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
@@ -1617,7 +1617,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-role-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildRoleDeleteEvent {
@@ -1628,7 +1628,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-role-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildRoleUpdateEvent {
@@ -1636,8 +1636,8 @@
 }
 
 <span class="comment">// Manual impl needed to insert guild_id field in Role
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GuildRoleUpdateEvent {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>GuildRoleUpdateEvent {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>event = RoleEventHelper::deserialize(deserializer)<span class="question-mark">?</span>;
         event.role.guild_id = event.guild_id;
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
@@ -1649,11 +1649,11 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_EMOJIS_AND_STICKERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-stickers-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildStickersUpdateEvent {
-    <span class="attr">#[serde(with = <span class="string">&quot;stickers&quot;</span>)]
+    <span class="attr">#[serde(with = <span class="string">"stickers"</span>)]
     </span><span class="kw">pub </span>stickers: HashMap&lt;StickerId, Sticker&gt;,
     <span class="kw">pub </span>guild_id: GuildId,
 }
@@ -1661,7 +1661,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_INVITES`] and [`Permissions::MANAGE_CHANNELS´] permission.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#invite-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>InviteCreateEvent {
@@ -1686,7 +1686,7 @@
     </span><span class="kw">pub </span>target_user: <span class="prelude-ty">Option</span>&lt;User&gt;,
     <span class="doccomment">/// Embedded application to open for this voice channel embedded application invite.
     </span><span class="kw">pub </span>target_application: <span class="prelude-ty">Option</span>&lt;Value&gt;,
-    <span class="doccomment">/// they&#39;re assigned a role).
+    <span class="doccomment">/// they're assigned a role).
     </span><span class="kw">pub </span>temporary: bool,
     <span class="doccomment">/// How many times the invite has been used (always will be 0).
     </span><span class="kw">pub </span>uses: u64,
@@ -1695,7 +1695,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_INVITES`] and [`Permissions::MANAGE_CHANNELS´] permission.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#invite-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>InviteDeleteEvent {
@@ -1707,19 +1707,19 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildUpdateEvent {
-    <span class="doccomment">/// GuildUpdateEvent doesn&#39;t have GuildCreate&#39;s extra fields, so this is a partial guild
+    <span class="doccomment">/// GuildUpdateEvent doesn't have GuildCreate's extra fields, so this is a partial guild
     </span><span class="kw">pub </span>guild: PartialGuild,
 }
 
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1730,7 +1730,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageDeleteBulkEvent {
@@ -1742,22 +1742,22 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageDeleteEvent {
     <span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="kw">pub </span>channel_id: ChannelId,
-    <span class="attr">#[serde(rename = <span class="string">&quot;id&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"id"</span>)]
     </span><span class="kw">pub </span>message_id: MessageId,
 }
 
 <span class="comment">// Any value that is present is considered Some value, including null.
 // Taken from https://github.com/serde-rs/serde/issues/984#issuecomment-314143738
-</span><span class="kw">fn </span>deserialize_some&lt;<span class="lifetime">&#39;de</span>, T, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, D::Error&gt;
+</span><span class="kw">fn </span>deserialize_some&lt;<span class="lifetime">'de</span>, T, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, D::Error&gt;
 <span class="kw">where
-    </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
-    D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+    </span>T: Deserialize&lt;<span class="lifetime">'de</span>&gt;,
+    D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
 {
     Deserialize::deserialize(deserializer).map(<span class="prelude-val">Some</span>)
 }
@@ -1770,7 +1770,7 @@
 /// [`Self::guild_id`])
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageUpdateEvent {
@@ -1789,24 +1789,24 @@
     <span class="kw">pub </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;Embed&gt;&gt;,
     <span class="kw">pub </span>reactions: <span class="prelude-ty">Option</span>&lt;Vec&lt;MessageReaction&gt;&gt;,
     <span class="kw">pub </span>pinned: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>webhook_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;WebhookId&gt;&gt;,
-    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;MessageType&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>activity: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageActivity&gt;&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageApplication&gt;&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ApplicationId&gt;&gt;,
     <span class="kw">pub </span>message_reference: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageReference&gt;&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageFlags&gt;&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_some&quot;</span>)]
+    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;GuildChannel&gt;&gt;,
     <span class="kw">pub </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;ActionRow&gt;&gt;,
     <span class="kw">pub </span>sticker_items: <span class="prelude-ty">Option</span>&lt;Vec&lt;StickerItem&gt;&gt;,
@@ -1858,8 +1858,8 @@
             member,
         } = <span class="self">self</span>;
 
-        <span class="comment">// Discord won&#39;t send a MessageUpdateEvent with a different MessageId and ChannelId than we
-        // already have. But let&#39;s set the fields anyways, in case the user calls this method with
+        <span class="comment">// Discord won't send a MessageUpdateEvent with a different MessageId and ChannelId than we
+        // already have. But let's set the fields anyways, in case the user calls this method with
         // a self-constructed MessageUpdateEvent that does change these fields.
         </span>message.id = <span class="kw-2">*</span>id;
         message.channel_id = <span class="kw-2">*</span>channel_id;
@@ -1899,7 +1899,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_PRESENCES`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#presence-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1908,7 +1908,7 @@
 }
 
 <span class="doccomment">/// Not officially documented.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1920,7 +1920,7 @@
 /// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-add).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1932,12 +1932,12 @@
 /// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ReactionRemoveEvent {
-    <span class="comment">// The Discord API doesn&#39;t share the same schema for Reaction Remove Event and Reaction Add
+    <span class="comment">// The Discord API doesn't share the same schema for Reaction Remove Event and Reaction Add
     // Event (which [`Reaction`] is), but the two currently match up well enough, so re-using the
     // [`Reaction`] struct here is fine.
     </span><span class="kw">pub </span>reaction: Reaction,
@@ -1947,7 +1947,7 @@
 /// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-all).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ReactionRemoveAllEvent {
@@ -1960,7 +1960,7 @@
 /// [`GatewayIntents::DIRECT_MESSAGE_REACTIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji-message-reaction-remove-emoji-event-fields).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1968,12 +1968,12 @@
     <span class="kw">pub </span>reaction: Reaction,
 }
 
-<span class="doccomment">/// The &quot;Ready&quot; event, containing initial ready cache
+<span class="doccomment">/// The "Ready" event, containing initial ready cache
 ///
 /// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#ready).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -1984,7 +1984,7 @@
 <span class="doccomment">/// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#resumed).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ResumedEvent {}
@@ -1992,7 +1992,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MESSAGE_TYPING`] or [`GatewayIntents::DIRECT_MESSAGE_TYPING`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#typing-start).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>TypingStartEvent {
@@ -2008,22 +2008,22 @@
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>UnknownEvent {
-    <span class="attr">#[serde(rename = <span class="string">&quot;t&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"t"</span>)]
     </span><span class="kw">pub </span>kind: String,
-    <span class="attr">#[serde(rename = <span class="string">&quot;d&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"d"</span>)]
     </span><span class="kw">pub </span>value: Value,
 }
 
-<span class="doccomment">/// Sent when properties about the current bot&#39;s user change.
+<span class="doccomment">/// Sent when properties about the current bot's user change.
 ///
 /// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#user-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2034,7 +2034,7 @@
 <span class="doccomment">/// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#voice-server-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>VoiceServerUpdateEvent {
@@ -2046,7 +2046,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_VOICE_STATES`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#voice-state-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2057,7 +2057,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>VoiceChannelStatusUpdateEvent {
@@ -2069,7 +2069,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_WEBHOOKS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#webhooks-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>WebhookUpdateEvent {
@@ -2080,7 +2080,7 @@
 <span class="doccomment">/// Requires no gateway intents.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#interaction-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2091,7 +2091,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#integration-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2102,7 +2102,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#integration-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2113,7 +2113,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_INTEGRATIONS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#integration-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IntegrationDeleteEvent {
@@ -2125,7 +2125,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#stage-instance-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2136,7 +2136,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#stage-instance-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2147,7 +2147,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#stage-instance-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2158,7 +2158,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2169,7 +2169,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2180,7 +2180,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2191,7 +2191,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-list-sync).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadListSyncEvent {
@@ -2212,7 +2212,7 @@
 /// [`GatewayIntents::GUILD_MEMBERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-member-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2223,7 +2223,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_MEMBERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ThreadMembersUpdateEvent {
@@ -2247,7 +2247,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-create).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2258,7 +2258,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2269,7 +2269,7 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-delete).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2280,11 +2280,11 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-user-add).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildScheduledEventUserAddEvent {
-    <span class="attr">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"guild_scheduled_event_id"</span>)]
     </span><span class="kw">pub </span>scheduled_event_id: ScheduledEventId,
     <span class="kw">pub </span>user_id: UserId,
     <span class="kw">pub </span>guild_id: GuildId,
@@ -2293,18 +2293,18 @@
 <span class="doccomment">/// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-user-remove).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildScheduledEventUserRemoveEvent {
-    <span class="attr">#[serde(rename = <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"guild_scheduled_event_id"</span>)]
     </span><span class="kw">pub </span>scheduled_event_id: ScheduledEventId,
     <span class="kw">pub </span>user_id: UserId,
     <span class="kw">pub </span>guild_id: GuildId,
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -2320,21 +2320,21 @@
 }
 
 <span class="comment">// Manual impl needed to emulate integer enum tags
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>GatewayEvent {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>GatewayEvent {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
-        <span class="kw">let </span>seq = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;s&quot;</span>)<span class="question-mark">?</span>.flatten();
+        <span class="kw">let </span>seq = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">"s"</span>)<span class="question-mark">?</span>.flatten();
 
-        <span class="prelude-val">Ok</span>(<span class="kw">match </span>remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;op&quot;</span>)<span class="question-mark">? </span>{
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"op"</span>)<span class="question-mark">? </span>{
             Opcode::Dispatch =&gt; <span class="self">Self</span>::Dispatch(
-                seq.ok_or_else(|| DeError::missing_field(<span class="string">&quot;s&quot;</span>))<span class="question-mark">?</span>,
+                seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>,
                 deserialize_val(Value::from(map))<span class="question-mark">?</span>,
             ),
             Opcode::Heartbeat =&gt; {
-                GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field(<span class="string">&quot;s&quot;</span>))<span class="question-mark">?</span>)
+                GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>)
             },
             Opcode::InvalidSession =&gt; {
-                GatewayEvent::InvalidateSession(remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;d&quot;</span>)<span class="question-mark">?</span>)
+                GatewayEvent::InvalidateSession(remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"d"</span>)<span class="question-mark">?</span>)
             },
             Opcode::Hello =&gt; {
                 <span class="attr">#[derive(Deserialize)]
@@ -2342,12 +2342,12 @@
                     heartbeat_interval: u64,
                 }
 
-                <span class="kw">let </span>inner: HelloPayload = remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">&quot;d&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>inner: HelloPayload = remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"d"</span>)<span class="question-mark">?</span>;
                 GatewayEvent::Hello(inner.heartbeat_interval)
             },
             Opcode::Reconnect =&gt; GatewayEvent::Reconnect,
             Opcode::HeartbeatAck =&gt; GatewayEvent::HeartbeatAck,
-            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">&quot;invalid opcode&quot;</span>)),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">"invalid opcode"</span>)),
         })
     }
 }
@@ -2356,10 +2356,10 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#receive-events).
 </span><span class="attr">#[allow(clippy::large_enum_variant)]
-#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(rename_all = <span class="string">&quot;SCREAMING_SNAKE_CASE&quot;</span>)]
-#[serde(tag = <span class="string">&quot;t&quot;</span>, content = <span class="string">&quot;d&quot;</span>)]
+#[serde(rename_all = <span class="string">"SCREAMING_SNAKE_CASE"</span>)]
+#[serde(tag = <span class="string">"t"</span>, content = <span class="string">"d"</span>)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Event {
     <span class="doccomment">/// The permissions of an [`Command`] was changed.
@@ -2396,7 +2396,7 @@
     ///
     /// [`EventHandler::auto_moderation_action_execution`]:
     /// crate::client::EventHandler::auto_moderation_action_execution
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;AUTO_MODERATION_ACTION_EXECUTION&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"AUTO_MODERATION_ACTION_EXECUTION"</span>)]
     </span>AutoModActionExecution(AutoModActionExecutionEvent),
     <span class="doccomment">/// A [`Channel`] was created.
     ///
@@ -2431,7 +2431,7 @@
     GuildIntegrationsUpdate(GuildIntegrationsUpdateEvent),
     GuildMemberAdd(GuildMemberAddEvent),
     GuildMemberRemove(GuildMemberRemoveEvent),
-    <span class="doccomment">/// A member&#39;s roles have changed
+    <span class="doccomment">/// A member's roles have changed
     </span>GuildMemberUpdate(GuildMemberUpdateEvent),
     GuildMembersChunk(GuildMembersChunkEvent),
     GuildRoleCreate(GuildRoleCreateEvent),
@@ -2457,37 +2457,37 @@
     MessageDeleteBulk(MessageDeleteBulkEvent),
     <span class="doccomment">/// A message has been edited, either by the user or the system
     </span>MessageUpdate(MessageUpdateEvent),
-    <span class="doccomment">/// A member&#39;s presence state (or username or avatar) has changed
+    <span class="doccomment">/// A member's presence state (or username or avatar) has changed
     </span>PresenceUpdate(PresenceUpdateEvent),
-    <span class="doccomment">/// The presence list of the user&#39;s friends should be replaced entirely
+    <span class="doccomment">/// The presence list of the user's friends should be replaced entirely
     </span>PresencesReplace(PresencesReplaceEvent),
     <span class="doccomment">/// A reaction was added to a message.
     ///
     /// Fires the [`EventHandler::reaction_add`] event handler.
     ///
     /// [`EventHandler::reaction_add`]: crate::client::EventHandler::reaction_add
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;MESSAGE_REACTION_ADD&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"MESSAGE_REACTION_ADD"</span>)]
     </span>ReactionAdd(ReactionAddEvent),
     <span class="doccomment">/// A reaction was removed to a message.
     ///
     /// Fires the [`EventHandler::reaction_remove`] event handler.
     ///
     /// [`EventHandler::reaction_remove`]: crate::client::EventHandler::reaction_remove
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;MESSAGE_REACTION_REMOVE&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"MESSAGE_REACTION_REMOVE"</span>)]
     </span>ReactionRemove(ReactionRemoveEvent),
     <span class="doccomment">/// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
     /// Fires the [`EventHandler::reaction_remove_all`] event handler.
     ///
     /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;MESSAGE_REACTION_REMOVE_ALL&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"MESSAGE_REACTION_REMOVE_ALL"</span>)]
     </span>ReactionRemoveAll(ReactionRemoveAllEvent),
     <span class="doccomment">/// Sent when a bot removes all instances of a given emoji from the reactions of a message.
     ///
     /// Fires the [`EventHandler::reaction_remove_emoji`] event handler.
     ///
     /// [`EventHandler::reaction_remove_emoji`]: crate::client::EventHandler::reaction_remove_emoji
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;MESSAGE_REACTION_REMOVE_EMOJI&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"MESSAGE_REACTION_REMOVE_EMOJI"</span>)]
     </span>ReactionRemoveEmoji(ReactionRemoveEmojiEvent),
     <span class="doccomment">/// The first event in a connection, containing the initial ready cache.
     ///
@@ -2497,9 +2497,9 @@
     </span>Resumed(ResumedEvent),
     <span class="doccomment">/// A user is typing; considered to last 5 seconds
     </span>TypingStart(TypingStartEvent),
-    <span class="doccomment">/// Update to the logged-in user&#39;s information
+    <span class="doccomment">/// Update to the logged-in user's information
     </span>UserUpdate(UserUpdateEvent),
-    <span class="doccomment">/// A member&#39;s voice state has changed
+    <span class="doccomment">/// A member's voice state has changed
     </span>VoiceStateUpdate(VoiceStateUpdateEvent),
     <span class="doccomment">/// Voice server information is available
     </span>VoiceServerUpdate(VoiceServerUpdateEvent),
@@ -2558,7 +2558,7 @@
             <span class="prelude-val">None
         </span>} <span class="kw">else </span>{
             <span class="kw">let </span>map = serde_json::to_value(<span class="self">self</span>).ok()<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>(map.get(<span class="string">&quot;t&quot;</span>)<span class="question-mark">?</span>.as_str()<span class="question-mark">?</span>.to_string())
+            <span class="prelude-val">Some</span>(map.get(<span class="string">"t"</span>)<span class="question-mark">?</span>.as_str()<span class="question-mark">?</span>.to_string())
         }
     }
 }

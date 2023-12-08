@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -561,26 +561,26 @@
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">mod </span>argument_convert;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">mod </span>content_safe;
 <span class="kw">mod </span>custom_message;
 <span class="kw">mod </span>formatted_timestamp;
 <span class="kw">mod </span>message_builder;
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">mod </span>quick_modal;
 
 <span class="kw">pub mod </span>token;
 
 <span class="kw">use </span>std::num::NonZeroU16;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">pub use </span>argument_convert::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">pub use </span>content_safe::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>formatted_timestamp::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">pub use </span>quick_modal::<span class="kw-2">*</span>;
 <span class="kw">use </span>url::Url;
 
@@ -588,47 +588,47 @@
 <span class="kw">pub use </span><span class="self">self</span>::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
 <span class="attr">#[doc(inline)]
 </span><span class="kw">pub use </span><span class="self">self</span>::token::validate <span class="kw">as </span>validate_token;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Retrieves the &quot;code&quot; part of an invite out of a URL.
+<span class="doccomment">/// Retrieves the "code" part of an invite out of a URL.
 ///
 /// # Examples
 ///
 /// Two formats of [invite][`RichInvite`] codes are supported, both regardless of protocol prefix.
 /// Some examples:
 ///
-/// 1. Retrieving the code from the URL `&quot;https://discord.gg/0cDvIgU2voY8RSYL&quot;`:
+/// 1. Retrieving the code from the URL `"https://discord.gg/0cDvIgU2voY8RSYL"`:
 ///
 /// ```rust
 /// use serenity::utils;
 ///
-/// let url = &quot;https://discord.gg/0cDvIgU2voY8RSYL&quot;;
+/// let url = "https://discord.gg/0cDvIgU2voY8RSYL";
 ///
-/// assert_eq!(utils::parse_invite(url), &quot;0cDvIgU2voY8RSYL&quot;);
+/// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// 2. Retrieving the code from the URL `&quot;http://discord.com/invite/0cDvIgU2voY8RSYL&quot;`:
+/// 2. Retrieving the code from the URL `"http://discord.com/invite/0cDvIgU2voY8RSYL"`:
 ///
 /// ```rust
 /// use serenity::utils;
 ///
-/// let url = &quot;http://discord.com/invite/0cDvIgU2voY8RSYL&quot;;
+/// let url = "http://discord.com/invite/0cDvIgU2voY8RSYL";
 ///
-/// assert_eq!(utils::parse_invite(url), &quot;0cDvIgU2voY8RSYL&quot;);
+/// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
 /// [`RichInvite`]: crate::model::invite::RichInvite
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_invite(code: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
-    <span class="kw">let </span>code = code.trim_start_matches(<span class="string">&quot;http://&quot;</span>).trim_start_matches(<span class="string">&quot;https://&quot;</span>);
+    <span class="kw">let </span>code = code.trim_start_matches(<span class="string">"http://"</span>).trim_start_matches(<span class="string">"https://"</span>);
     <span class="kw">let </span>lower = code.to_lowercase();
-    <span class="kw">if </span>lower.starts_with(<span class="string">&quot;discord.gg/&quot;</span>) {
+    <span class="kw">if </span>lower.starts_with(<span class="string">"discord.gg/"</span>) {
         <span class="kw-2">&amp;</span>code[<span class="number">11</span>..]
-    } <span class="kw">else if </span>lower.starts_with(<span class="string">&quot;discord.com/invite/&quot;</span>) {
+    } <span class="kw">else if </span>lower.starts_with(<span class="string">"discord.com/invite/"</span>) {
         <span class="kw-2">&amp;</span>code[<span class="number">19</span>..]
     } <span class="kw">else </span>{
         code
@@ -646,13 +646,13 @@
 ///
 /// use serenity::utils::parse_user_tag;
 ///
-/// assert_eq!(parse_user_tag(&quot;kangalioo#9108&quot;), Some((&quot;kangalioo&quot;, NonZeroU16::new(9108))));
-/// assert_eq!(parse_user_tag(&quot;kangalioo#10108&quot;), None);
-/// assert_eq!(parse_user_tag(&quot;kangalioo&quot;), Some((&quot;kangalioo&quot;, None)));
+/// assert_eq!(parse_user_tag("kangalioo#9108"), Some(("kangalioo", NonZeroU16::new(9108))));
+/// assert_eq!(parse_user_tag("kangalioo#10108"), None);
+/// assert_eq!(parse_user_tag("kangalioo"), Some(("kangalioo", None)));
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_user_tag(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;)&gt; {
-    <span class="kw">if let </span><span class="prelude-val">Some</span>((name, discrim)) = s.split_once(<span class="string">&#39;#&#39;</span>) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((name, discrim)) = s.split_once(<span class="string">'#'</span>) {
         <span class="kw">let </span>discrim: u16 = discrim.parse().ok()<span class="question-mark">?</span>;
         <span class="kw">if </span>discrim &gt; <span class="number">9999 </span>{
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -676,10 +676,10 @@
 /// use serenity::utils::parse_username;
 ///
 /// // regular username mention
-/// assert_eq!(parse_username(&quot;&lt;@114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
+/// assert_eq!(parse_username("&lt;@114941315417899012&gt;"), Some(UserId::new(114941315417899012)));
 ///
 /// // nickname mention
-/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));
+/// assert_eq!(parse_username("&lt;@!114941315417899012&gt;"), Some(UserId::new(114941315417899012)));
 /// ```
 ///
 /// Asserting that an invalid username or nickname mention returns [`None`]:
@@ -687,8 +687,8 @@
 /// ```rust
 /// use serenity::utils::parse_username;
 ///
-/// assert!(parse_username(&quot;&lt;@1149413154aa17899012&quot;).is_none());
-/// assert!(parse_username(&quot;&lt;@!11494131541789a90b1c2&quot;).is_none());
+/// assert!(parse_username("&lt;@1149413154aa17899012").is_none());
+/// assert!(parse_username("&lt;@!11494131541789a90b1c2").is_none());
 /// ```
 ///
 /// [`User`]: crate::model::user::User
@@ -699,16 +699,16 @@
     }
 
     <span class="kw">let </span>len = mention.len() - <span class="number">1</span>;
-    <span class="kw">if </span>mention.starts_with(<span class="string">&quot;&lt;@!&quot;</span>) {
+    <span class="kw">if </span>mention.starts_with(<span class="string">"&lt;@!"</span>) {
         mention[<span class="number">3</span>..len].parse().ok()
-    } <span class="kw">else if </span>mention.starts_with(<span class="string">&quot;&lt;@&quot;</span>) {
+    } <span class="kw">else if </span>mention.starts_with(<span class="string">"&lt;@"</span>) {
         mention[<span class="number">2</span>..len].parse().ok()
     } <span class="kw">else </span>{
         <span class="prelude-val">None
     </span>}
 }
 
-<span class="attr">#[deprecated = <span class="string">&quot;use `utils::parse_user_mention` instead&quot;</span>]
+<span class="attr">#[deprecated = <span class="string">"use `utils::parse_user_mention` instead"</span>]
 </span><span class="kw">pub fn </span>parse_username(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
     parse_user_mention(mention.as_ref())
 }
@@ -725,7 +725,7 @@
 /// use serenity::model::id::RoleId;
 /// use serenity::utils::parse_role;
 ///
-/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(RoleId::new(136107769680887808)));
+/// assert_eq!(parse_role("&lt;@&amp;136107769680887808&gt;"), Some(RoleId::new(136107769680887808)));
 /// ```
 ///
 /// Asserting that an invalid role mention returns [`None`]:
@@ -733,7 +733,7 @@
 /// ```rust
 /// use serenity::utils::parse_role;
 ///
-/// assert!(parse_role(&quot;&lt;@&amp;136107769680887808&quot;).is_none());
+/// assert!(parse_role("&lt;@&amp;136107769680887808").is_none());
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
@@ -743,7 +743,7 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if </span>mention.starts_with(<span class="string">&quot;&lt;@&amp;&quot;</span>) &amp;&amp; mention.ends_with(<span class="string">&#39;&gt;&#39;</span>) {
+    <span class="kw">if </span>mention.starts_with(<span class="string">"&lt;@&amp;"</span>) &amp;&amp; mention.ends_with(<span class="string">'&gt;'</span>) {
         <span class="kw">let </span>len = mention.len() - <span class="number">1</span>;
         mention[<span class="number">3</span>..len].parse().ok()
     } <span class="kw">else </span>{
@@ -751,7 +751,7 @@
     </span>}
 }
 
-<span class="attr">#[deprecated = <span class="string">&quot;use `utils::parse_role_mention` instead&quot;</span>]
+<span class="attr">#[deprecated = <span class="string">"use `utils::parse_role_mention` instead"</span>]
 </span><span class="kw">pub fn </span>parse_role(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;RoleId&gt; {
     parse_role_mention(mention.as_ref())
 }
@@ -768,7 +768,7 @@
 /// use serenity::model::id::ChannelId;
 /// use serenity::utils::parse_channel;
 ///
-/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(ChannelId::new(81384788765712384)));
+/// assert_eq!(parse_channel("&lt;#81384788765712384&gt;"), Some(ChannelId::new(81384788765712384)));
 /// ```
 ///
 /// Asserting that an invalid channel mention returns [`None`]:
@@ -776,8 +776,8 @@
 /// ```rust
 /// use serenity::utils::parse_channel;
 ///
-/// assert!(parse_channel(&quot;&lt;#!81384788765712384&gt;&quot;).is_none());
-/// assert!(parse_channel(&quot;&lt;#81384788765712384&quot;).is_none());
+/// assert!(parse_channel("&lt;#!81384788765712384&gt;").is_none());
+/// assert!(parse_channel("&lt;#81384788765712384").is_none());
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
@@ -787,7 +787,7 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if </span>mention.starts_with(<span class="string">&quot;&lt;#&quot;</span>) &amp;&amp; mention.ends_with(<span class="string">&#39;&gt;&#39;</span>) {
+    <span class="kw">if </span>mention.starts_with(<span class="string">"&lt;#"</span>) &amp;&amp; mention.ends_with(<span class="string">'&gt;'</span>) {
         <span class="kw">let </span>len = mention.len() - <span class="number">1</span>;
         mention[<span class="number">2</span>..len].parse().ok()
     } <span class="kw">else </span>{
@@ -795,7 +795,7 @@
     </span>}
 }
 
-<span class="attr">#[deprecated = <span class="string">&quot;use `utils::parse_channel_mention` instead&quot;</span>]
+<span class="attr">#[deprecated = <span class="string">"use `utils::parse_channel_mention` instead"</span>]
 </span><span class="kw">pub fn </span>parse_channel(mention: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
     parse_channel_mention(mention.as_ref())
 }
@@ -814,10 +814,10 @@
 /// use serenity::model::misc::EmojiIdentifier;
 /// use serenity::utils::parse_emoji;
 ///
-/// let emoji = parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&gt;&quot;).unwrap();
+/// let emoji = parse_emoji("&lt;:smugAnimeFace:302516740095606785&gt;").unwrap();
 /// assert_eq!(emoji.animated, false);
 /// assert_eq!(emoji.id, EmojiId::new(302516740095606785));
-/// assert_eq!(emoji.name, &quot;smugAnimeFace&quot;.to_string());
+/// assert_eq!(emoji.name, "smugAnimeFace".to_string());
 /// ```
 ///
 /// Asserting that an invalid emoji usage returns [`None`]:
@@ -825,7 +825,7 @@
 /// ```rust
 /// use serenity::utils::parse_emoji;
 ///
-/// assert!(parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&quot;).is_none());
+/// assert!(parse_emoji("&lt;:smugAnimeFace:302516740095606785").is_none());
 /// ```
 ///
 /// [`Emoji`]: crate::model::guild::Emoji
@@ -838,19 +838,19 @@
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if </span>(mention.starts_with(<span class="string">&quot;&lt;:&quot;</span>) || mention.starts_with(<span class="string">&quot;&lt;a:&quot;</span>)) &amp;&amp; mention.ends_with(<span class="string">&#39;&gt;&#39;</span>) {
+    <span class="kw">if </span>(mention.starts_with(<span class="string">"&lt;:"</span>) || mention.starts_with(<span class="string">"&lt;a:"</span>)) &amp;&amp; mention.ends_with(<span class="string">'&gt;'</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>name = String::default();
         <span class="kw">let </span><span class="kw-2">mut </span>id = String::default();
-        <span class="kw">let </span>animated = <span class="kw-2">&amp;</span>mention[<span class="number">1</span>..<span class="number">3</span>] == <span class="string">&quot;a:&quot;</span>;
+        <span class="kw">let </span>animated = <span class="kw-2">&amp;</span>mention[<span class="number">1</span>..<span class="number">3</span>] == <span class="string">"a:"</span>;
 
         <span class="kw">let </span>start = <span class="kw">if </span>animated { <span class="number">3 </span>} <span class="kw">else </span>{ <span class="number">2 </span>};
 
         <span class="kw">for </span>(i, x) <span class="kw">in </span>mention[start..].chars().enumerate() {
-            <span class="kw">if </span>x == <span class="string">&#39;:&#39; </span>{
+            <span class="kw">if </span>x == <span class="string">':' </span>{
                 <span class="kw">let </span>from = i + start + <span class="number">1</span>;
 
                 <span class="kw">for </span>y <span class="kw">in </span>mention[from..].chars() {
-                    <span class="kw">if </span>y == <span class="string">&#39;&gt;&#39; </span>{
+                    <span class="kw">if </span>y == <span class="string">'&gt;' </span>{
                         <span class="kw">break</span>;
                     }
                     id.push(y);
@@ -881,8 +881,8 @@
 /// ```rust
 /// use serenity::utils::parse_quotes;
 ///
-/// let command = r#&quot;&quot;this is the first&quot; &quot;this is the second&quot;&quot;#;
-/// let expected = vec![&quot;this is the first&quot;.to_string(), &quot;this is the second&quot;.to_string()];
+/// let command = r#""this is the first" "this is the second""#;
+/// let expected = vec!["this is the first".to_string(), "this is the second".to_string()];
 ///
 /// assert_eq!(parse_quotes(command), expected);
 /// ```
@@ -890,9 +890,9 @@
 /// ```rust
 /// use serenity::utils::parse_quotes;
 ///
-/// let command = r#&quot;&quot;this is a quoted command that doesn&#39;t have an ending quotation&quot;#;
+/// let command = r#""this is a quoted command that doesn't have an ending quotation"#;
 /// let expected =
-///     vec![&quot;this is a quoted command that doesn&#39;t have an ending quotation&quot;.to_string()];
+///     vec!["this is a quoted command that doesn't have an ending quotation".to_string()];
 ///
 /// assert_eq!(parse_quotes(command), expected);
 /// ```
@@ -905,9 +905,9 @@
 
     <span class="kw">for </span>x <span class="kw">in </span>s.chars() {
         <span class="kw">if </span>in_string {
-            <span class="kw">if </span>x == <span class="string">&#39;\\&#39; </span>&amp;&amp; !escaping {
+            <span class="kw">if </span>x == <span class="string">'\\' </span>&amp;&amp; !escaping {
                 escaping = <span class="bool-val">true</span>;
-            } <span class="kw">else if </span>x == <span class="string">&#39;&quot;&#39; </span>&amp;&amp; !escaping {
+            } <span class="kw">else if </span>x == <span class="string">'"' </span>&amp;&amp; !escaping {
                 <span class="kw">if </span>!current_str.is_empty() {
                     args.push(current_str);
                 }
@@ -918,13 +918,13 @@
                 current_str.push(x);
                 escaping = <span class="bool-val">false</span>;
             }
-        } <span class="kw">else if </span>x == <span class="string">&#39; &#39; </span>{
+        } <span class="kw">else if </span>x == <span class="string">' ' </span>{
             <span class="kw">if </span>!current_str.is_empty() {
                 args.push(current_str.clone());
             }
 
             current_str = String::default();
-        } <span class="kw">else if </span>x == <span class="string">&#39;&quot;&#39; </span>{
+        } <span class="kw">else if </span>x == <span class="string">'"' </span>{
             <span class="kw">if </span>!current_str.is_empty() {
                 args.push(current_str.clone());
             }
@@ -943,14 +943,14 @@
     args
 }
 
-<span class="doccomment">/// Discord&#39;s official domains. This is used in [`parse_webhook`] and in its corresponding test.
+<span class="doccomment">/// Discord's official domains. This is used in [`parse_webhook`] and in its corresponding test.
 </span><span class="kw">const </span>DOMAINS: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[
-    <span class="string">&quot;discord.com&quot;</span>,
-    <span class="string">&quot;canary.discord.com&quot;</span>,
-    <span class="string">&quot;ptb.discord.com&quot;</span>,
-    <span class="string">&quot;discordapp.com&quot;</span>,
-    <span class="string">&quot;canary.discordapp.com&quot;</span>,
-    <span class="string">&quot;ptb.discordapp.com&quot;</span>,
+    <span class="string">"discord.com"</span>,
+    <span class="string">"canary.discord.com"</span>,
+    <span class="string">"ptb.discord.com"</span>,
+    <span class="string">"discordapp.com"</span>,
+    <span class="string">"canary.discordapp.com"</span>,
+    <span class="string">"ptb.discordapp.com"</span>,
 ];
 
 <span class="doccomment">/// Parses the id and token from a webhook url. Expects a [`url::Url`] rather than a [`&amp;str`].
@@ -960,17 +960,17 @@
 /// ```rust
 /// use serenity::utils;
 ///
-/// let url_str = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
+/// let url_str = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let url = url_str.parse().unwrap();
 /// let (id, token) = utils::parse_webhook(&amp;url).unwrap();
 ///
 /// assert_eq!(id, 245037420704169985);
-/// assert_eq!(token, &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;);
+/// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_webhook(url: <span class="kw-2">&amp;</span>Url) -&gt; <span class="prelude-ty">Option</span>&lt;(WebhookId, <span class="kw-2">&amp;</span>str)&gt; {
-    <span class="kw">let </span>(webhook_id, token) = url.path().strip_prefix(<span class="string">&quot;/api/webhooks/&quot;</span>)<span class="question-mark">?</span>.split_once(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
-    <span class="kw">if </span>![<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].contains(<span class="kw-2">&amp;</span>url.scheme())
+    <span class="kw">let </span>(webhook_id, token) = url.path().strip_prefix(<span class="string">"/api/webhooks/"</span>)<span class="question-mark">?</span>.split_once(<span class="string">'/'</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>![<span class="string">"http"</span>, <span class="string">"https"</span>].contains(<span class="kw-2">&amp;</span>url.scheme())
         || !DOMAINS.contains(<span class="kw-2">&amp;</span>url.domain()<span class="question-mark">?</span>)
         || !(<span class="number">17</span>..=<span class="number">20</span>).contains(<span class="kw-2">&amp;</span>webhook_id.len())
         || !(<span class="number">60</span>..=<span class="number">68</span>).contains(<span class="kw-2">&amp;</span>token.len())
@@ -980,7 +980,7 @@
     <span class="prelude-val">Some</span>((webhook_id.parse().ok()<span class="question-mark">?</span>, token))
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_has_guild_perms(
     cache_http: <span class="kw">impl </span>CacheHttp,
     guild_id: GuildId,
@@ -994,9 +994,9 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Tries to find a user&#39;s permissions using the cache. Unlike [`user_has_perms`], this function
+<span class="doccomment">/// Tries to find a user's permissions using the cache. Unlike [`user_has_perms`], this function
 /// will return `true` even when the permissions are not in the cache.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 #[inline]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_has_perms_cache(
     cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
@@ -1019,7 +1019,7 @@
     }
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_perms(cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
     <span class="kw">let </span>cache = cache.as_ref();
 
@@ -1067,53 +1067,53 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_invite_parser() {
-        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;https://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;http://discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;discord.gg/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;DISCORD.GG/ABC&quot;</span>), <span class="string">&quot;ABC&quot;</span>);
-        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;https://discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;http://discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">&quot;discord.com/invite/abc&quot;</span>), <span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">"https://discord.gg/abc"</span>), <span class="string">"abc"</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">"http://discord.gg/abc"</span>), <span class="string">"abc"</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">"discord.gg/abc"</span>), <span class="string">"abc"</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">"DISCORD.GG/ABC"</span>), <span class="string">"ABC"</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">"https://discord.com/invite/abc"</span>), <span class="string">"abc"</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">"http://discord.com/invite/abc"</span>), <span class="string">"abc"</span>);
+        <span class="macro">assert_eq!</span>(parse_invite(<span class="string">"discord.com/invite/abc"</span>), <span class="string">"abc"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_username_parser() {
-        <span class="macro">assert_eq!</span>(parse_user_mention(<span class="string">&quot;&lt;@12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
-        <span class="macro">assert_eq!</span>(parse_user_mention(<span class="string">&quot;&lt;@!12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
+        <span class="macro">assert_eq!</span>(parse_user_mention(<span class="string">"&lt;@12345&gt;"</span>).unwrap(), <span class="number">12_345</span>);
+        <span class="macro">assert_eq!</span>(parse_user_mention(<span class="string">"&lt;@!12345&gt;"</span>).unwrap(), <span class="number">12_345</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>role_parser() {
-        <span class="macro">assert_eq!</span>(parse_role_mention(<span class="string">&quot;&lt;@&amp;12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
+        <span class="macro">assert_eq!</span>(parse_role_mention(<span class="string">"&lt;@&amp;12345&gt;"</span>).unwrap(), <span class="number">12_345</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_channel_parser() {
-        <span class="macro">assert_eq!</span>(parse_channel_mention(<span class="string">&quot;&lt;#12345&gt;&quot;</span>).unwrap(), <span class="number">12_345</span>);
+        <span class="macro">assert_eq!</span>(parse_channel_mention(<span class="string">"&lt;#12345&gt;"</span>).unwrap(), <span class="number">12_345</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_emoji_parser() {
-        <span class="kw">let </span>emoji = parse_emoji(<span class="string">&quot;&lt;:name:12345&gt;&quot;</span>).unwrap();
-        <span class="macro">assert_eq!</span>(emoji.name, <span class="string">&quot;name&quot;</span>);
+        <span class="kw">let </span>emoji = parse_emoji(<span class="string">"&lt;:name:12345&gt;"</span>).unwrap();
+        <span class="macro">assert_eq!</span>(emoji.name, <span class="string">"name"</span>);
         <span class="macro">assert_eq!</span>(emoji.id, <span class="number">12_345</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_quote_parser() {
-        <span class="kw">let </span>parsed = parse_quotes(<span class="string">&quot;a \&quot;b c\&quot; d\&quot;e f\&quot;  g&quot;</span>);
-        <span class="macro">assert_eq!</span>(parsed, [<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e f&quot;</span>, <span class="string">&quot;g&quot;</span>]);
+        <span class="kw">let </span>parsed = parse_quotes(<span class="string">"a \"b c\" d\"e f\"  g"</span>);
+        <span class="macro">assert_eq!</span>(parsed, [<span class="string">"a"</span>, <span class="string">"b c"</span>, <span class="string">"d"</span>, <span class="string">"e f"</span>, <span class="string">"g"</span>]);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_webhook_parser() {
         <span class="kw">for </span>domain <span class="kw">in </span>DOMAINS {
-            <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">&quot;https://{domain}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>).parse().unwrap();
+            <span class="kw">let </span>url = <span class="macro">format!</span>(<span class="string">"https://{domain}/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV"</span>).parse().unwrap();
             <span class="kw">let </span>(id, token) = parse_webhook(<span class="kw-2">&amp;</span>url).unwrap();
             <span class="macro">assert_eq!</span>(id, <span class="number">245037420704169985</span>);
             <span class="macro">assert_eq!</span>(
                 token,
-                <span class="string">&quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;
+                <span class="string">"ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV"
             </span>);
         }
     }

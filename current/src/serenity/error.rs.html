@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -192,17 +192,17 @@
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Error <span class="kw">as </span>FormatError};
 <span class="kw">use </span>std::io::Error <span class="kw">as </span>IoError;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span>reqwest::{header::InvalidHeaderValue, Error <span class="kw">as </span>ReqwestError};
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
 <span class="kw">use </span>tracing::instrument;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::ClientError;
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::GatewayError;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::HttpError;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::JsonError;
@@ -212,10 +212,10 @@
 ///
 /// The library exposes functions which, for a result type, exposes only one type, rather than the
 /// usual 2 (`Result&lt;T, Error&gt;`). This is because all functions that return a result return
-/// serenity&#39;s [`Error`], so this is implied, and a &quot;simpler&quot; result is used.
+/// serenity's [`Error`], so this is implied, and a "simpler" result is used.
 </span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T, E = Error&gt; = StdResult&lt;T, E&gt;;
 
-<span class="doccomment">/// A common error enum returned by most of the library&#39;s functionality within a custom [`Result`].
+<span class="doccomment">/// A common error enum returned by most of the library's functionality within a custom [`Result`].
 ///
 /// The most common error types, the [`ClientError`] and [`GatewayError`] enums, are both wrapped
 /// around this in the form of the [`Self::Client`] and [`Self::Gateway`] variants.
@@ -223,23 +223,23 @@
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error {
     <span class="doccomment">/// An error while decoding a payload.
-    </span>Decode(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Value),
+    </span>Decode(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, Value),
     <span class="doccomment">/// There was an error with a format.
     </span>Format(FormatError),
     <span class="doccomment">/// An [`std::io`] error.
     </span>Io(IoError),
-    <span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;simd_json&quot;</span>), doc = <span class="string">&quot;An error from the [`serde_json`] crate.&quot;</span>)]
-    #[cfg_attr(feature = <span class="string">&quot;simd_json&quot;</span>, doc = <span class="string">&quot;An error from the [`simd_json`] crate.&quot;</span>)]
+    <span class="attr">#[cfg_attr(not(feature = <span class="string">"simd_json"</span>), doc = <span class="string">"An error from the [`serde_json`] crate."</span>)]
+    #[cfg_attr(feature = <span class="string">"simd_json"</span>, doc = <span class="string">"An error from the [`simd_json`] crate."</span>)]
     </span>Json(JsonError),
     <span class="doccomment">/// An error from the [`model`] module.
     ///
     /// [`model`]: crate::model
     </span>Model(ModelError),
-    <span class="doccomment">/// Input exceeded a limit. Providing the input and the limit that&#39;s not supposed to be
+    <span class="doccomment">/// Input exceeded a limit. Providing the input and the limit that's not supposed to be
     /// exceeded.
     ///
     /// *This only exists for the [`GuildId::ban`] and [`Member::ban`] functions. For their cases,
-    /// it&#39;s the &quot;reason&quot;.*
+    /// it's the "reason".*
     ///
     /// [`GuildId::ban`]: crate::model::id::GuildId::ban
     /// [`Member::ban`]: crate::model::guild::Member::ban
@@ -252,29 +252,29 @@
     /// [`GuildId::members`]: crate::model::id::GuildId::members
     /// [`Guild::members`]: crate::model::guild::Guild::members
     /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
-    </span>NotInRange(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, u64, u64, u64),
-    <span class="doccomment">/// Some other error. This is only used for &quot;Expected value \&lt;TYPE\&gt;&quot; errors, when a more
+    </span>NotInRange(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u64, u64, u64),
+    <span class="doccomment">/// Some other error. This is only used for "Expected value \&lt;TYPE\&gt;" errors, when a more
     /// detailed error can not be easily provided via the [`Error::Decode`] variant.
-    </span>Other(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    </span>Other(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
     <span class="doccomment">/// An error from the [`url`] crate.
     </span>Url(String),
     <span class="doccomment">/// A [client] error.
     ///
     /// [client]: crate::client
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
     </span>Client(ClientError),
     <span class="doccomment">/// An error from the [`gateway`] module.
     ///
     /// [`gateway`]: crate::gateway
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
     </span>Gateway(GatewayError),
     <span class="doccomment">/// An error from the [`http`] module.
     ///
     /// [`http`]: crate::http
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     </span>Http(HttpError),
     <span class="doccomment">/// An error from the `tungstenite` crate.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
     </span>Tungstenite(TungsteniteError),
 }
 
@@ -284,7 +284,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">impl </span>From&lt;GatewayError&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: GatewayError) -&gt; Error {
         Error::Gateway(e)
@@ -309,28 +309,28 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">impl </span>From&lt;TungsteniteError&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: TungsteniteError) -&gt; Error {
         Error::Tungstenite(e)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">impl </span>From&lt;HttpError&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: HttpError) -&gt; Error {
         Error::Http(e)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">impl </span>From&lt;InvalidHeaderValue&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: InvalidHeaderValue) -&gt; Error {
         HttpError::InvalidHeader(e).into()
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">impl </span>From&lt;ReqwestError&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: ReqwestError) -&gt; Error {
         HttpError::Request(e).into()
@@ -338,23 +338,23 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Decode(msg, <span class="kw">_</span>) | <span class="self">Self</span>::Other(msg) =&gt; f.write_str(msg),
-            <span class="self">Self</span>::ExceededLimit(..) =&gt; f.write_str(<span class="string">&quot;Input exceeded a limit&quot;</span>),
-            <span class="self">Self</span>::NotInRange(..) =&gt; f.write_str(<span class="string">&quot;Input is not in the specified range&quot;</span>),
+            <span class="self">Self</span>::ExceededLimit(..) =&gt; f.write_str(<span class="string">"Input exceeded a limit"</span>),
+            <span class="self">Self</span>::NotInRange(..) =&gt; f.write_str(<span class="string">"Input is not in the specified range"</span>),
             <span class="self">Self</span>::Format(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Io(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Json(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Model(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Url(msg) =&gt; f.write_str(msg),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
             </span><span class="self">Self</span>::Client(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
             </span><span class="self">Self</span>::Gateway(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
             </span><span class="self">Self</span>::Http(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
             </span><span class="self">Self</span>::Tungstenite(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
         }
     }
@@ -362,17 +362,17 @@
 
 <span class="kw">impl </span>StdError <span class="kw">for </span>Error {
     <span class="attr">#[instrument]
-    </span><span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">&#39;static</span>)&gt; {
+    </span><span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">'static</span>)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Format(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="self">Self</span>::Io(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="self">Self</span>::Json(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="self">Self</span>::Model(inner) =&gt; <span class="prelude-val">Some</span>(inner),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
             </span><span class="self">Self</span>::Client(inner) =&gt; <span class="prelude-val">Some</span>(inner),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
             </span><span class="self">Self</span>::Http(inner) =&gt; <span class="prelude-val">Some</span>(inner),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
             </span><span class="self">Self</span>::Tungstenite(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }

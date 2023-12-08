@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1201,10 +1201,10 @@
 <a href="#1201" id="1201">1201</a>
 <a href="#1202" id="1202">1202</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     Builder,
     CreateAttachment,
@@ -1221,25 +1221,25 @@
     EditVoiceState,
     GetMessages,
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{<span class="self">self</span>, Cache};
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, Typing};
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::Timestamp;
 
-<span class="doccomment">/// Represents a guild&#39;s text, news, or voice channel. Some methods are available only for voice
+<span class="doccomment">/// Represents a guild's text, news, or voice channel. Some methods are available only for voice
 /// channels and some are only available for text channels. News channels are a subset of text
 /// channels and lack slow mode hence [`Self::rate_limit_per_user`] will be [`None`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>GuildChannel {
@@ -1255,13 +1255,13 @@
     </span><span class="kw">pub </span>parent_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     <span class="doccomment">/// The Id of the guild the channel is located in.
     ///
-    /// The original voice channel has an Id equal to the guild&#39;s Id, incremented by one.
+    /// The original voice channel has an Id equal to the guild's Id, incremented by one.
     ///
     /// [`id`]: GuildChannel::id
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The type of the channel.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ChannelType,
     <span class="doccomment">/// The Id of the user who created this channel
     ///
@@ -1293,15 +1293,15 @@
     ///
     /// **Note**: This is only available for voice channels.
     </span><span class="kw">pub </span>user_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
-    <span class="doccomment">/// Used to tell if the channel is not safe for work. Note however, it&#39;s recommended to use
-    /// [`Self::is_nsfw`] as it&#39;s gonna be more accurate.
-    </span><span class="comment">// This field can or can not be present sometimes, but if it isn&#39;t default to `false`.
+    <span class="doccomment">/// Used to tell if the channel is not safe for work. Note however, it's recommended to use
+    /// [`Self::is_nsfw`] as it's gonna be more accurate.
+    </span><span class="comment">// This field can or can not be present sometimes, but if it isn't default to `false`.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>nsfw: bool,
     <span class="doccomment">/// A rate limit that applies per user and excludes bots.
     ///
     /// **Note**: This is only available for text channels excluding news channels.
-    </span><span class="attr">#[doc(alias = <span class="string">&quot;slowmode&quot;</span>)]
+    </span><span class="attr">#[doc(alias = <span class="string">"slowmode"</span>)]
     #[serde(default)]
     </span><span class="kw">pub </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// The region override.
@@ -1340,7 +1340,7 @@
     /// **Note**: This is only available in forum channels.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>flags: ChannelFlags,
-    <span class="doccomment">/// The number of messages ever sent in a thread, it&#39;s similar to `message_count` on message
+    <span class="doccomment">/// The number of messages ever sent in a thread, it's similar to `message_count` on message
     /// creation, but will not decrement the number when a message is deleted.
     </span><span class="kw">pub </span>total_message_sent: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The set of available tags.
@@ -1382,8 +1382,8 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-forum-layout-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
-    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+    #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ForumLayoutType {
         <span class="doccomment">/// No default has been set for forum channel.
@@ -1397,7 +1397,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>GuildChannel {
     <span class="doccomment">/// Whether or not this channel is text-based, meaning that it is possible to send messages.
     </span><span class="attr">#[must_use]
@@ -1444,11 +1444,11 @@
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     </span><span class="attr">#[inline]
-    #[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+    #[cfg(feature = <span class="string">"utils"</span>)]
     </span><span class="kw">pub async fn </span>create_invite(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateInvite&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateInvite&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
         builder.execute(cache_http, <span class="self">self</span>.id).<span class="kw">await
     </span>}
@@ -1467,7 +1467,7 @@
     /// but denying the [Send TTS Messages] and [Attach Files] permissions:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = &quot;cache&quot;)]
+    /// # #[cfg(feature = "cache")]
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use std::sync::Arc;
@@ -1498,7 +1498,7 @@
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = &quot;cache&quot;)]
+    /// # #[cfg(feature = "cache")]
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId, RoleId}};
     /// # use std::sync::Arc;
@@ -1555,7 +1555,7 @@
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">crate</span>::utils::user_has_perms_cache(cache, <span class="self">self</span>.id, Permissions::MANAGE_CHANNELS)<span class="question-mark">?</span>;
@@ -1572,7 +1572,7 @@
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// **Note**: Messages that are older than 2 weeks can&#39;t be deleted using this method.
+    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
     ///
     /// # Errors
     ///
@@ -1647,7 +1647,7 @@
         <span class="self">self</span>.id.delete_reactions(http, message_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits the channel&#39;s settings.
+    <span class="doccomment">/// Edits the channel's settings.
     ///
     /// Refer to the documentation for [`EditChannel`] for a full list of methods.
     ///
@@ -1665,7 +1665,7 @@
     /// # async fn run() {
     /// # let http: Http = unimplemented!();
     /// # let channel = ChannelId::new(1234);
-    /// let builder = EditChannel::new().name(&quot;test&quot;).bitrate(86400);
+    /// let builder = EditChannel::new().name("test").bitrate(86400);
     /// channel.edit(&amp;http, builder).await;
     /// # }
     /// ```
@@ -1680,7 +1680,7 @@
     </span><span class="kw">pub async fn </span>edit(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditChannel&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditChannel&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>channel = builder.execute(cache_http, <span class="self">self</span>.id).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw-2">*</span><span class="self">self </span>= channel;
@@ -1719,7 +1719,7 @@
     </span><span class="kw">pub async fn </span>edit_thread(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditThread&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditThread&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.id.edit_thread(cache_http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
@@ -1736,7 +1736,7 @@
     /// Invite a user to speak.
     ///
     /// ```rust
-    /// # #[cfg(feature = &quot;cache&quot;)]
+    /// # #[cfg(feature = "cache")]
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
@@ -1774,7 +1774,7 @@
         builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id.into()))).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits the current user&#39;s voice state in a stage channel.
+    <span class="doccomment">/// Edits the current user's voice state in a stage channel.
     ///
     /// **Note**: Requires the [Request to Speak] permission. The [Mute Members] permission is
     /// **not** required.
@@ -1784,7 +1784,7 @@
     /// Send a request to speak, then clear the request.
     ///
     /// ```rust
-    /// # #[cfg(feature = &quot;cache&quot;)]
+    /// # #[cfg(feature = "cache")]
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::ChannelId};
@@ -1845,14 +1845,14 @@
         <span class="self">self</span>.id.follow(http, target_channel_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Attempts to find this channel&#39;s guild in the Cache.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="doccomment">/// Attempts to find this channel's guild in the Cache.
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
-    </span><span class="kw">pub fn </span>guild&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cache::GuildRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>guild&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cache::GuildRef&lt;<span class="lifetime">'a</span>&gt;&gt; {
         cache.as_ref().guild(<span class="self">self</span>.guild_id)
     }
 
-    <span class="doccomment">/// Gets all of the channel&#39;s invites.
+    <span class="doccomment">/// Gets all of the channel's invites.
     ///
     /// Requires the [Manage Channels] permission.
     ///
@@ -1942,7 +1942,7 @@
     ///         };
     ///
     ///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, &amp;msg.author) {
-    ///             println!(&quot;The user&#39;s permissions: {:?}&quot;, permissions);
+    ///             println!("The user's permissions: {:?}", permissions);
     ///         }
     ///     }
     /// }
@@ -1950,12 +1950,12 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel&#39;s guild could not be found in the
+    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could not be found in the
     /// [`Cache`].
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>permissions_for_user(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1974,14 +1974,14 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel&#39;s guild could not be found in the
+    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could not be found in the
     /// [`Cache`].
     ///
     /// Returns a [`ModelError::RoleNotFound`] if the given role could not be found in the
     /// [`Cache`].
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
-    #[deprecated = <span class="string">&quot;this function ignores other roles the user may have as well as user-specific permissions; use Guild::user_permissions_in instead&quot;</span>]
+    #[deprecated = <span class="string">"this function ignores other roles the user may have as well as user-specific permissions; use Guild::user_permissions_in instead"</span>]
     #[allow(deprecated)]
     </span><span class="kw">pub fn </span>permissions_for_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2013,7 +2013,7 @@
         <span class="self">self</span>.id.pin(http, message_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets all channel&#39;s pins.
+    <span class="doccomment">/// Gets all channel's pins.
     ///
     /// **Note**: If the current user lacks the [Read Message History] permission an empty [`Vec`]
     /// will be returned.
@@ -2108,9 +2108,9 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span>;
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
         </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span>;
         msg
     }
@@ -2132,7 +2132,7 @@
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = &quot;cache&quot;)]
+    /// # #[cfg(feature = "cache")]
     /// # async fn run() {
     /// # use serenity::{cache::Cache, http::Http, model::channel::GuildChannel, Result};
     /// # use std::sync::Arc;
@@ -2174,7 +2174,7 @@
         <span class="self">self</span>.id.unpin(http, message_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Retrieves the channel&#39;s webhooks.
+    <span class="doccomment">/// Retrieves the channel's webhooks.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
@@ -2199,7 +2199,7 @@
     ///
     /// Other [`ChannelType`]s lack the concept of [`Member`]s and will return:
     /// [`ModelError::InvalidChannelType`].
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
     </span><span class="kw">pub fn </span>members(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
         <span class="kw">let </span>cache = cache.as_ref();
@@ -2235,26 +2235,26 @@
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages sent in
     /// this guild channel.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_reply(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reply`].
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_replies(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
     <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions
     /// sent by this guild channel.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reaction`].
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_reactions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;,
@@ -2270,7 +2270,7 @@
     </span><span class="kw">pub async fn </span>create_webhook(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateWebhook&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateWebhook&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         <span class="self">self</span>.id.create_webhook(cache_http, builder).<span class="kw">await
     </span>}
@@ -2300,7 +2300,7 @@
     </span><span class="kw">pub async fn </span>create_stage_instance(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateStageInstance&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
         <span class="self">self</span>.id.create_stage_instance(cache_http, builder).<span class="kw">await
     </span>}
@@ -2316,7 +2316,7 @@
     </span><span class="kw">pub async fn </span>edit_stage_instance(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditStageInstance&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
         <span class="self">self</span>.id.edit_stage_instance(cache_http, builder).<span class="kw">await
     </span>}
@@ -2345,7 +2345,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
-        builder: CreateThread&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateThread&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="self">self</span>.id.create_thread_from_message(cache_http, message_id, builder).<span class="kw">await
     </span>}
@@ -2358,7 +2358,7 @@
     </span><span class="kw">pub async fn </span>create_thread(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateThread&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateThread&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="self">self</span>.id.create_thread(cache_http, builder).<span class="kw">await
     </span>}
@@ -2371,7 +2371,7 @@
     </span><span class="kw">pub async fn </span>create_forum_post(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateForumPost&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateForumPost&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="self">self</span>.id.create_forum_post(cache_http, builder).<span class="kw">await
     </span>}
@@ -2379,7 +2379,7 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>GuildChannel {
     <span class="doccomment">/// Formats the channel, creating a mention of it.
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.id.mention(), f)
     }
 }
@@ -2388,7 +2388,7 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
 /// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialGuildChannel {
@@ -2399,7 +2399,7 @@
     <span class="doccomment">/// The channel category Id,  or the parent text channel Id for a thread.
     </span><span class="kw">pub </span>parent_id: ChannelId,
     <span class="doccomment">/// The channel type.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ChannelType,
 }
 </code></pre></div></section></main></body></html>

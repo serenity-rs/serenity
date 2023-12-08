@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/misc.rs`."><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/misc.rs`."><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -296,21 +296,21 @@
 <a href="#296" id="296">296</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.
 
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">use </span>std::fmt::Write;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">use </span>std::result::Result <span class="kw">as </span>StdResult;
 <span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, any(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>)))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, any(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>)))]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
 <span class="doccomment">/// Hides the implementation detail of ImageHash as an enum.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">enum </span>ImageHashInner {
     Normal { hash: [u8; <span class="number">16</span>], is_animated: bool },
@@ -319,18 +319,18 @@
 
 <span class="doccomment">/// An image hash returned from the Discord API.
 ///
-/// This type can be constructed via it&#39;s [`FromStr`] implementation, and can be turned into it&#39;s
+/// This type can be constructed via it's [`FromStr`] implementation, and can be turned into it's
 /// cannonical representation via [`std::fmt::Display`] or [`serde::Serialize`].
 ///
 /// # Example
 /// ```rust
 /// use serenity::model::misc::ImageHash;
 ///
-/// let image_hash: ImageHash = &quot;f1eff024d9c85339c877985229ed8fec&quot;.parse().unwrap();
-/// assert_eq!(image_hash.to_string(), String::from(&quot;f1eff024d9c85339c877985229ed8fec&quot;));
+/// let image_hash: ImageHash = "f1eff024d9c85339c877985229ed8fec".parse().unwrap();
+/// assert_eq!(image_hash.to_string(), String::from("f1eff024d9c85339c877985229ed8fec"));
 /// ```
 
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>ImageHash(ImageHashInner);
 
@@ -341,7 +341,7 @@
     /// ```rust
     /// use serenity::model::misc::ImageHash;
     ///
-    /// let animated_hash: ImageHash = &quot;a_e3c0db7f38777778fb43081f8746ebc9&quot;.parse().unwrap();
+    /// let animated_hash: ImageHash = "a_e3c0db7f38777778fb43081f8746ebc9".parse().unwrap();
     /// assert!(animated_hash.is_animated());
     /// ```
     </span><span class="attr">#[must_use]
@@ -356,10 +356,10 @@
 }
 
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>ImageHash {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.write_str(<span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">"\""</span>)<span class="question-mark">?</span>;
         &lt;<span class="self">Self </span><span class="kw">as </span>std::fmt::Display&gt;::fmt(<span class="self">self</span>, f)<span class="question-mark">?</span>;
-        f.write_str(<span class="string">&quot;\&quot;&quot;</span>)
+        f.write_str(<span class="string">"\""</span>)
     }
 }
 
@@ -369,29 +369,29 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ImageHash {
-    <span class="kw">fn </span>deserialize&lt;D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>ImageHash {
+    <span class="kw">fn </span>deserialize&lt;D: serde::Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span>helper = arrayvec::ArrayString::&lt;<span class="number">34</span>&gt;::deserialize(deserializer)<span class="question-mark">?</span>;
         <span class="self">Self</span>::from_str(<span class="kw-2">&amp;</span>helper).map_err(serde::de::Error::custom)
     }
 }
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ImageHash {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">let </span>ImageHashInner::Normal {
             hash,
             is_animated,
         } = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
         </span><span class="kw">else </span>{
-            <span class="kw">return </span>f.write_str(<span class="string">&quot;clyde&quot;</span>);
+            <span class="kw">return </span>f.write_str(<span class="string">"clyde"</span>);
         };
 
         <span class="kw">if </span><span class="kw-2">*</span>is_animated {
-            f.write_str(<span class="string">&quot;a_&quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">"a_"</span>)<span class="question-mark">?</span>;
         }
 
         <span class="kw">for </span>byte <span class="kw">in </span>hash {
-            <span class="macro">write!</span>(f, <span class="string">&quot;{byte:02x}&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(f, <span class="string">"{byte:02x}"</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -408,10 +408,10 @@
 <span class="kw">impl </span>std::error::Error <span class="kw">for </span>ImageHashParseError {}
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ImageHashParseError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::InvalidLength(length) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Invalid length {length}, expected 32 or 34 characters&quot;</span>)
+                <span class="macro">write!</span>(f, <span class="string">"Invalid length {length}, expected 32 or 34 characters"</span>)
             },
         }
     }
@@ -421,11 +421,11 @@
     <span class="kw">type </span><span class="prelude-val">Err </span>= ImageHashParseError;
 
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
-        <span class="kw">let </span>(hex, is_animated) = <span class="kw">if </span>s.len() == <span class="number">34 </span>&amp;&amp; s.starts_with(<span class="string">&quot;a_&quot;</span>) {
+        <span class="kw">let </span>(hex, is_animated) = <span class="kw">if </span>s.len() == <span class="number">34 </span>&amp;&amp; s.starts_with(<span class="string">"a_"</span>) {
             (<span class="kw-2">&amp;</span>s[<span class="number">2</span>..], <span class="bool-val">true</span>)
         } <span class="kw">else if </span>s.len() == <span class="number">32 </span>{
             (s, <span class="bool-val">false</span>)
-        } <span class="kw">else if </span>s == <span class="string">&quot;clyde&quot; </span>{
+        } <span class="kw">else if </span>s == <span class="string">"clyde" </span>{
             <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>(ImageHashInner::Clyde));
         } <span class="kw">else </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="self">Self</span>::Err::InvalidLength(s.len()));
@@ -435,7 +435,7 @@
         <span class="kw">for </span>i <span class="kw">in </span>(<span class="number">0</span>..hex.len()).step_by(<span class="number">2</span>) {
             <span class="kw">let </span>hex_byte = <span class="kw-2">&amp;</span>hex[i..i + <span class="number">2</span>];
             hash[i / <span class="number">2</span>] = u8::from_str_radix(hex_byte, <span class="number">16</span>).unwrap_or_else(|err| {
-                <span class="macro">tracing::warn!</span>(<span class="string">&quot;Invalid byte in ImageHash ({s}): {err}&quot;</span>);
+                <span class="macro">tracing::warn!</span>(<span class="string">"Invalid byte in ImageHash ({s}): {err}"</span>);
                 <span class="number">0
             </span>});
         }
@@ -462,51 +462,51 @@
     </span><span class="kw">pub </span>name: String,
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">impl </span>EmojiIdentifier {
-    <span class="doccomment">/// Generates a URL to the emoji&#39;s image.
+    <span class="doccomment">/// Generates a URL to the emoji's image.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="kw">let </span>ext = <span class="kw">if </span><span class="self">self</span>.animated { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;png&quot; </span>};
+        <span class="kw">let </span>ext = <span class="kw">if </span><span class="self">self</span>.animated { <span class="string">"gif" </span>} <span class="kw">else </span>{ <span class="string">"png" </span>};
 
-        <span class="macro">cdn!</span>(<span class="string">&quot;/emojis/{}.{}&quot;</span>, <span class="self">self</span>.id, ext)
+        <span class="macro">cdn!</span>(<span class="string">"/emojis/{}.{}"</span>, <span class="self">self</span>.id, ext)
     }
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>EmojiIdentifier {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">if </span><span class="self">self</span>.animated {
-            f.write_str(<span class="string">&quot;&lt;a:&quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">"&lt;a:"</span>)<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
-            f.write_str(<span class="string">&quot;&lt;:&quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">"&lt;:"</span>)<span class="question-mark">?</span>;
         }
 
         f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.name)<span class="question-mark">?</span>;
 
-        f.write_char(<span class="string">&#39;:&#39;</span>)<span class="question-mark">?</span>;
+        f.write_char(<span class="string">':'</span>)<span class="question-mark">?</span>;
         fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.id, f)<span class="question-mark">?</span>;
-        f.write_char(<span class="string">&#39;&gt;&#39;</span>)
+        f.write_char(<span class="string">'&gt;'</span>)
     }
 }
 
 <span class="attr">#[derive(Debug)]
-#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">pub struct </span>EmojiIdentifierParseError {
     parsed_string: String,
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>EmojiIdentifierParseError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;`{}` is not a valid emoji identifier&quot;</span>, <span class="self">self</span>.parsed_string)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"`{}` is not a valid emoji identifier"</span>, <span class="self">self</span>.parsed_string)
     }
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">impl </span>StdError <span class="kw">for </span>EmojiIdentifierParseError {}
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">impl </span>FromStr <span class="kw">for </span>EmojiIdentifier {
     <span class="kw">type </span><span class="prelude-val">Err </span>= EmojiIdentifierParseError;
 
@@ -521,7 +521,7 @@
 ///
 /// This is not necessarily a representation of an ongoing incident.
 ///
-/// [Discord docs](https://discordstatus.com/api) (see &quot;Unresolved incident&quot; example)
+/// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Incident {
@@ -542,7 +542,7 @@
 ///
 /// This will typically state what new information has been discovered about an incident.
 ///
-/// [Discord docs](https://discordstatus.com/api) (see &quot;Unresolved incident&quot; example)
+/// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>IncidentUpdate {
@@ -558,7 +558,7 @@
 <span class="doccomment">/// A Discord status maintenance message. This can be either for active maintenances or for
 /// scheduled maintenances.
 ///
-/// [Discord docs](https://discordstatus.com/api) (see &quot;scheduled maintenances&quot; examples)
+/// [Discord docs](https://discordstatus.com/api) (see "scheduled maintenances" examples)
 </span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Maintenance {
@@ -583,11 +583,11 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_formatters() {
-        <span class="macro">assert_eq!</span>(ChannelId::new(<span class="number">1</span>).to_string(), <span class="string">&quot;1&quot;</span>);
-        <span class="macro">assert_eq!</span>(EmojiId::new(<span class="number">2</span>).to_string(), <span class="string">&quot;2&quot;</span>);
-        <span class="macro">assert_eq!</span>(GuildId::new(<span class="number">3</span>).to_string(), <span class="string">&quot;3&quot;</span>);
-        <span class="macro">assert_eq!</span>(RoleId::new(<span class="number">4</span>).to_string(), <span class="string">&quot;4&quot;</span>);
-        <span class="macro">assert_eq!</span>(UserId::new(<span class="number">5</span>).to_string(), <span class="string">&quot;5&quot;</span>);
+        <span class="macro">assert_eq!</span>(ChannelId::new(<span class="number">1</span>).to_string(), <span class="string">"1"</span>);
+        <span class="macro">assert_eq!</span>(EmojiId::new(<span class="number">2</span>).to_string(), <span class="string">"2"</span>);
+        <span class="macro">assert_eq!</span>(GuildId::new(<span class="number">3</span>).to_string(), <span class="string">"3"</span>);
+        <span class="macro">assert_eq!</span>(RoleId::new(<span class="number">4</span>).to_string(), <span class="string">"4"</span>);
+        <span class="macro">assert_eq!</span>(UserId::new(<span class="number">5</span>).to_string(), <span class="string">"5"</span>);
     }
 }
 </code></pre></div></section></main></body></html>

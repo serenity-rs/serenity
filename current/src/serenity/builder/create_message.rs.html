@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_message.rs`."><title>create_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_message.rs`."><title>create_message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -350,7 +350,7 @@
 <a href="#350" id="350">350</a>
 <a href="#351" id="351">351</a>
 <a href="#352" id="352">352</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
     CreateActionRow,
@@ -359,11 +359,11 @@
     CreateEmbed,
     EditAttachments,
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
@@ -383,7 +383,7 @@
 ///
 /// # Examples
 ///
-/// Sending a message with a content of `&quot;test&quot;` and applying text-to-speech:
+/// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
 /// ```rust,no_run
 /// use serenity::builder::{CreateEmbed, CreateMessage};
@@ -394,8 +394,8 @@
 /// # async fn run() {
 /// # let http: Arc&lt;Http&gt; = unimplemented!();
 /// # let channel_id = ChannelId::new(7);
-/// let embed = CreateEmbed::new().title(&quot;This is an embed&quot;).description(&quot;With a description&quot;);
-/// let builder = CreateMessage::new().content(&quot;test&quot;).tts(true).embed(embed);
+/// let embed = CreateEmbed::new().title("This is an embed").description("With a description");
+/// let builder = CreateMessage::new().content("test").tts(true).embed(embed);
 /// let _ = channel_id.send_message(&amp;http, builder).await;
 /// # }
 /// ```
@@ -404,20 +404,20 @@
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateMessage {
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>nonce: <span class="prelude-ty">Option</span>&lt;Nonce&gt;,
     tts: bool,
     embeds: Vec&lt;CreateEmbed&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>message_reference: <span class="prelude-ty">Option</span>&lt;MessageReference&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
     sticker_ids: Vec&lt;StickerId&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
     attachments: EditAttachments,
 
@@ -431,7 +431,7 @@
         <span class="self">Self</span>::default()
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
             check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
@@ -504,7 +504,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Adds a list of reactions to create after the message&#39;s sent.
+    <span class="doccomment">/// Adds a list of reactions to create after the message's sent.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>reactions&lt;R: Into&lt;ReactionType&gt;&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
@@ -631,13 +631,13 @@
     </span>}
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
 </span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateMessage {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-    </span><span class="kw">type </span>Context&lt;<span class="lifetime">&#39;ctx</span>&gt; = (ChannelId, <span class="prelude-ty">Option</span>&lt;GuildId&gt;);
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;cache&quot;</span>))]
-    </span><span class="kw">type </span>Context&lt;<span class="lifetime">&#39;ctx</span>&gt; = (ChannelId,);
+    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+    </span><span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (ChannelId, <span class="prelude-ty">Option</span>&lt;GuildId&gt;);
+    <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
+    </span><span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (ChannelId,);
     <span class="kw">type </span>Built = Message;
 
     <span class="doccomment">/// Send a message to the channel.
@@ -660,13 +660,13 @@
     </span><span class="kw">async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
         <span class="kw">let </span>channel_id = ctx.<span class="number">0</span>;
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">let </span>guild_id = ctx.<span class="number">1</span>;
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>req = Permissions::SEND_MESSAGES;
             <span class="kw">if </span>!<span class="self">self</span>.attachments.is_empty() {
@@ -683,15 +683,15 @@
 
         <span class="kw">let </span>files = <span class="self">self</span>.attachments.take_files();
 
-        <span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;cache&quot;</span>), allow(unused_mut))]
+        <span class="attr">#[cfg_attr(not(feature = <span class="string">"cache"</span>), allow(unused_mut))]
         </span><span class="kw">let </span><span class="kw-2">mut </span>message = http.send_message(channel_id, files, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for </span>reaction <span class="kw">in </span><span class="self">self</span>.reactions {
             http.create_reaction(channel_id, message.id, <span class="kw-2">&amp;</span>reaction).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="comment">// HTTP sent Messages don&#39;t have guild_id set, so we fill it in ourselves by best effort
-        </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="comment">// HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
+        </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">if </span>message.guild_id.is_none() {
             <span class="comment">// Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
             // we already know our guild ID), and otherwise find the guild ID in cache

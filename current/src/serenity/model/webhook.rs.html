@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -569,25 +569,25 @@
 <a href="#569" id="569">569</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>secrecy::ExposeSecret;
 <span class="kw">use </span>secrecy::SecretString;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::channel::Message;
 <span class="kw">use </span><span class="kw">super</span>::id::{ChannelId, GuildId, WebhookId};
 <span class="kw">use </span><span class="kw">super</span>::user::User;
 <span class="kw">use </span><span class="kw">super</span>::utils::secret;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, GuildChannelRef, GuildRef};
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::ModelError;
 
 <span class="macro">enum_number! </span>{
@@ -595,8 +595,8 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
-    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+    #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>WebhookType {
         <span class="doccomment">/// An indicator that the webhook can post messages to channels with a token.
@@ -615,10 +615,10 @@
     #[must_use]
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Incoming =&gt; <span class="string">&quot;incoming&quot;</span>,
-            <span class="self">Self</span>::ChannelFollower =&gt; <span class="string">&quot;channel follower&quot;</span>,
-            <span class="self">Self</span>::Application =&gt; <span class="string">&quot;application&quot;</span>,
-            <span class="self">Self</span>::Unknown(<span class="kw">_</span>) =&gt; <span class="string">&quot;unknown&quot;</span>,
+            <span class="self">Self</span>::Incoming =&gt; <span class="string">"incoming"</span>,
+            <span class="self">Self</span>::ChannelFollower =&gt; <span class="string">"channel follower"</span>,
+            <span class="self">Self</span>::Application =&gt; <span class="string">"application"</span>,
+            <span class="self">Self</span>::Unknown(<span class="kw">_</span>) =&gt; <span class="string">"unknown"</span>,
         }
     }
 }
@@ -627,7 +627,7 @@
 /// not necessarily require a bot user or authentication to use.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Webhook {
@@ -636,7 +636,7 @@
     /// Can be used to calculate the creation date of the webhook.
     </span><span class="kw">pub </span>id: WebhookId,
     <span class="doccomment">/// The type of the webhook.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: WebhookType,
     <span class="doccomment">/// The Id of the guild that owns the webhook.
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
@@ -654,8 +654,8 @@
     ///
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
     </span><span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-    <span class="doccomment">/// The webhook&#39;s secure token.
-    </span><span class="attr">#[serde(with = <span class="string">&quot;secret&quot;</span>, default)]
+    <span class="doccomment">/// The webhook's secure token.
+    </span><span class="attr">#[serde(with = <span class="string">"secret"</span>, default)]
     </span><span class="kw">pub </span>token: <span class="prelude-ty">Option</span>&lt;SecretString&gt;,
     <span class="doccomment">/// The bot/OAuth2 application that created this webhook.
     </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
@@ -666,12 +666,12 @@
     /// [`WebhookType::ChannelFollower`]).
     </span><span class="kw">pub </span>source_channel: <span class="prelude-ty">Option</span>&lt;WebhookChannel&gt;,
     <span class="doccomment">/// The url used for executing the webhook (returned by the webhooks OAuth2 flow).
-    </span><span class="attr">#[serde(with = <span class="string">&quot;secret&quot;</span>, default)]
+    </span><span class="attr">#[serde(with = <span class="string">"secret"</span>, default)]
     </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;SecretString&gt;,
 }
 
 <span class="doccomment">/// The guild object returned by a [`Webhook`], of type [`WebhookType::ChannelFollower`].
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>WebhookGuild {
@@ -685,12 +685,12 @@
     </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>WebhookGuild {
     <span class="doccomment">/// Tries to find the [`Guild`] by its Id in the cache.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
-    </span><span class="kw">pub fn </span>to_guild_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>to_guild_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         cache.as_ref().guild(<span class="self">self</span>.id)
     }
 
@@ -704,7 +704,7 @@
     /// Returns an [`Error::Http`] if the current user is not in the guild.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_partial_guild(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.guild(<span class="self">self</span>.id) {
@@ -733,7 +733,7 @@
     </span>}
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>WebhookChannel {
@@ -743,12 +743,12 @@
     </span><span class="kw">pub </span>name: String,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>WebhookChannel {
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
-    </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         cache.as_ref().channel(<span class="self">self</span>.id)
     }
 
@@ -765,7 +765,7 @@
     /// Returns [`Error::Http`] if the channel retrieval request failed.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(<span class="self">self</span>.id) {
@@ -777,7 +777,7 @@
         <span class="kw">let </span>channel = cache_http.http().get_channel(<span class="self">self</span>.id).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>guild_channel = channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))<span class="question-mark">?</span>;
 
-        <span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
+        <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"temp_cache"</span>))]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
@@ -791,7 +791,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>Webhook {
     <span class="doccomment">/// Retrieves a webhook given its Id.
     ///
@@ -819,7 +819,7 @@
     /// Returns an [`Error::Http`] if the current user is not authenticated, or if the webhook does
     /// not exist.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
     </span><span class="kw">pub async fn </span>from_id(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, webhook_id: <span class="kw">impl </span>Into&lt;WebhookId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         http.as_ref().get_webhook(webhook_id.into()).<span class="kw">await
@@ -840,7 +840,7 @@
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
     /// let id = WebhookId::new(245037420704169985);
-    /// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
+    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// let webhook = Webhook::from_id_with_token(&amp;http, id, token).await?;
     /// # Ok(())
@@ -851,7 +851,7 @@
     ///
     /// Returns an [`Error::Http`] if the webhook does not exist, or if the token is invalid.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
     </span><span class="kw">pub async fn </span>from_id_with_token(
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -875,7 +875,7 @@
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
-    /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let webhook = Webhook::from_url(&amp;http, url).await?;
     /// # Ok(())
     /// # }
@@ -886,7 +886,7 @@
     /// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not
     /// exist, or if the token is invalid.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
     </span><span class="kw">pub async fn </span>from_url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         http.as_ref().get_webhook_from_url(url).<span class="kw">await
@@ -926,10 +926,10 @@
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
-    /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&amp;http, url).await?;
     ///
-    /// let builder = EditWebhook::new().name(&quot;new name&quot;);
+    /// let builder = EditWebhook::new().name("new name");
     /// webhook.edit(&amp;http, builder).await?;
     /// # Ok(())
     /// # }
@@ -941,11 +941,11 @@
     ///
     /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
-    /// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.
+    /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
     </span><span class="kw">pub async fn </span>edit(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditWebhook&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditWebhook&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().map(ExposeSecret::expose_secret).map(String::as_str);
         <span class="kw-2">*</span><span class="self">self </span>= builder.execute(cache_http, (<span class="self">self</span>.id, token)).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -965,10 +965,10 @@
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
-    /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&amp;http, url).await?;
     ///
-    /// let builder = ExecuteWebhook::new().content(&quot;test&quot;);
+    /// let builder = ExecuteWebhook::new().content("test");
     /// webhook.execute(&amp;http, false, builder).await?;
     /// # Ok(())
     /// # }
@@ -985,18 +985,18 @@
     /// # let http: Http = unimplemented!();
     /// use serenity::builder::{CreateEmbed, ExecuteWebhook};
     ///
-    /// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&amp;http, url).await?;
     ///
     /// let embed = CreateEmbed::new()
-    ///     .title(&quot;Rust&#39;s website&quot;)
+    ///     .title("Rust's website")
     ///     .description(
-    ///         &quot;Rust is a systems programming language that runs blazingly fast, prevents \
-    ///         segfaults, and guarantees thread safety.&quot;,
+    ///         "Rust is a systems programming language that runs blazingly fast, prevents \
+    ///         segfaults, and guarantees thread safety.",
     ///     )
-    ///     .url(&quot;https://rust-lang.org&quot;);
+    ///     .url("https://rust-lang.org");
     ///
-    /// let builder = ExecuteWebhook::new().content(&quot;test&quot;).username(&quot;serenity&quot;).embed(embed);
+    /// let builder = ExecuteWebhook::new().content("test").username("serenity").embed(embed);
     /// webhook.execute(&amp;http, false, builder).await?;
     /// # Ok(())
     /// # }
@@ -1006,10 +1006,10 @@
     ///
     /// Returns an [`Error::Model`] if [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook&#39;s token
+    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook's token
     /// is invalid.
     ///
-    /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1027,10 +1027,10 @@
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return [`Error::Http`] if the webhook&#39;s token is invalid, or the given message Id
+    /// May also return [`Error::Http`] if the webhook's token is invalid, or the given message Id
     /// does not belong to the current webhook.
     ///
-    /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     </span><span class="kw">pub async fn </span>get_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1050,10 +1050,10 @@
     /// Returns an [`Error::Model`] if [`Self::token`] is [`None`], or if the message content is
     /// too long.
     ///
-    /// May also return an [`Error::Http`] if the content is malformed, the webhook&#39;s token is
+    /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is
     /// invalid, or the given message Id does not belong to the current webhook.
     ///
-    /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     </span><span class="kw">pub async fn </span>edit_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1070,7 +1070,7 @@
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     ///
-    /// May also return an [`Error::Http`] if the webhook&#39;s token is invalid or the given message
+    /// May also return an [`Error::Http`] if the webhook's token is invalid or the given message
     /// Id does not belong to the current webhook.
     </span><span class="kw">pub async fn </span>delete_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1094,7 +1094,7 @@
     /// May also return an [`Error::Http`] if the http client errors or if Discord returns an
     /// error. Such as if the [`Webhook`] was deleted.
     ///
-    /// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     </span><span class="kw">pub async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         http.as_ref().get_webhook_with_token(<span class="self">self</span>.id, token).<span class="kw">await</span>.map(|replacement| {
@@ -1105,7 +1105,7 @@
     <span class="doccomment">/// Returns the url of the webhook.
     ///
     /// ```rust,ignore
-    /// assert_eq!(hook.url(), &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;)
+    /// assert_eq!(hook.url(), "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV")
     /// ```
     ///
     /// # Errors
@@ -1113,11 +1113,11 @@
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
-        <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;https://discord.com/api/webhooks/{}/{token}&quot;</span>, <span class="self">self</span>.id))
+        <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">"https://discord.com/api/webhooks/{}/{token}"</span>, <span class="self">self</span>.id))
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>WebhookId {
     <span class="doccomment">/// Requests [`Webhook`] over REST API.
     ///

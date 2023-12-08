@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command_interaction.rs`."><title>command_interaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command_interaction.rs`."><title>command_interaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -883,7 +883,7 @@
 <span class="kw">use </span>serde::ser::{Error <span class="kw">as _</span>, Serializer};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     Builder,
     CreateInteractionResponse,
@@ -891,9 +891,9 @@
     CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::Context;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::{<span class="self">self</span>, JsonError};
@@ -915,15 +915,15 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 <span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;collector&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"collector"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils::{CreateQuickModal, QuickModalResponse};
 
 <span class="doccomment">/// An interaction when a user invokes a slash command.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(remote = <span class="string">&quot;Self&quot;</span>)]
+#[serde(remote = <span class="string">"Self"</span>)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandInteraction {
     <span class="doccomment">/// Id of the interaction.
@@ -933,7 +933,7 @@
     <span class="doccomment">/// The data of the interaction which was triggered.
     </span><span class="kw">pub </span>data: CommandData,
     <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// Channel that the interaction was sent from.
     </span><span class="kw">pub </span>channel: <span class="prelude-ty">Option</span>&lt;PartialChannel&gt;,
@@ -942,7 +942,7 @@
     <span class="doccomment">/// The `member` data for the invoking user.
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;Member&gt;&gt;,
     <span class="doccomment">/// The `user` object for the invoking user.
     </span><span class="attr">#[serde(default)]
@@ -955,11 +955,11 @@
     </span><span class="kw">pub </span>app_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
     <span class="doccomment">/// The selected language of the invoking user.
     </span><span class="kw">pub </span>locale: String,
-    <span class="doccomment">/// The guild&#39;s preferred locale.
+    <span class="doccomment">/// The guild's preferred locale.
     </span><span class="kw">pub </span>guild_locale: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>CommandInteraction {
     <span class="doccomment">/// Gets the interaction response.
     ///
@@ -1108,7 +1108,7 @@
     /// # Errors
     ///
     /// See [`CreateQuickModal::execute()`].
-    </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;collector&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+    </span><span class="attr">#[cfg(all(feature = <span class="string">"collector"</span>, feature = <span class="string">"utils"</span>))]
     </span><span class="kw">pub async fn </span>quick_modal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         ctx: <span class="kw-2">&amp;</span>Context,
@@ -1118,15 +1118,15 @@
     </span>}
 }
 
-<span class="comment">// Manual impl needed to insert guild_id into resolved Role&#39;s
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>CommandInteraction {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+<span class="comment">// Manual impl needed to insert guild_id into resolved Role's
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>CommandInteraction {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="comment">// calls #[serde(remote)]-generated inherent method
         </span><span class="kw">let </span><span class="kw-2">mut </span>interaction = <span class="self">Self</span>::deserialize(deserializer)<span class="question-mark">?</span>;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = interaction.guild_id {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = <span class="kw-2">&amp;mut </span>interaction.member {
                 member.guild_id = guild_id;
-                <span class="comment">// If `member` is present, `user` wasn&#39;t sent and is still filled with default data
+                <span class="comment">// If `member` is present, `user` wasn't sent and is still filled with default data
                 </span>interaction.user = member.user.clone();
             }
             interaction.data.resolved.roles.values_mut().for_each(|r| r.guild_id = guild_id);
@@ -1145,7 +1145,7 @@
 <span class="doccomment">/// The command data payload.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandData {
@@ -1154,7 +1154,7 @@
     <span class="doccomment">/// The name of the invoked command.
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// The application command type of the triggered application command.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: CommandType,
     <span class="doccomment">/// The parameters and the given values. The converted objects from the given options.
     </span><span class="attr">#[serde(default)]
@@ -1162,7 +1162,7 @@
     <span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>options: Vec&lt;CommandDataOption&gt;,
     <span class="doccomment">/// The Id of the guild the command is registered to.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// The targeted user or message, if the triggered application command type is [`User`] or
     /// [`Message`].
@@ -1178,8 +1178,8 @@
 <span class="kw">impl </span>CommandData {
     <span class="doccomment">/// Returns the autocomplete option from `CommandData::options`.
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>autocomplete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="kw">fn </span>find_option(opts: <span class="kw-2">&amp;</span>[CommandDataOption]) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>autocomplete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">'_</span>&gt;&gt; {
+        <span class="kw">fn </span>find_option(opts: <span class="kw-2">&amp;</span>[CommandDataOption]) -&gt; <span class="prelude-ty">Option</span>&lt;AutocompleteOption&lt;<span class="lifetime">'_</span>&gt;&gt; {
             <span class="kw">for </span>opt <span class="kw">in </span>opts {
                 <span class="kw">match </span><span class="kw-2">&amp;</span>opt.value {
                     CommandDataOptionValue::SubCommand(opts)
@@ -1206,11 +1206,11 @@
 
     <span class="doccomment">/// Returns the resolved options from `CommandData::options` and [`CommandData::resolved`].
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
-        <span class="kw">fn </span>resolve_options&lt;<span class="lifetime">&#39;a</span>&gt;(
-            opts: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[CommandDataOption],
-            resolved: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandDataResolved,
-        ) -&gt; Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ResolvedOption&lt;<span class="lifetime">'_</span>&gt;&gt; {
+        <span class="kw">fn </span>resolve_options&lt;<span class="lifetime">'a</span>&gt;(
+            opts: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[CommandDataOption],
+            resolved: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>CommandDataResolved,
+        ) -&gt; Vec&lt;ResolvedOption&lt;<span class="lifetime">'a</span>&gt;&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>options = Vec::new();
             <span class="kw">for </span>opt <span class="kw">in </span>opts {
                 <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>opt.value {
@@ -1277,7 +1277,7 @@
     ///
     /// [`target_id`]: Self::target_id
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ResolvedTarget&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ResolvedTarget&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">match </span>(<span class="self">self</span>.kind, <span class="self">self</span>.target_id) {
             (CommandType::User, <span class="prelude-val">Some</span>(id)) =&gt; {
                 <span class="kw">let </span>user_id = id.to_user_id();
@@ -1301,38 +1301,38 @@
 <span class="doccomment">/// The focused option for autocomplete interactions return by [`CommandData::autocomplete`].
 </span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>AutocompleteOption&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+</span><span class="kw">pub struct </span>AutocompleteOption&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
     <span class="kw">pub </span>kind: CommandOptionType,
-    <span class="kw">pub </span>value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub </span>value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
 }
 
 <span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-    <span class="kw">pub </span>value: ResolvedValue&lt;<span class="lifetime">&#39;a</span>&gt;,
+</span><span class="kw">pub struct </span>ResolvedOption&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+    <span class="kw">pub </span>value: ResolvedValue&lt;<span class="lifetime">'a</span>&gt;,
 }
 
 <span class="doccomment">/// The resolved value of a [`CommandDataOption`].
 </span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
-</span><span class="kw">pub enum </span>ResolvedValue&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Autocomplete { kind: CommandOptionType, value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
+</span><span class="kw">pub enum </span>ResolvedValue&lt;<span class="lifetime">'a</span>&gt; {
+    Autocomplete { kind: CommandOptionType, value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str },
     Boolean(bool),
     Integer(i64),
     Number(f64),
-    String(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
-    SubCommand(Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
-    SubCommandGroup(Vec&lt;ResolvedOption&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
-    Attachment(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Attachment),
-    Channel(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialChannel),
-    Role(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Role),
-    User(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialMember&gt;),
+    String(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str),
+    SubCommand(Vec&lt;ResolvedOption&lt;<span class="lifetime">'a</span>&gt;&gt;),
+    SubCommandGroup(Vec&lt;ResolvedOption&lt;<span class="lifetime">'a</span>&gt;&gt;),
+    Attachment(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Attachment),
+    Channel(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PartialChannel),
+    Role(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Role),
+    User(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PartialMember&gt;),
     Unresolved(Unresolved),
 }
 
-<span class="doccomment">/// Option value variants that couldn&#39;t be resolved by `CommandData::options()`.
+<span class="doccomment">/// Option value variants that couldn't be resolved by `CommandData::options()`.
 </span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Unresolved {
@@ -1348,36 +1348,36 @@
 <span class="doccomment">/// The resolved value of a [`CommandData::target_id`].
 </span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
-</span><span class="kw">pub enum </span>ResolvedTarget&lt;<span class="lifetime">&#39;a</span>&gt; {
-    User(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialMember&gt;),
-    Message(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message),
+</span><span class="kw">pub enum </span>ResolvedTarget&lt;<span class="lifetime">'a</span>&gt; {
+    User(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PartialMember&gt;),
+    Message(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Message),
 }
 
 <span class="doccomment">/// The resolved data of a command data interaction payload. It contains the objects of
 /// [`CommandDataOption`]s.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandDataResolved {
     <span class="doccomment">/// The resolved users.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"HashMap::is_empty"</span>)]
     </span><span class="kw">pub </span>users: HashMap&lt;UserId, User&gt;,
     <span class="doccomment">/// The resolved partial members.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"HashMap::is_empty"</span>)]
     </span><span class="kw">pub </span>members: HashMap&lt;UserId, PartialMember&gt;,
     <span class="doccomment">/// The resolved roles.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"HashMap::is_empty"</span>)]
     </span><span class="kw">pub </span>roles: HashMap&lt;RoleId, Role&gt;,
     <span class="doccomment">/// The resolved partial channels.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"HashMap::is_empty"</span>)]
     </span><span class="kw">pub </span>channels: HashMap&lt;ChannelId, PartialChannel&gt;,
     <span class="doccomment">/// The resolved messages.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"HashMap::is_empty"</span>)]
     </span><span class="kw">pub </span>messages: HashMap&lt;MessageId, Message&gt;,
     <span class="doccomment">/// The resolved attachments.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;HashMap::is_empty&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"HashMap::is_empty"</span>)]
     </span><span class="kw">pub </span>attachments: HashMap&lt;AttachmentId, Attachment&gt;,
 }
 
@@ -1390,7 +1390,7 @@
 /// Their resolved objects can be found on [`CommandData::resolved`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandDataOption {
@@ -1410,13 +1410,13 @@
 <span class="attr">#[derive(Deserialize, Serialize)]
 </span><span class="kw">struct </span>RawCommandDataOption {
     name: String,
-    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span>kind: CommandOptionType,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>value: <span class="prelude-ty">Option</span>&lt;json::Value&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>options: <span class="prelude-ty">Option</span>&lt;Vec&lt;RawCommandDataOption&gt;&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>focused: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
@@ -1424,7 +1424,7 @@
     <span class="macro">macro_rules! </span>value {
         () =&gt; {{
             json::from_value(
-                raw.value.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">&quot;value&quot;</span>))<span class="question-mark">?</span>,
+                raw.value.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"value"</span>))<span class="question-mark">?</span>,
             )<span class="question-mark">?
         </span>}};
     }
@@ -1440,13 +1440,13 @@
         CommandOptionType::String =&gt; CommandDataOptionValue::String(<span class="macro">value!</span>()),
         CommandOptionType::SubCommand =&gt; {
             <span class="kw">let </span>options =
-                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
+                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
             <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
             CommandDataOptionValue::SubCommand(options)
         },
         CommandOptionType::SubCommandGroup =&gt; {
             <span class="kw">let </span>options =
-                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">&quot;options&quot;</span>))<span class="question-mark">?</span>;
+                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
             <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
             CommandDataOptionValue::SubCommandGroup(options)
         },
@@ -1500,8 +1500,8 @@
 }
 
 <span class="comment">// Manual impl needed to emulate integer enum tags
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>CommandDataOption {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>CommandDataOption {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         option_from_raw(RawCommandDataOption::deserialize(deserializer)<span class="question-mark">?</span>).map_err(D::Error::custom)
     }
 }
@@ -1515,7 +1515,7 @@
 <span class="doccomment">/// The value of an [`CommandDataOption`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>CommandDataOptionValue {
@@ -1687,11 +1687,11 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>nested_options() {
         <span class="kw">let </span>value = CommandDataOption {
-            name: <span class="string">&quot;subcommand_group&quot;</span>.into(),
+            name: <span class="string">"subcommand_group"</span>.into(),
             value: CommandDataOptionValue::SubCommandGroup(<span class="macro">vec!</span>[CommandDataOption {
-                name: <span class="string">&quot;subcommand&quot;</span>.into(),
+                name: <span class="string">"subcommand"</span>.into(),
                 value: CommandDataOptionValue::SubCommand(<span class="macro">vec!</span>[CommandDataOption {
-                    name: <span class="string">&quot;channel&quot;</span>.into(),
+                    name: <span class="string">"channel"</span>.into(),
                     value: CommandDataOptionValue::Channel(ChannelId::new(<span class="number">3</span>)),
                 }]),
             }]),
@@ -1700,12 +1700,12 @@
         assert_json(
             <span class="kw-2">&amp;</span>value,
             <span class="macro">json!</span>({
-                <span class="string">&quot;name&quot;</span>: <span class="string">&quot;subcommand_group&quot;</span>,
-                <span class="string">&quot;type&quot;</span>: <span class="number">2</span>,
-                <span class="string">&quot;options&quot;</span>: [{
-                    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;subcommand&quot;</span>,
-                    <span class="string">&quot;type&quot;</span>: <span class="number">1</span>,
-                    <span class="string">&quot;options&quot;</span>: [{<span class="string">&quot;name&quot;</span>: <span class="string">&quot;channel&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">7</span>, <span class="string">&quot;value&quot;</span>: <span class="string">&quot;3&quot;</span>}],
+                <span class="string">"name"</span>: <span class="string">"subcommand_group"</span>,
+                <span class="string">"type"</span>: <span class="number">2</span>,
+                <span class="string">"options"</span>: [{
+                    <span class="string">"name"</span>: <span class="string">"subcommand"</span>,
+                    <span class="string">"type"</span>: <span class="number">1</span>,
+                    <span class="string">"options"</span>: [{<span class="string">"name"</span>: <span class="string">"channel"</span>, <span class="string">"type"</span>: <span class="number">7</span>, <span class="string">"value"</span>: <span class="string">"3"</span>}],
                 }]
             }),
         );
@@ -1715,30 +1715,30 @@
     </span><span class="kw">fn </span>mixed_options() {
         <span class="kw">let </span>value = <span class="macro">vec!</span>[
             CommandDataOption {
-                name: <span class="string">&quot;boolean&quot;</span>.into(),
+                name: <span class="string">"boolean"</span>.into(),
                 value: CommandDataOptionValue::Boolean(<span class="bool-val">true</span>),
             },
             CommandDataOption {
-                name: <span class="string">&quot;integer&quot;</span>.into(),
+                name: <span class="string">"integer"</span>.into(),
                 value: CommandDataOptionValue::Integer(<span class="number">1</span>),
             },
             CommandDataOption {
-                name: <span class="string">&quot;number&quot;</span>.into(),
+                name: <span class="string">"number"</span>.into(),
                 value: CommandDataOptionValue::Number(<span class="number">2.0</span>),
             },
             CommandDataOption {
-                name: <span class="string">&quot;string&quot;</span>.into(),
-                value: CommandDataOptionValue::String(<span class="string">&quot;foobar&quot;</span>.into()),
+                name: <span class="string">"string"</span>.into(),
+                value: CommandDataOptionValue::String(<span class="string">"foobar"</span>.into()),
             },
             CommandDataOption {
-                name: <span class="string">&quot;empty_subcommand&quot;</span>.into(),
+                name: <span class="string">"empty_subcommand"</span>.into(),
                 value: CommandDataOptionValue::SubCommand(<span class="macro">vec!</span>[]),
             },
             CommandDataOption {
-                name: <span class="string">&quot;autocomplete&quot;</span>.into(),
+                name: <span class="string">"autocomplete"</span>.into(),
                 value: CommandDataOptionValue::Autocomplete {
                     kind: CommandOptionType::Integer,
-                    value: <span class="string">&quot;not an integer&quot;</span>.into(),
+                    value: <span class="string">"not an integer"</span>.into(),
                 },
             },
         ];
@@ -1746,12 +1746,12 @@
         assert_json(
             <span class="kw-2">&amp;</span>value,
             <span class="macro">json!</span>([
-                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;boolean&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">5</span>, <span class="string">&quot;value&quot;</span>: <span class="bool-val">true</span>},
-                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;integer&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">4</span>, <span class="string">&quot;value&quot;</span>: <span class="number">1</span>},
-                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;number&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">10</span>, <span class="string">&quot;value&quot;</span>: <span class="number">2.0</span>},
-                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;string&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">3</span>, <span class="string">&quot;value&quot;</span>: <span class="string">&quot;foobar&quot;</span>},
-                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;empty_subcommand&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">1</span>, <span class="string">&quot;options&quot;</span>: []},
-                {<span class="string">&quot;name&quot;</span>: <span class="string">&quot;autocomplete&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="number">4</span>, <span class="string">&quot;value&quot;</span>: <span class="string">&quot;not an integer&quot;</span>, <span class="string">&quot;focused&quot;</span>: <span class="bool-val">true</span>},
+                {<span class="string">"name"</span>: <span class="string">"boolean"</span>, <span class="string">"type"</span>: <span class="number">5</span>, <span class="string">"value"</span>: <span class="bool-val">true</span>},
+                {<span class="string">"name"</span>: <span class="string">"integer"</span>, <span class="string">"type"</span>: <span class="number">4</span>, <span class="string">"value"</span>: <span class="number">1</span>},
+                {<span class="string">"name"</span>: <span class="string">"number"</span>, <span class="string">"type"</span>: <span class="number">10</span>, <span class="string">"value"</span>: <span class="number">2.0</span>},
+                {<span class="string">"name"</span>: <span class="string">"string"</span>, <span class="string">"type"</span>: <span class="number">3</span>, <span class="string">"value"</span>: <span class="string">"foobar"</span>},
+                {<span class="string">"name"</span>: <span class="string">"empty_subcommand"</span>, <span class="string">"type"</span>: <span class="number">1</span>, <span class="string">"options"</span>: []},
+                {<span class="string">"name"</span>: <span class="string">"autocomplete"</span>, <span class="string">"type"</span>: <span class="number">4</span>, <span class="string">"value"</span>: <span class="string">"not an integer"</span>, <span class="string">"focused"</span>: <span class="bool-val">true</span>},
             ]),
         );
     }

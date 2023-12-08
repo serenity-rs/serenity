@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/timestamp.rs`."><title>timestamp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/timestamp.rs`."><title>timestamp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -256,48 +256,48 @@
 //! #
 //! let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();
 //! assert_eq!(timestamp.unix_timestamp(), 1462015105);
-//! assert_eq!(timestamp.to_string(), &quot;2016-04-30T11:18:25.796Z&quot;);
+//! assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
 //! ```
 //!
 //! # Parsing RFC 3339 string
 //! ```
 //! # use serenity::model::Timestamp;
 //! #
-//! let timestamp = Timestamp::parse(&quot;2016-04-30T11:18:25Z&quot;).unwrap();
-//! let timestamp = Timestamp::parse(&quot;2016-04-30T11:18:25+00:00&quot;).unwrap();
-//! let timestamp = Timestamp::parse(&quot;2016-04-30T11:18:25.796Z&quot;).unwrap();
+//! let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
+//! let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
+//! let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
 //!
-//! let timestamp: Timestamp = &quot;2016-04-30T11:18:25Z&quot;.parse().unwrap();
-//! let timestamp: Timestamp = &quot;2016-04-30T11:18:25+00:00&quot;.parse().unwrap();
-//! let timestamp: Timestamp = &quot;2016-04-30T11:18:25.796Z&quot;.parse().unwrap();
+//! let timestamp: Timestamp = "2016-04-30T11:18:25Z".parse().unwrap();
+//! let timestamp: Timestamp = "2016-04-30T11:18:25+00:00".parse().unwrap();
+//! let timestamp: Timestamp = "2016-04-30T11:18:25.796Z".parse().unwrap();
 //!
-//! assert!(Timestamp::parse(&quot;2016-04-30T11:18:25&quot;).is_err());
-//! assert!(Timestamp::parse(&quot;2016-04-30T11:18&quot;).is_err());
+//! assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
+//! assert!(Timestamp::parse("2016-04-30T11:18").is_err());
 //! ```
 
 </span><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::str::FromStr;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
 </span><span class="kw">pub use </span>chrono::ParseError <span class="kw">as </span>InnerError;
-<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
 </span><span class="kw">use </span>chrono::{DateTime, SecondsFormat, TimeZone, Utc};
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
 </span><span class="kw">pub use </span>dep_time::error::Parse <span class="kw">as </span>InnerError;
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
 </span><span class="kw">use </span>dep_time::{format_description::well_known::Rfc3339, serde::rfc3339, Duration, OffsetDateTime};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// Discord&#39;s epoch starts at &quot;2015-01-01T00:00:00+00:00&quot;
+<span class="doccomment">/// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
 </span><span class="kw">const </span>DISCORD_EPOCH: u64 = <span class="number">1_420_070_400_000</span>;
 
 <span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[serde(transparent)]
 </span><span class="kw">pub struct </span>Timestamp(
-    <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)] </span>DateTime&lt;Utc&gt;,
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
-    #[serde(with = <span class="string">&quot;rfc3339&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)] </span>DateTime&lt;Utc&gt;,
+    <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
+    #[serde(with = <span class="string">"rfc3339"</span>)]
     </span>OffsetDateTime,
 );
 
@@ -308,9 +308,9 @@
     ///
     /// Returns `Err` if the value is invalid.
     </span><span class="kw">pub fn </span>from_millis(millis: i64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidTimestamp&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
         </span><span class="kw">let </span>x = Utc.timestamp_millis_opt(millis).single();
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::from_unix_timestamp_nanos(
             Duration::milliseconds(millis).whole_nanoseconds(),
         )
@@ -319,17 +319,17 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_discord_id(id: u64) -&gt; <span class="self">Self </span>{
-        <span class="comment">// This can&#39;t fail because of the bit shifting
-        // `(u64::MAX &gt;&gt; 22) + DISCORD_EPOCH` = 5818116911103 = &quot;Wed May 15 2154 07:35:11 GMT+0000&quot;
-        </span><span class="self">Self</span>::from_millis(((id &gt;&gt; <span class="number">22</span>) + DISCORD_EPOCH) <span class="kw">as </span>i64).expect(<span class="string">&quot;can&#39;t fail&quot;</span>)
+        <span class="comment">// This can't fail because of the bit shifting
+        // `(u64::MAX &gt;&gt; 22) + DISCORD_EPOCH` = 5818116911103 = "Wed May 15 2154 07:35:11 GMT+0000"
+        </span><span class="self">Self</span>::from_millis(((id &gt;&gt; <span class="number">22</span>) + DISCORD_EPOCH) <span class="kw">as </span>i64).expect(<span class="string">"can't fail"</span>)
     }
 
     <span class="doccomment">/// Create a new `Timestamp` with the current date and time in UTC.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>now() -&gt; <span class="self">Self </span>{
-        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
         </span><span class="kw">let </span>x = Utc::now();
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::now_utc();
         <span class="self">Self</span>(x)
     }
@@ -346,9 +346,9 @@
     <span class="doccomment">/// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>unix_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.timestamp();
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.unix_timestamp();
         x
     }
@@ -359,45 +359,45 @@
     /// ```
     /// # use serenity::model::Timestamp;
     /// #
-    /// let timestamp = Timestamp::parse(&quot;2016-04-30T11:18:25Z&quot;).unwrap();
-    /// let timestamp = Timestamp::parse(&quot;2016-04-30T11:18:25+00:00&quot;).unwrap();
-    /// let timestamp = Timestamp::parse(&quot;2016-04-30T11:18:25.796Z&quot;).unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
     ///
-    /// assert!(Timestamp::parse(&quot;2016-04-30T11:18:25&quot;).is_err());
-    /// assert!(Timestamp::parse(&quot;2016-04-30T11:18&quot;).is_err());
+    /// assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
+    /// assert!(Timestamp::parse("2016-04-30T11:18").is_err());
     /// ```
     ///
     /// # Errors
     ///
     /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
     </span><span class="kw">pub fn </span>parse(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Timestamp, ParseError&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
         </span><span class="kw">let </span>x = DateTime::parse_from_rfc3339(input).map_err(ParseError)<span class="question-mark">?</span>.with_timezone(<span class="kw-2">&amp;</span>Utc);
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::parse(input, <span class="kw-2">&amp;</span>Rfc3339).map_err(ParseError)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(x))
     }
 
     <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_rfc3339(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.to_rfc3339_opts(SecondsFormat::Millis, <span class="bool-val">true</span>);
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
         </span><span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.format(<span class="kw-2">&amp;</span>Rfc3339).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(x)
     }
 }
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Timestamp {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.to_rfc3339().ok_or(std::fmt::Error)<span class="question-mark">?</span>)
     }
 }
 
 <span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>Timestamp {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
     </span><span class="kw">type </span>Target = DateTime&lt;Utc&gt;;
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+    <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
     </span><span class="kw">type </span>Target = OffsetDateTime;
 
     <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
@@ -405,13 +405,13 @@
     </span>}
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
 </span><span class="kw">impl</span>&lt;Tz: TimeZone&gt; From&lt;DateTime&lt;Tz&gt;&gt; <span class="kw">for </span>Timestamp {
     <span class="kw">fn </span>from(dt: DateTime&lt;Tz&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(dt.with_timezone(<span class="kw-2">&amp;</span>Utc))
     }
 }
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
 </span><span class="kw">impl </span>From&lt;OffsetDateTime&gt; <span class="kw">for </span>Timestamp {
     <span class="kw">fn </span>from(dt: OffsetDateTime) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(dt)
@@ -420,9 +420,9 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>Timestamp {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="attr">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"chrono"</span>)]
         </span><span class="kw">let </span>x = DateTime::default();
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;chrono&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"chrono"</span>))]
         </span><span class="kw">let </span>x = OffsetDateTime::UNIX_EPOCH;
         <span class="self">Self</span>(x)
     }
@@ -434,8 +434,8 @@
 <span class="kw">impl </span>std::error::Error <span class="kw">for </span>InvalidTimestamp {}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidTimestamp {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.write_str(<span class="string">&quot;invalid UNIX timestamp value&quot;</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">"invalid UNIX timestamp value"</span>)
     }
 }
 
@@ -446,7 +446,7 @@
 <span class="kw">impl </span>std::error::Error <span class="kw">for </span>ParseError {}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ParseError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
     }
 }
@@ -460,11 +460,11 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; std::convert::TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Timestamp {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; std::convert::TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Timestamp {
     <span class="kw">type </span>Error = ParseError;
 
     <span class="doccomment">/// Parses an RFC 3339 date and time string such as `2016-04-30T11:18:25.796Z`.
-    </span><span class="kw">fn </span>try_from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+    </span><span class="kw">fn </span>try_from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
         Timestamp::parse(s)
     }
 }
@@ -483,10 +483,10 @@
     </span><span class="kw">fn </span>from_unix_timestamp() {
         <span class="kw">let </span>timestamp = Timestamp::from_unix_timestamp(<span class="number">1462015105</span>).unwrap();
         <span class="macro">assert_eq!</span>(timestamp.unix_timestamp(), <span class="number">1462015105</span>);
-        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;chrono&quot;</span>) {
-            <span class="macro">assert_eq!</span>(timestamp.to_string(), <span class="string">&quot;2016-04-30T11:18:25.000Z&quot;</span>);
+        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">"chrono"</span>) {
+            <span class="macro">assert_eq!</span>(timestamp.to_string(), <span class="string">"2016-04-30T11:18:25.000Z"</span>);
         } <span class="kw">else </span>{
-            <span class="macro">assert_eq!</span>(timestamp.to_string(), <span class="string">&quot;2016-04-30T11:18:25Z&quot;</span>);
+            <span class="macro">assert_eq!</span>(timestamp.to_string(), <span class="string">"2016-04-30T11:18:25Z"</span>);
         }
     }
 }
