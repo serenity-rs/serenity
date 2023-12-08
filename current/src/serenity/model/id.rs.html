@@ -403,6 +403,8 @@
 <a href="#403" id="403">403</a>
 <a href="#404" id="404">404</a>
 <a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
@@ -572,7 +574,8 @@
 </span><span class="kw">pub struct </span>RoleId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an auto moderation rule
-</span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>RuleId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Scheduled Event
@@ -653,7 +656,8 @@
 </span><span class="kw">pub struct </span>StageInstanceId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a forum tag.
-</span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+</span><span class="attr">#[repr(packed)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>ForumTagId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="macro">id_u64! </span>{
