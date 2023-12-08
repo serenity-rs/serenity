@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/role.rs`."><title>role.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/role.rs`."><title>role.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -271,40 +271,14 @@
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::fmt;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::EditRole;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
-</span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::utils::is_false;
@@ -316,17 +290,17 @@
 /// permissions.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Role {
-    <span class="doccomment">/// The Id of the role. Can be used to calculate the role&#39;s creation date.
+    <span class="doccomment">/// The Id of the role. Can be used to calculate the role's creation date.
     </span><span class="kw">pub </span>id: RoleId,
     <span class="doccomment">/// The Id of the Guild the Role is in.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The colour of the role.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;color&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"color"</span>)]
     </span><span class="kw">pub </span>colour: Colour,
     <span class="doccomment">/// Indicator of whether the role is pinned above lesser roles.
     ///
@@ -349,7 +323,7 @@
     ///
     /// [`permissions`]: crate::model::permissions
     </span><span class="kw">pub </span>permissions: Permissions,
-    <span class="doccomment">/// The role&#39;s position in the position list. Roles are considered higher in hierarchy if their
+    <span class="doccomment">/// The role's position in the position list. Roles are considered higher in hierarchy if their
     /// position is higher.
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
@@ -367,7 +341,7 @@
     </span><span class="kw">pub </span>unicode_emoji: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>Role {
     <span class="doccomment">/// Deletes the role.
     ///
@@ -397,7 +371,7 @@
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, builder: EditRole&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, builder: EditRole&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.guild_id.edit_role(http.as_ref(), <span class="self">self</span>.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
@@ -411,7 +385,7 @@
 
     <span class="doccomment">/// Checks whether the role has all of the given permissions.
     ///
-    /// The &#39;precise&#39; argument is used to check if the role&#39;s permissions are precisely equivalent
+    /// The 'precise' argument is used to check if the role's permissions are precisely equivalent
     /// to the given permissions. If you need only check that the role has at least the given
     /// permissions, pass `false`.
     </span><span class="attr">#[inline]
@@ -428,7 +402,7 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Role {
     <span class="doccomment">/// Format a mention for the role, pinging its members.
     </span><span class="comment">// This is in the format of: `&lt;@&amp;ROLE_ID&gt;`.
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.mention(), f)
     }
 }
@@ -457,28 +431,6 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
-</span><span class="kw">impl </span>RoleId {
-    <span class="doccomment">/// Tries to find the [`Role`] by its Id in the cache.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-    #[deprecated = <span class="string">&quot;Use Guild::roles. This performs a loop over the entire cache!&quot;</span>]
-    </span><span class="kw">pub fn </span>to_role_cached(<span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Role&gt; {
-        <span class="kw">for </span>guild_entry <span class="kw">in </span>cache.as_ref().guilds.iter() {
-            <span class="kw">let </span>guild = guild_entry.value();
-
-            <span class="kw">if </span>!guild.roles.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-                <span class="kw">continue</span>;
-            }
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild.roles.get(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-                <span class="kw">return </span><span class="prelude-val">Some</span>(role.clone());
-            }
-        }
-
-        <span class="prelude-val">None
-    </span>}
-}
-
 <span class="kw">impl </span>From&lt;Role&gt; <span class="kw">for </span>RoleId {
     <span class="doccomment">/// Gets the Id of a role.
     </span><span class="kw">fn </span>from(role: Role) -&gt; RoleId {
@@ -486,7 +438,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Role&gt; <span class="kw">for </span>RoleId {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Role&gt; <span class="kw">for </span>RoleId {
     <span class="doccomment">/// Gets the Id of a role.
     </span><span class="kw">fn </span>from(role: <span class="kw-2">&amp;</span>Role) -&gt; RoleId {
         role.id
@@ -497,23 +449,23 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure).
 </span><span class="attr">#[derive(Clone, Debug, Default, Eq, PartialEq, Deserialize, Serialize)]
-#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>RoleTags {
     <span class="doccomment">/// The Id of the bot the [`Role`] belongs to.
     </span><span class="kw">pub </span>bot_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     <span class="doccomment">/// The Id of the integration the [`Role`] belongs to.
     </span><span class="kw">pub </span>integration_id: <span class="prelude-ty">Option</span>&lt;IntegrationId&gt;,
-    <span class="doccomment">/// Whether this is the guild&#39;s premium subscriber role.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>, with = <span class="string">&quot;bool_as_option_unit&quot;</span>)]
+    <span class="doccomment">/// Whether this is the guild's premium subscriber role.
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>, with = <span class="string">"bool_as_option_unit"</span>)]
     </span><span class="kw">pub </span>premium_subscriber: bool,
-    <span class="doccomment">/// The id of this role&#39;s subscription sku and listing.
+    <span class="doccomment">/// The id of this role's subscription sku and listing.
     </span><span class="kw">pub </span>subscription_listing_id: <span class="prelude-ty">Option</span>&lt;SkuId&gt;,
     <span class="doccomment">/// Whether this role is available for purchase.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>, with = <span class="string">&quot;bool_as_option_unit&quot;</span>)]
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>, with = <span class="string">"bool_as_option_unit"</span>)]
     </span><span class="kw">pub </span>available_for_purchase: bool,
-    <span class="doccomment">/// Whether this role is a guild&#39;s linked role.
-    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>, with = <span class="string">&quot;bool_as_option_unit&quot;</span>)]
+    <span class="doccomment">/// Whether this role is a guild's linked role.
+    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>, with = <span class="string">"bool_as_option_unit"</span>)]
     </span><span class="kw">pub </span>guild_connections: bool,
 }
 
@@ -524,7 +476,7 @@
     <span class="kw">use </span>serde::de::{Error, Visitor};
     <span class="kw">use </span>serde::{Deserializer, Serializer};
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;bool, D::Error&gt; {
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;bool, D::Error&gt; {
         deserializer.deserialize_option(NullValueVisitor)
     }
 
@@ -535,11 +487,11 @@
 
     <span class="kw">struct </span>NullValueVisitor;
 
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>NullValueVisitor {
+    <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>NullValueVisitor {
         <span class="kw">type </span>Value = bool;
 
-        <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-            f.write_str(<span class="string">&quot;null value&quot;</span>)
+        <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+            f.write_str(<span class="string">"null value"</span>)
         }
 
         <span class="kw">fn </span>visit_none&lt;E: Error&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
@@ -571,7 +523,7 @@
 
         assert_json(
             <span class="kw-2">&amp;</span>value,
-            <span class="macro">json!</span>({<span class="string">&quot;bot_id&quot;</span>: null, <span class="string">&quot;integration_id&quot;</span>: null, <span class="string">&quot;premium_subscriber&quot;</span>: null, <span class="string">&quot;subscription_listing_id&quot;</span>: null}),
+            <span class="macro">json!</span>({<span class="string">"bot_id"</span>: null, <span class="string">"integration_id"</span>: null, <span class="string">"premium_subscriber"</span>: null, <span class="string">"subscription_listing_id"</span>: null}),
         );
     }
 
@@ -588,7 +540,7 @@
 
         assert_json(
             <span class="kw-2">&amp;</span>value,
-            <span class="macro">json!</span>({<span class="string">&quot;bot_id&quot;</span>: null, <span class="string">&quot;integration_id&quot;</span>: null, <span class="string">&quot;subscription_listing_id&quot;</span>: null}),
+            <span class="macro">json!</span>({<span class="string">"bot_id"</span>: null, <span class="string">"integration_id"</span>: null, <span class="string">"subscription_listing_id"</span>: null}),
         );
     }
 }

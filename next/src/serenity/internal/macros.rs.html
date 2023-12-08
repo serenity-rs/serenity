@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/internal/macros.rs`."><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/internal/macros.rs`."><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -201,42 +201,42 @@
 <a href="#201" id="201">201</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of macros for easily working with internals.
 
-</span><span class="attr">#[cfg(any(feature = <span class="string">&quot;model&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+</span><span class="attr">#[cfg(any(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="macro">macro_rules! </span>cdn {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
-        <span class="macro">concat!</span>(<span class="string">&quot;https://cdn.discordapp.com&quot;</span>, <span class="macro-nonterminal">$e</span>)
+        <span class="macro">concat!</span>(<span class="string">"https://cdn.discordapp.com"</span>, <span class="macro-nonterminal">$e</span>)
     };
     (<span class="macro-nonterminal">$e</span>:expr, $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="macro-nonterminal">$e</span>), $(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>)
     };
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="macro">macro_rules! </span>api {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
-        <span class="macro">concat!</span>(<span class="string">&quot;https://discord.com/api/v10&quot;</span>, <span class="macro-nonterminal">$e</span>)
+        <span class="macro">concat!</span>(<span class="string">"https://discord.com/api/v10"</span>, <span class="macro-nonterminal">$e</span>)
     };
     (<span class="macro-nonterminal">$e</span>:expr, $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="macro-nonterminal">$e</span>), $(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>)
     };
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;http&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="macro">macro_rules! </span>status {
     (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
-        <span class="macro">concat!</span>(<span class="string">&quot;https://status.discord.com/api/v2&quot;</span>, <span class="macro-nonterminal">$e</span>)
+        <span class="macro">concat!</span>(<span class="string">"https://status.discord.com/api/v2"</span>, <span class="macro-nonterminal">$e</span>)
     };
 }
 
 <span class="doccomment">/// The `enum_number!` macro generates `From` implementations to convert between values and the
-/// enum which can then be utilized by `serde` with `#[serde(from = &quot;u8&quot;, into = &quot;u8&quot;)]`.
+/// enum which can then be utilized by `serde` with `#[serde(from = "u8", into = "u8")]`.
 ///
 /// When defining the enum like this:
 /// ```ignore
 /// enum_number! {
 ///     /// The `Foo` enum
 ///     #[derive(Clone, Copy, Deserialize, Serialize)]
-///     #[serde(from = &quot;u8&quot;, into = &quot;u8&quot;)]
+///     #[serde(from = "u8", into = "u8")]
 ///     pub enum Foo {
 ///         /// First
 ///         Aah = 1,
@@ -254,7 +254,7 @@
 /// #
 /// /// The `Foo` enum
 /// #[derive(Clone, Copy, Deserialize, Serialize)]
-/// #[serde(from = &quot;u8&quot;, into = &quot;u8&quot;)]
+/// #[serde(from = "u8", into = "u8")]
 /// pub enum Foo {
 ///     /// First
 ///     Aah,
@@ -330,7 +330,7 @@
 }
 
 <span class="doccomment">/// The macro forwards the generation to the `bitflags::bitflags!` macro and implements the default
-/// (de)serialization for Discord&#39;s bitmask values.
+/// (de)serialization for Discord's bitmask values.
 ///
 /// The flags are created with `T::from_bits_truncate` for the deserialized integer value.
 ///
@@ -360,8 +360,8 @@
         <span class="macro">bitflags!</span>(__impl_serde <span class="macro-nonterminal">$BitFlags</span>: <span class="macro-nonterminal">$T</span>);
     };
     (__impl_serde <span class="macro-nonterminal">$BitFlags</span>:ident: <span class="macro-nonterminal">$T</span>:tt) =&gt; {
-        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::de::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$BitFlags </span>{
-            <span class="kw">fn </span>deserialize&lt;D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::de::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$BitFlags </span>{
+            <span class="kw">fn </span>deserialize&lt;D: serde::de::Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt; {
                 <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_bits_truncate(&lt;<span class="macro-nonterminal">$T</span>&gt;::deserialize(deserializer)<span class="question-mark">?</span>))
             }
         }
@@ -382,7 +382,7 @@
     </span><span class="kw">fn </span>enum_number() {
         <span class="macro">enum_number! </span>{
             <span class="attr">#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-            #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+            #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
             </span><span class="kw">pub enum </span>T {
                 <span class="doccomment">/// AAA
                 </span>A = <span class="number">1</span>,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/parse/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/parse/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -526,7 +526,7 @@
 <span class="kw">pub mod </span>map;
 
 <span class="kw">use </span>std::borrow::Cow;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
@@ -540,13 +540,13 @@
 // compromise, the method has been copied with the parameter added in to the place where the
 // *problem* occurs.
 //
-// When a bot&#39;s command is invoked in a large guild (e.g., 250k+ members), the method fails to
+// When a bot's command is invoked in a large guild (e.g., 250k+ members), the method fails to
 // retrieve the member data of the author that invoked the command, and instead defaults to
-// `@everyone`&#39;s permissions. This is because Discord does not send data of all members past 250,
+// `@everyone`'s permissions. This is because Discord does not send data of all members past 250,
 // resulting in the problem to meet permissions of a command even if the author does possess them.
 // To avoid defaulting to permissions of everyone, we fetch the member from HTTP if it is missing
-// in the guild&#39;s members list.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+// in the guild's members list.
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">fn </span>permissions_in(
     ctx: <span class="kw-2">&amp;</span>Context,
     guild_id: GuildId,
@@ -560,7 +560,7 @@
     }
 
     <span class="kw">let </span><span class="prelude-val">Some</span>(everyone) = roles.get(<span class="kw-2">&amp;</span>RoleId::new(guild_id.get())) <span class="kw">else </span>{
-        <span class="macro">tracing::error!</span>(<span class="string">&quot;@everyone role is missing in guild {}&quot;</span>, guild_id);
+        <span class="macro">tracing::error!</span>(<span class="string">"@everyone role is missing in guild {}"</span>, guild_id);
 
         <span class="kw">return </span>Permissions::empty();
     };
@@ -571,7 +571,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = roles.get(<span class="kw-2">&amp;</span>role) {
             permissions |= role.permissions;
         } <span class="kw">else </span>{
-            <span class="macro">tracing::warn!</span>(<span class="string">&quot;{} on {} has non-existent role {:?}&quot;</span>, member.user.id, guild_id, role);
+            <span class="macro">tracing::warn!</span>(<span class="string">"{} on {} has non-existent role {:?}"</span>, member.user.id, guild_id, role);
         }
     }
 
@@ -608,7 +608,7 @@
             permissions = (permissions &amp; !overwrite.deny) | overwrite.allow;
         }
     } <span class="kw">else </span>{
-        <span class="macro">tracing::warn!</span>(<span class="string">&quot;Guild {} does not contain channel {}&quot;</span>, guild_id, channel_id);
+        <span class="macro">tracing::warn!</span>(<span class="string">"Guild {} does not contain channel {}"</span>, guild_id, channel_id);
     }
 
     <span class="kw">if </span>channel_id.get() == guild_id.get() {
@@ -619,7 +619,7 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">fn </span>to_lowercase&lt;<span class="lifetime">&#39;a</span>&gt;(config: <span class="kw-2">&amp;</span>Configuration, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+</span><span class="kw">fn </span>to_lowercase&lt;<span class="lifetime">'a</span>&gt;(config: <span class="kw-2">&amp;</span>Configuration, s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; Cow&lt;<span class="lifetime">'a</span>, str&gt; {
     <span class="kw">if </span>config.case_insensitive {
         Cow::Owned(s.to_lowercase())
     } <span class="kw">else </span>{
@@ -630,21 +630,21 @@
 <span class="doccomment">/// Parse a mention in the message that is of either the direct (`&lt;@id&gt;`) or nickname (`&lt;@!id&gt;`)
 /// syntax, and compare the encoded `id` with the id from [`Configuration::on_mention`] for a
 /// match. Returns `Some(&lt;id&gt;)` on success, [`None`] otherwise.
-</span><span class="kw">pub fn </span>mention&lt;<span class="lifetime">&#39;a</span>&gt;(stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;a</span>&gt;, config: <span class="kw-2">&amp;</span>Configuration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+</span><span class="kw">pub fn </span>mention&lt;<span class="lifetime">'a</span>&gt;(stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">'a</span>&gt;, config: <span class="kw-2">&amp;</span>Configuration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; {
     <span class="kw">let </span>on_mention = config.on_mention.as_deref()<span class="question-mark">?</span>;
 
     <span class="kw">let </span>start = stream.offset();
 
-    <span class="kw">if </span>!stream.eat(<span class="string">&quot;&lt;@&quot;</span>) {
+    <span class="kw">if </span>!stream.eat(<span class="string">"&lt;@"</span>) {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
     <span class="comment">// Optional.
-    </span>stream.eat(<span class="string">&quot;!&quot;</span>);
+    </span>stream.eat(<span class="string">"!"</span>);
 
     <span class="kw">let </span>id = stream.take_while(|b| b.is_ascii_digit());
 
-    <span class="kw">if </span>!stream.eat(<span class="string">&quot;&gt;&quot;</span>) {
+    <span class="kw">if </span>!stream.eat(<span class="string">"&gt;"</span>) {
         <span class="comment">// Backtrack to where we were.
         </span>stream.set(start);
 
@@ -660,12 +660,12 @@
     </span>}
 }
 
-<span class="kw">async fn </span>find_prefix&lt;<span class="lifetime">&#39;a</span>&gt;(
+<span class="kw">async fn </span>find_prefix&lt;<span class="lifetime">'a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
     config: <span class="kw-2">&amp;</span>Configuration,
-    stream: <span class="kw-2">&amp;</span>Stream&lt;<span class="lifetime">&#39;a</span>&gt;,
-) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+    stream: <span class="kw-2">&amp;</span>Stream&lt;<span class="lifetime">'a</span>&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt; {
     <span class="kw">let </span>try_match = |prefix: <span class="kw-2">&amp;</span>str| {
         <span class="kw">let </span>peeked = stream.peek_for_char(prefix.chars().count());
         <span class="kw">let </span>peeked = to_lowercase(config, peeked);
@@ -686,7 +686,7 @@
 
 <span class="doccomment">/// Parse a prefix in the message.
 ///
-/// The &quot;prefix&quot; may be one of the following:
+/// The "prefix" may be one of the following:
 /// - A mention (`&lt;@id&gt;`/`&lt;@!id&gt;`)
 /// - A dynamically constructed prefix ([`Configuration::dynamic_prefix`])
 /// - A static prefix ([`Configuration::prefix`])
@@ -694,12 +694,12 @@
 ///
 /// In all cases, whitespace after the prefix is cleared.
 </span><span class="attr">#[allow(clippy::needless_lifetimes)] </span><span class="comment">// Clippy and the compiler disagree
-</span><span class="kw">pub async fn </span>prefix&lt;<span class="lifetime">&#39;a</span>&gt;(
+</span><span class="kw">pub async fn </span>prefix&lt;<span class="lifetime">'a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
-    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;a</span>&gt;,
+    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">'a</span>&gt;,
     config: <span class="kw-2">&amp;</span>Configuration,
-) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt; {
     <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = mention(stream, config) {
         stream.take_while_char(char::is_whitespace);
 
@@ -738,7 +738,7 @@
         <span class="kw">return </span><span class="prelude-val">Err</span>(DispatchError::OnlyForGuilds);
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span>{
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = msg.guild_id {
             <span class="kw">let </span>roles = <span class="kw">match </span>ctx.cache.guild(guild_id) {
@@ -765,7 +765,7 @@
 }
 
 <span class="kw">fn </span>try_parse&lt;M: ParseMap&gt;(
-    stream: <span class="kw-2">&amp;</span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
+    stream: <span class="kw-2">&amp;</span>Stream&lt;<span class="lifetime">'_</span>&gt;,
     map: <span class="kw-2">&amp;</span>M,
     by_space: bool,
     f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>str) -&gt; String,
@@ -794,13 +794,13 @@
     }
 }
 
-<span class="kw">fn </span>parse_cmd&lt;<span class="lifetime">&#39;a</span>&gt;(
-    stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
-    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
-    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandMap,
-) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command, ParseError&gt;&gt; {
+<span class="kw">fn </span>parse_cmd&lt;<span class="lifetime">'a</span>&gt;(
+    stream: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">'_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>CommandMap,
+) -&gt; BoxFuture&lt;<span class="lifetime">'a</span>, <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>Command, ParseError&gt;&gt; {
     <span class="kw">async move </span>{
         <span class="kw">let </span>(n, r) =
             try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).into_owned());
@@ -841,13 +841,13 @@
     .boxed()
 }
 
-<span class="kw">fn </span>parse_group&lt;<span class="lifetime">&#39;a</span>&gt;(
-    stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
-    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
-    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GroupMap,
-) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Arc&lt;CommandMap&gt;), ParseError&gt;&gt; {
+<span class="kw">fn </span>parse_group&lt;<span class="lifetime">'a</span>&gt;(
+    stream: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">'_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>GroupMap,
+) -&gt; BoxFuture&lt;<span class="lifetime">'a</span>, <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup, Arc&lt;CommandMap&gt;), ParseError&gt;&gt; {
     <span class="kw">async move </span>{
         <span class="kw">let </span>(n, o) = try_parse(stream, map, config.by_space, ToString::to_string);
 
@@ -881,13 +881,13 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">async fn </span>handle_command&lt;<span class="lifetime">&#39;a</span>&gt;(
-    stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
-    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
-    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandMap,
-    group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup,
+</span><span class="kw">async fn </span>handle_command&lt;<span class="lifetime">'a</span>&gt;(
+    stream: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Stream&lt;<span class="lifetime">'_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>CommandMap,
+    group: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Invoke, ParseError&gt; {
     <span class="kw">match </span>parse_cmd(stream, ctx, msg, config, map).<span class="kw">await </span>{
         <span class="prelude-val">Ok</span>(command) =&gt; <span class="prelude-val">Ok</span>(Invoke::Command {
@@ -914,12 +914,12 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">async fn </span>handle_group&lt;<span class="lifetime">&#39;a</span>&gt;(
-    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
-    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration,
-    map: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GroupMap,
+</span><span class="kw">async fn </span>handle_group&lt;<span class="lifetime">'a</span>&gt;(
+    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">'_</span>&gt;,
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Message,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Configuration,
+    map: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>GroupMap,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Invoke, ParseError&gt; {
     <span class="kw">match </span>parse_group(stream, ctx, msg, config, map).<span class="kw">await </span>{
         <span class="prelude-val">Ok</span>((group, map)) =&gt; handle_command(stream, ctx, msg, config, <span class="kw-2">&amp;</span>map, group).<span class="kw">await</span>,
@@ -939,7 +939,7 @@
 
 <span class="doccomment">/// Parse a command from the message.
 ///
-/// The &quot;command&quot; may be:
+/// The "command" may be:
 /// 1. A *help command* that provides a friendly browsing interface of all groups and commands,
 ///    explaining what each of them are, how they are laid out and how to invoke them. There can
 ///    only one help command registered, but might have many names defined for invocation of itself.
@@ -950,10 +950,10 @@
 </span><span class="kw">pub async fn </span>command(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
-    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;,
-    groups: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, Map)],
+    stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">'_</span>&gt;,
+    groups: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup, Map)],
     config: <span class="kw-2">&amp;</span>Configuration,
-    help_was_set: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str]&gt;,
+    help_was_set: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str]&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Invoke, ParseError&gt; {
     <span class="comment">// Precedence is taken over commands named as one of the help names.
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(names) = help_was_set {
@@ -1037,7 +1037,7 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>Invoke {
-    Command { group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup, command: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Command },
-    Help(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    Command { group: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup, command: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>Command },
+    Help(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
 }
 </code></pre></div></section></main></body></html>

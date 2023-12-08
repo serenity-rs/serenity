@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/wrappers.rs`."><title>wrappers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/wrappers.rs`."><title>wrappers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -156,28 +156,28 @@
 </pre></div><pre class="rust"><code><span class="doccomment">//! Wrappers around library types for easier use.
 
 </span><span class="kw">use </span>std::hash::Hash;
-<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>dashmap::mapref::multiple::RefMulti;
 <span class="kw">use </span>dashmap::mapref::one::{Ref, RefMut};
 <span class="kw">use </span>dashmap::DashMap;
-<span class="attr">#[cfg(feature = <span class="string">&quot;typesize&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"typesize"</span>)]
 </span><span class="kw">use </span>typesize::TypeSize;
 
 <span class="attr">#[derive(Debug)]
 </span><span class="doccomment">/// A wrapper around Option&lt;DashMap&lt;K, V&gt;&gt; to ease disabling specific cache fields.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MaybeMap&lt;K: Eq + Hash, V&gt;(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="prelude-ty">Option</span>&lt;DashMap&lt;K, V, BuildHasher&gt;&gt;);
 <span class="kw">impl</span>&lt;K: Eq + Hash, V&gt; MaybeMap&lt;K, V&gt; {
-    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">&#39;_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
         Option::iter(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).flat_map(DashMap::iter)
     }
 
-    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">&#39;_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.get(k)
     }
 
-    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;RefMut&lt;<span class="lifetime">&#39;_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;RefMut&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.get_mut(k)
     }
 
@@ -203,12 +203,12 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_read_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">&#39;_</span>, K, V&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_read_only(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">'_</span>, K, V&gt; {
         ReadOnlyMapRef(<span class="self">self</span>.<span class="number">0</span>.as_ref())
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;typesize&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"typesize"</span>)]
 </span><span class="kw">impl</span>&lt;K: Eq + Hash + TypeSize, V: TypeSize&gt; TypeSize <span class="kw">for </span>MaybeMap&lt;K, V&gt; {
     <span class="kw">fn </span>extra_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.<span class="number">0</span>.as_ref().map(DashMap::extra_size).unwrap_or_default()
@@ -222,13 +222,13 @@
 <span class="attr">#[derive(Clone, Copy, Debug)]
 </span><span class="doccomment">/// A wrapper around a reference to a MaybeMap, allowing for public inspection of the underlying
 /// map without allowing mutation of internal cache fields, which could cause issues.
-</span><span class="kw">pub struct </span>ReadOnlyMapRef&lt;<span class="lifetime">&#39;a</span>, K: Eq + Hash, V&gt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DashMap&lt;K, V, BuildHasher&gt;&gt;);
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, K: Eq + Hash, V&gt; ReadOnlyMapRef&lt;<span class="lifetime">&#39;a</span>, K, V&gt; {
-    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">&#39;_</span>, K, V, BuildHasher&gt;&gt; {
+</span><span class="kw">pub struct </span>ReadOnlyMapRef&lt;<span class="lifetime">'a</span>, K: Eq + Hash, V&gt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>DashMap&lt;K, V, BuildHasher&gt;&gt;);
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, K: Eq + Hash, V&gt; ReadOnlyMapRef&lt;<span class="lifetime">'a</span>, K, V&gt; {
+    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span>.into_iter().flat_map(DashMap::iter)
     }
 
-    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">&#39;_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span><span class="question-mark">?</span>.get(k)
     }
 
@@ -258,31 +258,31 @@
 
 <span class="doccomment">/// Wrapper around `SizableArc&lt;T, Owned&gt;`` with support for disabling typesize.
 ///
-/// This denotes an Arc where T&#39;s size should be considered when calling `TypeSize::get_size`
+/// This denotes an Arc where T's size should be considered when calling `TypeSize::get_size`
 </span><span class="attr">#[derive(Debug)]
-#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MaybeOwnedArc&lt;T&gt;(
-    <span class="attr">#[cfg(feature = <span class="string">&quot;typesize&quot;</span>)] </span>typesize::ptr::SizableArc&lt;T, typesize::ptr::Owned&gt;,
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;typesize&quot;</span>))] </span>Arc&lt;T&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">"typesize"</span>)] </span>typesize::ptr::SizableArc&lt;T, typesize::ptr::Owned&gt;,
+    <span class="attr">#[cfg(not(feature = <span class="string">"typesize"</span>))] </span>Arc&lt;T&gt;,
 );
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">impl</span>&lt;T&gt; MaybeOwnedArc&lt;T&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: T) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(Arc::new(inner).into())
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_inner(<span class="self">self</span>) -&gt; Arc&lt;T&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;typesize&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"typesize"</span>)]
         </span><span class="kw">let </span>inner = <span class="self">self</span>.<span class="number">0 </span>.<span class="number">0</span>;
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;typesize&quot;</span>))]
+        <span class="attr">#[cfg(not(feature = <span class="string">"typesize"</span>))]
         </span><span class="kw">let </span>inner = <span class="self">self</span>.<span class="number">0</span>;
 
         inner
     }
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;typesize&quot;</span>, feature = <span class="string">&quot;temp_cache&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"typesize"</span>, feature = <span class="string">"temp_cache"</span>))]
 </span><span class="kw">impl</span>&lt;T: typesize::TypeSize&gt; typesize::TypeSize <span class="kw">for </span>MaybeOwnedArc&lt;T&gt; {
     <span class="kw">fn </span>extra_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.<span class="number">0</span>.extra_size()
@@ -293,7 +293,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">impl</span>&lt;T&gt; std::ops::Deref <span class="kw">for </span>MaybeOwnedArc&lt;T&gt; {
     <span class="kw">type </span>Target = T;
 
@@ -302,7 +302,7 @@
     </span>}
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;temp_cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">impl</span>&lt;T&gt; Clone <span class="kw">for </span>MaybeOwnedArc&lt;T&gt; {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.clone().into())

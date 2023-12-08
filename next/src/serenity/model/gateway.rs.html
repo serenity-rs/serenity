@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -790,7 +790,7 @@
 <span class="doccomment">/// Representation of an activity that a [`User`] is performing.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Activity {
@@ -805,15 +805,15 @@
     <span class="doccomment">/// Whether or not the activity is an instanced game session.
     </span><span class="kw">pub </span>instance: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="doccomment">/// The type of activity being performed
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ActivityType,
     <span class="doccomment">/// The name of the activity.
     </span><span class="kw">pub </span>name: String,
-    <span class="doccomment">/// Information about the user&#39;s current party.
+    <span class="doccomment">/// Information about the user's current party.
     </span><span class="kw">pub </span>party: <span class="prelude-ty">Option</span>&lt;ActivityParty&gt;,
     <span class="doccomment">/// Secrets for Rich Presence joining and spectating.
     </span><span class="kw">pub </span>secrets: <span class="prelude-ty">Option</span>&lt;ActivitySecrets&gt;,
-    <span class="doccomment">/// The user&#39;s current party status.
+    <span class="doccomment">/// The user's current party status.
     </span><span class="kw">pub </span>state: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Emoji currently used in custom status
     </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ActivityEmoji&gt;,
@@ -821,25 +821,25 @@
     </span><span class="kw">pub </span>timestamps: <span class="prelude-ty">Option</span>&lt;ActivityTimestamps&gt;,
     <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity type which uses this
     /// parameter to store the track ID.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
     </span><span class="kw">pub </span>sync_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The session ID of the activity. Reserved for specific activity types, such as the Activity
     /// that is transmitted when a user is listening to Spotify.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable_discord_api&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
     </span><span class="kw">pub </span>session_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;Url&gt;,
     <span class="doccomment">/// The buttons of this activity.
     ///
     /// **Note**: There can only be up to 2 buttons.
-    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_buttons&quot;</span>)]
+    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_buttons"</span>)]
     </span><span class="kw">pub </span>buttons: Vec&lt;ActivityButton&gt;,
-    <span class="doccomment">/// Unix timestamp (in milliseconds) of when the activity was added to the user&#39;s session
+    <span class="doccomment">/// Unix timestamp (in milliseconds) of when the activity was added to the user's session
     </span><span class="kw">pub </span>created_at: u64,
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityButton {
@@ -855,7 +855,7 @@
 <span class="doccomment">/// The assets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityAssets {
@@ -870,10 +870,10 @@
 }
 
 <span class="macro">bitflags! </span>{
-    <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.
+    <span class="doccomment">/// A set of flags defining what is in an activity's payload.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).
-    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>ActivityFlags: u64 {
         <span class="doccomment">/// Whether the activity is an instance activity.
@@ -882,7 +882,7 @@
         </span><span class="kw">const </span>JOIN = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
         <span class="doccomment">/// Whether the activity can be spectated.
         </span><span class="kw">const </span>SPECTATE = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
-        <span class="doccomment">/// Whether a request can be sent to join the user&#39;s party.
+        <span class="doccomment">/// Whether a request can be sent to join the user's party.
         </span><span class="kw">const </span>JOIN_REQUEST = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
         <span class="doccomment">/// Whether the activity can be synced.
         </span><span class="kw">const </span>SYNC = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
@@ -897,30 +897,30 @@
     }
 }
 
-<span class="doccomment">/// Information about an activity&#39;s party.
+<span class="doccomment">/// Information about an activity's party.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activityparty-struct).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityParty {
     <span class="doccomment">/// The ID of the party.
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="doccomment">/// Used to show the party&#39;s current and maximum size.
+    <span class="doccomment">/// Used to show the party's current and maximum size.
     </span><span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;[u32; <span class="number">2</span>]&gt;,
 }
 
 <span class="doccomment">/// Secrets for an activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivitySecrets {
     <span class="doccomment">/// The secret for joining a party.
     </span><span class="kw">pub </span>join: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The secret for a specific instanced match.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;match&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"match"</span>)]
     </span><span class="kw">pub </span>match_: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The secret for spectating an activity.
     </span><span class="kw">pub </span>spectate: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -929,7 +929,7 @@
 <span class="doccomment">/// Representation of an emoji used in a custom status
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityEmoji {
@@ -944,8 +944,8 @@
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
-    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+    #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ActivityType {
         <span class="doccomment">/// An indicator that the user is playing a game.
@@ -980,7 +980,7 @@
 <span class="doccomment">/// Information detailing the current active status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ClientStatus {
@@ -996,18 +996,18 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object),
 /// [modification description](https://discord.com/developers/docs/topics/gateway-events#presence-update).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PresenceUser {
     <span class="kw">pub </span>id: UserId,
     <span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
     <span class="kw">pub </span>bot: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, with = <span class="string">&quot;discriminator&quot;</span>)]
+    <span class="attr">#[serde(default, skip_serializing_if = <span class="string">"Option::is_none"</span>, with = <span class="string">"discriminator"</span>)]
     </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;,
     <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>mfa_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    <span class="attr">#[serde(rename = <span class="string">&quot;username&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"username"</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
@@ -1016,7 +1016,7 @@
 <span class="kw">impl </span>PresenceUser {
     <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].
     ///
-    /// If one of [`User`]&#39;s required fields is None in `self`, None is returned.
+    /// If one of [`User`]'s required fields is None in `self`, None is returned.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>into_user(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
         <span class="prelude-val">Some</span>(User {
@@ -1044,13 +1044,13 @@
     ///
     /// Will clone individual fields if needed.
     ///
-    /// If one of [`User`]&#39;s required fields is None in `self`, None is returned.
+    /// If one of [`User`]'s required fields is None in `self`, None is returned.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>to_user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;User&gt; {
         <span class="self">self</span>.clone().into_user()
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)] </span><span class="comment">// method is only used with the cache feature enabled
+    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)] </span><span class="comment">// method is only used with the cache feature enabled
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_with_user(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>User) {
         <span class="self">self</span>.id = user.id;
         <span class="kw">if let </span><span class="prelude-val">Some</span>(avatar) = user.avatar {
@@ -1068,7 +1068,7 @@
 <span class="doccomment">/// Information detailing the current online status of a [`User`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Presence {
@@ -1076,9 +1076,9 @@
     </span><span class="kw">pub </span>user: PresenceUser,
     <span class="doccomment">/// The `GuildId` the presence update is coming from.
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-    <span class="doccomment">/// The user&#39;s online status.
+    <span class="doccomment">/// The user's online status.
     </span><span class="kw">pub </span>status: OnlineStatus,
-    <span class="doccomment">/// [`User`]&#39;s current activities.
+    <span class="doccomment">/// [`User`]'s current activities.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>activities: Vec&lt;Activity&gt;,
     <span class="doccomment">/// The devices a user are currently active on, if available.
@@ -1088,12 +1088,12 @@
 <span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Ready {
     <span class="doccomment">/// API version
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;v&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"v"</span>)]
     </span><span class="kw">pub </span>version: u8,
     <span class="doccomment">/// Information about the user including email
     </span><span class="kw">pub </span>user: CurrentUser,
@@ -1125,7 +1125,7 @@
     </span><span class="kw">pub </span>max_concurrency: u64,
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 </span><span class="kw">pub struct </span>ShardInfo {
     <span class="kw">pub </span>id: ShardId,
@@ -1142,8 +1142,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ShardInfo {
-    <span class="kw">fn </span>deserialize&lt;D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>ShardInfo {
+    <span class="kw">fn </span>deserialize&lt;D: serde::Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         &lt;(u32, u32)&gt;::deserialize(deserializer).map(|(id, total)| ShardInfo {
             id: ShardId(id),
             total,
@@ -1163,7 +1163,7 @@
 <span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityTimestamps {
@@ -1196,7 +1196,7 @@
     /// [Gateway Intents]: https://discord.com/developers/docs/topics/gateway#gateway-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
-    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
     </span><span class="kw">pub struct </span>GatewayIntents: u64 {
         <span class="doccomment">/// Enables the following gateway events:
@@ -1221,7 +1221,7 @@
         ///  - STAGE_INSTANCE_DELETE
         ///
         /// **Info:** The THREAD_MEMBERS_UPDATE event contains different data depending on which
-        /// intents are used. See [Discord&#39;s Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
+        /// intents are used. See [Discord's Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
         /// for more information.
         </span><span class="kw">const </span>GUILDS = <span class="number">1</span>;
         <span class="doccomment">/// Enables the following gateway events:
@@ -1235,7 +1235,7 @@
         /// well as enabling it in your code.
         ///
         /// **Info:** The THREAD_MEMBERS_UPDATE event contains different data depending on which
-        /// intents are used. See [Discord&#39;s Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
+        /// intents are used. See [Discord's Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
         /// for more information.
         </span><span class="kw">const </span>GUILD_MEMBERS = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
 
@@ -1308,7 +1308,7 @@
 
         <span class="doccomment">/// Enables receiving message content in gateway events
         ///
-        /// See [Discord&#39;s Docs](https://discord.com/developers/docs/topics/gateway#message-content-intent) for more information
+        /// See [Discord's Docs](https://discord.com/developers/docs/topics/gateway#message-content-intent) for more information
         ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
         /// application in the Developer Portal and enable the toggle for *Privileged Intents*,
@@ -1334,10 +1334,10 @@
 }
 
 <span class="kw">impl </span>GatewayIntents {
-    <span class="doccomment">/// Gets all of the intents that aren&#39;t considered privileged by Discord.
+    <span class="doccomment">/// Gets all of the intents that aren't considered privileged by Discord.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>non_privileged() -&gt; GatewayIntents {
-        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.
+        <span class="comment">// bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
         </span><span class="self">Self</span>::privileged().complement()
     }
@@ -1346,13 +1346,13 @@
     /// Use of these intents will require explicitly whitelisting the bot.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub const fn </span>privileged() -&gt; GatewayIntents {
-        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.
+        <span class="comment">// bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
         </span><span class="self">Self</span>::GUILD_MEMBERS.union(<span class="self">Self</span>::GUILD_PRESENCES).union(<span class="self">Self</span>::MESSAGE_CONTENT)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>GatewayIntents {
     <span class="doccomment">/// Checks if any of the included intents are privileged.
     </span><span class="attr">#[must_use]

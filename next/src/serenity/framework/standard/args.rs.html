@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/args.rs`."><title>args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/args.rs`."><title>args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1008,7 +1008,7 @@
 </span><span class="attr">#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error&lt;E&gt; {
-    <span class="doccomment">/// &quot;END-OF-STRING&quot;. We reached the end. There&#39;s nothing to parse anymore.
+    <span class="doccomment">/// "END-OF-STRING". We reached the end. There's nothing to parse anymore.
     </span>Eos,
     <span class="doccomment">/// Parsing operation failed. Contains how it did.
     </span>Parse(E),
@@ -1021,10 +1021,10 @@
 }
 
 <span class="kw">impl</span>&lt;E: fmt::Display&gt; fmt::Display <span class="kw">for </span>Error&lt;E&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Eos =&gt; f.write_str(<span class="string">r#&quot;ArgError(&quot;end of string&quot;)&quot;#</span>),
-            <span class="self">Self</span>::Parse(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ArgError(\&quot;{e}\&quot;)&quot;</span>),
+            <span class="self">Self</span>::Eos =&gt; f.write_str(<span class="string">r#"ArgError("end of string")"#</span>),
+            <span class="self">Self</span>::Parse(e) =&gt; <span class="macro">write!</span>(f, <span class="string">"ArgError(\"{e}\")"</span>),
         }
     }
 }
@@ -1042,7 +1042,7 @@
 
 <span class="kw">impl </span>Delimiter {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    </span><span class="kw">fn </span>to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">'_</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Single(c) =&gt; Cow::Owned(c.to_string()),
             <span class="self">Self</span>::Multiple(s) =&gt; Cow::Borrowed(s),
@@ -1064,16 +1064,16 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt; <span class="kw">for </span>Delimiter {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>String&gt; <span class="kw">for </span>Delimiter {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String) -&gt; Delimiter {
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>String) -&gt; Delimiter {
         Delimiter::Multiple(s.clone())
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Delimiter {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Delimiter {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Delimiter {
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; Delimiter {
         Delimiter::Multiple(s.to_string())
     }
 }
@@ -1103,8 +1103,8 @@
 
 <span class="comment">// A utility enum to handle an edge case with Apple OSs.
 //
-// By default, a feature called &quot;Smart Quotes&quot; is enabled on MacOS and iOS devices. This feature
-// automatically substitutes the lame, but simple `&quot;` ASCII character for quotation with the cool
+// By default, a feature called "Smart Quotes" is enabled on MacOS and iOS devices. This feature
+// automatically substitutes the lame, but simple `"` ASCII character for quotation with the cool
 // `”` Unicode character. It can be disabled, but users may not want to do that as it is a global
 // setting (i.e. they might not want to disable it just for properly invoking commands of bots on
 // Discord).
@@ -1117,21 +1117,21 @@
 <span class="kw">impl </span>QuoteKind {
     <span class="kw">fn </span>new(c: char) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">match </span>c {
-            <span class="string">&#39;&quot;&#39; </span>=&gt; <span class="prelude-val">Some</span>(QuoteKind::Ascii),
-            <span class="string">&#39;\u{201C}&#39; </span>=&gt; <span class="prelude-val">Some</span>(QuoteKind::Apple),
+            <span class="string">'"' </span>=&gt; <span class="prelude-val">Some</span>(QuoteKind::Ascii),
+            <span class="string">'\u{201C}' </span>=&gt; <span class="prelude-val">Some</span>(QuoteKind::Apple),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
     <span class="kw">fn </span>is_ending_quote(<span class="self">self</span>, c: char) -&gt; bool {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Ascii =&gt; c == <span class="string">&#39;&quot;&#39;</span>,
-            <span class="self">Self</span>::Apple =&gt; c == <span class="string">&#39;\u{201D}&#39;</span>,
+            <span class="self">Self</span>::Ascii =&gt; c == <span class="string">'"'</span>,
+            <span class="self">Self</span>::Apple =&gt; c == <span class="string">'\u{201D}'</span>,
         }
     }
 }
 
-<span class="kw">fn </span>lex(stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">&#39;_</span>&gt;, delims: <span class="kw-2">&amp;</span>[Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;]) -&gt; <span class="prelude-ty">Option</span>&lt;Token&gt; {
+<span class="kw">fn </span>lex(stream: <span class="kw-2">&amp;mut </span>Stream&lt;<span class="lifetime">'_</span>&gt;, delims: <span class="kw-2">&amp;</span>[Cow&lt;<span class="lifetime">'_</span>, str&gt;]) -&gt; <span class="prelude-ty">Option</span>&lt;Token&gt; {
     <span class="kw">if </span>stream.is_empty() {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
@@ -1143,7 +1143,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>prev_was_backslash = <span class="bool-val">false</span>;
         stream.take_until_char(|c| {
             <span class="kw">let </span>result = kind.is_ending_quote(c) &amp;&amp; !prev_was_backslash;
-            prev_was_backslash = c == <span class="string">&#39;\\&#39;</span>;
+            prev_was_backslash = c == <span class="string">'\\'</span>;
             result
         });
 
@@ -1160,19 +1160,19 @@
         <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw">if </span>is_quote {
             Token::new(TokenKind::QuotedArgument, start, end)
         } <span class="kw">else </span>{
-            <span class="comment">// We&#39;re missing an end quote. View this as a normal argument.
+            <span class="comment">// We're missing an end quote. View this as a normal argument.
             </span>Token::new(TokenKind::Argument, start, stream.len())
         });
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>end = start;
 
-    <span class="lifetime">&#39;outer</span>: <span class="kw">while </span>!stream.is_empty() {
+    <span class="lifetime">'outer</span>: <span class="kw">while </span>!stream.is_empty() {
         <span class="kw">for </span>delim <span class="kw">in </span>delims {
             end = stream.offset();
 
             <span class="kw">if </span>stream.eat(delim) {
-                <span class="kw">break </span><span class="lifetime">&#39;outer</span>;
+                <span class="kw">break </span><span class="lifetime">'outer</span>;
             }
         }
 
@@ -1193,7 +1193,7 @@
     }
 
     <span class="comment">// Refer to `QuoteKind` why we check for Unicode quote characters.
-    </span>is_surrounded_with(s, <span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>) || is_surrounded_with(s, <span class="string">&#39;\u{201C}&#39;</span>, <span class="string">&#39;\u{201D}&#39;</span>)
+    </span>is_surrounded_with(s, <span class="string">'"'</span>, <span class="string">'"'</span>) || is_surrounded_with(s, <span class="string">'\u{201C}'</span>, <span class="string">'\u{201D}'</span>)
 }
 
 <span class="kw">fn </span>strip(s: <span class="kw-2">&amp;</span>str, begin: char, end: char) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
@@ -1206,12 +1206,12 @@
         <span class="kw">return </span>s;
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = strip(s, <span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = strip(s, <span class="string">'"'</span>, <span class="string">'"'</span>) {
         <span class="kw">return </span>s;
     }
 
     <span class="comment">// Refer to `QuoteKind` why we check for Unicode quote characters.
-    </span>strip(s, <span class="string">&#39;\u{201C}&#39;</span>, <span class="string">&#39;\u{201D}&#39;</span>).unwrap_or(s)
+    </span>strip(s, <span class="string">'\u{201C}'</span>, <span class="string">'\u{201D}'</span>).unwrap_or(s)
 }
 
 <span class="attr">#[derive(Clone, Copy, Debug)]
@@ -1224,9 +1224,9 @@
     TrimmedQuoted,
 }
 
-<span class="doccomment">/// A utility struct for handling &quot;arguments&quot; of a command.
+<span class="doccomment">/// A utility struct for handling "arguments" of a command.
 ///
-/// An &quot;argument&quot; is a part of the message up that ends at one of the specified delimiters, or the
+/// An "argument" is a part of the message up that ends at one of the specified delimiters, or the
 /// end of the message.
 ///
 /// # Example
@@ -1234,15 +1234,15 @@
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
 ///
-/// let mut args = Args::new(&quot;hello world!&quot;, &amp;[Delimiter::Single(&#39; &#39;)]); // A space is our delimiter.
+/// let mut args = Args::new("hello world!", &amp;[Delimiter::Single(' ')]); // A space is our delimiter.
 ///
-/// // Parse our argument as a `String` and assert that it&#39;s the &quot;hello&quot; part of the message.
-/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;hello&quot;);
+/// // Parse our argument as a `String` and assert that it's the "hello" part of the message.
+/// assert_eq!(args.single::&lt;String&gt;().unwrap(), "hello");
 /// // Same here.
-/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;world!&quot;);
+/// assert_eq!(args.single::&lt;String&gt;().unwrap(), "world!");
 /// ```
 ///
-/// We can also parse &quot;quoted arguments&quot; (no pun intended):
+/// We can also parse "quoted arguments" (no pun intended):
 ///
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
@@ -1250,12 +1250,12 @@
 /// // Let us imagine this scenario:
 /// // You have a `photo` command that grabs the avatar url of a user. This command accepts names only.
 /// // Now, one of your users wants the avatar of a user named Princess Zelda.
-/// // Problem is, her name contains a space; our delimiter. This would result in two arguments, &quot;Princess&quot; and &quot;Zelda&quot;.
+/// // Problem is, her name contains a space; our delimiter. This would result in two arguments, "Princess" and "Zelda".
 /// // So how shall we get around this? Through quotes! By surrounding her name in them we can perceive it as one single argument.
-/// let mut args = Args::new(r#&quot;&quot;Princess Zelda&quot;&quot;#, &amp;[Delimiter::Single(&#39; &#39;)]);
+/// let mut args = Args::new(r#""Princess Zelda""#, &amp;[Delimiter::Single(' ')]);
 ///
 /// // Hooray!
-/// assert_eq!(args.single_quoted::&lt;String&gt;().unwrap(), &quot;Princess Zelda&quot;);
+/// assert_eq!(args.single_quoted::&lt;String&gt;().unwrap(), "Princess Zelda");
 /// ```
 ///
 /// In case of a mistake, we can go back in time... er I mean, one step (or entirely):
@@ -1263,12 +1263,12 @@
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
 ///
-/// let mut args = Args::new(&quot;4 2&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+/// let mut args = Args::new("4 2", &amp;[Delimiter::Single(' ')]);
 ///
 /// assert_eq!(args.single::&lt;u32&gt;().unwrap(), 4);
 ///
 /// // Oh wait, oops, meant to double the 4.
-/// // But I won&#39;t able to access it now...
+/// // But I won't able to access it now...
 /// // oh wait, I can `rewind`.
 /// args.rewind();
 ///
@@ -1277,16 +1277,16 @@
 /// // And the same for the 2
 /// assert_eq!(args.single::&lt;u32&gt;().unwrap() * 2, 4);
 ///
-/// // WAIT, NO. I wanted to concatenate them into a &quot;42&quot; string...
+/// // WAIT, NO. I wanted to concatenate them into a "42" string...
 /// // Argh, what should I do now????
 /// // ....
 /// // oh, `restore`
 /// args.restore();
 ///
-/// let res = format!(&quot;{}{}&quot;, args.single::&lt;String&gt;().unwrap(), args.single::&lt;String&gt;().unwrap());
+/// let res = format!("{}{}", args.single::&lt;String&gt;().unwrap(), args.single::&lt;String&gt;().unwrap());
 ///
 /// // Yay.
-/// assert_eq!(res, &quot;42&quot;);
+/// assert_eq!(res, "42");
 /// ```
 ///
 /// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same
@@ -1296,21 +1296,21 @@
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
 ///
-/// let mut args = Args::new(&quot;trois cinq quatre six&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+/// let mut args = Args::new("trois cinq quatre six", &amp;[Delimiter::Single(' ')]);
 ///
-/// assert_eq!(args.parse::&lt;String&gt;().unwrap(), &quot;trois&quot;);
+/// assert_eq!(args.parse::&lt;String&gt;().unwrap(), "trois");
 ///
-/// // It might suggest we&#39;ve lost the `trois`. But in fact, we didn&#39;t! And not only that, we can do it an infinite amount of times!
-/// assert_eq!(args.parse::&lt;String&gt;().unwrap(), &quot;trois&quot;);
-/// assert_eq!(args.current(), Some(&quot;trois&quot;));
-/// assert_eq!(args.parse::&lt;String&gt;().unwrap(), &quot;trois&quot;);
-/// assert_eq!(args.current(), Some(&quot;trois&quot;));
+/// // It might suggest we've lost the `trois`. But in fact, we didn't! And not only that, we can do it an infinite amount of times!
+/// assert_eq!(args.parse::&lt;String&gt;().unwrap(), "trois");
+/// assert_eq!(args.current(), Some("trois"));
+/// assert_eq!(args.parse::&lt;String&gt;().unwrap(), "trois");
+/// assert_eq!(args.current(), Some("trois"));
 ///
-/// // Only if we use its brother method we&#39;ll then lose it.
-/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;trois&quot;);
-/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;cinq&quot;);
-/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;quatre&quot;);
-/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;six&quot;);
+/// // Only if we use its brother method we'll then lose it.
+/// assert_eq!(args.single::&lt;String&gt;().unwrap(), "trois");
+/// assert_eq!(args.single::&lt;String&gt;().unwrap(), "cinq");
+/// assert_eq!(args.single::&lt;String&gt;().unwrap(), "quatre");
+/// assert_eq!(args.single::&lt;String&gt;().unwrap(), "six");
 /// ```
 </span><span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>Args {
@@ -1323,7 +1323,7 @@
 <span class="kw">impl </span>Args {
     <span class="doccomment">/// Create a new instance of [`Args`] for parsing arguments.
     ///
-    /// For more reference, look at [`Args`]&#39;s struct documentation.
+    /// For more reference, look at [`Args`]'s struct documentation.
     ///
     /// # Example
     ///
@@ -1331,20 +1331,20 @@
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
     /// let mut args = Args::new(
-    /// // Our message from which we&#39;ll parse over.
-    /// &quot;the quick brown fox jumps over the lazy&quot;,
+    /// // Our message from which we'll parse over.
+    /// "the quick brown fox jumps over the lazy",
     ///
-    /// // The &quot;delimiters&quot;, or aka the separators. They denote how we distinguish arguments as their own.
-    /// // For this example, we&#39;ll use one delimiter, the space (`0x20`), which will separate the message.
-    /// &amp;[Delimiter::Single(&#39; &#39;)],
+    /// // The "delimiters", or aka the separators. They denote how we distinguish arguments as their own.
+    /// // For this example, we'll use one delimiter, the space (`0x20`), which will separate the message.
+    /// &amp;[Delimiter::Single(' ')],
     /// );
     ///
-    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;the&quot;);
-    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;quick&quot;);
-    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;brown&quot;);
+    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), "the");
+    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), "quick");
+    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), "brown");
     ///
     /// // We shall not see `the quick brown` again.
-    /// assert_eq!(args.rest(), &quot;fox jumps over the lazy&quot;);
+    /// assert_eq!(args.rest(), "fox jumps over the lazy");
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(message: <span class="kw-2">&amp;</span>str, possible_delimiters: <span class="kw-2">&amp;</span>[Delimiter]) -&gt; <span class="self">Self </span>{
@@ -1437,7 +1437,7 @@
         <span class="self">self</span>.offset = <span class="number">0</span>;
     }
 
-    <span class="kw">fn </span>apply&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">fn </span>apply&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str {
         <span class="kw">fn </span>trim(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>str {
             <span class="kw">let </span>trimmed = s.trim();
 
@@ -1484,11 +1484,11 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let mut args = Args::new(&quot;4 2&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let mut args = Args::new("4 2", &amp;[Delimiter::Single(' ')]);
     ///
-    /// assert_eq!(args.current(), Some(&quot;4&quot;));
+    /// assert_eq!(args.current(), Some("4"));
     /// args.advance();
-    /// assert_eq!(args.current(), Some(&quot;2&quot;));
+    /// assert_eq!(args.current(), Some("2"));
     /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
@@ -1512,15 +1512,15 @@
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(&quot;     42     &quot;, &amp;[]);
+    /// let mut args = Args::new("     42     ", &amp;[]);
     ///
     /// // trimmed lasts for the whole lifetime of `Args`
     /// args.trimmed();
-    /// assert_eq!(args.current(), Some(&quot;42&quot;));
+    /// assert_eq!(args.current(), Some("42"));
     /// // or until we decide ourselves
     /// args.untrimmed();
-    /// assert_eq!(args.current(), Some(&quot;     42     &quot;));
-    /// assert_eq!(args.message(), &quot;     42     &quot;);
+    /// assert_eq!(args.current(), Some("     42     "));
+    /// assert_eq!(args.message(), "     42     ");
     /// ```
     </span><span class="kw">pub fn </span>trimmed(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self</span>.state {
@@ -1536,7 +1536,7 @@
     ///
     /// # Examples
     ///
-    /// Refer to [`Self::trimmed`]&#39;s examples.
+    /// Refer to [`Self::trimmed`]'s examples.
     </span><span class="kw">pub fn </span>untrimmed(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self</span>.state {
             State::Trimmed =&gt; <span class="self">self</span>.state = State::None,
@@ -1557,15 +1557,15 @@
     /// ```rust
     /// use serenity::framework::standard::Args;
     ///
-    /// let mut args = Args::new(&quot;\&quot;42\&quot;&quot;, &amp;[]);
+    /// let mut args = Args::new("\"42\"", &amp;[]);
     ///
     /// // `quoted` lasts the whole lifetime of `Args`
     /// args.quoted();
-    /// assert_eq!(args.current(), Some(&quot;42&quot;));
+    /// assert_eq!(args.current(), Some("42"));
     /// // or until we decide
     /// args.unquoted();
-    /// assert_eq!(args.current(), Some(&quot;\&quot;42\&quot;&quot;));
-    /// assert_eq!(args.message(), &quot;\&quot;42\&quot;&quot;);
+    /// assert_eq!(args.current(), Some("\"42\""));
+    /// assert_eq!(args.message(), "\"42\"");
     /// ```
     </span><span class="kw">pub fn </span>quoted(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
@@ -1589,7 +1589,7 @@
     ///
     /// # Examples
     ///
-    /// Refer to [`Self::quoted`]&#39;s examples.
+    /// Refer to [`Self::quoted`]'s examples.
     </span><span class="kw">pub fn </span>unquoted(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self</span>.state {
             State::Quoted =&gt; <span class="self">self</span>.state = State::None,
@@ -1610,10 +1610,10 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let mut args = Args::new(&quot;4 2&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let mut args = Args::new("4 2", &amp;[Delimiter::Single(' ')]);
     ///
     /// assert_eq!(args.parse::&lt;u32&gt;().unwrap(), 4);
-    /// assert_eq!(args.current(), Some(&quot;4&quot;));
+    /// assert_eq!(args.current(), Some("4"));
     /// ```
     ///
     /// # Errors
@@ -1635,7 +1635,7 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let mut args = Args::new(&quot;4 2&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let mut args = Args::new("4 2", &amp;[Delimiter::Single(' ')]);
     ///
     /// assert_eq!(args.single::&lt;u32&gt;().unwrap(), 4);
     ///
@@ -1663,9 +1663,9 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let mut args = Args::new(r#&quot;&quot;4&quot; &quot;2&quot;&quot;#, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let mut args = Args::new(r#""4" "2""#, &amp;[Delimiter::Single(' ')]);
     ///
-    /// assert_eq!(args.single_quoted::&lt;String&gt;().unwrap(), &quot;4&quot;);
+    /// assert_eq!(args.single_quoted::&lt;String&gt;().unwrap(), "4");
     /// assert_eq!(args.single_quoted::&lt;u32&gt;().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
@@ -1693,7 +1693,7 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let mut args = Args::new(&quot;4 2&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let mut args = Args::new("4 2", &amp;[Delimiter::Single(' ')]);
     ///
     /// for arg in args.iter::&lt;u32&gt;() {
     ///     // Zero troubles, zero worries.
@@ -1704,7 +1704,7 @@
     /// assert!(args.is_empty());
     /// ```
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>iter&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    </span><span class="kw">pub fn </span>iter&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">'_</span>, T&gt; {
         Iter {
             args: <span class="self">self</span>,
             state: State::None,
@@ -1721,15 +1721,15 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let args = Args::new(&quot;Harry Hermione Ronald&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let args = Args::new("Harry Hermione Ronald", &amp;[Delimiter::Single(' ')]);
     ///
-    /// let protagonists = args.raw().collect::&lt;Vec&lt;&amp;str&gt;&gt;().join(&quot;, &quot;);
+    /// let protagonists = args.raw().collect::&lt;Vec&lt;&amp;str&gt;&gt;().join(", ");
     ///
-    /// assert_eq!(protagonists, &quot;Harry, Hermione, Ronald&quot;);
+    /// assert_eq!(protagonists, "Harry, Hermione, Ronald");
     /// ```
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">&#39;_</span>&gt; {
+    </span><span class="kw">pub fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">'_</span>&gt; {
         RawArguments {
             tokens: <span class="kw-2">&amp;</span><span class="self">self</span>.args,
             msg: <span class="kw-2">&amp;</span><span class="self">self</span>.message,
@@ -1744,15 +1744,15 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let args = Args::new(&quot;Saw \&quot;The Mist\&quot; \&quot;A Quiet Place\&quot;&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let args = Args::new("Saw \"The Mist\" \"A Quiet Place\"", &amp;[Delimiter::Single(' ')]);
     ///
     /// let horror_movies = args.raw_quoted().collect::&lt;Vec&lt;&amp;str&gt;&gt;();
     ///
-    /// assert_eq!(&amp;*horror_movies, &amp;[&quot;Saw&quot;, &quot;The Mist&quot;, &quot;A Quiet Place&quot;]);
+    /// assert_eq!(&amp;*horror_movies, &amp;["Saw", "The Mist", "A Quiet Place"]);
     /// ```
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub fn </span>raw_quoted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">&#39;_</span>&gt; {
+    </span><span class="kw">pub fn </span>raw_quoted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">'_</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>raw = <span class="self">self</span>.raw();
         raw.quoted = <span class="bool-val">true</span>;
         raw
@@ -1765,8 +1765,8 @@
     /// The removal is irreversible. And happens after the search *and* the parse were successful.
     ///
     /// # Note 2
-    /// &quot;Arguments queue&quot; is the list which contains all arguments that were deemed unique as
-    /// defined by quotations and delimiters. The &#39;removed&#39; argument can be, likewise, still
+    /// "Arguments queue" is the list which contains all arguments that were deemed unique as
+    /// defined by quotations and delimiters. The 'removed' argument can be, likewise, still
     /// accessed via [`Self::message`].
     ///
     /// # Examples
@@ -1774,10 +1774,10 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let mut args = Args::new(&quot;c4 2&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let mut args = Args::new("c4 2", &amp;[Delimiter::Single(' ')]);
     ///
     /// assert_eq!(args.find::&lt;u32&gt;().unwrap(), 2);
-    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;c4&quot;);
+    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), "c4");
     /// assert!(args.is_empty());
     /// ```
     ///
@@ -1814,12 +1814,12 @@
     /// ```rust
     /// use serenity::framework::standard::{Args, Delimiter};
     ///
-    /// let mut args = Args::new(&quot;c4 2&quot;, &amp;[Delimiter::Single(&#39; &#39;)]);
+    /// let mut args = Args::new("c4 2", &amp;[Delimiter::Single(' ')]);
     ///
     /// assert_eq!(args.find_n::&lt;u32&gt;().unwrap(), 2);
     ///
-    /// // The `2` is still here, so let&#39;s parse it again.
-    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;c4&quot;);
+    /// // The `2` is still here, so let's parse it again.
+    /// assert_eq!(args.single::&lt;String&gt;().unwrap(), "c4");
     /// assert_eq!(args.single::&lt;u32&gt;().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
@@ -1877,7 +1877,7 @@
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.message[start..])
     }
 
-    <span class="doccomment">/// Return the full amount of recognised arguments. The length of the &quot;arguments queue&quot;.
+    <span class="doccomment">/// Return the full amount of recognised arguments. The length of the "arguments queue".
     ///
     /// # Note
     ///
@@ -1909,14 +1909,14 @@
 }
 
 <span class="doccomment">/// Parse each argument individually, as an iterator.
-</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>, T: FromStr&gt; {
-    args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Args,
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">'a</span>, T: FromStr&gt; {
+    args: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Args,
     state: State,
     _marker: PhantomData&lt;T&gt;,
 }
 
 <span class="attr">#[allow(clippy::missing_errors_doc)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: FromStr&gt; Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: FromStr&gt; Iter&lt;<span class="lifetime">'a</span>, T&gt; {
     <span class="doccomment">/// Retrieve the current argument.
     </span><span class="kw">pub fn </span>current(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="self">self</span>.args.state = <span class="self">self</span>.state;
@@ -1954,7 +1954,7 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: FromStr&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: FromStr&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">'a</span>, T&gt; {
     <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T, T::Err&gt;;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -1970,14 +1970,14 @@
 
 <span class="doccomment">/// Access to all of the arguments, as an iterator.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>RawArguments&lt;<span class="lifetime">&#39;a</span>&gt; {
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-    tokens: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Token],
+</span><span class="kw">pub struct </span>RawArguments&lt;<span class="lifetime">'a</span>&gt; {
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+    tokens: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Token],
     quoted: bool,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>RawArguments&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>RawArguments&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str;
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {

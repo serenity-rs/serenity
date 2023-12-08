@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -508,7 +508,7 @@
 <span class="doccomment">/// Determines the action that was done on a target.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Action {
@@ -583,8 +583,8 @@
 }
 
 <span class="comment">// Manual impl needed to emulate integer enum tags
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Action {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Action {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span>value = u8::deserialize(deserializer)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(Action::from_value(value))
     }
@@ -597,7 +597,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -608,7 +608,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -619,7 +619,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -636,7 +636,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -647,7 +647,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -658,7 +658,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -669,7 +669,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -680,7 +680,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -692,7 +692,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -703,7 +703,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -714,7 +714,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -725,7 +725,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -736,7 +736,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -747,7 +747,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -761,7 +761,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -771,7 +771,7 @@
 }
 
 <span class="doccomment">/// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -781,12 +781,12 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AuditLogs {
     <span class="doccomment">/// List of audit log entries, sorted from most to least recent.
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;audit_log_entries&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"audit_log_entries"</span>)]
     </span><span class="kw">pub </span>entries: Vec&lt;AuditLogEntry&gt;,
     <span class="doccomment">/// List of auto moderation rules referenced in the audit log.
     </span><span class="kw">pub </span>auto_moderation_rules: Vec&lt;Rule&gt;,
@@ -802,37 +802,37 @@
     /// map since archived threads might not be kept in memory by clients.
     </span><span class="kw">pub </span>threads: Vec&lt;GuildChannel&gt;,
     <span class="doccomment">/// List of users referenced in the audit log.
-    </span><span class="attr">#[serde(with = <span class="string">&quot;users&quot;</span>)]
+    </span><span class="attr">#[serde(with = <span class="string">"users"</span>)]
     </span><span class="kw">pub </span>users: HashMap&lt;UserId, User&gt;,
     <span class="doccomment">/// List of webhooks referenced in the audit log.
-    </span><span class="attr">#[serde(with = <span class="string">&quot;webhooks&quot;</span>)]
+    </span><span class="attr">#[serde(with = <span class="string">"webhooks"</span>)]
     </span><span class="kw">pub </span>webhooks: HashMap&lt;WebhookId, Webhook&gt;,
 }
 
 <span class="doccomment">/// Partial version of [`Integration`], used in [`AuditLogs::integrations`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object-example-partial-integration-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialIntegration {
     <span class="kw">pub </span>id: IntegrationId,
     <span class="kw">pub </span>name: String,
-    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: String,
     <span class="kw">pub </span>account: IntegrationAccount,
     <span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;IntegrationApplication&gt;,
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AuditLogEntry {
     <span class="doccomment">/// Determines to what entity an [`Self::action`] was used on.
     </span><span class="kw">pub </span>target_id: <span class="prelude-ty">Option</span>&lt;GenericId&gt;,
     <span class="doccomment">/// Determines what action was done on a [`Self::target_id`]
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;action_type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"action_type"</span>)]
     </span><span class="kw">pub </span>action: Action,
     <span class="doccomment">/// What was the reasoning by doing an action on a target? If there was one.
     </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -848,7 +848,7 @@
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
 </span><span class="comment">// TODO: should be renamed to a less ambiguous name
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Options {
@@ -859,27 +859,27 @@
     <span class="doccomment">/// ID of the app whose permissions were targeted.
     </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
     <span class="doccomment">/// Number of days after which inactive members were kicked.
-    </span><span class="attr">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="attr">#[serde(default, with = <span class="string">"optional_string"</span>)]
     </span><span class="kw">pub </span>delete_member_days: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// Number of members removed by the prune
-    </span><span class="attr">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="attr">#[serde(default, with = <span class="string">"optional_string"</span>)]
     </span><span class="kw">pub </span>members_removed: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// Channel in which the messages were deleted
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     <span class="doccomment">/// Number of deleted messages.
-    </span><span class="attr">#[serde(default, with = <span class="string">&quot;optional_string&quot;</span>)]
+    </span><span class="attr">#[serde(default, with = <span class="string">"optional_string"</span>)]
     </span><span class="kw">pub </span>count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// Id of the overwritten entity
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;GenericId&gt;,
-    <span class="doccomment">/// Type of overwritten entity (&quot;member&quot; or &quot;role&quot;).
-    </span><span class="attr">#[serde(default, rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="doccomment">/// Type of overwritten entity ("member" or "role").
+    </span><span class="attr">#[serde(default, rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Message that was pinned or unpinned.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>message_id: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
-    <span class="doccomment">/// Name of the role if type is &quot;role&quot;
+    <span class="doccomment">/// Name of the role if type is "role"
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>role_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The status of a voice channel when set.
@@ -896,7 +896,7 @@
         <span class="macro">macro_rules! </span>assert_action {
             (<span class="macro-nonterminal">$action</span>:pat, <span class="macro-nonterminal">$num</span>:literal) =&gt; {{
                 <span class="kw">let </span>a = Action::from_value(<span class="macro-nonterminal">$num</span>);
-                <span class="macro">assert!</span>(<span class="macro">matches!</span>(a, <span class="macro-nonterminal">$action</span>), <span class="string">&quot;{:?} didn&#39;t match the variant&quot;</span>, a);
+                <span class="macro">assert!</span>(<span class="macro">matches!</span>(a, <span class="macro-nonterminal">$action</span>), <span class="string">"{:?} didn't match the variant"</span>, a);
                 <span class="macro">assert_eq!</span>(a.num(), <span class="macro-nonterminal">$num</span>);
             }};
         }
@@ -971,7 +971,7 @@
         }
 
         <span class="kw">let </span>value = <span class="macro">json!</span>({
-            <span class="string">&quot;action&quot;</span>: <span class="number">234</span>,
+            <span class="string">"action"</span>: <span class="number">234</span>,
         });
 
         <span class="kw">let </span>value = json::from_value::&lt;T&gt;(value).unwrap();

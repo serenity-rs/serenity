@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log/change.rs`."><title>change.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log/change.rs`."><title>change.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -299,7 +299,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::sticker::StickerFormatType;
 <span class="kw">use </span><span class="kw">crate</span>::model::{Permissions, Timestamp};
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>AffectedRole {
@@ -307,7 +307,7 @@
     <span class="kw">pub </span>name: String,
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
 #[serde(untagged)]
 #[non_exhaustive]
@@ -322,22 +322,22 @@
         </span><span class="macro-nonterminal">$key</span>:literal =&gt; <span class="macro-nonterminal">$name</span>:ident (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>),
     )* ) =&gt; {
         <span class="attr">#[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
-        #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+        #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
         #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
-        </span><span class="comment">// serde_json&#39;s Value impls Eq, simd-json&#39;s Value doesn&#39;t
-        </span><span class="attr">#[cfg_attr(not(feature = <span class="string">&quot;simd_json&quot;</span>), derive(Eq))]
+        </span><span class="comment">// serde_json's Value impls Eq, simd-json's Value doesn't
+        </span><span class="attr">#[cfg_attr(not(feature = <span class="string">"simd_json"</span>), derive(Eq))]
         #[non_exhaustive]
-        #[serde(tag = <span class="string">&quot;key&quot;</span>)]
-        #[serde(rename_all = <span class="string">&quot;snake_case&quot;</span>)]
+        #[serde(tag = <span class="string">"key"</span>)]
+        #[serde(rename_all = <span class="string">"snake_case"</span>)]
         </span><span class="kw">pub enum </span>Change {
             $(
                 $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)<span class="question-mark">?
                 </span><span class="macro-nonterminal">$name </span>{
-                    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-                    #[serde(rename = <span class="string">&quot;old_value&quot;</span>)]
+                    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                    #[serde(rename = <span class="string">"old_value"</span>)]
                     </span>old: <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;,
-                    <span class="attr">#[<span class="macro-nonterminal">serde</span>(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-                    #[serde(rename = <span class="string">&quot;new_value&quot;</span>)]
+                    <span class="attr">#[<span class="macro-nonterminal">serde</span>(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                    #[serde(rename = <span class="string">"new_value"</span>)]
                     </span>new: <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;,
                 },
             )*
@@ -345,11 +345,11 @@
             <span class="doccomment">/// Unknown key was changed.
             </span><span class="macro-nonterminal">Other </span>{
                 name: String,
-                <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-                #[serde(rename = <span class="string">&quot;old_value&quot;</span>)]
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                #[serde(rename = <span class="string">"old_value"</span>)]
                 </span>old_value: <span class="prelude-ty">Option</span>&lt;Value&gt;,
-                <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-                #[serde(rename = <span class="string">&quot;new_value&quot;</span>)]
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                #[serde(rename = <span class="string">"new_value"</span>)]
                 </span>new_value: <span class="prelude-ty">Option</span>&lt;Value&gt;,
             },
 
@@ -364,7 +364,7 @@
                 <span class="kw">match </span><span class="self">self </span>{
                     $( <span class="self">Self</span>::<span class="macro-nonterminal">$name </span>{ .. } =&gt; <span class="macro-nonterminal">$key</span>, )*
                     <span class="self">Self</span>::Other { name, .. } =&gt; name,
-                    <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;unknown&quot;</span>,
+                    <span class="self">Self</span>::Unknown =&gt; <span class="string">"unknown"</span>,
                 }
             }
         }
@@ -372,156 +372,156 @@
 }
 
 <span class="macro">generate_change! </span>{
-    <span class="string">&quot;actions&quot; </span>=&gt; Actions(Vec&lt;Action&gt;),
+    <span class="string">"actions" </span>=&gt; Actions(Vec&lt;Action&gt;),
     <span class="doccomment">/// AFK channel was changed.
-    </span><span class="string">&quot;afk_channel_id&quot; </span>=&gt; AfkChannelId(ChannelId),
+    </span><span class="string">"afk_channel_id" </span>=&gt; AfkChannelId(ChannelId),
     <span class="doccomment">/// AFK timeout duration was changed.
-    </span><span class="string">&quot;afk_timeout&quot; </span>=&gt; AfkTimeout(AfkTimeout),
+    </span><span class="string">"afk_timeout" </span>=&gt; AfkTimeout(AfkTimeout),
     <span class="doccomment">/// Permission on a text or voice channel was allowed for a role.
-    </span><span class="string">&quot;allow&quot; </span>=&gt; Allow(Permissions),
+    </span><span class="string">"allow" </span>=&gt; Allow(Permissions),
     <span class="doccomment">/// Application ID of the added or removed webhook or bot.
-    </span><span class="string">&quot;application_id&quot; </span>=&gt; ApplicationId(ApplicationId),
+    </span><span class="string">"application_id" </span>=&gt; ApplicationId(ApplicationId),
     <span class="doccomment">/// Thread is now archived/unarchived.
-    </span><span class="string">&quot;archived&quot; </span>=&gt; Archived(bool),
-    <span class="string">&quot;asset&quot; </span>=&gt; Asset(String),
+    </span><span class="string">"archived" </span>=&gt; Archived(bool),
+    <span class="string">"asset" </span>=&gt; Asset(String),
     <span class="doccomment">/// Auto archive duration of a thread was changed.
-    </span><span class="string">&quot;auto_archive_duration&quot; </span>=&gt; AutoArchiveDuration(u16),
+    </span><span class="string">"auto_archive_duration" </span>=&gt; AutoArchiveDuration(u16),
     <span class="doccomment">/// Availability of a sticker was changed.
-    </span><span class="string">&quot;available&quot; </span>=&gt; Available(bool),
+    </span><span class="string">"available" </span>=&gt; Available(bool),
     <span class="doccomment">/// User avatar was changed.
-    </span><span class="string">&quot;avatar_hash&quot; </span>=&gt; AvatarHash(ImageHash),
+    </span><span class="string">"avatar_hash" </span>=&gt; AvatarHash(ImageHash),
     <span class="doccomment">/// Guild banner was changed.
-    </span><span class="string">&quot;banner_hash&quot; </span>=&gt; BannerHash(ImageHash),
+    </span><span class="string">"banner_hash" </span>=&gt; BannerHash(ImageHash),
     <span class="doccomment">/// Voice channel bitrate was changed.
-    </span><span class="string">&quot;bitrate&quot; </span>=&gt; Bitrate(u32),
+    </span><span class="string">"bitrate" </span>=&gt; Bitrate(u32),
     <span class="doccomment">/// Channel for invite code or guild scheduled event was changed.
-    </span><span class="string">&quot;channel_id&quot; </span>=&gt; ChannelId(ChannelId),
+    </span><span class="string">"channel_id" </span>=&gt; ChannelId(ChannelId),
     <span class="doccomment">/// Invite code was changed.
-    </span><span class="string">&quot;code&quot; </span>=&gt; Code(String),
+    </span><span class="string">"code" </span>=&gt; Code(String),
     <span class="doccomment">/// Role color was changed.
-    </span><span class="string">&quot;color&quot; </span>=&gt; Color(u32),
+    </span><span class="string">"color" </span>=&gt; Color(u32),
     <span class="doccomment">/// Member timeout state was changed.
-    </span><span class="string">&quot;communication_disabled_until&quot; </span>=&gt; CommunicationDisabledUntil(Timestamp),
+    </span><span class="string">"communication_disabled_until" </span>=&gt; CommunicationDisabledUntil(Timestamp),
     <span class="doccomment">/// User was server deafened/undeafened.
-    </span><span class="string">&quot;deaf&quot; </span>=&gt; Deaf(bool),
+    </span><span class="string">"deaf" </span>=&gt; Deaf(bool),
     <span class="doccomment">/// Default auto archive duration for newly created threads was changed.
-    </span><span class="string">&quot;default_auto_archive_duration&quot; </span>=&gt; DefaultAutoArchiveDuration(u16),
+    </span><span class="string">"default_auto_archive_duration" </span>=&gt; DefaultAutoArchiveDuration(u16),
     <span class="doccomment">/// Default message notification level for a server was changed.
-    </span><span class="string">&quot;default_message_notifications&quot; </span>=&gt; DefaultMessageNotifications(DefaultMessageNotificationLevel),
+    </span><span class="string">"default_message_notifications" </span>=&gt; DefaultMessageNotifications(DefaultMessageNotificationLevel),
     <span class="doccomment">/// Permission on a text or voice channel was denied for a role.
-    </span><span class="string">&quot;deny&quot; </span>=&gt; Deny(Permissions),
+    </span><span class="string">"deny" </span>=&gt; Deny(Permissions),
     <span class="doccomment">/// Description for guild, sticker, or guild scheduled event was changed.
-    </span><span class="string">&quot;description&quot; </span>=&gt; Description(String),
-    <span class="doccomment">/// Guild&#39;s discovery splash was changed.
-    </span><span class="string">&quot;discovery_splash_hash&quot; </span>=&gt; DiscoverySplashHash(ImageHash),
-    <span class="string">&quot;enabled&quot; </span>=&gt; Enabled(bool),
+    </span><span class="string">"description" </span>=&gt; Description(String),
+    <span class="doccomment">/// Guild's discovery splash was changed.
+    </span><span class="string">"discovery_splash_hash" </span>=&gt; DiscoverySplashHash(ImageHash),
+    <span class="string">"enabled" </span>=&gt; Enabled(bool),
     <span class="doccomment">/// Integration emoticons was enabled/disabled.
-    </span><span class="string">&quot;enable_emoticons&quot; </span>=&gt; EnableEmoticons(bool),
+    </span><span class="string">"enable_emoticons" </span>=&gt; EnableEmoticons(bool),
     <span class="doccomment">/// Entity type of guild scheduled event was changed.
-    </span><span class="string">&quot;entity_type&quot; </span>=&gt; EntityType(u64),
-    <span class="string">&quot;event_type&quot; </span>=&gt; EventType(EventType),
-    <span class="string">&quot;exempt_channels&quot; </span>=&gt; ExemptChannels(Vec&lt;ChannelId&gt;),
-    <span class="string">&quot;exempt_roles&quot; </span>=&gt; ExemptRoles(Vec&lt;RoleId&gt;),
+    </span><span class="string">"entity_type" </span>=&gt; EntityType(u64),
+    <span class="string">"event_type" </span>=&gt; EventType(EventType),
+    <span class="string">"exempt_channels" </span>=&gt; ExemptChannels(Vec&lt;ChannelId&gt;),
+    <span class="string">"exempt_roles" </span>=&gt; ExemptRoles(Vec&lt;RoleId&gt;),
     <span class="doccomment">/// Behavior of the expiration of an integration was changed.
-    </span><span class="string">&quot;expire_behavior&quot; </span>=&gt; ExpireBehavior(u64),
+    </span><span class="string">"expire_behavior" </span>=&gt; ExpireBehavior(u64),
     <span class="doccomment">/// Grace period of the expiration of an integration was changed.
-    </span><span class="string">&quot;expire_grace_period&quot; </span>=&gt; ExpireGracePeriod(u64),
+    </span><span class="string">"expire_grace_period" </span>=&gt; ExpireGracePeriod(u64),
     <span class="doccomment">/// Explicit content filter level of a guild was changed.
-    </span><span class="string">&quot;explicit_content_filter&quot; </span>=&gt; ExplicitContentFilter(ExplicitContentFilter),
+    </span><span class="string">"explicit_content_filter" </span>=&gt; ExplicitContentFilter(ExplicitContentFilter),
     <span class="doccomment">/// Unknown but sent by discord
-    </span><span class="string">&quot;flags&quot; </span>=&gt; Flags(u64),
+    </span><span class="string">"flags" </span>=&gt; Flags(u64),
     <span class="doccomment">/// Format type of a sticker was changed.
-    </span><span class="string">&quot;format_type&quot; </span>=&gt; FormatType(StickerFormatType),
+    </span><span class="string">"format_type" </span>=&gt; FormatType(StickerFormatType),
     <span class="doccomment">/// Guild a sticker is in was changed.
-    </span><span class="string">&quot;guild_id&quot; </span>=&gt; GuildId(GuildId),
+    </span><span class="string">"guild_id" </span>=&gt; GuildId(GuildId),
     <span class="doccomment">/// Role is now displayed/no longer displayed separate from online users.
-    </span><span class="string">&quot;hoist&quot; </span>=&gt; Hoist(bool),
+    </span><span class="string">"hoist" </span>=&gt; Hoist(bool),
     <span class="doccomment">/// Guild icon was changed.
-    </span><span class="string">&quot;icon_hash&quot; </span>=&gt; IconHash(ImageHash),
+    </span><span class="string">"icon_hash" </span>=&gt; IconHash(ImageHash),
     <span class="doccomment">/// Guild scheduled event cover image was changed.
-    </span><span class="string">&quot;id&quot; </span>=&gt; Id(GenericId),
+    </span><span class="string">"id" </span>=&gt; Id(GenericId),
     <span class="doccomment">/// ID of the changed entity.
-    </span><span class="string">&quot;image_hash&quot; </span>=&gt; ImageHash(ImageHash),
-    <span class="doccomment">/// Private thread&#39;s invitable state was changed.
-    </span><span class="string">&quot;invitable&quot; </span>=&gt; Invitable(bool),
+    </span><span class="string">"image_hash" </span>=&gt; ImageHash(ImageHash),
+    <span class="doccomment">/// Private thread's invitable state was changed.
+    </span><span class="string">"invitable" </span>=&gt; Invitable(bool),
     <span class="doccomment">/// ID of the user who created the invite.
-    </span><span class="string">&quot;inviter_id&quot; </span>=&gt; InviterId(UserId),
+    </span><span class="string">"inviter_id" </span>=&gt; InviterId(UserId),
     <span class="doccomment">/// Location for a guild scheduled event was changed.
-    </span><span class="string">&quot;location&quot; </span>=&gt; Location(String),
+    </span><span class="string">"location" </span>=&gt; Location(String),
     <span class="doccomment">/// Thread was locked/unlocked.
-    </span><span class="string">&quot;locked&quot; </span>=&gt; Locked(bool),
+    </span><span class="string">"locked" </span>=&gt; Locked(bool),
     <span class="doccomment">/// How long invite code lasts was changed.
-    </span><span class="string">&quot;max_age&quot; </span>=&gt; MaxAge(u32),
+    </span><span class="string">"max_age" </span>=&gt; MaxAge(u32),
     <span class="doccomment">/// Maximum uses of an invite was changed.
-    </span><span class="string">&quot;max_uses&quot; </span>=&gt; MaxUses(u8),
+    </span><span class="string">"max_uses" </span>=&gt; MaxUses(u8),
     <span class="doccomment">/// Whether a role can be mentioned in a message was changed.
-    </span><span class="string">&quot;mentionable&quot; </span>=&gt; Mentionable(bool),
+    </span><span class="string">"mentionable" </span>=&gt; Mentionable(bool),
     <span class="doccomment">/// Multi-factor authentication requirement was changed.
-    </span><span class="string">&quot;mfa_level&quot; </span>=&gt; MfaLevel(MfaLevel),
+    </span><span class="string">"mfa_level" </span>=&gt; MfaLevel(MfaLevel),
     <span class="doccomment">/// User was server muted/unmuted.
-    </span><span class="string">&quot;mute&quot; </span>=&gt; Mute(bool),
+    </span><span class="string">"mute" </span>=&gt; Mute(bool),
     <span class="doccomment">/// Name of an entity was changed.
-    </span><span class="string">&quot;name&quot; </span>=&gt; Name(String),
+    </span><span class="string">"name" </span>=&gt; Name(String),
     <span class="doccomment">/// Nickname of a member was changed.
-    </span><span class="string">&quot;nick&quot; </span>=&gt; Nick(String),
+    </span><span class="string">"nick" </span>=&gt; Nick(String),
     <span class="doccomment">/// Channel NSFW restriction was changed.
-    </span><span class="string">&quot;nsfw&quot; </span>=&gt; Nsfw(bool),
+    </span><span class="string">"nsfw" </span>=&gt; Nsfw(bool),
     <span class="doccomment">/// Owner of a guild was changed.
-    </span><span class="string">&quot;owner_id&quot; </span>=&gt; OwnerId(UserId),
+    </span><span class="string">"owner_id" </span>=&gt; OwnerId(UserId),
     <span class="doccomment">/// Permissions on a channel were changed.
-    </span><span class="string">&quot;permission_overwrites&quot; </span>=&gt; PermissionOverwrites(Vec&lt;PermissionOverwrite&gt;),
+    </span><span class="string">"permission_overwrites" </span>=&gt; PermissionOverwrites(Vec&lt;PermissionOverwrite&gt;),
     <span class="doccomment">/// Permissions for a role were changed.
-    </span><span class="string">&quot;permissions&quot; </span>=&gt; Permissions(Permissions),
+    </span><span class="string">"permissions" </span>=&gt; Permissions(Permissions),
     <span class="doccomment">/// Channel or role position was changed.
-    </span><span class="string">&quot;position&quot; </span>=&gt; Position(u32),
+    </span><span class="string">"position" </span>=&gt; Position(u32),
     <span class="doccomment">/// Preferred locale of a guild was changed.
-    </span><span class="string">&quot;preferred_locale&quot; </span>=&gt; PreferredLocale(String),
+    </span><span class="string">"preferred_locale" </span>=&gt; PreferredLocale(String),
     <span class="doccomment">/// Privacy level of the stage instance was changed.
-    </span><span class="string">&quot;privacy_level&quot; </span>=&gt; PrivacyLevel(u64),
+    </span><span class="string">"privacy_level" </span>=&gt; PrivacyLevel(u64),
     <span class="doccomment">/// Number of days after which inactive and role-unassigned members are kicked was changed.
-    </span><span class="string">&quot;prune_delete_days&quot; </span>=&gt; PruneDeleteDays(u64),
+    </span><span class="string">"prune_delete_days" </span>=&gt; PruneDeleteDays(u64),
     <span class="doccomment">/// ID of the public updates channel was changed.
-    </span><span class="string">&quot;public_updates_channel_id&quot; </span>=&gt; PublicUpdatesChannelId(ChannelId),
+    </span><span class="string">"public_updates_channel_id" </span>=&gt; PublicUpdatesChannelId(ChannelId),
     <span class="doccomment">/// Ratelimit per user in a text channel was changed.
-    </span><span class="string">&quot;rate_limit_per_user&quot; </span>=&gt; RateLimitPerUser(u16),
+    </span><span class="string">"rate_limit_per_user" </span>=&gt; RateLimitPerUser(u16),
     <span class="doccomment">/// Region of a guild was changed.
-    </span><span class="string">&quot;region&quot; </span>=&gt; Region(String),
+    </span><span class="string">"region" </span>=&gt; Region(String),
     <span class="doccomment">/// Role was added to a member.
-    </span><span class="string">&quot;add&quot; </span>=&gt; RolesAdded(Vec&lt;AffectedRole&gt;),
+    </span><span class="string">"add" </span>=&gt; RolesAdded(Vec&lt;AffectedRole&gt;),
     <span class="doccomment">/// Role was removed to a member.
-    </span><span class="string">&quot;remove&quot; </span>=&gt; RolesRemove(Vec&lt;AffectedRole&gt;),
+    </span><span class="string">"remove" </span>=&gt; RolesRemove(Vec&lt;AffectedRole&gt;),
     <span class="doccomment">/// ID of the rules channel was changed.
-    </span><span class="string">&quot;rules_channel_id&quot; </span>=&gt; RulesChannelId(ChannelId),
+    </span><span class="string">"rules_channel_id" </span>=&gt; RulesChannelId(ChannelId),
     <span class="doccomment">/// Invite splash page artwork was changed.
-    </span><span class="string">&quot;splash_hash&quot; </span>=&gt; SplashHash(ImageHash),
+    </span><span class="string">"splash_hash" </span>=&gt; SplashHash(ImageHash),
     <span class="doccomment">/// Status of guild scheduled event was changed.
-    </span><span class="string">&quot;status&quot; </span>=&gt; Status(u64),
+    </span><span class="string">"status" </span>=&gt; Status(u64),
     <span class="doccomment">/// ID of the system channel was changed.
-    </span><span class="string">&quot;system_channel_id&quot; </span>=&gt; SystemChannelId(ChannelId),
+    </span><span class="string">"system_channel_id" </span>=&gt; SystemChannelId(ChannelId),
     <span class="doccomment">/// Related emoji of a sticker was changed.
-    </span><span class="string">&quot;tags&quot; </span>=&gt; Tags(String),
+    </span><span class="string">"tags" </span>=&gt; Tags(String),
     <span class="doccomment">/// Whether an invite is temporary or never expires was changed.
-    </span><span class="string">&quot;temporary&quot; </span>=&gt; Temporary(bool),
+    </span><span class="string">"temporary" </span>=&gt; Temporary(bool),
     <span class="doccomment">/// Topic of a text channel or stage instance was changed.
-    </span><span class="string">&quot;topic&quot; </span>=&gt; Topic(String),
-    <span class="string">&quot;trigger_metadata&quot; </span>=&gt; TriggerMetadata(TriggerMetadata),
-    <span class="string">&quot;trigger_type&quot; </span>=&gt; TriggerType(TriggerType),
+    </span><span class="string">"topic" </span>=&gt; Topic(String),
+    <span class="string">"trigger_metadata" </span>=&gt; TriggerMetadata(TriggerMetadata),
+    <span class="string">"trigger_type" </span>=&gt; TriggerType(TriggerType),
     <span class="doccomment">/// Type of a created entity.
-    </span><span class="string">&quot;type&quot; </span>=&gt; Type(EntityType),
+    </span><span class="string">"type" </span>=&gt; Type(EntityType),
     <span class="doccomment">/// Unicode emoji of a role icon was changed.
-    </span><span class="string">&quot;unicode_emoji&quot; </span>=&gt; UnicodeEmoji(String),
+    </span><span class="string">"unicode_emoji" </span>=&gt; UnicodeEmoji(String),
     <span class="doccomment">/// Maximum number of users in a voice channel was changed.
-    </span><span class="string">&quot;user_limit&quot; </span>=&gt; UserLimit(u64),
+    </span><span class="string">"user_limit" </span>=&gt; UserLimit(u64),
     <span class="doccomment">/// Number of uses of an invite was changed.
-    </span><span class="string">&quot;uses&quot; </span>=&gt; Uses(u64),
+    </span><span class="string">"uses" </span>=&gt; Uses(u64),
     <span class="doccomment">/// Guild invite vanity url was changed.
-    </span><span class="string">&quot;vanity_url_code&quot; </span>=&gt; VanityUrlCode(String),
+    </span><span class="string">"vanity_url_code" </span>=&gt; VanityUrlCode(String),
     <span class="doccomment">/// Required verification level for new members was changed.
-    </span><span class="string">&quot;verification_level&quot; </span>=&gt; VerificationLevel(VerificationLevel),
+    </span><span class="string">"verification_level" </span>=&gt; VerificationLevel(VerificationLevel),
     <span class="doccomment">/// Channel of the server widget was changed.
-    </span><span class="string">&quot;widget_channel_id&quot; </span>=&gt; WidgetChannelId(ChannelId),
+    </span><span class="string">"widget_channel_id" </span>=&gt; WidgetChannelId(ChannelId),
     <span class="doccomment">/// Whether a widget is enabled or not was changed.
-    </span><span class="string">&quot;widget_enabled&quot; </span>=&gt; WidgetEnabled(bool),
+    </span><span class="string">"widget_enabled" </span>=&gt; WidgetEnabled(bool),
 }
 
 <span class="attr">#[cfg(test)]
@@ -535,7 +535,7 @@
             old: <span class="prelude-val">Some</span>(ChannelId::new(<span class="number">1</span>)),
             new: <span class="prelude-val">Some</span>(ChannelId::new(<span class="number">2</span>)),
         };
-        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;afk_channel_id&quot;</span>, <span class="string">&quot;old_value&quot;</span>: <span class="string">&quot;1&quot;</span>, <span class="string">&quot;new_value&quot;</span>: <span class="string">&quot;2&quot;</span>}));
+        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">"key"</span>: <span class="string">"afk_channel_id"</span>, <span class="string">"old_value"</span>: <span class="string">"1"</span>, <span class="string">"new_value"</span>: <span class="string">"2"</span>}));
     }
 
     <span class="attr">#[test]
@@ -544,21 +544,21 @@
             old: <span class="prelude-val">None</span>,
             new: <span class="prelude-val">Some</span>(ChannelId::new(<span class="number">2</span>)),
         };
-        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;afk_channel_id&quot;</span>, <span class="string">&quot;new_value&quot;</span>: <span class="string">&quot;2&quot;</span>}));
+        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">"key"</span>: <span class="string">"afk_channel_id"</span>, <span class="string">"new_value"</span>: <span class="string">"2"</span>}));
         <span class="kw">let </span>value = Change::AfkChannelId {
             old: <span class="prelude-val">Some</span>(ChannelId::new(<span class="number">1</span>)),
             new: <span class="prelude-val">None</span>,
         };
-        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;afk_channel_id&quot;</span>, <span class="string">&quot;old_value&quot;</span>: <span class="string">&quot;1&quot;</span>}));
+        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">"key"</span>: <span class="string">"afk_channel_id"</span>, <span class="string">"old_value"</span>: <span class="string">"1"</span>}));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>entity_type_variant() {
         <span class="kw">let </span>value = Change::Type {
             old: <span class="prelude-val">Some</span>(EntityType::Int(<span class="number">123</span>)),
-            new: <span class="prelude-val">Some</span>(EntityType::Str(<span class="string">&quot;discord&quot;</span>.into())),
+            new: <span class="prelude-val">Some</span>(EntityType::Str(<span class="string">"discord"</span>.into())),
         };
-        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;type&quot;</span>, <span class="string">&quot;old_value&quot;</span>: <span class="number">123</span>, <span class="string">&quot;new_value&quot;</span>: <span class="string">&quot;discord&quot;</span>}));
+        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">"key"</span>: <span class="string">"type"</span>, <span class="string">"old_value"</span>: <span class="number">123</span>, <span class="string">"new_value"</span>: <span class="string">"discord"</span>}));
     }
 
     <span class="attr">#[test]
@@ -567,7 +567,7 @@
             old: <span class="prelude-val">Some</span>(Permissions::default()),
             new: <span class="prelude-val">Some</span>(Permissions::MANAGE_GUILD),
         };
-        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">&quot;key&quot;</span>: <span class="string">&quot;permissions&quot;</span>, <span class="string">&quot;old_value&quot;</span>: <span class="string">&quot;0&quot;</span>, <span class="string">&quot;new_value&quot;</span>: <span class="string">&quot;32&quot;</span>}));
+        assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">"key"</span>: <span class="string">"permissions"</span>, <span class="string">"old_value"</span>: <span class="string">"0"</span>, <span class="string">"new_value"</span>: <span class="string">"32"</span>}));
     }
 }
 </code></pre></div></section></main></body></html>

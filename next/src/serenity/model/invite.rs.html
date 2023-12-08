@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/invite.rs`."><title>invite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/invite.rs`."><title>invite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -418,13 +418,13 @@
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models for server and channel invites.
 
 </span><span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::CreateInvite;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Information about an invite code.
@@ -474,11 +474,11 @@
     </span><span class="kw">pub </span>stage_instance: <span class="prelude-ty">Option</span>&lt;InviteStageInstance&gt;,
     <span class="doccomment">/// Guild scheduled event data, only included if guild_scheduled_event_id contains a valid
     /// guild scheduled event id (according to Discord docs, whatever that means).
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;guild_scheduled_event&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"guild_scheduled_event"</span>)]
     </span><span class="kw">pub </span>scheduled_event: <span class="prelude-ty">Option</span>&lt;ScheduledEvent&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>Invite {
     <span class="doccomment">/// Creates an invite for the given channel.
     ///
@@ -494,7 +494,7 @@
     </span><span class="kw">pub async fn </span>create(
         cache_http: <span class="kw">impl </span>CacheHttp,
         channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
-        builder: CreateInvite&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateInvite&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
         channel_id.into().create_invite(cache_http, builder).<span class="kw">await
     </span>}
@@ -514,7 +514,7 @@
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">crate</span>::utils::user_has_perms_cache(
@@ -537,7 +537,7 @@
     /// * `expiration` - Whether to include information about when the invite expires.
     /// * `event_id` - An optional server event ID to include with the invite.
     ///
-    /// More information about these arguments can be found on Discord&#39;s
+    /// More information about these arguments can be found on Discord's
     /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
     ///
     /// # Errors
@@ -553,7 +553,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>invite = code;
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;utils&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
         </span>{
             invite = <span class="kw">crate</span>::utils::parse_invite(invite);
         }
@@ -573,39 +573,39 @@
     /// #
     /// # fn main() {
     /// # let invite = from_value::&lt;Invite&gt;(json!({
-    /// #     &quot;approximate_member_count&quot;: Some(1812),
-    /// #     &quot;approximate_presence_count&quot;: Some(717),
-    /// #     &quot;code&quot;: &quot;WxZumR&quot;,
-    /// #     &quot;channel&quot;: {
-    /// #         &quot;id&quot;: ChannelId::new(1),
-    /// #         &quot;name&quot;: &quot;foo&quot;,
-    /// #         &quot;type&quot;: ChannelType::Text,
+    /// #     "approximate_member_count": Some(1812),
+    /// #     "approximate_presence_count": Some(717),
+    /// #     "code": "WxZumR",
+    /// #     "channel": {
+    /// #         "id": ChannelId::new(1),
+    /// #         "name": "foo",
+    /// #         "type": ChannelType::Text,
     /// #     },
-    /// #     &quot;guild&quot;: {
-    /// #         &quot;id&quot;: GuildId::new(2),
-    /// #         &quot;icon&quot;: None::&lt;String&gt;,
-    /// #         &quot;name&quot;: &quot;bar&quot;,
-    /// #         &quot;splash_hash&quot;: None::&lt;String&gt;,
-    /// #         &quot;text_channel_count&quot;: 7,
-    /// #         &quot;voice_channel_count&quot;: 3,
-    /// #         &quot;features&quot;: [&quot;NEWS&quot;, &quot;DISCOVERABLE&quot;],
-    /// #         &quot;verification_level&quot;: 2,
-    /// #         &quot;nsfw_level&quot;: 0,
+    /// #     "guild": {
+    /// #         "id": GuildId::new(2),
+    /// #         "icon": None::&lt;String&gt;,
+    /// #         "name": "bar",
+    /// #         "splash_hash": None::&lt;String&gt;,
+    /// #         "text_channel_count": 7,
+    /// #         "voice_channel_count": 3,
+    /// #         "features": ["NEWS", "DISCOVERABLE"],
+    /// #         "verification_level": 2,
+    /// #         "nsfw_level": 0,
     /// #     },
-    /// #     &quot;inviter&quot;: {
-    /// #         &quot;id&quot;: UserId::new(3),
-    /// #         &quot;username&quot;: &quot;foo&quot;,
-    /// #         &quot;discriminator&quot;: &quot;1234&quot;,
-    /// #         &quot;avatar&quot;: &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;
+    /// #     "inviter": {
+    /// #         "id": UserId::new(3),
+    /// #         "username": "foo",
+    /// #         "discriminator": "1234",
+    /// #         "avatar": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     /// #     },
     /// # })).unwrap();
     /// #
-    /// assert_eq!(invite.url(), &quot;https://discord.gg/WxZumR&quot;);
+    /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="macro">format!</span>(<span class="string">&quot;https://discord.gg/{}&quot;</span>, <span class="self">self</span>.code)
+        <span class="macro">format!</span>(<span class="string">"https://discord.gg/{}"</span>, <span class="self">self</span>.code)
     }
 }
 
@@ -617,7 +617,7 @@
 </span><span class="kw">pub struct </span>InviteChannel {
     <span class="kw">pub </span>id: ChannelId,
     <span class="kw">pub </span>name: String,
-    <span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ChannelType,
 }
 
@@ -640,7 +640,7 @@
     <span class="kw">pub </span>premium_subscription_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>InviteGuild {
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
     ///
@@ -650,7 +650,7 @@
     /// number of shards in use. If you already have the total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
-    </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+    </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>))]
     #[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; u32 {
@@ -675,7 +675,7 @@
     ///
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
-    </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;utils&quot;</span>, not(feature = <span class="string">&quot;cache&quot;</span>)))]
+    </span><span class="attr">#[cfg(all(feature = <span class="string">"utils"</span>, not(feature = <span class="string">"cache"</span>)))]
     #[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_count: u32) -&gt; u32 {
@@ -721,7 +721,7 @@
     </span><span class="kw">pub </span>uses: u64,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>RichInvite {
     <span class="doccomment">/// Deletes the invite.
     ///
@@ -737,7 +737,7 @@
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">crate</span>::utils::user_has_perms_cache(
@@ -763,44 +763,44 @@
     /// #
     /// # fn main() {
     /// # let invite = from_value::&lt;RichInvite&gt;(json!({
-    /// #     &quot;code&quot;: &quot;WxZumR&quot;,
-    /// #     &quot;channel&quot;: {
-    /// #         &quot;id&quot;: ChannelId::new(1),
-    /// #         &quot;name&quot;: &quot;foo&quot;,
-    /// #         &quot;type&quot;: ChannelType::Text,
+    /// #     "code": "WxZumR",
+    /// #     "channel": {
+    /// #         "id": ChannelId::new(1),
+    /// #         "name": "foo",
+    /// #         "type": ChannelType::Text,
     /// #     },
-    /// #     &quot;created_at&quot;: &quot;2017-01-29T15:35:17.136000+00:00&quot;,
-    /// #     &quot;guild&quot;: {
-    /// #         &quot;id&quot;: GuildId::new(2),
-    /// #         &quot;icon&quot;: None::&lt;String&gt;,
-    /// #         &quot;name&quot;: &quot;baz&quot;,
-    /// #         &quot;splash_hash&quot;: None::&lt;String&gt;,
-    /// #         &quot;text_channel_count&quot;: None::&lt;u64&gt;,
-    /// #         &quot;voice_channel_count&quot;: None::&lt;u64&gt;,
-    /// #         &quot;features&quot;: [&quot;NEWS&quot;, &quot;DISCOVERABLE&quot;],
-    /// #         &quot;verification_level&quot;: 2,
-    /// #         &quot;nsfw_level&quot;: 0,
+    /// #     "created_at": "2017-01-29T15:35:17.136000+00:00",
+    /// #     "guild": {
+    /// #         "id": GuildId::new(2),
+    /// #         "icon": None::&lt;String&gt;,
+    /// #         "name": "baz",
+    /// #         "splash_hash": None::&lt;String&gt;,
+    /// #         "text_channel_count": None::&lt;u64&gt;,
+    /// #         "voice_channel_count": None::&lt;u64&gt;,
+    /// #         "features": ["NEWS", "DISCOVERABLE"],
+    /// #         "verification_level": 2,
+    /// #         "nsfw_level": 0,
     /// #     },
-    /// #     &quot;inviter&quot;: {
-    /// #         &quot;avatar&quot;: None::&lt;String&gt;,
-    /// #         &quot;bot&quot;: false,
-    /// #         &quot;discriminator&quot;: &quot;1234&quot;,
-    /// #         &quot;id&quot;: UserId::new(4),
-    /// #         &quot;username&quot;: &quot;qux&quot;,
-    /// #         &quot;public_flags&quot;: None::&lt;UserPublicFlags&gt;,
+    /// #     "inviter": {
+    /// #         "avatar": None::&lt;String&gt;,
+    /// #         "bot": false,
+    /// #         "discriminator": "1234",
+    /// #         "id": UserId::new(4),
+    /// #         "username": "qux",
+    /// #         "public_flags": None::&lt;UserPublicFlags&gt;,
     /// #     },
-    /// #     &quot;max_age&quot;: 5,
-    /// #     &quot;max_uses&quot;: 6,
-    /// #     &quot;temporary&quot;: true,
-    /// #     &quot;uses&quot;: 7,
+    /// #     "max_age": 5,
+    /// #     "max_uses": 6,
+    /// #     "temporary": true,
+    /// #     "uses": 7,
     /// # })).unwrap();
     /// #
-    /// assert_eq!(invite.url(), &quot;https://discord.gg/WxZumR&quot;);
+    /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-        <span class="macro">format!</span>(<span class="string">&quot;https://discord.gg/{}&quot;</span>, <span class="self">self</span>.code)
+        <span class="macro">format!</span>(<span class="string">"https://discord.gg/{}"</span>, <span class="self">self</span>.code)
     }
 }
 
@@ -823,8 +823,8 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
-    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+    #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>InviteTargetType {
         Stream = <span class="number">1</span>,

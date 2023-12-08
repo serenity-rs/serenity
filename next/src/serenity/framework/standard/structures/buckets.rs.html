@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/buckets.rs`."><title>buckets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -577,9 +577,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
 
-<span class="kw">type </span>Check = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, bool&gt;;
+<span class="kw">type </span>Check = <span class="kw">for</span>&lt;<span class="lifetime">'fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">'fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">'fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">'fut</span>, bool&gt;;
 
-<span class="kw">type </span>DelayHook = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, ()&gt;;
+<span class="kw">type </span>DelayHook = <span class="kw">for</span>&lt;<span class="lifetime">'fut</span>&gt; <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">'fut </span>Context, <span class="kw-2">&amp;</span><span class="lifetime">'fut </span>Message) -&gt; BoxFuture&lt;<span class="lifetime">'fut</span>, ()&gt;;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Ratelimit {
     <span class="kw">pub </span>delay: Duration,
@@ -617,9 +617,9 @@
     </span>Channel(TicketCounter),
     <span class="doccomment">/// The bucket will collect tickets per category.
     ///
-    /// This requires the cache, as messages do not contain their channel&#39;s category and retrieving
+    /// This requires the cache, as messages do not contain their channel's category and retrieving
     /// channel data via HTTP is costly.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span>Category(TicketCounter),
 }
 
@@ -637,8 +637,8 @@
                 </span>}
             },
             <span class="self">Self</span>::Channel(counter) =&gt; counter.take(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s category.
-            </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="comment">// This requires the cache, as messages do not contain their channel's category.
+            </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
             </span><span class="self">Self</span>::Category(counter) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
                     counter.take(ctx, msg, category_id.get()).<span class="kw">await
@@ -660,8 +660,8 @@
                 }
             },
             <span class="self">Self</span>::Channel(counter) =&gt; counter.give(ctx, msg, msg.channel_id.get()).<span class="kw">await</span>,
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s category.
-            </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="comment">// This requires the cache, as messages do not contain their channel's category.
+            </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
             </span><span class="self">Self</span>::Category(counter) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(category_id) = msg.category_id(ctx).<span class="kw">await </span>{
                     counter.give(ctx, msg, category_id.get()).<span class="kw">await</span>;
@@ -772,7 +772,7 @@
                             <span class="kw">let </span>ctx = ctx.clone();
                             <span class="kw">let </span>msg = msg.clone();
 
-                            spawn_named(<span class="string">&quot;buckets::delay_action&quot;</span>, <span class="kw">async move </span>{
+                            spawn_named(<span class="string">"buckets::delay_action"</span>, <span class="kw">async move </span>{
                                 delay_action(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
                             });
                         }
@@ -817,7 +817,7 @@
                     <span class="kw">let </span>ctx = ctx.clone();
                     <span class="kw">let </span>msg = msg.clone();
 
-                    spawn_named(<span class="string">&quot;buckets::delay_action&quot;</span>, <span class="kw">async move </span>{
+                    spawn_named(<span class="string">"buckets::delay_action"</span>, <span class="kw">async move </span>{
                         delay_action(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
                     });
                 }
@@ -880,8 +880,8 @@
 </span><span class="kw">pub struct </span>RevertBucket;
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RevertBucket {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.write_str(<span class="string">&quot;RevertBucket&quot;</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">"RevertBucket"</span>)
     }
 }
 
@@ -900,8 +900,8 @@
     </span>Channel,
     <span class="doccomment">/// The bucket will collect tickets per category.
     ///
-    /// This requires the cache, as messages do not contain their channel&#39;s category.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    /// This requires the cache, as messages do not contain their channel's category.
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span>Category,
 }
 
@@ -975,8 +975,8 @@
 
     <span class="doccomment">/// A bucket collecting tickets per channel category.
     ///
-    /// This requires the cache, as messages do not contain their channel&#39;s category.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    /// This requires the cache, as messages do not contain their channel's category.
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>new_category() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -985,7 +985,7 @@
         }
     }
 
-    <span class="doccomment">/// The &quot;break&quot; time between invocations of a command.
+    <span class="doccomment">/// The "break" time between invocations of a command.
     ///
     /// Expressed in seconds.
     </span><span class="attr">#[inline]
@@ -1022,15 +1022,15 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// This function is called when a user&#39;s command invocation is delayed when:
+    <span class="doccomment">/// This function is called when a user's command invocation is delayed when:
     /// 1. `await_ratelimits` is set to a non zero value (the default is 0).
-    /// 2. user&#39;s message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then
+    /// 2. user's message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then
     ///    it will only respond once when the delay is first exceeded).
     ///
     /// For convenience, this function will automatically raise `await_ratelimits` to at least 1.
     ///
     /// You can use this to, for example, send a custom response when someone exceeds the amount of
-    /// commands they&#39;re allowed to make.
+    /// commands they're allowed to make.
     ///
     /// # Examples
     ///
@@ -1042,25 +1042,25 @@
     /// use serenity::prelude::*;
     ///
     /// #[command]
-    /// #[bucket = &quot;example_bucket&quot;]
+    /// #[bucket = "example_bucket"]
     /// async fn example_command(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {
-    ///     msg.reply(ctx, &quot;Example message, You can only repeat this once every 10 seconds&quot;).await?;
+    ///     msg.reply(ctx, "Example message, You can only repeat this once every 10 seconds").await?;
     ///
     ///     Ok(())
     /// }
     ///
     /// async fn example_overuse_response(ctx: &amp;Context, msg: &amp;Message) {
-    ///     msg.reply(ctx, &quot;I told you that you can&#39;t call this command less than every 10 seconds!&quot;).await.unwrap();
+    ///     msg.reply(ctx, "I told you that you can't call this command less than every 10 seconds!").await.unwrap();
     /// }
     ///
     /// #[group]
     /// #[commands(example_command)]
     /// struct General;
     ///
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     ///
     /// let framework = StandardFramework::new()
-    ///     .bucket(&quot;example_bucket&quot;, BucketBuilder::default()
+    ///     .bucket("example_bucket", BucketBuilder::default()
     ///         // We initialise the bucket with the function we want to run
     ///         .delay_action(|ctx, msg| {
     ///             Box::pin(example_overuse_response(ctx, msg))
@@ -1071,7 +1071,7 @@
     ///     .await
     ///     .group(&amp;GENERAL_GROUP);
     ///
-    /// framework.configure(Configuration::new().prefix(&quot;~&quot;));
+    /// framework.configure(Configuration::new().prefix("~"));
     ///
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default())
     /// .framework(framework)
@@ -1129,8 +1129,8 @@
             LimitedFor::User =&gt; Bucket::User(counter),
             LimitedFor::Guild =&gt; Bucket::Guild(counter),
             LimitedFor::Channel =&gt; Bucket::Channel(counter),
-            <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s category.
-            </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="comment">// This requires the cache, as messages do not contain their channel's category.
+            </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
             </span>LimitedFor::Category =&gt; Bucket::Category(counter),
             LimitedFor::Global =&gt; Bucket::Global(counter),
         }

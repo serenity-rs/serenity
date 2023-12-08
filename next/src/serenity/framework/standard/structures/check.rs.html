@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/check.rs`."><title>check.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/structures/check.rs`."><title>check.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -112,12 +112,12 @@
 
 <span class="kw">impl </span>Error <span class="kw">for </span>Reason {}
 
-<span class="kw">pub type </span>CheckFunction = <span class="kw">for</span>&lt;<span class="lifetime">&#39;fut</span>&gt; <span class="kw">fn</span>(
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Context,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>Message,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span><span class="kw-2">mut </span>Args,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut </span>CommandOptions,
-) -&gt; BoxFuture&lt;<span class="lifetime">&#39;fut</span>, <span class="prelude-ty">Result</span>&lt;(), Reason&gt;&gt;;
+<span class="kw">pub type </span>CheckFunction = <span class="kw">for</span>&lt;<span class="lifetime">'fut</span>&gt; <span class="kw">fn</span>(
+    <span class="kw-2">&amp;</span><span class="lifetime">'fut </span>Context,
+    <span class="kw-2">&amp;</span><span class="lifetime">'fut </span>Message,
+    <span class="kw-2">&amp;</span><span class="lifetime">'fut </span><span class="kw-2">mut </span>Args,
+    <span class="kw-2">&amp;</span><span class="lifetime">'fut </span>CommandOptions,
+) -&gt; BoxFuture&lt;<span class="lifetime">'fut</span>, <span class="prelude-ty">Result</span>&lt;(), Reason&gt;&gt;;
 
 <span class="doccomment">/// A check can be part of a command or group and will be executed to determine whether a user is
 /// permitted to use related item.
@@ -125,39 +125,39 @@
 /// Additionally, a check may hold additional settings.
 </span><span class="kw">pub struct </span>Check {
     <span class="doccomment">/// Name listed in help-system.
-    </span><span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    </span><span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
     <span class="doccomment">/// Function that will be executed.
     </span><span class="kw">pub </span>function: CheckFunction,
-    <span class="doccomment">/// Whether a check should be evaluated in the help-system. `false` will ignore check and won&#39;t
+    <span class="doccomment">/// Whether a check should be evaluated in the help-system. `false` will ignore check and won't
     /// fail execution.
     </span><span class="kw">pub </span>check_in_help: bool,
-    <span class="doccomment">/// Whether a check shall be listed in the help-system. `false` won&#39;t affect whether the check
+    <span class="doccomment">/// Whether a check shall be listed in the help-system. `false` won't affect whether the check
     /// will be evaluated help, solely [`Self::check_in_help`] sets this.
     </span><span class="kw">pub </span>display_in_help: bool,
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Check {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;Check&quot;</span>)
-            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
-            .field(<span class="string">&quot;function&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;&lt;fn&gt;&quot;</span>)
-            .field(<span class="string">&quot;check_in_help&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.check_in_help)
-            .field(<span class="string">&quot;display_in_help&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.display_in_help)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">"Check"</span>)
+            .field(<span class="string">"name"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
+            .field(<span class="string">"function"</span>, <span class="kw-2">&amp;</span><span class="string">"&lt;fn&gt;"</span>)
+            .field(<span class="string">"check_in_help"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.check_in_help)
+            .field(<span class="string">"display_in_help"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.display_in_help)
             .finish()
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Reason {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Unknown =&gt; f.write_str(<span class="string">&quot;Unknown&quot;</span>),
-            <span class="self">Self</span>::User(reason) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;User {reason}&quot;</span>),
-            <span class="self">Self</span>::Log(reason) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Log {reason}&quot;</span>),
+            <span class="self">Self</span>::Unknown =&gt; f.write_str(<span class="string">"Unknown"</span>),
+            <span class="self">Self</span>::User(reason) =&gt; <span class="macro">write!</span>(f, <span class="string">"User {reason}"</span>),
+            <span class="self">Self</span>::Log(reason) =&gt; <span class="macro">write!</span>(f, <span class="string">"Log {reason}"</span>),
             <span class="self">Self</span>::UserAndLog {
                 user,
                 log,
             } =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;UserAndLog {{user: {user}, log: {log}}}&quot;</span>)
+                <span class="macro">write!</span>(f, <span class="string">"UserAndLog {{user: {user}, log: {log}}}"</span>)
             },
         }
     }

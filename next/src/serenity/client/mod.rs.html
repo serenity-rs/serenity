@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -901,8 +901,8 @@
 <a href="#901" id="901">901</a>
 <a href="#902" id="902">902</a>
 <a href="#903" id="903">903</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well as event handlers.
-//! Dispatching events to configured handlers and starting the shards&#39; connections are handled
+</pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
+//! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
 //! handled by the Client module for you.
 //!
@@ -918,16 +918,16 @@
 //! [Client examples]: Client#examples
 
 </span><span class="kw">mod </span>context;
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>dispatch;
 <span class="kw">mod </span>error;
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">mod </span>event_handler;
 
 <span class="kw">use </span>std::future::IntoFuture;
 <span class="kw">use </span>std::ops::Range;
 <span class="kw">use </span>std::sync::Arc;
-<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span>std::sync::OnceLock;
 
 <span class="kw">use </span>futures::channel::mpsc::UnboundedReceiver <span class="kw">as </span>Receiver;
@@ -939,58 +939,58 @@
 
 <span class="kw">pub use </span><span class="self">self</span>::context::Context;
 <span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>ClientError;
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">pub use </span><span class="self">self</span>::event_handler::{EventHandler, FullEvent, RawEventHandler};
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::gateway::GatewayError;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::Cache;
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Settings <span class="kw">as </span>CacheSettings;
-<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
-<span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::VoiceGatewayManager;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{ActivityData, PresenceData};
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::{ShardManager, ShardManagerOptions};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::gateway::GatewayIntents;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::ApplicationId;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::OnlineStatus;
 
 <span class="doccomment">/// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
-#[must_use = <span class="string">&quot;Builders do nothing unless they are awaited&quot;</span>]
+</span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
+#[must_use = <span class="string">"Builders do nothing unless they are awaited"</span>]
 </span><span class="kw">pub struct </span>ClientBuilder {
     data: TypeMap,
     http: Http,
     intents: GatewayIntents,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span>cache_settings: CacheSettings,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span>framework: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
     </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt;,
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     presence: PresenceData,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">impl </span>ClientBuilder {
     <span class="kw">fn </span>_new(http: Http, intents: GatewayIntents) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             data: TypeMap::new(),
             http,
             intents,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
             </span>cache_settings: CacheSettings::default(),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span>framework: <span class="prelude-val">None</span>,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
             </span>voice_manager: <span class="prelude-val">None</span>,
             event_handlers: <span class="macro">vec!</span>[],
             raw_event_handlers: <span class="macro">vec!</span>[],
@@ -999,7 +999,7 @@
     }
 
     <span class="doccomment">/// Construct a new builder to call methods on for the client construction. The `token` will
-    /// automatically be prefixed &quot;Bot &quot; if not already.
+    /// automatically be prefixed "Bot " if not already.
     ///
     /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
@@ -1018,7 +1018,7 @@
         <span class="self">Self</span>::_new(http, intents)
     }
 
-    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;, this method will
+    <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
     /// automatically do so.
     </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.http = Http::new(token.as_ref());
@@ -1070,14 +1070,14 @@
     <span class="doccomment">/// Sets the settings of the cache. Refer to [`Settings`] for more information.
     ///
     /// [`Settings`]: CacheSettings
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub fn </span>cache_settings(<span class="kw-2">mut </span><span class="self">self</span>, settings: CacheSettings) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.cache_settings = settings;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Gets the cache settings. See [`Self::cache_settings`] for more info.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub fn </span>get_cache_settings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>CacheSettings {
         <span class="kw-2">&amp;</span><span class="self">self</span>.cache_settings
     }
@@ -1087,10 +1087,10 @@
     ///
     /// *Info*: If a reference to the framework is required for manual dispatch, you can implement
     /// [`Framework`] on [`Arc&lt;YourFrameworkType&gt;`] instead of `YourFrameworkType`.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span><span class="kw">pub fn </span>framework&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, framework: F) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>F: Framework + <span class="lifetime">&#39;static</span>,
+        </span>F: Framework + <span class="lifetime">'static</span>,
     {
         <span class="self">self</span>.framework = <span class="prelude-val">Some</span>(Box::new(framework));
 
@@ -1098,7 +1098,7 @@
     </span>}
 
     <span class="doccomment">/// Gets the framework, if already initialized. See [`Self::framework`] for more info.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span><span class="kw">pub fn </span>get_framework(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>Framework&gt; {
         <span class="self">self</span>.framework.as_deref()
     }
@@ -1108,25 +1108,25 @@
     ///
     /// *Info*: If a reference to the voice_manager is required for manual dispatch, use the
     /// [`Self::voice_manager_arc`]-method instead.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
     </span><span class="kw">pub fn </span>voice_manager&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, voice_manager: V) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>V: VoiceGatewayManager + <span class="lifetime">&#39;static</span>,
+        </span>V: VoiceGatewayManager + <span class="lifetime">'static</span>,
     {
         <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(Arc::new(voice_manager));
 
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `voice_manager` - this step is done for you in the
-    /// [`voice_manager`]-method, if you don&#39;t need the extra control. You can provide a clone and
+    <span class="doccomment">/// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is done for you in the
+    /// [`voice_manager`]-method, if you don't need the extra control. You can provide a clone and
     /// keep the original to manually dispatch.
     ///
     /// [`voice_manager`]: Self::voice_manager
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
     </span><span class="kw">pub fn </span>voice_manager_arc(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        voice_manager: Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">&#39;static</span>&gt;,
+        voice_manager: Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">'static</span>&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.voice_manager = <span class="prelude-val">Some</span>(voice_manager);
 
@@ -1134,7 +1134,7 @@
     </span>}
 
     <span class="doccomment">/// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
     </span><span class="kw">pub fn </span>get_voice_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt; {
         <span class="self">self</span>.voice_manager.clone()
     }
@@ -1171,14 +1171,14 @@
     }
 
     <span class="doccomment">/// Adds an event handler with multiple methods for each possible event.
-    </span><span class="kw">pub fn </span>event_handler&lt;H: EventHandler + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, event_handler: H) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>event_handler&lt;H: EventHandler + <span class="lifetime">'static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, event_handler: H) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.event_handlers.push(Arc::new(event_handler));
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Adds an event handler with multiple methods for each possible event. Passed by Arc.
-    </span><span class="kw">pub fn </span>event_handler_arc&lt;H: EventHandler + <span class="lifetime">&#39;static</span>&gt;(
+    </span><span class="kw">pub fn </span>event_handler_arc&lt;H: EventHandler + <span class="lifetime">'static</span>&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
         event_handler_arc: Arc&lt;H&gt;,
     ) -&gt; <span class="self">Self </span>{
@@ -1194,7 +1194,7 @@
 
     <span class="doccomment">/// Adds an event handler with a single method where all received gateway events will be
     /// dispatched.
-    </span><span class="kw">pub fn </span>raw_event_handler&lt;H: RawEventHandler + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, raw_event_handler: H) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>raw_event_handler&lt;H: RawEventHandler + <span class="lifetime">'static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, raw_event_handler: H) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.raw_event_handlers.push(Arc::new(raw_event_handler));
 
         <span class="self">self
@@ -1225,16 +1225,16 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">impl </span>IntoFuture <span class="kw">for </span>ClientBuilder {
     <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;Client&gt;;
 
-    <span class="kw">type </span>IntoFuture = BoxFuture&lt;<span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span>&lt;Client&gt;&gt;;
+    <span class="kw">type </span>IntoFuture = BoxFuture&lt;<span class="lifetime">'static</span>, <span class="prelude-ty">Result</span>&lt;Client&gt;&gt;;
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">fn </span>into_future(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoFuture {
         <span class="kw">let </span>data = Arc::new(RwLock::new(<span class="self">self</span>.data));
-        <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
         </span><span class="kw">let </span>framework = <span class="self">self</span>.framework;
         <span class="kw">let </span>event_handlers = <span class="self">self</span>.event_handlers;
         <span class="kw">let </span>raw_event_handlers = <span class="self">self</span>.raw_event_handlers;
@@ -1255,36 +1255,36 @@
 
         <span class="kw">let </span>http = Arc::new(http);
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
         </span><span class="kw">let </span>voice_manager = <span class="self">self</span>.voice_manager;
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">let </span>cache = Arc::new(Cache::new_with_settings(<span class="self">self</span>.cache_settings));
 
         Box::pin(<span class="kw">async move </span>{
             <span class="kw">let </span>ws_url = Arc::new(Mutex::new(<span class="kw">match </span>http.get_gateway().<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(response) =&gt; response.url,
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">tracing::warn!</span>(<span class="string">&quot;HTTP request to get gateway URL failed: {}&quot;</span>, err);
-                    <span class="string">&quot;wss://gateway.discord.gg&quot;</span>.to_string()
+                    <span class="macro">tracing::warn!</span>(<span class="string">"HTTP request to get gateway URL failed: {}"</span>, err);
+                    <span class="string">"wss://gateway.discord.gg"</span>.to_string()
                 },
             }));
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span><span class="kw">let </span>framework_cell = Arc::new(OnceLock::new());
             <span class="kw">let </span>(shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(<span class="kw-2">&amp;</span>data),
                 event_handlers,
                 raw_event_handlers,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
                 </span>framework: Arc::clone(<span class="kw-2">&amp;</span>framework_cell),
                 shard_index: <span class="number">0</span>,
                 shard_init: <span class="number">0</span>,
                 shard_total: <span class="number">0</span>,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
                 </span>voice_manager: voice_manager.as_ref().map(Arc::clone),
                 ws_url: Arc::clone(<span class="kw-2">&amp;</span>ws_url),
-                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
                 </span>cache: Arc::clone(<span class="kw-2">&amp;</span>cache),
                 http: Arc::clone(<span class="kw-2">&amp;</span>http),
                 intents,
@@ -1295,18 +1295,18 @@
                 data,
                 shard_manager,
                 shard_manager_return_value: shard_manager_ret_value,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
                 </span>voice_manager,
                 ws_url,
-                <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+                <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
                 </span>cache,
                 http,
             };
-            <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>framework) = framework {
                 framework.init(<span class="kw-2">&amp;</span>client).<span class="kw">await</span>;
                 <span class="kw">if let </span><span class="prelude-val">Err</span>(_existing) = framework_cell.set(framework.into()) {
-                    <span class="macro">tracing::warn!</span>(<span class="string">&quot;overwrote existing contents of framework OnceLock&quot;</span>);
+                    <span class="macro">tracing::warn!</span>(<span class="string">"overwrote existing contents of framework OnceLock"</span>);
                 }
             }
             <span class="prelude-val">Ok</span>(client)
@@ -1329,7 +1329,7 @@
 /// # Examples
 ///
 /// Creating a Client instance and adding a handler on every message receive, acting as a
-/// &quot;ping-pong&quot; bot is simple:
+/// "ping-pong" bot is simple:
 ///
 /// ```no_run
 /// use serenity::model::prelude::*;
@@ -1341,15 +1341,15 @@
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
 ///     async fn message(&amp;self, context: Context, msg: Message) {
-///         if msg.content == &quot;!ping&quot; {
-///             let _ = msg.channel_id.say(&amp;context, &quot;Pong!&quot;);
+///         if msg.content == "!ping" {
+///             let _ = msg.channel_id.say(&amp;context, "Pong!");
 ///         }
 ///     }
 /// }
 ///
 /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
 /// let mut client =
-///     Client::builder(&quot;my token here&quot;, GatewayIntents::default()).event_handler(Handler).await?;
+///     Client::builder("my token here", GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// # Ok(())
@@ -1359,14 +1359,14 @@
 /// [`Shard`]: crate::gateway::Shard
 /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 /// [sharding docs]: crate::gateway#sharding
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;gateway&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">pub struct </span>Client {
     <span class="doccomment">/// A TypeMap which requires types to be Send + Sync. This is a map that can be safely shared
     /// across contexts.
     ///
     /// The purpose of the data field is to be accessible and persistent across contexts; that is,
     /// data can be modified by one context, and will persist through the future and be accessible
-    /// through other contexts. This is useful for anything that should &quot;live&quot; through the program:
+    /// through other contexts. This is useful for anything that should "live" through the program:
     /// counters, database connections, custom user caches, etc.
     ///
     /// In the meaning of a context, this data can be accessed through [`Context::data`].
@@ -1405,16 +1405,16 @@
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, ctx: Context, _: Message) {
-    ///         reg(ctx, &quot;MessageCreate&quot;).await
+    ///         reg(ctx, "MessageCreate").await
     ///     }
     ///     async fn message_delete(&amp;self, ctx: Context, _: ChannelId, _: MessageId) {
-    ///         reg(ctx, &quot;MessageDelete&quot;).await
+    ///         reg(ctx, "MessageDelete").await
     ///     }
     ///     async fn message_delete_bulk(&amp;self, ctx: Context, _: ChannelId, _: Vec&lt;MessageId&gt;) {
-    ///         reg(ctx, &quot;MessageDeleteBulk&quot;).await
+    ///         reg(ctx, "MessageDeleteBulk").await
     ///     }
     ///
-    ///     #[cfg(feature = &quot;cache&quot;)]
+    ///     #[cfg(feature = "cache")]
     ///     async fn message_update(
     ///         &amp;self,
     ///         ctx: Context,
@@ -1422,17 +1422,17 @@
     ///         _new: Option&lt;Message&gt;,
     ///         _: MessageUpdateEvent,
     ///     ) {
-    ///         reg(ctx, &quot;MessageUpdate&quot;).await
+    ///         reg(ctx, "MessageUpdate").await
     ///     }
     ///
-    ///     #[cfg(not(feature = &quot;cache&quot;))]
+    ///     #[cfg(not(feature = "cache"))]
     ///     async fn message_update(&amp;self, ctx: Context, _new_data: MessageUpdateEvent) {
-    ///         reg(ctx, &quot;MessageUpdate&quot;).await
+    ///         reg(ctx, "MessageUpdate").await
     ///     }
     /// }
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;
     /// {
     ///     let mut data = client.data.write().await;
@@ -1459,7 +1459,7 @@
     /// # Examples
     ///
     /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this HashMap will only
-    /// ever contain a single key of `3`, as that&#39;s the only Shard the client is responsible for.
+    /// ever contain a single key of `3`, as that's the only Shard the client is responsible for.
     ///
     /// If you call [`client.start_shards(10)`][`Client::start_shards`], this HashMap will contain
     /// keys 0 through 9, one for each shard handled by the client.
@@ -1477,7 +1477,7 @@
     /// tokio::spawn(async move {
     ///     loop {
     ///         let count = shard_manager.shards_instantiated().await.len();
-    ///         println!(&quot;Shard count instantiated: {}&quot;, count);
+    ///         println!("Shard count instantiated: {}", count);
     ///
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
     ///     }
@@ -1502,7 +1502,7 @@
     ///
     ///     shard_manager.shutdown_all().await;
     ///
-    ///     println!(&quot;Shutdown shard manager!&quot;);
+    ///     println!("Shutdown shard manager!");
     /// });
     /// # }
     /// ```
@@ -1510,18 +1510,18 @@
     shard_manager_return_value: Receiver&lt;<span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;&gt;,
     <span class="doccomment">/// The voice manager for the client.
     ///
-    /// This is an ergonomic structure for interfacing over shards&#39; voice
+    /// This is an ergonomic structure for interfacing over shards' voice
     /// connections.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
-    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">&#39;static</span>&gt;&gt;,
-    <span class="doccomment">/// URL that the client&#39;s shards will use to connect to the gateway.
+    </span><span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
+    </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">'static</span>&gt;&gt;,
+    <span class="doccomment">/// URL that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used for debugging.
     ///
     /// This is wrapped in an `Arc&lt;Mutex&lt;T&gt;&gt;` so all shards will have an updated value available.
     </span><span class="kw">pub </span>ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
     <span class="doccomment">/// The cache for the client.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
     <span class="doccomment">/// An HTTP client.
     </span><span class="kw">pub </span>http: Arc&lt;Http&gt;,
@@ -1554,11 +1554,11 @@
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start().await {
-    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
     /// # }
@@ -1591,11 +1591,11 @@
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_autosharded().await {
-    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
     /// # }
@@ -1637,11 +1637,11 @@
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(3, 5).await {
-    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
     /// # }
@@ -1656,11 +1656,11 @@
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(0, 1).await {
-    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
     /// # }
@@ -1697,11 +1697,11 @@
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shards(8).await {
-    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
     /// # }
@@ -1738,11 +1738,11 @@
     /// use serenity::Client;
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-    /// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&amp;token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard_range(4..7, 10).await {
-    ///     println!(&quot;Err with client: {:?}&quot;, why);
+    ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
     /// # }
@@ -1775,7 +1775,7 @@
         end_shard: u32,
         total_shards: u32,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
             <span class="kw">let </span>user = <span class="self">self</span>.http.get_current_user().<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1786,11 +1786,11 @@
 
         <span class="self">self</span>.shard_manager.set_shards(start_shard, init, total_shards).<span class="kw">await</span>;
 
-        <span class="macro">debug!</span>(<span class="string">&quot;Initializing shard info: {} - {}/{}&quot;</span>, start_shard, init, total_shards);
+        <span class="macro">debug!</span>(<span class="string">"Initializing shard info: {} - {}/{}"</span>, start_shard, init, total_shards);
 
         <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard_manager.initialize() {
-            <span class="macro">error!</span>(<span class="string">&quot;Failed to boot a shard: {:?}&quot;</span>, why);
-            <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Failed to boot a shard: {:?}"</span>, why);
+            <span class="macro">info!</span>(<span class="string">"Shutting down all shards"</span>);
 
             <span class="self">self</span>.shard_manager.shutdown_all().<span class="kw">await</span>;
 

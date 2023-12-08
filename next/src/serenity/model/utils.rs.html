@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/utils.rs`."><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/utils.rs`."><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -325,35 +325,35 @@
     <span class="bool-val">true
 </span>}
 
-<span class="doccomment">/// Helper function for `#[serde(skip_serializing_if = &quot;is_false&quot;)]`
+<span class="doccomment">/// Helper function for `#[serde(skip_serializing_if = "is_false")]`
 </span><span class="attr">#[allow(clippy::trivially_copy_pass_by_ref)]
 </span><span class="kw">pub fn </span>is_false(v: <span class="kw-2">&amp;</span>bool) -&gt; bool {
     !v
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>avatar_url(
     guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     user_id: UserId,
     hash: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ImageHash&gt;,
 ) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
     hash.map(|hash| {
-        <span class="kw">let </span>ext = <span class="kw">if </span>hash.is_animated() { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;webp&quot; </span>};
+        <span class="kw">let </span>ext = <span class="kw">if </span>hash.is_animated() { <span class="string">"gif" </span>} <span class="kw">else </span>{ <span class="string">"webp" </span>};
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
-            <span class="macro">cdn!</span>(<span class="string">&quot;/guilds/{}/users/{}/avatars/{}.{}?size=1024&quot;</span>, guild_id, user_id, hash, ext)
+            <span class="macro">cdn!</span>(<span class="string">"/guilds/{}/users/{}/avatars/{}.{}?size=1024"</span>, guild_id, user_id, hash, ext)
         } <span class="kw">else </span>{
-            <span class="macro">cdn!</span>(<span class="string">&quot;/avatars/{}/{}.{}?size=1024&quot;</span>, user_id, hash, ext)
+            <span class="macro">cdn!</span>(<span class="string">"/avatars/{}/{}.{}?size=1024"</span>, user_id, hash, ext)
         }
     })
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>icon_url(id: GuildId, icon: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ImageHash&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
     icon.map(|icon| {
-        <span class="kw">let </span>ext = <span class="kw">if </span>icon.is_animated() { <span class="string">&quot;gif&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;webp&quot; </span>};
+        <span class="kw">let </span>ext = <span class="kw">if </span>icon.is_animated() { <span class="string">"gif" </span>} <span class="kw">else </span>{ <span class="string">"webp" </span>};
 
-        <span class="macro">cdn!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>, id, icon, ext)
+        <span class="macro">cdn!</span>(<span class="string">"/icons/{}/{}.{}"</span>, id, icon, ext)
     })
 }
 
@@ -373,7 +373,7 @@
     map.remove(key).map(deserialize_val).transpose()
 }
 
-<span class="kw">pub fn </span>remove_from_map&lt;T, E&gt;(map: <span class="kw-2">&amp;mut </span>JsonMap, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; StdResult&lt;T, E&gt;
+<span class="kw">pub fn </span>remove_from_map&lt;T, E&gt;(map: <span class="kw-2">&amp;mut </span>JsonMap, key: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; StdResult&lt;T, E&gt;
 <span class="kw">where
     </span>T: serde::de::DeserializeOwned,
     E: serde::de::Error,
@@ -381,7 +381,7 @@
     remove_from_map_opt(map, key)<span class="question-mark">?</span>.ok_or_else(|| serde::de::Error::missing_field(key))
 }
 
-<span class="doccomment">/// Used with `#[serde(with = &quot;emojis&quot;)]`
+<span class="doccomment">/// Used with `#[serde(with = "emojis")]`
 </span><span class="kw">pub mod </span>emojis {
     <span class="kw">use </span>std::collections::HashMap;
 
@@ -391,7 +391,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::model::guild::Emoji;
     <span class="kw">use </span><span class="kw">crate</span>::model::id::EmojiId;
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
         deserializer: D,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;EmojiId, Emoji&gt;, D::Error&gt; {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|emoji: <span class="kw-2">&amp;</span>Emoji| emoji.id))
@@ -400,12 +400,12 @@
     <span class="kw">pub use </span><span class="kw">super</span>::serialize_map_values <span class="kw">as </span>serialize;
 }
 
-<span class="kw">pub fn </span>deserialize_guild_channels&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+<span class="kw">pub fn </span>deserialize_guild_channels&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
     deserializer: D,
 ) -&gt; StdResult&lt;HashMap&lt;ChannelId, GuildChannel&gt;, D::Error&gt; {
     <span class="kw">struct </span>TryDeserialize&lt;T&gt;(StdResult&lt;T, String&gt;);
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>TryDeserialize&lt;T&gt; {
-        <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+    <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>, T: Deserialize&lt;<span class="lifetime">'de</span>&gt;&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>TryDeserialize&lt;T&gt; {
+        <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>(T::deserialize(deserializer).map_err(|e| e.to_string())))
         }
     }
@@ -418,20 +418,20 @@
             <span class="prelude-val">Ok</span>(channel) =&gt; {
                 map.insert(channel.id, channel);
             },
-            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">tracing::warn!</span>(<span class="string">&quot;skipping guild channel due to deserialization error: {}&quot;</span>, e),
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">tracing::warn!</span>(<span class="string">"skipping guild channel due to deserialization error: {}"</span>, e),
         }
     }
 
     <span class="prelude-val">Ok</span>(map)
 }
 
-<span class="kw">pub fn </span>deserialize_members&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+<span class="kw">pub fn </span>deserialize_members&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
     deserializer: D,
 ) -&gt; StdResult&lt;HashMap&lt;UserId, Member&gt;, D::Error&gt; {
     deserializer.deserialize_seq(SequenceToMapVisitor::new(|member: <span class="kw-2">&amp;</span>Member| member.user.id))
 }
 
-<span class="doccomment">/// Used with `#[serde(with = &quot;presences&quot;)]`
+<span class="doccomment">/// Used with `#[serde(with = "presences")]`
 </span><span class="kw">pub mod </span>presences {
     <span class="kw">use </span>std::collections::HashMap;
 
@@ -441,7 +441,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::model::gateway::Presence;
     <span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
         deserializer: D,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;UserId, Presence&gt;, D::Error&gt; {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|p: <span class="kw-2">&amp;</span>Presence| p.user.id))
@@ -450,7 +450,7 @@
     <span class="kw">pub use </span><span class="kw">super</span>::serialize_map_values <span class="kw">as </span>serialize;
 }
 
-<span class="kw">pub fn </span>deserialize_buttons&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+<span class="kw">pub fn </span>deserialize_buttons&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
     deserializer: D,
 ) -&gt; StdResult&lt;Vec&lt;ActivityButton&gt;, D::Error&gt; {
     Vec::deserialize(deserializer).map(|labels| {
@@ -464,7 +464,7 @@
     })
 }
 
-<span class="doccomment">/// Used with `#[serde(with = &quot;roles&quot;)]`
+<span class="doccomment">/// Used with `#[serde(with = "roles")]`
 </span><span class="kw">pub mod </span>roles {
     <span class="kw">use </span>std::collections::HashMap;
 
@@ -474,7 +474,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::model::guild::Role;
     <span class="kw">use </span><span class="kw">crate</span>::model::id::RoleId;
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
         deserializer: D,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;RoleId, Role&gt;, D::Error&gt; {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|role: <span class="kw-2">&amp;</span>Role| role.id))
@@ -483,7 +483,7 @@
     <span class="kw">pub use </span><span class="kw">super</span>::serialize_map_values <span class="kw">as </span>serialize;
 }
 
-<span class="doccomment">/// Used with `#[serde(with = &quot;stickers&quot;)]`
+<span class="doccomment">/// Used with `#[serde(with = "stickers")]`
 </span><span class="kw">pub mod </span>stickers {
     <span class="kw">use </span>std::collections::HashMap;
 
@@ -493,7 +493,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::model::id::StickerId;
     <span class="kw">use </span><span class="kw">crate</span>::model::sticker::Sticker;
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
         deserializer: D,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;StickerId, Sticker&gt;, D::Error&gt; {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|sticker: <span class="kw-2">&amp;</span>Sticker| sticker.id))
@@ -502,26 +502,26 @@
     <span class="kw">pub use </span><span class="kw">super</span>::serialize_map_values <span class="kw">as </span>serialize;
 }
 
-<span class="doccomment">/// Used with `#[serde(with = &quot;comma_separated_string&quot;)]`
+<span class="doccomment">/// Used with `#[serde(with = "comma_separated_string")]`
 </span><span class="kw">pub mod </span>comma_separated_string {
     <span class="kw">use </span>serde::{Deserialize, Deserializer, Serializer};
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
         deserializer: D,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, D::Error&gt; {
         <span class="kw">let </span>str_sequence = String::deserialize(deserializer)<span class="question-mark">?</span>;
-        <span class="kw">let </span>vec = str_sequence.split(<span class="string">&quot;, &quot;</span>).map(str::to_owned).collect();
+        <span class="kw">let </span>vec = str_sequence.split(<span class="string">", "</span>).map(str::to_owned).collect();
 
         <span class="prelude-val">Ok</span>(vec)
     }
 
     <span class="attr">#[allow(clippy::ptr_arg)]
     </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(vec: <span class="kw-2">&amp;</span>Vec&lt;String&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-        serializer.serialize_str(<span class="kw-2">&amp;</span>vec.join(<span class="string">&quot;, &quot;</span>))
+        serializer.serialize_str(<span class="kw-2">&amp;</span>vec.join(<span class="string">", "</span>))
     }
 }
 
-<span class="doccomment">/// Used with `#[serde(with = &quot;single_recipient&quot;)]`
+<span class="doccomment">/// Used with `#[serde(with = "single_recipient")]`
 </span><span class="kw">pub mod </span>single_recipient {
     <span class="kw">use </span>serde::de::Error;
     <span class="kw">use </span>serde::ser::SerializeSeq;
@@ -529,11 +529,11 @@
 
     <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;User, D::Error&gt; {
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;User, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>users: Vec&lt;User&gt; = Vec::deserialize(deserializer)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>user = <span class="kw">if </span>users.is_empty() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::custom(<span class="string">&quot;Expected a single recipient&quot;</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::custom(<span class="string">"Expected a single recipient"</span>));
         } <span class="kw">else </span>{
             users.remove(<span class="number">0</span>)
         };
@@ -554,7 +554,7 @@
     <span class="kw">use </span>secrecy::{ExposeSecret, Secret, Zeroize};
     <span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, S: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; + Zeroize, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, S: Deserialize&lt;<span class="lifetime">'de</span>&gt; + Zeroize, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
         deserializer: D,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Secret&lt;S&gt;&gt;, D::Error&gt; {
         <span class="prelude-ty">Option</span>::&lt;S&gt;::deserialize(deserializer).map(|s| s.map(Secret::new))
@@ -568,7 +568,7 @@
     }
 }
 
-<span class="kw">pub fn </span>deserialize_voice_states&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+<span class="kw">pub fn </span>deserialize_voice_states&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
     deserializer: D,
 ) -&gt; StdResult&lt;HashMap&lt;UserId, VoiceState&gt;, D::Error&gt; {
     deserializer.deserialize_seq(SequenceToMapVisitor::new(|state: <span class="kw-2">&amp;</span>VoiceState| state.user_id))
@@ -602,21 +602,21 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, F, K, V&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SequenceToMapVisitor&lt;F, V&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>, F, K, V&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>SequenceToMapVisitor&lt;F, V&gt;
 <span class="kw">where
     </span>K: Eq + Hash,
-    V: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
+    V: Deserialize&lt;<span class="lifetime">'de</span>&gt;,
     F: FnMut(<span class="kw-2">&amp;</span>V) -&gt; K,
 {
     <span class="kw">type </span>Value = HashMap&lt;K, V&gt;;
 
-    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        formatter.write_str(<span class="string">&quot;sequence&quot;</span>)
+    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        formatter.write_str(<span class="string">"sequence"</span>)
     }
 
     <span class="kw">fn </span>visit_seq&lt;A&gt;(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>seq: A) -&gt; StdResult&lt;<span class="self">Self</span>::Value, A::Error&gt;
     <span class="kw">where
-        </span>A: serde::de::SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
+        </span>A: serde::de::SeqAccess&lt;<span class="lifetime">'de</span>&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>map = seq.size_hint().map_or_else(HashMap::new, HashMap::with_capacity);
         <span class="kw">while let </span><span class="prelude-val">Some</span>(elem) = seq.next_element()<span class="question-mark">? </span>{

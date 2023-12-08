@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/id.rs`."><title>id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/id.rs`."><title>id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -414,7 +414,7 @@
     ($(<span class="macro-nonterminal">$name</span>:ident;)<span class="kw-2">*</span>) =&gt; {
         $(
             <span class="kw">impl </span><span class="macro-nonterminal">$name </span>{
-                <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Creates a new &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot; from a u64.&quot;</span>)]
+                <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">"Creates a new "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">" from a u64."</span>)]
                 </span><span class="doccomment">/// # Panics
                 /// Panics if `id` is zero.
                 </span><span class="attr">#[inline]
@@ -423,7 +423,7 @@
                 </span><span class="kw">pub const fn </span>new(id: u64) -&gt; <span class="self">Self </span>{
                     <span class="kw">match </span>NonZeroU64::new(id) {
                         <span class="prelude-val">Some</span>(inner) =&gt; <span class="self">Self</span>(inner),
-                        <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="macro">concat!</span>(<span class="string">&quot;Attempted to call &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot;::new with invalid (0) value&quot;</span>))
+                        <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="macro">concat!</span>(<span class="string">"Attempted to call "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">"::new with invalid (0) value"</span>))
                     }
                 }
 
@@ -434,7 +434,7 @@
                     <span class="self">self</span>.<span class="number">0</span>.get()
                 }
 
-                <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Retrieves the time that the &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot; was created.&quot;</span>)]
+                <span class="attr">#[doc = <span class="macro">concat!</span>(<span class="string">"Retrieves the time that the "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">" was created."</span>)]
                 #[must_use]
                 </span><span class="kw">pub fn </span>created_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Timestamp {
                     Timestamp::from_discord_id(<span class="self">self</span>.get())
@@ -461,8 +461,8 @@
                 </span>}
             }
 
-            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$name</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
-                <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$name</span>) -&gt; <span class="macro-nonterminal">$name </span>{
+            <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="macro-nonterminal">$name</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
+                <span class="kw">fn </span>from(id: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="macro-nonterminal">$name</span>) -&gt; <span class="macro-nonterminal">$name </span>{
                     id.clone()
                 }
             }
@@ -486,7 +486,7 @@
             }
 
             <span class="kw">impl </span>fmt::Display <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
-                <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
                     <span class="kw">let </span>inner = <span class="self">self</span>.<span class="number">0</span>;
                     fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f)
                 }
@@ -524,7 +524,7 @@
                 }
             }
 
-            <span class="attr">#[cfg(feature = <span class="string">&quot;typesize&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"typesize"</span>)]
             </span><span class="kw">impl </span>typesize::TypeSize <span class="kw">for </span><span class="macro-nonterminal">$name </span>{}
         )*
     }
@@ -533,128 +533,128 @@
 <span class="doccomment">/// An identifier for an Application.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>ApplicationId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>ApplicationId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Channel
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>ChannelId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>ChannelId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an Emoji
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>EmojiId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>EmojiId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an unspecific entity.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="comment">// TODO: replace occurences of `#[serde(with = &quot;snowflake&quot;)] u64` in the codebase with GenericId
-</span><span class="kw">pub struct </span>GenericId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="comment">// TODO: replace occurences of `#[serde(with = "snowflake")] u64` in the codebase with GenericId
+</span><span class="kw">pub struct </span>GenericId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Guild
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>GuildId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>GuildId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an Integration
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>IntegrationId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>IntegrationId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Message
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>MessageId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>MessageId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Role
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>RoleId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>RoleId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an auto moderation rule
 </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>RuleId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>RuleId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a Scheduled Event
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>ScheduledEventId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>ScheduledEventId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a User
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>UserId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>UserId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a [`Webhook`][super::webhook::Webhook]
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>WebhookId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>WebhookId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an audit log entry.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>AuditLogEntryId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>AuditLogEntryId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an attachment.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>AttachmentId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>AttachmentId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a sticker.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>StickerId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>StickerId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a sticker pack.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>StickerPackId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>StickerPackId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a sticker pack banner.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>StickerPackBannerId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>StickerPackBannerId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a SKU.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>SkuId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>SkuId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for an interaction.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>InteractionId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>InteractionId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>CommandId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>CommandId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command permission Id. Can contain
 /// a [`RoleId`] or [`UserId`].
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>CommandPermissionId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>CommandPermissionId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command version Id.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>CommandVersionId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>CommandVersionId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a slash command target Id. Can contain
 /// a [`UserId`] or [`MessageId`].
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>TargetId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>TargetId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a stage channel instance.
 </span><span class="attr">#[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>StageInstanceId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>StageInstanceId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="doccomment">/// An identifier for a forum tag.
 </span><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-</span><span class="kw">pub struct </span>ForumTagId(<span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)] </span>NonZeroU64);
+</span><span class="kw">pub struct </span>ForumTagId(<span class="attr">#[serde(with = <span class="string">"snowflake"</span>)] </span>NonZeroU64);
 
 <span class="macro">id_u64! </span>{
     AttachmentId;
@@ -688,13 +688,13 @@
 ///
 /// This identifier is special, it simply models internal IDs for type safety,
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 </span><span class="kw">pub struct </span>ShardId(<span class="kw">pub </span>u32);
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ShardId {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -705,19 +705,19 @@
 /// ```rust,ignore
 /// #[derive(Deserialize, Serialize)]
 /// struct A {
-///     #[serde(with = &quot;snowflake&quot;)]
+///     #[serde(with = "snowflake")]
 ///     id: u64,
 /// }
 ///
 /// #[derive(Deserialize)]
 /// struct B {
-///     #[serde(deserialize_with = &quot;snowflake::deserialize&quot;)]
+///     #[serde(deserialize_with = "snowflake::deserialize")]
 ///     id: u64,
 /// }
 ///
 /// #[derive(Serialize)]
 /// struct C {
-///     #[serde(serialize_with = &quot;snowflake::serialize&quot;)]
+///     #[serde(serialize_with = "snowflake::serialize")]
 ///     id: u64,
 /// }
 /// ```
@@ -729,7 +729,7 @@
     <span class="kw">use </span>serde::de::{Error, Visitor};
     <span class="kw">use </span>serde::{Deserializer, Serializer};
 
-    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;NonZeroU64, D::Error&gt; {
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;NonZeroU64, D::Error&gt; {
         deserializer.deserialize_any(SnowflakeVisitor)
     }
 
@@ -740,11 +740,11 @@
 
     <span class="kw">struct </span>SnowflakeVisitor;
 
-    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SnowflakeVisitor {
+    <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>SnowflakeVisitor {
         <span class="kw">type </span>Value = NonZeroU64;
 
-        <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-            formatter.write_str(<span class="string">&quot;a non-zero string or integer snowflake&quot;</span>)
+        <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+            formatter.write_str(<span class="string">"a non-zero string or integer snowflake"</span>)
         }
 
         <span class="comment">// Called by formats like TOML.
@@ -753,7 +753,7 @@
         }
 
         <span class="kw">fn </span>visit_u64&lt;E: Error&gt;(<span class="self">self</span>, value: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
-            NonZeroU64::new(value).ok_or_else(|| Error::custom(<span class="string">&quot;invalid value, expected non-zero&quot;</span>))
+            NonZeroU64::new(value).ok_or_else(|| Error::custom(<span class="string">"invalid value, expected non-zero"</span>))
         }
 
         <span class="kw">fn </span>visit_str&lt;E: Error&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
@@ -770,10 +770,10 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_created_at() {
-        <span class="comment">// The id is from discord&#39;s snowflake docs
+        <span class="comment">// The id is from discord's snowflake docs
         </span><span class="kw">let </span>id = GuildId::new(<span class="number">175928847299117063</span>);
         <span class="macro">assert_eq!</span>(id.created_at().unix_timestamp(), <span class="number">1462015105</span>);
-        <span class="macro">assert_eq!</span>(id.created_at().to_string(), <span class="string">&quot;2016-04-30T11:18:25.796Z&quot;</span>);
+        <span class="macro">assert_eq!</span>(id.created_at().to_string(), <span class="string">"2016-04-30T11:18:25.796Z"</span>);
     }
 
     <span class="attr">#[test]
@@ -785,7 +785,7 @@
 
         <span class="attr">#[derive(Debug, PartialEq, Deserialize, Serialize)]
         </span><span class="kw">struct </span>S {
-            <span class="attr">#[serde(with = <span class="string">&quot;snowflake&quot;</span>)]
+            <span class="attr">#[serde(with = <span class="string">"snowflake"</span>)]
             </span>id: NonZeroU64,
         }
 
@@ -795,17 +795,17 @@
         }
 
         <span class="kw">let </span>id = GuildId::new(<span class="number">17_5928_8472_9911_7063</span>);
-        assert_json(<span class="kw-2">&amp;</span>id, <span class="macro">json!</span>(<span class="string">&quot;175928847299117063&quot;</span>));
+        assert_json(<span class="kw-2">&amp;</span>id, <span class="macro">json!</span>(<span class="string">"175928847299117063"</span>));
 
         <span class="kw">let </span>s = S {
             id: NonZeroU64::new(<span class="number">17_5928_8472_9911_7063</span>).unwrap(),
         };
-        assert_json(<span class="kw-2">&amp;</span>s, <span class="macro">json!</span>({<span class="string">&quot;id&quot;</span>: <span class="string">&quot;175928847299117063&quot;</span>}));
+        assert_json(<span class="kw-2">&amp;</span>s, <span class="macro">json!</span>({<span class="string">"id"</span>: <span class="string">"175928847299117063"</span>}));
 
         <span class="kw">let </span>s = Opt {
             id: <span class="prelude-val">Some</span>(GuildId::new(<span class="number">17_5928_8472_9911_7063</span>)),
         };
-        assert_json(<span class="kw-2">&amp;</span>s, <span class="macro">json!</span>({<span class="string">&quot;id&quot;</span>: <span class="string">&quot;175928847299117063&quot;</span>}));
+        assert_json(<span class="kw-2">&amp;</span>s, <span class="macro">json!</span>({<span class="string">"id"</span>: <span class="string">"175928847299117063"</span>}));
     }
 }
 </code></pre></div></section></main></body></html>

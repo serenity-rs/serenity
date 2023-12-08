@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/interactions_endpoint.rs`."><title>interactions_endpoint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/interactions_endpoint.rs`."><title>interactions_endpoint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -117,10 +117,10 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Contains tools related to Discord&#39;s Interactions Endpoint URL feature.
+</pre></div><pre class="rust"><code><span class="doccomment">//! Contains tools related to Discord's Interactions Endpoint URL feature.
 //!
-//! &quot;You can optionally configure an interactions endpoint to receive interactions via HTTP POSTs
-//! rather than over Gateway with a bot user.&quot;
+//! "You can optionally configure an interactions endpoint to receive interactions via HTTP POSTs
+//! rather than over Gateway with a bot user."
 //!
 //! &lt;https://discord.com/developers/docs/tutorials/upgrading-to-application-commands#adding-an-interactions-endpoint-url&gt;
 //!
@@ -139,16 +139,16 @@
     <span class="prelude-val">Some</span>(res)
 }
 
-<span class="doccomment">/// The byte array couldn&#39;t be parsed into a valid cryptographic public key.
+<span class="doccomment">/// The byte array couldn't be parsed into a valid cryptographic public key.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>InvalidKey(ed25519_dalek::SignatureError);
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>InvalidKey {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;invalid bot public key: {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"invalid bot public key: {}"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 <span class="kw">impl </span>std::error::Error <span class="kw">for </span>InvalidKey {
-    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">&#39;static</span>)&gt; {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">'static</span>)&gt; {
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -161,13 +161,13 @@
 /// use serenity::interactions_endpoint::Verifier;
 ///
 /// let verifier =
-///     Verifier::new(&quot;67c6bd767ca099e79efac9fcce4d2022a63bf7dea780e7f3d813f694c1597089&quot;);
+///     Verifier::new("67c6bd767ca099e79efac9fcce4d2022a63bf7dea780e7f3d813f694c1597089");
 ///
 /// // When receiving an HTTP request:
-/// # let http_headers = std::collections::HashMap::from([(&quot;X-Signature-Ed25519&quot;, &quot;&quot;), (&quot;X-Signature-Timestamp&quot;, &quot;&quot;)]);
+/// # let http_headers = std::collections::HashMap::from([("X-Signature-Ed25519", ""), ("X-Signature-Timestamp", "")]);
 /// # let request_body = &amp;[];
-/// let signature = http_headers[&quot;X-Signature-Ed25519&quot;];
-/// let timestamp = http_headers[&quot;X-Signature-Timestamp&quot;];
+/// let signature = http_headers["X-Signature-Ed25519"];
+/// let timestamp = http_headers["X-Signature-Timestamp"];
 /// if verifier.verify(signature, timestamp, request_body).is_err() {
 ///     // Send HTTP 401 Unauthorized response
 /// }
@@ -183,15 +183,15 @@
     /// [`Self::try_new()`].
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(public_key: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::try_new(parse_hex(public_key).expect(<span class="string">&quot;public key must be a 64 digit hex string&quot;</span>))
-            .expect(<span class="string">&quot;invalid public key&quot;</span>)
+        <span class="self">Self</span>::try_new(parse_hex(public_key).expect(<span class="string">"public key must be a 64 digit hex string"</span>))
+            .expect(<span class="string">"invalid public key"</span>)
     }
 
     <span class="doccomment">/// Creates a new [`Verifier`] from the public key bytes.
     ///
     /// # Errors
     ///
-    /// [`InvalidKey`] if the key isn&#39;t cryptographically valid.
+    /// [`InvalidKey`] if the key isn't cryptographically valid.
     </span><span class="kw">pub fn </span>try_new(public_key: [u8; <span class="number">32</span>]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidKey&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             public_key: ed25519_dalek::VerifyingKey::from_bytes(<span class="kw-2">&amp;</span>public_key).map_err(InvalidKey)<span class="question-mark">?</span>,
@@ -200,7 +200,7 @@
 
     <span class="doccomment">/// Verifies a Discord request for authenticity, given the `X-Signature-Ed25519` HTTP header,
     /// `X-Signature-Timestamp` HTTP headers and request body.
-    </span><span class="comment">// We just need to differentiate &quot;pass&quot; and &quot;failure&quot;. There&#39;s deliberately no data besides ().
+    </span><span class="comment">// We just need to differentiate "pass" and "failure". There's deliberately no data besides ().
     </span><span class="attr">#[allow(clippy::result_unit_err, clippy::missing_errors_doc)]
     </span><span class="kw">pub fn </span>verify(<span class="kw-2">&amp;</span><span class="self">self</span>, signature: <span class="kw-2">&amp;</span>str, timestamp: <span class="kw-2">&amp;</span>str, body: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), ()&gt; {
         <span class="kw">use </span>ed25519_dalek::Verifier <span class="kw">as _</span>;
@@ -221,13 +221,13 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_parse_hex() {
-        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">&quot;bf7dea78&quot;</span>), <span class="prelude-val">Some</span>([<span class="number">0xBF</span>, <span class="number">0x7D</span>, <span class="number">0xEA</span>, <span class="number">0x78</span>]));
-        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">&quot;bf7dea7&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">&quot;bf7dea789&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">&quot;bf7dea7x&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(parse_hex(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Some</span>([]));
+        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">"bf7dea78"</span>), <span class="prelude-val">Some</span>([<span class="number">0xBF</span>, <span class="number">0x7D</span>, <span class="number">0xEA</span>, <span class="number">0x78</span>]));
+        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">"bf7dea7"</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">"bf7dea789"</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(parse_hex::&lt;<span class="number">4</span>&gt;(<span class="string">"bf7dea7x"</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(parse_hex(<span class="string">""</span>), <span class="prelude-val">Some</span>([]));
         <span class="macro">assert_eq!</span>(
-            parse_hex(<span class="string">&quot;67c6bd767ca099e79efac9fcce4d2022a63bf7dea780e7f3d813f694c1597089&quot;</span>),
+            parse_hex(<span class="string">"67c6bd767ca099e79efac9fcce4d2022a63bf7dea780e7f3d813f694c1597089"</span>),
             <span class="prelude-val">Some</span>([
                 <span class="number">0x67</span>, <span class="number">0xC6</span>, <span class="number">0xBD</span>, <span class="number">0x76</span>, <span class="number">0x7C</span>, <span class="number">0xA0</span>, <span class="number">0x99</span>, <span class="number">0xE7</span>, <span class="number">0x9E</span>, <span class="number">0xFA</span>, <span class="number">0xC9</span>, <span class="number">0xFC</span>, <span class="number">0xCE</span>, <span class="number">0x4D</span>,
                 <span class="number">0x20</span>, <span class="number">0x22</span>, <span class="number">0xA6</span>, <span class="number">0x3B</span>, <span class="number">0xF7</span>, <span class="number">0xDE</span>, <span class="number">0xA7</span>, <span class="number">0x80</span>, <span class="number">0xE7</span>, <span class="number">0xF3</span>, <span class="number">0xD8</span>, <span class="number">0x13</span>, <span class="number">0xF6</span>, <span class="number">0x94</span>,

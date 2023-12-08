@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/bridge/shard_manager.rs`."><title>shard_manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/bridge/shard_manager.rs`."><title>shard_manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -404,7 +404,7 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::sync::atomic::{AtomicU32, Ordering};
 <span class="kw">use </span>std::sync::Arc;
-<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span>std::sync::OnceLock;
 <span class="kw">use </span>std::time::Duration;
 
@@ -415,13 +415,13 @@
 <span class="kw">use </span>tracing::{info, instrument, warn};
 <span class="kw">use </span>typemap_rev::TypeMap;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::VoiceGatewayManager;
 <span class="kw">use super</span>::{ShardId, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="kw">use </span><span class="kw">crate</span>::client::{EventHandler, RawEventHandler};
-<span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, GatewayError, PresenceData};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
@@ -443,12 +443,12 @@
 /// ```rust,no_run
 /// # use std::error::Error;
 /// #
-/// # #[cfg(feature = &quot;voice&quot;)]
+/// # #[cfg(feature = "voice")]
 /// # use serenity::model::id::UserId;
-/// # #[cfg(feature = &quot;cache&quot;)]
+/// # #[cfg(feature = "cache")]
 /// # use serenity::cache::Cache;
 /// #
-/// # #[cfg(feature = &quot;framework&quot;)]
+/// # #[cfg(feature = "framework")]
 /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
 /// #
 /// use std::env;
@@ -471,7 +471,7 @@
 /// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;
-/// let framework = Arc::new(StandardFramework::new()) as Arc&lt;dyn Framework + &#39;static&gt;;
+/// let framework = Arc::new(StandardFramework::new()) as Arc&lt;dyn Framework + 'static&gt;;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data,
@@ -484,10 +484,10 @@
 ///     shard_init: 3,
 ///     // the total number of shards in use
 ///     shard_total: 5,
-///     # #[cfg(feature = &quot;voice&quot;)]
+///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
 ///     ws_url,
-///     # #[cfg(feature = &quot;cache&quot;)]
+///     # #[cfg(feature = "cache")]
 ///     # cache: unimplemented!(),
 ///     # http,
 ///     intents: GatewayIntents::non_privileged(),
@@ -548,24 +548,24 @@
             data: opt.data,
             event_handlers: opt.event_handlers,
             raw_event_handlers: opt.raw_event_handlers,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span>framework: opt.framework,
             last_start: <span class="prelude-val">None</span>,
             manager: Arc::clone(<span class="kw-2">&amp;</span>manager),
             queue: VecDeque::new(),
             runners,
             rx: shard_queue_rx,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
             </span>voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
             </span>cache: opt.cache,
             http: opt.http,
             intents: opt.intents,
             presence: opt.presence,
         };
 
-        spawn_named(<span class="string">&quot;shard_queuer::run&quot;</span>, <span class="kw">async move </span>{
+        spawn_named(<span class="string">"shard_queuer::run"</span>, <span class="kw">async move </span>{
             shard_queuer.run().<span class="kw">await</span>;
         });
 
@@ -615,7 +615,7 @@
 
     <span class="doccomment">/// Restarts a shard runner.
     ///
-    /// This sends a shutdown signal to a shard&#39;s associated [`ShardRunner`], and then queues a
+    /// This sends a shutdown signal to a shard's associated [`ShardRunner`], and then queues a
     /// initialization of a shard runner for the same shard via the [`ShardQueuer`].
     ///
     /// # Examples
@@ -635,7 +635,7 @@
     /// [`ShardRunner`]: super::ShardRunner
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>restart(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId) {
-        <span class="macro">info!</span>(<span class="string">&quot;Restarting shard {}&quot;</span>, shard_id);
+        <span class="macro">info!</span>(<span class="string">"Restarting shard {}"</span>, shard_id);
         <span class="self">self</span>.shutdown(shard_id, <span class="number">4000</span>).<span class="kw">await</span>;
 
         <span class="kw">let </span>shard_total = <span class="self">self</span>.shard_total.load(Ordering::Relaxed);
@@ -664,7 +664,7 @@
     </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId, code: u16) {
         <span class="kw">const </span>TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(<span class="number">5</span>);
 
-        <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, shard_id);
+        <span class="macro">info!</span>(<span class="string">"Shutting down shard {}"</span>, shard_id);
 
         {
             <span class="kw">let </span><span class="kw-2">mut </span>shard_shutdown = <span class="self">self</span>.shard_shutdown.lock().<span class="kw">await</span>;
@@ -676,7 +676,7 @@
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(shutdown_shard_id)) =&gt; {
                     <span class="kw">if </span>shutdown_shard_id != shard_id {
                         <span class="macro">warn!</span>(
-                        <span class="string">&quot;Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID&quot;</span>,
+                        <span class="string">"Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID"</span>,
                         shard_id,
                     );
                     }
@@ -684,7 +684,7 @@
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
                 <span class="prelude-val">Err</span>(why) =&gt; {
                     <span class="macro">warn!</span>(
-                        <span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>,
+                        <span class="string">"Failed to cleanly shutdown shard {}, reached timeout: {:?}"</span>,
                         shard_id, why
                     );
                 },
@@ -714,7 +714,7 @@
             runners.keys().copied().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
         };
 
-        <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Shutting down all shards"</span>);
 
         <span class="kw">for </span>shard_id <span class="kw">in </span>keys {
             <span class="self">self</span>.shutdown(shard_id, <span class="number">1000</span>).<span class="kw">await</span>;
@@ -729,7 +729,7 @@
 
     <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">fn </span>boot(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_info: [ShardId; <span class="number">2</span>]) {
-        <span class="macro">info!</span>(<span class="string">&quot;Telling shard queuer to start shard {}&quot;</span>, shard_info[<span class="number">0</span>]);
+        <span class="macro">info!</span>(<span class="string">"Telling shard queuer to start shard {}"</span>, shard_info[<span class="number">0</span>]);
 
         <span class="kw">let </span>msg = ShardQueuerMessage::Start(shard_info[<span class="number">0</span>], shard_info[<span class="number">1</span>]);
 
@@ -744,20 +744,20 @@
 
     <span class="kw">pub async fn </span>return_with_value(<span class="kw-2">&amp;</span><span class="self">self</span>, ret: <span class="prelude-ty">Result</span>&lt;(), GatewayError&gt;) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.return_value_tx.lock().<span class="kw">await</span>.send(ret).<span class="kw">await </span>{
-            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to send return value: {}&quot;</span>, e);
+            <span class="macro">tracing::warn!</span>(<span class="string">"failed to send return value: {}"</span>, e);
         }
     }
 
     <span class="kw">pub fn </span>shutdown_finished(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ShardId) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.shard_shutdown_send.unbounded_send(id) {
-            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to notify about finished shutdown: {}&quot;</span>, e);
+            <span class="macro">tracing::warn!</span>(<span class="string">"failed to notify about finished shutdown: {}"</span>, e);
         }
     }
 
     <span class="kw">pub async fn </span>restart_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ShardId) {
         <span class="self">self</span>.restart(id).<span class="kw">await</span>;
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.shard_shutdown_send.unbounded_send(id) {
-            <span class="macro">tracing::warn!</span>(<span class="string">&quot;failed to notify about finished shutdown: {}&quot;</span>, e);
+            <span class="macro">tracing::warn!</span>(<span class="string">"failed to notify about finished shutdown: {}"</span>, e);
         }
     }
 
@@ -790,15 +790,15 @@
     <span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
     <span class="kw">pub </span>event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     <span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;framework&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span><span class="kw">pub </span>framework: Arc&lt;OnceLock&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;&gt;,
     <span class="kw">pub </span>shard_index: u32,
     <span class="kw">pub </span>shard_init: u32,
     <span class="kw">pub </span>shard_total: u32,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;voice&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
     </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt;,
     <span class="kw">pub </span>ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
     <span class="kw">pub </span>intents: GatewayIntents,

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/help_commands.rs`."><title>help_commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/help_commands.rs`."><title>help_commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1417,7 +1417,7 @@
 //!
 //! # Example
 //!
-//! Using the [`with_embeds`] function to have the framework&#39;s help message use embeds:
+//! Using the [`with_embeds`] function to have the framework's help message use embeds:
 //!
 //! ```rust,no_run
 //! use std::collections::HashSet;
@@ -1444,17 +1444,17 @@
 //!     context: &amp;Context,
 //!     msg: &amp;Message,
 //!     args: Args,
-//!     help_options: &amp;&#39;static HelpOptions,
-//!     groups: &amp;[&amp;&#39;static CommandGroup],
+//!     help_options: &amp;'static HelpOptions,
+//!     groups: &amp;[&amp;'static CommandGroup],
 //!     owners: HashSet&lt;UserId&gt;,
 //! ) -&gt; CommandResult {
-//! #  #[cfg(all(feature = &quot;cache&quot;, feature = &quot;http&quot;))]
+//! #  #[cfg(all(feature = "cache", feature = "http"))]
 //! # {
 //!     let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners).await;
 //!     Ok(())
 //! # }
 //! #
-//! # #[cfg(not(all(feature = &quot;cache&quot;, feature = &quot;http&quot;)))]
+//! # #[cfg(not(all(feature = "cache", feature = "http")))]
 //! # Ok(())
 //! }
 //!
@@ -1464,19 +1464,19 @@
 //! The same can be accomplished with no embeds by substituting `with_embeds` with the [`plain`]
 //! function.
 
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">use </span>std::{collections::HashSet, fmt::Write};
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">use </span>futures::future::{BoxFuture, FutureExt};
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">use </span>levenshtein::levenshtein;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">use </span>tracing::warn;
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">use </span><span class="kw">super</span>::structures::Command <span class="kw">as </span>InternalCommand;
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">use super</span>::{
     has_correct_permissions,
     has_correct_roles,
@@ -1488,7 +1488,7 @@
     HelpOptions,
     OnlyIn,
 };
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">use crate</span>::{
     builder::{CreateEmbed, CreateMessage},
     cache::Cache,
@@ -1503,12 +1503,12 @@
 
 <span class="doccomment">/// Macro to format a command according to a [`HelpBehaviour`] or continue to the next command-name
 /// upon hiding.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="macro">macro_rules! </span>format_command_name {
     (<span class="macro-nonterminal">$behaviour</span>:expr, <span class="macro-nonterminal">$command_name</span>:expr) =&gt; {
         <span class="kw">match </span><span class="macro-nonterminal">$behaviour </span>{
-            HelpBehaviour::Strike =&gt; <span class="macro">format!</span>(<span class="string">&quot;~~`{}`~~&quot;</span>, <span class="macro-nonterminal">$command_name</span>),
-            HelpBehaviour::Nothing =&gt; <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="macro-nonterminal">$command_name</span>),
+            HelpBehaviour::Strike =&gt; <span class="macro">format!</span>(<span class="string">"~~`{}`~~"</span>, <span class="macro-nonterminal">$command_name</span>),
+            HelpBehaviour::Nothing =&gt; <span class="macro">format!</span>(<span class="string">"`{}`"</span>, <span class="macro-nonterminal">$command_name</span>),
             HelpBehaviour::Hide =&gt; <span class="kw">continue</span>,
         }
     };
@@ -1518,14 +1518,14 @@
 /// help-settings measured to the user.
 </span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>GroupCommandsPair {
-    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-    <span class="kw">pub </span>prefixes: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+    <span class="kw">pub </span>prefixes: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
     <span class="kw">pub </span>command_names: Vec&lt;String&gt;,
-    <span class="kw">pub </span>summary: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="kw">pub </span>summary: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
     <span class="kw">pub </span>sub_groups: Vec&lt;GroupCommandsPair&gt;,
 }
 
-<span class="doccomment">/// A single suggested command containing its name and Levenshtein distance to the actual user&#39;s
+<span class="doccomment">/// A single suggested command containing its name and Levenshtein distance to the actual user's
 /// searched command name.
 </span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>SuggestedCommandName {
@@ -1536,16 +1536,16 @@
 <span class="doccomment">/// A single command containing all related pieces of information.
 </span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
-</span><span class="kw">pub struct </span>Command&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-    <span class="kw">pub </span>group_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
-    <span class="kw">pub </span>group_prefixes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+</span><span class="kw">pub struct </span>Command&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+    <span class="kw">pub </span>group_name: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+    <span class="kw">pub </span>group_prefixes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str],
     <span class="kw">pub </span>sub_commands: Vec&lt;String&gt;,
-    <span class="kw">pub </span>aliases: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
-    <span class="kw">pub </span>availability: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
-    <span class="kw">pub </span>usage: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
-    <span class="kw">pub </span>usage_sample: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    <span class="kw">pub </span>aliases: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
+    <span class="kw">pub </span>availability: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
+    <span class="kw">pub </span>usage: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
+    <span class="kw">pub </span>usage_sample: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
     <span class="kw">pub </span>checks: Vec&lt;String&gt;,
 }
 
@@ -1553,7 +1553,7 @@
 </span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub struct </span>Suggestions(<span class="kw">pub </span>Vec&lt;SuggestedCommandName&gt;);
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">impl </span>Suggestions {
     <span class="doccomment">/// Immutably borrow inner [`Vec`].
     </span><span class="attr">#[inline]
@@ -1588,19 +1588,19 @@
 /// representation.
 </span><span class="attr">#[derive(Clone, Debug)]
 #[non_exhaustive]
-</span><span class="kw">pub enum </span>CustomisedHelpData&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub enum </span>CustomisedHelpData&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// To display suggested commands.
     </span>SuggestedCommands { help_description: String, suggestions: Suggestions },
     <span class="doccomment">/// To display groups and their commands by name.
     </span>GroupedCommands { help_description: String, groups: Vec&lt;GroupCommandsPair&gt; },
     <span class="doccomment">/// To display one specific command.
-    </span>SingleCommand { command: Command&lt;<span class="lifetime">&#39;a</span>&gt; },
+    </span>SingleCommand { command: Command&lt;<span class="lifetime">'a</span>&gt; },
     <span class="doccomment">/// To display failure in finding a fitting command.
-    </span>NoCommandFound { help_error_message: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str },
+    </span>NoCommandFound { help_error_message: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str },
 }
 
 <span class="doccomment">/// Checks whether a user is member of required roles and given the required permissions.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">pub fn </span>has_all_requirements(cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;, cmd: <span class="kw-2">&amp;</span>CommandOptions, msg: <span class="kw-2">&amp;</span>Message) -&gt; bool {
     <span class="kw">let </span>cache = cache.as_ref();
 
@@ -1614,7 +1614,7 @@
                         || (has_correct_roles(<span class="kw-2">&amp;</span>cmd, <span class="kw-2">&amp;</span>roles, <span class="kw-2">&amp;</span>member)
                             &amp;&amp; has_correct_permissions(cache, <span class="kw-2">&amp;</span>cmd, msg))
                 } <span class="kw">else </span>{
-                    <span class="macro">warn!</span>(<span class="string">&quot;Failed to find the guild and its roles.&quot;</span>);
+                    <span class="macro">warn!</span>(<span class="string">"Failed to find the guild and its roles."</span>);
 
                     <span class="bool-val">false
                 </span>};
@@ -1625,16 +1625,16 @@
     cmd.only_in != OnlyIn::Guild
 }
 
-<span class="doccomment">/// Checks if `search_on` starts with `word` and is then cleanly followed by a `&quot; &quot;`.
+<span class="doccomment">/// Checks if `search_on` starts with `word` and is then cleanly followed by a `" "`.
 </span><span class="attr">#[inline]
-#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">fn </span>starts_with_whole_word(search_on: <span class="kw-2">&amp;</span>str, word: <span class="kw-2">&amp;</span>str) -&gt; bool {
     search_on.starts_with(word)
-        &amp;&amp; search_on.get(word.len()..=word.len()).is_some_and(|slice| slice == <span class="string">&quot; &quot;</span>)
+        &amp;&amp; search_on.get(word.len()..=word.len()).is_some_and(|slice| slice == <span class="string">" "</span>)
 }
 
 <span class="comment">// Decides how a listed help entry shall be displayed.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">fn </span>check_common_behaviour(
     cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -1677,7 +1677,7 @@
         .unwrap_or(HelpBehaviour::Nothing)
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">async fn </span>check_command_behaviour(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -1696,7 +1696,7 @@
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let </span><span class="kw-2">mut </span>args = Args::new(<span class="string">&quot;&quot;</span>, <span class="kw-2">&amp;</span>[]);
+            <span class="kw">let </span><span class="kw-2">mut </span>args = Args::new(<span class="string">""</span>, <span class="kw-2">&amp;</span>[]);
 
             <span class="kw">if </span>(check.function)(ctx, msg, <span class="kw-2">&amp;mut </span>args, options).<span class="kw">await</span>.is_err() {
                 <span class="kw">return </span>help_options.lacking_conditions;
@@ -1709,18 +1709,18 @@
 
 <span class="comment">// This function will recursively go through all commands and their sub-commands, trying to find
 // `name`. Similar commands will be collected into `similar_commands`.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 #[allow(clippy::too_many_arguments)]
-</span><span class="kw">fn </span>nested_commands_search&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Message,
-    group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>CommandGroup,
-    commands: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>InternalCommand],
-    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span><span class="kw-2">mut </span>String,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
-    similar_commands: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span><span class="kw-2">mut </span>Vec&lt;SuggestedCommandName&gt;,
-    owners: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-) -&gt; BoxFuture&lt;<span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InternalCommand&gt;&gt; {
+</span><span class="kw">fn </span>nested_commands_search&lt;<span class="lifetime">'rec</span>, <span class="lifetime">'a</span>: <span class="lifetime">'rec</span>&gt;(
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Message,
+    group: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>CommandGroup,
+    commands: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>InternalCommand],
+    name: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span><span class="kw-2">mut </span>String,
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
+    similar_commands: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span><span class="kw-2">mut </span>Vec&lt;SuggestedCommandName&gt;,
+    owners: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">'rec</span>, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>InternalCommand&gt;&gt; {
     <span class="kw">async move </span>{
         <span class="kw">for </span>command <span class="kw">in </span>commands {
             <span class="kw">let </span><span class="kw-2">mut </span>command = <span class="kw-2">*</span>command;
@@ -1784,7 +1784,7 @@
                     <span class="comment">// If we found a sub-command, we replace the parent with it. This allows the
                     // help-system to extract information from the sub-command.
                     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(sub_command) = sub_command_found {
-                        <span class="comment">// Check parent command&#39;s behaviour and permission first before we consider
+                        <span class="comment">// Check parent command's behaviour and permission first before we consider
                         // the sub-command overwrite it.
                         </span><span class="kw">if </span>HelpBehaviour::Nothing
                             == check_command_behaviour(
@@ -1847,16 +1847,16 @@
 
 <span class="comment">// This function will recursively go through all groups and their groups, trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
-</span><span class="kw">fn </span>nested_group_command_search&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Message,
-    groups: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
-    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span><span class="kw-2">mut </span>String,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
-    similar_commands: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span><span class="kw-2">mut </span>Vec&lt;SuggestedCommandName&gt;,
-    owners: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-) -&gt; BoxFuture&lt;<span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Result</span>&lt;CustomisedHelpData&lt;<span class="lifetime">&#39;a</span>&gt;, ()&gt;&gt; {
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
+</span><span class="kw">fn </span>nested_group_command_search&lt;<span class="lifetime">'rec</span>, <span class="lifetime">'a</span>: <span class="lifetime">'rec</span>&gt;(
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Message,
+    groups: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup],
+    name: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span><span class="kw-2">mut </span>String,
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
+    similar_commands: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span><span class="kw-2">mut </span>Vec&lt;SuggestedCommandName&gt;,
+    owners: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
+) -&gt; BoxFuture&lt;<span class="lifetime">'rec</span>, <span class="prelude-ty">Result</span>&lt;CustomisedHelpData&lt;<span class="lifetime">'a</span>&gt;, ()&gt;&gt; {
     <span class="kw">async move </span>{
         <span class="kw">for </span>group <span class="kw">in </span>groups {
             <span class="kw">let </span>group = <span class="kw-2">*</span>group;
@@ -1964,15 +1964,15 @@
 
 <span class="doccomment">/// Tries to extract a single command matching searched command name otherwise returns similar
 /// commands.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-</span><span class="kw">async fn </span>fetch_single_command&lt;<span class="lifetime">&#39;a</span>&gt;(
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+</span><span class="kw">async fn </span>fetch_single_command&lt;<span class="lifetime">'a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
-    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
-    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
+    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup],
+    name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
     owners: <span class="kw-2">&amp;</span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-) -&gt; <span class="prelude-ty">Result</span>&lt;CustomisedHelpData&lt;<span class="lifetime">&#39;a</span>&gt;, Vec&lt;SuggestedCommandName&gt;&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;CustomisedHelpData&lt;<span class="lifetime">'a</span>&gt;, Vec&lt;SuggestedCommandName&gt;&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>similar_commands: Vec&lt;SuggestedCommandName&gt; = Vec::new();
     <span class="kw">let </span><span class="kw-2">mut </span>name = name.to_string();
 
@@ -1989,15 +1989,15 @@
     </span>.map_err(|()| similar_commands)
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 #[allow(clippy::too_many_arguments)]
-</span><span class="kw">async fn </span>fill_eligible_commands&lt;<span class="lifetime">&#39;a</span>&gt;(
+</span><span class="kw">async fn </span>fill_eligible_commands&lt;<span class="lifetime">'a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
-    commands: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>InternalCommand],
+    commands: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>InternalCommand],
     owners: <span class="kw-2">&amp;</span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
-    group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandGroup,
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
+    group: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>CommandGroup,
     to_fill: <span class="kw-2">&amp;mut </span>GroupCommandsPair,
     highest_formatter: <span class="kw-2">&amp;mut </span>HelpBehaviour,
 ) {
@@ -2045,17 +2045,17 @@
 }
 
 <span class="doccomment">/// Tries to fetch all commands visible to the user within a group and its sub-groups.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 #[allow(clippy::too_many_arguments)]
-</span><span class="kw">fn </span>fetch_all_eligible_commands_in_group&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Message,
-    commands: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>InternalCommand],
-    owners: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
-    group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommandGroup,
+</span><span class="kw">fn </span>fetch_all_eligible_commands_in_group&lt;<span class="lifetime">'rec</span>, <span class="lifetime">'a</span>: <span class="lifetime">'rec</span>&gt;(
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Message,
+    commands: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>InternalCommand],
+    owners: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
+    group: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>CommandGroup,
     highest_formatter: HelpBehaviour,
-) -&gt; BoxFuture&lt;<span class="lifetime">&#39;rec</span>, GroupCommandsPair&gt; {
+) -&gt; BoxFuture&lt;<span class="lifetime">'rec</span>, GroupCommandsPair&gt; {
     <span class="kw">async move </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>group_with_cmds = GroupCommandsPair::default();
         <span class="kw">let </span><span class="kw-2">mut </span>highest_formatter = highest_formatter;
@@ -2101,13 +2101,13 @@
 }
 
 <span class="doccomment">/// Fetch groups with their commands.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-</span><span class="kw">async fn </span>create_command_group_commands_pair_from_groups&lt;<span class="lifetime">&#39;a</span>&gt;(
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+</span><span class="kw">async fn </span>create_command_group_commands_pair_from_groups&lt;<span class="lifetime">'a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
-    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
+    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup],
     owners: <span class="kw-2">&amp;</span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
 ) -&gt; Vec&lt;GroupCommandsPair&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>listed_groups: Vec&lt;GroupCommandsPair&gt; = Vec::default();
 
@@ -2125,7 +2125,7 @@
 }
 
 <span class="doccomment">/// Fetches a single group with its commands.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">async fn </span>create_single_group(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
@@ -2156,7 +2156,7 @@
 ///
 /// If a group has no prefixes, it is not required to be part of `searched_group` to reach a
 /// sub-group of `group_name`.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">fn </span>trim_prefixless_group(group_name: <span class="kw-2">&amp;</span>str, searched_group: <span class="kw-2">&amp;mut </span>String) -&gt; bool {
     <span class="kw">if </span>group_name == searched_group.as_str() {
         <span class="kw">return </span><span class="bool-val">true</span>;
@@ -2168,15 +2168,15 @@
     <span class="bool-val">false
 </span>}
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-</span><span class="kw">pub fn </span>searched_lowercase&lt;<span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span>&gt;(
-    ctx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Context,
-    msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>Message,
-    group: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>CommandGroup,
-    owners: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
-    searched_named_lowercase: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec </span><span class="kw-2">mut </span>String,
-) -&gt; BoxFuture&lt;<span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Option</span>&lt;CustomisedHelpData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+<span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+</span><span class="kw">pub fn </span>searched_lowercase&lt;<span class="lifetime">'rec</span>, <span class="lifetime">'a</span>: <span class="lifetime">'rec</span>&gt;(
+    ctx: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Context,
+    msg: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>Message,
+    group: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>CommandGroup,
+    owners: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
+    searched_named_lowercase: <span class="kw-2">&amp;</span><span class="lifetime">'rec </span><span class="kw-2">mut </span>String,
+) -&gt; BoxFuture&lt;<span class="lifetime">'rec</span>, <span class="prelude-ty">Option</span>&lt;CustomisedHelpData&lt;<span class="lifetime">'a</span>&gt;&gt;&gt; {
     <span class="kw">async move </span>{
         <span class="kw">let </span>is_prefixless_group = {
             group.options.prefixes.is_empty()
@@ -2230,15 +2230,15 @@
 <span class="doccomment">/// Iterates over all commands and forges them into a [`CustomisedHelpData`], taking
 /// [`HelpOptions`] into consideration when deciding on whether a command shall be picked and in
 /// what textual format.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
-</span><span class="kw">pub async fn </span>create_customised_help_data&lt;<span class="lifetime">&#39;a</span>&gt;(
+</span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+</span><span class="kw">pub async fn </span>create_customised_help_data&lt;<span class="lifetime">'a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
-    args: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Args,
-    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
+    args: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Args,
+    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup],
     owners: <span class="kw-2">&amp;</span>HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
-    help_options: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HelpOptions,
-) -&gt; CustomisedHelpData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    help_options: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>HelpOptions,
+) -&gt; CustomisedHelpData&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">if </span>!args.is_empty() {
         <span class="kw">let </span>name = args.message();
 
@@ -2283,7 +2283,7 @@
     };
 
     <span class="kw">let </span>description = <span class="kw">if let </span><span class="prelude-val">Some</span>(strikethrough_command_text) = strikethrough_command_tip {
-        <span class="macro">format!</span>(<span class="string">&quot;{}\n{strikethrough_command_text}&quot;</span>, help_options.individual_command_tip)
+        <span class="macro">format!</span>(<span class="string">"{}\n{strikethrough_command_text}"</span>, help_options.individual_command_tip)
     } <span class="kw">else </span>{
         help_options.individual_command_tip.to_string()
     };
@@ -2305,8 +2305,8 @@
 }
 
 <span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text` buffer. If
-/// `nest_level` is `0`, this function will skip the group&#39;s name.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+/// `nest_level` is `0`, this function will skip the group's name.
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">fn </span>flatten_group_to_string(
     group_text: <span class="kw-2">&amp;mut </span>String,
     group: <span class="kw-2">&amp;</span>GroupCommandsPair,
@@ -2316,23 +2316,23 @@
     <span class="kw">let </span>repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     <span class="kw">if </span>nest_level &gt; <span class="number">0 </span>{
-        <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{repeated_indent_str}__**{}**__&quot;</span>, group.name,)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(group_text, <span class="string">"{repeated_indent_str}__**{}**__"</span>, group.name,)<span class="question-mark">?</span>;
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>summary_or_prefixes = <span class="bool-val">false</span>;
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(group_summary) = group.summary {
-        <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{}*{group_summary}*&quot;</span>, <span class="kw-2">&amp;</span>repeated_indent_str)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(group_text, <span class="string">"{}*{group_summary}*"</span>, <span class="kw-2">&amp;</span>repeated_indent_str)<span class="question-mark">?</span>;
         summary_or_prefixes = <span class="bool-val">true</span>;
     }
 
     <span class="kw">if </span>!group.prefixes.is_empty() {
         <span class="macro">writeln!</span>(
             group_text,
-            <span class="string">&quot;{}{}: `{}`&quot;</span>,
+            <span class="string">"{}{}: `{}`"</span>,
             <span class="kw-2">&amp;</span>repeated_indent_str,
             help_options.group_prefix,
-            group.prefixes.join(<span class="string">&quot;`, `&quot;</span>),
+            group.prefixes.join(<span class="string">"`, `"</span>),
         )<span class="question-mark">?</span>;
         summary_or_prefixes = <span class="bool-val">true</span>;
     };
@@ -2341,13 +2341,13 @@
         <span class="macro">writeln!</span>(group_text)<span class="question-mark">?</span>;
     }
 
-    <span class="kw">let </span><span class="kw-2">mut </span>joined_commands = group.command_names.join(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\n{}&quot;</span>, <span class="kw-2">&amp;</span>repeated_indent_str));
+    <span class="kw">let </span><span class="kw-2">mut </span>joined_commands = group.command_names.join(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"\n{}"</span>, <span class="kw-2">&amp;</span>repeated_indent_str));
 
     <span class="kw">if </span>!group.command_names.is_empty() {
         joined_commands.insert_str(<span class="number">0</span>, <span class="kw-2">&amp;</span>repeated_indent_str);
     }
 
-    <span class="macro">writeln!</span>(group_text, <span class="string">&quot;{joined_commands}&quot;</span>)<span class="question-mark">?</span>;
+    <span class="macro">writeln!</span>(group_text, <span class="string">"{joined_commands}"</span>)<span class="question-mark">?</span>;
 
     <span class="kw">for </span>sub_group <span class="kw">in </span><span class="kw-2">&amp;</span>group.sub_groups {
         <span class="kw">if </span>!(sub_group.command_names.is_empty() &amp;&amp; sub_group.sub_groups.is_empty()) {
@@ -2355,7 +2355,7 @@
 
             flatten_group_to_string(<span class="kw-2">&amp;mut </span>sub_group_text, sub_group, nest_level + <span class="number">1</span>, help_options)<span class="question-mark">?</span>;
 
-            <span class="macro">write!</span>(group_text, <span class="string">&quot;{sub_group_text}&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(group_text, <span class="string">"{sub_group_text}"</span>)<span class="question-mark">?</span>;
         }
     }
 
@@ -2363,8 +2363,8 @@
 }
 
 <span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text` buffer respecting
-/// the plain help format. If `nest_level` is `0`, this function will skip the group&#39;s name.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+/// the plain help format. If `nest_level` is `0`, this function will skip the group's name.
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">fn </span>flatten_group_to_plain_string(
     group_text: <span class="kw-2">&amp;mut </span>String,
     group: <span class="kw-2">&amp;</span>GroupCommandsPair,
@@ -2374,21 +2374,21 @@
     <span class="kw">let </span>repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     <span class="kw">if </span>nest_level &gt; <span class="number">0 </span>{
-        <span class="macro">write!</span>(group_text, <span class="string">&quot;\n{repeated_indent_str}**{}**&quot;</span>, group.name).unwrap();
+        <span class="macro">write!</span>(group_text, <span class="string">"\n{repeated_indent_str}**{}**"</span>, group.name).unwrap();
     }
 
     <span class="kw">if </span>group.prefixes.is_empty() {
-        group_text.push_str(<span class="string">&quot;: &quot;</span>);
+        group_text.push_str(<span class="string">": "</span>);
     } <span class="kw">else </span>{
         <span class="macro">write!</span>(
             group_text,
-            <span class="string">&quot; ({}: `{}`): &quot;</span>,
+            <span class="string">" ({}: `{}`): "</span>,
             help_options.group_prefix,
-            group.prefixes.join(<span class="string">&quot;`, `&quot;</span>),
+            group.prefixes.join(<span class="string">"`, `"</span>),
         ).unwrap();
     }
 
-    <span class="kw">let </span>joined_commands = group.command_names.join(<span class="string">&quot;, &quot;</span>);
+    <span class="kw">let </span>joined_commands = group.command_names.join(<span class="string">", "</span>);
 
     group_text.push_str(<span class="kw-2">&amp;</span>joined_commands);
 
@@ -2402,7 +2402,7 @@
 }
 
 <span class="doccomment">/// Sends an embed listing all groups with their commands.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">async fn </span>send_grouped_commands_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
@@ -2427,12 +2427,12 @@
 </span>}
 
 <span class="doccomment">/// Sends embed showcasing information about a single command.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">async fn </span>send_single_command_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
     channel_id: ChannelId,
-    command: <span class="kw-2">&amp;</span>Command&lt;<span class="lifetime">&#39;_</span>&gt;,
+    command: <span class="kw-2">&amp;</span>Command&lt;<span class="lifetime">'_</span>&gt;,
     colour: Colour,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Message, Error&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>embed = CreateEmbed::new().title(command.name).colour(colour);
@@ -2443,9 +2443,9 @@
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(usage) = command.usage {
         <span class="kw">let </span>full_usage_text = <span class="kw">if let </span><span class="prelude-val">Some</span>(first_prefix) = command.group_prefixes.first() {
-            <span class="macro">format!</span>(<span class="string">&quot;`{first_prefix} {} {usage}`&quot;</span>, command.name)
+            <span class="macro">format!</span>(<span class="string">"`{first_prefix} {} {usage}`"</span>, command.name)
         } <span class="kw">else </span>{
-            <span class="macro">format!</span>(<span class="string">&quot;`{} {usage}`&quot;</span>, command.name)
+            <span class="macro">format!</span>(<span class="string">"`{} {usage}`"</span>, command.name)
         };
 
         embed = embed.field(help_options.usage_label, full_usage_text, <span class="bool-val">true</span>);
@@ -2453,10 +2453,10 @@
 
     <span class="kw">if </span>!command.usage_sample.is_empty() {
         <span class="kw">let </span>full_example_text = <span class="kw">if let </span><span class="prelude-val">Some</span>(first_prefix) = command.group_prefixes.first() {
-            <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">&quot;`{first_prefix} {} {example}`\n&quot;</span>, command.name);
+            <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">"`{first_prefix} {} {example}`\n"</span>, command.name);
             command.usage_sample.iter().map(format_example).collect::&lt;String&gt;()
         } <span class="kw">else </span>{
-            <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">&quot;`{} {example}`\n&quot;</span>, command.name);
+            <span class="kw">let </span>format_example = |example| <span class="macro">format!</span>(<span class="string">"`{} {example}`\n"</span>, command.name);
             command.usage_sample.iter().map(format_example).collect::&lt;String&gt;()
         };
         embed = embed.field(help_options.usage_sample_label, full_example_text, <span class="bool-val">true</span>);
@@ -2467,7 +2467,7 @@
     <span class="kw">if </span>!command.aliases.is_empty() {
         embed = embed.field(
             help_options.aliases_label,
-            <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.aliases.join(<span class="string">&quot;`, `&quot;</span>)),
+            <span class="macro">format!</span>(<span class="string">"`{}`"</span>, command.aliases.join(<span class="string">"`, `"</span>)),
             <span class="bool-val">true</span>,
         );
     }
@@ -2479,7 +2479,7 @@
     <span class="kw">if </span>!command.checks.is_empty() {
         embed = embed.field(
             help_options.checks_label,
-            <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.checks.join(<span class="string">&quot;`, `&quot;</span>)),
+            <span class="macro">format!</span>(<span class="string">"`{}`"</span>, command.checks.join(<span class="string">"`, `"</span>)),
             <span class="bool-val">true</span>,
         );
     }
@@ -2487,7 +2487,7 @@
     <span class="kw">if </span>!command.sub_commands.is_empty() {
         embed = embed.field(
             help_options.sub_commands_label,
-            <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, command.sub_commands.join(<span class="string">&quot;`, `&quot;</span>)),
+            <span class="macro">format!</span>(<span class="string">"`{}`"</span>, command.sub_commands.join(<span class="string">"`, `"</span>)),
             <span class="bool-val">true</span>,
         );
     }
@@ -2497,7 +2497,7 @@
 </span>}
 
 <span class="doccomment">/// Sends embed listing commands that are similar to the sent one.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">async fn </span>send_suggestion_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     channel_id: ChannelId,
@@ -2505,7 +2505,7 @@
     suggestions: <span class="kw-2">&amp;</span>Suggestions,
     colour: Colour,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Message, Error&gt; {
-    <span class="kw">let </span>text = help_description.replace(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>suggestions.join(<span class="string">&quot;`, `&quot;</span>));
+    <span class="kw">let </span>text = help_description.replace(<span class="string">"{}"</span>, <span class="kw-2">&amp;</span>suggestions.join(<span class="string">"`, `"</span>));
 
     <span class="kw">let </span>embed = CreateEmbed::new().colour(colour).description(text);
     <span class="kw">let </span>builder = CreateMessage::new().embed(embed);
@@ -2513,7 +2513,7 @@
 </span>}
 
 <span class="doccomment">/// Sends an embed explaining fetching commands failed.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">async fn </span>send_error_embed(
     cache_http: <span class="kw">impl </span>CacheHttp,
     channel_id: ChannelId,
@@ -2552,8 +2552,8 @@
 ///     context: &amp;Context,
 ///     msg: &amp;Message,
 ///     args: Args,
-///     help_options: &amp;&#39;static HelpOptions,
-///     groups: &amp;[&amp;&#39;static CommandGroup],
+///     help_options: &amp;'static HelpOptions,
+///     groups: &amp;[&amp;'static CommandGroup],
 ///     owners: HashSet&lt;UserId&gt;,
 /// ) -&gt; CommandResult {
 ///     let _ = with_embeds(context, msg, args, &amp;help_options, groups, owners).await?;
@@ -2568,13 +2568,13 @@
 /// Returns the same errors as [`ChannelId::send_message`].
 ///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">pub async fn </span>with_embeds(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
     args: Args,
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
-    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
+    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup],
     owners: HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Message, Error&gt; {
     <span class="kw">let </span>formatted_help =
@@ -2635,19 +2635,19 @@
 }
 
 <span class="doccomment">/// Turns grouped commands into a [`String`] taking plain help format into account.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">fn </span>grouped_commands_to_plain_string(
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
     help_description: <span class="kw-2">&amp;</span>str,
     groups: <span class="kw-2">&amp;</span>[GroupCommandsPair],
 ) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="string">&quot;__**Commands**__\n&quot;</span>.to_string();
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="string">"__**Commands**__\n"</span>.to_string();
 
     result.push_str(help_description);
-    result.push(<span class="string">&#39;\n&#39;</span>);
+    result.push(<span class="string">'\n'</span>);
 
     <span class="kw">for </span>group <span class="kw">in </span>groups {
-        <span class="macro">write!</span>(result, <span class="string">&quot;\n**{}**&quot;</span>, <span class="kw-2">&amp;</span>group.name).unwrap();
+        <span class="macro">write!</span>(result, <span class="string">"\n**{}**"</span>, <span class="kw-2">&amp;</span>group.name).unwrap();
 
         flatten_group_to_plain_string(<span class="kw-2">&amp;mut </span>result, group, <span class="number">0</span>, help_options);
     }
@@ -2656,31 +2656,31 @@
 }
 
 <span class="doccomment">/// Turns a single command into a [`String`] taking plain help format into account.
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
-</span><span class="kw">fn </span>single_command_to_plain_string(help_options: <span class="kw-2">&amp;</span>HelpOptions, command: <span class="kw-2">&amp;</span>Command&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
+</span><span class="kw">fn </span>single_command_to_plain_string(help_options: <span class="kw-2">&amp;</span>HelpOptions, command: <span class="kw-2">&amp;</span>Command&lt;<span class="lifetime">'_</span>&gt;) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>result = String::new();
 
-    <span class="macro">writeln!</span>(result, <span class="string">&quot;__**{}**__&quot;</span>, command.name).unwrap();
+    <span class="macro">writeln!</span>(result, <span class="string">"__**{}**__"</span>, command.name).unwrap();
 
     <span class="kw">if </span>!command.aliases.is_empty() {
-        <span class="macro">write!</span>(result, <span class="string">&quot;**{}**: `{}`&quot;</span>, help_options.aliases_label, command.aliases.join(<span class="string">&quot;`, `&quot;</span>))
+        <span class="macro">write!</span>(result, <span class="string">"**{}**: `{}`"</span>, help_options.aliases_label, command.aliases.join(<span class="string">"`, `"</span>))
             .unwrap();
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = command.description {
-        <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: {description}&quot;</span>, help_options.description_label).unwrap();
+        <span class="macro">writeln!</span>(result, <span class="string">"**{}**: {description}"</span>, help_options.description_label).unwrap();
     };
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(usage) = command.usage {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(first_prefix) = command.group_prefixes.first() {
             <span class="macro">writeln!</span>(
                 result,
-                <span class="string">&quot;**{}**: `{first_prefix} {} {usage}`&quot;</span>,
+                <span class="string">"**{}**: `{first_prefix} {} {usage}`"</span>,
                 help_options.usage_label, command.name
             )
             .unwrap();
         } <span class="kw">else </span>{
-            <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: `{} {usage}`&quot;</span>, help_options.usage_label, command.name)
+            <span class="macro">writeln!</span>(result, <span class="string">"**{}**: `{} {usage}`"</span>, help_options.usage_label, command.name)
                 .unwrap();
         }
     }
@@ -2690,7 +2690,7 @@
             <span class="kw">let </span>format_example = |example| {
                 <span class="macro">writeln!</span>(
                     result,
-                    <span class="string">&quot;**{}**: `{first_prefix} {} {example}`&quot;</span>,
+                    <span class="string">"**{}**: `{first_prefix} {} {example}`"</span>,
                     help_options.usage_sample_label, command.name
                 )
                 .unwrap();
@@ -2700,7 +2700,7 @@
             <span class="kw">let </span>format_example = |example| {
                 <span class="macro">writeln!</span>(
                     result,
-                    <span class="string">&quot;**{}**: `{} {example}`&quot;</span>,
+                    <span class="string">"**{}**: `{} {example}`"</span>,
                     help_options.usage_sample_label, command.name
                 )
                 .unwrap();
@@ -2709,18 +2709,18 @@
         }
     }
 
-    <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: {}&quot;</span>, help_options.grouped_label, command.group_name).unwrap();
+    <span class="macro">writeln!</span>(result, <span class="string">"**{}**: {}"</span>, help_options.grouped_label, command.group_name).unwrap();
 
     <span class="kw">if </span>!help_options.available_text.is_empty() &amp;&amp; !command.availability.is_empty() {
-        <span class="macro">writeln!</span>(result, <span class="string">&quot;**{}**: {}&quot;</span>, help_options.available_text, command.availability).unwrap();
+        <span class="macro">writeln!</span>(result, <span class="string">"**{}**: {}"</span>, help_options.available_text, command.availability).unwrap();
     }
 
     <span class="kw">if </span>!command.sub_commands.is_empty() {
         <span class="macro">writeln!</span>(
             result,
-            <span class="string">&quot;**{}**: `{}`&quot;</span>,
+            <span class="string">"**{}**: `{}`"</span>,
             help_options.sub_commands_label,
-            command.sub_commands.join(<span class="string">&quot;`, `&quot;</span>),
+            command.sub_commands.join(<span class="string">"`, `"</span>),
         )
         .unwrap();
     }
@@ -2755,8 +2755,8 @@
 ///     context: &amp;Context,
 ///     msg: &amp;Message,
 ///     args: Args,
-///     help_options: &amp;&#39;static HelpOptions,
-///     groups: &amp;[&amp;&#39;static CommandGroup],
+///     help_options: &amp;'static HelpOptions,
+///     groups: &amp;[&amp;'static CommandGroup],
 ///     owners: HashSet&lt;UserId&gt;,
 /// ) -&gt; CommandResult {
 ///     let _ = plain(context, msg, args, &amp;help_options, groups, owners).await?;
@@ -2768,13 +2768,13 @@
 /// # Errors
 ///
 /// Returns the same errors as [`ChannelId::send_message`].
-</span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">pub async fn </span>plain(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,
     args: Args,
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
-    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>CommandGroup],
+    groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>CommandGroup],
     owners: HashSet&lt;UserId, <span class="kw">impl </span>std::hash::BuildHasher + Send + Sync&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Message, Error&gt; {
     <span class="kw">let </span>formatted_help =
@@ -2784,7 +2784,7 @@
         CustomisedHelpData::SuggestedCommands {
             <span class="kw-2">ref </span>help_description,
             <span class="kw-2">ref </span>suggestions,
-        } =&gt; help_description.replace(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>suggestions.join(<span class="string">&quot;`, `&quot;</span>)),
+        } =&gt; help_description.replace(<span class="string">"{}"</span>, <span class="kw-2">&amp;</span>suggestions.join(<span class="string">"`, `"</span>)),
         CustomisedHelpData::NoCommandFound {
             help_error_message,
         } =&gt; help_error_message.to_string(),
@@ -2801,7 +2801,7 @@
 </span>}
 
 <span class="attr">#[cfg(test)]
-#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;http&quot;</span>))]
+#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::{SuggestedCommandName, Suggestions};
 
@@ -2809,22 +2809,22 @@
     </span><span class="kw">fn </span>suggestions_join() {
         <span class="kw">let </span>names = <span class="macro">vec!</span>[
             SuggestedCommandName {
-                name: <span class="string">&quot;aa&quot;</span>.to_owned(),
+                name: <span class="string">"aa"</span>.to_owned(),
                 levenshtein_distance: <span class="number">0</span>,
             },
             SuggestedCommandName {
-                name: <span class="string">&quot;bbb&quot;</span>.to_owned(),
+                name: <span class="string">"bbb"</span>.to_owned(),
                 levenshtein_distance: <span class="number">0</span>,
             },
             SuggestedCommandName {
-                name: <span class="string">&quot;cccc&quot;</span>.to_owned(),
+                name: <span class="string">"cccc"</span>.to_owned(),
                 levenshtein_distance: <span class="number">0</span>,
             },
         ];
 
-        <span class="kw">let </span>actual = Suggestions(names).join(<span class="string">&quot;, &quot;</span>);
+        <span class="kw">let </span>actual = Suggestions(names).join(<span class="string">", "</span>);
 
-        <span class="macro">assert_eq!</span>(actual, <span class="string">&quot;aa, bbb, cccc&quot;</span>);
+        <span class="macro">assert_eq!</span>(actual, <span class="string">"aa, bbb, cccc"</span>);
         <span class="macro">assert_eq!</span>(actual.capacity(), <span class="number">13</span>);
     }
 }

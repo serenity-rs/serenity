@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/formatted_timestamp.rs`."><title>formatted_timestamp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/formatted_timestamp.rs`."><title>formatted_timestamp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -261,21 +261,21 @@
 /// [Discord docs](https://discord.com/developers/docs/reference#message-formatting-timestamp-styles).
 </span><span class="attr">#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
 </span><span class="kw">pub enum </span>FormattedTimestampStyle {
-    <span class="doccomment">/// Represents a short time format, e.g., &quot;12:34 PM&quot;.
+    <span class="doccomment">/// Represents a short time format, e.g., "12:34 PM".
     </span>ShortTime,
-    <span class="doccomment">/// Represents a long time format, e.g., &quot;12:34:56 PM&quot;.
+    <span class="doccomment">/// Represents a long time format, e.g., "12:34:56 PM".
     </span>LongTime,
-    <span class="doccomment">/// Represents a short date format, e.g., &quot;2023-11-17&quot;.
+    <span class="doccomment">/// Represents a short date format, e.g., "2023-11-17".
     </span>ShortDate,
-    <span class="doccomment">/// Represents a long date format, e.g., &quot;November 17, 2023&quot;.
+    <span class="doccomment">/// Represents a long date format, e.g., "November 17, 2023".
     </span>LongDate,
-    <span class="doccomment">/// Represents a short date and time format, e.g., &quot;November 17, 2023 12:34 PM&quot;.
+    <span class="doccomment">/// Represents a short date and time format, e.g., "November 17, 2023 12:34 PM".
     </span><span class="attr">#[default]
     </span>ShortDateTime,
-    <span class="doccomment">/// Represents a long date and time format, e.g., &quot;Thursday, November 17, 2023 12:34 PM&quot;.
+    <span class="doccomment">/// Represents a long date and time format, e.g., "Thursday, November 17, 2023 12:34 PM".
     </span>LongDateTime,
     <span class="doccomment">/// Represents a relative time format, indicating the time relative to the current moment,
-    /// e.g., &quot;2 hours ago&quot; or &quot;in 2 hours&quot;.
+    /// e.g., "2 hours ago" or "in 2 hours".
     </span>RelativeTime,
 }
 
@@ -325,24 +325,24 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>FormattedTimestamp {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">match </span><span class="self">self</span>.style {
-            <span class="prelude-val">Some</span>(style) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;&lt;t:{}:{}&gt;&quot;</span>, <span class="self">self</span>.timestamp, style),
-            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;&lt;t:{}&gt;&quot;</span>, <span class="self">self</span>.timestamp),
+            <span class="prelude-val">Some</span>(style) =&gt; <span class="macro">write!</span>(f, <span class="string">"&lt;t:{}:{}&gt;"</span>, <span class="self">self</span>.timestamp, style),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">"&lt;t:{}&gt;"</span>, <span class="self">self</span>.timestamp),
         }
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>FormattedTimestampStyle {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">let </span>style = <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::ShortTime =&gt; <span class="string">&quot;t&quot;</span>,
-            <span class="self">Self</span>::LongTime =&gt; <span class="string">&quot;T&quot;</span>,
-            <span class="self">Self</span>::ShortDate =&gt; <span class="string">&quot;d&quot;</span>,
-            <span class="self">Self</span>::LongDate =&gt; <span class="string">&quot;D&quot;</span>,
-            <span class="self">Self</span>::ShortDateTime =&gt; <span class="string">&quot;f&quot;</span>,
-            <span class="self">Self</span>::LongDateTime =&gt; <span class="string">&quot;F&quot;</span>,
-            <span class="self">Self</span>::RelativeTime =&gt; <span class="string">&quot;R&quot;</span>,
+            <span class="self">Self</span>::ShortTime =&gt; <span class="string">"t"</span>,
+            <span class="self">Self</span>::LongTime =&gt; <span class="string">"T"</span>,
+            <span class="self">Self</span>::ShortDate =&gt; <span class="string">"d"</span>,
+            <span class="self">Self</span>::LongDate =&gt; <span class="string">"D"</span>,
+            <span class="self">Self</span>::ShortDateTime =&gt; <span class="string">"f"</span>,
+            <span class="self">Self</span>::LongDateTime =&gt; <span class="string">"F"</span>,
+            <span class="self">Self</span>::RelativeTime =&gt; <span class="string">"R"</span>,
         };
         f.write_str(style)
     }
@@ -358,16 +358,16 @@
 <span class="kw">impl </span>StdError <span class="kw">for </span>FormattedTimestampParseError {}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>FormattedTimestampParseError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;invalid formatted timestamp {:?}&quot;</span>, <span class="self">self</span>.string)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"invalid formatted timestamp {:?}"</span>, <span class="self">self</span>.string)
     }
 }
 
 <span class="kw">fn </span>parse_formatted_timestamp(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;FormattedTimestamp&gt; {
     <span class="comment">// A formatted timestamp looks like: &lt;t:TIMESTAMP&gt; or &lt;t:TIMESTAMP:STYLE&gt;
-    </span><span class="kw">let </span>inner = s.strip_prefix(<span class="string">&quot;&lt;t:&quot;</span>)<span class="question-mark">?</span>.strip_suffix(<span class="string">&#39;&gt;&#39;</span>)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>inner = s.strip_prefix(<span class="string">"&lt;t:"</span>)<span class="question-mark">?</span>.strip_suffix(<span class="string">'&gt;'</span>)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Some</span>(<span class="kw">match </span>inner.split_once(<span class="string">&#39;:&#39;</span>) {
+    <span class="prelude-val">Some</span>(<span class="kw">match </span>inner.split_once(<span class="string">':'</span>) {
         <span class="prelude-val">Some</span>((timestamp, style)) =&gt; FormattedTimestamp {
             timestamp: timestamp.parse().ok()<span class="question-mark">?</span>,
             style: <span class="prelude-val">Some</span>(style.parse().ok()<span class="question-mark">?</span>),
@@ -395,13 +395,13 @@
     <span class="kw">type </span><span class="prelude-val">Err </span>= FormattedTimestampParseError;
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="kw">match </span>s {
-            <span class="string">&quot;t&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ShortTime),
-            <span class="string">&quot;T&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LongTime),
-            <span class="string">&quot;d&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ShortDate),
-            <span class="string">&quot;D&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LongDate),
-            <span class="string">&quot;f&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ShortDateTime),
-            <span class="string">&quot;F&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LongDateTime),
-            <span class="string">&quot;R&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::RelativeTime),
+            <span class="string">"t" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ShortTime),
+            <span class="string">"T" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LongTime),
+            <span class="string">"d" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ShortDate),
+            <span class="string">"D" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LongDate),
+            <span class="string">"f" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ShortDateTime),
+            <span class="string">"F" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LongDateTime),
+            <span class="string">"R" </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::RelativeTime),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FormattedTimestampParseError {
                 string: s.into(),
             }),
@@ -424,7 +424,7 @@
         <span class="macro">assert_eq!</span>(
             time_str,
             <span class="macro">format!</span>(
-                <span class="string">&quot;&lt;t:{}:{}&gt;&quot;</span>,
+                <span class="string">"&lt;t:{}:{}&gt;"</span>,
                 timestamp.unix_timestamp(),
                 FormattedTimestampStyle::ShortDateTime
             )
@@ -434,18 +434,18 @@
 
         <span class="kw">let </span>unstyled_str = unstyled.to_string();
 
-        <span class="macro">assert_eq!</span>(unstyled_str, <span class="macro">format!</span>(<span class="string">&quot;&lt;t:{}&gt;&quot;</span>, timestamp.unix_timestamp()));
+        <span class="macro">assert_eq!</span>(unstyled_str, <span class="macro">format!</span>(<span class="string">"&lt;t:{}&gt;"</span>, timestamp.unix_timestamp()));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_message_time_style() {
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortTime.to_string(), <span class="string">&quot;t&quot;</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongTime.to_string(), <span class="string">&quot;T&quot;</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortDate.to_string(), <span class="string">&quot;d&quot;</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongDate.to_string(), <span class="string">&quot;D&quot;</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortDateTime.to_string(), <span class="string">&quot;f&quot;</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongDateTime.to_string(), <span class="string">&quot;F&quot;</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::RelativeTime.to_string(), <span class="string">&quot;R&quot;</span>);
+        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortTime.to_string(), <span class="string">"t"</span>);
+        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongTime.to_string(), <span class="string">"T"</span>);
+        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortDate.to_string(), <span class="string">"d"</span>);
+        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongDate.to_string(), <span class="string">"D"</span>);
+        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortDateTime.to_string(), <span class="string">"f"</span>);
+        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongDateTime.to_string(), <span class="string">"F"</span>);
+        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::RelativeTime.to_string(), <span class="string">"R"</span>);
     }
 
     <span class="attr">#[test]
@@ -455,7 +455,7 @@
         <span class="kw">let </span>time = FormattedTimestamp::new(timestamp, <span class="prelude-val">Some</span>(FormattedTimestampStyle::ShortDateTime));
 
         <span class="kw">let </span>time_str = <span class="macro">format!</span>(
-            <span class="string">&quot;&lt;t:{}:{}&gt;&quot;</span>,
+            <span class="string">"&lt;t:{}:{}&gt;"</span>,
             timestamp.unix_timestamp(),
             FormattedTimestampStyle::ShortDateTime
         );
@@ -466,7 +466,7 @@
 
         <span class="kw">let </span>unstyled = FormattedTimestamp::new(timestamp, <span class="prelude-val">None</span>);
 
-        <span class="kw">let </span>unstyled_str = <span class="macro">format!</span>(<span class="string">&quot;&lt;t:{}&gt;&quot;</span>, timestamp.unix_timestamp());
+        <span class="kw">let </span>unstyled_str = <span class="macro">format!</span>(<span class="string">"&lt;t:{}&gt;"</span>, timestamp.unix_timestamp());
 
         <span class="kw">let </span>unstyled_parsed = unstyled_str.parse::&lt;FormattedTimestamp&gt;().unwrap();
 
@@ -475,13 +475,13 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_message_time_style_parse() {
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">&quot;t&quot;</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::ShortTime)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">&quot;T&quot;</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::LongTime)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">&quot;d&quot;</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::ShortDate)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">&quot;D&quot;</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::LongDate)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">&quot;f&quot;</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::ShortDateTime)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">&quot;F&quot;</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::LongDateTime)));
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">&quot;R&quot;</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::RelativeTime)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">"t"</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::ShortTime)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">"T"</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::LongTime)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">"d"</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::ShortDate)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">"D"</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::LongDate)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">"f"</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::ShortDateTime)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">"F"</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::LongDateTime)));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="string">"R"</span>.parse(), <span class="prelude-val">Ok</span>(FormattedTimestampStyle::RelativeTime)));
     }
 }
 </code></pre></div></section></main></body></html>

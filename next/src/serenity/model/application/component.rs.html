@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/component.rs`."><title>component.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/component.rs`."><title>component.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -336,8 +336,8 @@
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// The type of a component
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
-    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+    #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ComponentType {
         ActionRow = <span class="number">1</span>,
@@ -355,12 +355,12 @@
 <span class="doccomment">/// An action row.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#action-rows).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActionRow {
     <span class="doccomment">/// Always [`ComponentType::ActionRow`]
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// The components of this ActionRow.
     </span><span class="attr">#[serde(default)]
@@ -370,7 +370,7 @@
 <span class="doccomment">/// A component which can be inside of an [`ActionRow`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object-component-types).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>ActionRowComponent {
@@ -379,11 +379,11 @@
     InputText(InputText),
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ActionRowComponent {
-    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>ActionRowComponent {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>raw_kind = map.get(<span class="string">&quot;type&quot;</span>).ok_or_else(|| DeError::missing_field(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>.clone();
+        <span class="kw">let </span>raw_kind = map.get(<span class="string">"type"</span>).ok_or_else(|| DeError::missing_field(<span class="string">"type"</span>))<span class="question-mark">?</span>.clone();
         <span class="kw">let </span>value = Value::from(map);
 
         <span class="kw">match </span>deserialize_val(raw_kind)<span class="question-mark">? </span>{
@@ -395,10 +395,10 @@
             | ComponentType::MentionableSelect
             | ComponentType::ChannelSelect =&gt; from_value(value).map(ActionRowComponent::SelectMenu),
             ComponentType::ActionRow =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">&quot;Invalid component type ActionRow&quot;</span>))
+                <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">"Invalid component type ActionRow"</span>))
             },
             ComponentType::Unknown(i) =&gt; {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="macro">format_args!</span>(<span class="string">&quot;Unknown component type {i}&quot;</span>)))
+                <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="macro">format_args!</span>(<span class="string">"Unknown component type {i}"</span>)))
             },
         }
         .map_err(DeError::custom)
@@ -427,7 +427,7 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+<span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>ButtonKind {
@@ -441,12 +441,12 @@
         </span>S: Serializer,
     {
         <span class="attr">#[derive(Serialize)]
-        </span><span class="kw">struct </span>Helper&lt;<span class="lifetime">&#39;a</span>&gt; {
+        </span><span class="kw">struct </span>Helper&lt;<span class="lifetime">'a</span>&gt; {
             style: u8,
-            <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-            </span>url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
-            <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-            </span>custom_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+            </span>url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+            </span>custom_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
         }
 
         <span class="kw">let </span>helper = <span class="kw">match </span><span class="self">self </span>{
@@ -473,21 +473,21 @@
 <span class="doccomment">/// A button component.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Button {
     <span class="doccomment">/// The component type, it will always be [`ComponentType::Button`].
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// The button kind and style.
     </span><span class="attr">#[serde(flatten)]
     </span><span class="kw">pub </span>data: ButtonKind,
     <span class="doccomment">/// The text which appears on the button.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>label: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The emoji of this button, if there is one.
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
     <span class="doccomment">/// Whether the button is disabled.
     </span><span class="attr">#[serde(default)]
@@ -497,8 +497,8 @@
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// The style of a button.
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
-    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+    #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>ButtonStyle {
         Primary = <span class="number">1</span>,
@@ -513,14 +513,14 @@
 <span class="doccomment">/// A select menu component.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>SelectMenu {
     <span class="doccomment">/// The component type, which may either be [`ComponentType::StringSelect`],
     /// [`ComponentType::UserSelect`], [`ComponentType::RoleSelect`],
     /// [`ComponentType::MentionableSelect`], or [`ComponentType::ChannelSelect`].
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// An identifier defined by the developer for the select menu.
     </span><span class="kw">pub </span>custom_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -546,7 +546,7 @@
 <span class="doccomment">/// A select menu component options.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>SelectMenuOption {
@@ -566,43 +566,43 @@
 <span class="doccomment">/// An input text component for modal interactions
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>InputText {
     <span class="doccomment">/// The component type, it will always be [`ComponentType::InputText`].
-    </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ComponentType,
     <span class="doccomment">/// Developer-defined identifier for the input; max 100 characters
     </span><span class="kw">pub </span>custom_id: String,
     <span class="doccomment">/// The [`InputTextStyle`]. Required when sending modal data.
     ///
     /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
-    /// but it&#39;s not. It&#39;s only required when _sending_ modal data to Discord.
+    /// but it's not. It's only required when _sending_ modal data to Discord.
     /// &lt;https://github.com/discord/discord-api-docs/issues/6141&gt;
     </span><span class="kw">pub </span>style: <span class="prelude-ty">Option</span>&lt;InputTextStyle&gt;,
     <span class="doccomment">/// Label for this component; max 45 characters. Required when sending modal data.
     ///
     /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
-    /// but it&#39;s not. It&#39;s only required when _sending_ modal data to Discord.
+    /// but it's not. It's only required when _sending_ modal data to Discord.
     /// &lt;https://github.com/discord/discord-api-docs/issues/6141&gt;
     </span><span class="kw">pub </span>label: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Minimum input length for a text input; min 0, max 4000
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>min_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// Maximum input length for a text input; min 1, max 4000
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>max_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="doccomment">/// Whether this component is required to be filled (defaults to true)
-    </span><span class="attr">#[serde(default = <span class="string">&quot;default_true&quot;</span>)]
+    </span><span class="attr">#[serde(default = <span class="string">"default_true"</span>)]
     </span><span class="kw">pub </span>required: bool,
     <span class="doccomment">/// When sending: Pre-filled value for this component; max 4000 characters (may be None).
     ///
     /// When receiving: The input from the user (always Some)
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// Custom placeholder text if the input is empty; max 100 characters
-    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
@@ -611,8 +611,8 @@
     ///
     /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles).
     </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = <span class="string">&quot;typesize&quot;</span>, derive(typesize::derive::TypeSize))]
-    #[serde(from = <span class="string">&quot;u8&quot;</span>, into = <span class="string">&quot;u8&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+    #[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
     #[non_exhaustive]
     </span><span class="kw">pub enum </span>InputTextStyle {
         Short = <span class="number">1</span>,
@@ -631,24 +631,24 @@
         <span class="kw">let </span><span class="kw-2">mut </span>button = Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
-                custom_id: <span class="string">&quot;hello&quot;</span>.into(),
+                custom_id: <span class="string">"hello"</span>.into(),
                 style: ButtonStyle::Danger,
             },
-            label: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.into()),
+            label: <span class="prelude-val">Some</span>(<span class="string">"a"</span>.into()),
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
         };
         assert_json(
             <span class="kw-2">&amp;</span>button,
-            <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="number">2</span>, <span class="string">&quot;style&quot;</span>: <span class="number">4</span>, <span class="string">&quot;custom_id&quot;</span>: <span class="string">&quot;hello&quot;</span>, <span class="string">&quot;label&quot;</span>: <span class="string">&quot;a&quot;</span>, <span class="string">&quot;disabled&quot;</span>: <span class="bool-val">false</span>}),
+            <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="number">2</span>, <span class="string">"style"</span>: <span class="number">4</span>, <span class="string">"custom_id"</span>: <span class="string">"hello"</span>, <span class="string">"label"</span>: <span class="string">"a"</span>, <span class="string">"disabled"</span>: <span class="bool-val">false</span>}),
         );
 
         button.data = ButtonKind::Link {
-            url: <span class="string">&quot;https://google.com&quot;</span>.into(),
+            url: <span class="string">"https://google.com"</span>.into(),
         };
         assert_json(
             <span class="kw-2">&amp;</span>button,
-            <span class="macro">json!</span>({<span class="string">&quot;type&quot;</span>: <span class="number">2</span>, <span class="string">&quot;style&quot;</span>: <span class="number">5</span>, <span class="string">&quot;url&quot;</span>: <span class="string">&quot;https://google.com&quot;</span>, <span class="string">&quot;label&quot;</span>: <span class="string">&quot;a&quot;</span>, <span class="string">&quot;disabled&quot;</span>: <span class="bool-val">false</span>}),
+            <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="number">2</span>, <span class="string">"style"</span>: <span class="number">5</span>, <span class="string">"url"</span>: <span class="string">"https://google.com"</span>, <span class="string">"label"</span>: <span class="string">"a"</span>, <span class="string">"disabled"</span>: <span class="bool-val">false</span>}),
         );
     }
 }

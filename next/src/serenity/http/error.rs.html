@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/error.rs`."><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -299,7 +299,7 @@
     <span class="doccomment">/// The error message.
     </span><span class="kw">pub </span>message: String,
     <span class="doccomment">/// The full explained errors with their path in the request body.
-    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">&quot;deserialize_errors&quot;</span>)]
+    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_errors"</span>)]
     </span><span class="kw">pub </span>errors: Vec&lt;DiscordJsonSingleError&gt;,
 }
 
@@ -331,7 +331,7 @@
             method,
             error: decode_resp(r).<span class="kw">await</span>.unwrap_or_else(|e| DiscordJsonError {
                 code: -<span class="number">1</span>,
-                message: <span class="macro">format!</span>(<span class="string">&quot;[Serenity] Could not decode json when receiving error response from discord:, {e}&quot;</span>),
+                message: <span class="macro">format!</span>(<span class="string">"[Serenity] Could not decode json when receiving error response from discord:, {e}"</span>),
                 errors: <span class="macro">vec!</span>[],
             }),
         }
@@ -354,7 +354,7 @@
     </span>InvalidWebhook,
     <span class="doccomment">/// Header value contains invalid input.
     </span>InvalidHeader(InvalidHeaderValue),
-    <span class="doccomment">/// Reqwest&#39;s Error contain information on why sending a request failed.
+    <span class="doccomment">/// Reqwest's Error contain information on why sending a request failed.
     </span>Request(ReqwestError),
     <span class="doccomment">/// When using a proxy with an invalid scheme.
     </span>InvalidScheme,
@@ -418,44 +418,44 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>HttpError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::UnsuccessfulRequest(e) =&gt; {
                 f.write_str(<span class="kw-2">&amp;</span>e.error.message)<span class="question-mark">?</span>;
 
-                <span class="comment">// Put Discord&#39;s human readable error explanations in parentheses
+                <span class="comment">// Put Discord's human readable error explanations in parentheses
                 </span><span class="kw">let </span><span class="kw-2">mut </span>errors_iter = e.error.errors.iter();
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(error) = errors_iter.next() {
-                    f.write_str(<span class="string">&quot; (&quot;</span>)<span class="question-mark">?</span>;
+                    f.write_str(<span class="string">" ("</span>)<span class="question-mark">?</span>;
                     f.write_str(<span class="kw-2">&amp;</span>error.path)<span class="question-mark">?</span>;
-                    f.write_str(<span class="string">&quot;: &quot;</span>)<span class="question-mark">?</span>;
+                    f.write_str(<span class="string">": "</span>)<span class="question-mark">?</span>;
                     f.write_str(<span class="kw-2">&amp;</span>error.message)<span class="question-mark">?</span>;
                     <span class="kw">for </span>error <span class="kw">in </span>errors_iter {
-                        f.write_str(<span class="string">&quot;, &quot;</span>)<span class="question-mark">?</span>;
+                        f.write_str(<span class="string">", "</span>)<span class="question-mark">?</span>;
                         f.write_str(<span class="kw-2">&amp;</span>error.path)<span class="question-mark">?</span>;
-                        f.write_str(<span class="string">&quot;: &quot;</span>)<span class="question-mark">?</span>;
+                        f.write_str(<span class="string">": "</span>)<span class="question-mark">?</span>;
                         f.write_str(<span class="kw-2">&amp;</span>error.message)<span class="question-mark">?</span>;
                     }
-                    f.write_str(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
+                    f.write_str(<span class="string">")"</span>)<span class="question-mark">?</span>;
                 }
 
                 <span class="prelude-val">Ok</span>(())
             },
-            <span class="self">Self</span>::RateLimitI64F64 =&gt; f.write_str(<span class="string">&quot;Error decoding a header into an i64 or f64&quot;</span>),
-            <span class="self">Self</span>::RateLimitUtf8 =&gt; f.write_str(<span class="string">&quot;Error decoding a header from UTF-8&quot;</span>),
-            <span class="self">Self</span>::Url(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Provided URL is incorrect.&quot;</span>),
-            <span class="self">Self</span>::InvalidWebhook =&gt; f.write_str(<span class="string">&quot;Provided URL is not a valid webhook.&quot;</span>),
-            <span class="self">Self</span>::InvalidHeader(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Provided value is an invalid header value.&quot;</span>),
-            <span class="self">Self</span>::Request(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">&quot;Error while sending HTTP request.&quot;</span>),
-            <span class="self">Self</span>::InvalidScheme =&gt; f.write_str(<span class="string">&quot;Invalid Url scheme.&quot;</span>),
-            <span class="self">Self</span>::InvalidPort =&gt; f.write_str(<span class="string">&quot;Invalid port.&quot;</span>),
-            <span class="self">Self</span>::ApplicationIdMissing =&gt; f.write_str(<span class="string">&quot;Application id was expected but missing.&quot;</span>),
+            <span class="self">Self</span>::RateLimitI64F64 =&gt; f.write_str(<span class="string">"Error decoding a header into an i64 or f64"</span>),
+            <span class="self">Self</span>::RateLimitUtf8 =&gt; f.write_str(<span class="string">"Error decoding a header from UTF-8"</span>),
+            <span class="self">Self</span>::Url(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Provided URL is incorrect."</span>),
+            <span class="self">Self</span>::InvalidWebhook =&gt; f.write_str(<span class="string">"Provided URL is not a valid webhook."</span>),
+            <span class="self">Self</span>::InvalidHeader(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Provided value is an invalid header value."</span>),
+            <span class="self">Self</span>::Request(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Error while sending HTTP request."</span>),
+            <span class="self">Self</span>::InvalidScheme =&gt; f.write_str(<span class="string">"Invalid Url scheme."</span>),
+            <span class="self">Self</span>::InvalidPort =&gt; f.write_str(<span class="string">"Invalid port."</span>),
+            <span class="self">Self</span>::ApplicationIdMissing =&gt; f.write_str(<span class="string">"Application id was expected but missing."</span>),
         }
     }
 }
 
 <span class="kw">impl </span>StdError <span class="kw">for </span>HttpError {
-    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">&#39;static</span>)&gt; {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">'static</span>)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Url(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="self">Self</span>::Request(inner) =&gt; <span class="prelude-val">Some</span>(inner),
@@ -465,7 +465,7 @@
 }
 
 <span class="attr">#[allow(clippy::missing_errors_doc)]
-</span><span class="kw">pub fn </span>deserialize_errors&lt;<span class="lifetime">&#39;de</span>, D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;&gt;(
+</span><span class="kw">pub fn </span>deserialize_errors&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
     deserializer: D,
 ) -&gt; StdResult&lt;Vec&lt;DiscordJsonSingleError&gt;, D::Error&gt; {
     <span class="kw">let </span>map: Value = Value::deserialize(deserializer)<span class="question-mark">?</span>;
@@ -485,38 +485,38 @@
     errors_value: <span class="kw-2">&amp;</span>Value,
     errors: <span class="kw-2">&amp;mut </span>Vec&lt;DiscordJsonSingleError&gt;,
     path: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
-) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
-    <span class="kw">let </span>found_errors = errors_value.as_array().ok_or(<span class="string">&quot;expected array&quot;</span>)<span class="question-mark">?</span>;
+) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
+    <span class="kw">let </span>found_errors = errors_value.as_array().ok_or(<span class="string">"expected array"</span>)<span class="question-mark">?</span>;
 
     <span class="kw">for </span>error <span class="kw">in </span>found_errors {
-        <span class="kw">let </span>error_object = error.as_object().ok_or(<span class="string">&quot;expected object&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>error_object = error.as_object().ok_or(<span class="string">"expected object"</span>)<span class="question-mark">?</span>;
 
         errors.push(DiscordJsonSingleError {
             code: error_object
-                .get(<span class="string">&quot;code&quot;</span>)
-                .ok_or(<span class="string">&quot;expected code&quot;</span>)<span class="question-mark">?
+                .get(<span class="string">"code"</span>)
+                .ok_or(<span class="string">"expected code"</span>)<span class="question-mark">?
                 </span>.as_str()
-                .ok_or(<span class="string">&quot;expected string&quot;</span>)<span class="question-mark">?
+                .ok_or(<span class="string">"expected string"</span>)<span class="question-mark">?
                 </span>.to_owned(),
             message: error_object
-                .get(<span class="string">&quot;message&quot;</span>)
-                .ok_or(<span class="string">&quot;expected message&quot;</span>)<span class="question-mark">?
+                .get(<span class="string">"message"</span>)
+                .ok_or(<span class="string">"expected message"</span>)<span class="question-mark">?
                 </span>.as_str()
-                .ok_or(<span class="string">&quot;expected string&quot;</span>)<span class="question-mark">?
+                .ok_or(<span class="string">"expected string"</span>)<span class="question-mark">?
                 </span>.to_owned(),
-            path: path.join(<span class="string">&quot;.&quot;</span>),
+            path: path.join(<span class="string">"."</span>),
         });
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn </span>loop_errors&lt;<span class="lifetime">&#39;a</span>&gt;(
-    value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value,
+<span class="kw">fn </span>loop_errors&lt;<span class="lifetime">'a</span>&gt;(
+    value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Value,
     errors: <span class="kw-2">&amp;mut </span>Vec&lt;DiscordJsonSingleError&gt;,
-    path: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
-) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
-    <span class="kw">for </span>(key, value) <span class="kw">in </span>value.as_object().ok_or(<span class="string">&quot;expected object&quot;</span>)<span class="question-mark">? </span>{
-        <span class="kw">if </span>key == <span class="string">&quot;_errors&quot; </span>{
+    path: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
+    <span class="kw">for </span>(key, value) <span class="kw">in </span>value.as_object().ok_or(<span class="string">"expected object"</span>)<span class="question-mark">? </span>{
+        <span class="kw">if </span>key == <span class="string">"_errors" </span>{
             make_error(value, errors, path)<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
             path.push(key);
@@ -539,13 +539,13 @@
     </span><span class="kw">async fn </span>test_error_response_into() {
         <span class="kw">let </span>error = DiscordJsonError {
             code: <span class="number">43121215</span>,
-            message: String::from(<span class="string">&quot;This is a Ferris error&quot;</span>),
+            message: String::from(<span class="string">"This is a Ferris error"</span>),
             errors: <span class="macro">vec!</span>[],
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Builder::new();
         builder = builder.status(<span class="number">403</span>);
-        builder = builder.url(String::from(<span class="string">&quot;https://ferris.crab&quot;</span>).parse().unwrap());
+        builder = builder.url(String::from(<span class="string">"https://ferris.crab"</span>).parse().unwrap());
         <span class="kw">let </span>body_string = to_string(<span class="kw-2">&amp;</span>error).unwrap();
         <span class="kw">let </span>response = builder.body(body_string.into_bytes()).unwrap();
 
@@ -554,7 +554,7 @@
 
         <span class="kw">let </span>known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(<span class="number">403</span>).unwrap(),
-            url: String::from(<span class="string">&quot;https://ferris.crab/&quot;</span>),
+            url: String::from(<span class="string">"https://ferris.crab/"</span>),
             method: Method::POST,
             error,
         };

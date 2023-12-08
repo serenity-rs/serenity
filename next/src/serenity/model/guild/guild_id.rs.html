@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/guild_id.rs`."><title>guild_id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (9fad68599 2023-12-03)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/guild_id.rs`."><title>guild_id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1833,14 +1833,12 @@
 <a href="#1833" id="1833">1833</a>
 <a href="#1834" id="1834">1834</a>
 <a href="#1835" id="1835">1835</a>
-<a href="#1836" id="1836">1836</a>
-<a href="#1837" id="1837">1837</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>futures::stream::Stream;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
     AddMember,
     Builder,
@@ -1858,25 +1856,25 @@
     EditScheduledEvent,
     EditSticker,
 };
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;model&quot;</span>))]
+<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, GuildRef};
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
-<span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, UserPagination};
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl </span>GuildId {
     <span class="doccomment">/// Gets all auto moderation [`Rule`]s of this guild via HTTP.
     ///
@@ -1929,9 +1927,9 @@
     /// # use serenity::http::Http;
     /// # let http: Http = unimplemented!();
     /// let builder = EditAutoModRule::new()
-    ///     .name(&quot;foobar filter&quot;)
+    ///     .name("foobar filter")
     ///     .trigger(Trigger::Keyword {
-    ///         strings: vec![&quot;foo*&quot;.to_string(), &quot;*bar&quot;.to_string()],
+    ///         strings: vec!["foo*".to_string(), "*bar".to_string()],
     ///         regex_patterns: vec![],
     ///         allow_list: vec![],
     ///     })
@@ -1954,7 +1952,7 @@
     </span><span class="kw">pub async fn </span>create_automod_rule(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditAutoModRule&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditAutoModRule&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">None</span>)).<span class="kw">await
     </span>}
@@ -1973,7 +1971,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         rule_id: <span class="kw">impl </span>Into&lt;RuleId&gt;,
-        builder: EditAutoModRule&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditAutoModRule&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">Some</span>(rule_id.into()))).<span class="kw">await
     </span>}
@@ -2015,7 +2013,7 @@
         builder.execute(cache_http, (<span class="self">self</span>, user_id.into())).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of days&#39; worth of messages (`dmd`) between
+    <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
     /// the range 0 and 7.
     ///
     /// Refer to the documentation for [`Guild::ban`] for more information.
@@ -2024,7 +2022,7 @@
     ///
     /// # Examples
     ///
-    /// Ban a member and remove all messages they&#39;ve sent in the last 4 days:
+    /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
     /// ```rust,no_run
     /// use serenity::model::id::{GuildId, UserId};
@@ -2041,7 +2039,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days&#39; worth of messages
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days' worth of messages
     /// to delete is over the maximum.
     ///
     /// Also can return [`Error::Http`] if the current user lacks permission.
@@ -2090,7 +2088,7 @@
         http.as_ref().ban_user(<span class="self">self</span>, user, dmd, reason).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets a list of the guild&#39;s bans, with additional options and filtering. See
+    <span class="doccomment">/// Gets a list of the guild's bans, with additional options and filtering. See
     /// [`Http::get_bans`] for details.
     ///
     /// **Note**: Requires the [Ban Members] permission.
@@ -2110,7 +2108,7 @@
         http.as_ref().get_bans(<span class="self">self</span>, target, limit).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets a list of the guild&#39;s audit log entries
+    <span class="doccomment">/// Gets a list of the guild's audit log entries
     ///
     /// **Note**: Requires the [View Audit Log] permission.
     ///
@@ -2132,7 +2130,7 @@
         http.as_ref().get_audit_logs(<span class="self">self</span>, action_type, user_id, before, limit).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets all of the guild&#39;s channels over the REST API.
+    <span class="doccomment">/// Gets all of the guild's channels over the REST API.
     ///
     /// # Errors
     ///
@@ -2164,7 +2162,7 @@
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
-    /// let builder = CreateChannel::new(&quot;test&quot;).kind(ChannelType::Voice);
+    /// let builder = CreateChannel::new("test").kind(ChannelType::Voice);
     /// let _channel = GuildId::new(7).create_channel(&amp;http, builder).await?;
     /// # Ok(())
     /// # }
@@ -2180,7 +2178,7 @@
     </span><span class="kw">pub async fn </span>create_channel(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateChannel&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateChannel&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
     </span>}
@@ -2212,8 +2210,8 @@
         image: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: name,
-            <span class="string">&quot;image&quot;</span>: image,
+            <span class="string">"name"</span>: name,
+            <span class="string">"image"</span>: image,
         });
 
         http.as_ref().create_emoji(<span class="self">self</span>, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
@@ -2237,8 +2235,8 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>integration_id = integration_id.into();
         <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">&quot;id&quot;</span>: integration_id,
-            <span class="string">&quot;type&quot;</span>: kind,
+            <span class="string">"id"</span>: integration_id,
+            <span class="string">"type"</span>: kind,
         });
 
         http.as_ref().create_guild_integration(<span class="self">self</span>, integration_id, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
@@ -2260,7 +2258,7 @@
     </span><span class="kw">pub async fn </span>create_role(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditRole&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditRole&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">None</span>)).<span class="kw">await
     </span>}
@@ -2278,7 +2276,7 @@
     </span><span class="kw">pub async fn </span>create_scheduled_event(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateScheduledEvent&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateScheduledEvent&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
     </span>}
@@ -2297,7 +2295,7 @@
     </span><span class="kw">pub async fn </span>create_sticker(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateSticker&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: CreateSticker&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
         builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
     </span>}
@@ -2435,14 +2433,12 @@
     </span><span class="kw">pub async fn </span>edit(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditGuild&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditGuild&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
         builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits an [`Emoji`]&#39;s name in the guild.
-    ///
-    /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features enabled.
+    <span class="doccomment">/// Edits an [`Emoji`]'s name in the guild.
     ///
     /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
     /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
@@ -2463,7 +2459,7 @@
         name: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: name,
+            <span class="string">"name"</span>: name,
         });
 
         http.as_ref().edit_emoji(<span class="self">self</span>, emoji_id.into(), <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
@@ -2502,12 +2498,12 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        builder: EditMember&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditMember&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, user_id.into())).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits the guild&#39;s MFA level. Returns the new level on success.
+    <span class="doccomment">/// Edits the guild's MFA level. Returns the new level on success.
     ///
     /// Requires guild ownership.
     ///
@@ -2521,12 +2517,12 @@
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;MfaLevel&gt; {
         <span class="kw">let </span>value = <span class="macro">json!</span>({
-            <span class="string">&quot;level&quot;</span>: mfa_level,
+            <span class="string">"level"</span>: mfa_level,
         });
         http.as_ref().edit_guild_mfa_level(<span class="self">self</span>, <span class="kw-2">&amp;</span>value, audit_log_reason).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits the current user&#39;s nickname for the guild.
+    <span class="doccomment">/// Edits the current user's nickname for the guild.
     ///
     /// Pass [`None`] to reset the nickname.
     ///
@@ -2566,7 +2562,7 @@
     /// # let role_id = RoleId::new(8);
     /// #
     /// // assuming a `role_id` and `guild_id` has been bound
-    /// let builder = EditRole::new().name(&quot;a test role&quot;).hoist(true);
+    /// let builder = EditRole::new().name("a test role").hoist(true);
     /// let role = guild_id.edit_role(&amp;http, role_id, builder).await?;
     /// # Ok(())
     /// # }
@@ -2583,7 +2579,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
-        builder: EditRole&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditRole&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">Some</span>(role_id.into()))).<span class="kw">await
     </span>}
@@ -2604,7 +2600,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
-        builder: EditScheduledEvent&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditScheduledEvent&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, event_id.into())).<span class="kw">await
     </span>}
@@ -2626,7 +2622,7 @@
     ///
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
-    /// let builder = EditSticker::new().name(&quot;Bun bun meow&quot;);
+    /// let builder = EditSticker::new().name("Bun bun meow");
     /// let _ = GuildId::new(7).edit_sticker(&amp;http, StickerId::new(7), builder).await?;
     /// # Ok(())
     /// # }
@@ -2643,7 +2639,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         sticker_id: <span class="kw">impl </span>Into&lt;StickerId&gt;,
-        builder: EditSticker&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditSticker&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, sticker_id.into())).<span class="kw">await
     </span>}
@@ -2674,7 +2670,7 @@
         http.as_ref().edit_role_position(<span class="self">self</span>, role_id.into(), position, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits the guild&#39;s welcome screen.
+    <span class="doccomment">/// Edits the guild's welcome screen.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -2686,12 +2682,12 @@
     </span><span class="kw">pub async fn </span>edit_welcome_screen(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditGuildWelcomeScreen&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditGuildWelcomeScreen&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWelcomeScreen&gt; {
         builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edits the guild&#39;s widget.
+    <span class="doccomment">/// Edits the guild's widget.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -2703,12 +2699,12 @@
     </span><span class="kw">pub async fn </span>edit_widget(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditGuildWidget&lt;<span class="lifetime">&#39;_</span>&gt;,
+        builder: EditGuildWidget&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildWidget&gt; {
         builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets all of the guild&#39;s roles over the REST API.
+    <span class="doccomment">/// Gets all of the guild's roles over the REST API.
     ///
     /// # Errors
     ///
@@ -2728,9 +2724,9 @@
     }
 
     <span class="doccomment">/// Tries to find the [`Guild`] by its Id in the cache.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
-    </span><span class="kw">pub fn </span>to_guild_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>to_guild_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         cache.as_ref().guild(<span class="self">self</span>)
     }
 
@@ -2744,7 +2740,7 @@
     /// Returns an [`Error::Http`] if the current user is not in the guild.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_partial_guild(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.guild(<span class="self">self</span>) {
@@ -2827,7 +2823,7 @@
         http.as_ref().get_guild_integrations(<span class="self">self</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets all of the guild&#39;s invites.
+    <span class="doccomment">/// Gets all of the guild's invites.
     ///
     /// Requires the [Manage Guild] permission.
     ///
@@ -2894,7 +2890,7 @@
         http.as_ref().leave_guild(<span class="self">self</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets a user&#39;s [`Member`] for the guild by Id.
+    <span class="doccomment">/// Gets a user's [`Member`] for the guild by Id.
     ///
     /// If the cache feature is enabled the cache will be checked first. If not found it will
     /// resort to an http request.
@@ -2911,7 +2907,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="kw">let </span>user_id = user_id.into();
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = cache.member(<span class="self">self</span>, user_id) {
@@ -2923,12 +2919,12 @@
         cache_http.http().get_member(<span class="self">self</span>, user_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Gets a list of the guild&#39;s members.
+    <span class="doccomment">/// Gets a list of the guild's members.
     ///
     /// Optionally pass in the `limit` to limit the number of results. Minimum value is 1, maximum
     /// and default value is 1000.
     ///
-    /// Optionally pass in `after` to offset the results by a [`User`]&#39;s Id.
+    /// Optionally pass in `after` to offset the results by a [`User`]'s Id.
     ///
     /// # Errors
     ///
@@ -2965,8 +2961,8 @@
     /// let mut members = guild_id.members_iter(&amp;ctx).boxed();
     /// while let Some(member_result) = members.next().await {
     ///     match member_result {
-    ///         Ok(member) =&gt; println!(&quot;{} is {}&quot;, member, member.display_name(),),
-    ///         Err(error) =&gt; eprintln!(&quot;Uh oh!  Error: {}&quot;, error),
+    ///         Ok(member) =&gt; println!("{} is {}", member, member.display_name(),),
+    ///         Err(error) =&gt; eprintln!("Uh oh!  Error: {}", error),
     ///     }
     /// }
     /// # }
@@ -2997,7 +2993,7 @@
     </span>}
 
     <span class="doccomment">/// Returns the name of whatever guild this id holds.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;cache&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>name(<span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="self">self</span>.to_guild_cached(cache.as_ref()).map(|g| g.name.clone())
@@ -3040,7 +3036,7 @@
     ///
     /// Accepts an iterator of a tuple of the channel ID to modify and its new position.
     ///
-    /// Although not required, you should specify all channels&#39; positions, regardless of whether
+    /// Although not required, you should specify all channels' positions, regardless of whether
     /// they were updated. Otherwise, positioning can sometimes get weird.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
@@ -3060,8 +3056,8 @@
             .into_iter()
             .map(|(id, pos)| {
                 <span class="macro">json!</span>({
-                    <span class="string">&quot;id&quot;</span>: id,
-                    <span class="string">&quot;position&quot;</span>: pos,
+                    <span class="string">"id"</span>: id,
+                    <span class="string">"position"</span>: pos,
                 })
             })
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
@@ -3181,7 +3177,7 @@
     /// number of shards in use. If you already have the total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
-    </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;cache&quot;</span>, feature = <span class="string">&quot;utils&quot;</span>))]
+    </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>))]
     #[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>shard_id(<span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; u32 {
@@ -3207,7 +3203,7 @@
     ///
     /// assert_eq!(guild_id.shard_id(17), 7);
     /// ```
-    </span><span class="attr">#[cfg(all(feature = <span class="string">&quot;utils&quot;</span>, not(feature = <span class="string">&quot;cache&quot;</span>)))]
+    </span><span class="attr">#[cfg(all(feature = <span class="string">"utils"</span>, not(feature = <span class="string">"cache"</span>)))]
     #[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>shard_id(<span class="self">self</span>, shard_count: u32) -&gt; u32 {
@@ -3263,7 +3259,7 @@
         http.as_ref().remove_ban(<span class="self">self</span>, user_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Retrieve&#39;s the guild&#39;s vanity URL.
+    <span class="doccomment">/// Retrieve's the guild's vanity URL.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -3278,7 +3274,7 @@
         http.as_ref().get_guild_vanity_url(<span class="self">self</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Retrieves the guild&#39;s webhooks.
+    <span class="doccomment">/// Retrieves the guild's webhooks.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
@@ -3294,26 +3290,26 @@
     </span>}
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this
     /// guild.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_reply(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).guild_id(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reply`].
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_replies(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in
     /// this guild.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_reaction(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).guild_id(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reaction`].
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;collector&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     </span><span class="kw">pub fn </span>await_reactions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;,
@@ -3480,7 +3476,7 @@
     <span class="doccomment">/// Get the widget image URL.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>widget_image_url(<span class="self">self</span>, style: GuildWidgetStyle) -&gt; String {
-        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget.png?style={}&quot;</span>, <span class="self">self</span>, style)
+        <span class="macro">api!</span>(<span class="string">"/guilds/{}/widget.png?style={}"</span>, <span class="self">self</span>, style)
     }
 
     <span class="doccomment">/// Gets the guild active threads.
@@ -3501,7 +3497,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>PartialGuild&gt; <span class="kw">for </span>GuildId {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PartialGuild&gt; <span class="kw">for </span>GuildId {
     <span class="doccomment">/// Gets the Id of a partial guild.
     </span><span class="kw">fn </span>from(guild: <span class="kw-2">&amp;</span>PartialGuild) -&gt; GuildId {
         guild.id
@@ -3515,7 +3511,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GuildInfo&gt; <span class="kw">for </span>GuildId {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>GuildInfo&gt; <span class="kw">for </span>GuildId {
     <span class="doccomment">/// Gets the Id of Guild information struct.
     </span><span class="kw">fn </span>from(guild_info: <span class="kw-2">&amp;</span>GuildInfo) -&gt; GuildId {
         guild_info.id
@@ -3529,7 +3525,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InviteGuild&gt; <span class="kw">for </span>GuildId {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>InviteGuild&gt; <span class="kw">for </span>GuildId {
     <span class="doccomment">/// Gets the Id of Invite Guild struct.
     </span><span class="kw">fn </span>from(invite_guild: <span class="kw-2">&amp;</span>InviteGuild) -&gt; GuildId {
         invite_guild.id
@@ -3543,7 +3539,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Guild&gt; <span class="kw">for </span>GuildId {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Guild&gt; <span class="kw">for </span>GuildId {
     <span class="doccomment">/// Gets the Id of Guild.
     </span><span class="kw">fn </span>from(live_guild: <span class="kw-2">&amp;</span>Guild) -&gt; GuildId {
         live_guild.id
@@ -3557,7 +3553,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>WebhookGuild&gt; <span class="kw">for </span>GuildId {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>WebhookGuild&gt; <span class="kw">for </span>GuildId {
     <span class="doccomment">/// Gets the Id of Webhook Guild struct.
     </span><span class="kw">fn </span>from(webhook_guild: <span class="kw-2">&amp;</span>WebhookGuild) -&gt; GuildId {
         webhook_guild.id
@@ -3566,7 +3562,7 @@
 
 <span class="doccomment">/// A helper class returned by [`GuildId::members_iter`]
 </span><span class="attr">#[derive(Clone, Debug)]
-#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">pub struct </span>MembersIter&lt;H: AsRef&lt;Http&gt;&gt; {
     guild_id: GuildId,
     http: H,
@@ -3575,7 +3571,7 @@
     tried_fetch: bool,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;model&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">impl</span>&lt;H: AsRef&lt;Http&gt;&gt; MembersIter&lt;H&gt; {
     <span class="kw">fn </span>new(guild_id: GuildId, http: H) -&gt; MembersIter&lt;H&gt; {
         MembersIter {
@@ -3630,8 +3626,8 @@
     /// let mut members = MembersIter::&lt;Http&gt;::stream(&amp;ctx, guild_id).boxed();
     /// while let Some(member_result) = members.next().await {
     ///     match member_result {
-    ///         Ok(member) =&gt; println!(&quot;{} is {}&quot;, member, member.display_name(),),
-    ///         Err(error) =&gt; eprintln!(&quot;Uh oh!  Error: {}&quot;, error),
+    ///         Ok(member) =&gt; println!("{} is {}", member, member.display_name(),),
+    ///         Err(error) =&gt; eprintln!("Uh oh!  Error: {}", error),
     ///     }
     /// }
     /// # }
@@ -3662,13 +3658,13 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>GuildWidgetStyle {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Shield =&gt; f.write_str(<span class="string">&quot;shield&quot;</span>),
-            <span class="self">Self</span>::Banner1 =&gt; f.write_str(<span class="string">&quot;banner1&quot;</span>),
-            <span class="self">Self</span>::Banner2 =&gt; f.write_str(<span class="string">&quot;banner2&quot;</span>),
-            <span class="self">Self</span>::Banner3 =&gt; f.write_str(<span class="string">&quot;banner3&quot;</span>),
-            <span class="self">Self</span>::Banner4 =&gt; f.write_str(<span class="string">&quot;banner4&quot;</span>),
+            <span class="self">Self</span>::Shield =&gt; f.write_str(<span class="string">"shield"</span>),
+            <span class="self">Self</span>::Banner1 =&gt; f.write_str(<span class="string">"banner1"</span>),
+            <span class="self">Self</span>::Banner2 =&gt; f.write_str(<span class="string">"banner2"</span>),
+            <span class="self">Self</span>::Banner3 =&gt; f.write_str(<span class="string">"banner3"</span>),
+            <span class="self">Self</span>::Banner4 =&gt; f.write_str(<span class="string">"banner4"</span>),
         }
     }
 }
