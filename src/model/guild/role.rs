@@ -3,8 +3,6 @@ use std::fmt;
 
 #[cfg(feature = "model")]
 use crate::builder::EditRole;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -174,28 +172,6 @@ impl PartialEq for Role {
 impl PartialOrd for Role {
     fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
         Some(self.cmp(other))
-    }
-}
-
-#[cfg(feature = "model")]
-impl RoleId {
-    /// Tries to find the [`Role`] by its Id in the cache.
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Guild::roles. This performs a loop over the entire cache!"]
-    pub fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
-        for guild_entry in cache.as_ref().guilds.iter() {
-            let guild = guild_entry.value();
-
-            if !guild.roles.contains_key(&self) {
-                continue;
-            }
-
-            if let Some(role) = guild.roles.get(&self) {
-                return Some(role.clone());
-            }
-        }
-
-        None
     }
 }
 
