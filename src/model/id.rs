@@ -167,6 +167,7 @@ pub struct MessageId(#[serde(with = "snowflake")] NonZeroU64);
 pub struct RoleId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for an auto moderation rule
+#[repr(packed)]
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 pub struct RuleId(#[serde(with = "snowflake")] NonZeroU64);
 
@@ -248,6 +249,7 @@ pub struct TargetId(#[serde(with = "snowflake")] NonZeroU64);
 pub struct StageInstanceId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a forum tag.
+#[repr(packed)]
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 pub struct ForumTagId(#[serde(with = "snowflake")] NonZeroU64);
 
