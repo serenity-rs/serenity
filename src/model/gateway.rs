@@ -22,7 +22,7 @@ pub struct BotGateway {
     /// The gateway to connect to.
     pub url: String,
     /// The number of shards that is recommended to be used by the current bot user.
-    pub shards: u32,
+    pub shards: NonZeroU16,
     /// Information describing how many gateway sessions you can initiate within a ratelimit
     /// period.
     pub session_start_limit: SessionStartLimit,
@@ -372,12 +372,12 @@ pub struct SessionStartLimit {
 #[derive(Clone, Copy, Debug)]
 pub struct ShardInfo {
     pub id: ShardId,
-    pub total: u32,
+    pub total: NonZeroU16,
 }
 
 impl ShardInfo {
     #[must_use]
-    pub(crate) fn new(id: ShardId, total: u32) -> Self {
+    pub(crate) fn new(id: ShardId, total: NonZeroU16) -> Self {
         Self {
             id,
             total,
@@ -387,7 +387,7 @@ impl ShardInfo {
 
 impl<'de> serde::Deserialize<'de> for ShardInfo {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        <(u32, u32)>::deserialize(deserializer).map(|(id, total)| ShardInfo {
+        <(u16, NonZeroU16)>::deserialize(deserializer).map(|(id, total)| ShardInfo {
             id: ShardId(id),
             total,
         })
