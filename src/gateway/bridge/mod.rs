@@ -50,6 +50,7 @@ mod shard_runner_message;
 mod voice;
 
 use std::fmt;
+use std::num::NonZeroU16;
 use std::time::Duration as StdDuration;
 
 pub use self::event::ShardStageUpdateEvent;
@@ -68,9 +69,10 @@ use crate::model::id::ShardId;
 /// A message to be sent to the [`ShardQueuer`].
 #[derive(Clone, Debug)]
 pub enum ShardQueuerMessage {
-    /// Message to start a shard, where the 0-index element is the ID of the Shard to start and the
-    /// 1-index element is the total shards in use.
-    Start(ShardId, ShardId),
+    /// Message to set the shard total.
+    SetShardTotal(NonZeroU16),
+    /// Message to start a shard.
+    Start(ShardId),
     /// Message to shutdown the shard queuer.
     Shutdown,
     /// Message to dequeue/shutdown a shard.

@@ -22,6 +22,7 @@ pub use content_safe::*;
 pub use formatted_timestamp::*;
 #[cfg(feature = "collector")]
 pub use quick_modal::*;
+use tracing::warn;
 use url::Url;
 
 pub use self::custom_message::CustomMessage;
@@ -485,8 +486,16 @@ pub(crate) fn user_perms(cache: impl AsRef<Cache>, channel_id: ChannelId) -> Res
 /// ```
 #[inline]
 #[must_use]
-pub fn shard_id(guild_id: GuildId, shard_count: u32) -> u32 {
-    ((guild_id.get() >> 22) % (shard_count as u64)) as u32
+pub fn shard_id(guild_id: GuildId, shard_count: u16) -> u16 {
+    let shard_count = check_shard_total(shard_count);
+    ((guild_id.get() >> 22) % (shard_count.get() as u64)) as u16
+}
+
+pub(crate) fn check_shard_total(total_shards: u16) -> NonZeroU16 {
+    NonZeroU16::new(total_shards).unwrap_or_else(|| {
+        warn!("Invalid shard total provided ({total_shards}), defaulting to 1");
+        NonZeroU16::MIN
+    })
 }
 
 #[cfg(test)]

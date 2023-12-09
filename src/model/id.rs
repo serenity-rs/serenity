@@ -213,15 +213,15 @@ id_u64! {
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-pub struct ShardId(pub u32);
+pub struct ShardId(pub u16);
 
 impl ShardId {
-    /// Retrieves the value as a [`u32`].
+    /// Retrieves the value as a [`u16`].
     ///
     /// This is not a [`u64`] as [`ShardId`]s are not a discord concept and are simply used for
     /// internal type safety.
     #[must_use]
-    pub fn get(self) -> u32 {
+    pub fn get(self) -> u16 {
         self.0
     }
 }
