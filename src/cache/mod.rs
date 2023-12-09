@@ -26,6 +26,7 @@
 
 use std::collections::{HashSet, VecDeque};
 use std::hash::Hash;
+use std::num::NonZeroU16;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 #[cfg(feature = "temp_cache")]
@@ -127,7 +128,7 @@ pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Mes
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
 pub(crate) struct CachedShardData {
-    pub total: u32,
+    pub total: NonZeroU16,
     pub connected: HashSet<ShardId>,
     pub has_sent_shards_ready: bool,
 }
@@ -286,7 +287,7 @@ impl Cache {
             message_queue: DashMap::default(),
 
             shard_data: RwLock::new(CachedShardData {
-                total: 1,
+                total: NonZeroU16::MIN,
                 connected: HashSet::new(),
                 has_sent_shards_ready: false,
             }),
@@ -539,7 +540,7 @@ impl Cache {
 
     /// Returns the number of shards.
     #[inline]
-    pub fn shard_count(&self) -> u32 {
+    pub fn shard_count(&self) -> NonZeroU16 {
         self.shard_data.read().total
     }
 
