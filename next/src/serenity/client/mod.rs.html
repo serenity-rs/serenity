@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (f967532a4 2023-12-08)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -858,23 +858,6 @@
 <a href="#858" id="858">858</a>
 <a href="#859" id="859">859</a>
 <a href="#860" id="860">860</a>
-<a href="#861" id="861">861</a>
-<a href="#862" id="862">862</a>
-<a href="#863" id="863">863</a>
-<a href="#864" id="864">864</a>
-<a href="#865" id="865">865</a>
-<a href="#866" id="866">866</a>
-<a href="#867" id="867">867</a>
-<a href="#868" id="868">868</a>
-<a href="#869" id="869">869</a>
-<a href="#870" id="870">870</a>
-<a href="#871" id="871">871</a>
-<a href="#872" id="872">872</a>
-<a href="#873" id="873">873</a>
-<a href="#874" id="874">874</a>
-<a href="#875" id="875">875</a>
-<a href="#876" id="876">876</a>
-<a href="#877" id="877">877</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -899,6 +882,7 @@
 </span><span class="kw">mod </span>event_handler;
 
 <span class="kw">use </span>std::future::IntoFuture;
+<span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::ops::Range;
 <span class="kw">use </span>std::sync::Arc;
 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
@@ -907,7 +891,7 @@
 <span class="kw">use </span>futures::channel::mpsc::UnboundedReceiver <span class="kw">as </span>Receiver;
 <span class="kw">use </span>futures::future::BoxFuture;
 <span class="kw">use </span>futures::StreamExt <span class="kw">as _</span>;
-<span class="kw">use </span>tokio::sync::{Mutex, RwLock};
+<span class="kw">use </span>tokio::sync::RwLock;
 <span class="kw">use </span>tracing::{debug, error, info, instrument};
 <span class="kw">use </span>typemap_rev::{TypeMap, TypeMapKey};
 
@@ -934,6 +918,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::model::gateway::GatewayIntents;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::ApplicationId;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::OnlineStatus;
+<span class="kw">use </span><span class="kw">crate</span>::utils::check_shard_total;
 
 <span class="doccomment">/// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
@@ -1210,13 +1195,13 @@
         </span><span class="kw">let </span>cache = Arc::new(Cache::new_with_settings(<span class="self">self</span>.cache_settings));
 
         Box::pin(<span class="kw">async move </span>{
-            <span class="kw">let </span>ws_url = Arc::new(Mutex::new(<span class="kw">match </span>http.get_gateway().<span class="kw">await </span>{
-                <span class="prelude-val">Ok</span>(response) =&gt; response.url,
+            <span class="kw">let </span>(ws_url, shard_total) = <span class="kw">match </span>http.get_bot_gateway().<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(response) =&gt; (Arc::from(response.url), response.shards),
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">tracing::warn!</span>(<span class="string">"HTTP request to get gateway URL failed: {}"</span>, err);
-                    <span class="string">"wss://gateway.discord.gg"</span>.to_string()
+                    <span class="macro">tracing::warn!</span>(<span class="string">"HTTP request to get gateway URL failed: {err}"</span>);
+                    (Arc::from(<span class="string">"wss://gateway.discord.gg"</span>), NonZeroU16::MIN)
                 },
-            }));
+            };
 
             <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span><span class="kw">let </span>framework_cell = Arc::new(OnceLock::new());
@@ -1226,12 +1211,10 @@
                 raw_event_handlers,
                 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
                 </span>framework: Arc::clone(<span class="kw-2">&amp;</span>framework_cell),
-                shard_index: <span class="number">0</span>,
-                shard_init: <span class="number">0</span>,
-                shard_total: <span class="number">0</span>,
                 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
                 </span>voice_manager: voice_manager.as_ref().map(Arc::clone),
                 ws_url: Arc::clone(<span class="kw-2">&amp;</span>ws_url),
+                shard_total,
                 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
                 </span>cache: Arc::clone(<span class="kw-2">&amp;</span>cache),
                 http: Arc::clone(<span class="kw-2">&amp;</span>http),
@@ -1463,11 +1446,7 @@
     </span><span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
     </span><span class="kw">pub </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager + <span class="lifetime">'static</span>&gt;&gt;,
     <span class="doccomment">/// URL that the client's shards will use to connect to the gateway.
-    ///
-    /// This is likely not important for production usage and is, at best, used for debugging.
-    ///
-    /// This is wrapped in an `Arc&lt;Mutex&lt;T&gt;&gt;` so all shards will have an updated value available.
-    </span><span class="kw">pub </span>ws_url: Arc&lt;Mutex&lt;String&gt;&gt;,
+    </span><span class="kw">pub </span>ws_url: Arc&lt;str&gt;,
     <span class="doccomment">/// The cache for the client.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
@@ -1515,7 +1494,7 @@
     /// [gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.start_connection(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>).<span class="kw">await
+        <span class="self">self</span>.start_connection(<span class="number">0</span>, <span class="number">0</span>, NonZeroU16::MIN).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Establish the connection(s) and start listening for events.
@@ -1558,8 +1537,7 @@
     </span><span class="kw">pub async fn </span>start_autosharded(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>(end, total) = {
             <span class="kw">let </span>res = <span class="self">self</span>.http.get_bot_gateway().<span class="kw">await</span><span class="question-mark">?</span>;
-
-            (res.shards - <span class="number">1</span>, res.shards)
+            (res.shards.get() - <span class="number">1</span>, res.shards)
         };
 
         <span class="self">self</span>.start_connection(<span class="number">0</span>, end, total).<span class="kw">await
@@ -1620,8 +1598,8 @@
     ///
     /// [gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>start_shard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard: u32, shards: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.start_connection(shard, shard, shards).<span class="kw">await
+    </span><span class="kw">pub async fn </span>start_shard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard: u16, shards: u16) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.start_connection(shard, shard, check_shard_total(shards)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Establish sharded connections and start listening for events.
@@ -1661,8 +1639,8 @@
     ///
     /// [Gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>start_shards(<span class="kw-2">&amp;mut </span><span class="self">self</span>, total_shards: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.start_connection(<span class="number">0</span>, total_shards - <span class="number">1</span>, total_shards).<span class="kw">await
+    </span><span class="kw">pub async fn </span>start_shards(<span class="kw-2">&amp;mut </span><span class="self">self</span>, total_shards: u16) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.start_connection(<span class="number">0</span>, total_shards - <span class="number">1</span>, check_shard_total(total_shards)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Establish a range of sharded connections and start listening for events.
@@ -1702,26 +1680,16 @@
     ///
     /// [Gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>start_shard_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;u32&gt;, total_shards: u32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.start_connection(range.start, range.end, total_shards).<span class="kw">await
+    </span><span class="kw">pub async fn </span>start_shard_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;u16&gt;, total_shards: u16) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.start_connection(range.start, range.end, check_shard_total(total_shards)).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Shard data layout is:
-    /// 0: first shard number to initialize
-    /// 1: shard number to initialize up to and including
-    /// 2: total number of shards the bot is sharding for
-    ///
-    /// Not all shards need to be initialized in this process.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">async fn </span>start_connection(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        start_shard: u32,
-        end_shard: u32,
-        total_shards: u32,
+        start_shard: u16,
+        end_shard: u16,
+        total_shards: NonZeroU16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
@@ -1732,11 +1700,9 @@
 
         <span class="kw">let </span>init = end_shard - start_shard + <span class="number">1</span>;
 
-        <span class="self">self</span>.shard_manager.set_shards(start_shard, init, total_shards).<span class="kw">await</span>;
-
         <span class="macro">debug!</span>(<span class="string">"Initializing shard info: {} - {}/{}"</span>, start_shard, init, total_shards);
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard_manager.initialize() {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard_manager.initialize(start_shard, init, total_shards) {
             <span class="macro">error!</span>(<span class="string">"Failed to boot a shard: {:?}"</span>, why);
             <span class="macro">info!</span>(<span class="string">"Shutting down all shards"</span>);
 
