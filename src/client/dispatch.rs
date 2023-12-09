@@ -347,13 +347,12 @@ fn update_cache_with_event(
             #[cfg(feature = "cache")]
             {
                 let mut shards = cache.shard_data.write();
-                if shards.connected.len() as u32 == shards.total && !shards.has_sent_shards_ready {
+                if shards.connected.len() == shards.total.get() as usize
+                    && !shards.has_sent_shards_ready
+                {
                     shards.has_sent_shards_ready = true;
-                    let total = shards.total;
-                    drop(shards);
-
                     extra_event = Some(FullEvent::ShardsReady {
-                        total_shards: total,
+                        total_shards: shards.total,
                     });
                 }
             }
