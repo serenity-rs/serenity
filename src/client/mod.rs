@@ -24,6 +24,7 @@ mod error;
 mod event_handler;
 
 use std::future::IntoFuture;
+use std::num::NonZeroU16;
 use std::ops::Range;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
@@ -32,7 +33,7 @@ use std::sync::OnceLock;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 use tracing::{debug, error, info, instrument};
 use typemap_rev::{TypeMap, TypeMapKey};
 
@@ -59,6 +60,7 @@ use crate::internal::prelude::*;
 use crate::model::gateway::GatewayIntents;
 use crate::model::id::ApplicationId;
 use crate::model::user::OnlineStatus;
+use crate::utils::check_shard_total;
 
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
@@ -335,13 +337,13 @@ impl IntoFuture for ClientBuilder {
         let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
-            let ws_url = Arc::new(Mutex::new(match http.get_gateway().await {
-                Ok(response) => response.url,
+            let (ws_url, shard_total) = match http.get_bot_gateway().await {
+                Ok(response) => (Arc::from(response.url), response.shards),
                 Err(err) => {
-                    tracing::warn!("HTTP request to get gateway URL failed: {}", err);
-                    "wss://gateway.discord.gg".to_string()
+                    tracing::warn!("HTTP request to get gateway URL failed: {err}");
+                    (Arc::from("wss://gateway.discord.gg"), NonZeroU16::MIN)
                 },
-            }));
+            };
 
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceLock::new());
@@ -351,12 +353,10 @@ impl IntoFuture for ClientBuilder {
                 raw_event_handlers,
                 #[cfg(feature = "framework")]
                 framework: Arc::clone(&framework_cell),
-                shard_index: 0,
-                shard_init: 0,
-                shard_total: 0,
                 #[cfg(feature = "voice")]
                 voice_manager: voice_manager.clone(),
                 ws_url: Arc::clone(&ws_url),
+                shard_total,
                 #[cfg(feature = "cache")]
                 cache: Arc::clone(&cache),
                 http: Arc::clone(&http),
@@ -590,11 +590,7 @@ pub struct Client {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// URL that the client's shards will use to connect to the gateway.
-    ///
-    /// This is likely not important for production usage and is, at best, used for debugging.
-    ///
-    /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated value available.
-    pub ws_url: Arc<Mutex<String>>,
+    pub ws_url: Arc<str>,
     /// The cache for the client.
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
@@ -642,7 +638,7 @@ impl Client {
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start(&mut self) -> Result<()> {
-        self.start_connection(0, 0, 1).await
+        self.start_connection(0, 0, NonZeroU16::MIN).await
     }
 
     /// Establish the connection(s) and start listening for events.
@@ -685,8 +681,7 @@ impl Client {
     pub async fn start_autosharded(&mut self) -> Result<()> {
         let (end, total) = {
             let res = self.http.get_bot_gateway().await?;
-
-            (res.shards - 1, res.shards)
+            (res.shards.get() - 1, res.shards)
         };
 
         self.start_connection(0, end, total).await
@@ -747,8 +742,8 @@ impl Client {
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
-    pub async fn start_shard(&mut self, shard: u32, shards: u32) -> Result<()> {
-        self.start_connection(shard, shard, shards).await
+    pub async fn start_shard(&mut self, shard: u16, shards: u16) -> Result<()> {
+        self.start_connection(shard, shard, check_shard_total(shards)).await
     }
 
     /// Establish sharded connections and start listening for events.
@@ -788,8 +783,8 @@ impl Client {
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
-    pub async fn start_shards(&mut self, total_shards: u32) -> Result<()> {
-        self.start_connection(0, total_shards - 1, total_shards).await
+    pub async fn start_shards(&mut self, total_shards: u16) -> Result<()> {
+        self.start_connection(0, total_shards - 1, check_shard_total(total_shards)).await
     }
 
     /// Establish a range of sharded connections and start listening for events.
@@ -829,26 +824,16 @@ impl Client {
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
-    pub async fn start_shard_range(&mut self, range: Range<u32>, total_shards: u32) -> Result<()> {
-        self.start_connection(range.start, range.end, total_shards).await
+    pub async fn start_shard_range(&mut self, range: Range<u16>, total_shards: u16) -> Result<()> {
+        self.start_connection(range.start, range.end, check_shard_total(total_shards)).await
     }
 
-    /// Shard data layout is:
-    /// 0: first shard number to initialize
-    /// 1: shard number to initialize up to and including
-    /// 2: total number of shards the bot is sharding for
-    ///
-    /// Not all shards need to be initialized in this process.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     #[instrument(skip(self))]
     async fn start_connection(
         &mut self,
-        start_shard: u32,
-        end_shard: u32,
-        total_shards: u32,
+        start_shard: u16,
+        end_shard: u16,
+        total_shards: NonZeroU16,
     ) -> Result<()> {
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
@@ -859,11 +844,9 @@ impl Client {
 
         let init = end_shard - start_shard + 1;
 
-        self.shard_manager.set_shards(start_shard, init, total_shards).await;
-
         debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
 
-        if let Err(why) = self.shard_manager.initialize() {
+        if let Err(why) = self.shard_manager.initialize(start_shard, init, total_shards) {
             error!("Failed to boot a shard: {:?}", why);
             info!("Shutting down all shards");
 

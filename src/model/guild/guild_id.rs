@@ -1384,8 +1384,8 @@ impl GuildId {
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     #[must_use]
-    pub fn shard_id(self, cache: impl AsRef<Cache>) -> u32 {
-        crate::utils::shard_id(self, cache.as_ref().shard_count())
+    pub fn shard_id(self, cache: impl AsRef<Cache>) -> u16 {
+        crate::utils::shard_id(self, cache.as_ref().shard_count().get())
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -1410,7 +1410,7 @@ impl GuildId {
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
     #[must_use]
-    pub fn shard_id(self, shard_count: u32) -> u32 {
+    pub fn shard_id(self, shard_count: u16) -> u16 {
         crate::utils::shard_id(self, shard_count)
     }
 
