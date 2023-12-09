@@ -108,29 +108,31 @@ impl ShardQueuer {
         const TIMEOUT: Duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
 
         loop {
-            match timeout(TIMEOUT, self.rx.next()).await {
-                Ok(Some(ShardQueuerMessage::Shutdown)) => {
-                    debug!("[Shard Queuer] Received to shutdown.");
-                    self.shutdown_runners().await;
-
-                    break;
-                },
-                Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
-                    debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
-                    self.shutdown(shard, code).await;
-                },
-                Ok(Some(ShardQueuerMessage::Start(shard_id))) => {
-                    self.checked_start(shard_id).await;
-                },
-                Ok(Some(ShardQueuerMessage::SetShardTotal(shard_total))) => {
-                    self.shard_total = shard_total;
-                },
-                Ok(None) => break,
-                Err(_) => {
-                    if let Some(shard) = self.queue.pop_front() {
-                        self.checked_start(shard).await;
-                    }
-                },
+            if let Ok(msg) = timeout(TIMEOUT, self.rx.next()).await {
+                match msg {
+                    Some(ShardQueuerMessage::SetShardTotal(shard_total)) => {
+                        self.shard_total = shard_total;
+                    },
+                    Some(ShardQueuerMessage::Start(shard_id)) => {
+                        self.queue.push_back(shard_id);
+                    },
+                    Some(ShardQueuerMessage::ShutdownShard(shard, code)) => {
+                        debug!(
+                            "[Shard Queuer] Received to shutdown shard {} with code {}",
+                            shard.0, code
+                        );
+                        self.shutdown(shard, code).await;
+                    },
+                    Some(ShardQueuerMessage::Shutdown) => {
+                        debug!("[Shard Queuer] Received to shutdown all shards");
+                        self.shutdown_runners().await;
+                        break;
+                    },
+                    None => break,
+                }
+            }
+            if let Some(shard_id) = self.queue.pop_front() {
+                self.checked_start(shard_id).await;
             }
         }
     }
