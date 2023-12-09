@@ -1,3 +1,4 @@
+use crate::internal::prelude::*;
 use crate::model::channel::{ChannelType, ThreadMetadata};
 use crate::model::id::{ChannelId, WebhookId};
 use crate::model::Permissions;
@@ -13,7 +14,7 @@ pub struct PartialChannel {
     /// The channel Id.
     pub id: ChannelId,
     /// The channel name.
-    pub name: Option<String>,
+    pub name: Option<FixedString>,
     /// The channel type.
     #[serde(rename = "type")]
     pub kind: ChannelType,
