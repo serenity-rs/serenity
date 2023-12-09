@@ -1806,7 +1806,7 @@
     <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;&gt;,
     <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
-    </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;GuildChannel&gt;&gt;,
+    </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;GuildChannel&gt;&gt;&gt;,
     <span class="kw">pub </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;ActionRow&gt;&gt;,
     <span class="kw">pub </span>sticker_items: <span class="prelude-ty">Option</span>&lt;Vec&lt;StickerItem&gt;&gt;,
     <span class="kw">pub </span>position: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;u64&gt;&gt;,

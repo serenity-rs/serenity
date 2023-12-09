@@ -1250,7 +1250,7 @@
     /// [`Interaction`]: crate::model::application::Interaction
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;,
     <span class="doccomment">/// The thread that was started from this message, includes thread member object.
-    </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;GuildChannel&gt;,
+    </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;Box&lt;GuildChannel&gt;&gt;,
     <span class="doccomment">/// The components of this message
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>components: Vec&lt;ActionRow&gt;,
