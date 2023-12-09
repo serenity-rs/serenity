@@ -1,3 +1,5 @@
+use std::num::NonZeroU16;
+
 use super::{Cache, CacheUpdate};
 use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
@@ -488,7 +490,8 @@ impl CacheUpdate for ReadyEvent {
             cache.unavailable_guilds.insert(unavailable.id, ());
         }
 
-        let shard_data = self.ready.shard.unwrap_or_else(|| ShardInfo::new(ShardId(1), 1));
+        let shard_data =
+            self.ready.shard.unwrap_or_else(|| ShardInfo::new(ShardId(1), NonZeroU16::MIN));
 
         {
             let mut cached_shard_data = cache.shard_data.write();
