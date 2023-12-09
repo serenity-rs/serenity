@@ -117,7 +117,7 @@ pub struct Message {
     #[cfg(feature = "unstable_discord_api")]
     pub interaction_metadata: Option<Box<MessageInteractionMetadata>>,
     /// The thread that was started from this message, includes thread member object.
-    pub thread: Option<GuildChannel>,
+    pub thread: Option<Box<GuildChannel>>,
     /// The components of this message
     #[serde(default)]
     pub components: Vec<ActionRow>,
