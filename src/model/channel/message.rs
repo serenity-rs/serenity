@@ -116,7 +116,7 @@ pub struct Message {
     /// [`Interaction`]: crate::model::application::Interaction
     pub interaction_metadata: Option<Box<MessageInteractionMetadata>>,
     /// The thread that was started from this message, includes thread member object.
-    pub thread: Option<GuildChannel>,
+    pub thread: Option<Box<GuildChannel>>,
     /// The components of this message
     #[serde(default, deserialize_with = "deserialize_components")]
     pub components: Vec<ActionRow>,
