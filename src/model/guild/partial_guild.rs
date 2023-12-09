@@ -1347,7 +1347,7 @@ impl PartialGuild {
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     #[must_use]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u32 {
+    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
         self.id.shard_id(cache)
     }
 
@@ -1372,7 +1372,7 @@ impl PartialGuild {
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
     #[must_use]
-    pub fn shard_id(&self, shard_count: u32) -> u32 {
+    pub fn shard_id(&self, shard_count: u16) -> u16 {
         self.id.shard_id(shard_count)
     }
 

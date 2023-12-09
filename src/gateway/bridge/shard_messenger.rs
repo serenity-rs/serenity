@@ -58,24 +58,17 @@ impl ShardMessenger {
     /// parameter:
     ///
     /// ```rust,no_run
-    /// # use tokio::sync::Mutex;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::model::id::ShardId;
     /// # use serenity::gateway::{ChunkGuildFilter, Shard};
-    /// # use std::sync::Arc;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #
-    /// #     let shard_info = ShardInfo {
-    /// #         id: ShardId(0),
-    /// #         total: 1,
-    /// #     };
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
-    /// #
+    /// # async fn run(mut shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::id::GuildId;
     ///
-    /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), false, ChunkGuildFilter::None, None);
+    /// shard.chunk_guild(
+    ///     GuildId::new(81384788765712384),
+    ///     Some(2000),
+    ///     false,
+    ///     ChunkGuildFilter::None,
+    ///     None,
+    /// );
     /// # Ok(())
     /// # }
     /// ```
@@ -84,22 +77,8 @@ impl ShardMessenger {
     /// and a nonce of `"request"`:
     ///
     /// ```rust,no_run
-    /// # use tokio::sync::Mutex;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use serenity::model::id::ShardId;
     /// # use serenity::gateway::{ChunkGuildFilter, Shard};
-    /// # use std::sync::Arc;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #
-    /// #     let shard_info = ShardInfo {
-    /// #         id: ShardId(0),
-    /// #         total: 1,
-    /// #     };
-    /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;;
-    /// #
+    /// # async fn run(mut shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::id::GuildId;
     ///
     /// shard.chunk_guild(
@@ -138,21 +117,8 @@ impl ShardMessenger {
     /// Setting the current activity to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
-    /// # use tokio::sync::Mutex;
-    /// # use serenity::gateway::{Shard};
-    /// # use serenity::model::id::ShardId;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use std::sync::Arc;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #
-    /// #     let shard_info = ShardInfo {
-    /// #         id: ShardId(0),
-    /// #         total: 1,
-    /// #     };
-    /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
+    /// # use serenity::gateway::Shard;
+    /// # async fn run(mut shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::gateway::ActivityData;
     ///
     /// shard.set_activity(Some(ActivityData::playing("Heroes of the Storm")));
@@ -172,20 +138,8 @@ impl ShardMessenger {
     /// Set the current user as playing `"Heroes of the Storm"` and being online:
     ///
     /// ```rust,ignore
-    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use std::sync::Arc;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #
-    /// #     let shard_info = ShardInfo {
-    /// #         id: 0,
-    /// #         total: 1,
-    /// #     };
-    /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, None).await?;
-    /// #
+    /// # async fn run(shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::gateway::ActivityData;
     /// use serenity::model::user::OnlineStatus;
     ///
@@ -214,21 +168,8 @@ impl ShardMessenger {
     /// Setting the current online status for the shard to [`DoNotDisturb`].
     ///
     /// ```rust,no_run
-    /// # use tokio::sync::Mutex;
-    /// # use serenity::gateway::{Shard};
-    /// # use serenity::model::id::ShardId;
-    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
-    /// # use std::sync::Arc;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #     let shard_info = ShardInfo {
-    /// #         id: ShardId(0),
-    /// #         total: 1,
-    /// #     };
-    /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
-    /// #
+    /// # use serenity::gateway::Shard;
+    /// # async fn run(mut shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::user::OnlineStatus;
     ///
     /// shard.set_status(OnlineStatus::DoNotDisturb);
