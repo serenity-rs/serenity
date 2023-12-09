@@ -592,7 +592,7 @@ pub struct MessageUpdateEvent {
     pub interaction: Option<Option<Box<MessageInteraction>>>,
     pub interaction_metadata: Option<Option<Box<MessageInteractionMetadata>>>,
     #[serde(default, deserialize_with = "deserialize_some")]
-    pub thread: Option<Option<GuildChannel>>,
+    pub thread: Option<Option<Box<GuildChannel>>>,
     #[serde(default, deserialize_with = "optional_deserialize_components")]
     pub components: Option<Vec<ActionRow>>,
     pub sticker_items: Option<Vec<StickerItem>>,
