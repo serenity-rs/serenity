@@ -292,7 +292,7 @@ id_u64! {
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-pub struct ShardId(pub u32);
+pub struct ShardId(pub u16);
 
 impl fmt::Display for ShardId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::num::NonZeroU16;
 
 use async_trait::async_trait;
 
@@ -117,7 +118,7 @@ event_handler! {
 
     /// Dispatched when every shard has received a Ready event
     #[cfg(feature = "cache")]
-    ShardsReady { total_shards: u32 } => async fn shards_ready(&self, ctx: Context);
+    ShardsReady { total_shards: NonZeroU16 } => async fn shards_ready(&self, ctx: Context);
 
     /// Dispatched when a channel is created.
     ///

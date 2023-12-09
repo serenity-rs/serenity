@@ -1,5 +1,5 @@
 use std::collections::{HashMap, VecDeque};
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::num::NonZeroU16;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
 use std::sync::OnceLock;
@@ -65,7 +65,10 @@ use crate::model::gateway::GatewayIntents;
 /// impl RawEventHandler for Handler {}
 ///
 /// # let http: Arc<Http> = unimplemented!();
-/// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+/// let gateway_info = http.get_bot_gateway().await?;
+///
+/// let shard_total = gateway_info.shards;
+/// let ws_url = Arc::from(gateway_info.url);
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + 'static>;
@@ -75,15 +78,10 @@ use crate::model::gateway::GatewayIntents;
 ///     event_handlers: vec![event_handler],
 ///     raw_event_handlers: vec![],
 ///     framework: Arc::new(OnceLock::from(framework)),
-///     // the shard index to start initiating from
-///     shard_index: 0,
-///     // the number of shards to initiate (this initiates 0, 1, and 2)
-///     shard_init: 3,
-///     // the total number of shards in use
-///     shard_total: 5,
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
 ///     ws_url,
+///     shard_total,
 ///     # #[cfg(feature = "cache")]
 ///     # cache: unimplemented!(),
 ///     # http,
@@ -103,13 +101,6 @@ pub struct ShardManager {
     /// **Note**: It is highly unrecommended to mutate this yourself unless you need to. Instead
     /// prefer to use methods on this struct that are provided where possible.
     pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
-    /// The index of the first shard to initialize, 0-indexed.
-    // Atomics are used here to allow for mutation without requiring a mutable reference to self.
-    shard_index: AtomicU32,
-    /// The number of shards to initialize.
-    shard_init: AtomicU32,
-    /// The total shards in use, 1-indexed.
-    shard_total: AtomicU32,
     shard_queuer: Sender<ShardQueuerMessage>,
     // We can safely use a Mutex for this field, as it is only ever used in one single place
     // and only is ever used to receive a single message
@@ -131,10 +122,7 @@ impl ShardManager {
 
         let manager = Arc::new(Self {
             return_value_tx: Mutex::new(return_value_tx),
-            shard_index: AtomicU32::new(opt.shard_index),
-            shard_init: AtomicU32::new(opt.shard_init),
             shard_queuer: shard_queue_tx,
-            shard_total: AtomicU32::new(opt.shard_total),
             shard_shutdown: Mutex::new(shutdown_recv),
             shard_shutdown_send: shutdown_send,
             runners: Arc::clone(&runners),
@@ -155,6 +143,7 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
+            shard_total: opt.shard_total,
             #[cfg(feature = "cache")]
             cache: opt.cache,
             http: opt.http,
@@ -182,32 +171,20 @@ impl ShardManager {
     /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
     /// queued.
     #[instrument(skip(self))]
-    pub fn initialize(&self) -> Result<()> {
-        let shard_index = self.shard_index.load(Ordering::Relaxed);
-        let shard_init = self.shard_init.load(Ordering::Relaxed);
-        let shard_total = self.shard_total.load(Ordering::Relaxed);
-
+    pub fn initialize(
+        &self,
+        shard_index: u16,
+        shard_init: u16,
+        shard_total: NonZeroU16,
+    ) -> Result<()> {
         let shard_to = shard_index + shard_init;
 
+        self.set_shard_total(shard_total);
         for shard_id in shard_index..shard_to {
-            self.boot([ShardId(shard_id), ShardId(shard_total)]);
+            self.boot(ShardId(shard_id));
         }
 
         Ok(())
-    }
-
-    /// Sets the new sharding information for the manager.
-    ///
-    /// This will shutdown all existing shards.
-    ///
-    /// This will _not_ instantiate the new shards.
-    #[instrument(skip(self))]
-    pub async fn set_shards(&self, index: u32, init: u32, total: u32) {
-        self.shutdown_all().await;
-
-        self.shard_index.store(index, Ordering::Relaxed);
-        self.shard_init.store(init, Ordering::Relaxed);
-        self.shard_total.store(total, Ordering::Relaxed);
     }
 
     /// Restarts a shard runner.
@@ -232,12 +209,9 @@ impl ShardManager {
     /// [`ShardRunner`]: super::ShardRunner
     #[instrument(skip(self))]
     pub async fn restart(&self, shard_id: ShardId) {
-        info!("Restarting shard {}", shard_id);
+        info!("Restarting shard {shard_id}");
         self.shutdown(shard_id, 4000).await;
-
-        let shard_total = self.shard_total.load(Ordering::Relaxed);
-
-        self.boot([shard_id, ShardId(shard_total)]);
+        self.boot(shard_id);
     }
 
     /// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
@@ -324,12 +298,18 @@ impl ShardManager {
         drop(self.return_value_tx.lock().await.unbounded_send(Ok(())));
     }
 
+    fn set_shard_total(&self, shard_total: NonZeroU16) {
+        info!("Setting shard total to {shard_total}");
+
+        let msg = ShardQueuerMessage::SetShardTotal(shard_total);
+        drop(self.shard_queuer.unbounded_send(msg));
+    }
+
     #[instrument(skip(self))]
-    fn boot(&self, shard_info: [ShardId; 2]) {
-        info!("Telling shard queuer to start shard {}", shard_info[0]);
+    fn boot(&self, shard_id: ShardId) {
+        info!("Telling shard queuer to start shard {shard_id}");
 
-        let msg = ShardQueuerMessage::Start(shard_info[0], shard_info[1]);
-
+        let msg = ShardQueuerMessage::Start(shard_id);
         drop(self.shard_queuer.unbounded_send(msg));
     }
 
@@ -351,10 +331,10 @@ impl ShardManager {
         }
     }
 
-    pub async fn restart_shard(&self, id: ShardId) {
-        self.restart(id).await;
-        if let Err(e) = self.shard_shutdown_send.unbounded_send(id) {
-            tracing::warn!("failed to notify about finished shutdown: {}", e);
+    pub async fn restart_shard(&self, shard_id: ShardId) {
+        self.restart(shard_id).await;
+        if let Err(e) = self.shard_shutdown_send.unbounded_send(shard_id) {
+            tracing::warn!("failed to notify about finished shutdown: {e}");
         }
     }
 
@@ -389,12 +369,10 @@ pub struct ShardManagerOptions {
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
-    pub shard_index: u32,
-    pub shard_init: u32,
-    pub shard_total: u32,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
-    pub ws_url: Arc<Mutex<String>>,
+    pub ws_url: Arc<str>,
+    pub shard_total: NonZeroU16,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
