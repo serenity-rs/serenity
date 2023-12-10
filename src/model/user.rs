@@ -19,7 +19,6 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
-#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
@@ -234,7 +233,7 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique. Unless the account has
     /// migrated to a next generation username, which does not have a discriminant.
     #[serde(rename = "username")]
-    pub name: String,
+    pub name: FixedString<u8>,
     /// The account's discriminator to differentiate the user from others with
     /// the same [`Self::name`]. The name+discriminator pair is always unique.
     /// If the discriminator is not present, then this is a next generation username
@@ -243,7 +242,7 @@ pub struct User {
     pub discriminator: Option<NonZeroU16>,
     /// The account's display name, if it is set.
     /// For bots this is the application name.
-    pub global_name: Option<String>,
+    pub global_name: Option<FixedString<u8>>,
     /// Optional avatar hash.
     pub avatar: Option<ImageHash>,
     /// Indicator of whether the user is a bot.
@@ -267,7 +266,7 @@ pub struct User {
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<Colour>,
     /// The user's chosen language option
-    pub locale: Option<String>,
+    pub locale: Option<FixedString>,
     /// Whether the email on this account has been verified
     ///
     /// Requires [`Scope::Email`]
@@ -275,7 +274,7 @@ pub struct User {
     /// The user's email
     ///
     /// Requires [`Scope::Email`]
-    pub email: Option<String>,
+    pub email: Option<FixedString>,
     /// The flags on a user's account
     #[serde(default)]
     pub flags: UserPublicFlags,
@@ -583,14 +582,19 @@ impl User {
             if let Some(cache) = cache_http.cache() {
                 if let Some(guild) = guild_id.to_guild_cached(cache) {
                     if let Some(member) = guild.members.get(&self.id) {
-                        return member.nick.clone();
+                        return member.nick.clone().map(Into::into);
                     }
                 }
             }
         }
 
         // At this point we're guaranteed to do an API call.
-        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
+        guild_id
+            .member(cache_http, &self.id)
+            .await
+            .ok()
+            .and_then(|member| member.nick)
+            .map(Into::into)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages sent by
@@ -878,7 +882,7 @@ mod test {
                 id: UserId::new(210),
                 avatar: Some(ImageHash::from_str("fb211703bcc04ee612c88d494df0272f").unwrap()),
                 discriminator: NonZeroU16::new(1432),
-                name: "test".to_string(),
+                name: "test".to_string().into(),
                 ..Default::default()
             };
 
