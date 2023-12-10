@@ -1200,7 +1200,7 @@ impl GuildId {
     #[cfg(feature = "cache")]
     #[must_use]
     pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
-        self.to_guild_cached(cache.as_ref()).map(|g| g.name.clone())
+        self.to_guild_cached(cache.as_ref()).map(|g| g.name.to_string())
     }
 
     /// Disconnects a member from a voice channel in the guild.

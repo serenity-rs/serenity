@@ -94,8 +94,8 @@ impl CreateGuildWelcomeChannel {
     pub fn new(channel_id: ChannelId, description: String) -> Self {
         Self(GuildWelcomeChannel {
             channel_id,
-            description,
             emoji: None,
+            description: description.into(),
         })
     }
 
@@ -107,7 +107,7 @@ impl CreateGuildWelcomeChannel {
 
     /// The description shown for the channel.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.0.description = description.into();
+        self.0.description = description.into().into();
         self
     }
 

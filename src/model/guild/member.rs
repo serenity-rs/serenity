@@ -8,7 +8,6 @@ use crate::builder::EditMember;
 use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
@@ -27,11 +26,11 @@ pub struct Member {
     /// The member's nickname, if present.
     ///
     /// Can't be longer than 32 characters.
-    pub nick: Option<String>,
+    pub nick: Option<FixedString<u8>>,
     /// The guild avatar hash
     pub avatar: Option<ImageHash>,
     /// Vector of Ids of [`Role`]s given to the member.
-    pub roles: Vec<RoleId>,
+    pub roles: FixedArray<RoleId>,
     /// Timestamp representing the date when the member joined.
     pub joined_at: Option<Timestamp>,
     /// Timestamp representing the date since the member is boosting the guild.
@@ -577,9 +576,9 @@ pub struct PartialMember {
     /// The member's nickname, if present.
     ///
     /// Can't be longer than 32 characters.
-    pub nick: Option<String>,
+    pub nick: Option<FixedString<u8>>,
     /// Vector of Ids of [`Role`]s given to the member.
-    pub roles: Vec<RoleId>,
+    pub roles: FixedArray<RoleId>,
     /// Indicator that the member hasn't accepted the rules of the guild yet.
     #[serde(default)]
     pub pending: bool,

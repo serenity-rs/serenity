@@ -1,3 +1,4 @@
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Information about a guild scheduled event.
@@ -18,9 +19,9 @@ pub struct ScheduledEvent {
     /// Only `None` for events created before October 25th, 2021.
     pub creator_id: Option<UserId>,
     /// The name of the scheduled event.
-    pub name: String,
+    pub name: FixedString,
     /// The description of the scheduled event, if any.
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     /// The event's starting time.
     #[serde(rename = "scheduled_start_time")]
     pub start_time: Timestamp,
@@ -88,7 +89,7 @@ enum_number! {
 #[non_exhaustive]
 pub struct ScheduledEventMetadata {
     #[serde(default)]
-    pub location: Option<String>,
+    pub location: Option<FixedString>,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-user-object).

@@ -2,6 +2,7 @@ use futures::future::pending;
 use futures::{Stream, StreamExt as _};
 
 use crate::gateway::{CollectorCallback, ShardMessenger};
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Fundamental collector function. All collector types in this module are just wrappers around
@@ -85,7 +86,7 @@ macro_rules! make_specific_collector {
             }
 
             $(
-                #[doc = concat!("Filters [`", stringify!($item_type), "`]'s by a specific [`", stringify!($filter_type), "`].")]
+                #[doc = concat!("Filters [`", stringify!($item_type), "`]'s by a specific [`type@", stringify!($filter_type), "`].")]
                 pub fn $filter_name(mut self, $filter_name: $filter_type) -> Self {
                     self.$filter_name = Some($filter_name);
                     self
@@ -158,7 +159,7 @@ make_specific_collector!(
     channel_id: ChannelId => interaction.channel_id == *channel_id,
     guild_id: GuildId => interaction.guild_id.map_or(true, |x| x == *guild_id),
     message_id: MessageId => interaction.message.id == *message_id,
-    custom_ids: Vec<String> => custom_ids.contains(&interaction.data.custom_id),
+    custom_ids: FixedArray<FixedString> => custom_ids.contains(&interaction.data.custom_id),
 );
 make_specific_collector!(
     ModalInteractionCollector, ModalInteraction,
@@ -169,7 +170,7 @@ make_specific_collector!(
     channel_id: ChannelId => interaction.channel_id == *channel_id,
     guild_id: GuildId => interaction.guild_id.map_or(true, |g| g == *guild_id),
     message_id: MessageId => interaction.message.as_ref().map_or(true, |m| m.id == *message_id),
-    custom_ids: Vec<String> => custom_ids.contains(&interaction.data.custom_id),
+    custom_ids: Vec<FixedString> => custom_ids.contains(&interaction.data.custom_id),
 );
 make_specific_collector!(
     ReactionCollector, Reaction,
