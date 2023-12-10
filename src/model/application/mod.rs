@@ -21,6 +21,7 @@ use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
 use super::misc::ImageHash;
 use super::user::User;
 use super::Permissions;
+use crate::internal::prelude::*;
 
 /// Partial information about the given application.
 ///
@@ -42,29 +43,29 @@ pub struct PartialCurrentApplicationInfo {
 #[non_exhaustive]
 pub struct CurrentApplicationInfo {
     pub id: ApplicationId,
-    pub name: String,
+    pub name: FixedString,
     pub icon: Option<ImageHash>,
-    pub description: String,
+    pub description: FixedString,
     #[serde(default)]
-    pub rpc_origins: Vec<String>,
+    pub rpc_origins: FixedArray<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
     #[serde(default)]
-    pub terms_of_service_url: Option<String>,
+    pub terms_of_service_url: Option<FixedString>,
     #[serde(default)]
-    pub privacy_policy_url: Option<String>,
+    pub privacy_policy_url: Option<FixedString>,
     pub owner: Option<User>,
     // omitted `summary` because it deprecated
-    pub verify_key: String,
+    pub verify_key: FixedString,
     pub team: Option<Team>,
     #[serde(default)]
     pub guild_id: Option<GuildId>,
     #[serde(default)]
     pub primary_sku_id: Option<SkuId>,
     #[serde(default)]
-    pub slug: Option<String>,
+    pub slug: Option<FixedString>,
     #[serde(default)]
-    pub cover_image: Option<String>,
+    pub cover_image: Option<FixedString>,
     #[serde(default)]
     pub flags: Option<ApplicationFlags>,
     #[serde(default)]
@@ -72,10 +73,10 @@ pub struct CurrentApplicationInfo {
     #[serde(default)]
     pub install_params: Option<InstallParams>,
     #[serde(default)]
-    pub custom_install_url: Option<String>,
+    pub custom_install_url: Option<FixedString>,
     /// The application's role connection verification entry point, which when configured will
     /// render the app as a verification method in the guild role verification configuration.
-    pub role_connections_verification_url: Option<String>,
+    pub role_connections_verification_url: Option<FixedString>,
 }
 
 /// Information about the Team group of the application.
@@ -89,9 +90,9 @@ pub struct Team {
     /// The snowflake ID of the team.
     pub id: GenericId,
     /// The name of the team.
-    pub name: String,
+    pub name: FixedString,
     /// The members of the team
-    pub members: Vec<TeamMember>,
+    pub members: FixedArray<TeamMember>,
     /// The user id of the team owner.
     pub owner_user_id: UserId,
 }
@@ -107,7 +108,7 @@ pub struct TeamMember {
     /// The list of permissions of the member on the team.
     ///
     /// NOTE: Will always be ["*"] for now.
-    pub permissions: Vec<String>,
+    pub permissions: FixedArray<String>,
     /// The ID of the team they are a member of.
     pub team_id: GenericId,
     /// The user type of the team member.
@@ -168,6 +169,6 @@ bitflags! {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct InstallParams {
-    pub scopes: Vec<Scope>,
+    pub scopes: FixedArray<Scope>,
     pub permissions: Permissions,
 }
