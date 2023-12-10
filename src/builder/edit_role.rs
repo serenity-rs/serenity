@@ -3,7 +3,6 @@ use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
-#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -47,7 +46,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: Option<FixedString>,
     #[serde(skip_serializing_if = "Option::is_none")]
     permissions: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,9 +55,9 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<Option<String>>,
+    icon: Option<Option<FixedString>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    unicode_emoji: Option<Option<String>>,
+    unicode_emoji: Option<Option<FixedString>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     mentionable: Option<bool>,
@@ -112,7 +111,7 @@ impl<'a> EditRole<'a> {
 
     /// Set the role's name.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+        self.name = Some(name.into().into());
         self
     }
 
@@ -131,14 +130,14 @@ impl<'a> EditRole<'a> {
 
     /// Set the role icon to a unicode emoji.
     pub fn unicode_emoji(mut self, unicode_emoji: Option<String>) -> Self {
-        self.unicode_emoji = Some(unicode_emoji);
+        self.unicode_emoji = Some(unicode_emoji.map(Into::into));
         self.icon = Some(None);
         self
     }
 
     /// Set the role icon to a custom image.
     pub fn icon(mut self, icon: Option<&CreateAttachment>) -> Self {
-        self.icon = Some(icon.map(CreateAttachment::to_base64));
+        self.icon = Some(icon.map(CreateAttachment::to_base64).map(Into::into));
         self.unicode_emoji = Some(None);
         self
     }
