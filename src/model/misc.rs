@@ -11,6 +11,7 @@ use std::str::FromStr;
 use arrayvec::ArrayString;
 
 use super::prelude::*;
+use crate::internal::prelude::*;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use crate::utils;
 
@@ -170,7 +171,7 @@ pub struct EmojiIdentifier {
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can only contain
     /// alphanumeric characters and underscores.
-    pub name: String,
+    pub name: FixedString,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -204,7 +205,7 @@ impl fmt::Display for EmojiIdentifier {
 #[derive(Debug)]
 #[cfg(all(feature = "model", feature = "utils"))]
 pub struct EmojiIdentifierParseError {
-    parsed_string: String,
+    parsed_string: FixedString,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -223,7 +224,7 @@ impl FromStr for EmojiIdentifier {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
-            parsed_string: s.to_owned(),
+            parsed_string: s.to_owned().into(),
         })
     }
 }
@@ -236,17 +237,17 @@ impl FromStr for EmojiIdentifier {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Incident {
-    pub created_at: String,
-    pub id: String,
-    pub impact: String,
-    pub incident_updates: Vec<IncidentUpdate>,
-    pub monitoring_at: Option<String>,
-    pub name: String,
-    pub page_id: String,
-    pub resolved_at: Option<String>,
-    pub shortlink: String,
-    pub status: String,
-    pub updated_at: String,
+    pub created_at: FixedString,
+    pub id: FixedString,
+    pub impact: FixedString,
+    pub incident_updates: FixedArray<IncidentUpdate>,
+    pub monitoring_at: Option<FixedString>,
+    pub name: FixedString,
+    pub page_id: FixedString,
+    pub resolved_at: Option<FixedString>,
+    pub shortlink: FixedString,
+    pub status: FixedString,
+    pub updated_at: FixedString,
 }
 
 /// An update to an incident from the Discord status page.
@@ -257,13 +258,13 @@ pub struct Incident {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct IncidentUpdate {
-    pub body: String,
-    pub created_at: String,
-    pub display_at: String,
-    pub id: String,
-    pub incident_id: String,
-    pub status: String,
-    pub updated_at: String,
+    pub body: FixedString,
+    pub created_at: FixedString,
+    pub display_at: FixedString,
+    pub id: FixedString,
+    pub incident_id: FixedString,
+    pub status: FixedString,
+    pub updated_at: FixedString,
 }
 
 /// A Discord status maintenance message. This can be either for active maintenances or for
@@ -273,19 +274,19 @@ pub struct IncidentUpdate {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Maintenance {
-    pub created_at: String,
-    pub id: String,
-    pub impact: String,
-    pub incident_updates: Vec<IncidentUpdate>,
-    pub monitoring_at: Option<String>,
-    pub name: String,
-    pub page_id: String,
-    pub resolved_at: Option<String>,
-    pub scheduled_for: String,
-    pub scheduled_until: String,
-    pub shortlink: String,
-    pub status: String,
-    pub updated_at: String,
+    pub created_at: FixedString,
+    pub id: FixedString,
+    pub impact: FixedString,
+    pub incident_updates: FixedArray<IncidentUpdate>,
+    pub monitoring_at: Option<FixedString>,
+    pub name: FixedString,
+    pub page_id: FixedString,
+    pub resolved_at: Option<FixedString>,
+    pub scheduled_for: FixedString,
+    pub scheduled_until: FixedString,
+    pub shortlink: FixedString,
+    pub status: FixedString,
+    pub updated_at: FixedString,
 }
 
 #[cfg(test)]
