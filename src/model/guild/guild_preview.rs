@@ -1,3 +1,4 @@
+use crate::internal::prelude::*;
 use crate::model::guild::Emoji;
 use crate::model::id::GuildId;
 use crate::model::misc::ImageHash;
@@ -14,7 +15,7 @@ pub struct GuildPreview {
     /// The guild Id.
     pub id: GuildId,
     /// The guild name.
-    pub name: String,
+    pub name: FixedString,
     /// The guild icon hash if it has one.
     pub icon: Option<ImageHash>,
     /// The guild splash hash if it has one.
@@ -22,17 +23,17 @@ pub struct GuildPreview {
     /// The guild discovery splash hash it it has one.
     pub discovery_splash: Option<ImageHash>,
     /// The custom guild emojis.
-    pub emojis: Vec<Emoji>,
+    pub emojis: FixedArray<Emoji>,
     /// The guild features. See [`Guild::features`]
     ///
     /// [`Guild::features`]: super::Guild::features
-    pub features: Vec<String>,
+    pub features: FixedArray<String>,
     /// Approximate number of members in this guild.
     pub approximate_member_count: u64,
     /// Approximate number of online members in this guild.
     pub approximate_presence_count: u64,
     /// The description for the guild, if the guild has the `DISCOVERABLE` feature.
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     /// Custom guild stickers.
-    pub stickers: Vec<Sticker>,
+    pub stickers: FixedArray<Sticker>,
 }

@@ -39,13 +39,13 @@ pub struct Command {
     /// **Note**: It may only be present if it is received through the gateway.
     pub guild_id: Option<GuildId>,
     /// The command name.
-    pub name: String,
+    pub name: FixedString<u8>,
     /// The localized command name of the selected locale.
     ///
     /// If the name is localized, either this field or [`Self::name_localizations`] is set,
     /// depending on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
-    pub name_localized: Option<String>,
+    pub name_localized: Option<FixedString<u8>>,
     /// All localized command names.
     ///
     /// If the name is localized, either this field or [`Self::name_localized`] is set, depending
@@ -53,13 +53,13 @@ pub struct Command {
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
     pub name_localizations: Option<HashMap<String, String>>,
     /// The command description.
-    pub description: String,
+    pub description: FixedString<u8>,
     /// The localized command description of the selected locale.
     ///
     /// If the description is localized, either this field or [`Self::description_localizations`]
     /// is set, depending on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
-    pub description_localized: Option<String>,
+    pub description_localized: Option<FixedString<u8>>,
     /// All localized command descriptions.
     ///
     /// If the description is localized, either this field or [`Self::description_localized`] is
@@ -68,7 +68,7 @@ pub struct Command {
     pub description_localizations: Option<HashMap<String, String>>,
     /// The parameters for the command.
     #[serde(default)]
-    pub options: Vec<CommandOption>,
+    pub options: FixedArray<CommandOption>,
     /// The default permissions required to execute the command.
     pub default_member_permissions: Option<Permissions>,
     /// Indicates whether the command is available in DMs with the app, only for globally-scoped
@@ -278,12 +278,12 @@ pub struct CommandOption {
     #[serde(rename = "type")]
     pub kind: CommandOptionType,
     /// The option name.
-    pub name: String,
+    pub name: FixedString,
     /// Localizations of the option name with locale as the key
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localizations: Option<std::collections::HashMap<String, String>>,
     /// The option description.
-    pub description: String,
+    pub description: FixedString,
     /// Localizations of the option description with locale as the key
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localizations: Option<std::collections::HashMap<String, String>>,
@@ -310,7 +310,7 @@ pub struct CommandOption {
     ///
     /// [`Channel`]: CommandOptionType::Channel
     #[serde(default)]
-    pub channel_types: Vec<ChannelType>,
+    pub channel_types: FixedArray<ChannelType>,
     /// Minimum permitted value for Integer or Number options
     #[serde(default)]
     pub min_value: Option<serde_json::Number>,
@@ -359,7 +359,7 @@ enum_number! {
 #[non_exhaustive]
 pub struct CommandOptionChoice {
     /// The choice name.
-    pub name: String,
+    pub name: FixedString,
     /// Localizations of the choice name, with locale as key
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localizations: Option<std::collections::HashMap<String, String>>,
@@ -381,7 +381,7 @@ pub struct CommandPermissions {
     /// The id of the guild.
     pub guild_id: GuildId,
     /// The permissions for the command in the guild.
-    pub permissions: Vec<CommandPermission>,
+    pub permissions: FixedArray<CommandPermission>,
 }
 
 /// The [`CommandPermission`] data.

@@ -9,6 +9,7 @@ use super::{Context, FullEvent};
 use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::channel::ChannelType;
 use crate::model::event::Event;
@@ -299,7 +300,7 @@ fn update_cache_with_event(
         },
         Event::MessageDeleteBulk(event) => FullEvent::MessageDeleteBulk {
             channel_id: event.channel_id,
-            multiple_deleted_messages_ids: event.ids,
+            multiple_deleted_messages_ids: event.ids.into_vec(),
             guild_id: event.guild_id,
         },
         Event::MessageDelete(event) => FullEvent::MessageDelete {
@@ -319,7 +320,7 @@ fn update_cache_with_event(
         },
         #[allow(deprecated)]
         Event::PresencesReplace(event) => FullEvent::PresenceReplace {
-            presences: event.presences,
+            presences: event.presences.into_vec(),
         },
         Event::PresenceUpdate(mut event) => {
             update_cache!(cache, event);
@@ -391,11 +392,11 @@ fn update_cache_with_event(
             }
         },
         Event::VoiceChannelStatusUpdate(mut event) => {
-            let old = if_cache!(event.update(cache));
+            let old = if_cache!(event.update(cache).map(FixedString::into_string));
 
             FullEvent::VoiceChannelStatusUpdate {
                 old,
-                status: event.status,
+                status: event.status.map(FixedString::into_string),
                 id: event.id,
                 guild_id: event.guild_id,
             }

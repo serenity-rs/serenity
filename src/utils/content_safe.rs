@@ -283,13 +283,13 @@ mod tests {
     fn test_content_safe() {
         let user = User {
             id: UserId::new(100000000000000000),
-            name: "Crab".to_string(),
+            name: "Crab".to_string().into(),
             ..Default::default()
         };
 
         let outside_cache_user = User {
             id: UserId::new(100000000000000001),
-            name: "Boat".to_string(),
+            name: "Boat".to_string().into(),
             ..Default::default()
         };
 
@@ -299,19 +299,19 @@ mod tests {
         };
 
         let member = Member {
-            nick: Some("Ferris".to_string()),
+            nick: Some("Ferris".to_string().into()),
             ..Default::default()
         };
 
         let role = Role {
             id: RoleId::new(333333333333333333),
-            name: "ferris-club-member".to_string(),
+            name: "ferris-club-member".to_string().into(),
             ..Default::default()
         };
 
         let channel = GuildChannel {
             id: ChannelId::new(111880193700067777),
-            name: "general".to_string(),
+            name: "general".to_string().into(),
             ..Default::default()
         };
 

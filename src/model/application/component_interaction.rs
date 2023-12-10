@@ -49,7 +49,7 @@ pub struct ComponentInteraction {
     #[serde(default)]
     pub user: User,
     /// A continuation token for responding to the interaction.
-    pub token: String,
+    pub token: FixedString,
     /// Always `1`.
     pub version: u8,
     /// The message this interaction was triggered by, if it is a component.
@@ -57,9 +57,9 @@ pub struct ComponentInteraction {
     /// Permissions the app or bot has within the channel the interaction was sent from.
     pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
-    pub locale: String,
+    pub locale: FixedString,
     /// The guild's preferred locale.
-    pub guild_locale: Option<String>,
+    pub guild_locale: Option<FixedString>,
     /// For monetized applications, any entitlements of the invoking user.
     pub entitlements: Vec<Entitlement>,
     /// The owners of the applications that authorized the interaction, such as a guild or user.
@@ -252,11 +252,11 @@ impl Serialize for ComponentInteraction {
 #[derive(Clone, Debug)]
 pub enum ComponentInteractionDataKind {
     Button,
-    StringSelect { values: Vec<String> },
-    UserSelect { values: Vec<UserId> },
-    RoleSelect { values: Vec<RoleId> },
-    MentionableSelect { values: Vec<GenericId> },
-    ChannelSelect { values: Vec<ChannelId> },
+    StringSelect { values: FixedArray<String> },
+    UserSelect { values: FixedArray<UserId> },
+    RoleSelect { values: FixedArray<RoleId> },
+    MentionableSelect { values: FixedArray<GenericId> },
+    ChannelSelect { values: FixedArray<ChannelId> },
     Unknown(u8),
 }
 
@@ -339,7 +339,7 @@ impl Serialize for ComponentInteractionDataKind {
 #[non_exhaustive]
 pub struct ComponentInteractionData {
     /// The custom id of the component.
-    pub custom_id: String,
+    pub custom_id: FixedString,
     /// Type and type-specific data of this component interaction.
     #[serde(flatten)]
     pub kind: ComponentInteractionDataKind,

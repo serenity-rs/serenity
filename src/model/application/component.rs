@@ -37,7 +37,7 @@ pub struct ActionRow {
     pub kind: ComponentType,
     /// The components of this ActionRow.
     #[serde(default)]
-    pub components: Vec<ActionRowComponent>,
+    pub components: FixedArray<ActionRowComponent>,
 }
 
 /// A component which can be inside of an [`ActionRow`].
@@ -104,9 +104,9 @@ impl From<SelectMenu> for ActionRowComponent {
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum ButtonKind {
-    Link { url: String },
+    Link { url: FixedString },
     Premium { sku_id: SkuId },
-    NonLink { custom_id: String, style: ButtonStyle },
+    NonLink { custom_id: FixedString, style: ButtonStyle },
 }
 
 impl Serialize for ButtonKind {
@@ -171,7 +171,7 @@ pub struct Button {
     pub data: ButtonKind,
     /// The text which appears on the button.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub label: Option<String>,
+    pub label: Option<FixedString>,
     /// The emoji of this button, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ReactionType>,
@@ -209,17 +209,17 @@ pub struct SelectMenu {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// An identifier defined by the developer for the select menu.
-    pub custom_id: Option<String>,
+    pub custom_id: Option<FixedString>,
     /// The options of this select menu.
     ///
     /// Required for [`ComponentType::StringSelect`] and unavailable for all others.
     #[serde(default)]
-    pub options: Vec<SelectMenuOption>,
+    pub options: FixedArray<SelectMenuOption>,
     /// List of channel types to include in the [`ComponentType::ChannelSelect`].
     #[serde(default)]
-    pub channel_types: Vec<ChannelType>,
+    pub channel_types: FixedArray<ChannelType>,
     /// The placeholder shown when nothing is selected.
-    pub placeholder: Option<String>,
+    pub placeholder: Option<FixedString>,
     /// The minimum number of selections allowed.
     pub min_values: Option<u8>,
     /// The maximum number of selections allowed.
@@ -237,11 +237,11 @@ pub struct SelectMenu {
 #[non_exhaustive]
 pub struct SelectMenuOption {
     /// The text displayed on this option.
-    pub label: String,
+    pub label: FixedString,
     /// The value to be sent for this option.
-    pub value: String,
+    pub value: FixedString,
     /// The description shown for this option.
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     /// The emoji displayed on this option.
     pub emoji: Option<ReactionType>,
     /// Render this option as the default selection.
@@ -260,7 +260,7 @@ pub struct InputText {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// Developer-defined identifier for the input; max 100 characters
-    pub custom_id: String,
+    pub custom_id: FixedString<u8>,
     /// The [`InputTextStyle`]. Required when sending modal data.
     ///
     /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
@@ -272,7 +272,7 @@ pub struct InputText {
     /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
     /// but it's not. It's only required when _sending_ modal data to Discord.
     /// <https://github.com/discord/discord-api-docs/issues/6141>
-    pub label: Option<String>,
+    pub label: Option<FixedString<u8>>,
     /// Minimum input length for a text input; min 0, max 4000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<u16>,
@@ -286,10 +286,10 @@ pub struct InputText {
     ///
     /// When receiving: The input from the user (always Some)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<String>,
+    pub value: Option<FixedString<u16>>,
     /// Custom placeholder text if the input is empty; max 100 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub placeholder: Option<String>,
+    pub placeholder: Option<FixedString<u8>>,
 }
 
 enum_number! {
@@ -317,10 +317,10 @@ mod tests {
         let mut button = Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
-                custom_id: "hello".into(),
+                custom_id: "hello".to_string().into(),
                 style: ButtonStyle::Danger,
             },
-            label: Some("a".into()),
+            label: Some("a".to_string().into()),
             emoji: None,
             disabled: false,
         };
@@ -330,7 +330,7 @@ mod tests {
         );
 
         button.data = ButtonKind::Link {
-            url: "https://google.com".into(),
+            url: "https://google.com".to_string().into(),
         };
         assert_json(
             &button,

@@ -24,6 +24,7 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
+use crate::internal::prelude::*;
 use crate::json::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
@@ -423,7 +424,7 @@ pub struct StageInstance {
     /// The Id of the associated stage channel.
     pub channel_id: ChannelId,
     /// The topic of the stage instance.
-    pub topic: String,
+    pub topic: FixedString,
     /// The privacy level of the Stage instance.
     pub privacy_level: StageInstancePrivacyLevel,
     /// Whether or not Stage Discovery is disabled (deprecated).
@@ -472,9 +473,9 @@ pub struct ThreadMetadata {
 #[non_exhaustive]
 pub struct ThreadsData {
     /// The threads channels.
-    pub threads: Vec<GuildChannel>,
+    pub threads: FixedArray<GuildChannel>,
     /// A thread member for each returned thread the current user has joined.
-    pub members: Vec<ThreadMember>,
+    pub members: FixedArray<ThreadMember>,
     /// Whether there are potentially more threads that could be returned on a subsequent call.
     #[serde(default)]
     pub has_more: bool,
@@ -491,13 +492,13 @@ pub enum ForumEmoji {
     /// The id of a guild's custom emoji.
     Id(EmojiId),
     /// The unicode character of the emoji.
-    Name(String),
+    Name(FixedString),
 }
 
 #[derive(Deserialize)]
 struct RawForumEmoji {
     emoji_id: Option<EmojiId>,
-    emoji_name: Option<String>,
+    emoji_name: Option<FixedString>,
 }
 
 impl serde::Serialize for ForumEmoji {
@@ -544,7 +545,7 @@ pub struct ForumTag {
     /// The id of the tag.
     pub id: ForumTagId,
     /// The name of the tag (0-20 characters).
-    pub name: String,
+    pub name: FixedString<u8>,
     /// Whether this tag can only be added to or removed from threads by a member with the
     /// MANAGE_THREADS permission.
     pub moderated: bool,

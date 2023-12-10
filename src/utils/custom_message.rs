@@ -66,7 +66,7 @@ impl CustomMessage {
     /// If not used, the default value is an empty string (`String::default()`).
     #[inline]
     pub fn content(&mut self, s: impl Into<String>) -> &mut Self {
-        self.msg.content = s.into();
+        self.msg.content = s.into().into();
 
         self
     }

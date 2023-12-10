@@ -71,16 +71,16 @@ pub struct CommandInteraction {
     #[serde(default)]
     pub user: User,
     /// A continuation token for responding to the interaction.
-    pub token: String,
+    pub token: FixedString,
     /// Always `1`.
     pub version: u8,
     /// Permissions the app or bot has within the channel the interaction was sent from.
     // TODO(next): This is now always serialized.
     pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
-    pub locale: String,
+    pub locale: FixedString,
     /// The guild's preferred locale.
-    pub guild_locale: Option<String>,
+    pub guild_locale: Option<FixedString>,
     /// For monetized applications, any entitlements of the invoking user.
     pub entitlements: Vec<Entitlement>,
     /// The owners of the applications that authorized the interaction, such as a guild or user.
@@ -283,7 +283,7 @@ pub struct CommandData {
     /// The Id of the invoked command.
     pub id: CommandId,
     /// The name of the invoked command.
-    pub name: String,
+    pub name: FixedString,
     /// The application command type of the triggered application command.
     #[serde(rename = "type")]
     pub kind: CommandType,
@@ -291,7 +291,7 @@ pub struct CommandData {
     #[serde(default)]
     pub resolved: CommandDataResolved,
     #[serde(default)]
-    pub options: Vec<CommandDataOption>,
+    pub options: FixedArray<CommandDataOption>,
     /// The Id of the guild the command is registered to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -526,7 +526,7 @@ pub struct CommandDataResolved {
 #[non_exhaustive]
 pub struct CommandDataOption {
     /// The name of the parameter.
-    pub name: String,
+    pub name: FixedString,
     /// The given value.
     pub value: CommandDataOptionValue,
 }
@@ -540,7 +540,7 @@ impl CommandDataOption {
 
 #[derive(Deserialize, Serialize)]
 struct RawCommandDataOption {
-    name: String,
+    name: FixedString,
     #[serde(rename = "type")]
     kind: CommandOptionType,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -650,13 +650,13 @@ impl Serialize for CommandDataOption {
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 pub enum CommandDataOptionValue {
-    Autocomplete { kind: CommandOptionType, value: String },
+    Autocomplete { kind: CommandOptionType, value: FixedString },
     Boolean(bool),
     Integer(i64),
     Number(f64),
-    String(String),
-    SubCommand(Vec<CommandDataOption>),
-    SubCommandGroup(Vec<CommandDataOption>),
+    String(FixedString),
+    SubCommand(FixedArray<CommandDataOption>),
+    SubCommandGroup(FixedArray<CommandDataOption>),
     Attachment(AttachmentId),
     Channel(ChannelId),
     Mentionable(GenericId),
@@ -818,14 +818,20 @@ mod tests {
     #[test]
     fn nested_options() {
         let value = CommandDataOption {
-            name: "subcommand_group".into(),
-            value: CommandDataOptionValue::SubCommandGroup(vec![CommandDataOption {
-                name: "subcommand".into(),
-                value: CommandDataOptionValue::SubCommand(vec![CommandDataOption {
-                    name: "channel".into(),
-                    value: CommandDataOptionValue::Channel(ChannelId::new(3)),
-                }]),
-            }]),
+            name: "subcommand_group".to_string().into(),
+            value: CommandDataOptionValue::SubCommandGroup(
+                vec![CommandDataOption {
+                    name: "subcommand".to_string().into(),
+                    value: CommandDataOptionValue::SubCommand(
+                        vec![CommandDataOption {
+                            name: "channel".to_string().into(),
+                            value: CommandDataOptionValue::Channel(ChannelId::new(3)),
+                        }]
+                        .into(),
+                    ),
+                }]
+                .into(),
+            ),
         };
 
         assert_json(
@@ -846,30 +852,30 @@ mod tests {
     fn mixed_options() {
         let value = vec![
             CommandDataOption {
-                name: "boolean".into(),
+                name: "boolean".to_string().into(),
                 value: CommandDataOptionValue::Boolean(true),
             },
             CommandDataOption {
-                name: "integer".into(),
+                name: "integer".to_string().into(),
                 value: CommandDataOptionValue::Integer(1),
             },
             CommandDataOption {
-                name: "number".into(),
+                name: "number".to_string().into(),
                 value: CommandDataOptionValue::Number(2.0),
             },
             CommandDataOption {
-                name: "string".into(),
-                value: CommandDataOptionValue::String("foobar".into()),
+                name: "string".to_string().into(),
+                value: CommandDataOptionValue::String("foobar".to_string().into()),
             },
             CommandDataOption {
-                name: "empty_subcommand".into(),
-                value: CommandDataOptionValue::SubCommand(vec![]),
+                name: "empty_subcommand".to_string().into(),
+                value: CommandDataOptionValue::SubCommand(FixedArray::default()),
             },
             CommandDataOption {
-                name: "autocomplete".into(),
+                name: "autocomplete".to_string().into(),
                 value: CommandDataOptionValue::Autocomplete {
                     kind: CommandOptionType::Integer,
-                    value: "not an integer".into(),
+                    value: "not an integer".to_string().into(),
                 },
             },
         ];
