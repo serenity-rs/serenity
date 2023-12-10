@@ -328,7 +328,7 @@ pub struct AutocompleteChoice(CommandOptionChoice);
 impl AutocompleteChoice {
     pub fn new(name: impl Into<String>, value: impl Into<Value>) -> Self {
         Self(CommandOptionChoice {
-            name: name.into(),
+            name: name.into().into(),
             name_localizations: None,
             value: value.into(),
         })
