@@ -7,6 +7,7 @@ use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
+use crate::internal::prelude::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -20,7 +21,7 @@ use super::utils::*;
 #[non_exhaustive]
 pub struct BotGateway {
     /// The gateway to connect to.
-    pub url: String,
+    pub url: FixedString,
     /// The number of shards that is recommended to be used by the current bot user.
     pub shards: NonZeroU16,
     /// Information describing how many gateway sessions you can initiate within a ratelimit
@@ -42,7 +43,7 @@ pub struct Activity {
     /// Images for the presence and their texts.
     pub assets: Option<ActivityAssets>,
     /// What the user is doing.
-    pub details: Option<String>,
+    pub details: Option<FixedString>,
     /// Activity flags describing what the payload includes.
     pub flags: Option<ActivityFlags>,
     /// Whether or not the activity is an instanced game session.
@@ -51,13 +52,13 @@ pub struct Activity {
     #[serde(rename = "type")]
     pub kind: ActivityType,
     /// The name of the activity.
-    pub name: String,
+    pub name: FixedString,
     /// Information about the user's current party.
     pub party: Option<ActivityParty>,
     /// Secrets for Rich Presence joining and spectating.
     pub secrets: Option<ActivitySecrets>,
     /// The user's current party status.
-    pub state: Option<String>,
+    pub state: Option<FixedString>,
     /// Emoji currently used in custom status
     pub emoji: Option<ActivityEmoji>,
     /// Unix timestamps for the start and/or end times of the activity.
@@ -65,18 +66,18 @@ pub struct Activity {
     /// The sync ID of the activity. Mainly used by the Spotify activity type which uses this
     /// parameter to store the track ID.
     #[cfg(feature = "unstable_discord_api")]
-    pub sync_id: Option<String>,
+    pub sync_id: Option<FixedString>,
     /// The session ID of the activity. Reserved for specific activity types, such as the Activity
     /// that is transmitted when a user is listening to Spotify.
     #[cfg(feature = "unstable_discord_api")]
-    pub session_id: Option<String>,
+    pub session_id: Option<FixedString>,
     /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     pub url: Option<Url>,
     /// The buttons of this activity.
     ///
     /// **Note**: There can only be up to 2 buttons.
     #[serde(default, deserialize_with = "deserialize_buttons")]
-    pub buttons: Vec<ActivityButton>,
+    pub buttons: FixedArray<ActivityButton>,
     /// Unix timestamp (in milliseconds) of when the activity was added to the user's session
     pub created_at: u64,
 }
@@ -87,12 +88,12 @@ pub struct Activity {
 #[non_exhaustive]
 pub struct ActivityButton {
     /// The text shown on the button.
-    pub label: String,
+    pub label: FixedString,
     /// The url opened when clicking the button.
     ///
     /// **Note**: Bots cannot access activity button URL.
     #[serde(default)]
-    pub url: String,
+    pub url: FixedString,
 }
 
 /// The assets for an activity.
@@ -103,13 +104,13 @@ pub struct ActivityButton {
 #[non_exhaustive]
 pub struct ActivityAssets {
     /// The ID for a large asset of the activity, usually a snowflake.
-    pub large_image: Option<String>,
+    pub large_image: Option<FixedString>,
     /// Text displayed when hovering over the large image of the activity.
-    pub large_text: Option<String>,
+    pub large_text: Option<FixedString>,
     /// The ID for a small asset of the activity, usually a snowflake.
-    pub small_image: Option<String>,
+    pub small_image: Option<FixedString>,
     /// Text displayed when hovering over the small image of the activity.
-    pub small_text: Option<String>,
+    pub small_text: Option<FixedString>,
 }
 
 bitflags! {
@@ -148,7 +149,7 @@ bitflags! {
 #[non_exhaustive]
 pub struct ActivityParty {
     /// The ID of the party.
-    pub id: Option<String>,
+    pub id: Option<FixedString>,
     /// Used to show the party's current and maximum size.
     pub size: Option<[u32; 2]>,
 }
@@ -161,12 +162,12 @@ pub struct ActivityParty {
 #[non_exhaustive]
 pub struct ActivitySecrets {
     /// The secret for joining a party.
-    pub join: Option<String>,
+    pub join: Option<FixedString>,
     /// The secret for a specific instanced match.
     #[serde(rename = "match")]
-    pub match_: Option<String>,
+    pub match_: Option<FixedString>,
     /// The secret for spectating an activity.
-    pub spectate: Option<String>,
+    pub spectate: Option<FixedString>,
 }
 
 /// Representation of an emoji used in a custom status
@@ -177,7 +178,7 @@ pub struct ActivitySecrets {
 #[non_exhaustive]
 pub struct ActivityEmoji {
     /// The name of the emoji.
-    pub name: String,
+    pub name: FixedString,
     /// The id of the emoji.
     pub id: Option<EmojiId>,
     /// Whether this emoji is animated.
@@ -217,7 +218,7 @@ enum_number! {
 #[non_exhaustive]
 pub struct Gateway {
     /// The gateway to connect to.
-    pub url: String,
+    pub url: FixedString,
 }
 
 /// Information detailing the current active status of a [`User`].
@@ -248,10 +249,10 @@ pub struct PresenceUser {
     pub bot: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
     pub discriminator: Option<NonZeroU16>,
-    pub email: Option<String>,
+    pub email: Option<FixedString>,
     pub mfa_enabled: Option<bool>,
     #[serde(rename = "username")]
-    pub name: Option<String>,
+    pub name: Option<FixedString<u8>>,
     pub verified: Option<bool>,
     pub public_flags: Option<UserPublicFlags>,
 }
@@ -323,7 +324,7 @@ pub struct Presence {
     pub status: OnlineStatus,
     /// [`User`]'s current activities.
     #[serde(default)]
-    pub activities: Vec<Activity>,
+    pub activities: FixedArray<Activity>,
     /// The devices a user are currently active on, if available.
     pub client_status: Option<ClientStatus>,
 }
@@ -341,11 +342,11 @@ pub struct Ready {
     /// Information about the user including email
     pub user: CurrentUser,
     /// Guilds the user is in
-    pub guilds: Vec<UnavailableGuild>,
+    pub guilds: FixedArray<UnavailableGuild>,
     /// Used for resuming connections
-    pub session_id: String,
+    pub session_id: FixedString,
     /// Gateway URL for resuming connections
-    pub resume_gateway_url: String,
+    pub resume_gateway_url: FixedString,
     /// Shard information associated with this session, if sent when identifying
     pub shard: Option<ShardInfo>,
     /// Contains id and flags

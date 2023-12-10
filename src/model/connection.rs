@@ -1,6 +1,7 @@
 //! Models for user connections.
 
 use super::prelude::*;
+use crate::internal::prelude::*;
 
 /// Information about a connection between the current user and a third party service.
 ///
@@ -9,20 +10,20 @@ use super::prelude::*;
 #[non_exhaustive]
 pub struct Connection {
     /// The ID of the account on the other side of this connection.
-    pub id: String,
+    pub id: FixedString,
     /// The username of the account on the other side of this connection.
-    pub name: String,
+    pub name: FixedString,
     /// The service that this connection represents (e.g. twitch, youtube)
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-services).
     #[serde(rename = "type")]
-    pub kind: String,
+    pub kind: FixedString,
     /// Whether this connection has been revoked and is no longer valid.
     #[serde(default)]
     pub revoked: bool,
     /// A list of partial guild [`Integration`]s that use this connection.
     #[serde(default)]
-    pub integrations: Vec<Integration>,
+    pub integrations: FixedArray<Integration>,
     /// Whether this connection has been verified and the user has proven they own the account.
     pub verified: bool,
     /// Whether friend sync is enabled for this connection.

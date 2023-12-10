@@ -5,7 +5,6 @@ use std::fmt;
 use crate::builder::EditRole;
 #[cfg(feature = "model")]
 use crate::http::Http;
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
@@ -48,7 +47,7 @@ pub struct Role {
     #[serde(default)]
     pub mentionable: bool,
     /// The name of the role.
-    pub name: String,
+    pub name: FixedString,
     /// A set of permissions that the role has been assigned.
     ///
     /// See the [`permissions`] module for more information.
@@ -71,7 +70,7 @@ pub struct Role {
     /// Role icon image hash.
     pub icon: Option<ImageHash>,
     /// Role unicoded image.
-    pub unicode_emoji: Option<String>,
+    pub unicode_emoji: Option<FixedString>,
 }
 
 #[cfg(feature = "model")]

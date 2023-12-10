@@ -1201,10 +1201,10 @@ mod test {
                 animated: false,
                 available: true,
                 id: EmojiId::new(32),
-                name: "Rohrkatze".to_string(),
+                name: "Rohrkatze".to_string().into(),
                 managed: false,
                 require_colons: true,
-                roles: vec![],
+                roles: vec![].into(),
                 user: None,
             })
             .build();
