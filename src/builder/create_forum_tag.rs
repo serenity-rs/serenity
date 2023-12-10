@@ -1,3 +1,4 @@
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object-forum-tag-structure)
@@ -6,16 +7,16 @@ use crate::model::prelude::*;
 #[must_use]
 #[derive(Clone, Debug, Serialize)]
 pub struct CreateForumTag {
-    name: String,
+    name: FixedString,
     moderated: bool,
     emoji_id: Option<EmojiId>,
-    emoji_name: Option<String>,
+    emoji_name: Option<FixedString>,
 }
 
 impl CreateForumTag {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
-            name: name.into(),
+            name: name.into().into(),
             moderated: false,
             emoji_id: None,
             emoji_name: None,
