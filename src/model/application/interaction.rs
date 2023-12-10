@@ -418,7 +418,7 @@ pub struct MessageInteraction {
     /// The name of the [`Command`].
     ///
     /// [`Command`]: crate::model::application::Command
-    pub name: String,
+    pub name: FixedString<u8>,
     /// The user who invoked the interaction.
     pub user: User,
     /// The member who invoked the interaction in the guild.

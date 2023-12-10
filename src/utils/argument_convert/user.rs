@@ -43,7 +43,7 @@ fn lookup_by_global_cache(ctx: impl CacheHttp, s: &str) -> Option<User> {
     let lookup_by_name = || {
         users.iter().find_map(|m| {
             let user = m.value();
-            (user.name == s).then(|| user.clone())
+            (&*user.name == s).then(|| user.clone())
         })
     };
 

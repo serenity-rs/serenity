@@ -295,10 +295,10 @@ pub enum ReactionType {
         id: EmojiId,
         /// The name of the custom emoji. This is primarily used for decoration and distinguishing
         /// the emoji client-side.
-        name: Option<String>,
+        name: Option<FixedString>,
     },
     /// A reaction with a twemoji.
-    Unicode(String),
+    Unicode(FixedString),
 }
 
 // Manual impl needed to decide enum variant by presence of `id`
@@ -309,7 +309,7 @@ impl<'de> Deserialize<'de> for ReactionType {
             #[serde(default)]
             animated: bool,
             id: Option<EmojiId>,
-            name: Option<String>,
+            name: Option<FixedString>,
         }
         let emoji = PartialEmoji::deserialize(deserializer)?;
         Ok(match (emoji.id, emoji.name) {
@@ -383,7 +383,7 @@ impl ReactionType {
     #[must_use]
     pub fn unicode_eq(&self, other: &str) -> bool {
         if let ReactionType::Unicode(unicode) = &self {
-            unicode == other
+            &**unicode == other
         } else {
             // Always return false if not a unicode reaction
             false
@@ -425,7 +425,7 @@ impl From<char> for ReactionType {
     /// # fn main() {}
     /// ```
     fn from(ch: char) -> ReactionType {
-        ReactionType::Unicode(ch.to_string())
+        ReactionType::Unicode(ch.to_string().into())
     }
 }
 
@@ -444,7 +444,7 @@ impl From<EmojiId> for ReactionType {
         ReactionType::Custom {
             animated: false,
             id: emoji_id,
-            name: Some("emoji".to_string()),
+            name: Some("emoji".to_string().into()),
         }
     }
 }
@@ -479,7 +479,7 @@ impl TryFrom<String> for ReactionType {
         }
 
         if !emoji_string.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_string));
+            return Ok(ReactionType::Unicode(emoji_string.into()));
         }
         ReactionType::try_from(&emoji_string[..])
     }
@@ -519,7 +519,7 @@ impl TryFrom<&str> for ReactionType {
     /// let reaction2 = ReactionType::Custom {
     ///     animated: false,
     ///     id: EmojiId::new(600404340292059257),
-    ///     name: Some("customemoji".to_string()),
+    ///     name: Some("customemoji".to_string().into()),
     /// };
     ///
     /// assert_eq!(reaction, reaction2);
@@ -532,7 +532,7 @@ impl TryFrom<&str> for ReactionType {
         }
 
         if !emoji_str.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_str.to_string()));
+            return Ok(ReactionType::Unicode(emoji_str.to_string().into()));
         }
 
         if !emoji_str.ends_with('>') {
@@ -544,7 +544,7 @@ impl TryFrom<&str> for ReactionType {
         let mut split_iter = emoji_str.split(':');
 
         let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
-        let name = split_iter.next().ok_or(ReactionConversionError)?.to_string().into();
+        let name = Some(split_iter.next().ok_or(ReactionConversionError)?.to_string().into());
         let id = split_iter.next().and_then(|s| s.parse().ok()).ok_or(ReactionConversionError)?;
 
         Ok(ReactionType::Custom {

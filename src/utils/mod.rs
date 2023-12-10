@@ -246,7 +246,7 @@ pub fn parse_channel_mention(mention: &str) -> Option<ChannelId> {
 /// let emoji = parse_emoji("<:smugAnimeFace:302516740095606785>").unwrap();
 /// assert_eq!(emoji.animated, false);
 /// assert_eq!(emoji.id, EmojiId::new(302516740095606785));
-/// assert_eq!(emoji.name, "smugAnimeFace".to_string());
+/// assert_eq!(&*emoji.name, "smugAnimeFace");
 /// ```
 ///
 /// Asserting that an invalid emoji usage returns [`None`]:
@@ -291,9 +291,9 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
         }
 
         id.parse().ok().map(|id| EmojiIdentifier {
+            name: name.into(),
             animated,
             id,
-            name,
         })
     } else {
         None
@@ -532,7 +532,7 @@ mod test {
     #[test]
     fn test_emoji_parser() {
         let emoji = parse_emoji("<:name:12345>").unwrap();
-        assert_eq!(emoji.name, "name");
+        assert_eq!(&*emoji.name, "name");
         assert_eq!(emoji.id, 12_345);
     }
 
