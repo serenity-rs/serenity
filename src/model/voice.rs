@@ -3,6 +3,7 @@
 use serde::de::{Deserialize, Deserializer};
 use serde::Serialize;
 
+use crate::internal::prelude::*;
 use crate::model::guild::Member;
 use crate::model::id::{ChannelId, GuildId, UserId};
 use crate::model::Timestamp;
@@ -18,9 +19,9 @@ pub struct VoiceRegion {
     /// Whether it is a deprecated voice region, which you should avoid using.
     pub deprecated: bool,
     /// The internal Id of the voice region.
-    pub id: String,
+    pub id: FixedString,
     /// A recognizable name of the location of the voice region.
-    pub name: String,
+    pub name: FixedString,
     /// Whether the voice region is optimal for use by the current user.
     pub optimal: bool,
 }
@@ -42,7 +43,7 @@ pub struct VoiceState {
     pub self_mute: bool,
     pub self_stream: Option<bool>,
     pub self_video: bool,
-    pub session_id: String,
+    pub session_id: FixedString,
     pub suppress: bool,
     pub user_id: UserId,
     /// When unsuppressed, non-bot users will have this set to the current time. Bot users will be

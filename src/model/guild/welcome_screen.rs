@@ -1,5 +1,6 @@
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
+use crate::internal::prelude::*;
 use crate::model::id::{ChannelId, EmojiId};
 
 /// Information relating to a guild's welcome screen.
@@ -10,11 +11,11 @@ use crate::model::id::{ChannelId, EmojiId};
 #[non_exhaustive]
 pub struct GuildWelcomeScreen {
     /// The server description shown in the welcome screen.
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     /// The channels shown in the welcome screen.
     ///
     /// **Note**: There can only be only up to 5 channels.
-    pub welcome_channels: Vec<GuildWelcomeChannel>,
+    pub welcome_channels: FixedArray<GuildWelcomeChannel>,
 }
 
 /// A channel shown in the [`GuildWelcomeScreen`].
@@ -27,7 +28,7 @@ pub struct GuildWelcomeChannel {
     /// The channel Id.
     pub channel_id: ChannelId,
     /// The description shown for the channel.
-    pub description: String,
+    pub description: FixedString,
     /// The emoji shown, if there is one.
     pub emoji: Option<GuildWelcomeChannelEmoji>,
 }
@@ -38,9 +39,9 @@ impl<'de> Deserialize<'de> for GuildWelcomeChannel {
         #[derive(Deserialize)]
         struct Helper {
             channel_id: ChannelId,
-            description: String,
+            description: FixedString,
             emoji_id: Option<EmojiId>,
-            emoji_name: Option<String>,
+            emoji_name: Option<FixedString>,
         }
         let Helper {
             channel_id,
@@ -95,7 +96,7 @@ impl Serialize for GuildWelcomeChannel {
 #[non_exhaustive]
 pub enum GuildWelcomeChannelEmoji {
     /// A custom emoji.
-    Custom { id: EmojiId, name: String },
+    Custom { id: EmojiId, name: FixedString },
     /// A unicode emoji.
-    Unicode(String),
+    Unicode(FixedString),
 }

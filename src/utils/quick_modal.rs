@@ -7,12 +7,13 @@ use crate::builder::{
 };
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 #[cfg(feature = "collector")]
 pub struct QuickModalResponse {
     pub interaction: ModalInteraction,
-    pub inputs: Vec<String>,
+    pub inputs: FixedArray<FixedString<u16>>,
 }
 
 /// Convenience builder to create a modal, wait for the user to submit and parse the response.
@@ -27,7 +28,7 @@ pub struct QuickModalResponse {
 ///     .paragraph_field("Hobbies and interests");
 /// let response = interaction.quick_modal(ctx, modal).await?;
 /// let inputs = response.unwrap().inputs;
-/// let (first_name, last_name, hobbies) = (&inputs[0], &inputs[1], &inputs[2]);
+/// let (first_name, last_name, hobbies) = (&inputs[0_usize], &inputs[1_usize], &inputs[2_usize]);
 /// # Ok(())
 /// # }
 /// ```
@@ -105,7 +106,7 @@ impl CreateQuickModal {
         builder.execute(ctx, (interaction_id, token)).await?;
 
         let collector =
-            ModalInteractionCollector::new(&ctx.shard).custom_ids(vec![modal_custom_id]);
+            ModalInteractionCollector::new(&ctx.shard).custom_ids(vec![modal_custom_id.into()]);
 
         let collector = match self.timeout {
             Some(timeout) => collector.timeout(timeout),

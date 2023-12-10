@@ -11,7 +11,6 @@ use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
 use crate::cache::{Cache, GuildChannelRef, GuildRef};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -74,7 +73,7 @@ pub struct Webhook {
     /// The default name of the webhook.
     ///
     /// This can be temporarily overridden via [`ExecuteWebhook::username`].
-    pub name: Option<String>,
+    pub name: Option<FixedString<u8>>,
     /// The default avatar.
     ///
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
@@ -103,7 +102,7 @@ pub struct WebhookGuild {
     /// The unique Id identifying the guild.
     pub id: GuildId,
     /// The name of the guild.
-    pub name: String,
+    pub name: FixedString<u8>,
     /// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
@@ -165,7 +164,7 @@ pub struct WebhookChannel {
     /// The unique Id of the channel.
     pub id: ChannelId,
     /// The name of the channel.
-    pub name: String,
+    pub name: FixedString<u8>,
 }
 
 #[cfg(feature = "model")]

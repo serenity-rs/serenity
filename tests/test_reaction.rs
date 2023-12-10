@@ -10,7 +10,7 @@ fn str_to_reaction_type() {
     let reaction2 = ReactionType::Custom {
         animated: false,
         id: EmojiId::new(600404340292059257),
-        name: Some("customemoji".to_string()),
+        name: Some("customemoji".to_string().into()),
     };
     assert_eq!(reaction, reaction2);
 }
@@ -22,7 +22,7 @@ fn str_to_reaction_type_animated() {
     let reaction2 = ReactionType::Custom {
         animated: true,
         id: EmojiId::new(600409340292059257),
-        name: Some("customemoji2".to_string()),
+        name: Some("customemoji2".to_string().into()),
     };
     assert_eq!(reaction, reaction2);
 }
@@ -34,7 +34,7 @@ fn string_to_reaction_type() {
     let reaction2 = ReactionType::Custom {
         animated: false,
         id: EmojiId::new(600404340292059257),
-        name: Some("customemoji".to_string()),
+        name: Some("customemoji".to_string().into()),
     };
     assert_eq!(reaction, reaction2);
 }
@@ -105,7 +105,7 @@ fn json_to_reaction_type() {
     let value = serde_json::from_str(s).unwrap();
     assert!(matches!(value, ReactionType::Unicode(_)));
     if let ReactionType::Unicode(value) = value {
-        assert_eq!(value, "foo");
+        assert_eq!(&*value, "foo");
     }
 
     let s = r#"{"name": null}"#;

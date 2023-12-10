@@ -28,6 +28,7 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::model::prelude::*;
@@ -531,7 +532,7 @@ impl ChannelId {
     /// # Errors
     ///
     /// Same as [`Self::to_channel()`].
-    pub async fn name(self, cache_http: impl CacheHttp) -> Result<String> {
+    pub async fn name(self, cache_http: impl CacheHttp) -> Result<FixedString<u8>> {
         let channel = self.to_channel(cache_http).await?;
 
         Ok(match channel {
