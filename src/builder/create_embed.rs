@@ -59,7 +59,7 @@ impl CreateEmbed {
     /// **Note**: This can't be longer than 4096 characters.
     #[inline]
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.0.description = Some(description.into());
+        self.0.description = Some(description.into().into());
         self
     }
 
@@ -107,7 +107,7 @@ impl CreateEmbed {
     #[inline]
     pub fn image(mut self, url: impl Into<String>) -> Self {
         self.0.image = Some(EmbedImage {
-            url: url.into(),
+            url: url.into().into(),
             proxy_url: None,
             height: None,
             width: None,
@@ -119,7 +119,7 @@ impl CreateEmbed {
     #[inline]
     pub fn thumbnail(mut self, url: impl Into<String>) -> Self {
         self.0.thumbnail = Some(EmbedThumbnail {
-            url: url.into(),
+            url: url.into().into(),
             proxy_url: None,
             height: None,
             width: None,
@@ -150,14 +150,14 @@ impl CreateEmbed {
     /// Set the title of the embed.
     #[inline]
     pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.0.title = Some(title.into());
+        self.0.title = Some(title.into().into());
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
     pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.0.url = Some(url.into());
+        self.0.url = Some(url.into().into());
         self
     }
 
@@ -213,7 +213,7 @@ impl Default for CreateEmbed {
             description: None,
             thumbnail: None,
             timestamp: None,
-            kind: Some("rich".into()),
+            kind: Some("rich".to_string().into()),
             author: None,
             colour: None,
             footer: None,
@@ -241,7 +241,7 @@ impl CreateEmbedAuthor {
     /// Creates an author object with the given name, leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
         Self(EmbedAuthor {
-            name: name.into(),
+            name: name.into().into(),
             icon_url: None,
             url: None,
             // Has no builder method because I think this field is only relevant when receiving (?)
@@ -251,19 +251,19 @@ impl CreateEmbedAuthor {
 
     /// Set the author's name, replacing the current value as set in [`Self::new`].
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.0.name = name.into();
+        self.0.name = name.into().into();
         self
     }
 
     /// Set the URL of the author's icon.
     pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.0.icon_url = Some(icon_url.into());
+        self.0.icon_url = Some(icon_url.into().into());
         self
     }
 
     /// Set the author's URL.
     pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.0.url = Some(url.into());
+        self.0.url = Some(url.into().into());
         self
     }
 }
@@ -299,7 +299,7 @@ impl CreateEmbedFooter {
     /// Creates a new footer object with the given text, leaving all other fields empty.
     pub fn new(text: impl Into<String>) -> Self {
         Self(EmbedFooter {
-            text: text.into(),
+            text: text.into().into(),
             icon_url: None,
             // Has no builder method because I think this field is only relevant when receiving (?)
             proxy_icon_url: None,
@@ -308,7 +308,7 @@ impl CreateEmbedFooter {
 
     /// Set the footer's text, replacing the current value as set in [`Self::new`].
     pub fn text(mut self, text: impl Into<String>) -> Self {
-        self.0.text = text.into();
+        self.0.text = text.into().into();
         self
     }
 
@@ -316,7 +316,7 @@ impl CreateEmbedFooter {
     ///
     /// Refer [`CreateEmbed::image`] for rules on naming local attachments.
     pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.0.icon_url = Some(icon_url.into());
+        self.0.icon_url = Some(icon_url.into().into());
         self
     }
 }

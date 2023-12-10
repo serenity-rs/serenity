@@ -7,7 +7,6 @@ use crate::builder::CreateInvite;
 use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 
 /// Information about an invite code.
@@ -26,7 +25,7 @@ pub struct Invite {
     /// These include [invisible][`OnlineStatus::Invisible`] members.
     pub approximate_presence_count: Option<u64>,
     /// The unique code for the invite.
-    pub code: String,
+    pub code: FixedString,
     /// A representation of the minimal amount of information needed about the [`GuildChannel`]
     /// being invited to.
     pub channel: InviteChannel,
@@ -199,7 +198,7 @@ impl Invite {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
     pub id: ChannelId,
-    pub name: String,
+    pub name: FixedString,
     #[serde(rename = "type")]
     pub kind: ChannelType,
 }
@@ -211,14 +210,14 @@ pub struct InviteChannel {
 #[non_exhaustive]
 pub struct InviteGuild {
     pub id: GuildId,
-    pub name: String,
+    pub name: FixedString,
     pub splash: Option<ImageHash>,
     pub banner: Option<ImageHash>,
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     pub icon: Option<ImageHash>,
-    pub features: Vec<String>,
+    pub features: FixedArray<String>,
     pub verification_level: VerificationLevel,
-    pub vanity_url_code: Option<String>,
+    pub vanity_url_code: Option<FixedString>,
     pub nsfw_level: NsfwLevel,
     pub premium_subscription_count: Option<u64>,
 }
@@ -281,7 +280,7 @@ pub struct RichInvite {
     /// invited to.
     pub channel: InviteChannel,
     /// The unique code for the invite.
-    pub code: String,
+    pub code: FixedString,
     /// When the invite was created.
     pub created_at: Timestamp,
     /// A representation of the minimal amount of information needed about the [`Guild`] being
@@ -393,13 +392,13 @@ impl RichInvite {
 #[non_exhaustive]
 pub struct InviteStageInstance {
     /// The members speaking in the Stage
-    pub members: Vec<PartialMember>,
+    pub members: FixedArray<PartialMember>,
     /// The number of users in the Stage
     pub participant_count: u64,
     /// The number of users speaking in the Stage
     pub speaker_count: u64,
     /// The topic of the Stage instance (1-120 characters)
-    pub topic: String,
+    pub topic: FixedString<u8>,
 }
 
 enum_number! {
