@@ -1,5 +1,6 @@
 use std::fmt;
 
+use crate::internal::prelude::*;
 use crate::model::id::{EmojiId, RoleId};
 use crate::model::user::User;
 use crate::model::utils::default_true;
@@ -23,7 +24,7 @@ pub struct Emoji {
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can only contain
     /// alphanumeric characters and underscores.
-    pub name: String,
+    pub name: FixedString,
     /// Whether the emoji is managed via an [`Integration`] service.
     ///
     /// [`Integration`]: super::Integration
@@ -37,7 +38,7 @@ pub struct Emoji {
     ///
     /// [`Role`]: super::Role
     #[serde(default)]
-    pub roles: Vec<RoleId>,
+    pub roles: FixedArray<RoleId>,
     /// The user who created the emoji.
     pub user: Option<User>,
 }

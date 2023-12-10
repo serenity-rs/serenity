@@ -1,7 +1,6 @@
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 
-#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
@@ -36,23 +35,23 @@ pub struct Attachment {
     pub id: AttachmentId,
     /// The filename of the file that was uploaded. This is equivalent to what the uploader had
     /// their file named.
-    pub filename: String,
+    pub filename: FixedString,
     /// Sescription for the file (max 1024 characters).
-    pub description: Option<String>,
+    pub description: Option<FixedString<u16>>,
     /// If the attachment is an image, then the height of the image is provided.
     pub height: Option<u32>,
     /// The proxy URL.
-    pub proxy_url: String,
+    pub proxy_url: FixedString,
     /// The size of the file in bytes.
     pub size: u32,
     /// The URL of the uploaded attachment.
-    pub url: String,
+    pub url: FixedString,
     /// If the attachment is an image, then the width of the image is provided.
     pub width: Option<u32>,
     /// The attachment's [media type].
     ///
     /// [media type]: https://en.wikipedia.org/wiki/Media_type
-    pub content_type: Option<String>,
+    pub content_type: Option<FixedString>,
     /// Whether this attachment is ephemeral.
     ///
     /// Ephemeral attachments will automatically be removed after a set period of time.
@@ -151,7 +150,7 @@ impl Attachment {
     /// [`Message`]: super::Message
     pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();
-        let bytes = reqwest.get(&self.url).send().await?.bytes().await?;
+        let bytes = reqwest.get(&*self.url).send().await?.bytes().await?;
         Ok(bytes.to_vec())
     }
 }

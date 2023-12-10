@@ -55,7 +55,6 @@ pub use self::bridge::*;
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws::WsClient;
-#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::gateway::{Activity, ActivityType};
 use crate::model::id::UserId;
@@ -74,12 +73,12 @@ pub struct PresenceData {
 #[derive(Clone, Debug, Serialize)]
 pub struct ActivityData {
     /// The name of the activity
-    pub name: String,
+    pub name: FixedString,
     /// The type of the activity
     #[serde(rename = "type")]
     pub kind: ActivityType,
     /// The state of the activity, if the type is [`ActivityType::Custom`]
-    pub state: Option<String>,
+    pub state: Option<FixedString>,
     /// The url of the activity, if the type is [`ActivityType::Streaming`]
     pub url: Option<Url>,
 }
@@ -89,7 +88,7 @@ impl ActivityData {
     #[must_use]
     pub fn playing(name: impl Into<String>) -> Self {
         Self {
-            name: name.into(),
+            name: name.into().into(),
             kind: ActivityType::Playing,
             state: None,
             url: None,
@@ -104,7 +103,7 @@ impl ActivityData {
     #[cfg(feature = "http")]
     pub fn streaming(name: impl Into<String>, url: impl IntoUrl) -> Result<Self> {
         Ok(Self {
-            name: name.into(),
+            name: name.into().into(),
             kind: ActivityType::Streaming,
             state: None,
             url: Some(url.into_url()?),
@@ -115,7 +114,7 @@ impl ActivityData {
     #[must_use]
     pub fn listening(name: impl Into<String>) -> Self {
         Self {
-            name: name.into(),
+            name: name.into().into(),
             kind: ActivityType::Listening,
             state: None,
             url: None,
@@ -126,7 +125,7 @@ impl ActivityData {
     #[must_use]
     pub fn watching(name: impl Into<String>) -> Self {
         Self {
-            name: name.into(),
+            name: name.into().into(),
             kind: ActivityType::Watching,
             state: None,
             url: None,
@@ -137,7 +136,7 @@ impl ActivityData {
     #[must_use]
     pub fn competing(name: impl Into<String>) -> Self {
         Self {
-            name: name.into(),
+            name: name.into().into(),
             kind: ActivityType::Competing,
             state: None,
             url: None,
@@ -150,9 +149,9 @@ impl ActivityData {
         Self {
             // discord seems to require a name for custom activities
             // even though it's not displayed
-            name: "~".to_string(),
+            name: "~".to_string().into(),
             kind: ActivityType::Custom,
-            state: Some(state.into()),
+            state: Some(state.into().into()),
             url: None,
         }
     }

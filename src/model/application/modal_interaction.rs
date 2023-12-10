@@ -44,7 +44,7 @@ pub struct ModalInteraction {
     #[serde(default)]
     pub user: User,
     /// A continuation token for responding to the interaction.
-    pub token: String,
+    pub token: FixedString,
     /// Always `1`.
     pub version: u8,
     /// The message this interaction was triggered by
@@ -56,9 +56,9 @@ pub struct ModalInteraction {
     /// Permissions the app or bot has within the channel the interaction was sent from.
     pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
-    pub locale: String,
+    pub locale: FixedString,
     /// The guild's preferred locale.
-    pub guild_locale: Option<String>,
+    pub guild_locale: Option<FixedString>,
 }
 
 #[cfg(feature = "model")]
@@ -218,7 +218,7 @@ impl Serialize for ModalInteraction {
 #[non_exhaustive]
 pub struct ModalInteractionData {
     /// The custom id of the modal
-    pub custom_id: String,
+    pub custom_id: FixedString,
     /// The components.
-    pub components: Vec<ActionRow>,
+    pub components: FixedArray<ActionRow>,
 }

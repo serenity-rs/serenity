@@ -4,5 +4,7 @@
 
 pub use std::result::Result as StdResult;
 
+pub use small_fixed_array::{FixedArray, FixedString};
+
 pub use crate::error::{Error, Result};
 pub use crate::json::{JsonMap, Value};

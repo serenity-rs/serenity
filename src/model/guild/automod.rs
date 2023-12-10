@@ -8,6 +8,7 @@ use serde::de::{Deserializer, Error};
 use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
 
+use crate::internal::prelude::*;
 use crate::model::id::*;
 
 /// Configured auto moderation rule.
@@ -23,7 +24,7 @@ pub struct Rule {
     /// ID of the guild this rule belongs to.
     pub guild_id: GuildId,
     /// Name of the rule.
-    pub name: String,
+    pub name: FixedString,
     /// ID of the user which created the rule.
     pub creator_id: UserId,
     /// Event context in which the rule should be checked.
@@ -32,17 +33,17 @@ pub struct Rule {
     #[serde(flatten)]
     pub trigger: Trigger,
     /// Actions which will execute when the rule is triggered.
-    pub actions: Vec<Action>,
+    pub actions: FixedArray<Action>,
     /// Whether the rule is enabled.
     pub enabled: bool,
     /// Roles that should not be affected by the rule.
     ///
     /// Maximum of 20.
-    pub exempt_roles: Vec<RoleId>,
+    pub exempt_roles: FixedArray<RoleId, u8>,
     /// Channels that should not be affected by the rule.
     ///
     /// Maximum of 50.
-    pub exempt_channels: Vec<ChannelId>,
+    pub exempt_channels: FixedArray<ChannelId, u8>,
 }
 
 /// Indicates in what event context a rule should be checked.
@@ -330,7 +331,7 @@ pub enum Action {
         /// Additional explanation that will be shown to members whenever their message is blocked
         ///
         /// Maximum of 150 characters
-        custom_message: Option<String>,
+        custom_message: Option<FixedString<u8>>,
     },
     /// Logs user content to a specified channel.
     Alert(ChannelId),
@@ -381,15 +382,15 @@ pub struct ActionExecution {
     /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
     ///
     /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
-    pub content: String,
+    pub content: FixedString,
     /// Word or phrase configured in the rule that triggered the rule.
-    pub matched_keyword: Option<String>,
+    pub matched_keyword: Option<FixedString>,
     /// Substring in content that triggered the rule.
     ///
     /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
     ///
     /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
-    pub matched_content: Option<String>,
+    pub matched_content: Option<FixedString>,
 }
 
 /// Helper struct for the (de)serialization of `Action`.
@@ -400,7 +401,7 @@ struct RawActionMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     duration_seconds: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    custom_message: Option<String>,
+    custom_message: Option<FixedString<u8>>,
 }
 
 /// Helper struct for the (de)serialization of `Action`.
