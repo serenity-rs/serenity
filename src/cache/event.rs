@@ -2,6 +2,7 @@ use std::collections::HashSet;
 use std::num::NonZeroU16;
 
 use super::{Cache, CacheUpdate};
+use crate::internal::prelude::*;
 use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
     ChannelCreateEvent,
@@ -447,7 +448,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         mute: false,
                         nick: None,
                         user,
-                        roles: vec![],
+                        roles: FixedArray::default(),
                         pending: false,
                         premium_since: None,
                         permissions: None,
@@ -468,9 +469,7 @@ impl CacheUpdate for ReadyEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        let ready = self.ready.clone();
-
-        for unavailable in ready.guilds {
+        for unavailable in &self.ready.guilds {
             cache.guilds.remove(&unavailable.id);
             cache.unavailable_guilds.insert(unavailable.id, ());
         }
@@ -502,7 +501,7 @@ impl CacheUpdate for ReadyEvent {
             cached_shard_data.total = shard_data.total;
             cached_shard_data.connected.insert(shard_data.id);
         }
-        *cache.user.write() = ready.user;
+        cache.user.write().clone_from(&self.ready.user);
 
         None
     }
@@ -518,7 +517,11 @@ impl CacheUpdate for ThreadCreateEvent {
             if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
                 Some(std::mem::replace(&mut g.threads[i], self.thread.clone()))
             } else {
-                g.threads.push(self.thread.clone());
+                // This is a rare enough occurence to realloc.
+                let mut threads = std::mem::take(&mut g.threads).into_vec();
+                threads.push(self.thread.clone());
+                g.threads = threads.into();
+
                 None
             }
         })
@@ -535,7 +538,11 @@ impl CacheUpdate for ThreadUpdateEvent {
             if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
                 Some(std::mem::replace(&mut g.threads[i], self.thread.clone()))
             } else {
-                g.threads.push(self.thread.clone());
+                // This is a rare enough occurence to realloc.
+                let mut threads = std::mem::take(&mut g.threads).into_vec();
+                threads.push(self.thread.clone());
+                g.threads = threads.into();
+
                 None
             }
         })
@@ -549,7 +556,13 @@ impl CacheUpdate for ThreadDeleteEvent {
         let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
 
         cache.guilds.get_mut(&guild_id).and_then(|mut g| {
-            g.threads.iter().position(|e| e.id == thread_id).map(|i| g.threads.remove(i))
+            g.threads.iter().position(|e| e.id == thread_id).map(|i| {
+                let mut threads = std::mem::take(&mut g.threads).into_vec();
+                let thread = threads.remove(i);
+                g.threads = threads.into();
+
+                thread
+            })
         })
     }
 }
@@ -590,7 +603,7 @@ impl CacheUpdate for VoiceStateUpdateEvent {
 }
 
 impl CacheUpdate for VoiceChannelStatusUpdateEvent {
-    type Output = String;
+    type Output = FixedString<u16>;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;

@@ -8,6 +8,7 @@ use crate::builder::{CreateAttachment, CreateMessage, EditMessage, GetMessages};
 use crate::http::CacheHttp;
 #[cfg(feature = "model")]
 use crate::http::{Http, Typing};
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::single_recipient;
 
@@ -199,8 +200,8 @@ impl PrivateChannel {
 
     /// Returns "DM with $username#discriminator".
     #[must_use]
-    pub fn name(&self) -> String {
-        format!("DM with {}", self.recipient.tag())
+    pub fn name(&self) -> FixedString<u8> {
+        format!("DM with {}", self.recipient.tag()).into()
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].

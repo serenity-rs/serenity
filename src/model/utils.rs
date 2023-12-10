@@ -3,11 +3,13 @@ use std::hash::Hash;
 use std::marker::PhantomData;
 use std::num::NonZeroU64;
 
+use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use serde_cow::CowStr;
 
 use super::prelude::*;
+use crate::internal::prelude::*;
 
 pub fn default_true() -> bool {
     true
@@ -230,13 +232,13 @@ pub mod presences {
 
 pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     deserializer: D,
-) -> StdResult<Vec<ActivityButton>, D::Error> {
-    Vec::deserialize(deserializer).map(|labels| {
+) -> StdResult<FixedArray<ActivityButton>, D::Error> {
+    ArrayVec::<_, 2>::deserialize(deserializer).map(|labels| {
         labels
             .into_iter()
             .map(|l| ActivityButton {
                 label: l,
-                url: String::new(),
+                url: FixedString::default(),
             })
             .collect()
     })
@@ -285,17 +287,23 @@ pub mod comma_separated_string {
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_cow::CowStr;
 
+    use crate::internal::prelude::*;
+
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
-    ) -> Result<Vec<String>, D::Error> {
+    ) -> Result<FixedArray<FixedString>, D::Error> {
         let str_sequence = CowStr::deserialize(deserializer)?.0;
-        let vec = str_sequence.split(", ").map(str::to_owned).collect();
+        let vec = str_sequence.split(", ").map(str::to_owned).map(FixedString::from).collect();
 
         Ok(vec)
     }
 
     #[allow(clippy::ptr_arg)]
-    pub fn serialize<S: Serializer>(vec: &Vec<String>, serializer: S) -> Result<S::Ok, S::Error> {
+    pub fn serialize<S: Serializer>(
+        vec: &FixedArray<FixedString>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        let vec: Vec<String> = vec.iter().map(FixedString::clone).map(String::from).collect();
         serializer.serialize_str(&vec.join(", "))
     }
 }

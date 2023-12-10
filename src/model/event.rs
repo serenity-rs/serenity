@@ -19,6 +19,8 @@ use crate::model::utils::{
     remove_from_map_opt,
     stickers,
 };
+use crate::constants::Opcode;
+use crate::internal::prelude::*;
 
 /// Requires no gateway intents.
 ///
@@ -247,9 +249,9 @@ pub struct GuildMemberRemoveEvent {
 #[non_exhaustive]
 pub struct GuildMemberUpdateEvent {
     pub guild_id: GuildId,
-    pub nick: Option<String>,
+    pub nick: Option<FixedString<u8>>,
     pub joined_at: Timestamp,
-    pub roles: Vec<RoleId>,
+    pub roles: FixedArray<RoleId>,
     pub user: User,
     pub premium_since: Option<Timestamp>,
     #[serde(default)]
@@ -283,12 +285,12 @@ pub struct GuildMembersChunkEvent {
     /// When passing an invalid ID to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], it will
     /// be returned here.
     #[serde(default)]
-    pub not_found: Vec<GenericId>,
+    pub not_found: FixedArray<GenericId>,
     /// When passing true to [`crate::gateway::ShardRunnerMessage::ChunkGuild`], presences of the
     /// returned members will be here.
     pub presences: Option<Vec<Presence>>,
     /// Nonce used in the [`crate::gateway::ShardRunnerMessage::ChunkGuild`] request.
-    pub nonce: Option<String>,
+    pub nonce: Option<FixedString>,
 }
 
 // Manual impl needed to insert guild_id fields in Member
@@ -390,7 +392,7 @@ pub struct InviteCreateEvent {
     /// Channel the invite is for.
     pub channel_id: ChannelId,
     /// Unique invite [code](Invite::code).
-    pub code: String,
+    pub code: FixedString,
     /// Time at which the invite was created.
     pub created_at: Timestamp,
     /// Guild of the invite.
@@ -422,7 +424,7 @@ pub struct InviteCreateEvent {
 pub struct InviteDeleteEvent {
     pub channel_id: ChannelId,
     pub guild_id: Option<GuildId>,
-    pub code: String,
+    pub code: FixedString,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].
@@ -457,7 +459,7 @@ pub struct MessageCreateEvent {
 pub struct MessageDeleteBulkEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
-    pub ids: Vec<MessageId>,
+    pub ids: FixedArray<MessageId>,
 }
 
 /// Requires [`GatewayIntents::GUILD_MESSAGES`] or [`GatewayIntents::DIRECT_MESSAGES`].
@@ -498,17 +500,17 @@ pub struct MessageUpdateEvent {
     pub id: MessageId,
     pub channel_id: ChannelId,
     pub author: Option<User>,
-    pub content: Option<String>,
+    pub content: Option<FixedString<u16>>,
     pub timestamp: Option<Timestamp>,
     pub edited_timestamp: Option<Timestamp>,
     pub tts: Option<bool>,
     pub mention_everyone: Option<bool>,
-    pub mentions: Option<Vec<User>>,
-    pub mention_roles: Option<Vec<RoleId>>,
-    pub mention_channels: Option<Vec<ChannelMention>>,
-    pub attachments: Option<Vec<Attachment>>,
-    pub embeds: Option<Vec<Embed>>,
-    pub reactions: Option<Vec<MessageReaction>>,
+    pub mentions: Option<FixedArray<User>>,
+    pub mention_roles: Option<FixedArray<RoleId>>,
+    pub mention_channels: Option<FixedArray<ChannelMention>>,
+    pub attachments: Option<FixedArray<Attachment>>,
+    pub embeds: Option<FixedArray<Embed>>,
+    pub reactions: Option<FixedArray<MessageReaction>>,
     pub pinned: Option<bool>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub webhook_id: Option<Option<WebhookId>>,
@@ -531,8 +533,8 @@ pub struct MessageUpdateEvent {
     pub interaction_metadata: Option<Option<Box<MessageInteractionMetadata>>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub thread: Option<Option<Box<GuildChannel>>>,
-    pub components: Option<Vec<ActionRow>>,
-    pub sticker_items: Option<Vec<StickerItem>>,
+    pub components: Option<FixedArray<ActionRow>>,
+    pub sticker_items: Option<FixedArray<StickerItem>>,
     pub position: Option<Option<u64>>,
     pub role_subscription_data: Option<Option<RoleSubscriptionData>>,
     pub guild_id: Option<GuildId>,
@@ -638,7 +640,7 @@ pub struct PresenceUpdateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct PresencesReplaceEvent {
-    pub presences: Vec<Presence>,
+    pub presences: FixedArray<Presence>,
 }
 
 /// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
@@ -738,7 +740,7 @@ pub struct TypingStartEvent {
 #[non_exhaustive]
 pub struct UnknownEvent {
     #[serde(rename = "t")]
-    pub kind: String,
+    pub kind: FixedString,
     #[serde(rename = "d")]
     pub value: Value,
 }
@@ -763,9 +765,9 @@ pub struct UserUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct VoiceServerUpdateEvent {
-    pub token: String,
+    pub token: FixedString,
     pub guild_id: Option<GuildId>,
-    pub endpoint: Option<String>,
+    pub endpoint: Option<FixedString>,
 }
 
 /// Requires [`GatewayIntents::GUILD_VOICE_STATES`].
@@ -786,7 +788,7 @@ pub struct VoiceStateUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct VoiceChannelStatusUpdateEvent {
-    pub status: Option<String>,
+    pub status: Option<FixedString<u16>>,
     pub id: ChannelId,
     pub guild_id: GuildId,
 }
@@ -927,10 +929,10 @@ pub struct ThreadListSyncEvent {
     /// well, so you know to clear that data.
     pub channel_ids: Option<Vec<ChannelId>>,
     /// All active threads in the given channels that the current user can access.
-    pub threads: Vec<GuildChannel>,
+    pub threads: FixedArray<GuildChannel>,
     /// All thread member objects from the synced threads for the current user, indicating which
     /// threads the current user has been added to
-    pub members: Vec<ThreadMember>,
+    pub members: FixedArray<ThreadMember>,
 }
 
 /// Requires [`GatewayIntents::GUILDS`], and, to receive this event for other users,
@@ -963,10 +965,10 @@ pub struct ThreadMembersUpdateEvent {
     pub member_count: i16,
     /// The users who were added to the thread.
     #[serde(default)]
-    pub added_members: Vec<ThreadMember>,
+    pub added_members: FixedArray<ThreadMember>,
     /// The ids of the users who were removed from the thread.
     #[serde(default)]
-    pub removed_member_ids: Vec<UserId>,
+    pub removed_member_ids: FixedArray<UserId>,
 }
 
 /// Requires [`GatewayIntents::GUILD_SCHEDULED_EVENTS`].
