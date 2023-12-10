@@ -22,6 +22,7 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
@@ -47,7 +48,7 @@ pub struct PartialGuild {
     /// This is equivalent to the Id of the default role (`@everyone`).
     pub id: GuildId,
     /// The name of the guild.
-    pub name: String,
+    pub name: FixedString,
     /// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
@@ -119,7 +120,7 @@ pub struct PartialGuild {
     ///
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
-    pub features: Vec<String>,
+    pub features: FixedArray<FixedString>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
     pub mfa_level: MfaLevel,
@@ -140,18 +141,18 @@ pub struct PartialGuild {
     /// The maximum number of members for the guild.
     pub max_members: Option<u64>,
     /// The vanity url code for the guild, if it has one.
-    pub vanity_url_code: Option<String>,
+    pub vanity_url_code: Option<FixedString>,
     /// The server's description, if it has one.
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     /// The guild's banner, if it has one.
-    pub banner: Option<String>,
+    pub banner: Option<FixedString>,
     /// The server's premium boosting level.
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server.
     pub premium_subscription_count: Option<u64>,
     /// The preferred locale of this guild only set if guild has the "DISCOVERABLE" feature,
     /// defaults to en-US.
-    pub preferred_locale: String,
+    pub preferred_locale: FixedString,
     /// The id of the channel where admins and moderators of Community guilds receive notices from
     /// Discord.
     ///
@@ -390,7 +391,7 @@ impl PartialGuild {
         let guild_channels = cache.as_ref().guild_channels(self.id)?;
 
         for (id, channel) in guild_channels.iter() {
-            if channel.name == name {
+            if &*channel.name == name {
                 return Some(*id);
             }
         }
@@ -1517,7 +1518,7 @@ impl PartialGuild {
     #[inline]
     #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
-        self.roles.values().find(|role| role_name == role.name)
+        self.roles.values().find(|role| role_name == &*role.name)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this

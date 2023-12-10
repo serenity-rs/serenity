@@ -898,7 +898,7 @@ impl Http {
             route: Route::Entitlements {
                 application_id: self.try_application_id()?,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -1391,7 +1391,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 entitlement_id,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }
@@ -3145,7 +3145,8 @@ impl Http {
         guild_id: Option<GuildId>,
         exclude_ended: Option<bool>,
     ) -> Result<Vec<Entitlement>> {
-        let mut params = vec![];
+        let mut params = ArrayVec::<_, 7>::new();
+
         if let Some(user_id) = user_id {
             params.push(("user_id", user_id.to_string()));
         }
@@ -3179,7 +3180,7 @@ impl Http {
             route: Route::Entitlements {
                 application_id: self.try_application_id()?,
             },
-            params: Some(params),
+            params,
         })
         .await
     }
@@ -4048,7 +4049,7 @@ impl Http {
             route: Route::Skus {
                 application_id: self.try_application_id()?,
             },
-            params: None,
+            params: [].into(),
         })
         .await
     }

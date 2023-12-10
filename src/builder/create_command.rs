@@ -28,9 +28,9 @@ impl CreateCommandOption {
     ) -> Self {
         Self(CommandOption {
             kind,
-            name: name.into(),
+            name: name.into().into(),
             name_localizations: None,
-            description: description.into(),
+            description: description.into().into(),
             description_localizations: None,
             required: false,
             autocomplete: false,
@@ -39,7 +39,7 @@ impl CreateCommandOption {
             min_length: None,
             max_length: None,
 
-            channel_types: Vec::new(),
+            channel_types: FixedArray::default(),
             choices: Vec::new(),
             options: Vec::new(),
         })
@@ -55,7 +55,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.0.name = name.into();
+        self.0.name = name.into().into();
         self
     }
 
@@ -79,7 +79,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: Must be between 1 and 100 characters.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.0.description = description.into();
+        self.0.description = description.into().into();
         self
     }
     /// Specifies a localized description of the option.
@@ -116,7 +116,7 @@ impl CreateCommandOption {
     /// characters. Value must be between -2^53 and 2^53.
     pub fn add_int_choice(self, name: impl Into<String>, value: i32) -> Self {
         self.add_choice(CommandOptionChoice {
-            name: name.into(),
+            name: name.into().into(),
             value: Value::from(value),
             name_localizations: None,
         })
@@ -130,7 +130,7 @@ impl CreateCommandOption {
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> Self {
         self.add_choice(CommandOptionChoice {
-            name: name.into(),
+            name: name.into().into(),
             value: Value::from(value),
             name_localizations: Some(
                 locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
@@ -144,7 +144,7 @@ impl CreateCommandOption {
     /// characters. Value must be up to 100 characters.
     pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
         self.add_choice(CommandOptionChoice {
-            name: name.into(),
+            name: name.into().into(),
             value: Value::String(value.into()),
             name_localizations: None,
         })
@@ -158,7 +158,7 @@ impl CreateCommandOption {
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> Self {
         self.add_choice(CommandOptionChoice {
-            name: name.into(),
+            name: name.into().into(),
             value: Value::String(value.into()),
             name_localizations: Some(
                 locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
@@ -172,7 +172,7 @@ impl CreateCommandOption {
     /// characters. Value must be between -2^53 and 2^53.
     pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
         self.add_choice(CommandOptionChoice {
-            name: name.into(),
+            name: name.into().into(),
             value: Value::from(value),
             name_localizations: None,
         })
@@ -186,7 +186,7 @@ impl CreateCommandOption {
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> Self {
         self.add_choice(CommandOptionChoice {
-            name: name.into(),
+            name: name.into().into(),
             value: Value::from(value),
             name_localizations: Some(
                 locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
@@ -243,7 +243,7 @@ impl CreateCommandOption {
     ///
     /// [`Channel`]: crate::model::application::CommandOptionType::Channel
     pub fn channel_types(mut self, channel_types: Vec<ChannelType>) -> Self {
-        self.0.channel_types = channel_types;
+        self.0.channel_types = channel_types.into();
         self
     }
 
@@ -302,7 +302,7 @@ impl CreateCommandOption {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateCommand {
-    name: String,
+    name: FixedString,
     name_localizations: HashMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
@@ -324,7 +324,7 @@ impl CreateCommand {
         Self {
             kind: None,
 
-            name: name.into(),
+            name: name.into().into(),
             name_localizations: HashMap::new(),
             description: None,
             description_localizations: HashMap::new(),
@@ -343,7 +343,7 @@ impl CreateCommand {
     /// global commands of the same app cannot have the same name. Two guild-specific commands of
     /// the same app cannot have the same name.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = name.into();
+        self.name = name.into().into();
         self
     }
 

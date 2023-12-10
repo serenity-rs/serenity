@@ -21,6 +21,7 @@ use crate::constants;
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::internal::prelude::*;
 use crate::model::application::{ActionRow, MessageInteraction};
 use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "cache"))]
@@ -41,7 +42,7 @@ pub struct Message {
     /// The user that sent the message.
     pub author: User,
     /// The content of the message.
-    pub content: String,
+    pub content: FixedString<u16>,
     /// Initial message creation timestamp, calculated from its Id.
     pub timestamp: Timestamp,
     /// The timestamp of the last time the message was updated, if it was.
@@ -53,9 +54,9 @@ pub struct Message {
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of users mentioned in the message.
-    pub mentions: Vec<User>,
+    pub mentions: FixedArray<User>,
     /// Array of [`Role`]s' Ids mentioned in the message.
-    pub mention_roles: Vec<RoleId>,
+    pub mention_roles: FixedArray<RoleId>,
     /// Channels specifically mentioned in this message.
     ///
     /// **Note**: Not all channel mentions in a message will appear in [`Self::mention_channels`].
@@ -73,15 +74,15 @@ pub struct Message {
     /// [Refer to Discord's documentation for more information][discord-docs].
     ///
     /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
-    #[serde(default = "Vec::new")]
-    pub mention_channels: Vec<ChannelMention>,
+    #[serde(default)]
+    pub mention_channels: FixedArray<ChannelMention>,
     /// An vector of the files attached to a message.
-    pub attachments: Vec<Attachment>,
+    pub attachments: FixedArray<Attachment>,
     /// Array of embeds sent with the message.
-    pub embeds: Vec<Embed>,
+    pub embeds: FixedArray<Embed>,
     /// Array of reactions performed on the message.
     #[serde(default)]
-    pub reactions: Vec<MessageReaction>,
+    pub reactions: FixedArray<MessageReaction>,
     /// Non-repeating number used for ensuring message order.
     #[serde(default)]
     pub nonce: Option<Nonce>,
@@ -114,10 +115,10 @@ pub struct Message {
     pub thread: Option<Box<GuildChannel>>,
     /// The components of this message
     #[serde(default)]
-    pub components: Vec<ActionRow>,
+    pub components: FixedArray<ActionRow>,
     /// Array of message sticker item objects.
     #[serde(default)]
-    pub sticker_items: Vec<StickerItem>,
+    pub sticker_items: FixedArray<StickerItem>,
     /// A generally increasing integer (there may be gaps or duplicates) that represents the
     /// approximate position of the message in a thread, it can be used to estimate the relative
     /// position of the message in a thread in company with total_message_sent on parent thread.
@@ -368,7 +369,7 @@ impl Message {
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
     pub fn content_safe(&self, cache: impl AsRef<Cache>) -> String {
-        let mut result = self.content.clone();
+        let mut result = self.content.to_string();
 
         // First replace all user mentions.
         for u in &self.mentions {
@@ -962,11 +963,11 @@ pub struct MessageApplication {
     /// ID of the embed's image asset.
     pub cover_image: Option<ImageHash>,
     /// Application's description.
-    pub description: String,
+    pub description: FixedString,
     /// ID of the application's icon.
     pub icon: Option<ImageHash>,
     /// Name of the application.
-    pub name: String,
+    pub name: FixedString,
 }
 
 /// Rich Presence activity information.
@@ -980,7 +981,7 @@ pub struct MessageActivity {
     #[serde(rename = "type")]
     pub kind: MessageActivityKind,
     /// `party_id` from a Rich Presence event.
-    pub party_id: Option<String>,
+    pub party_id: Option<FixedString>,
 }
 
 /// Reference data sent with crossposted messages.
@@ -1036,7 +1037,7 @@ pub struct ChannelMention {
     #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The name of the channel
-    pub name: String,
+    pub name: FixedString,
 }
 
 bitflags! {
@@ -1131,7 +1132,7 @@ pub struct RoleSubscriptionData {
     /// The id of the sku and listing that the user is subscribed to.
     pub role_subscription_listing_id: SkuId,
     /// The name of the tier that the user is subscribed to.
-    pub tier_name: String,
+    pub tier_name: FixedString,
     /// The cumulative number of months that the user has been subscribed for.
     pub total_months_subscribed: u16,
     /// Whether this notification is for a renewal rather than a new purchase.
