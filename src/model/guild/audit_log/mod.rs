@@ -10,6 +10,7 @@ mod utils;
 pub use change::{AffectedRole, Change, EntityType};
 use utils::{optional_string, users, webhooks};
 
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.
@@ -295,20 +296,20 @@ pub enum VoiceChannelStatusAction {
 pub struct AuditLogs {
     /// List of audit log entries, sorted from most to least recent.
     #[serde(rename = "audit_log_entries")]
-    pub entries: Vec<AuditLogEntry>,
+    pub entries: FixedArray<AuditLogEntry>,
     /// List of auto moderation rules referenced in the audit log.
-    pub auto_moderation_rules: Vec<Rule>,
+    pub auto_moderation_rules: FixedArray<Rule>,
     /// List of application commands referenced in the audit log.
-    pub application_commands: Vec<Command>,
+    pub application_commands: FixedArray<Command>,
     /// List of guild scheduled events referenced in the audit log.
-    pub guild_scheduled_events: Vec<ScheduledEvent>,
+    pub guild_scheduled_events: FixedArray<ScheduledEvent>,
     /// List of partial integration objects.
-    pub integrations: Vec<PartialIntegration>,
+    pub integrations: FixedArray<PartialIntegration>,
     /// List of threads referenced in the audit log.
     ///
     /// Threads referenced in THREAD_CREATE and THREAD_UPDATE events are included in the threads
     /// map since archived threads might not be kept in memory by clients.
-    pub threads: Vec<GuildChannel>,
+    pub threads: FixedArray<GuildChannel>,
     /// List of users referenced in the audit log.
     #[serde(with = "users")]
     pub users: HashMap<UserId, User>,
@@ -325,9 +326,9 @@ pub struct AuditLogs {
 #[non_exhaustive]
 pub struct PartialIntegration {
     pub id: IntegrationId,
-    pub name: String,
+    pub name: FixedString,
     #[serde(rename = "type")]
-    pub kind: String,
+    pub kind: FixedString,
     pub account: IntegrationAccount,
     pub application: Option<IntegrationApplication>,
 }
@@ -343,7 +344,7 @@ pub struct AuditLogEntry {
     #[serde(rename = "action_type")]
     pub action: Action,
     /// What was the reasoning by doing an action on a target? If there was one.
-    pub reason: Option<String>,
+    pub reason: Option<FixedString>,
     /// The user that did this action on a target.
     pub user_id: UserId,
     /// What changes were made.
@@ -361,9 +362,9 @@ pub struct AuditLogEntry {
 #[non_exhaustive]
 pub struct Options {
     /// Name of the Auto Moderation rule that was triggered.
-    pub auto_moderation_rule_name: Option<String>,
+    pub auto_moderation_rule_name: Option<FixedString>,
     /// Trigger type of the Auto Moderation rule that was triggered.
-    pub auto_moderation_rule_trigger_type: Option<String>,
+    pub auto_moderation_rule_trigger_type: Option<FixedString>,
     /// ID of the app whose permissions were targeted.
     pub application_id: Option<ApplicationId>,
     /// Number of days after which inactive members were kicked.
@@ -383,16 +384,16 @@ pub struct Options {
     pub id: Option<GenericId>,
     /// Type of overwritten entity ("member" or "role").
     #[serde(default, rename = "type")]
-    pub kind: Option<String>,
+    pub kind: Option<FixedString>,
     /// Message that was pinned or unpinned.
     #[serde(default)]
     pub message_id: Option<MessageId>,
     /// Name of the role if type is "role"
     #[serde(default)]
-    pub role_name: Option<String>,
+    pub role_name: Option<FixedString>,
     /// The status of a voice channel when set.
     #[serde(default)]
-    pub status: Option<String>,
+    pub status: Option<FixedString>,
 }
 
 #[cfg(test)]
