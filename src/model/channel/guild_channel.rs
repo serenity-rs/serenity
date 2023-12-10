@@ -27,7 +27,6 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -74,11 +73,11 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for text channels.
     pub last_pin_timestamp: Option<Timestamp>,
-    /// The name of the channel.
-    pub name: String,
+    /// The name of the channel. (1-100 characters)
+    pub name: FixedString<u8>,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.
     #[serde(default)]
-    pub permission_overwrites: Vec<PermissionOverwrite>,
+    pub permission_overwrites: FixedArray<PermissionOverwrite>,
     /// The position of the channel.
     ///
     /// The default text channel will _almost always_ have a position of `0`.
@@ -87,7 +86,7 @@ pub struct GuildChannel {
     /// The topic of the channel.
     ///
     /// **Note**: This is only available for text, forum and stage channels.
-    pub topic: Option<String>,
+    pub topic: Option<FixedString<u16>>,
     /// The maximum number of members allowed in the channel.
     ///
     /// **Note**: This is only available for voice channels.
@@ -106,7 +105,7 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
     /// channels means automatic region selection.
-    pub rtc_region: Option<String>,
+    pub rtc_region: Option<FixedString<u8>>,
     /// The video quality mode for a voice channel.
     pub video_quality_mode: Option<VideoQualityMode>,
     /// An approximate count of messages in the thread.
@@ -145,12 +144,12 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available in forum channels.
     #[serde(default)]
-    pub available_tags: Vec<ForumTag>,
+    pub available_tags: FixedArray<ForumTag>,
     /// The set of applied tags.
     ///
     /// **Note**: This is only available in a thread in a forum.
     #[serde(default)]
-    pub applied_tags: Vec<ForumTagId>,
+    pub applied_tags: FixedArray<ForumTagId>,
     /// The emoji to show in the add reaction button
     ///
     /// **Note**: This is only available in a forum.
@@ -163,7 +162,7 @@ pub struct GuildChannel {
     /// The status of a voice channel.
     ///
     /// **Note**: This is only available in voice channels.
-    pub status: Option<String>,
+    pub status: Option<FixedString<u16>>,
     /// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.

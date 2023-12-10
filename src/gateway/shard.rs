@@ -65,7 +65,7 @@ pub struct Shard {
     // This must be set to `true` in `Shard::handle_event`'s `Ok(GatewayEvent::HeartbeatAck)` arm.
     last_heartbeat_acknowledged: bool,
     seq: u64,
-    session_id: Option<String>,
+    session_id: Option<FixedString>,
     shard_info: ShardInfo,
     stage: ConnectionStage,
     /// Instant of when the shard was started.
@@ -235,8 +235,8 @@ impl Shard {
     }
 
     #[inline]
-    pub fn session_id(&self) -> Option<&String> {
-        self.session_id.as_ref()
+    pub fn session_id(&self) -> Option<&str> {
+        self.session_id.as_deref()
     }
 
     #[inline]

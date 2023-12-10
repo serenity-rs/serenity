@@ -2,7 +2,6 @@
 use crate::builder::EditSticker;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::comma_separated_string;
@@ -43,7 +42,7 @@ pub struct StickerItem {
     /// The unique ID given to this sticker.
     pub id: StickerId,
     /// The name of the sticker.
-    pub name: String,
+    pub name: FixedString,
     /// The type of sticker format.
     pub format_type: StickerFormatType,
 }
@@ -82,15 +81,15 @@ pub struct StickerPack {
     /// The unique ID given to this sticker sticker pack.
     pub id: StickerPackId,
     /// The stickers in the pack
-    pub stickers: Vec<Sticker>,
+    pub stickers: FixedArray<Sticker>,
     /// The name of the sticker pack
-    pub name: String,
+    pub name: FixedString,
     /// The unique ID given to the pack's SKU.
     pub sku_id: SkuId,
     /// ID of a sticker in the pack which is shown as the pack's icon.
     pub cover_sticker_id: Option<StickerId>,
     /// Description of the sticker pack.
-    pub description: String,
+    pub description: FixedString,
     /// The unique ID given to the sticker pack's banner image.
     pub banner_asset_id: StickerPackBannerId,
 }
@@ -126,13 +125,13 @@ pub struct Sticker {
     /// The unique ID of the pack the sticker is from.
     pub pack_id: Option<StickerPackId>,
     /// The name of the sticker.
-    pub name: String,
+    pub name: FixedString,
     /// Description of the sticker
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     /// For guild stickers, the Discord name of a unicode emoji representing the sticker's
     /// expression. For standard stickers, a list of related expressions.
     #[serde(with = "comma_separated_string")]
-    pub tags: Vec<String>,
+    pub tags: FixedArray<FixedString>,
     /// The type of sticker.
     #[serde(rename = "type")]
     pub kind: StickerType,

@@ -45,7 +45,7 @@ impl CreateButton {
         Self(Button {
             kind: ComponentType::Button,
             data: ButtonKind::Link {
-                url: url.into(),
+                url: url.into().into(),
             },
             label: None,
             emoji: None,
@@ -75,7 +75,7 @@ impl CreateButton {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
                 style: ButtonStyle::Primary,
-                custom_id: custom_id.into(),
+                custom_id: custom_id.into().into(),
             },
             label: None,
             emoji: None,
@@ -92,7 +92,7 @@ impl CreateButton {
             custom_id, ..
         } = &mut self.0.data
         {
-            *custom_id = id.into();
+            *custom_id = id.into().into();
         }
         self
     }
@@ -112,7 +112,7 @@ impl CreateButton {
 
     /// Sets label of the button.
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.0.label = Some(label.into());
+        self.0.label = Some(label.into().into());
         self
     }
 
@@ -366,8 +366,8 @@ impl CreateInputText {
     ) -> Self {
         Self(InputText {
             style: Some(style),
-            label: Some(label.into()),
-            custom_id: custom_id.into(),
+            label: Some(label.into().into()),
+            custom_id: custom_id.into().into(),
 
             placeholder: None,
             min_length: None,
@@ -387,20 +387,20 @@ impl CreateInputText {
 
     /// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.0.label = Some(label.into());
+        self.0.label = Some(label.into().into());
         self
     }
 
     /// Sets the custom id of the input text, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.0.custom_id = id.into();
+        self.0.custom_id = id.into().into();
         self
     }
 
     /// Sets the placeholder of this input text.
     pub fn placeholder(mut self, label: impl Into<String>) -> Self {
-        self.0.placeholder = Some(label.into());
+        self.0.placeholder = Some(label.into().into());
         self
     }
 
@@ -418,7 +418,7 @@ impl CreateInputText {
 
     /// Sets the value of this input text.
     pub fn value(mut self, value: impl Into<String>) -> Self {
-        self.0.value = Some(value.into());
+        self.0.value = Some(value.into().into());
         self
     }
 

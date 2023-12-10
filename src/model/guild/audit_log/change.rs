@@ -1,3 +1,4 @@
+use crate::internal::prelude::*;
 use crate::json::Value;
 use crate::model::channel::PermissionOverwrite;
 use crate::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
@@ -20,7 +21,7 @@ use crate::model::{Permissions, Timestamp};
 #[non_exhaustive]
 pub struct AffectedRole {
     pub id: RoleId,
-    pub name: String,
+    pub name: FixedString,
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -89,7 +90,7 @@ macro_rules! generate_change {
 
             /// Unknown key was changed.
             Other {
-                name: String,
+                name: FixedString,
                 #[serde(skip_serializing_if = "Option::is_none")]
                 #[serde(rename = "old_value")]
                 old_value: Option<Value>,
