@@ -10,9 +10,9 @@ use crate::model::prelude::*;
 #[non_exhaustive]
 pub struct Integration {
     pub id: IntegrationId,
-    pub name: String,
+    pub name: FixedString,
     #[serde(rename = "type")]
-    pub kind: String,
+    pub kind: FixedString,
     pub enabled: bool,
     pub syncing: Option<bool>,
     pub role_id: Option<RoleId>,
@@ -60,8 +60,8 @@ impl From<Integration> for IntegrationId {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct IntegrationAccount {
-    pub id: String,
-    pub name: String,
+    pub id: FixedString,
+    pub name: FixedString,
 }
 
 /// Integration application object.
@@ -72,8 +72,8 @@ pub struct IntegrationAccount {
 #[non_exhaustive]
 pub struct IntegrationApplication {
     pub id: ApplicationId,
-    pub name: String,
+    pub name: FixedString,
     pub icon: Option<ImageHash>,
-    pub description: String,
+    pub description: FixedString,
     pub bot: Option<User>,
 }
