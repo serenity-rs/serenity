@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command.rs`."><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (f967532a4 2023-12-08)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command.rs`."><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (06e02d5b2 2023-12-09)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -419,7 +419,6 @@
 <a href="#419" id="419">419</a>
 <a href="#420" id="420">420</a>
 <a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -428,8 +427,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, CreateCommand};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::Value;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::ChannelType;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{
@@ -462,13 +460,13 @@
     /// **Note**: It may only be present if it is received through the gateway.
     </span><span class="kw">pub </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     <span class="doccomment">/// The command name.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString&lt;u8&gt;,
     <span class="doccomment">/// The localized command name of the selected locale.
     ///
     /// If the name is localized, either this field or [`Self::name_localizations`] is set,
     /// depending on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
-    </span><span class="kw">pub </span>name_localized: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>name_localized: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
     <span class="doccomment">/// All localized command names.
     ///
     /// If the name is localized, either this field or [`Self::name_localized`] is set, depending
@@ -476,13 +474,13 @@
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
     </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The command description.
-    </span><span class="kw">pub </span>description: String,
+    </span><span class="kw">pub </span>description: FixedString&lt;u8&gt;,
     <span class="doccomment">/// The localized command description of the selected locale.
     ///
     /// If the description is localized, either this field or [`Self::description_localizations`]
     /// is set, depending on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
-    </span><span class="kw">pub </span>description_localized: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>description_localized: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
     <span class="doccomment">/// All localized command descriptions.
     ///
     /// If the description is localized, either this field or [`Self::description_localized`] is
@@ -491,7 +489,7 @@
     </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The parameters for the command.
     </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>options: Vec&lt;CommandOption&gt;,
+    </span><span class="kw">pub </span>options: FixedArray&lt;CommandOption&gt;,
     <span class="doccomment">/// The default permissions required to execute the command.
     </span><span class="kw">pub </span>default_member_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
     <span class="doccomment">/// Indicates whether the command is available in DMs with the app, only for globally-scoped
@@ -667,12 +665,12 @@
     </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: CommandOptionType,
     <span class="doccomment">/// The option name.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// Localizations of the option name with locale as the key
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The option description.
-    </span><span class="kw">pub </span>description: String,
+    </span><span class="kw">pub </span>description: FixedString,
     <span class="doccomment">/// Localizations of the option description with locale as the key
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
@@ -699,7 +697,7 @@
     ///
     /// [`Channel`]: CommandOptionType::Channel
     </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>channel_types: Vec&lt;ChannelType&gt;,
+    </span><span class="kw">pub </span>channel_types: FixedArray&lt;ChannelType&gt;,
     <span class="doccomment">/// Minimum permitted value for Integer or Number options
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>min_value: <span class="prelude-ty">Option</span>&lt;serde_json::Number&gt;,
@@ -748,7 +746,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandOptionChoice {
     <span class="doccomment">/// The choice name.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// Localizations of the choice name, with locale as key
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
@@ -770,7 +768,7 @@
     <span class="doccomment">/// The id of the guild.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// The permissions for the command in the guild.
-    </span><span class="kw">pub </span>permissions: Vec&lt;CommandPermission&gt;,
+    </span><span class="kw">pub </span>permissions: FixedArray&lt;CommandPermission&gt;,
 }
 
 <span class="doccomment">/// The [`CommandPermission`] data.

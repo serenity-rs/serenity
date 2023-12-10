@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/automod.rs`."><title>automod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (f967532a4 2023-12-08)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/automod.rs`."><title>automod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (06e02d5b2 2023-12-09)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -592,6 +592,7 @@
 <a href="#592" id="592">592</a>
 <a href="#593" id="593">593</a>
 <a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Auto moderation types
 //!
 //! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
@@ -602,6 +603,7 @@
 <span class="kw">use </span>serde::ser::Serializer;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Configured auto moderation rule.
@@ -617,7 +619,7 @@
     <span class="doccomment">/// ID of the guild this rule belongs to.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// Name of the rule.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// ID of the user which created the rule.
     </span><span class="kw">pub </span>creator_id: UserId,
     <span class="doccomment">/// Event context in which the rule should be checked.
@@ -626,17 +628,17 @@
     </span><span class="attr">#[serde(flatten)]
     </span><span class="kw">pub </span>trigger: Trigger,
     <span class="doccomment">/// Actions which will execute when the rule is triggered.
-    </span><span class="kw">pub </span>actions: Vec&lt;Action&gt;,
+    </span><span class="kw">pub </span>actions: FixedArray&lt;Action&gt;,
     <span class="doccomment">/// Whether the rule is enabled.
     </span><span class="kw">pub </span>enabled: bool,
     <span class="doccomment">/// Roles that should not be affected by the rule.
     ///
     /// Maximum of 20.
-    </span><span class="kw">pub </span>exempt_roles: Vec&lt;RoleId&gt;,
+    </span><span class="kw">pub </span>exempt_roles: FixedArray&lt;RoleId, u8&gt;,
     <span class="doccomment">/// Channels that should not be affected by the rule.
     ///
     /// Maximum of 50.
-    </span><span class="kw">pub </span>exempt_channels: Vec&lt;ChannelId&gt;,
+    </span><span class="kw">pub </span>exempt_channels: FixedArray&lt;ChannelId, u8&gt;,
 }
 
 <span class="doccomment">/// Indicates in what event context a rule should be checked.
@@ -924,7 +926,7 @@
         <span class="doccomment">/// Additional explanation that will be shown to members whenever their message is blocked
         ///
         /// Maximum of 150 characters
-        </span>custom_message: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        </span>custom_message: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
     },
     <span class="doccomment">/// Logs user content to a specified channel.
     </span>Alert(ChannelId),
@@ -975,15 +977,15 @@
     /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
     ///
     /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
-    </span><span class="kw">pub </span>content: String,
+    </span><span class="kw">pub </span>content: FixedString,
     <span class="doccomment">/// Word or phrase configured in the rule that triggered the rule.
-    </span><span class="kw">pub </span>matched_keyword: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>matched_keyword: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// Substring in content that triggered the rule.
     ///
     /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
     ///
     /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
-    </span><span class="kw">pub </span>matched_content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>matched_content: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
 }
 
 <span class="doccomment">/// Helper struct for the (de)serialization of `Action`.
@@ -994,7 +996,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>duration_seconds: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>custom_message: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>custom_message: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
 }
 
 <span class="doccomment">/// Helper struct for the (de)serialization of `Action`.

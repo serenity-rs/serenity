@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (f967532a4 2023-12-08)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (06e02d5b2 2023-12-09)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2729,6 +2729,7 @@
 <a href="#2729" id="2729">2729</a>
 <a href="#2730" id="2730">2730</a>
 <a href="#2731" id="2731">2731</a>
+<a href="#2732" id="2732">2732</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2789,6 +2790,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, UserPagination};
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -2806,7 +2808,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Ban {
     <span class="doccomment">/// The reason given for this ban.
-    </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The user that was banned.
     </span><span class="kw">pub </span>user: User,
 }
@@ -2834,7 +2836,7 @@
     /// This is equivalent to the Id of the default role (`@everyone`).
     </span><span class="kw">pub </span>id: GuildId,
     <span class="doccomment">/// The name of the guild.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
@@ -2906,7 +2908,7 @@
     ///
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
-    </span><span class="kw">pub </span>features: Vec&lt;String&gt;,
+    </span><span class="kw">pub </span>features: FixedArray&lt;FixedString&gt;,
     <span class="doccomment">/// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
     </span><span class="kw">pub </span>mfa_level: MfaLevel,
@@ -2927,18 +2929,18 @@
     <span class="doccomment">/// The maximum number of members for the guild.
     </span><span class="kw">pub </span>max_members: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The vanity url code for the guild, if it has one.
-    </span><span class="kw">pub </span>vanity_url_code: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>vanity_url_code: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The server's description, if it has one.
-    </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The guild's banner, if it has one.
-    </span><span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The server's premium boosting level.
     </span><span class="kw">pub </span>premium_tier: PremiumTier,
     <span class="doccomment">/// The total number of users currently boosting this server.
     </span><span class="kw">pub </span>premium_subscription_count: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="doccomment">/// The preferred locale of this guild only set if guild has the "DISCOVERABLE" feature,
     /// defaults to en-US.
-    </span><span class="kw">pub </span>preferred_locale: String,
+    </span><span class="kw">pub </span>preferred_locale: FixedString,
     <span class="doccomment">/// The id of the channel where admins and moderators of Community guilds receive notices from
     /// Discord.
     ///
@@ -2997,17 +2999,17 @@
     #[serde(deserialize_with = <span class="string">"deserialize_guild_channels"</span>)]
     </span><span class="kw">pub </span>channels: HashMap&lt;ChannelId, GuildChannel&gt;,
     <span class="doccomment">/// All active threads in this guild that current user has permission to view.
-    </span><span class="kw">pub </span>threads: Vec&lt;GuildChannel&gt;,
+    </span><span class="kw">pub </span>threads: FixedArray&lt;GuildChannel&gt;,
     <span class="doccomment">/// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// **Note**: This will be empty unless the "guild presences" privileged intent is enabled.
     </span><span class="attr">#[serde(with = <span class="string">"presences"</span>)]
     </span><span class="kw">pub </span>presences: HashMap&lt;UserId, Presence&gt;,
     <span class="doccomment">/// The stage instances in this guild.
-    </span><span class="kw">pub </span>stage_instances: Vec&lt;StageInstance&gt;,
+    </span><span class="kw">pub </span>stage_instances: FixedArray&lt;StageInstance&gt;,
     <span class="doccomment">/// The stage instances in this guild.
     </span><span class="attr">#[serde(rename = <span class="string">"guild_scheduled_events"</span>)]
-    </span><span class="kw">pub </span>scheduled_events: Vec&lt;ScheduledEvent&gt;,
+    </span><span class="kw">pub </span>scheduled_events: FixedArray&lt;ScheduledEvent&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -3173,7 +3175,7 @@
         <span class="kw">let </span>guild_channels = cache.as_ref().guild_channels(<span class="self">self</span>.id)<span class="question-mark">?</span>;
 
         <span class="kw">for </span>(id, channel) <span class="kw">in </span>guild_channels.iter() {
-            <span class="kw">if </span>channel.name == name {
+            <span class="kw">if </span><span class="kw-2">&amp;*</span>channel.name == name {
                 <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw-2">*</span>id);
             }
         }
@@ -4376,14 +4378,14 @@
         };
 
         <span class="kw">for </span>member <span class="kw">in </span><span class="self">self</span>.members.values() {
-            <span class="kw">if </span>member.user.name == username
+            <span class="kw">if </span><span class="kw-2">&amp;*</span>member.user.name == username
                 &amp;&amp; discrim.map_or(<span class="bool-val">true</span>, |d| member.user.discriminator == d)
             {
                 <span class="kw">return </span><span class="prelude-val">Some</span>(member);
             }
         }
 
-        <span class="self">self</span>.members.values().find(|member| member.nick.as_ref().is_some_and(|nick| nick == name))
+        <span class="self">self</span>.members.values().find(|member| member.nick.as_deref().is_some_and(|nick| nick == name))
     }
 
     <span class="doccomment">/// Retrieves all [`Member`] that start with a given [`String`].
@@ -4410,7 +4412,7 @@
         prefix: <span class="kw-2">&amp;</span>str,
         case_sensitive: bool,
         sorted: bool,
-    ) -&gt; Vec&lt;(<span class="kw-2">&amp;</span>Member, String)&gt; {
+    ) -&gt; Vec&lt;(<span class="kw-2">&amp;</span>Member, <span class="kw-2">&amp;</span>str)&gt; {
         <span class="kw">fn </span>starts_with(name: <span class="kw-2">&amp;</span>str, prefix: <span class="kw-2">&amp;</span>str, case_sensitive: bool) -&gt; bool {
             <span class="kw">if </span>case_sensitive {
                 name.starts_with(prefix)
@@ -4426,19 +4428,19 @@
                 <span class="kw">let </span>username = <span class="kw-2">&amp;</span>member.user.name;
 
                 <span class="kw">if </span>starts_with(username, prefix, case_sensitive) {
-                    <span class="prelude-val">Some</span>((member, username.clone()))
+                    <span class="prelude-val">Some</span>((member, username.as_str()))
                 } <span class="kw">else </span>{
                     <span class="kw">match </span><span class="kw-2">&amp;</span>member.nick {
                         <span class="prelude-val">Some</span>(nick) =&gt; starts_with(nick, prefix, case_sensitive)
-                            .then(|| (member, nick.clone())),
+                            .then(|| (member, nick.as_str())),
                         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
                     }
                 }
             })
-            .collect::&lt;Vec&lt;(<span class="kw-2">&amp;</span>Member, String)&gt;&gt;();
+            .collect::&lt;Vec&lt;(<span class="kw-2">&amp;</span>Member, <span class="kw-2">&amp;</span>str)&gt;&gt;();
 
         <span class="kw">if </span>sorted {
-            members.sort_by(|a, b| closest_to_origin(prefix, <span class="kw-2">&amp;</span>a.<span class="number">1</span>[..], <span class="kw-2">&amp;</span>b.<span class="number">1</span>[..]));
+            members.sort_by(|a, b| closest_to_origin(prefix, a.<span class="number">1</span>, b.<span class="number">1</span>));
         }
 
         members
@@ -4487,11 +4489,11 @@
                 <span class="kw">let </span>username = <span class="kw-2">&amp;</span>member.user.name;
 
                 <span class="kw">if </span>contains(username, substring, case_sensitive) {
-                    <span class="prelude-val">Some</span>((member, username.clone()))
+                    <span class="prelude-val">Some</span>((member, username.clone().into()))
                 } <span class="kw">else </span>{
                     <span class="kw">match </span><span class="kw-2">&amp;</span>member.nick {
                         <span class="prelude-val">Some</span>(nick) =&gt; contains(nick, substring, case_sensitive)
-                            .then(|| (member, nick.clone())),
+                            .then(|| (member, nick.clone().into())),
                         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
                     }
                 }
@@ -4541,7 +4543,7 @@
             .values()
             .filter_map(|member| {
                 <span class="kw">let </span>name = <span class="kw-2">&amp;</span>member.user.name;
-                contains(name, substring, case_sensitive).then(|| (member, name.clone()))
+                contains(name, substring, case_sensitive).then(|| (member, name.clone().into()))
             })
             .collect::&lt;Vec&lt;(<span class="kw-2">&amp;</span>Member, String)&gt;&gt;();
 
@@ -4590,7 +4592,7 @@
             .values()
             .filter_map(|member| {
                 <span class="kw">let </span>nick = member.nick.as_ref().unwrap_or(<span class="kw-2">&amp;</span>member.user.name);
-                contains(nick, substring, case_sensitive).then(|| (member, nick.clone()))
+                contains(nick, substring, case_sensitive).then(|| (member, nick.clone().into()))
             })
             .collect::&lt;Vec&lt;(<span class="kw-2">&amp;</span>Member, String)&gt;&gt;();
 
@@ -5051,7 +5053,7 @@
     /// ```
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>role_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, role_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
-        <span class="self">self</span>.roles.values().find(|role| role_name == role.name)
+        <span class="self">self</span>.roles.values().find(|role| role_name == <span class="kw-2">&amp;*</span>role.name)
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this
@@ -5245,7 +5247,7 @@
     /// Can be used to calculate creation date.
     </span><span class="kw">pub </span>id: GuildId,
     <span class="doccomment">/// The name of the guild.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// The hash of the icon of the guild.
     ///
     /// This can be used to generate a URL to the guild's icon image.
@@ -5255,7 +5257,7 @@
     <span class="doccomment">/// The permissions that the current user has.
     </span><span class="kw">pub </span>permissions: Permissions,
     <span class="doccomment">/// See [`Guild::features`].
-    </span><span class="kw">pub </span>features: Vec&lt;String&gt;,
+    </span><span class="kw">pub </span>features: FixedArray&lt;String&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -5424,9 +5426,9 @@
 
         <span class="kw">fn </span>gen_member() -&gt; Member {
             Member {
-                nick: <span class="prelude-val">Some</span>(<span class="string">"aaaa"</span>.to_string()),
+                nick: <span class="prelude-val">Some</span>(<span class="string">"aaaa"</span>.to_string().into()),
                 user: User {
-                    name: <span class="string">"test"</span>.into(),
+                    name: <span class="string">"test"</span>.to_string().into(),
                     discriminator: NonZeroU16::new(<span class="number">1432</span>),
                     ..User::default()
                 },

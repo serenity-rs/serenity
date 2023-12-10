@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (f967532a4 2023-12-08)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/gateway.rs`."><title>gateway.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (06e02d5b2 2023-12-09)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -757,6 +757,7 @@
 <a href="#757" id="757">757</a>
 <a href="#758" id="758">758</a>
 <a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -766,6 +767,7 @@
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">super</span>::utils::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -779,7 +781,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>BotGateway {
     <span class="doccomment">/// The gateway to connect to.
-    </span><span class="kw">pub </span>url: String,
+    </span><span class="kw">pub </span>url: FixedString,
     <span class="doccomment">/// The number of shards that is recommended to be used by the current bot user.
     </span><span class="kw">pub </span>shards: NonZeroU16,
     <span class="doccomment">/// Information describing how many gateway sessions you can initiate within a ratelimit
@@ -799,7 +801,7 @@
     <span class="doccomment">/// Images for the presence and their texts.
     </span><span class="kw">pub </span>assets: <span class="prelude-ty">Option</span>&lt;ActivityAssets&gt;,
     <span class="doccomment">/// What the user is doing.
-    </span><span class="kw">pub </span>details: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>details: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// Activity flags describing what the payload includes.
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;ActivityFlags&gt;,
     <span class="doccomment">/// Whether or not the activity is an instanced game session.
@@ -808,13 +810,13 @@
     </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: ActivityType,
     <span class="doccomment">/// The name of the activity.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// Information about the user's current party.
     </span><span class="kw">pub </span>party: <span class="prelude-ty">Option</span>&lt;ActivityParty&gt;,
     <span class="doccomment">/// Secrets for Rich Presence joining and spectating.
     </span><span class="kw">pub </span>secrets: <span class="prelude-ty">Option</span>&lt;ActivitySecrets&gt;,
     <span class="doccomment">/// The user's current party status.
-    </span><span class="kw">pub </span>state: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>state: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// Emoji currently used in custom status
     </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ActivityEmoji&gt;,
     <span class="doccomment">/// Unix timestamps for the start and/or end times of the activity.
@@ -822,18 +824,18 @@
     <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity type which uses this
     /// parameter to store the track ID.
     </span><span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
-    </span><span class="kw">pub </span>sync_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>sync_id: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The session ID of the activity. Reserved for specific activity types, such as the Activity
     /// that is transmitted when a user is listening to Spotify.
     </span><span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
-    </span><span class="kw">pub </span>session_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>session_id: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;Url&gt;,
     <span class="doccomment">/// The buttons of this activity.
     ///
     /// **Note**: There can only be up to 2 buttons.
     </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_buttons"</span>)]
-    </span><span class="kw">pub </span>buttons: Vec&lt;ActivityButton&gt;,
+    </span><span class="kw">pub </span>buttons: FixedArray&lt;ActivityButton&gt;,
     <span class="doccomment">/// Unix timestamp (in milliseconds) of when the activity was added to the user's session
     </span><span class="kw">pub </span>created_at: u64,
 }
@@ -844,12 +846,12 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityButton {
     <span class="doccomment">/// The text shown on the button.
-    </span><span class="kw">pub </span>label: String,
+    </span><span class="kw">pub </span>label: FixedString,
     <span class="doccomment">/// The url opened when clicking the button.
     ///
     /// **Note**: Bots cannot access activity button URL.
     </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>url: String,
+    </span><span class="kw">pub </span>url: FixedString,
 }
 
 <span class="doccomment">/// The assets for an activity.
@@ -860,13 +862,13 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityAssets {
     <span class="doccomment">/// The ID for a large asset of the activity, usually a snowflake.
-    </span><span class="kw">pub </span>large_image: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>large_image: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// Text displayed when hovering over the large image of the activity.
-    </span><span class="kw">pub </span>large_text: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>large_text: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The ID for a small asset of the activity, usually a snowflake.
-    </span><span class="kw">pub </span>small_image: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>small_image: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// Text displayed when hovering over the small image of the activity.
-    </span><span class="kw">pub </span>small_text: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>small_text: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
 }
 
 <span class="macro">bitflags! </span>{
@@ -905,7 +907,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityParty {
     <span class="doccomment">/// The ID of the party.
-    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// Used to show the party's current and maximum size.
     </span><span class="kw">pub </span>size: <span class="prelude-ty">Option</span>&lt;[u32; <span class="number">2</span>]&gt;,
 }
@@ -918,12 +920,12 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivitySecrets {
     <span class="doccomment">/// The secret for joining a party.
-    </span><span class="kw">pub </span>join: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>join: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The secret for a specific instanced match.
     </span><span class="attr">#[serde(rename = <span class="string">"match"</span>)]
-    </span><span class="kw">pub </span>match_: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>match_: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The secret for spectating an activity.
-    </span><span class="kw">pub </span>spectate: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>spectate: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
 }
 
 <span class="doccomment">/// Representation of an emoji used in a custom status
@@ -934,7 +936,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ActivityEmoji {
     <span class="doccomment">/// The name of the emoji.
-    </span><span class="kw">pub </span>name: String,
+    </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// The id of the emoji.
     </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;EmojiId&gt;,
     <span class="doccomment">/// Whether this emoji is animated.
@@ -974,7 +976,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Gateway {
     <span class="doccomment">/// The gateway to connect to.
-    </span><span class="kw">pub </span>url: String,
+    </span><span class="kw">pub </span>url: FixedString,
 }
 
 <span class="doccomment">/// Information detailing the current active status of a [`User`].
@@ -1005,10 +1007,10 @@
     <span class="kw">pub </span>bot: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(default, skip_serializing_if = <span class="string">"Option::is_none"</span>, with = <span class="string">"discriminator"</span>)]
     </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;NonZeroU16&gt;,
-    <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="kw">pub </span>mfa_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(rename = <span class="string">"username"</span>)]
-    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
     <span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="kw">pub </span>public_flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
 }
@@ -1080,7 +1082,7 @@
     </span><span class="kw">pub </span>status: OnlineStatus,
     <span class="doccomment">/// [`User`]'s current activities.
     </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>activities: Vec&lt;Activity&gt;,
+    </span><span class="kw">pub </span>activities: FixedArray&lt;Activity&gt;,
     <span class="doccomment">/// The devices a user are currently active on, if available.
     </span><span class="kw">pub </span>client_status: <span class="prelude-ty">Option</span>&lt;ClientStatus&gt;,
 }
@@ -1098,11 +1100,11 @@
     <span class="doccomment">/// Information about the user including email
     </span><span class="kw">pub </span>user: CurrentUser,
     <span class="doccomment">/// Guilds the user is in
-    </span><span class="kw">pub </span>guilds: Vec&lt;UnavailableGuild&gt;,
+    </span><span class="kw">pub </span>guilds: FixedArray&lt;UnavailableGuild&gt;,
     <span class="doccomment">/// Used for resuming connections
-    </span><span class="kw">pub </span>session_id: String,
+    </span><span class="kw">pub </span>session_id: FixedString,
     <span class="doccomment">/// Gateway URL for resuming connections
-    </span><span class="kw">pub </span>resume_gateway_url: String,
+    </span><span class="kw">pub </span>resume_gateway_url: FixedString,
     <span class="doccomment">/// Shard information associated with this session, if sent when identifying
     </span><span class="kw">pub </span>shard: <span class="prelude-ty">Option</span>&lt;ShardInfo&gt;,
     <span class="doccomment">/// Contains id and flags
