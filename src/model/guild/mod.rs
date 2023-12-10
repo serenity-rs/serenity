@@ -58,6 +58,7 @@ use crate::constants::LARGE_THRESHOLD;
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::model::prelude::*;
@@ -70,7 +71,7 @@ use crate::model::utils::*;
 #[non_exhaustive]
 pub struct Ban {
     /// The reason given for this ban.
-    pub reason: Option<String>,
+    pub reason: Option<FixedString>,
     /// The user that was banned.
     pub user: User,
 }
@@ -98,7 +99,7 @@ pub struct Guild {
     /// This is equivalent to the Id of the default role (`@everyone`).
     pub id: GuildId,
     /// The name of the guild.
-    pub name: String,
+    pub name: FixedString,
     /// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
@@ -170,7 +171,7 @@ pub struct Guild {
     ///
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
-    pub features: Vec<String>,
+    pub features: FixedArray<FixedString>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
     pub mfa_level: MfaLevel,
@@ -191,18 +192,18 @@ pub struct Guild {
     /// The maximum number of members for the guild.
     pub max_members: Option<u64>,
     /// The vanity url code for the guild, if it has one.
-    pub vanity_url_code: Option<String>,
+    pub vanity_url_code: Option<FixedString>,
     /// The server's description, if it has one.
-    pub description: Option<String>,
+    pub description: Option<FixedString>,
     /// The guild's banner, if it has one.
-    pub banner: Option<String>,
+    pub banner: Option<FixedString>,
     /// The server's premium boosting level.
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server.
     pub premium_subscription_count: Option<u64>,
     /// The preferred locale of this guild only set if guild has the "DISCOVERABLE" feature,
     /// defaults to en-US.
-    pub preferred_locale: String,
+    pub preferred_locale: FixedString,
     /// The id of the channel where admins and moderators of Community guilds receive notices from
     /// Discord.
     ///
@@ -260,17 +261,17 @@ pub struct Guild {
     #[serde(deserialize_with = "deserialize_guild_channels")]
     pub channels: HashMap<ChannelId, GuildChannel>,
     /// All active threads in this guild that current user has permission to view.
-    pub threads: Vec<GuildChannel>,
+    pub threads: FixedArray<GuildChannel>,
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// **Note**: This will be empty unless the "guild presences" privileged intent is enabled.
     #[serde(with = "presences")]
     pub presences: HashMap<UserId, Presence>,
     /// The stage instances in this guild.
-    pub stage_instances: Vec<StageInstance>,
+    pub stage_instances: FixedArray<StageInstance>,
     /// The stage instances in this guild.
     #[serde(rename = "guild_scheduled_events")]
-    pub scheduled_events: Vec<ScheduledEvent>,
+    pub scheduled_events: FixedArray<ScheduledEvent>,
 }
 
 #[cfg(feature = "model")]
@@ -435,7 +436,7 @@ impl Guild {
     ) -> Option<ChannelId> {
         let name = name.as_ref();
 
-        self.channels.values().find(|c| c.name == name).map(|c| c.id)
+        self.channels.values().find(|c| &*c.name == name).map(|c| c.id)
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -1633,14 +1634,14 @@ impl Guild {
         };
 
         for member in self.members.values() {
-            if member.user.name == username
+            if &*member.user.name == username
                 && discrim.map_or(true, |d| member.user.discriminator == d)
             {
                 return Some(member);
             }
         }
 
-        self.members.values().find(|member| member.nick.as_ref().is_some_and(|nick| nick == name))
+        self.members.values().find(|member| member.nick.as_deref().is_some_and(|nick| nick == name))
     }
 
     /// Retrieves all [`Member`] that start with a given [`String`].
@@ -1667,7 +1668,7 @@ impl Guild {
         prefix: &str,
         case_sensitive: bool,
         sorted: bool,
-    ) -> Vec<(&Member, String)> {
+    ) -> Vec<(&Member, &str)> {
         fn starts_with(name: &str, prefix: &str, case_sensitive: bool) -> bool {
             if case_sensitive {
                 name.starts_with(prefix)
@@ -1683,19 +1684,19 @@ impl Guild {
                 let username = &member.user.name;
 
                 if starts_with(username, prefix, case_sensitive) {
-                    Some((member, username.clone()))
+                    Some((member, username.as_str()))
                 } else {
                     match &member.nick {
                         Some(nick) => starts_with(nick, prefix, case_sensitive)
-                            .then(|| (member, nick.clone())),
+                            .then(|| (member, nick.as_str())),
                         None => None,
                     }
                 }
             })
-            .collect::<Vec<(&Member, String)>>();
+            .collect::<Vec<(&Member, &str)>>();
 
         if sorted {
-            members.sort_by(|a, b| closest_to_origin(prefix, &a.1[..], &b.1[..]));
+            members.sort_by(|a, b| closest_to_origin(prefix, a.1, b.1));
         }
 
         members
@@ -1744,11 +1745,11 @@ impl Guild {
                 let username = &member.user.name;
 
                 if contains(username, substring, case_sensitive) {
-                    Some((member, username.clone()))
+                    Some((member, username.clone().into()))
                 } else {
                     match &member.nick {
                         Some(nick) => contains(nick, substring, case_sensitive)
-                            .then(|| (member, nick.clone())),
+                            .then(|| (member, nick.clone().into())),
                         None => None,
                     }
                 }
@@ -1798,7 +1799,7 @@ impl Guild {
             .values()
             .filter_map(|member| {
                 let name = &member.user.name;
-                contains(name, substring, case_sensitive).then(|| (member, name.clone()))
+                contains(name, substring, case_sensitive).then(|| (member, name.clone().into()))
             })
             .collect::<Vec<(&Member, String)>>();
 
@@ -1847,7 +1848,7 @@ impl Guild {
             .values()
             .filter_map(|member| {
                 let nick = member.nick.as_ref().unwrap_or(&member.user.name);
-                contains(nick, substring, case_sensitive).then(|| (member, nick.clone()))
+                contains(nick, substring, case_sensitive).then(|| (member, nick.clone().into()))
             })
             .collect::<Vec<(&Member, String)>>();
 
@@ -2308,7 +2309,7 @@ impl Guild {
     /// ```
     #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
-        self.roles.values().find(|role| role_name == role.name)
+        self.roles.values().find(|role| role_name == &*role.name)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this
@@ -2502,7 +2503,7 @@ pub struct GuildInfo {
     /// Can be used to calculate creation date.
     pub id: GuildId,
     /// The name of the guild.
-    pub name: String,
+    pub name: FixedString,
     /// The hash of the icon of the guild.
     ///
     /// This can be used to generate a URL to the guild's icon image.
@@ -2512,7 +2513,7 @@ pub struct GuildInfo {
     /// The permissions that the current user has.
     pub permissions: Permissions,
     /// See [`Guild::features`].
-    pub features: Vec<String>,
+    pub features: FixedArray<String>,
 }
 
 #[cfg(feature = "model")]
@@ -2681,9 +2682,9 @@ mod test {
 
         fn gen_member() -> Member {
             Member {
-                nick: Some("aaaa".to_string()),
+                nick: Some("aaaa".to_string().into()),
                 user: User {
-                    name: "test".into(),
+                    name: "test".to_string().into(),
                     discriminator: NonZeroU16::new(1432),
                     ..User::default()
                 },
