@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+#[cfg(feature = "cache")]
 use std::num::NonZeroU16;
 
 use async_trait::async_trait;
