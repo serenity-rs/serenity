@@ -56,7 +56,7 @@ use std::time::Duration as StdDuration;
 pub use self::event::ShardStageUpdateEvent;
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_messenger::ShardMessenger;
-pub use self::shard_queuer::ShardQueuer;
+pub use self::shard_queuer::{ShardQueue, ShardQueuer};
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::ShardRunnerMessage;
 #[cfg(feature = "voice")]
@@ -72,7 +72,7 @@ pub enum ShardQueuerMessage {
     /// Message to set the shard total.
     SetShardTotal(NonZeroU16),
     /// Message to start a shard.
-    Start(ShardId),
+    Start(ShardId, bool),
     /// Message to shutdown the shard queuer.
     Shutdown,
     /// Message to dequeue/shutdown a shard.
