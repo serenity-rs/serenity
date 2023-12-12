@@ -357,6 +357,9 @@ pub struct SessionStartLimit {
     /// The total number of session starts within the ratelimit period allowed.
     pub total: u64,
     /// The number of identify requests allowed per 5 seconds.
+    ///
+    /// This is almost always 1, but for large bots (in more than 150,000 servers) it can be
+    /// larger.
     pub max_concurrency: NonZeroU16,
 }
 

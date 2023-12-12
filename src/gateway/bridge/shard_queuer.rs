@@ -297,10 +297,6 @@ impl ShardQueuer {
 #[must_use]
 pub struct ShardQueue {
     buckets: HashMap<u16, VecDeque<ShardId>>,
-    /// The maximum amount of shards that can be started at once.
-    ///
-    /// This is almost always 1, but for large bots (in more than 150,000 servers) it can be
-    /// larger.
     max_concurrency: NonZeroU16,
 }
 
