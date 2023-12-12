@@ -254,8 +254,8 @@ impl Builder for EditMessage {
     ) -> Result<Self::Built> {
         self.check_length()?;
 
+        #[cfg(feature = "cache")]
         if let Some(user_id) = ctx.2 {
-            #[cfg(feature = "cache")]
             {
                 if let Some(cache) = cache_http.cache() {
                     let reference_builder = EditMessage::new().suppress_embeds(true);
