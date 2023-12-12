@@ -294,6 +294,7 @@ impl ShardQueuer {
 
 /// A queue of [`ShardId`]s that is split up into multiple buckets according to the value of
 /// [`max_concurrency`](crate::model::gateway::SessionStartLimit::max_concurrency).
+#[must_use]
 pub struct ShardQueue {
     buckets: HashMap<u16, VecDeque<ShardId>>,
     /// The maximum amount of shards that can be started at once.
@@ -326,15 +327,16 @@ impl ShardQueue {
     /// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
     pub fn pop_batch(&mut self) -> Vec<ShardId> {
         (0..self.max_concurrency.get())
-            .filter_map(|i| self.buckets.get_mut(&i).map(|bucket| bucket.pop_front()).flatten())
+            .filter_map(|i| self.buckets.get_mut(&i).and_then(|bucket| bucket.pop_front()))
             .collect()
     }
 
     /// Returns `true` if every bucket contains at least one `ShardId`.
+    #[must_use]
     pub fn buckets_filled(&self) -> bool {
         for i in 0..self.max_concurrency.get() {
             let Some(bucket) = self.buckets.get(&i) else { return false };
-            if bucket.len() == 0 {
+            if bucket.is_empty() {
                 return false;
             }
         }
