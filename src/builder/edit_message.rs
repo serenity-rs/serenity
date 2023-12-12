@@ -256,7 +256,6 @@ impl Builder for EditMessage {
 
         #[cfg(feature = "cache")]
         if let Some(user_id) = ctx.2 {
-            {
                 if let Some(cache) = cache_http.cache() {
                     let reference_builder = EditMessage::new().suppress_embeds(true);
 
@@ -264,7 +263,6 @@ impl Builder for EditMessage {
                         return Err(Error::Model(ModelError::InvalidUser));
                     }
                 }
-            }
         }
 
         let files = self.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
