@@ -18,7 +18,7 @@ use crate::model::id::AttachmentId;
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
 ///
 /// [`send_files`]: crate::model::id::ChannelId::send_files
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 #[non_exhaustive]
 #[must_use]
 pub struct CreateAttachment {
@@ -114,12 +114,12 @@ impl CreateAttachment {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, PartialEq)]
 struct ExistingAttachment {
     id: AttachmentId,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, PartialEq)]
 #[serde(untagged)]
 enum NewOrExisting {
     New(CreateAttachment),
@@ -181,7 +181,7 @@ enum NewOrExisting {
 ///
 /// Internally, this type is used not just for message editing endpoints, but also for message
 /// creation endpoints.
-#[derive(Default, Debug, Clone, serde::Serialize)]
+#[derive(Default, Debug, Clone, serde::Serialize, PartialEq)]
 #[serde(transparent)]
 #[must_use]
 pub struct EditAttachments {

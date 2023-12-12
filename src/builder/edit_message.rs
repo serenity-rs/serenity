@@ -35,7 +35,7 @@ use crate::model::prelude::*;
 /// ```
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, PartialEq)]
 #[must_use]
 pub struct EditMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -221,7 +221,7 @@ impl EditMessage {
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 impl Builder for EditMessage {
-    type Context<'ctx> = (ChannelId, MessageId);
+    type Context<'ctx> = (ChannelId, MessageId, Option<UserId>);
     type Built = Message;
 
     /// Edits a message in the channel.
@@ -253,6 +253,19 @@ impl Builder for EditMessage {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         self.check_length()?;
+
+        if let Some(user_id) = ctx.2 {
+            #[cfg(feature = "cache")]
+            {
+                if let Some(cache) = cache_http.cache() {
+                    let reference_builder = EditMessage::new().suppress_embeds(true);
+
+                    if user_id != cache.current_user().id && self != reference_builder {
+                        return Err(Error::Model(ModelError::InvalidUser));
+                    }
+                }
+            }
+        }
 
         let files = self.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
 

@@ -6,7 +6,7 @@ use crate::model::prelude::*;
 /// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 #[must_use]
 pub enum CreateActionRow {
     Buttons(Vec<CreateButton>),
@@ -32,7 +32,7 @@ impl serde::Serialize for CreateActionRow {
 }
 
 /// A builder for creating a button component in a message
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateButton(Button);
 
@@ -128,7 +128,7 @@ impl Serialize for CreateSelectMenuDefault {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum CreateSelectMenuKind {
     String { options: Vec<CreateSelectMenuOption> },
     User { default_users: Option<Vec<UserId>> },
@@ -198,7 +198,7 @@ impl Serialize for CreateSelectMenuKind {
 /// A builder for creating a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateSelectMenu {
     custom_id: String,
@@ -264,7 +264,7 @@ impl CreateSelectMenu {
 /// A builder for creating an option of a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateSelectMenuOption {
     label: String,
@@ -324,7 +324,7 @@ impl CreateSelectMenuOption {
 /// A builder for creating an input text component in a modal
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateInputText(InputText);
 

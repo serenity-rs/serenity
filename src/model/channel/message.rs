@@ -346,25 +346,14 @@ impl Message {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditMessage) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user().id {
-                    let reference_builder = EditMessage::new().suppress_embeds(true);
-
-                    if serde_json::to_string(&builder).unwrap() != serde_json::to_string(&reference_builder).unwrap() {
-                        return Err(Error::Model(ModelError::InvalidUser));
-                    }
-                }
-            }
-        }
         if let Some(flags) = self.flags {
             if flags.contains(MessageFlags::IS_VOICE_MESSAGE) {
                 return Err(Error::Model(ModelError::CannotEditVoiceMessage));
             }
         }
 
-        *self = builder.execute(cache_http, (self.channel_id, self.id)).await?;
+        *self =
+            builder.execute(cache_http, (self.channel_id, self.id, Some(self.author.id))).await?;
         Ok(())
     }
 

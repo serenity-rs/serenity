@@ -55,7 +55,7 @@ enum ParseValue {
 /// ```
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object).
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateAllowedMentions {
     parse: HashSet<ParseValue>,
