@@ -1,4 +1,5 @@
 use std::env::consts;
+use std::io::ErrorKind;
 #[cfg(feature = "client")]
 use std::io::Read;
 use std::time::SystemTime;
@@ -19,11 +20,16 @@ use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 #[cfg(feature = "client")]
 use tokio_tungstenite::tungstenite::Error as WsError;
 use tokio_tungstenite::tungstenite::Message;
-use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
+use tokio_tungstenite::{
+    client_async_tls_with_config,
+    connect_async_with_config,
+    MaybeTlsStream,
+    WebSocketStream,
+};
 #[cfg(feature = "client")]
 use tracing::warn;
 use tracing::{debug, trace};
-use url::Url;
+use url::{Position, Url};
 
 use super::{ActivityData, ChunkGuildFilter, PresenceData};
 use crate::constants::{self, Opcode};
@@ -100,13 +106,49 @@ const TIMEOUT: Duration = Duration::from_millis(500);
 const DECOMPRESSION_MULTIPLIER: usize = 3;
 
 impl WsClient {
-    pub(crate) async fn connect(url: Url) -> Result<Self> {
+    async fn connect_with_proxy_async(
+        target_url: &Url,
+        proxy_url: &Url,
+    ) -> std::result::Result<TcpStream, std::io::Error> {
+        let proxy_addr = &proxy_url[Position::BeforeHost..Position::AfterPort];
+        if proxy_url.scheme() != "http" && proxy_url.scheme() != "https" {
+            return Err(std::io::Error::new(ErrorKind::Unsupported, "unknown proxy scheme"));
+        }
+
+        let host = target_url
+            .host_str()
+            .ok_or_else(|| std::io::Error::new(ErrorKind::Unsupported, "unknown target host"))?;
+        let port = target_url
+            .port()
+            .or_else(|| match target_url.scheme() {
+                "wss" => Some(443),
+                "ws" => Some(80),
+                _ => None,
+            })
+            .ok_or_else(|| std::io::Error::new(ErrorKind::Unsupported, "unknown target scheme"))?;
+        let mut tcp_stream = TcpStream::connect(proxy_addr).await?;
+
+        async_http_proxy::http_connect_tokio(&mut tcp_stream, host, port)
+            .await
+            .map_err(|_| std::io::Error::new(ErrorKind::Unsupported, "unsupported proxy"))?;
+
+        Ok(tcp_stream)
+    }
+
+    pub(crate) async fn connect(url: Url, proxy: Option<&Url>) -> Result<Self> {
         let config = WebSocketConfig {
             max_message_size: None,
             max_frame_size: None,
             ..Default::default()
         };
-        let (stream, _) = connect_async_with_config(url, Some(config), false).await?;
+        let (stream, _) = match proxy {
+            None => connect_async_with_config(url, Some(config), false).await?,
+            Some(proxy) => {
+                let tls_stream = Self::connect_with_proxy_async(&url, proxy).await?;
+                tls_stream.set_nodelay(true)?;
+                client_async_tls_with_config(url, tls_stream, Some(config), None).await?
+            },
+        };
 
         Ok(Self(stream))
     }

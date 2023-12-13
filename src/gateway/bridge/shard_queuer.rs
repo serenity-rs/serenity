@@ -9,6 +9,7 @@ use futures::StreamExt;
 use tokio::sync::Mutex;
 use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, warn};
+use url::Url;
 
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
@@ -68,6 +69,7 @@ pub struct ShardQueuer {
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<str>,
+    pub ws_proxy: Option<Arc<Url>>,
     /// The total amount of shards to start.
     pub shard_total: NonZeroU16,
     #[cfg(feature = "cache")]
@@ -211,6 +213,7 @@ impl ShardQueuer {
     async fn start(&mut self, shard_id: ShardId) -> Result<()> {
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
+            self.ws_proxy.clone(),
             Arc::clone(self.http.token()),
             ShardInfo::new(shard_id, self.shard_total),
             self.intents,

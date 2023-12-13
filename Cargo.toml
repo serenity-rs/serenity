@@ -38,6 +38,7 @@ nonmax = { version = "0.5.5", features = ["serde"] }
 strum = { version = "0.26", features = ["derive"] }
 to-arraystring = "0.1.0"
 extract_map = { version = "0.1.0", features = ["serde", "iter_mut"] }
+async-http-proxy = { version = "1.2.5", features = ["runtime-tokio"] }
 # Optional dependencies
 fxhash = { version = "0.2.1", optional = true }
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"], optional = true }

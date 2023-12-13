@@ -76,6 +76,7 @@ pub struct Shard {
     token: Secret<Token>,
     ws_url: Arc<str>,
     resume_ws_url: Option<FixedString>,
+    ws_proxy: Option<Arc<Url>>,
     pub intents: GatewayIntents,
 }
 
@@ -109,7 +110,7 @@ impl Shard {
     ///
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::from(http.get_gateway().await?.url);
-    /// let shard = Shard::new(gateway, token, shard_info, GatewayIntents::all(), None).await?;
+    /// let shard = Shard::new(gateway, None, token, shard_info, GatewayIntents::all(), None).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -123,12 +124,13 @@ impl Shard {
     /// TLS error.
     pub async fn new(
         ws_url: Arc<str>,
+        ws_proxy: Option<Arc<Url>>,
         token: Arc<str>,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
     ) -> Result<Shard> {
-        let client = connect(&ws_url).await?;
+        let client = connect(&ws_url, ws_proxy.as_deref()).await?;
 
         let presence = presence.unwrap_or_default();
         let last_heartbeat_sent = None;
@@ -155,6 +157,7 @@ impl Shard {
             shard_info,
             ws_url,
             resume_ws_url: None,
+            ws_proxy,
             intents,
         })
     }
@@ -710,7 +713,8 @@ impl Shard {
         // Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
-        let client = connect(ws_url).await?;
+        let proxy = self.ws_proxy.as_deref();
+        let client = connect(ws_url, proxy).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)
@@ -769,7 +773,7 @@ impl Shard {
     }
 }
 
-async fn connect(base_url: &str) -> Result<WsClient> {
+async fn connect(base_url: &str, proxy: Option<&Url>) -> Result<WsClient> {
     let url =
         Url::parse(&format!("{base_url}?v={}", constants::GATEWAY_VERSION)).map_err(|why| {
             warn!("Error building gateway URL with base `{}`: {:?}", base_url, why);
@@ -777,5 +781,5 @@ async fn connect(base_url: &str) -> Result<WsClient> {
             Error::Gateway(GatewayError::BuildingUrl)
         })?;
 
-    WsClient::connect(url).await
+    WsClient::connect(url, proxy).await
 }

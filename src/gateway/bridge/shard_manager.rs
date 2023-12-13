@@ -10,6 +10,7 @@ use futures::{SinkExt, StreamExt};
 use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tracing::{info, warn};
+use url::Url;
 
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
@@ -76,6 +77,7 @@ use crate::model::gateway::GatewayIntents;
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
 ///     ws_url,
+///     ws_proxy: None,
 ///     shard_total,
 ///     # #[cfg(feature = "cache")]
 ///     # cache: unimplemented!(),
@@ -138,6 +140,7 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
+            ws_proxy: opt.ws_proxy,
             shard_total: opt.shard_total,
             #[cfg(feature = "cache")]
             cache: opt.cache,
@@ -362,6 +365,7 @@ pub struct ShardManagerOptions {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     pub ws_url: Arc<str>,
+    pub ws_proxy: Option<Arc<Url>>,
     pub shard_total: NonZeroU16,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
