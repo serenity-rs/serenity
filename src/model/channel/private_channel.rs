@@ -200,8 +200,8 @@ impl PrivateChannel {
 
     /// Returns "DM with $username#discriminator".
     #[must_use]
-    pub fn name(&self) -> FixedString<u8> {
-        format!("DM with {}", self.recipient.tag()).into()
+    pub fn name(&self) -> String {
+        format!("DM with {}", self.recipient.tag())
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].

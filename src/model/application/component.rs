@@ -260,7 +260,7 @@ pub struct InputText {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// Developer-defined identifier for the input; max 100 characters
-    pub custom_id: FixedString<u8>,
+    pub custom_id: FixedString<u16>,
     /// The [`InputTextStyle`]. Required when sending modal data.
     ///
     /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
@@ -289,7 +289,7 @@ pub struct InputText {
     pub value: Option<FixedString<u16>>,
     /// Custom placeholder text if the input is empty; max 100 characters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub placeholder: Option<FixedString<u8>>,
+    pub placeholder: Option<FixedString<u16>>,
 }
 
 enum_number! {
