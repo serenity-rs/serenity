@@ -102,7 +102,7 @@ pub struct WebhookGuild {
     /// The unique Id identifying the guild.
     pub id: GuildId,
     /// The name of the guild.
-    pub name: FixedString<u8>,
+    pub name: FixedString<u16>,
     /// The hash of the icon used by the guild.
     ///
     /// In the client, this appears on the guild list on the left-hand side.
@@ -164,7 +164,7 @@ pub struct WebhookChannel {
     /// The unique Id of the channel.
     pub id: ChannelId,
     /// The name of the channel.
-    pub name: FixedString<u8>,
+    pub name: FixedString<u16>,
 }
 
 #[cfg(feature = "model")]
