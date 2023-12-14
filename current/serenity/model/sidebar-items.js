@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["application","channel","colour","connection","error","event","gateway","guild","id","invite","mention","misc","permissions","prelude","sticker","timestamp","user","voice","webhook"]};
+window.SIDEBAR_ITEMS = {"mod":["application","channel","colour","connection","error","event","gateway","guild","id","invite","mention","misc","monetization","permissions","prelude","sticker","timestamp","user","voice","webhook"]};

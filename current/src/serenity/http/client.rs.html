@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (eeff92ad3 2023-12-13)" data-channel="nightly" data-search-js="search-ec029af4ec3ae4df.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4560,6 +4560,119 @@
 <a href="#4560" id="4560">4560</a>
 <a href="#4561" id="4561">4561</a>
 <a href="#4562" id="4562">4562</a>
+<a href="#4563" id="4563">4563</a>
+<a href="#4564" id="4564">4564</a>
+<a href="#4565" id="4565">4565</a>
+<a href="#4566" id="4566">4566</a>
+<a href="#4567" id="4567">4567</a>
+<a href="#4568" id="4568">4568</a>
+<a href="#4569" id="4569">4569</a>
+<a href="#4570" id="4570">4570</a>
+<a href="#4571" id="4571">4571</a>
+<a href="#4572" id="4572">4572</a>
+<a href="#4573" id="4573">4573</a>
+<a href="#4574" id="4574">4574</a>
+<a href="#4575" id="4575">4575</a>
+<a href="#4576" id="4576">4576</a>
+<a href="#4577" id="4577">4577</a>
+<a href="#4578" id="4578">4578</a>
+<a href="#4579" id="4579">4579</a>
+<a href="#4580" id="4580">4580</a>
+<a href="#4581" id="4581">4581</a>
+<a href="#4582" id="4582">4582</a>
+<a href="#4583" id="4583">4583</a>
+<a href="#4584" id="4584">4584</a>
+<a href="#4585" id="4585">4585</a>
+<a href="#4586" id="4586">4586</a>
+<a href="#4587" id="4587">4587</a>
+<a href="#4588" id="4588">4588</a>
+<a href="#4589" id="4589">4589</a>
+<a href="#4590" id="4590">4590</a>
+<a href="#4591" id="4591">4591</a>
+<a href="#4592" id="4592">4592</a>
+<a href="#4593" id="4593">4593</a>
+<a href="#4594" id="4594">4594</a>
+<a href="#4595" id="4595">4595</a>
+<a href="#4596" id="4596">4596</a>
+<a href="#4597" id="4597">4597</a>
+<a href="#4598" id="4598">4598</a>
+<a href="#4599" id="4599">4599</a>
+<a href="#4600" id="4600">4600</a>
+<a href="#4601" id="4601">4601</a>
+<a href="#4602" id="4602">4602</a>
+<a href="#4603" id="4603">4603</a>
+<a href="#4604" id="4604">4604</a>
+<a href="#4605" id="4605">4605</a>
+<a href="#4606" id="4606">4606</a>
+<a href="#4607" id="4607">4607</a>
+<a href="#4608" id="4608">4608</a>
+<a href="#4609" id="4609">4609</a>
+<a href="#4610" id="4610">4610</a>
+<a href="#4611" id="4611">4611</a>
+<a href="#4612" id="4612">4612</a>
+<a href="#4613" id="4613">4613</a>
+<a href="#4614" id="4614">4614</a>
+<a href="#4615" id="4615">4615</a>
+<a href="#4616" id="4616">4616</a>
+<a href="#4617" id="4617">4617</a>
+<a href="#4618" id="4618">4618</a>
+<a href="#4619" id="4619">4619</a>
+<a href="#4620" id="4620">4620</a>
+<a href="#4621" id="4621">4621</a>
+<a href="#4622" id="4622">4622</a>
+<a href="#4623" id="4623">4623</a>
+<a href="#4624" id="4624">4624</a>
+<a href="#4625" id="4625">4625</a>
+<a href="#4626" id="4626">4626</a>
+<a href="#4627" id="4627">4627</a>
+<a href="#4628" id="4628">4628</a>
+<a href="#4629" id="4629">4629</a>
+<a href="#4630" id="4630">4630</a>
+<a href="#4631" id="4631">4631</a>
+<a href="#4632" id="4632">4632</a>
+<a href="#4633" id="4633">4633</a>
+<a href="#4634" id="4634">4634</a>
+<a href="#4635" id="4635">4635</a>
+<a href="#4636" id="4636">4636</a>
+<a href="#4637" id="4637">4637</a>
+<a href="#4638" id="4638">4638</a>
+<a href="#4639" id="4639">4639</a>
+<a href="#4640" id="4640">4640</a>
+<a href="#4641" id="4641">4641</a>
+<a href="#4642" id="4642">4642</a>
+<a href="#4643" id="4643">4643</a>
+<a href="#4644" id="4644">4644</a>
+<a href="#4645" id="4645">4645</a>
+<a href="#4646" id="4646">4646</a>
+<a href="#4647" id="4647">4647</a>
+<a href="#4648" id="4648">4648</a>
+<a href="#4649" id="4649">4649</a>
+<a href="#4650" id="4650">4650</a>
+<a href="#4651" id="4651">4651</a>
+<a href="#4652" id="4652">4652</a>
+<a href="#4653" id="4653">4653</a>
+<a href="#4654" id="4654">4654</a>
+<a href="#4655" id="4655">4655</a>
+<a href="#4656" id="4656">4656</a>
+<a href="#4657" id="4657">4657</a>
+<a href="#4658" id="4658">4658</a>
+<a href="#4659" id="4659">4659</a>
+<a href="#4660" id="4660">4660</a>
+<a href="#4661" id="4661">4661</a>
+<a href="#4662" id="4662">4662</a>
+<a href="#4663" id="4663">4663</a>
+<a href="#4664" id="4664">4664</a>
+<a href="#4665" id="4665">4665</a>
+<a href="#4666" id="4666">4666</a>
+<a href="#4667" id="4667">4667</a>
+<a href="#4668" id="4668">4668</a>
+<a href="#4669" id="4669">4669</a>
+<a href="#4670" id="4670">4670</a>
+<a href="#4671" id="4671">4671</a>
+<a href="#4672" id="4672">4672</a>
+<a href="#4673" id="4673">4673</a>
+<a href="#4674" id="4674">4674</a>
+<a href="#4675" id="4675">4675</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -5435,6 +5548,36 @@
         .<span class="kw">await
     </span>}
 
+    <span class="doccomment">/// Creates a test entitlement to a given SKU for a given guild or user. Discord will act as
+    /// though that user/guild has entitlement in perpetuity to the SKU. As a result, the returned
+    /// entitlement will have `starts_at` and `ends_at` both be `None`.
+    </span><span class="kw">pub async fn </span>create_test_entitlement(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        sku_id: SkuId,
+        owner: EntitlementOwner,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Entitlement&gt; {
+        <span class="kw">let </span>(owner_id, owner_type) = <span class="kw">match </span>owner {
+            EntitlementOwner::Guild(id) =&gt; (id.get(), <span class="number">1</span>),
+            EntitlementOwner::User(id) =&gt; (id.get(), <span class="number">2</span>),
+        };
+        <span class="kw">let </span>map = <span class="macro">json!</span>({
+            <span class="string">"sku_id"</span>: sku_id,
+            <span class="string">"owner_id"</span>: owner_id,
+            <span class="string">"owner_type"</span>: owner_type
+        });
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">Some</span>(to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>),
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Post,
+            route: Route::Entitlements {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
     <span class="doccomment">/// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in the given data.
     ///
     /// This method requires authentication.
@@ -5905,6 +6048,23 @@
             route: Route::GuildSticker {
                 guild_id,
                 sticker_id,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Deletes a currently active test entitlement. Discord will act as though the corresponding
+    /// user/guild *no longer has* an entitlement to the corresponding SKU.
+    </span><span class="kw">pub async fn </span>delete_test_entitlement(<span class="kw-2">&amp;</span><span class="self">self</span>, entitlement_id: EntitlementId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+            body: <span class="prelude-val">None</span>,
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Delete,
+            route: Route::Entitlement {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
+                entitlement_id,
             },
             params: <span class="prelude-val">None</span>,
         })
@@ -7631,6 +7791,57 @@
         .<span class="kw">await
     </span>}
 
+    <span class="attr">#[allow(clippy::too_many_arguments)]
+    </span><span class="doccomment">/// Gets all entitlements for the current app, active and expired.
+    </span><span class="kw">pub async fn </span>get_entitlements(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+        sku_ids: <span class="prelude-ty">Option</span>&lt;Vec&lt;SkuId&gt;&gt;,
+        before: <span class="prelude-ty">Option</span>&lt;EntitlementId&gt;,
+        after: <span class="prelude-ty">Option</span>&lt;EntitlementId&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+        guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+        exclude_ended: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Entitlement&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="macro">vec!</span>[];
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = user_id {
+            params.push((<span class="string">"user_id"</span>, user_id.to_string()));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sku_ids) = sku_ids {
+            params.push((
+                <span class="string">"sku_ids"</span>,
+                sku_ids.iter().map(ToString::to_string).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">","</span>),
+            ));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
+            params.push((<span class="string">"before"</span>, before.to_string()));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
+            params.push((<span class="string">"after"</span>, after.to_string()));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
+            params.push((<span class="string">"limit"</span>, limit.to_string()));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
+            params.push((<span class="string">"guild_id"</span>, guild_id.to_string()));
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(exclude_ended) = exclude_ended {
+            params.push((<span class="string">"exclude_ended"</span>, exclude_ended.to_string()));
+        }
+
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">None</span>,
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Get,
+            route: Route::Entitlements {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
+            },
+            params: <span class="prelude-val">Some</span>(params),
+        })
+        .<span class="kw">await
+    </span>}
+
     <span class="doccomment">/// Gets current gateway.
     </span><span class="kw">pub async fn </span>get_gateway(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Gateway&gt; {
         <span class="self">self</span>.fire(Request {
@@ -8481,6 +8692,21 @@
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
             params: <span class="prelude-val">Some</span>(params),
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Gets all SKUs for the current application.
+    </span><span class="kw">pub async fn </span>get_skus(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Sku&gt;&gt; {
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">None</span>,
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Get,
+            route: Route::Skus {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
+            },
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
