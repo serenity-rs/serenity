@@ -477,6 +477,15 @@ fn update_cache_with_event(
         Event::GuildScheduledEventUserRemove(event) => FullEvent::GuildScheduledEventUserRemove {
             unsubscribed: event,
         },
+        Event::EntitlementCreate(event) => FullEvent::EntitlementCreate {
+            entitlement: event.entitlement,
+        },
+        Event::EntitlementUpdate(event) => FullEvent::EntitlementUpdate {
+            entitlement: event.entitlement,
+        },
+        Event::EntitlementDelete(event) => FullEvent::EntitlementDelete {
+            entitlement: event.entitlement,
+        },
     };
 
     Some((event, extra_event))

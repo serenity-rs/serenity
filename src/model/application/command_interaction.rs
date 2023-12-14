@@ -34,6 +34,7 @@ use crate::model::id::{
     TargetId,
     UserId,
 };
+use crate::model::monetization::Entitlement;
 use crate::model::user::User;
 use crate::model::Permissions;
 #[cfg(all(feature = "collector", feature = "utils"))]
@@ -78,6 +79,8 @@ pub struct CommandInteraction {
     pub locale: String,
     /// The guild's preferred locale.
     pub guild_locale: Option<String>,
+    /// For monetized applications, any entitlements of the invoking user.
+    pub entitlements: Vec<Entitlement>,
 }
 
 #[cfg(feature = "model")]

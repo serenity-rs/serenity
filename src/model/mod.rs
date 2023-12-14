@@ -32,6 +32,7 @@ pub mod id;
 pub mod invite;
 pub mod mention;
 pub mod misc;
+pub mod monetization;
 pub mod permissions;
 pub mod sticker;
 pub mod timestamp;
@@ -90,6 +91,7 @@ pub mod prelude {
         invite::*,
         mention::*,
         misc::*,
+        monetization::*,
         permissions::*,
         sticker::*,
         user::*,

@@ -1021,6 +1021,39 @@ pub struct GuildScheduledEventUserRemoveEvent {
     pub guild_id: GuildId,
 }
 
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#new-entitlement)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct EntitlementCreateEvent {
+    pub entitlement: Entitlement,
+}
+
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#new-entitlement)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct EntitlementUpdateEvent {
+    pub entitlement: Entitlement,
+}
+
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#new-entitlement)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct EntitlementDeleteEvent {
+    pub entitlement: Entitlement,
+}
+
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[allow(clippy::large_enum_variant)]
@@ -1262,6 +1295,12 @@ pub enum Event {
     GuildScheduledEventUserAdd(GuildScheduledEventUserAddEvent),
     /// A guild member has unsubscribed from a scheduled event.
     GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
+    /// A user subscribed to a SKU.
+    EntitlementCreate(EntitlementCreateEvent),
+    /// A user's entitlement was updated or renewed.
+    EntitlementUpdate(EntitlementUpdateEvent),
+    /// A user's entitlement was deleted by Discord, or refunded.
+    EntitlementDelete(EntitlementDeleteEvent),
     /// An event type not covered by the above
     #[serde(untagged)]
     Unknown(UnknownEvent),

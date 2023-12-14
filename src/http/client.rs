@@ -873,6 +873,36 @@ impl Http {
         .await
     }
 
+    /// Creates a test entitlement to a given SKU for a given guild or user. Discord will act as
+    /// though that user/guild has entitlement in perpetuity to the SKU. As a result, the returned
+    /// entitlement will have `starts_at` and `ends_at` both be `None`.
+    pub async fn create_test_entitlement(
+        &self,
+        sku_id: SkuId,
+        owner: EntitlementOwner,
+    ) -> Result<Entitlement> {
+        let (owner_id, owner_type) = match owner {
+            EntitlementOwner::Guild(id) => (id.get(), 1),
+            EntitlementOwner::User(id) => (id.get(), 2),
+        };
+        let map = json!({
+            "sku_id": sku_id,
+            "owner_id": owner_id,
+            "owner_type": owner_type
+        });
+        self.fire(Request {
+            body: Some(to_vec(&map)?),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Post,
+            route: Route::Entitlements {
+                application_id: self.try_application_id()?,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in the given data.
     ///
     /// This method requires authentication.
@@ -1343,6 +1373,23 @@ impl Http {
             route: Route::GuildSticker {
                 guild_id,
                 sticker_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Deletes a currently active test entitlement. Discord will act as though the corresponding
+    /// user/guild *no longer has* an entitlement to the corresponding SKU.
+    pub async fn delete_test_entitlement(&self, entitlement_id: EntitlementId) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Delete,
+            route: Route::Entitlement {
+                application_id: self.try_application_id()?,
+                entitlement_id,
             },
             params: None,
         })
@@ -3069,6 +3116,57 @@ impl Http {
         .await
     }
 
+    #[allow(clippy::too_many_arguments)]
+    /// Gets all entitlements for the current app, active and expired.
+    pub async fn get_entitlements(
+        &self,
+        user_id: Option<UserId>,
+        sku_ids: Option<Vec<SkuId>>,
+        before: Option<EntitlementId>,
+        after: Option<EntitlementId>,
+        limit: Option<u8>,
+        guild_id: Option<GuildId>,
+        exclude_ended: Option<bool>,
+    ) -> Result<Vec<Entitlement>> {
+        let mut params = vec![];
+        if let Some(user_id) = user_id {
+            params.push(("user_id", user_id.to_string()));
+        }
+        if let Some(sku_ids) = sku_ids {
+            params.push((
+                "sku_ids",
+                sku_ids.iter().map(ToString::to_string).collect::<Vec<_>>().join(","),
+            ));
+        }
+        if let Some(before) = before {
+            params.push(("before", before.to_string()));
+        }
+        if let Some(after) = after {
+            params.push(("after", after.to_string()));
+        }
+        if let Some(limit) = limit {
+            params.push(("limit", limit.to_string()));
+        }
+        if let Some(guild_id) = guild_id {
+            params.push(("guild_id", guild_id.to_string()));
+        }
+        if let Some(exclude_ended) = exclude_ended {
+            params.push(("exclude_ended", exclude_ended.to_string()));
+        }
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::Entitlements {
+                application_id: self.try_application_id()?,
+            },
+            params: Some(params),
+        })
+        .await
+    }
+
     /// Gets current gateway.
     pub async fn get_gateway(&self) -> Result<Gateway> {
         self.fire(Request {
@@ -3919,6 +4017,21 @@ impl Http {
                 reaction: &reaction_type.as_data(),
             },
             params: Some(params),
+        })
+        .await
+    }
+
+    /// Gets all SKUs for the current application.
+    pub async fn get_skus(&self) -> Result<Vec<Sku>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::Skus {
+                application_id: self.try_application_id()?,
+            },
+            params: None,
         })
         .await
     }

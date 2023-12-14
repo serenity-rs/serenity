@@ -453,6 +453,26 @@ event_handler! {
     /// Provides data about the cancelled subscription.
     GuildScheduledEventUserRemove { unsubscribed: GuildScheduledEventUserRemoveEvent } => async fn guild_scheduled_event_user_remove(&self, ctx: Context);
 
+    /// Dispatched when a user subscribes to a SKU.
+    ///
+    /// Provides data about the subscription.
+    EntitlementCreate { entitlement: Entitlement } => async fn entitlement_create(&self, ctx: Context);
+
+    /// Dispatched when a user's entitlement has been updated, such as when a subscription is
+    /// renewed for the next billing period.
+    ///
+    /// Provides data abut the updated subscription. If the entitlement is renewed, the
+    /// [`Entitlement::ends_at`] field will have changed.
+    EntitlementUpdate { entitlement: Entitlement } => async fn entitlement_update(&self, ctx: Context);
+
+    /// Dispatched when a user's entitlement has been deleted. This happens rarely, but can occur
+    /// if a subscription is refunded or otherwise deleted by Discord. Entitlements are not deleted
+    /// when they expire.
+    ///
+    /// Provides data about the subscription. Specifically, the [`Entitlement::deleted`] field will
+    /// be set.
+    EntitlementDelete { entitlement: Entitlement } => async fn entitlement_delete(&self, ctx: Context);
+
     /// Dispatched when an HTTP rate limit is hit
     Ratelimit { data: RatelimitInfo } => async fn ratelimit(&self);
 }
