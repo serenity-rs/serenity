@@ -53,13 +53,13 @@ pub struct Command {
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
     pub name_localizations: Option<HashMap<String, String>>,
     /// The command description.
-    pub description: FixedString<u8>,
+    pub description: FixedString<u16>,
     /// The localized command description of the selected locale.
     ///
     /// If the description is localized, either this field or [`Self::description_localizations`]
     /// is set, depending on which endpoint this data was retrieved from
     /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
-    pub description_localized: Option<FixedString<u8>>,
+    pub description_localized: Option<FixedString<u16>>,
     /// All localized command descriptions.
     ///
     /// If the description is localized, either this field or [`Self::description_localized`] is

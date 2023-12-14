@@ -74,7 +74,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available for text channels.
     pub last_pin_timestamp: Option<Timestamp>,
     /// The name of the channel. (1-100 characters)
-    pub name: FixedString<u8>,
+    pub name: FixedString<u16>,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.
     #[serde(default)]
     pub permission_overwrites: FixedArray<PermissionOverwrite>,
