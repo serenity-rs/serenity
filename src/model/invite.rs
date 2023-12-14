@@ -398,7 +398,7 @@ pub struct InviteStageInstance {
     /// The number of users speaking in the Stage
     pub speaker_count: u64,
     /// The topic of the Stage instance (1-120 characters)
-    pub topic: FixedString<u8>,
+    pub topic: FixedString<u16>,
 }
 
 enum_number! {
