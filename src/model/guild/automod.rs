@@ -331,7 +331,7 @@ pub enum Action {
         /// Additional explanation that will be shown to members whenever their message is blocked
         ///
         /// Maximum of 150 characters
-        custom_message: Option<FixedString<u8>>,
+        custom_message: Option<FixedString<u16>>,
     },
     /// Logs user content to a specified channel.
     Alert(ChannelId),
@@ -401,7 +401,7 @@ struct RawActionMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     duration_seconds: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    custom_message: Option<FixedString<u8>>,
+    custom_message: Option<FixedString<u16>>,
 }
 
 /// Helper struct for the (de)serialization of `Action`.
