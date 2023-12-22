@@ -112,7 +112,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice(self, name: impl Into<String>, value: i32) -> Self {
+    pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
         self.add_choice(CommandOptionChoice {
             name: name.into().into(),
             value: Value::from(value),
@@ -124,7 +124,7 @@ impl CreateCommandOption {
     pub fn add_int_choice_localized(
         self,
         name: impl Into<String>,
-        value: i32,
+        value: i64,
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> Self {
         self.add_choice(CommandOptionChoice {
@@ -246,13 +246,13 @@ impl CreateCommandOption {
     }
 
     /// Sets the minimum permitted value for this integer option
-    pub fn min_int_value(mut self, value: u64) -> Self {
+    pub fn min_int_value(mut self, value: i64) -> Self {
         self.0.min_value = Some(value.into());
         self
     }
 
     /// Sets the maximum permitted value for this integer option
-    pub fn max_int_value(mut self, value: u64) -> Self {
+    pub fn max_int_value(mut self, value: i64) -> Self {
         self.0.max_value = Some(value.into());
         self
     }
