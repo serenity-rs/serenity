@@ -580,7 +580,7 @@
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    </span><span class="kw">pub fn </span>add_int_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: i32) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_int_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: i64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(CommandOptionChoice {
             name: name.into().into(),
             value: Value::from(value),
@@ -592,7 +592,7 @@
     </span><span class="kw">pub fn </span>add_int_choice_localized(
         <span class="self">self</span>,
         name: <span class="kw">impl </span>Into&lt;String&gt;,
-        value: i32,
+        value: i64,
         locales: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw">impl </span>Into&lt;String&gt;, <span class="kw">impl </span>Into&lt;String&gt;)&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(CommandOptionChoice {
@@ -714,13 +714,13 @@
     </span>}
 
     <span class="doccomment">/// Sets the minimum permitted value for this integer option
-    </span><span class="kw">pub fn </span>min_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>min_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: i64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.min_value = <span class="prelude-val">Some</span>(value.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the maximum permitted value for this integer option
-    </span><span class="kw">pub fn </span>max_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: u64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>max_int_value(<span class="kw-2">mut </span><span class="self">self</span>, value: i64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.max_value = <span class="prelude-val">Some</span>(value.into());
         <span class="self">self
     </span>}
