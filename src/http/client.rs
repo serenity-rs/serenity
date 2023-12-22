@@ -2856,7 +2856,7 @@ impl Http {
     pub async fn get_channel_archived_public_threads(
         &self,
         channel_id: ChannelId,
-        before: Option<u64>,
+        before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
         let mut params = ArrayVec::<_, 2>::new();
@@ -2884,7 +2884,7 @@ impl Http {
     pub async fn get_channel_archived_private_threads(
         &self,
         channel_id: ChannelId,
-        before: Option<u64>,
+        before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
         let mut params = ArrayVec::<_, 2>::new();
@@ -2912,7 +2912,7 @@ impl Http {
     pub async fn get_channel_joined_archived_private_threads(
         &self,
         channel_id: ChannelId,
-        before: Option<u64>,
+        before: Option<ChannelId>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
         let mut params = ArrayVec::<_, 2>::new();
