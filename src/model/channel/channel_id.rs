@@ -1016,7 +1016,7 @@ impl ChannelId {
     pub async fn get_archived_private_threads(
         self,
         http: impl AsRef<Http>,
-        before: Option<u64>,
+        before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
         http.as_ref().get_channel_archived_private_threads(self, before, limit).await
@@ -1030,7 +1030,7 @@ impl ChannelId {
     pub async fn get_archived_public_threads(
         self,
         http: impl AsRef<Http>,
-        before: Option<u64>,
+        before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
         http.as_ref().get_channel_archived_public_threads(self, before, limit).await
@@ -1044,7 +1044,7 @@ impl ChannelId {
     pub async fn get_joined_archived_private_threads(
         self,
         http: impl AsRef<Http>,
-        before: Option<u64>,
+        before: Option<ChannelId>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
         http.as_ref().get_channel_joined_archived_private_threads(self, before, limit).await
