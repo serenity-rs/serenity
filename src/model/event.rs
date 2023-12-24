@@ -273,7 +273,7 @@ pub struct GuildMembersChunkEvent {
     /// ID of the guild.
     pub guild_id: GuildId,
     /// Set of guild members.
-    pub members: HashMap<UserId, Member>,
+    pub members: Vec<Member>,
     /// Chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count).
     pub chunk_index: u32,
     /// Total number of expected chunks for this response.
@@ -293,7 +293,7 @@ pub struct GuildMembersChunkEvent {
 impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut event = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
-        event.members.values_mut().for_each(|m| m.guild_id = event.guild_id);
+        event.members.iter_mut().for_each(|m| m.guild_id = event.guild_id);
         Ok(event)
     }
 }

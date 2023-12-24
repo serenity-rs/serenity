@@ -242,12 +242,12 @@ impl CacheUpdate for GuildMembersChunkEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        for member in self.members.values() {
+        for member in &self.members {
             cache.update_user_entry(&member.user);
         }
 
         if let Some(mut g) = cache.guilds.get_mut(&self.guild_id) {
-            g.members.extend(self.members.clone());
+            g.members.extend(self.members.iter().map(|member| (member.user.id, member.clone())));
         }
 
         None
