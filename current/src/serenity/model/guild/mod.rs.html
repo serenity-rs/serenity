@@ -2815,7 +2815,6 @@
 <a href="#2814" id="2814">2814</a>
 <a href="#2815" id="2815">2815</a>
 <a href="#2816" id="2816">2816</a>
-<a href="#2817" id="2817">2817</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -3073,8 +3072,7 @@
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received if the
     /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
-    </span><span class="attr">#[serde(serialize_with = <span class="string">"serialize_map_values"</span>)]
-    #[serde(deserialize_with = <span class="string">"deserialize_members"</span>)]
+    </span><span class="attr">#[serde(with = <span class="string">"members"</span>)]
     </span><span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
     <span class="doccomment">/// All voice and text channels contained within a guild.
     ///
