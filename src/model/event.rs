@@ -13,7 +13,14 @@ use serde::Serialize;
 
 use super::application::ActionRow;
 use super::prelude::*;
-use super::utils::{deserialize_val, emojis, remove_from_map, remove_from_map_opt, stickers};
+use super::utils::{
+    deserialize_val,
+    emojis,
+    members,
+    remove_from_map,
+    remove_from_map_opt,
+    stickers,
+};
 use crate::constants::Opcode;
 use crate::model::application::{CommandPermissions, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;
@@ -272,6 +279,7 @@ pub struct GuildMembersChunkEvent {
     /// ID of the guild.
     pub guild_id: GuildId,
     /// Set of guild members.
+    #[serde(with = "members")]
     pub members: HashMap<UserId, Member>,
     /// Chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count).
     pub chunk_index: u32,

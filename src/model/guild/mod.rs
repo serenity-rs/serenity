@@ -255,8 +255,7 @@ pub struct Guild {
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received if the
     /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
-    #[serde(serialize_with = "serialize_map_values")]
-    #[serde(deserialize_with = "deserialize_members")]
+    #[serde(with = "members")]
     pub members: HashMap<UserId, Member>,
     /// All voice and text channels contained within a guild.
     ///
