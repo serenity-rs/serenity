@@ -113,10 +113,23 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-pub fn deserialize_members<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<UserId, Member>, D::Error> {
-    deserializer.deserialize_seq(SequenceToMapVisitor::new(|member: &Member| member.user.id))
+/// Used with `#[serde(with = "members")]
+pub mod members {
+    use std::collections::HashMap;
+
+    use serde::Deserializer;
+
+    use super::SequenceToMapVisitor;
+    use crate::model::guild::Member;
+    use crate::model::id::UserId;
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<UserId, Member>, D::Error> {
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|member: &Member| member.user.id))
+    }
+
+    pub use super::serialize_map_values as serialize;
 }
 
 /// Used with `#[serde(with = "presences")]`
