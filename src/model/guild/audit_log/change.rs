@@ -56,6 +56,29 @@ macro_rules! generate_change {
                 },
             )*
 
+            /* These changes are special because their variant names do not match their keys. */
+
+            /// Role was added to a member.
+            #[serde(rename = "$add")]
+            RolesAdded {
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[serde(rename = "old_value")]
+                old: Option<Vec<AffectedRole>>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[serde(rename = "new_value")]
+                new: Option<Vec<AffectedRole>>,
+            },
+            /// Role was removed to a member.
+            #[serde(rename = "$remove")]
+            RolesRemove {
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[serde(rename = "old_value")]
+                old: Option<Vec<AffectedRole>>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[serde(rename = "new_value")]
+                new: Option<Vec<AffectedRole>>,
+            },
+
             /// Unknown key was changed.
             Other {
                 name: String,
@@ -77,6 +100,8 @@ macro_rules! generate_change {
             pub fn key(&self) -> &str {
                 match self {
                     $( Self::$name { .. } => $key, )*
+                    Self::RolesAdded { .. } => "$add",
+                    Self::RolesRemove { .. } => "$remove",
                     Self::Other { name, .. } => name,
                     Self::Unknown => "unknown",
                 }
@@ -200,10 +225,6 @@ generate_change! {
     "rate_limit_per_user" => RateLimitPerUser(u16),
     /// Region of a guild was changed.
     "region" => Region(String),
-    /// Role was added to a member.
-    "add" => RolesAdded(Vec<AffectedRole>),
-    /// Role was removed to a member.
-    "remove" => RolesRemove(Vec<AffectedRole>),
     /// ID of the rules channel was changed.
     "rules_channel_id" => RulesChannelId(ChannelId),
     /// Invite splash page artwork was changed.
