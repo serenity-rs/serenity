@@ -1281,14 +1281,6 @@
 <a href="#1280" id="1280">1280</a>
 <a href="#1281" id="1281">1281</a>
 <a href="#1282" id="1282">1282</a>
-<a href="#1283" id="1283">1283</a>
-<a href="#1284" id="1284">1284</a>
-<a href="#1285" id="1285">1285</a>
-<a href="#1286" id="1286">1286</a>
-<a href="#1287" id="1287">1287</a>
-<a href="#1288" id="1288">1288</a>
-<a href="#1289" id="1289">1289</a>
-<a href="#1290" id="1290">1290</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1304,14 +1296,7 @@
 
 <span class="kw">use </span><span class="kw">super</span>::application::ActionRow;
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">super</span>::utils::{
-    deserialize_val,
-    emojis,
-    members,
-    remove_from_map,
-    remove_from_map_opt,
-    stickers,
-};
+<span class="kw">use </span><span class="kw">super</span>::utils::{deserialize_val, emojis, remove_from_map, remove_from_map_opt, stickers};
 <span class="kw">use </span><span class="kw">crate</span>::constants::Opcode;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermissions, Interaction};
@@ -1571,7 +1556,6 @@
     <span class="doccomment">/// ID of the guild.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// Set of guild members.
-    </span><span class="attr">#[serde(with = <span class="string">"members"</span>)]
     </span><span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
     <span class="doccomment">/// Chunk index in the expected chunks for this response (0 &lt;= chunk_index &lt; chunk_count).
     </span><span class="kw">pub </span>chunk_index: u32,
