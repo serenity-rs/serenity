@@ -32,7 +32,6 @@ use std::sync::Arc;
 #[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
-use dashmap::mapref::entry::Entry;
 use dashmap::mapref::one::{MappedRef, Ref};
 use dashmap::DashMap;
 #[cfg(feature = "temp_cache")]
@@ -193,23 +192,6 @@ pub struct Cache {
     /// are "sent in" over time through the receiving of [`Event::GuildCreate`]s.
     pub(crate) unavailable_guilds: MaybeMap<GuildId, ()>,
 
-    // Users cache:
-    // ---
-    /// A map of users that the current user sees.
-    ///
-    /// Users are added to - and updated from - this map via the following received events:
-    ///
-    /// - [`GuildMemberAdd`][`GuildMemberAddEvent`]
-    /// - [`GuildMemberRemove`][`GuildMemberRemoveEvent`]
-    /// - [`GuildMembersChunk`][`GuildMembersChunkEvent`]
-    /// - [`PresenceUpdate`][`PresenceUpdateEvent`]
-    /// - [`Ready`][`ReadyEvent`]
-    ///
-    /// Note, however, that users are _not_ removed from the map on removal events such as
-    /// [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other structs such as members or
-    /// recipients may still exist.
-    pub(crate) users: MaybeMap<UserId, User>,
-
     // Messages cache:
     // ---
     pub(crate) messages: MessageCache,
@@ -280,8 +262,6 @@ impl Cache {
 
             guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
-
-            users: MaybeMap(settings.cache_users.then(DashMap::default)),
 
             messages: DashMap::default(),
             message_queue: DashMap::default(),
@@ -648,56 +628,6 @@ impl Cache {
         self.settings.write().max_messages = max;
     }
 
-    /// Retrieves a [`User`] from the cache's [`Self::users`] map, if it exists.
-    ///
-    /// The only advantage of this method is that you can pass in anything that is indirectly a
-    /// [`UserId`].
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a user from the cache and print their name:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::client::Context;
-    /// #
-    /// # async fn test(context: &Context) -> Result<(), Box<dyn std::error::Error>> {
-    /// if let Some(user) = context.cache.user(7) {
-    ///     println!("User with Id 7 is currently named {}", user.name);
-    /// }
-    /// # Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<UserRef<'_>> {
-        self.user_(user_id.into())
-    }
-
-    #[cfg(feature = "temp_cache")]
-    fn user_(&self, user_id: UserId) -> Option<UserRef<'_>> {
-        if let Some(user) = self.users.get(&user_id) {
-            Some(CacheRef::from_ref(user))
-        } else {
-            self.temp_users.get(&user_id).map(CacheRef::from_arc)
-        }
-    }
-
-    #[cfg(not(feature = "temp_cache"))]
-    fn user_(&self, user_id: UserId) -> Option<UserRef<'_>> {
-        self.users.get(&user_id).map(CacheRef::from_ref)
-    }
-
-    /// Clones all users and returns them.
-    #[inline]
-    pub fn users(&self) -> ReadOnlyMapRef<'_, UserId, User> {
-        self.users.as_read_only()
-    }
-
-    /// Returns the amount of cached users.
-    #[inline]
-    pub fn user_count(&self) -> usize {
-        self.users.len()
-    }
-
     /// This method provides a reference to the user used by the bot.
     #[inline]
     pub fn current_user(&self) -> CurrentUserRef<'_> {
@@ -749,19 +679,6 @@ impl Cache {
     #[instrument(skip(self, e))]
     pub fn update<E: CacheUpdate>(&self, e: &mut E) -> Option<E::Output> {
         e.update(self)
-    }
-
-    pub(crate) fn update_user_entry(&self, user: &User) {
-        if let Some(users) = &self.users.0 {
-            match users.entry(user.id) {
-                Entry::Vacant(e) => {
-                    e.insert(user.clone());
-                },
-                Entry::Occupied(mut e) => {
-                    e.get_mut().clone_from(user);
-                },
-            }
-        }
     }
 }
 
