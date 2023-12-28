@@ -346,10 +346,10 @@ impl CommandData {
             for opt in opts {
                 let value = match &opt.value {
                     CommandDataOptionValue::SubCommand(opts) => {
-                        ResolvedValue::SubCommand(resolve_options(opts, resolved))
+                        ResolvedValue::SubCommand(resolve_options(opts, resolved).into())
                     },
                     CommandDataOptionValue::SubCommandGroup(opts) => {
-                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved))
+                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved).into())
                     },
                     CommandDataOptionValue::Autocomplete {
                         kind,
@@ -454,8 +454,8 @@ pub enum ResolvedValue<'a> {
     Integer(i64),
     Number(f64),
     String(&'a str),
-    SubCommand(Vec<ResolvedOption<'a>>),
-    SubCommandGroup(Vec<ResolvedOption<'a>>),
+    SubCommand(FixedArray<ResolvedOption<'a>>),
+    SubCommandGroup(FixedArray<ResolvedOption<'a>>),
     Attachment(&'a Attachment),
     Channel(&'a PartialChannel),
     Role(&'a Role),
