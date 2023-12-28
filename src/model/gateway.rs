@@ -293,20 +293,6 @@ impl PresenceUser {
     pub fn to_user(&self) -> Option<User> {
         self.clone().into_user()
     }
-
-    #[cfg(feature = "cache")] // method is only used with the cache feature enabled
-    pub(crate) fn update_with_user(&mut self, user: &User) {
-        self.id = user.id;
-        if let Some(avatar) = user.avatar {
-            self.avatar = Some(avatar);
-        }
-        self.bot = Some(user.bot);
-        self.discriminator = user.discriminator;
-        self.name = Some(user.name.clone());
-        if let Some(public_flags) = user.public_flags {
-            self.public_flags = Some(public_flags);
-        }
-    }
 }
 
 /// Information detailing the current online status of a [`User`].
