@@ -1281,6 +1281,53 @@
 <a href="#1280" id="1280">1280</a>
 <a href="#1281" id="1281">1281</a>
 <a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+<a href="#1312" id="1312">1312</a>
+<a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1296,7 +1343,14 @@
 
 <span class="kw">use </span><span class="kw">super</span>::application::ActionRow;
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">super</span>::utils::{deserialize_val, emojis, remove_from_map, remove_from_map_opt, stickers};
+<span class="kw">use </span><span class="kw">super</span>::utils::{
+    deserialize_val,
+    emojis,
+    members,
+    remove_from_map,
+    remove_from_map_opt,
+    stickers,
+};
 <span class="kw">use </span><span class="kw">crate</span>::constants::Opcode;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermissions, Interaction};
@@ -1556,6 +1610,7 @@
     <span class="doccomment">/// ID of the guild.
     </span><span class="kw">pub </span>guild_id: GuildId,
     <span class="doccomment">/// Set of guild members.
+    </span><span class="attr">#[serde(with = <span class="string">"members"</span>)]
     </span><span class="kw">pub </span>members: HashMap&lt;UserId, Member&gt;,
     <span class="doccomment">/// Chunk index in the expected chunks for this response (0 &lt;= chunk_index &lt; chunk_count).
     </span><span class="kw">pub </span>chunk_index: u32,
@@ -2304,6 +2359,39 @@
     <span class="kw">pub </span>guild_id: GuildId,
 }
 
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#new-entitlement)
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EntitlementCreateEvent {
+    <span class="kw">pub </span>entitlement: Entitlement,
+}
+
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#new-entitlement)
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EntitlementUpdateEvent {
+    <span class="kw">pub </span>entitlement: Entitlement,
+}
+
+<span class="doccomment">/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#new-entitlement)
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>EntitlementDeleteEvent {
+    <span class="kw">pub </span>entitlement: Entitlement,
+}
+
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[allow(clippy::large_enum_variant)]
@@ -2545,6 +2633,12 @@
     </span>GuildScheduledEventUserAdd(GuildScheduledEventUserAddEvent),
     <span class="doccomment">/// A guild member has unsubscribed from a scheduled event.
     </span>GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
+    <span class="doccomment">/// A user subscribed to a SKU.
+    </span>EntitlementCreate(EntitlementCreateEvent),
+    <span class="doccomment">/// A user's entitlement was updated or renewed.
+    </span>EntitlementUpdate(EntitlementUpdateEvent),
+    <span class="doccomment">/// A user's entitlement was deleted by Discord, or refunded.
+    </span>EntitlementDelete(EntitlementDeleteEvent),
     <span class="doccomment">/// An event type not covered by the above
     </span><span class="attr">#[serde(untagged)]
     </span>Unknown(UnknownEvent),

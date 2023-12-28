@@ -466,6 +466,26 @@
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
 <a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -922,6 +942,26 @@
     ///
     /// Provides data about the cancelled subscription.
     </span>GuildScheduledEventUserRemove { unsubscribed: GuildScheduledEventUserRemoveEvent } =&gt; <span class="kw">async fn </span>guild_scheduled_event_user_remove(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
+
+    <span class="doccomment">/// Dispatched when a user subscribes to a SKU.
+    ///
+    /// Provides data about the subscription.
+    </span>EntitlementCreate { entitlement: Entitlement } =&gt; <span class="kw">async fn </span>entitlement_create(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
+
+    <span class="doccomment">/// Dispatched when a user's entitlement has been updated, such as when a subscription is
+    /// renewed for the next billing period.
+    ///
+    /// Provides data abut the updated subscription. If the entitlement is renewed, the
+    /// [`Entitlement::ends_at`] field will have changed.
+    </span>EntitlementUpdate { entitlement: Entitlement } =&gt; <span class="kw">async fn </span>entitlement_update(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
+
+    <span class="doccomment">/// Dispatched when a user's entitlement has been deleted. This happens rarely, but can occur
+    /// if a subscription is refunded or otherwise deleted by Discord. Entitlements are not deleted
+    /// when they expire.
+    ///
+    /// Provides data about the subscription. Specifically, the [`Entitlement::deleted`] field will
+    /// be set.
+    </span>EntitlementDelete { entitlement: Entitlement } =&gt; <span class="kw">async fn </span>entitlement_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
 
     <span class="doccomment">/// Dispatched when an HTTP rate limit is hit
     </span>Ratelimit { data: RatelimitInfo } =&gt; <span class="kw">async fn </span>ratelimit(<span class="kw-2">&amp;</span><span class="self">self</span>);

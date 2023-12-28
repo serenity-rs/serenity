@@ -459,6 +459,18 @@
 <a href="#458" id="458">458</a>
 <a href="#459" id="459">459</a>
 <a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::num::NonZeroU64;
 
@@ -909,6 +921,18 @@
 
     GuildCommandsPermissions { application_id: ApplicationId, guild_id: GuildId },
     <span class="macro">api!</span>(<span class="string">"/applications/{}/guilds/{}/commands/permissions"</span>, application_id, guild_id),
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.into()));
+
+    Skus { application_id: ApplicationId },
+    <span class="macro">api!</span>(<span class="string">"/applications/{}/skus"</span>, application_id),
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.into()));
+
+    Entitlement { application_id: ApplicationId, entitlement_id: EntitlementId },
+    <span class="macro">api!</span>(<span class="string">"/applications/{}/entitlements/{}"</span>, application_id, entitlement_id),
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.into()));
+
+    Entitlements { application_id: ApplicationId },
+    <span class="macro">api!</span>(<span class="string">"/applications/{}/entitlements"</span>, application_id),
     <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(application_id.into()));
 
     StageInstances,

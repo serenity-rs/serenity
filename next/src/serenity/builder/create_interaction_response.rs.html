@@ -417,6 +417,15 @@
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
 <a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
@@ -476,6 +485,13 @@
     ///
     /// Corresponds to Discord's `MODAL`.
     </span>Modal(CreateModal),
+    <span class="doccomment">/// Not valid for autocomplete and Ping interactions. Only available for applications with
+    /// monetization enabled.
+    ///
+    /// Responds to the interaction with an upgrade button.
+    ///
+    /// Corresponds to Discord's `PREMIUM_REQUIRED'.
+    </span>PremiumRequired,
 }
 
 <span class="kw">impl </span>serde::Serialize <span class="kw">for </span>CreateInteractionResponse {
@@ -485,13 +501,14 @@
         <span class="attr">#[allow(clippy::match_same_arms)] </span><span class="comment">// hurts readability
         </span><span class="macro">json!</span>({
             <span class="string">"type"</span>: <span class="kw">match </span><span class="self">self </span>{
-                <span class="self">Self</span>::Pong { .. } =&gt; <span class="number">1</span>,
-                <span class="self">Self</span>::Message { .. } =&gt; <span class="number">4</span>,
-                <span class="self">Self</span>::Defer { .. } =&gt; <span class="number">5</span>,
-                <span class="self">Self</span>::Acknowledge { .. } =&gt; <span class="number">6</span>,
-                <span class="self">Self</span>::UpdateMessage { .. } =&gt; <span class="number">7</span>,
-                <span class="self">Self</span>::Autocomplete { .. } =&gt; <span class="number">8</span>,
-                <span class="self">Self</span>::Modal { .. } =&gt; <span class="number">9</span>,
+                <span class="self">Self</span>::Pong =&gt; <span class="number">1</span>,
+                <span class="self">Self</span>::Message(<span class="kw">_</span>) =&gt; <span class="number">4</span>,
+                <span class="self">Self</span>::Defer(<span class="kw">_</span>) =&gt; <span class="number">5</span>,
+                <span class="self">Self</span>::Acknowledge =&gt; <span class="number">6</span>,
+                <span class="self">Self</span>::UpdateMessage(<span class="kw">_</span>) =&gt; <span class="number">7</span>,
+                <span class="self">Self</span>::Autocomplete(<span class="kw">_</span>) =&gt; <span class="number">8</span>,
+                <span class="self">Self</span>::Modal(<span class="kw">_</span>) =&gt; <span class="number">9</span>,
+                <span class="self">Self</span>::PremiumRequired =&gt; <span class="number">10</span>,
             },
             <span class="string">"data"</span>: <span class="kw">match </span><span class="self">self </span>{
                 <span class="self">Self</span>::Pong =&gt; json::NULL,
@@ -501,6 +518,7 @@
                 <span class="self">Self</span>::UpdateMessage(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
                 <span class="self">Self</span>::Autocomplete(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
                 <span class="self">Self</span>::Modal(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::PremiumRequired =&gt; json::NULL,
             }
         })
         .serialize(serializer)

@@ -223,6 +223,8 @@
 <a href="#222" id="222">222</a>
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer};
 <span class="kw">use </span>serde::Serialize;
 
@@ -284,6 +286,8 @@
     </span><span class="kw">pub </span>locale: FixedString,
     <span class="doccomment">/// The guild's preferred locale.
     </span><span class="kw">pub </span>guild_locale: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+    <span class="doccomment">/// For monetized applications, any entitlements of the invoking user.
+    </span><span class="kw">pub </span>entitlements: Vec&lt;Entitlement&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]

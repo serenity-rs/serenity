@@ -884,6 +884,9 @@
 <a href="#883" id="883">883</a>
 <a href="#884" id="884">884</a>
 <a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
@@ -920,6 +923,7 @@
     TargetId,
     UserId,
 };
+<span class="kw">use </span><span class="kw">crate</span>::model::monetization::Entitlement;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 <span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
 <span class="attr">#[cfg(all(feature = <span class="string">"collector"</span>, feature = <span class="string">"utils"</span>))]
@@ -964,6 +968,8 @@
     </span><span class="kw">pub </span>locale: FixedString,
     <span class="doccomment">/// The guild's preferred locale.
     </span><span class="kw">pub </span>guild_locale: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+    <span class="doccomment">/// For monetized applications, any entitlements of the invoking user.
+    </span><span class="kw">pub </span>entitlements: Vec&lt;Entitlement&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]

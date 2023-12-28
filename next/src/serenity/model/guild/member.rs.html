@@ -680,7 +680,6 @@
 <a href="#679" id="679">679</a>
 <a href="#680" id="680">680</a>
 <a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::cmp::Reverse;
 <span class="kw">use </span>std::fmt;
@@ -956,9 +955,8 @@
     <span class="doccomment">/// Retrieves the ID and position of the member's highest role in the hierarchy, if they have
     /// one.
     ///
-    /// This _may_ return [`None`] if:
-    /// - the user has roles, but they are not present in the cache for cache inconsistency reasons
-    /// - you already have a write lock to the member's guild
+    /// This _may_ return [`None`] if the user has roles, but they are not present in the cache for
+    /// cache inconsistency reasons.
     ///
     /// The "highest role in hierarchy" is defined as the role with the highest position. If two or
     /// more roles have the same highest position, then the role with the lowest ID is the highest.

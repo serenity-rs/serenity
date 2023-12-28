@@ -286,6 +286,27 @@
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::Value;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::PermissionOverwrite;
@@ -345,8 +366,31 @@
                 },
             )*
 
+            <span class="comment">/* These changes are special because their variant names do not match their keys. */
+
+            </span><span class="doccomment">/// Role was added to a member.
+            </span><span class="attr">#[<span class="macro-nonterminal">serde</span>(rename = <span class="string">"$add"</span>)]
+            </span>RolesAdded {
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                #[serde(rename = <span class="string">"old_value"</span>)]
+                </span>old: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                #[serde(rename = <span class="string">"new_value"</span>)]
+                </span>new: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+            },
+            <span class="doccomment">/// Role was removed to a member.
+            </span><span class="attr">#[serde(rename = <span class="string">"$remove"</span>)]
+            </span>RolesRemove {
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                #[serde(rename = <span class="string">"old_value"</span>)]
+                </span>old: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+                <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+                #[serde(rename = <span class="string">"new_value"</span>)]
+                </span>new: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+            },
+
             <span class="doccomment">/// Unknown key was changed.
-            </span><span class="macro-nonterminal">Other </span>{
+            </span>Other {
                 name: FixedString,
                 <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
                 #[serde(rename = <span class="string">"old_value"</span>)]
@@ -366,6 +410,8 @@
             </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
                 <span class="kw">match </span><span class="self">self </span>{
                     $( <span class="self">Self</span>::<span class="macro-nonterminal">$name </span>{ .. } =&gt; <span class="macro-nonterminal">$key</span>, )*
+                    <span class="self">Self</span>::RolesAdded { .. } =&gt; <span class="string">"$add"</span>,
+                    <span class="self">Self</span>::RolesRemove { .. } =&gt; <span class="string">"$remove"</span>,
                     <span class="self">Self</span>::Other { name, .. } =&gt; name,
                     <span class="self">Self</span>::Unknown =&gt; <span class="string">"unknown"</span>,
                 }
@@ -489,10 +535,6 @@
     </span><span class="string">"rate_limit_per_user" </span>=&gt; RateLimitPerUser(u16),
     <span class="doccomment">/// Region of a guild was changed.
     </span><span class="string">"region" </span>=&gt; Region(String),
-    <span class="doccomment">/// Role was added to a member.
-    </span><span class="string">"add" </span>=&gt; RolesAdded(Vec&lt;AffectedRole&gt;),
-    <span class="doccomment">/// Role was removed to a member.
-    </span><span class="string">"remove" </span>=&gt; RolesRemove(Vec&lt;AffectedRole&gt;),
     <span class="doccomment">/// ID of the rules channel was changed.
     </span><span class="string">"rules_channel_id" </span>=&gt; RulesChannelId(ChannelId),
     <span class="doccomment">/// Invite splash page artwork was changed.

@@ -300,6 +300,18 @@
 <a href="#299" id="299">299</a>
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -308,6 +320,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::json::from_value;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::PartialMember;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{ApplicationId, InteractionId};
+<span class="kw">use </span><span class="kw">crate</span>::model::monetization::Entitlement;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 <span class="kw">use </span><span class="kw">crate</span>::model::utils::deserialize_val;
 <span class="kw">use </span><span class="kw">crate</span>::model::Permissions;
@@ -389,6 +402,17 @@
             <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; i.guild_locale.as_deref(),
             <span class="self">Self</span>::Component(i) =&gt; i.guild_locale.as_deref(),
             <span class="self">Self</span>::Modal(i) =&gt; i.guild_locale.as_deref(),
+        }
+    }
+
+    <span class="doccomment">/// For monetized applications, gets the invoking user's granted entitlements.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>entitlements(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[Entitlement]&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Ping(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::Command(i) | <span class="self">Self</span>::Autocomplete(i) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>i.entitlements),
+            <span class="self">Self</span>::Component(i) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>i.entitlements),
+            <span class="self">Self</span>::Modal(i) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>i.entitlements),
         }
     }
 

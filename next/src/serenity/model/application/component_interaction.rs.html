@@ -336,6 +336,8 @@
 <a href="#335" id="335">335</a>
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Error <span class="kw">as _</span>, Serialize};
 
@@ -398,6 +400,8 @@
     </span><span class="kw">pub </span>locale: FixedString,
     <span class="doccomment">/// The guild's preferred locale.
     </span><span class="kw">pub </span>guild_locale: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+    <span class="doccomment">/// For monetized applications, any entitlements of the invoking user.
+    </span><span class="kw">pub </span>entitlements: Vec&lt;Entitlement&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
