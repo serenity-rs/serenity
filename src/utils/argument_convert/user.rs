@@ -23,36 +23,6 @@ impl fmt::Display for UserParseError {
     }
 }
 
-#[cfg(feature = "cache")]
-fn lookup_by_global_cache(ctx: impl CacheHttp, s: &str) -> Option<User> {
-    let users = &ctx.cache()?.users;
-
-    let lookup_by_id = || users.get(&s.parse().ok()?).map(|u| u.clone());
-
-    let lookup_by_mention = || users.get(&crate::utils::parse_user_mention(s)?).map(|u| u.clone());
-
-    let lookup_by_name_and_discrim = || {
-        let (name, discrim) = crate::utils::parse_user_tag(s)?;
-        users.iter().find_map(|m| {
-            let user = m.value();
-            (user.discriminator == discrim && user.name.eq_ignore_ascii_case(name))
-                .then(|| user.clone())
-        })
-    };
-
-    let lookup_by_name = || {
-        users.iter().find_map(|m| {
-            let user = m.value();
-            (&*user.name == s).then(|| user.clone())
-        })
-    };
-
-    lookup_by_id()
-        .or_else(lookup_by_mention)
-        .or_else(lookup_by_name_and_discrim)
-        .or_else(lookup_by_name)
-}
-
 /// Look up a user by a string case-insensitively.
 ///
 /// Requires the cache feature to be enabled. If a user is not in cache, they will not be found!
@@ -72,13 +42,7 @@ impl ArgumentConvert for User {
         channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
-        // Try to look up in global user cache via a variety of methods
-        #[cfg(feature = "cache")]
-        if let Some(user) = lookup_by_global_cache(&ctx, s) {
-            return Ok(user);
-        }
-
-        // If not successful, convert as a Member which uses HTTP endpoints instead of cache
+        // Convert as a Member which uses HTTP endpoints instead of cache
         if let Ok(member) = Member::convert(&ctx, guild_id, channel_id, s).await {
             return Ok(member.user);
         }

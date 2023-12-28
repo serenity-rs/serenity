@@ -344,23 +344,18 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 async fn say(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     match args.single_quoted::<String>() {
-        Ok(x) => {
-            let settings = if let Some(guild_id) = msg.guild_id {
+        Ok(mut x) => {
+            // We only need to wipe mentions in guilds, as DM mentions do not matter.
+            if let Some(guild) = msg.guild(&ctx.cache) {
                 // By default roles, users, and channel mentions are cleaned.
-                ContentSafeOptions::default()
+                let settings = ContentSafeOptions::default()
                     // We do not want to clean channal mentions as they do not ping users.
-                    .clean_channel(false)
-                    // If it's a guild channel, we want mentioned users to be displayed as their
-                    // display name.
-                    .display_as_member_from(guild_id)
-            } else {
-                ContentSafeOptions::default().clean_channel(false).clean_role(false)
-            };
+                    .clean_channel(false);
 
-            let content = content_safe(&ctx.cache, x, &settings, &msg.mentions);
+                x = content_safe(&guild, x, &settings, &msg.mentions);
+            }
 
-            msg.channel_id.say(&ctx.http, &content).await?;
-
+            msg.channel_id.say(&ctx.http, x).await?;
             return Ok(());
         },
         Err(_) => {
