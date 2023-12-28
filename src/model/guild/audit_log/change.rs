@@ -30,7 +30,7 @@ pub struct AffectedRole {
 #[non_exhaustive]
 pub enum EntityType {
     Int(u64),
-    Str(String),
+    Str(FixedString),
 }
 
 impl<'de> serde::Deserialize<'de> for EntityType {
@@ -72,20 +72,20 @@ macro_rules! generate_change {
             RolesAdded {
                 #[serde(skip_serializing_if = "Option::is_none")]
                 #[serde(rename = "old_value")]
-                old: Option<Vec<AffectedRole>>,
+                old: Option<FixedArray<AffectedRole>>,
                 #[serde(skip_serializing_if = "Option::is_none")]
                 #[serde(rename = "new_value")]
-                new: Option<Vec<AffectedRole>>,
+                new: Option<FixedArray<AffectedRole>>,
             },
             /// Role was removed to a member.
             #[serde(rename = "$remove")]
             RolesRemove {
                 #[serde(skip_serializing_if = "Option::is_none")]
                 #[serde(rename = "old_value")]
-                old: Option<Vec<AffectedRole>>,
+                old: Option<FixedArray<AffectedRole>>,
                 #[serde(skip_serializing_if = "Option::is_none")]
                 #[serde(rename = "new_value")]
-                new: Option<Vec<AffectedRole>>,
+                new: Option<FixedArray<AffectedRole>>,
             },
 
             /// Unknown key was changed.
@@ -120,7 +120,7 @@ macro_rules! generate_change {
 }
 
 generate_change! {
-    "actions" => Actions(Vec<Action>),
+    "actions" => Actions(FixedArray<Action>),
     /// AFK channel was changed.
     "afk_channel_id" => AfkChannelId(ChannelId),
     /// AFK timeout duration was changed.
@@ -131,7 +131,7 @@ generate_change! {
     "application_id" => ApplicationId(ApplicationId),
     /// Thread is now archived/unarchived.
     "archived" => Archived(bool),
-    "asset" => Asset(String),
+    "asset" => Asset(FixedString),
     /// Auto archive duration of a thread was changed.
     "auto_archive_duration" => AutoArchiveDuration(u16),
     /// Availability of a sticker was changed.
@@ -145,7 +145,7 @@ generate_change! {
     /// Channel for invite code or guild scheduled event was changed.
     "channel_id" => ChannelId(ChannelId),
     /// Invite code was changed.
-    "code" => Code(String),
+    "code" => Code(FixedString),
     /// Role color was changed.
     "color" => Color(u32),
     /// Member timeout state was changed.
@@ -159,7 +159,7 @@ generate_change! {
     /// Permission on a text or voice channel was denied for a role.
     "deny" => Deny(Permissions),
     /// Description for guild, sticker, or guild scheduled event was changed.
-    "description" => Description(String),
+    "description" => Description(FixedString),
     /// Guild's discovery splash was changed.
     "discovery_splash_hash" => DiscoverySplashHash(ImageHash),
     "enabled" => Enabled(bool),
@@ -168,8 +168,8 @@ generate_change! {
     /// Entity type of guild scheduled event was changed.
     "entity_type" => EntityType(u64),
     "event_type" => EventType(EventType),
-    "exempt_channels" => ExemptChannels(Vec<ChannelId>),
-    "exempt_roles" => ExemptRoles(Vec<RoleId>),
+    "exempt_channels" => ExemptChannels(FixedArray<ChannelId>),
+    "exempt_roles" => ExemptRoles(FixedArray<RoleId>),
     /// Behavior of the expiration of an integration was changed.
     "expire_behavior" => ExpireBehavior(u64),
     /// Grace period of the expiration of an integration was changed.
@@ -195,7 +195,7 @@ generate_change! {
     /// ID of the user who created the invite.
     "inviter_id" => InviterId(UserId),
     /// Location for a guild scheduled event was changed.
-    "location" => Location(String),
+    "location" => Location(FixedString),
     /// Thread was locked/unlocked.
     "locked" => Locked(bool),
     /// How long invite code lasts was changed.
@@ -209,21 +209,21 @@ generate_change! {
     /// User was server muted/unmuted.
     "mute" => Mute(bool),
     /// Name of an entity was changed.
-    "name" => Name(String),
+    "name" => Name(FixedString),
     /// Nickname of a member was changed.
-    "nick" => Nick(String),
+    "nick" => Nick(FixedString),
     /// Channel NSFW restriction was changed.
     "nsfw" => Nsfw(bool),
     /// Owner of a guild was changed.
     "owner_id" => OwnerId(UserId),
     /// Permissions on a channel were changed.
-    "permission_overwrites" => PermissionOverwrites(Vec<PermissionOverwrite>),
+    "permission_overwrites" => PermissionOverwrites(FixedArray<PermissionOverwrite>),
     /// Permissions for a role were changed.
     "permissions" => Permissions(Permissions),
     /// Channel or role position was changed.
     "position" => Position(u32),
     /// Preferred locale of a guild was changed.
-    "preferred_locale" => PreferredLocale(String),
+    "preferred_locale" => PreferredLocale(FixedString),
     /// Privacy level of the stage instance was changed.
     "privacy_level" => PrivacyLevel(u64),
     /// Number of days after which inactive and role-unassigned members are kicked was changed.
@@ -233,7 +233,7 @@ generate_change! {
     /// Ratelimit per user in a text channel was changed.
     "rate_limit_per_user" => RateLimitPerUser(u16),
     /// Region of a guild was changed.
-    "region" => Region(String),
+    "region" => Region(FixedString),
     /// ID of the rules channel was changed.
     "rules_channel_id" => RulesChannelId(ChannelId),
     /// Invite splash page artwork was changed.
@@ -245,23 +245,23 @@ generate_change! {
     /// ID of the system channel was changed.
     "system_channel_id" => SystemChannelId(ChannelId),
     /// Related emoji of a sticker was changed.
-    "tags" => Tags(String),
+    "tags" => Tags(FixedString),
     /// Whether an invite is temporary or never expires was changed.
     "temporary" => Temporary(bool),
     /// Topic of a text channel or stage instance was changed.
-    "topic" => Topic(String),
+    "topic" => Topic(FixedString),
     "trigger_metadata" => TriggerMetadata(TriggerMetadata),
     "trigger_type" => TriggerType(TriggerType),
     /// Type of a created entity.
     "type" => Type(EntityType),
     /// Unicode emoji of a role icon was changed.
-    "unicode_emoji" => UnicodeEmoji(String),
+    "unicode_emoji" => UnicodeEmoji(FixedString),
     /// Maximum number of users in a voice channel was changed.
     "user_limit" => UserLimit(u64),
     /// Number of uses of an invite was changed.
     "uses" => Uses(u64),
     /// Guild invite vanity url was changed.
-    "vanity_url_code" => VanityUrlCode(String),
+    "vanity_url_code" => VanityUrlCode(FixedString),
     /// Required verification level for new members was changed.
     "verification_level" => VerificationLevel(VerificationLevel),
     /// Channel of the server widget was changed.
@@ -302,7 +302,7 @@ mod tests {
     fn entity_type_variant() {
         let value = Change::Type {
             old: Some(EntityType::Int(123)),
-            new: Some(EntityType::Str("discord".into())),
+            new: Some(EntityType::Str("discord".to_string().into())),
         };
         assert_json(&value, json!({"key": "type", "old_value": 123, "new_value": "discord"}));
     }
