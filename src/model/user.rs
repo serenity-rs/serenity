@@ -11,8 +11,6 @@ use serde::{Deserialize, Serialize};
 use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::{Builder, CreateMessage, EditProfile};
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::{Cache, UserRef};
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
@@ -725,13 +723,6 @@ impl UserId {
         self.direct_message(cache_http, builder).await
     }
 
-    /// Attempts to find a [`User`] by its Id in the cache.
-    #[cfg(feature = "cache")]
-    #[inline]
-    pub fn to_user_cached(self, cache: &impl AsRef<Cache>) -> Option<UserRef<'_>> {
-        cache.as_ref().user(self)
-    }
-
     /// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
     /// REST API.
     ///
@@ -748,18 +739,18 @@ impl UserId {
     /// May also return an [`Error::Json`] if there is an error in deserializing the user.
     #[inline]
     pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
-        #[cfg(feature = "cache")]
+        #[cfg(feature = "temp_cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(user) = cache.user(self) {
-                    return Ok(user.clone());
+                if let Some(user) = cache.temp_users.get(&self) {
+                    return Ok(User::clone(&user));
                 }
             }
         }
 
         let user = cache_http.http().get_user(self).await?;
 
-        #[cfg(all(feature = "cache", feature = "temp_cache"))]
+        #[cfg(feature = "temp_cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 use crate::cache::MaybeOwnedArc;
