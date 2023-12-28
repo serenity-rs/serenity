@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/content_safe.rs`."><title>content_safe.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (2d7be7393 2023-12-23)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/content_safe.rs`."><title>content_safe.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (89e2160c4 2023-12-27)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -395,56 +395,9 @@
 <a href="#394" id="394">394</a>
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
-<a href="#405" id="405">405</a>
-<a href="#406" id="406">406</a>
-<a href="#407" id="407">407</a>
-<a href="#408" id="408">408</a>
-<a href="#409" id="409">409</a>
-<a href="#410" id="410">410</a>
-<a href="#411" id="411">411</a>
-<a href="#412" id="412">412</a>
-<a href="#413" id="413">413</a>
-<a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
-<a href="#438" id="438">438</a>
-<a href="#439" id="439">439</a>
-<a href="#440" id="440">440</a>
-<a href="#441" id="441">441</a>
-<a href="#442" id="442">442</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<span class="kw">use </span><span class="kw">crate</span>::model::id::GuildId;
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::Guild;
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mention;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
@@ -457,7 +410,6 @@
     clean_here: bool,
     clean_everyone: bool,
     show_discriminator: bool,
-    guild_reference: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
 }
 
 <span class="kw">impl </span>ContentSafeOptions {
@@ -507,15 +459,6 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// If set, [`content_safe`] will replace a user mention with the user's display name in passed
-    /// `guild`.
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>display_as_member_from&lt;G: Into&lt;GuildId&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, guild: G) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.guild_reference = <span class="prelude-val">Some</span>(guild.into());
-
-        <span class="self">self
-    </span>}
-
     <span class="doccomment">/// If set, [`content_safe`] will replace `@here` with a non-pinging alternative.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>clean_here(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
@@ -543,13 +486,12 @@
             clean_here: <span class="bool-val">true</span>,
             clean_everyone: <span class="bool-val">true</span>,
             show_discriminator: <span class="bool-val">true</span>,
-            guild_reference: <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="doccomment">/// Transforms role, channel, user, `@everyone` and `@here` mentions into raw text by using the
-/// [`Cache`] and the users passed in with `users`.
+/// Guild and the users passed in with `users`.
 ///
 /// [`ContentSafeOptions`] decides what kind of mentions should be filtered and how the raw-text
 /// will be displayed.
@@ -559,15 +501,14 @@
 /// Sanitise an `@everyone` mention.
 ///
 /// ```rust
-/// # use serenity::client::Cache;
-/// #
-/// # let cache = Cache::default();
+/// # let cache = serenity::client::Cache::default();
+/// # let guild = serenity::model::guild::Guild::default();
 /// use serenity::utils::{content_safe, ContentSafeOptions};
 ///
 /// let with_mention = "@everyone";
-/// let without_mention = content_safe(&amp;cache, &amp;with_mention, &amp;ContentSafeOptions::default(), &amp;[]);
+/// let without_mention = content_safe(&amp;guild, &amp;with_mention, &amp;ContentSafeOptions::default(), &amp;[]);
 ///
-/// assert_eq!("@\u{200B}everyone".to_string(), without_mention);
+/// assert_eq!("@\u{200B}everyone", without_mention);
 /// ```
 ///
 /// Filtering out mentions from a message.
@@ -578,16 +519,26 @@
 /// use serenity::utils::{content_safe, ContentSafeOptions};
 ///
 /// fn filter_message(cache: &amp;Cache, message: &amp;Message) -&gt; String {
-///     content_safe(cache, &amp;message.content, &amp;ContentSafeOptions::default(), &amp;message.mentions)
+///     if let Some(guild) = message.guild(cache) {
+///         content_safe(
+///             &amp;guild,
+///             &amp;message.content,
+///             &amp;ContentSafeOptions::default(),
+///             &amp;message.mentions,
+///         )
+///     } else {
+///         // We don't need to clean messages in DMs
+///         message.content.to_string()
+///     }
 /// }
 /// ```
 </span><span class="kw">pub fn </span>content_safe(
-    cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+    guild: <span class="kw-2">&amp;</span>Guild,
     s: <span class="kw">impl </span>AsRef&lt;str&gt;,
     options: <span class="kw-2">&amp;</span>ContentSafeOptions,
     users: <span class="kw-2">&amp;</span>[User],
 ) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>content = clean_mentions(<span class="kw-2">&amp;</span>cache, s, options, users);
+    <span class="kw">let </span><span class="kw-2">mut </span>content = clean_mentions(guild, s, options, users);
 
     <span class="kw">if </span>options.clean_here {
         content = content.replace(<span class="string">"@here"</span>, <span class="string">"@\u{200B}here"</span>);
@@ -601,7 +552,7 @@
 }
 
 <span class="kw">fn </span>clean_mentions(
-    cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+    guild: <span class="kw-2">&amp;</span>Guild,
     s: <span class="kw">impl </span>AsRef&lt;str&gt;,
     options: <span class="kw-2">&amp;</span>ContentSafeOptions,
     users: <span class="kw-2">&amp;</span>[User],
@@ -640,7 +591,7 @@
                         <span class="comment">// NOTE: numeric strings that are too large to fit into u64 will not parse
                         // correctly and will be left unchanged.
                         </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(mention) = mention_str.parse() {
-                            content.push_str(<span class="kw-2">&amp;</span>clean_mention(<span class="kw-2">&amp;</span>cache, mention, options, users));
+                            content.push_str(<span class="kw-2">&amp;</span>clean_mention(guild, mention, options, users));
                             cleaned = <span class="bool-val">true</span>;
                         }
                     }
@@ -657,53 +608,39 @@
 }
 
 <span class="kw">fn </span>clean_mention(
-    cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+    guild: <span class="kw-2">&amp;</span>Guild,
     mention: Mention,
     options: <span class="kw-2">&amp;</span>ContentSafeOptions,
     users: <span class="kw-2">&amp;</span>[User],
 ) -&gt; Cow&lt;<span class="lifetime">'static</span>, str&gt; {
-    <span class="kw">let </span>cache = cache.as_ref();
     <span class="kw">match </span>mention {
         Mention::Channel(id) =&gt; {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = id.to_channel_cached(cache) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = guild.channels.get(<span class="kw-2">&amp;</span>id) {
                 <span class="macro">format!</span>(<span class="string">"#{}"</span>, channel.name).into()
             } <span class="kw">else </span>{
                 <span class="string">"#deleted-channel"</span>.into()
             }
         },
-        Mention::Role(id) =&gt; options
-            .guild_reference
-            .and_then(|id| cache.guild(id))
-            .and_then(|g| g.roles.get(<span class="kw-2">&amp;</span>id).map(|role| <span class="macro">format!</span>(<span class="string">"@{}"</span>, role.name).into()))
-            .unwrap_or(Cow::Borrowed(<span class="string">"@deleted-role"</span>)),
+        Mention::Role(id) =&gt; guild
+            .roles
+            .get(<span class="kw-2">&amp;</span>id)
+            .map_or(Cow::Borrowed(<span class="string">"@deleted-role"</span>), |role| <span class="macro">format!</span>(<span class="string">"@{}"</span>, role.name).into()),
         Mention::User(id) =&gt; {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = options.guild_reference {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.guild(guild_id) {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = guild.members.get(<span class="kw-2">&amp;</span>id) {
-                        <span class="kw">return if </span>options.show_discriminator {
-                            <span class="macro">format!</span>(<span class="string">"@{}"</span>, member.distinct())
-                        } <span class="kw">else </span>{
-                            <span class="macro">format!</span>(<span class="string">"@{}"</span>, member.display_name())
-                        }
-                        .into();
-                    }
-                }
-            }
-
-            <span class="kw">let </span>get_username = |user: <span class="kw-2">&amp;</span>User| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = guild.members.get(<span class="kw-2">&amp;</span>id) {
                 <span class="kw">if </span>options.show_discriminator {
-                    <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.tag())
+                    <span class="macro">format!</span>(<span class="string">"@{}"</span>, member.distinct()).into()
                 } <span class="kw">else </span>{
-                    <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.name)
+                    <span class="macro">format!</span>(<span class="string">"@{}"</span>, member.display_name()).into()
                 }
-                .into()
-            };
-
-            cache
-                .user(id)
-                .map(|u| get_username(<span class="kw-2">&amp;</span>u))
-                .or_else(|| users.iter().find(|u| u.id == id).map(get_username))
-                .unwrap_or(Cow::Borrowed(<span class="string">"@invalid-user"</span>))
+            } <span class="kw">else if let </span><span class="prelude-val">Some</span>(user) = users.iter().find(|u| u.id == id) {
+                <span class="kw">if </span>options.show_discriminator {
+                    <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.tag()).into()
+                } <span class="kw">else </span>{
+                    <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.name).into()
+                }
+            } <span class="kw">else </span>{
+                <span class="string">"@invalid-user"</span>.into()
+            }
         },
     }
 }
@@ -711,12 +648,10 @@
 <span class="attr">#[allow(clippy::non_ascii_literal)]
 #[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>std::sync::Arc;
-
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::model::channel::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::model::guild::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, RoleId, UserId};
+    <span class="kw">use </span><span class="kw">crate</span>::model::id::{ChannelId, GuildId, RoleId, UserId};
     <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
 
     <span class="attr">#[test]
@@ -727,16 +662,12 @@
             ..Default::default()
         };
 
-        <span class="kw">let </span>outside_cache_user = User {
-            id: UserId::new(<span class="number">100000000000000001</span>),
-            name: <span class="string">"Boat"</span>.to_string().into(),
-            ..Default::default()
-        };
-
-        <span class="kw">let </span><span class="kw-2">mut </span>guild = Guild {
+        <span class="kw">let </span>no_member_guild = Guild {
             id: GuildId::new(<span class="number">381880193251409931</span>),
             ..Default::default()
         };
+
+        <span class="kw">let </span><span class="kw-2">mut </span>guild = no_member_guild.clone();
 
         <span class="kw">let </span>member = Member {
             nick: <span class="prelude-val">Some</span>(<span class="string">"Ferris"</span>.to_string().into()),
@@ -755,14 +686,9 @@
             ..Default::default()
         };
 
-        <span class="kw">let </span>cache = Arc::new(Cache::default());
-
         guild.channels.insert(channel.id, channel.clone());
         guild.members.insert(user.id, member.clone());
         guild.roles.insert(role.id, role);
-        cache.users.insert(user.id, user.clone());
-        cache.guilds.insert(guild.id, guild.clone());
-        cache.channels.insert(channel.id, guild.id);
 
         <span class="kw">let </span>with_user_mentions = <span class="string">"&lt;@!100000000000000000&gt; &lt;@!000000000000000000&gt; &lt;@123&gt; &lt;@!123&gt; \
         &lt;@!123123123123123123123&gt; &lt;@123&gt; &lt;@123123123123123123&gt; &lt;@!invalid&gt; \
@@ -770,7 +696,7 @@
         &lt;@!i)/==(&lt;&lt;&gt;z/9080)&gt; &lt;@!1231invalid&gt; &lt;@invalid123&gt; \
         &lt;@123invalid&gt; &lt;@&gt; &lt;@ "</span>;
 
-        <span class="kw">let </span>without_user_mentions = <span class="string">"@Crab &lt;@!000000000000000000&gt; @invalid-user @invalid-user \
+        <span class="kw">let </span>without_user_mentions = <span class="string">"@Ferris &lt;@!000000000000000000&gt; @invalid-user @invalid-user \
         &lt;@!123123123123123123123&gt; @invalid-user @invalid-user &lt;@!invalid&gt; \
         &lt;@invalid&gt; &lt;@日本語 한국어$§)[/__#\\(/&amp;2032$§#&gt; \
         &lt;@!i)/==(&lt;&lt;&gt;z/9080)&gt; &lt;@!1231invalid&gt; &lt;@invalid123&gt; \
@@ -778,49 +704,31 @@
 
         <span class="comment">// User mentions
         </span><span class="kw">let </span>options = ContentSafeOptions::default();
-        <span class="macro">assert_eq!</span>(without_user_mentions, content_safe(<span class="kw-2">&amp;</span>cache, with_user_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert_eq!</span>(without_user_mentions, content_safe(<span class="kw-2">&amp;</span>guild, with_user_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
 
-        <span class="kw">let </span>options = ContentSafeOptions::default();
+        <span class="macro">assert_eq!</span>(
+            <span class="string">"@invalid-user"</span>,
+            content_safe(<span class="kw-2">&amp;</span>no_member_guild, <span class="string">"&lt;@100000000000000001&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+        );
+
+        <span class="kw">let </span>options = ContentSafeOptions::default().show_discriminator(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(
             <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.name),
-            content_safe(<span class="kw-2">&amp;</span>cache, <span class="string">"&lt;@!100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+            content_safe(<span class="kw-2">&amp;</span>no_member_guild, <span class="string">"&lt;@!100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[user.clone()])
         );
 
-        <span class="kw">let </span>options = ContentSafeOptions::default();
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.name),
-            content_safe(<span class="kw-2">&amp;</span>cache, <span class="string">"&lt;@100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+            <span class="string">"@invalid-user"</span>,
+            content_safe(<span class="kw-2">&amp;</span>no_member_guild, <span class="string">"&lt;@!100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
         );
 
-        <span class="kw">let </span>options = ContentSafeOptions::default();
-        <span class="macro">assert_eq!</span>(<span class="string">"@invalid-user"</span>, content_safe(<span class="kw-2">&amp;</span>cache, <span class="string">"&lt;@100000000000000001&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
-
-        <span class="kw">let </span>options = ContentSafeOptions::default();
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"@{}"</span>, outside_cache_user.name),
-            content_safe(<span class="kw-2">&amp;</span>cache, <span class="string">"&lt;@100000000000000001&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[outside_cache_user])
-        );
-
-        <span class="kw">let </span>options = options.show_discriminator(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.name),
-            content_safe(<span class="kw-2">&amp;</span>cache, <span class="string">"&lt;@!100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
-        );
-
-        <span class="kw">let </span>options = options.show_discriminator(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"@{}"</span>, user.name),
-            content_safe(<span class="kw-2">&amp;</span>cache, <span class="string">"&lt;@100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
-        );
-
-        <span class="kw">let </span>options = options.display_as_member_from(guild.id);
-        <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">"@{}"</span>, member.nick.unwrap()),
-            content_safe(<span class="kw-2">&amp;</span>cache, <span class="string">"&lt;@!100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+            <span class="macro">format!</span>(<span class="string">"@{}"</span>, member.nick.as_ref().unwrap()),
+            content_safe(<span class="kw-2">&amp;</span>guild, <span class="string">"&lt;@100000000000000000&gt;"</span>, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
         );
 
         <span class="kw">let </span>options = options.clean_user(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(with_user_mentions, content_safe(<span class="kw-2">&amp;</span>cache, with_user_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert_eq!</span>(with_user_mentions, content_safe(<span class="kw-2">&amp;</span>guild, with_user_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
 
         <span class="comment">// Channel mentions
         </span><span class="kw">let </span>with_channel_mentions = <span class="string">"&lt;#&gt; &lt;#deleted-channel&gt; #deleted-channel &lt;#1&gt; \
@@ -833,13 +741,13 @@
 
         <span class="macro">assert_eq!</span>(
             without_channel_mentions,
-            content_safe(<span class="kw-2">&amp;</span>cache, with_channel_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+            content_safe(<span class="kw-2">&amp;</span>guild, with_channel_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
         );
 
         <span class="kw">let </span>options = options.clean_channel(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(
             with_channel_mentions,
-            content_safe(<span class="kw-2">&amp;</span>cache, with_channel_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+            content_safe(<span class="kw-2">&amp;</span>guild, with_channel_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
         );
 
         <span class="comment">// Role mentions
@@ -851,10 +759,10 @@
         @ferris-club-member @deleted-role \
         &lt;@&amp;111111111111111111111111111111&gt; &lt;@&amp;@deleted-role"</span>;
 
-        <span class="macro">assert_eq!</span>(without_role_mentions, content_safe(<span class="kw-2">&amp;</span>cache, with_role_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert_eq!</span>(without_role_mentions, content_safe(<span class="kw-2">&amp;</span>guild, with_role_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
 
         <span class="kw">let </span>options = options.clean_role(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(with_role_mentions, content_safe(<span class="kw-2">&amp;</span>cache, with_role_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert_eq!</span>(with_role_mentions, content_safe(<span class="kw-2">&amp;</span>guild, with_role_mentions, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
 
         <span class="comment">// Everyone mentions
         </span><span class="kw">let </span>with_everyone_mention = <span class="string">"@everyone"</span>;
@@ -863,13 +771,13 @@
 
         <span class="macro">assert_eq!</span>(
             without_everyone_mention,
-            content_safe(<span class="kw-2">&amp;</span>cache, with_everyone_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+            content_safe(<span class="kw-2">&amp;</span>guild, with_everyone_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
         );
 
         <span class="kw">let </span>options = options.clean_everyone(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(
             with_everyone_mention,
-            content_safe(<span class="kw-2">&amp;</span>cache, with_everyone_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
+            content_safe(<span class="kw-2">&amp;</span>guild, with_everyone_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[])
         );
 
         <span class="comment">// Here mentions
@@ -877,10 +785,10 @@
 
         <span class="kw">let </span>without_here_mention = <span class="string">"@\u{200B}here"</span>;
 
-        <span class="macro">assert_eq!</span>(without_here_mention, content_safe(<span class="kw-2">&amp;</span>cache, with_here_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert_eq!</span>(without_here_mention, content_safe(<span class="kw-2">&amp;</span>guild, with_here_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
 
         <span class="kw">let </span>options = options.clean_here(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(with_here_mention, content_safe(<span class="kw-2">&amp;</span>cache, with_here_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert_eq!</span>(with_here_mention, content_safe(<span class="kw-2">&amp;</span>guild, with_here_mention, <span class="kw-2">&amp;</span>options, <span class="kw-2">&amp;</span>[]));
     }
 }
 </code></pre></div></section></main></body></html>

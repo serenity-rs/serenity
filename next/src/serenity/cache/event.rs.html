@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (2d7be7393 2023-12-23)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/event.rs`."><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (89e2160c4 2023-12-27)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -565,33 +565,6 @@
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
-<a href="#575" id="575">575</a>
-<a href="#576" id="576">576</a>
-<a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 <span class="kw">use </span>std::num::NonZeroU16;
 
@@ -691,14 +664,7 @@
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
         cache.unavailable_guilds.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id);
-        <span class="kw">let </span><span class="kw-2">mut </span>guild = <span class="self">self</span>.guild.clone();
-
-        <span class="kw">for </span>(user_id, member) <span class="kw">in </span><span class="kw-2">&amp;mut </span>guild.members {
-            cache.update_user_entry(<span class="kw-2">&amp;</span>member.user);
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(u) = cache.user(user_id) {
-                member.user = u.clone();
-            }
-        }
+        <span class="kw">let </span>guild = <span class="self">self</span>.guild.clone();
 
         cache.guilds.insert(<span class="self">self</span>.guild.id, guild);
         <span class="kw">for </span>channel_id <span class="kw">in </span><span class="self">self</span>.guild.channels.keys() {
@@ -753,15 +719,9 @@
     <span class="kw">type </span>Output = ();
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
-        <span class="kw">let </span>user_id = <span class="self">self</span>.member.user.id;
-        cache.update_user_entry(<span class="kw-2">&amp;</span><span class="self">self</span>.member.user);
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(u) = cache.user(user_id) {
-            <span class="self">self</span>.member.user = u.clone();
-        }
-
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.member.guild_id) {
             guild.member_count += <span class="number">1</span>;
-            guild.members.insert(user_id, <span class="self">self</span>.member.clone());
+            guild.members.insert(<span class="self">self</span>.member.user.id, <span class="self">self</span>.member.clone());
         }
 
         <span class="prelude-val">None
@@ -785,8 +745,6 @@
     <span class="kw">type </span>Output = Member;
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
-        cache.update_user_entry(<span class="kw-2">&amp;</span><span class="self">self</span>.user);
-
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id) {
             <span class="kw">let </span>item = <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = guild.members.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.user.id) {
                 <span class="kw">let </span>item = <span class="prelude-val">Some</span>(member.clone());
@@ -836,10 +794,6 @@
     <span class="kw">type </span>Output = ();
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
-        <span class="kw">for </span>member <span class="kw">in </span><span class="self">self</span>.members.values() {
-            cache.update_user_entry(<span class="kw-2">&amp;</span>member.user);
-        }
-
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>g) = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id) {
             g.members.extend(<span class="self">self</span>.members.clone());
         }
@@ -979,14 +933,6 @@
     <span class="kw">type </span>Output = ();
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="self">self</span>.presence.user.to_user() {
-            cache.update_user_entry(<span class="kw-2">&amp;</span>user);
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = cache.user(<span class="self">self</span>.presence.user.id) {
-            <span class="self">self</span>.presence.user.update_with_user(<span class="kw-2">&amp;</span>user);
-        }
-
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.presence.guild_id {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id) {
                 <span class="comment">// If the member went offline, remove them from the presence list.
