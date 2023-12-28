@@ -12,7 +12,7 @@ use crate::model::user::User;
     document_setters,
     owning_setters
 )]
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct ContentSafeOptions {
     /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name prefixed with `@`
     /// (`@rolename`) or with `@deleted-role` if the identifier is invalid.
@@ -69,7 +69,7 @@ impl Default for ContentSafeOptions {
 /// use serenity::utils::{content_safe, ContentSafeOptions};
 ///
 /// let with_mention = "@everyone";
-/// let without_mention = content_safe(&guild, &with_mention, &ContentSafeOptions::default(), &[]);
+/// let without_mention = content_safe(&guild, &with_mention, ContentSafeOptions::default(), &[]);
 ///
 /// assert_eq!("@\u{200B}everyone", without_mention);
 /// ```
@@ -83,12 +83,7 @@ impl Default for ContentSafeOptions {
 ///
 /// fn filter_message(cache: &Cache, message: &Message) -> String {
 ///     if let Some(guild) = message.guild(cache) {
-///         content_safe(
-///             &guild,
-///             &message.content,
-///             &ContentSafeOptions::default(),
-///             &message.mentions,
-///         )
+///         content_safe(&guild, &message.content, ContentSafeOptions::default(), &message.mentions)
 ///     } else {
 ///         // We don't need to clean messages in DMs
 ///         message.content.to_string()
@@ -98,7 +93,7 @@ impl Default for ContentSafeOptions {
 pub fn content_safe(
     guild: &Guild,
     s: impl AsRef<str>,
-    options: &ContentSafeOptions,
+    options: ContentSafeOptions,
     users: &[User],
 ) -> String {
     let mut content = clean_mentions(guild, s, options, users);
@@ -117,7 +112,7 @@ pub fn content_safe(
 fn clean_mentions(
     guild: &Guild,
     s: impl AsRef<str>,
-    options: &ContentSafeOptions,
+    options: ContentSafeOptions,
     users: &[User],
 ) -> String {
     let s = s.as_ref();
@@ -173,7 +168,7 @@ fn clean_mentions(
 fn clean_mention(
     guild: &Guild,
     mention: Mention,
-    options: &ContentSafeOptions,
+    options: ContentSafeOptions,
     users: &[User],
 ) -> Cow<'static, str> {
     match mention {
@@ -267,32 +262,32 @@ mod tests {
 
         // User mentions
         let options = ContentSafeOptions::default();
-        assert_eq!(without_user_mentions, content_safe(&guild, with_user_mentions, &options, &[]));
+        assert_eq!(without_user_mentions, content_safe(&guild, with_user_mentions, options, &[]));
 
         assert_eq!(
             "@invalid-user",
-            content_safe(&no_member_guild, "<@100000000000000001>", &options, &[])
+            content_safe(&no_member_guild, "<@100000000000000001>", options, &[])
         );
 
         let mut options = ContentSafeOptions::default();
         options = options.show_discriminator(false);
         assert_eq!(
             format!("@{}", user.name),
-            content_safe(&no_member_guild, "<@!100000000000000000>", &options, &[user.clone()])
+            content_safe(&no_member_guild, "<@!100000000000000000>", options, &[user.clone()])
         );
 
         assert_eq!(
             "@invalid-user",
-            content_safe(&no_member_guild, "<@!100000000000000000>", &options, &[])
+            content_safe(&no_member_guild, "<@!100000000000000000>", options, &[])
         );
 
         assert_eq!(
             format!("@{}", member.nick.as_ref().unwrap()),
-            content_safe(&guild, "<@100000000000000000>", &options, &[])
+            content_safe(&guild, "<@100000000000000000>", options, &[])
         );
 
         options = options.clean_user(false);
-        assert_eq!(with_user_mentions, content_safe(&guild, with_user_mentions, &options, &[]));
+        assert_eq!(with_user_mentions, content_safe(&guild, with_user_mentions, options, &[]));
 
         // Channel mentions
         let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#1> \
@@ -305,13 +300,13 @@ mod tests {
 
         assert_eq!(
             without_channel_mentions,
-            content_safe(&guild, with_channel_mentions, &options, &[])
+            content_safe(&guild, with_channel_mentions, options, &[])
         );
 
         options = options.clean_channel(false);
         assert_eq!(
             with_channel_mentions,
-            content_safe(&guild, with_channel_mentions, &options, &[])
+            content_safe(&guild, with_channel_mentions, options, &[])
         );
 
         // Role mentions
@@ -323,10 +318,10 @@ mod tests {
         @ferris-club-member @deleted-role \
         <@&111111111111111111111111111111> <@&@deleted-role";
 
-        assert_eq!(without_role_mentions, content_safe(&guild, with_role_mentions, &options, &[]));
+        assert_eq!(without_role_mentions, content_safe(&guild, with_role_mentions, options, &[]));
 
         options = options.clean_role(false);
-        assert_eq!(with_role_mentions, content_safe(&guild, with_role_mentions, &options, &[]));
+        assert_eq!(with_role_mentions, content_safe(&guild, with_role_mentions, options, &[]));
 
         // Everyone mentions
         let with_everyone_mention = "@everyone";
@@ -334,13 +329,13 @@ mod tests {
 
         assert_eq!(
             without_everyone_mention,
-            content_safe(&guild, with_everyone_mention, &options, &[])
+            content_safe(&guild, with_everyone_mention, options, &[])
         );
 
         options = options.clean_everyone(false);
         assert_eq!(
             with_everyone_mention,
-            content_safe(&guild, with_everyone_mention, &options, &[])
+            content_safe(&guild, with_everyone_mention, options, &[])
         );
 
         // Here mentions
@@ -348,9 +343,9 @@ mod tests {
 
         let without_here_mention = "@\u{200B}here";
 
-        assert_eq!(without_here_mention, content_safe(&guild, with_here_mention, &options, &[]));
+        assert_eq!(without_here_mention, content_safe(&guild, with_here_mention, options, &[]));
 
         options = options.clean_here(false);
-        assert_eq!(with_here_mention, content_safe(&guild, with_here_mention, &options, &[]));
+        assert_eq!(with_here_mention, content_safe(&guild, with_here_mention, options, &[]));
     }
 }
