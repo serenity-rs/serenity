@@ -293,8 +293,8 @@
     ///
     /// The maximum number of fields is 25.
     </span><span class="attr">#[serde(default)]
-    #[serde(skip_serializing_if = <span class="string">"Vec::is_empty"</span>)]
-    </span><span class="kw">pub </span>fields: Vec&lt;EmbedField&gt;,
+    #[serde(skip_serializing_if = <span class="string">"FixedArray::is_empty"</span>)]
+    </span><span class="kw">pub </span>fields: FixedArray&lt;EmbedField, u8&gt;,
 }
 
 <span class="doccomment">/// An author object in an embed.
