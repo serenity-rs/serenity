@@ -66,8 +66,8 @@ pub struct Embed {
     ///
     /// The maximum number of fields is 25.
     #[serde(default)]
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub fields: Vec<EmbedField>,
+    #[serde(skip_serializing_if = "FixedArray::is_empty")]
+    pub fields: FixedArray<EmbedField, u8>,
 }
 
 /// An author object in an embed.
