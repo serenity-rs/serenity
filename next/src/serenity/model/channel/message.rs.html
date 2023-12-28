@@ -2262,7 +2262,7 @@
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>Nonce {
-    String(String),
+    String(FixedString),
     Number(u64),
 }
 

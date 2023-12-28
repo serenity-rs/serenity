@@ -337,7 +337,7 @@
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>EntityType {
     Int(u64),
-    Str(String),
+    Str(FixedString),
 }
 
 <span class="macro">macro_rules! </span>generate_change {
@@ -373,20 +373,20 @@
             </span>RolesAdded {
                 <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
                 #[serde(rename = <span class="string">"old_value"</span>)]
-                </span>old: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+                </span>old: <span class="prelude-ty">Option</span>&lt;FixedArray&lt;AffectedRole&gt;&gt;,
                 <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
                 #[serde(rename = <span class="string">"new_value"</span>)]
-                </span>new: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+                </span>new: <span class="prelude-ty">Option</span>&lt;FixedArray&lt;AffectedRole&gt;&gt;,
             },
             <span class="doccomment">/// Role was removed to a member.
             </span><span class="attr">#[serde(rename = <span class="string">"$remove"</span>)]
             </span>RolesRemove {
                 <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
                 #[serde(rename = <span class="string">"old_value"</span>)]
-                </span>old: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+                </span>old: <span class="prelude-ty">Option</span>&lt;FixedArray&lt;AffectedRole&gt;&gt;,
                 <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
                 #[serde(rename = <span class="string">"new_value"</span>)]
-                </span>new: <span class="prelude-ty">Option</span>&lt;Vec&lt;AffectedRole&gt;&gt;,
+                </span>new: <span class="prelude-ty">Option</span>&lt;FixedArray&lt;AffectedRole&gt;&gt;,
             },
 
             <span class="doccomment">/// Unknown key was changed.
@@ -421,7 +421,7 @@
 }
 
 <span class="macro">generate_change! </span>{
-    <span class="string">"actions" </span>=&gt; Actions(Vec&lt;Action&gt;),
+    <span class="string">"actions" </span>=&gt; Actions(FixedArray&lt;Action&gt;),
     <span class="doccomment">/// AFK channel was changed.
     </span><span class="string">"afk_channel_id" </span>=&gt; AfkChannelId(ChannelId),
     <span class="doccomment">/// AFK timeout duration was changed.
@@ -432,7 +432,7 @@
     </span><span class="string">"application_id" </span>=&gt; ApplicationId(ApplicationId),
     <span class="doccomment">/// Thread is now archived/unarchived.
     </span><span class="string">"archived" </span>=&gt; Archived(bool),
-    <span class="string">"asset" </span>=&gt; Asset(String),
+    <span class="string">"asset" </span>=&gt; Asset(FixedString),
     <span class="doccomment">/// Auto archive duration of a thread was changed.
     </span><span class="string">"auto_archive_duration" </span>=&gt; AutoArchiveDuration(u16),
     <span class="doccomment">/// Availability of a sticker was changed.
@@ -446,7 +446,7 @@
     <span class="doccomment">/// Channel for invite code or guild scheduled event was changed.
     </span><span class="string">"channel_id" </span>=&gt; ChannelId(ChannelId),
     <span class="doccomment">/// Invite code was changed.
-    </span><span class="string">"code" </span>=&gt; Code(String),
+    </span><span class="string">"code" </span>=&gt; Code(FixedString),
     <span class="doccomment">/// Role color was changed.
     </span><span class="string">"color" </span>=&gt; Color(u32),
     <span class="doccomment">/// Member timeout state was changed.
@@ -460,7 +460,7 @@
     <span class="doccomment">/// Permission on a text or voice channel was denied for a role.
     </span><span class="string">"deny" </span>=&gt; Deny(Permissions),
     <span class="doccomment">/// Description for guild, sticker, or guild scheduled event was changed.
-    </span><span class="string">"description" </span>=&gt; Description(String),
+    </span><span class="string">"description" </span>=&gt; Description(FixedString),
     <span class="doccomment">/// Guild's discovery splash was changed.
     </span><span class="string">"discovery_splash_hash" </span>=&gt; DiscoverySplashHash(ImageHash),
     <span class="string">"enabled" </span>=&gt; Enabled(bool),
@@ -469,8 +469,8 @@
     <span class="doccomment">/// Entity type of guild scheduled event was changed.
     </span><span class="string">"entity_type" </span>=&gt; EntityType(u64),
     <span class="string">"event_type" </span>=&gt; EventType(EventType),
-    <span class="string">"exempt_channels" </span>=&gt; ExemptChannels(Vec&lt;ChannelId&gt;),
-    <span class="string">"exempt_roles" </span>=&gt; ExemptRoles(Vec&lt;RoleId&gt;),
+    <span class="string">"exempt_channels" </span>=&gt; ExemptChannels(FixedArray&lt;ChannelId&gt;),
+    <span class="string">"exempt_roles" </span>=&gt; ExemptRoles(FixedArray&lt;RoleId&gt;),
     <span class="doccomment">/// Behavior of the expiration of an integration was changed.
     </span><span class="string">"expire_behavior" </span>=&gt; ExpireBehavior(u64),
     <span class="doccomment">/// Grace period of the expiration of an integration was changed.
@@ -496,7 +496,7 @@
     <span class="doccomment">/// ID of the user who created the invite.
     </span><span class="string">"inviter_id" </span>=&gt; InviterId(UserId),
     <span class="doccomment">/// Location for a guild scheduled event was changed.
-    </span><span class="string">"location" </span>=&gt; Location(String),
+    </span><span class="string">"location" </span>=&gt; Location(FixedString),
     <span class="doccomment">/// Thread was locked/unlocked.
     </span><span class="string">"locked" </span>=&gt; Locked(bool),
     <span class="doccomment">/// How long invite code lasts was changed.
@@ -510,21 +510,21 @@
     <span class="doccomment">/// User was server muted/unmuted.
     </span><span class="string">"mute" </span>=&gt; Mute(bool),
     <span class="doccomment">/// Name of an entity was changed.
-    </span><span class="string">"name" </span>=&gt; Name(String),
+    </span><span class="string">"name" </span>=&gt; Name(FixedString),
     <span class="doccomment">/// Nickname of a member was changed.
-    </span><span class="string">"nick" </span>=&gt; Nick(String),
+    </span><span class="string">"nick" </span>=&gt; Nick(FixedString),
     <span class="doccomment">/// Channel NSFW restriction was changed.
     </span><span class="string">"nsfw" </span>=&gt; Nsfw(bool),
     <span class="doccomment">/// Owner of a guild was changed.
     </span><span class="string">"owner_id" </span>=&gt; OwnerId(UserId),
     <span class="doccomment">/// Permissions on a channel were changed.
-    </span><span class="string">"permission_overwrites" </span>=&gt; PermissionOverwrites(Vec&lt;PermissionOverwrite&gt;),
+    </span><span class="string">"permission_overwrites" </span>=&gt; PermissionOverwrites(FixedArray&lt;PermissionOverwrite&gt;),
     <span class="doccomment">/// Permissions for a role were changed.
     </span><span class="string">"permissions" </span>=&gt; Permissions(Permissions),
     <span class="doccomment">/// Channel or role position was changed.
     </span><span class="string">"position" </span>=&gt; Position(u32),
     <span class="doccomment">/// Preferred locale of a guild was changed.
-    </span><span class="string">"preferred_locale" </span>=&gt; PreferredLocale(String),
+    </span><span class="string">"preferred_locale" </span>=&gt; PreferredLocale(FixedString),
     <span class="doccomment">/// Privacy level of the stage instance was changed.
     </span><span class="string">"privacy_level" </span>=&gt; PrivacyLevel(u64),
     <span class="doccomment">/// Number of days after which inactive and role-unassigned members are kicked was changed.
@@ -534,7 +534,7 @@
     <span class="doccomment">/// Ratelimit per user in a text channel was changed.
     </span><span class="string">"rate_limit_per_user" </span>=&gt; RateLimitPerUser(u16),
     <span class="doccomment">/// Region of a guild was changed.
-    </span><span class="string">"region" </span>=&gt; Region(String),
+    </span><span class="string">"region" </span>=&gt; Region(FixedString),
     <span class="doccomment">/// ID of the rules channel was changed.
     </span><span class="string">"rules_channel_id" </span>=&gt; RulesChannelId(ChannelId),
     <span class="doccomment">/// Invite splash page artwork was changed.
@@ -544,23 +544,23 @@
     <span class="doccomment">/// ID of the system channel was changed.
     </span><span class="string">"system_channel_id" </span>=&gt; SystemChannelId(ChannelId),
     <span class="doccomment">/// Related emoji of a sticker was changed.
-    </span><span class="string">"tags" </span>=&gt; Tags(String),
+    </span><span class="string">"tags" </span>=&gt; Tags(FixedString),
     <span class="doccomment">/// Whether an invite is temporary or never expires was changed.
     </span><span class="string">"temporary" </span>=&gt; Temporary(bool),
     <span class="doccomment">/// Topic of a text channel or stage instance was changed.
-    </span><span class="string">"topic" </span>=&gt; Topic(String),
+    </span><span class="string">"topic" </span>=&gt; Topic(FixedString),
     <span class="string">"trigger_metadata" </span>=&gt; TriggerMetadata(TriggerMetadata),
     <span class="string">"trigger_type" </span>=&gt; TriggerType(TriggerType),
     <span class="doccomment">/// Type of a created entity.
     </span><span class="string">"type" </span>=&gt; Type(EntityType),
     <span class="doccomment">/// Unicode emoji of a role icon was changed.
-    </span><span class="string">"unicode_emoji" </span>=&gt; UnicodeEmoji(String),
+    </span><span class="string">"unicode_emoji" </span>=&gt; UnicodeEmoji(FixedString),
     <span class="doccomment">/// Maximum number of users in a voice channel was changed.
     </span><span class="string">"user_limit" </span>=&gt; UserLimit(u64),
     <span class="doccomment">/// Number of uses of an invite was changed.
     </span><span class="string">"uses" </span>=&gt; Uses(u64),
     <span class="doccomment">/// Guild invite vanity url was changed.
-    </span><span class="string">"vanity_url_code" </span>=&gt; VanityUrlCode(String),
+    </span><span class="string">"vanity_url_code" </span>=&gt; VanityUrlCode(FixedString),
     <span class="doccomment">/// Required verification level for new members was changed.
     </span><span class="string">"verification_level" </span>=&gt; VerificationLevel(VerificationLevel),
     <span class="doccomment">/// Channel of the server widget was changed.
@@ -601,7 +601,7 @@
     </span><span class="kw">fn </span>entity_type_variant() {
         <span class="kw">let </span>value = Change::Type {
             old: <span class="prelude-val">Some</span>(EntityType::Int(<span class="number">123</span>)),
-            new: <span class="prelude-val">Some</span>(EntityType::Str(<span class="string">"discord"</span>.into())),
+            new: <span class="prelude-val">Some</span>(EntityType::Str(<span class="string">"discord"</span>.to_string().into())),
         };
         assert_json(<span class="kw-2">&amp;</span>value, <span class="macro">json!</span>({<span class="string">"key"</span>: <span class="string">"type"</span>, <span class="string">"old_value"</span>: <span class="number">123</span>, <span class="string">"new_value"</span>: <span class="string">"discord"</span>}));
     }

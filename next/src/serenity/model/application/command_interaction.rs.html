@@ -1228,10 +1228,10 @@
             <span class="kw">for </span>opt <span class="kw">in </span>opts {
                 <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>opt.value {
                     CommandDataOptionValue::SubCommand(opts) =&gt; {
-                        ResolvedValue::SubCommand(resolve_options(opts, resolved))
+                        ResolvedValue::SubCommand(resolve_options(opts, resolved).into())
                     },
                     CommandDataOptionValue::SubCommandGroup(opts) =&gt; {
-                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved))
+                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved).into())
                     },
                     CommandDataOptionValue::Autocomplete {
                         kind,
@@ -1336,8 +1336,8 @@
     Integer(i64),
     Number(f64),
     String(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str),
-    SubCommand(Vec&lt;ResolvedOption&lt;<span class="lifetime">'a</span>&gt;&gt;),
-    SubCommandGroup(Vec&lt;ResolvedOption&lt;<span class="lifetime">'a</span>&gt;&gt;),
+    SubCommand(FixedArray&lt;ResolvedOption&lt;<span class="lifetime">'a</span>&gt;&gt;),
+    SubCommandGroup(FixedArray&lt;ResolvedOption&lt;<span class="lifetime">'a</span>&gt;&gt;),
     Attachment(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Attachment),
     Channel(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PartialChannel),
     Role(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Role),
