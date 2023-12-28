@@ -21,9 +21,22 @@ use crate::model::prelude::*;
 /// A builder to create an embed in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 #[must_use]
-pub struct CreateEmbed(Embed);
+pub struct CreateEmbed {
+    inner: Embed,
+    fields: Vec<EmbedField>,
+}
+
+impl serde::Serialize for CreateEmbed {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        let owned_self = self.clone();
+
+        let mut embed = owned_self.inner;
+        embed.fields = owned_self.fields.into();
+        embed.serialize(serializer)
+    }
+}
 
 impl CreateEmbed {
     /// Equivalent to [`Self::default`].
@@ -35,7 +48,7 @@ impl CreateEmbed {
     ///
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more information.
     pub fn author(mut self, author: CreateEmbedAuthor) -> Self {
-        self.0.author = Some(author.0);
+        self.inner.author = Some(author.0);
         self
     }
 
@@ -50,7 +63,7 @@ impl CreateEmbed {
     /// Set the colour of the left-hand side of the embed.
     #[inline]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self.0.colour = Some(colour.into());
+        self.inner.colour = Some(colour.into());
         self
     }
 
@@ -59,7 +72,7 @@ impl CreateEmbed {
     /// **Note**: This can't be longer than 4096 characters.
     #[inline]
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.0.description = Some(description.into().into());
+        self.inner.description = Some(description.into().into());
         self
     }
 
@@ -74,7 +87,7 @@ impl CreateEmbed {
         value: impl Into<String>,
         inline: bool,
     ) -> Self {
-        self.0.fields.push(EmbedField::new(name, value, inline));
+        self.fields.push(EmbedField::new(name, value, inline));
         self
     }
 
@@ -88,7 +101,7 @@ impl CreateEmbed {
     {
         let fields =
             fields.into_iter().map(|(name, value, inline)| EmbedField::new(name, value, inline));
-        self.0.fields.extend(fields);
+        self.fields.extend(fields);
         self
     }
 
@@ -96,7 +109,7 @@ impl CreateEmbed {
     ///
     /// Refer to the documentation for [`CreateEmbedFooter`] for more information.
     pub fn footer(mut self, footer: CreateEmbedFooter) -> Self {
-        self.0.footer = Some(footer.0);
+        self.inner.footer = Some(footer.0);
         self
     }
 
@@ -106,7 +119,7 @@ impl CreateEmbed {
     /// for rules on naming local attachments.
     #[inline]
     pub fn image(mut self, url: impl Into<String>) -> Self {
-        self.0.image = Some(EmbedImage {
+        self.inner.image = Some(EmbedImage {
             url: url.into().into(),
             proxy_url: None,
             height: None,
@@ -118,7 +131,7 @@ impl CreateEmbed {
     /// Set the thumbnail of the embed.
     #[inline]
     pub fn thumbnail(mut self, url: impl Into<String>) -> Self {
-        self.0.thumbnail = Some(EmbedThumbnail {
+        self.inner.thumbnail = Some(EmbedThumbnail {
             url: url.into().into(),
             proxy_url: None,
             height: None,
@@ -143,21 +156,21 @@ impl CreateEmbed {
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.0.timestamp = Some(timestamp.into());
+        self.inner.timestamp = Some(timestamp.into());
         self
     }
 
     /// Set the title of the embed.
     #[inline]
     pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.0.title = Some(title.into().into());
+        self.inner.title = Some(title.into().into());
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
     pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.0.url = Some(url.into().into());
+        self.inner.url = Some(url.into().into());
         self
     }
 
@@ -179,24 +192,24 @@ impl CreateEmbed {
     #[cfg(feature = "http")]
     pub(super) fn check_length(&self) -> Result<()> {
         let mut length = 0;
-        if let Some(ref author) = self.0.author {
+        if let Some(ref author) = self.inner.author {
             length += author.name.chars().count();
         }
 
-        if let Some(ref description) = self.0.description {
+        if let Some(ref description) = self.inner.description {
             length += description.chars().count();
         }
 
-        for field in &self.0.fields {
+        for field in &self.fields {
             length += field.name.chars().count();
             length += field.value.chars().count();
         }
 
-        if let Some(ref footer) = self.0.footer {
+        if let Some(ref footer) = self.inner.footer {
             length += footer.text.chars().count();
         }
 
-        if let Some(ref title) = self.0.title {
+        if let Some(ref title) = self.inner.title {
             length += title.chars().count();
         }
 
@@ -208,27 +221,33 @@ impl CreateEmbed {
 impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> Self {
-        Self(Embed {
+        Self {
             fields: Vec::new(),
-            description: None,
-            thumbnail: None,
-            timestamp: None,
-            kind: Some("rich".to_string().into()),
-            author: None,
-            colour: None,
-            footer: None,
-            image: None,
-            title: None,
-            url: None,
-            video: None,
-            provider: None,
-        })
+            inner: Embed {
+                fields: FixedArray::new(),
+                description: None,
+                thumbnail: None,
+                timestamp: None,
+                kind: Some("rich".to_string().into()),
+                author: None,
+                colour: None,
+                footer: None,
+                image: None,
+                title: None,
+                url: None,
+                video: None,
+                provider: None,
+            },
+        }
     }
 }
 
 impl From<Embed> for CreateEmbed {
-    fn from(embed: Embed) -> Self {
-        Self(embed)
+    fn from(mut embed: Embed) -> Self {
+        Self {
+            fields: std::mem::take(&mut embed.fields).into_vec(),
+            inner: embed,
+        }
     }
 }
 
