@@ -1317,7 +1317,7 @@ impl MessageId {
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 pub enum Nonce {
-    String(String),
+    String(FixedString),
     Number(u64),
 }
 
