@@ -100,14 +100,7 @@ impl CacheUpdate for GuildCreateEvent {
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
         cache.unavailable_guilds.remove(&self.guild.id);
-        let mut guild = self.guild.clone();
-
-        for (user_id, member) in &mut guild.members {
-            cache.update_user_entry(&member.user);
-            if let Some(u) = cache.user(user_id) {
-                member.user = u.clone();
-            }
-        }
+        let guild = self.guild.clone();
 
         cache.guilds.insert(self.guild.id, guild);
         for channel_id in self.guild.channels.keys() {
@@ -162,15 +155,9 @@ impl CacheUpdate for GuildMemberAddEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        let user_id = self.member.user.id;
-        cache.update_user_entry(&self.member.user);
-        if let Some(u) = cache.user(user_id) {
-            self.member.user = u.clone();
-        }
-
         if let Some(mut guild) = cache.guilds.get_mut(&self.member.guild_id) {
             guild.member_count += 1;
-            guild.members.insert(user_id, self.member.clone());
+            guild.members.insert(self.member.user.id, self.member.clone());
         }
 
         None
@@ -194,8 +181,6 @@ impl CacheUpdate for GuildMemberUpdateEvent {
     type Output = Member;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        cache.update_user_entry(&self.user);
-
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
             let item = if let Some(member) = guild.members.get_mut(&self.user.id) {
                 let item = Some(member.clone());
@@ -247,10 +232,6 @@ impl CacheUpdate for GuildMembersChunkEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        for member in self.members.values() {
-            cache.update_user_entry(&member.user);
-        }
-
         if let Some(mut g) = cache.guilds.get_mut(&self.guild_id) {
             g.members.extend(self.members.clone());
         }
@@ -422,14 +403,6 @@ impl CacheUpdate for PresenceUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        if let Some(user) = self.presence.user.to_user() {
-            cache.update_user_entry(&user);
-        }
-
-        if let Some(user) = cache.user(self.presence.user.id) {
-            self.presence.user.update_with_user(&user);
-        }
-
         if let Some(guild_id) = self.presence.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
                 // If the member went offline, remove them from the presence list.
