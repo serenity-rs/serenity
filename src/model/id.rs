@@ -107,10 +107,10 @@ macro_rules! id_u64 {
             }
 
             impl std::str::FromStr for $name {
-                type Err = <u64 as std::str::FromStr>::Err;
+                type Err = ();
 
                 fn from_str(s: &str) -> Result<Self, Self::Err> {
-                    Ok(Self(s.parse()?))
+                    Ok(Self(snowflake::parse(s).ok_or(())?))
                 }
             }
 
@@ -325,6 +325,53 @@ pub(crate) mod snowflake {
     use serde::de::{Error, Visitor};
     use serde::{Deserializer, Serializer};
 
+    /// impl from std ([T]::as_chunks)
+    const fn as_chunks<T, const N: usize>(slice: &[T]) -> (&[[T; N]], &[T]) {
+        assert!(N != 0, "chunk size must be non-zero");
+        let len = slice.len() / N;
+        let (multiple_of_n, remainder) = slice.split_at(len * N);
+        let new_len = multiple_of_n.len() / N;
+        // SAFETY: We cast a slice of `new_len * N` elements into
+        // a slice of `new_len` many `N` elements chunks.
+        (unsafe { std::slice::from_raw_parts(multiple_of_n.as_ptr().cast(), new_len) }, remainder)
+    }
+
+    pub fn parse(x: &(impl AsRef<[u8]> + ?Sized)) -> Option<NonZeroU64> {
+        if x.as_ref().len() > 19 {
+            // SAFETY: max snowflake is 9223372036854775807
+            // unsafe { std::hint::unreachable_unchecked() }
+            // being UB is faster, but unsounder
+            return None;
+        }
+        fn parse(s: [u8; 8]) -> u64 {
+            let n = u64::from_ne_bytes(s);
+            let n = ((n & 0x0f000f000f000f00) >> 08) + ((n & 0x000f000f000f000f) * 010);
+            let n = ((n & 0x00ff000000ff0000) >> 16) + ((n & 0x000000ff000000ff) * 100);
+            ((n & 0x0000ffff00000000) >> 32) + ((n & 0x000000000000ffff) * 10000)
+        }
+        Some(match as_chunks(x.as_ref()) {
+            // 16, ..4 (most flakes are length 18, so this is on top)
+            (&[a, b], rest) => generic(parse(a) * 100000000 + parse(b), rest),
+            // 8, 4..8
+            (&[a], rest) => generic(parse(a), rest),
+            // omitting this shaves a ns
+            (&[], rest) => generic(0, rest),
+            // SAFETY: as the max snowflake length is 19, it can either be split into [a, b](16),
+            // rest, [a](8), rest or [], rest. [a, b, c], rest would require a snowflake of length
+            // 24
+            _ => unsafe { std::hint::unreachable_unchecked() },
+        })
+        .map(NonZeroU64::new)
+        .flatten()
+    }
+
+    fn generic(mut n: u64, s: &[u8]) -> u64 {
+        for &b in s {
+            n = n * 10 + (b - b'0') as u64
+        }
+        n
+    }
+
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NonZeroU64, D::Error> {
         deserializer.deserialize_any(SnowflakeVisitor)
     }
@@ -353,7 +400,7 @@ pub(crate) mod snowflake {
         }
 
         fn visit_str<E: Error>(self, value: &str) -> Result<Self::Value, E> {
-            value.parse().map_err(Error::custom)
+            parse(value).ok_or(Error::custom("invalid value, expected non-zero"))
         }
     }
 }
