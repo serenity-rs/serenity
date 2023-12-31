@@ -101,24 +101,56 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// [`Client`]: crate::Client
 /// [`StandardFramework`]: super::StandardFramework
 /// [default implementation]: Self::default
+#[bool_to_bitflags::bool_to_bitflags(
+    getter_prefix = "get_",
+    setter_prefix = "",
+    private_getters,
+    document_setters,
+    owning_setters
+)]
 #[derive(Clone)]
 pub struct Configuration {
-    pub(crate) allow_dm: bool,
     pub(crate) with_whitespace: WithWhiteSpace,
-    pub(crate) by_space: bool,
     pub(crate) blocked_guilds: HashSet<GuildId>,
     pub(crate) blocked_users: HashSet<UserId>,
     pub(crate) allowed_channels: HashSet<ChannelId>,
     pub(crate) disabled_commands: HashSet<String>,
     pub(crate) dynamic_prefixes: Vec<DynamicPrefixHook>,
-    pub(crate) ignore_bots: bool,
-    pub(crate) ignore_webhooks: bool,
     pub(crate) on_mention: Option<String>,
     pub(crate) owners: HashSet<UserId>,
     pub(crate) prefixes: Vec<String>,
-    pub(crate) no_dm_prefix: bool,
     pub(crate) delimiters: Vec<Delimiter>,
-    pub(crate) case_insensitive: bool,
+    /// If set to false, bot will ignore any private messages.
+    ///
+    /// **Note**: Defaults to `true`.
+    pub allow_dm: bool,
+    /// Whether the framework should split the message by a space first to parse the group or
+    /// command. If set to false, it will only test part of the message by the *length* of the
+    /// group's or command's names.
+    ///
+    /// **Note**: Defaults to `true`
+    pub by_space: bool,
+    /// Whether the bot should respond to other bots.
+    ///
+    /// For example, if this is set to false, then the bot will respond to any other bots including
+    /// itself.
+    ///
+    /// **Note**: Defaults to `true`.
+    pub ignore_bots: bool,
+    /// If set to true, bot will ignore all commands called by webhooks.
+    ///
+    /// **Note**: Defaults to `true`.
+    pub ignore_webhooks: bool,
+    /// Sets whether command execution can be done without a prefix. Works only in private
+    /// channels.
+    ///
+    /// **Note**: Defaults to `false`.
+    ///
+    /// # Note
+    ///
+    /// The `cache` feature is required. If disabled this does absolutely nothing.
+    pub no_dm_prefix: bool,
+    case_insensitive: bool,
 }
 
 impl Configuration {
@@ -126,15 +158,6 @@ impl Configuration {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
-    }
-
-    /// If set to false, bot will ignore any private messages.
-    ///
-    /// **Note**: Defaults to `true`.
-    #[must_use]
-    pub fn allow_dm(mut self, allow_dm: bool) -> Self {
-        self.allow_dm = allow_dm;
-        self
     }
 
     /// Whether to allow whitespace being optional between a prefix/group-prefix/command and a
@@ -162,17 +185,6 @@ impl Configuration {
     #[must_use]
     pub fn with_whitespace(mut self, with: impl Into<WithWhiteSpace>) -> Self {
         self.with_whitespace = with.into();
-        self
-    }
-
-    /// Whether the framework should split the message by a space first to parse the group or
-    /// command. If set to false, it will only test part of the message by the *length* of the
-    /// group's or command's names.
-    ///
-    /// **Note**: Defaults to `true`
-    #[must_use]
-    pub fn by_space(mut self, b: bool) -> Self {
-        self.by_space = b;
         self
     }
 
@@ -351,27 +363,6 @@ impl Configuration {
         self
     }
 
-    /// Whether the bot should respond to other bots.
-    ///
-    /// For example, if this is set to false, then the bot will respond to any other bots including
-    /// itself.
-    ///
-    /// **Note**: Defaults to `true`.
-    #[must_use]
-    pub fn ignore_bots(mut self, ignore_bots: bool) -> Self {
-        self.ignore_bots = ignore_bots;
-        self
-    }
-
-    /// If set to true, bot will ignore all commands called by webhooks.
-    ///
-    /// **Note**: Defaults to `true`.
-    #[must_use]
-    pub fn ignore_webhooks(mut self, ignore_webhooks: bool) -> Self {
-        self.ignore_webhooks = ignore_webhooks;
-        self
-    }
-
     /// Whether or not to respond to commands initiated with `id_to_mention`.
     ///
     /// **Note**: that this can be used in conjunction with [`Self::prefix`].
@@ -485,20 +476,6 @@ impl Configuration {
         self
     }
 
-    /// Sets whether command execution can be done without a prefix. Works only in private channels.
-    ///
-    /// **Note**: Defaults to `false`.
-    ///
-    /// # Note
-    ///
-    /// The `cache` feature is required. If disabled this does absolutely nothing.
-    #[inline]
-    #[must_use]
-    pub fn no_dm_prefix(mut self, b: bool) -> Self {
-        self.no_dm_prefix = b;
-        self
-    }
-
     /// Sets a single delimiter to be used when splitting the content after a command.
     ///
     /// **Note**: Defaults to a vector with a single element of `' '`.
@@ -555,7 +532,7 @@ impl Configuration {
     /// **Note**: Defaults to `false`.
     #[must_use]
     pub fn case_insensitivity(mut self, cs: bool) -> Self {
-        self.case_insensitive = cs;
+        self = self.case_insensitive(cs);
 
         for prefix in &mut self.prefixes {
             *prefix = prefix.to_lowercase();
@@ -585,23 +562,20 @@ impl Default for Configuration {
     /// - **owners** to an empty HashSet
     /// - **prefix** to "~"
     fn default() -> Configuration {
-        Configuration {
-            allow_dm: true,
+        let config = Configuration {
+            __generated_flags: ConfigurationGeneratedFlags::empty(),
             with_whitespace: WithWhiteSpace::default(),
-            by_space: true,
             blocked_guilds: HashSet::default(),
             blocked_users: HashSet::default(),
             allowed_channels: HashSet::default(),
-            case_insensitive: false,
             delimiters: vec![Delimiter::Single(' ')],
             disabled_commands: HashSet::default(),
             dynamic_prefixes: Vec::new(),
-            ignore_bots: true,
-            ignore_webhooks: true,
-            no_dm_prefix: false,
             on_mention: None,
             owners: HashSet::default(),
             prefixes: vec![String::from("~")],
-        }
+        };
+
+        config.allow_dm(true).by_space(true).ignore_bots(true).ignore_webhooks(true)
     }
 }
