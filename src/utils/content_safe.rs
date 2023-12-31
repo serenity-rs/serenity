@@ -5,14 +5,37 @@ use crate::model::mention::Mention;
 use crate::model::user::User;
 
 /// Struct that allows to alter [`content_safe`]'s behaviour.
-#[derive(Clone, Debug)]
+#[bool_to_bitflags::bool_to_bitflags(
+    getter_prefix = "get_",
+    setter_prefix = "",
+    private_getters,
+    document_setters,
+    owning_setters
+)]
+#[derive(Copy, Clone, Debug)]
 pub struct ContentSafeOptions {
-    clean_role: bool,
-    clean_user: bool,
-    clean_channel: bool,
-    clean_here: bool,
-    clean_everyone: bool,
-    show_discriminator: bool,
+    /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name prefixed with `@`
+    /// (`@rolename`) or with `@deleted-role` if the identifier is invalid.
+    pub clean_role: bool,
+    /// If set to true, [`content_safe`] will replace user mentions (`<@!{id}>` or `<@{id}>`) with
+    /// the user's name prefixed with `@` (`@username`) or with `@invalid-user` if the identifier
+    /// is invalid.
+    pub clean_user: bool,
+    /// If set to true, [`content_safe`] will replace channel mentions (`<#{id}>`) with the
+    /// channel's name prefixed with `#` (`#channelname`) or with `#deleted-channel` if the
+    /// identifier is invalid.
+    pub clean_channel: bool,
+    /// If set, [`content_safe`] will replace `@here` with a non-pinging alternative.
+    pub clean_here: bool,
+    /// If set, [`content_safe`] will replace `@everyone` with a non-pinging alternative.
+    pub clean_everyone: bool,
+    /// If set to true, if [`content_safe`] replaces a user mention it will add their four digit
+    /// discriminator with a preceding `#`, turning `@username` to `@username#discriminator`.
+    ///
+    /// This option is ignored if the username is a next-gen username, and
+    /// therefore does not have a discriminator.
+    #[deprecated = "Discriminators are deprecated on the discord side, and this doesn't reflect message rendering behaviour"]
+    pub show_discriminator: bool,
 }
 
 impl ContentSafeOptions {
@@ -20,76 +43,13 @@ impl ContentSafeOptions {
     pub fn new() -> Self {
         ContentSafeOptions::default()
     }
-
-    /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name prefixed with `@`
-    /// (`@rolename`) or with `@deleted-role` if the identifier is invalid.
-    #[must_use]
-    pub fn clean_role(mut self, b: bool) -> Self {
-        self.clean_role = b;
-
-        self
-    }
-
-    /// If set to true, [`content_safe`] will replace user mentions (`<@!{id}>` or `<@{id}>`) with
-    /// the user's name prefixed with `@` (`@username`) or with `@invalid-user` if the identifier
-    /// is invalid.
-    #[must_use]
-    pub fn clean_user(mut self, b: bool) -> Self {
-        self.clean_user = b;
-
-        self
-    }
-
-    /// If set to true, [`content_safe`] will replace channel mentions (`<#{id}>`) with the
-    /// channel's name prefixed with `#` (`#channelname`) or with `#deleted-channel` if the
-    /// identifier is invalid.
-    #[must_use]
-    pub fn clean_channel(mut self, b: bool) -> Self {
-        self.clean_channel = b;
-
-        self
-    }
-
-    /// If set to true, if [`content_safe`] replaces a user mention it will add their four digit
-    /// discriminator with a preceding `#`, turning `@username` to `@username#discriminator`.
-    ///
-    /// This option is ignored if the username is a next-gen username, and
-    /// therefore does not have a discriminator.
-    #[must_use]
-    #[deprecated = "Discriminators are deprecated on the discord side, and this doesn't reflect message rendering behaviour"]
-    pub fn show_discriminator(mut self, b: bool) -> Self {
-        self.show_discriminator = b;
-
-        self
-    }
-
-    /// If set, [`content_safe`] will replace `@here` with a non-pinging alternative.
-    #[must_use]
-    pub fn clean_here(mut self, b: bool) -> Self {
-        self.clean_here = b;
-
-        self
-    }
-
-    /// If set, [`content_safe`] will replace `@everyone` with a non-pinging alternative.
-    #[must_use]
-    pub fn clean_everyone(mut self, b: bool) -> Self {
-        self.clean_everyone = b;
-
-        self
-    }
 }
 
 impl Default for ContentSafeOptions {
     /// Instantiates with all options set to `true`.
     fn default() -> Self {
         ContentSafeOptions {
-            clean_role: true,
-            clean_user: true,
-            clean_channel: true,
-            clean_here: true,
-            clean_everyone: true,
-            show_discriminator: true,
+            __generated_flags: ContentSafeOptionsGeneratedFlags::all(),
         }
     }
 }
@@ -110,7 +70,7 @@ impl Default for ContentSafeOptions {
 /// use serenity::utils::{content_safe, ContentSafeOptions};
 ///
 /// let with_mention = "@everyone";
-/// let without_mention = content_safe(&guild, &with_mention, &ContentSafeOptions::default(), &[]);
+/// let without_mention = content_safe(&guild, &with_mention, ContentSafeOptions::default(), &[]);
 ///
 /// assert_eq!("@\u{200B}everyone", without_mention);
 /// ```
@@ -124,12 +84,7 @@ impl Default for ContentSafeOptions {
 ///
 /// fn filter_message(cache: &Cache, message: &Message) -> String {
 ///     if let Some(guild) = message.guild(cache) {
-///         content_safe(
-///             &guild,
-///             &message.content,
-///             &ContentSafeOptions::default(),
-///             &message.mentions,
-///         )
+///         content_safe(&guild, &message.content, ContentSafeOptions::default(), &message.mentions)
 ///     } else {
 ///         // We don't need to clean messages in DMs
 ///         message.content.to_string()
@@ -139,16 +94,16 @@ impl Default for ContentSafeOptions {
 pub fn content_safe(
     guild: &Guild,
     s: impl AsRef<str>,
-    options: &ContentSafeOptions,
+    options: ContentSafeOptions,
     users: &[User],
 ) -> String {
     let mut content = clean_mentions(guild, s, options, users);
 
-    if options.clean_here {
+    if options.get_clean_here() {
         content = content.replace("@here", "@\u{200B}here");
     }
 
-    if options.clean_everyone {
+    if options.get_clean_everyone() {
         content = content.replace("@everyone", "@\u{200B}everyone");
     }
 
@@ -158,7 +113,7 @@ pub fn content_safe(
 fn clean_mentions(
     guild: &Guild,
     s: impl AsRef<str>,
-    options: &ContentSafeOptions,
+    options: ContentSafeOptions,
     users: &[User],
 ) -> String {
     let s = s.as_ref();
@@ -178,12 +133,12 @@ fn clean_mentions(
                     let mut chars = mention_str.chars();
                     chars.next();
                     let should_parse = match chars.next() {
-                        Some('#') => options.clean_channel,
+                        Some('#') => options.get_clean_channel(),
                         Some('@') => {
                             if let Some('&') = chars.next() {
-                                options.clean_role
+                                options.get_clean_role()
                             } else {
-                                options.clean_user
+                                options.get_clean_user()
                             }
                         },
                         _ => false,
@@ -214,7 +169,7 @@ fn clean_mentions(
 fn clean_mention(
     guild: &Guild,
     mention: Mention,
-    options: &ContentSafeOptions,
+    options: ContentSafeOptions,
     users: &[User],
 ) -> Cow<'static, str> {
     match mention {
@@ -231,7 +186,7 @@ fn clean_mention(
             .map_or(Cow::Borrowed("@deleted-role"), |role| format!("@{}", role.name).into()),
         Mention::User(id) => {
             if let Some(member) = guild.members.get(&id) {
-                if options.show_discriminator {
+                if options.get_show_discriminator() {
                     #[allow(deprecated)]
                     let name = member.distinct();
                     format!("@{name}").into()
@@ -239,7 +194,7 @@ fn clean_mention(
                     format!("@{}", member.display_name()).into()
                 }
             } else if let Some(user) = users.iter().find(|u| u.id == id) {
-                if options.show_discriminator {
+                if options.get_show_discriminator() {
                     format!("@{}", user.tag()).into()
                 } else {
                     format!("@{}", user.name).into()
@@ -310,22 +265,23 @@ mod tests {
 
         // User mentions
         let options = ContentSafeOptions::default();
-        assert_eq!(without_user_mentions, content_safe(&guild, with_user_mentions, &options, &[]));
+        assert_eq!(without_user_mentions, content_safe(&guild, with_user_mentions, options, &[]));
 
         assert_eq!(
             "@invalid-user",
-            content_safe(&no_member_guild, "<@100000000000000001>", &options, &[])
+            content_safe(&no_member_guild, "<@100000000000000001>", options, &[])
         );
 
-        let options = ContentSafeOptions::default().show_discriminator(false);
+        let mut options = ContentSafeOptions::default();
+        options = options.show_discriminator(false);
         assert_eq!(
             format!("@{}", user.name),
-            content_safe(&no_member_guild, "<@!100000000000000000>", &options, &[user.clone()])
+            content_safe(&no_member_guild, "<@!100000000000000000>", options, &[user.clone()])
         );
 
         assert_eq!(
             "@invalid-user",
-            content_safe(&no_member_guild, "<@!100000000000000000>", &options, &[])
+            content_safe(&no_member_guild, "<@!100000000000000000>", options, &[])
         );
 
         #[allow(deprecated)]
@@ -338,11 +294,11 @@ mod tests {
         let options = options.display_as_member_from(guild.id);
         assert_eq!(
             format!("@{}", member.nick.as_ref().unwrap()),
-            content_safe(&guild, "<@100000000000000000>", &options, &[])
+            content_safe(&guild, "<@100000000000000000>", options, &[])
         );
 
-        let options = options.clean_user(false);
-        assert_eq!(with_user_mentions, content_safe(&guild, with_user_mentions, &options, &[]));
+        options = options.clean_user(false);
+        assert_eq!(with_user_mentions, content_safe(&guild, with_user_mentions, options, &[]));
 
         // Channel mentions
         let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#1> \
@@ -355,13 +311,13 @@ mod tests {
 
         assert_eq!(
             without_channel_mentions,
-            content_safe(&guild, with_channel_mentions, &options, &[])
+            content_safe(&guild, with_channel_mentions, options, &[])
         );
 
-        let options = options.clean_channel(false);
+        options = options.clean_channel(false);
         assert_eq!(
             with_channel_mentions,
-            content_safe(&guild, with_channel_mentions, &options, &[])
+            content_safe(&guild, with_channel_mentions, options, &[])
         );
 
         // Role mentions
@@ -373,25 +329,24 @@ mod tests {
         @ferris-club-member @deleted-role \
         <@&111111111111111111111111111111> <@&@deleted-role";
 
-        assert_eq!(without_role_mentions, content_safe(&guild, with_role_mentions, &options, &[]));
+        assert_eq!(without_role_mentions, content_safe(&guild, with_role_mentions, options, &[]));
 
-        let options = options.clean_role(false);
-        assert_eq!(with_role_mentions, content_safe(&guild, with_role_mentions, &options, &[]));
+        options = options.clean_role(false);
+        assert_eq!(with_role_mentions, content_safe(&guild, with_role_mentions, options, &[]));
 
         // Everyone mentions
         let with_everyone_mention = "@everyone";
-
         let without_everyone_mention = "@\u{200B}everyone";
 
         assert_eq!(
             without_everyone_mention,
-            content_safe(&guild, with_everyone_mention, &options, &[])
+            content_safe(&guild, with_everyone_mention, options, &[])
         );
 
-        let options = options.clean_everyone(false);
+        options = options.clean_everyone(false);
         assert_eq!(
             with_everyone_mention,
-            content_safe(&guild, with_everyone_mention, &options, &[])
+            content_safe(&guild, with_everyone_mention, options, &[])
         );
 
         // Here mentions
@@ -399,9 +354,9 @@ mod tests {
 
         let without_here_mention = "@\u{200B}here";
 
-        assert_eq!(without_here_mention, content_safe(&guild, with_here_mention, &options, &[]));
+        assert_eq!(without_here_mention, content_safe(&guild, with_here_mention, options, &[]));
 
-        let options = options.clean_here(false);
-        assert_eq!(with_here_mention, content_safe(&guild, with_here_mention, &options, &[]));
+        options = options.clean_here(false);
+        assert_eq!(with_here_mention, content_safe(&guild, with_here_mention, options, &[]));
     }
 }
