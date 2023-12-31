@@ -16,8 +16,9 @@ use crate::model::utils::is_false;
 /// permissions.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
@@ -174,7 +175,8 @@ impl<'a> From<&'a Role> for RoleId {
 /// The tags of a [`Role`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure).
-#[derive(Clone, Debug, Default, Eq, PartialEq, Deserialize, Serialize)]
+#[bool_to_bitflags::bool_to_bitflags]
+#[derive(Clone, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
 pub struct RoleTags {
@@ -238,14 +240,8 @@ mod tests {
 
     #[test]
     fn premium_subscriber_role_serde() {
-        let value = RoleTags {
-            bot_id: None,
-            integration_id: None,
-            premium_subscriber: true,
-            subscription_listing_id: None,
-            available_for_purchase: false,
-            guild_connections: false,
-        };
+        let mut value = RoleTags::default();
+        value.set_premium_subscriber(true);
 
         assert_json(
             &value,
@@ -255,14 +251,7 @@ mod tests {
 
     #[test]
     fn non_premium_subscriber_role_serde() {
-        let value = RoleTags {
-            bot_id: None,
-            integration_id: None,
-            premium_subscriber: false,
-            subscription_listing_id: None,
-            available_for_purchase: false,
-            guild_connections: false,
-        };
+        let value = RoleTags::default();
 
         assert_json(
             &value,
