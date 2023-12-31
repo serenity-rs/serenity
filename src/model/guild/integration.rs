@@ -5,8 +5,9 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object),
 /// [extra fields 1](https://discord.com/developers/docs/topics/gateway-events#integration-create),
 /// [extra fields 2](https://discord.com/developers/docs/topics/gateway-events#integration-update),
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Integration {
     pub id: IntegrationId,

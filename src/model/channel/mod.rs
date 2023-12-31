@@ -436,8 +436,9 @@ pub struct StageInstance {
 /// A thread data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct ThreadMetadata {
     /// Whether the thread is archived.

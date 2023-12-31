@@ -95,7 +95,7 @@ fn permissions_in(
 
 #[inline]
 fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
-    if config.case_insensitive {
+    if config.get_case_insensitive() {
         Cow::Owned(s.to_lowercase())
     } else {
         Cow::Borrowed(s)
@@ -209,7 +209,7 @@ async fn check_discrepancy(
         return Err(DispatchError::OnlyForDM);
     }
 
-    if (!config.allow_dm || options.only_in() == OnlyIn::Guild) && msg.is_private() {
+    if (!config.get_allow_dm() || options.only_in() == OnlyIn::Guild) && msg.is_private() {
         return Err(DispatchError::OnlyForGuilds);
     }
 
@@ -278,7 +278,7 @@ fn parse_cmd<'a>(
 ) -> BoxFuture<'a, Result<&'static Command, ParseError>> {
     async move {
         let (n, r) =
-            try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).into_owned());
+            try_parse(stream, map, config.get_by_space(), |s| to_lowercase(config, s).into_owned());
 
         if config.disabled_commands.contains(&n) {
             return Err(ParseError::Dispatch {
@@ -324,7 +324,7 @@ fn parse_group<'a>(
     map: &'a GroupMap,
 ) -> BoxFuture<'a, Result<(&'static CommandGroup, Arc<CommandMap>), ParseError>> {
     async move {
-        let (n, o) = try_parse(stream, map, config.by_space, ToString::to_string);
+        let (n, o) = try_parse(stream, map, config.get_by_space(), ToString::to_string);
 
         if let Some((group, map, commands)) = o {
             stream.increment(n.len());

@@ -240,8 +240,9 @@ pub struct ClientStatus {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object),
 /// [modification description](https://discord.com/developers/docs/topics/gateway-events#presence-update).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct PresenceUser {
     pub id: UserId,
@@ -281,9 +282,10 @@ impl PresenceUser {
     /// If one of [`User`]'s required fields is None in `self`, None is returned.
     #[must_use]
     pub fn into_user(self) -> Option<User> {
-        Some(User {
+        let (bot, verified, system, mfa_enabled) =
+            (self.bot()?, self.verified(), self.system(), self.mfa_enabled());
+        let mut user = User {
             avatar: self.avatar,
-            bot: self.bot?,
             discriminator: self.discriminator,
             global_name: self.global_name,
             id: self.id,
@@ -292,17 +294,22 @@ impl PresenceUser {
             banner: self.banner,
             accent_colour: self.accent_colour,
             member: self.member,
-            system: false,
-            mfa_enabled: self.mfa_enabled.unwrap_or_default(),
             locale: self.locale,
-            verified: self.verified,
             email: self.email,
             flags: self.public_flags.unwrap_or_default(),
             premium_type: self.premium_type.unwrap_or_default(),
             primary_guild: self.primary_guild,
             avatar_decoration_data: self.avatar_decoration_data,
             collectibles: self.collectibles,
-        })
+            __generated_flags: UserGeneratedFlags::empty(),
+        };
+
+        user.set_bot(bot);
+        user.set_verified(verified);
+        user.set_system(system.unwrap_or_default());
+        user.set_mfa_enabled(mfa_enabled.unwrap_or_default());
+
+        Some(user)
     }
 
     /// Attempts to convert this [`PresenceUser`] instance into a [`User`].
