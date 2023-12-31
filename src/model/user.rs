@@ -221,8 +221,9 @@ impl OnlineStatus {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
 /// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's creation date.
@@ -401,7 +402,7 @@ impl User {
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
     #[inline]
     pub async fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
-        if self.bot {
+        if self.bot() {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
