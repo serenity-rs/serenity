@@ -61,7 +61,7 @@ pub struct Member {
     /// The unique Id of the guild that the member is a part of.
     #[serde(default)]
     pub guild_id: GuildId,
-    /// If the member is current flagged for sending excessive DMs to non-friend server members
+    /// If the member is currently flagged for sending excessive DMs to non-friend server members
     /// in the last 24 hours.
     ///
     /// Will be None if the user is not currently flagged.
@@ -597,7 +597,7 @@ pub struct PartialMember {
     ///
     /// [`Interaction`]: crate::model::application::Interaction
     pub permissions: Option<Permissions>,
-    /// If the member is current flagged for sending excessive DMs to non-friend server members
+    /// If the member is currently flagged for sending excessive DMs to non-friend server members
     /// in the last 24 hours.
     ///
     /// Will be None if the user is not currently flagged.
