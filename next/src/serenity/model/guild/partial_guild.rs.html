@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><title>partial_guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (89e2160c4 2023-12-27)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><title>partial_guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1622,6 +1622,12 @@
 <a href="#1621" id="1621">1621</a>
 <a href="#1622" id="1622">1622</a>
 <a href="#1623" id="1623">1623</a>
+<a href="#1624" id="1624">1624</a>
+<a href="#1625" id="1625">1625</a>
+<a href="#1626" id="1626">1626</a>
+<a href="#1627" id="1627">1627</a>
+<a href="#1628" id="1628">1628</a>
+<a href="#1629" id="1629">1629</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1659,8 +1665,9 @@
 <span class="doccomment">/// Partial information about a [`Guild`]. This does not include information like member data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(remote = <span class="string">"Self"</span>)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialGuild {
@@ -3186,7 +3193,7 @@
 }
 
 <span class="comment">// Manual impl needed to insert guild_id into Role's
-</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>PartialGuild {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>PartialGuildGeneratedOriginal {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>guild = <span class="self">Self</span>::deserialize(deserializer)<span class="question-mark">?</span>; <span class="comment">// calls #[serde(remote)]-generated inherent method
         </span>guild.roles.values_mut().for_each(|r| r.guild_id = guild.id);
@@ -3194,7 +3201,7 @@
     }
 }
 
-<span class="kw">impl </span>Serialize <span class="kw">for </span>PartialGuild {
+<span class="kw">impl </span>Serialize <span class="kw">for </span>PartialGuildGeneratedOriginal {
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
         <span class="self">Self</span>::serialize(<span class="self">self</span>, serializer) <span class="comment">// calls #[serde(remote)]-generated inherent method
     </span>}
@@ -3203,12 +3210,15 @@
 <span class="kw">impl </span>From&lt;Guild&gt; <span class="kw">for </span>PartialGuild {
     <span class="doccomment">/// Converts this [`Guild`] instance into a [`PartialGuild`]
     </span><span class="kw">fn </span>from(guild: Guild) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
+        <span class="kw">let </span>(premium_progress_bar_enabled, widget_enabled) =
+            (guild.premium_progress_bar_enabled(), guild.widget_enabled());
+
+        <span class="kw">let </span><span class="kw-2">mut </span>partial = <span class="self">Self </span>{
+            __generated_flags: PartialGuildGeneratedFlags::empty(),
             application_id: guild.application_id,
             id: guild.id,
             afk_metadata: guild.afk_metadata,
             default_message_notifications: guild.default_message_notifications,
-            widget_enabled: guild.widget_enabled,
             widget_channel_id: guild.widget_channel_id,
             emojis: guild.emojis,
             features: guild.features,
@@ -3241,8 +3251,10 @@
             explicit_content_filter: guild.explicit_content_filter,
             preferred_locale: guild.preferred_locale,
             max_stage_video_channel_users: guild.max_stage_video_channel_users,
-            premium_progress_bar_enabled: guild.premium_progress_bar_enabled,
-        }
+        };
+        partial.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
+        partial.set_widget_enabled(widget_enabled);
+        partial
     }
 }
 </code></pre></div></section></main></body></html>

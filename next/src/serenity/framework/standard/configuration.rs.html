@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/configuration.rs`."><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (89e2160c4 2023-12-27)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/framework/standard/configuration.rs`."><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -580,32 +580,6 @@
 <a href="#579" id="579">579</a>
 <a href="#580" id="580">580</a>
 <a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
-<a href="#594" id="594">594</a>
-<a href="#595" id="595">595</a>
-<a href="#596" id="596">596</a>
-<a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use </span>futures::future::BoxFuture;
@@ -709,24 +683,56 @@
 /// [`Client`]: crate::Client
 /// [`StandardFramework`]: super::StandardFramework
 /// [default implementation]: Self::default
-</span><span class="attr">#[derive(Clone)]
+</span><span class="attr">#[bool_to_bitflags::bool_to_bitflags(
+    getter_prefix = <span class="string">"get_"</span>,
+    setter_prefix = <span class="string">""</span>,
+    private_getters,
+    document_setters,
+    owning_setters
+)]
+#[derive(Clone)]
 </span><span class="kw">pub struct </span>Configuration {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) allow_dm: bool,
     <span class="kw">pub</span>(<span class="kw">crate</span>) with_whitespace: WithWhiteSpace,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) by_space: bool,
     <span class="kw">pub</span>(<span class="kw">crate</span>) blocked_guilds: HashSet&lt;GuildId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) blocked_users: HashSet&lt;UserId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) allowed_channels: HashSet&lt;ChannelId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) disabled_commands: HashSet&lt;String&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) dynamic_prefixes: Vec&lt;DynamicPrefixHook&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) ignore_bots: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) ignore_webhooks: bool,
     <span class="kw">pub</span>(<span class="kw">crate</span>) on_mention: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) owners: HashSet&lt;UserId&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) prefixes: Vec&lt;String&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) no_dm_prefix: bool,
     <span class="kw">pub</span>(<span class="kw">crate</span>) delimiters: Vec&lt;Delimiter&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) case_insensitive: bool,
+    <span class="doccomment">/// If set to false, bot will ignore any private messages.
+    ///
+    /// **Note**: Defaults to `true`.
+    </span><span class="kw">pub </span>allow_dm: bool,
+    <span class="doccomment">/// Whether the framework should split the message by a space first to parse the group or
+    /// command. If set to false, it will only test part of the message by the *length* of the
+    /// group's or command's names.
+    ///
+    /// **Note**: Defaults to `true`
+    </span><span class="kw">pub </span>by_space: bool,
+    <span class="doccomment">/// Whether the bot should respond to other bots.
+    ///
+    /// For example, if this is set to false, then the bot will respond to any other bots including
+    /// itself.
+    ///
+    /// **Note**: Defaults to `true`.
+    </span><span class="kw">pub </span>ignore_bots: bool,
+    <span class="doccomment">/// If set to true, bot will ignore all commands called by webhooks.
+    ///
+    /// **Note**: Defaults to `true`.
+    </span><span class="kw">pub </span>ignore_webhooks: bool,
+    <span class="doccomment">/// Sets whether command execution can be done without a prefix. Works only in private
+    /// channels.
+    ///
+    /// **Note**: Defaults to `false`.
+    ///
+    /// # Note
+    ///
+    /// The `cache` feature is required. If disabled this does absolutely nothing.
+    </span><span class="kw">pub </span>no_dm_prefix: bool,
+    case_insensitive: bool,
 }
 
 <span class="kw">impl </span>Configuration {
@@ -735,15 +741,6 @@
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
     }
-
-    <span class="doccomment">/// If set to false, bot will ignore any private messages.
-    ///
-    /// **Note**: Defaults to `true`.
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>allow_dm(<span class="kw-2">mut </span><span class="self">self</span>, allow_dm: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.allow_dm = allow_dm;
-        <span class="self">self
-    </span>}
 
     <span class="doccomment">/// Whether to allow whitespace being optional between a prefix/group-prefix/command and a
     /// command.
@@ -770,17 +767,6 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>with_whitespace(<span class="kw-2">mut </span><span class="self">self</span>, with: <span class="kw">impl </span>Into&lt;WithWhiteSpace&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.with_whitespace = with.into();
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// Whether the framework should split the message by a space first to parse the group or
-    /// command. If set to false, it will only test part of the message by the *length* of the
-    /// group's or command's names.
-    ///
-    /// **Note**: Defaults to `true`
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>by_space(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.by_space = b;
         <span class="self">self
     </span>}
 
@@ -959,27 +945,6 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Whether the bot should respond to other bots.
-    ///
-    /// For example, if this is set to false, then the bot will respond to any other bots including
-    /// itself.
-    ///
-    /// **Note**: Defaults to `true`.
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>ignore_bots(<span class="kw-2">mut </span><span class="self">self</span>, ignore_bots: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.ignore_bots = ignore_bots;
-        <span class="self">self
-    </span>}
-
-    <span class="doccomment">/// If set to true, bot will ignore all commands called by webhooks.
-    ///
-    /// **Note**: Defaults to `true`.
-    </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>ignore_webhooks(<span class="kw-2">mut </span><span class="self">self</span>, ignore_webhooks: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.ignore_webhooks = ignore_webhooks;
-        <span class="self">self
-    </span>}
-
     <span class="doccomment">/// Whether or not to respond to commands initiated with `id_to_mention`.
     ///
     /// **Note**: that this can be used in conjunction with [`Self::prefix`].
@@ -1093,20 +1058,6 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Sets whether command execution can be done without a prefix. Works only in private channels.
-    ///
-    /// **Note**: Defaults to `false`.
-    ///
-    /// # Note
-    ///
-    /// The `cache` feature is required. If disabled this does absolutely nothing.
-    </span><span class="attr">#[inline]
-    #[must_use]
-    </span><span class="kw">pub fn </span>no_dm_prefix(<span class="kw-2">mut </span><span class="self">self</span>, b: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.no_dm_prefix = b;
-        <span class="self">self
-    </span>}
-
     <span class="doccomment">/// Sets a single delimiter to be used when splitting the content after a command.
     ///
     /// **Note**: Defaults to a vector with a single element of `' '`.
@@ -1163,7 +1114,7 @@
     /// **Note**: Defaults to `false`.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>case_insensitivity(<span class="kw-2">mut </span><span class="self">self</span>, cs: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.case_insensitive = cs;
+        <span class="self">self </span>= <span class="self">self</span>.case_insensitive(cs);
 
         <span class="kw">for </span>prefix <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.prefixes {
             <span class="kw-2">*</span>prefix = prefix.to_lowercase();
@@ -1193,24 +1144,21 @@
     /// - **owners** to an empty HashSet
     /// - **prefix** to "~"
     </span><span class="kw">fn </span>default() -&gt; Configuration {
-        Configuration {
-            allow_dm: <span class="bool-val">true</span>,
+        <span class="kw">let </span>config = Configuration {
+            __generated_flags: ConfigurationGeneratedFlags::empty(),
             with_whitespace: WithWhiteSpace::default(),
-            by_space: <span class="bool-val">true</span>,
             blocked_guilds: HashSet::default(),
             blocked_users: HashSet::default(),
             allowed_channels: HashSet::default(),
-            case_insensitive: <span class="bool-val">false</span>,
             delimiters: <span class="macro">vec!</span>[Delimiter::Single(<span class="string">' '</span>)],
             disabled_commands: HashSet::default(),
             dynamic_prefixes: Vec::new(),
-            ignore_bots: <span class="bool-val">true</span>,
-            ignore_webhooks: <span class="bool-val">true</span>,
-            no_dm_prefix: <span class="bool-val">false</span>,
             on_mention: <span class="prelude-val">None</span>,
             owners: HashSet::default(),
             prefixes: <span class="macro">vec!</span>[String::from(<span class="string">"~"</span>)],
-        }
+        };
+
+        config.allow_dm(<span class="bool-val">true</span>).by_space(<span class="bool-val">true</span>).ignore_bots(<span class="bool-val">true</span>).ignore_webhooks(<span class="bool-val">true</span>)
     }
 }
 </code></pre></div></section></main></body></html>

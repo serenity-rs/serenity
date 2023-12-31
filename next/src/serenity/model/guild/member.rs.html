@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/member.rs`."><title>member.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (89e2160c4 2023-12-27)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/member.rs`."><title>member.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-452d19225583af2a.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (3cdd004e5 2023-12-29)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-6902632119e002ca.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -680,6 +680,16 @@
 <a href="#679" id="679">679</a>
 <a href="#680" id="680">680</a>
 <a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::cmp::Reverse;
 <span class="kw">use </span>std::fmt;
@@ -701,8 +711,9 @@
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
-</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+</span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Member {
     <span class="doccomment">/// Attached User struct.
@@ -1238,8 +1249,9 @@
 /// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
-</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+</span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>PartialMember {
     <span class="doccomment">/// Indicator of whether the member can hear in voice channels.
@@ -1277,38 +1289,46 @@
 
 <span class="kw">impl </span>From&lt;PartialMember&gt; <span class="kw">for </span>Member {
     <span class="kw">fn </span>from(partial: PartialMember) -&gt; <span class="self">Self </span>{
-        Member {
+        <span class="kw">let </span>(pending, deaf, mute) = (partial.pending(), partial.deaf(), partial.mute());
+        <span class="kw">let </span><span class="kw-2">mut </span>member = Member {
+            __generated_flags: MemberGeneratedFlags::empty(),
             user: partial.user.unwrap_or_default(),
             nick: partial.nick,
             avatar: <span class="prelude-val">None</span>,
             roles: partial.roles,
             joined_at: partial.joined_at,
             premium_since: partial.premium_since,
-            deaf: partial.deaf,
-            mute: partial.mute,
             flags: GuildMemberFlags::default(),
-            pending: partial.pending,
             permissions: partial.permissions,
             communication_disabled_until: <span class="prelude-val">None</span>,
             guild_id: partial.guild_id.unwrap_or_default(),
-        }
+        };
+
+        member.set_pending(pending);
+        member.set_deaf(deaf);
+        member.set_mute(mute);
+        member
     }
 }
 
 <span class="kw">impl </span>From&lt;Member&gt; <span class="kw">for </span>PartialMember {
     <span class="kw">fn </span>from(member: Member) -&gt; <span class="self">Self </span>{
-        PartialMember {
-            deaf: member.deaf,
+        <span class="kw">let </span>(pending, deaf, mute) = (member.pending(), member.deaf(), member.mute());
+        <span class="kw">let </span><span class="kw-2">mut </span>partial = PartialMember {
+            __generated_flags: PartialMemberGeneratedFlags::empty(),
             joined_at: member.joined_at,
-            mute: member.mute,
             nick: member.nick,
             roles: member.roles,
-            pending: member.pending,
             premium_since: member.premium_since,
             guild_id: <span class="prelude-val">Some</span>(member.guild_id),
             user: <span class="prelude-val">Some</span>(member.user),
             permissions: member.permissions,
-        }
+        };
+
+        partial.set_deaf(deaf);
+        partial.set_mute(mute);
+        partial.set_pending(pending);
+        partial
     }
 }
 
