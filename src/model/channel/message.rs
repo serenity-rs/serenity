@@ -31,8 +31,9 @@ use crate::utils;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object) with some
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date of the message.
