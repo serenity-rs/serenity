@@ -403,7 +403,7 @@ impl From<char> for ReactionType {
 impl From<Emoji> for ReactionType {
     fn from(emoji: Emoji) -> ReactionType {
         ReactionType::Custom {
-            animated: emoji.animated,
+            animated: emoji.animated(),
             id: emoji.id,
             name: Some(emoji.name),
         }

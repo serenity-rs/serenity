@@ -35,8 +35,9 @@ use crate::model::utils::{emojis, roles, stickers};
 /// Partial information about a [`Guild`]. This does not include information like member data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct PartialGuild {
@@ -1562,7 +1563,7 @@ impl PartialGuild {
 }
 
 // Manual impl needed to insert guild_id into Role's
-impl<'de> Deserialize<'de> for PartialGuild {
+impl<'de> Deserialize<'de> for PartialGuildGeneratedOriginal {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
         guild.roles.values_mut().for_each(|r| r.guild_id = guild.id);
@@ -1570,7 +1571,7 @@ impl<'de> Deserialize<'de> for PartialGuild {
     }
 }
 
-impl Serialize for PartialGuild {
+impl Serialize for PartialGuildGeneratedOriginal {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
     }
@@ -1579,12 +1580,15 @@ impl Serialize for PartialGuild {
 impl From<Guild> for PartialGuild {
     /// Converts this [`Guild`] instance into a [`PartialGuild`]
     fn from(guild: Guild) -> Self {
-        Self {
+        let (premium_progress_bar_enabled, widget_enabled) =
+            (guild.premium_progress_bar_enabled(), guild.widget_enabled());
+
+        let mut partial = Self {
+            __generated_flags: PartialGuildGeneratedFlags::empty(),
             application_id: guild.application_id,
             id: guild.id,
             afk_metadata: guild.afk_metadata,
             default_message_notifications: guild.default_message_notifications,
-            widget_enabled: guild.widget_enabled,
             widget_channel_id: guild.widget_channel_id,
             emojis: guild.emojis,
             features: guild.features,
@@ -1617,7 +1621,9 @@ impl From<Guild> for PartialGuild {
             explicit_content_filter: guild.explicit_content_filter,
             preferred_locale: guild.preferred_locale,
             max_stage_video_channel_users: guild.max_stage_video_channel_users,
-            premium_progress_bar_enabled: guild.premium_progress_bar_enabled,
-        }
+        };
+        partial.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
+        partial.set_widget_enabled(widget_enabled);
+        partial
     }
 }
