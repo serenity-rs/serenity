@@ -42,6 +42,7 @@ secrecy = { version = "0.8.0", features = ["serde"] }
 arrayvec = { version = "0.7.4", features = ["serde"] }
 serde_cow = { version = "0.1.0" }
 small-fixed-array = { git = "https://github.com/GnomedDev/small-fixed-array", features = ["serde", "log_using_tracing"] }
+bool_to_bitflags = { git = "https://github.com/GnomedDev/bool-to-bitflags", version = "0.1.0" }
 # Optional dependencies
 fxhash = { version = "0.2.1", optional = true }
 simd-json = { version = "0.13.4", optional = true }
@@ -136,7 +137,7 @@ simd_json = ["simd-json", "typesize?/simd_json"]
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka", "typesize?/mini_moka"]
 
-typesize = ["dep:typesize", "small-fixed-array/typesize"]
+typesize = ["dep:typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize"]
 
 # Removed feature (https://github.com/serenity-rs/serenity/pull/2246)
 absolute_ratelimits = []
