@@ -9,13 +9,13 @@ pub struct IDFromStrError;
 
 impl fmt::Debug for IDFromStrError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "IDFromStrError(id of zero, or too long)")
+        write!(f, "IDFromStrError(id of zero)")
     }
 }
 
 impl fmt::Display for IDFromStrError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Attempted to construct a id of zero, or id too long.")
+        write!(f, "Attempted to construct a id of zero.")
     }
 }
 
@@ -386,23 +386,13 @@ pub(crate) mod snowflake {
 
     // this parse is 4x faster than [`str::parse`], see <https://github.com/serenity-rs/serenity/pull/2677#issue-2060912973>
     pub fn parse(x: &(impl AsRef<[u8]> + ?Sized)) -> Option<NonZeroU64> {
-        if x.as_ref().len() > 19 {
-            // SAFETY: max snowflake is 9223372036854775807
-            // unsafe { std::hint::unreachable_unchecked() }
-            // being UB is faster, but unsounder
-            return None;
-        }
         NonZeroU64::new(match as_chunks(x.as_ref()) {
             // 16, ..4 (most flakes are length 18, so this is on top)
             (&[a, b], rest) => simple_parse(parse_eight(a) * 100000000 + parse_eight(b), rest),
             // 8, 4..8
             (&[a], rest) => simple_parse(parse_eight(a), rest),
-            // omitting this shaves a ns
-            (&[], rest) => simple_parse(0, rest),
-            // SAFETY: as the max snowflake length is 19, it can either be split into [a, b](16),
-            // rest, [a](8), rest or [], rest. [a, b, c], rest would require a snowflake of length
-            // 24
-            _ => unsafe { std::hint::unreachable_unchecked() },
+            // largest number is 20 digits, if this is a problem you have bigger problems
+            (_, rest) => simple_parse(0, rest),
         })
     }
 
