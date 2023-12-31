@@ -205,6 +205,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.mute.clone_from(&self.mute);
                 member.avatar.clone_from(&self.avatar);
                 member.communication_disabled_until.clone_from(&self.communication_disabled_until);
+                member.unusual_dm_activity_until.clone_from(&self.unusual_dm_activity_until);
 
                 item
             } else {
@@ -226,6 +227,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     avatar: self.avatar,
                     communication_disabled_until: self.communication_disabled_until,
                     flags: GuildMemberFlags::default(),
+                    unusual_dm_activity_until: self.unusual_dm_activity_until,
                 });
             }
 
@@ -416,6 +418,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         avatar: None,
                         communication_disabled_until: None,
                         flags: GuildMemberFlags::default(),
+                        unusual_dm_activity_until: None,
                     });
                 }
             }

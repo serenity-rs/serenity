@@ -61,6 +61,11 @@ pub struct Member {
     /// The unique Id of the guild that the member is a part of.
     #[serde(default)]
     pub guild_id: GuildId,
+    /// If the member is current flagged for sending excessive DMs to non-friend server members
+    /// in the last 24 hours.
+    ///
+    /// Will be None if the user is not currently flagged.
+    pub unusual_dm_activity_until: Option<Timestamp>,
 }
 
 bitflags! {
@@ -592,6 +597,11 @@ pub struct PartialMember {
     ///
     /// [`Interaction`]: crate::model::application::Interaction
     pub permissions: Option<Permissions>,
+    /// If the member is current flagged for sending excessive DMs to non-friend server members
+    /// in the last 24 hours.
+    ///
+    /// Will be None if the user is not currently flagged.
+    pub unusual_dm_activity_until: Option<Timestamp>,
 }
 
 impl From<PartialMember> for Member {
@@ -610,6 +620,7 @@ impl From<PartialMember> for Member {
             permissions: partial.permissions,
             communication_disabled_until: None,
             guild_id: partial.guild_id.unwrap_or_default(),
+            unusual_dm_activity_until: partial.unusual_dm_activity_until,
         }
     }
 }
@@ -627,6 +638,7 @@ impl From<Member> for PartialMember {
             guild_id: Some(member.guild_id),
             user: Some(member.user),
             permissions: member.permissions,
+            unusual_dm_activity_until: member.unusual_dm_activity_until,
         }
     }
 }
