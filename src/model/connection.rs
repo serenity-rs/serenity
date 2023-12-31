@@ -6,7 +6,8 @@ use crate::internal::prelude::*;
 /// Information about a connection between the current user and a third party service.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-connection-structure).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[bool_to_bitflags::bool_to_bitflags]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Connection {
     /// The ID of the account on the other side of this connection.

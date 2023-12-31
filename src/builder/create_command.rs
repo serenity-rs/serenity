@@ -32,8 +32,7 @@ impl CreateCommandOption {
             name_localizations: None,
             description: description.into().into(),
             description_localizations: None,
-            required: false,
-            autocomplete: false,
+            __generated_flags: CommandOptionGeneratedFlags::empty(),
             min_value: None,
             max_value: None,
             min_length: None,
@@ -106,7 +105,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(mut self, required: bool) -> Self {
-        self.0.required = required;
+        self.0.set_required(required);
         self
     }
 
@@ -205,7 +204,7 @@ impl CreateCommandOption {
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     pub fn set_autocomplete(mut self, value: bool) -> Self {
-        self.0.autocomplete = value;
+        self.0.set_autocomplete(value);
         self
     }
 
