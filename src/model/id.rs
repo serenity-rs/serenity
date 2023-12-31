@@ -345,7 +345,7 @@ pub(crate) mod snowflake {
         }
         fn parse(s: [u8; 8]) -> u64 {
             let n = u64::from_ne_bytes(s);
-            let n = ((n & 0x0f000f000f000f00) >> 08) + ((n & 0x000f000f000f000f) * 010);
+            let n = ((n & 0x0f000f000f000f00) >> 8) + ((n & 0x000f000f000f000f) * 10);
             let n = ((n & 0x00ff000000ff0000) >> 16) + ((n & 0x000000ff000000ff) * 100);
             ((n & 0x0000ffff00000000) >> 32) + ((n & 0x000000000000ffff) * 10000)
         }
@@ -361,13 +361,12 @@ pub(crate) mod snowflake {
             // 24
             _ => unsafe { std::hint::unreachable_unchecked() },
         })
-        .map(NonZeroU64::new)
-        .flatten()
+        .and_then(NonZeroU64::new)
     }
 
     fn generic(mut n: u64, s: &[u8]) -> u64 {
         for &b in s {
-            n = n * 10 + (b - b'0') as u64
+            n = n * 10 + (b - b'0') as u64;
         }
         n
     }
