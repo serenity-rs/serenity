@@ -10,6 +10,7 @@ use serde::de::Error as DeError;
 use serde::Serialize;
 
 use crate::constants::Opcode;
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::{
     deserialize_val,
@@ -19,8 +20,6 @@ use crate::model::utils::{
     remove_from_map_opt,
     stickers,
 };
-use crate::constants::Opcode;
-use crate::internal::prelude::*;
 
 /// Requires no gateway intents.
 ///
@@ -244,8 +243,9 @@ pub struct GuildMemberRemoveEvent {
 /// Requires [`GatewayIntents::GUILD_MEMBERS`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#guild-member-update).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct GuildMemberUpdateEvent {
     pub guild_id: GuildId,
@@ -593,15 +593,15 @@ impl MessageUpdateEvent {
         if let Some(x) = content { message.content.clone_from(x) }
         if let Some(x) = timestamp { message.timestamp = x.clone() }
         message.edited_timestamp = *edited_timestamp;
-        if let Some(x) = tts { message.tts = x.clone() }
-        if let Some(x) = mention_everyone { message.mention_everyone = x.clone() }
+        if let Some(x) = tts { message.set_tts(*x) }
+        if let Some(x) = mention_everyone { message.set_mention_everyone(*x) }
         if let Some(x) = mentions { message.mentions.clone_from(x) }
         if let Some(x) = mention_roles { message.mention_roles.clone_from(x) }
         if let Some(x) = mention_channels { message.mention_channels.clone_from(x) }
         if let Some(x) = attachments { message.attachments.clone_from(x) }
         if let Some(x) = embeds { message.embeds.clone_from(x) }
         if let Some(x) = reactions { message.reactions.clone_from(x) }
-        if let Some(x) = pinned { message.pinned = x.clone() }
+        if let Some(x) = pinned { message.set_pinned(*x) }
         if let Some(x) = webhook_id { message.webhook_id.clone_from(x) }
         if let Some(x) = kind { message.kind = x.clone() }
         if let Some(x) = activity { message.activity.clone_from(x) }
