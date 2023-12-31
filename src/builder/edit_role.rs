@@ -77,8 +77,8 @@ impl<'a> EditRole<'a> {
     /// Creates a new builder with the values of the given [`Role`].
     pub fn from_role(role: &Role) -> Self {
         EditRole {
-            hoist: Some(role.hoist),
-            mentionable: Some(role.mentionable),
+            hoist: Some(role.hoist()),
+            mentionable: Some(role.mentionable()),
             name: Some(role.name.clone()),
             permissions: Some(role.permissions.bits()),
             position: Some(role.position),
