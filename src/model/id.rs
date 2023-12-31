@@ -384,6 +384,7 @@ pub(crate) mod snowflake {
         ((n & 0x0000ffff00000000) >> 32) + ((n & 0x000000000000ffff) * 10000)
     }
 
+    // this parse is 4x faster than [`str::parse`], see <https://github.com/serenity-rs/serenity/pull/2677#issue-2060912973>
     pub fn parse(x: &(impl AsRef<[u8]> + ?Sized)) -> Option<NonZeroU64> {
         if x.as_ref().len() > 19 {
             // SAFETY: max snowflake is 9223372036854775807
