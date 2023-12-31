@@ -5,17 +5,12 @@ use std::num::{NonZeroI64, NonZeroU64};
 
 use super::Timestamp;
 
+#[derive(Debug, Clone, Copy)]
 pub struct IDFromStrError;
-
-impl fmt::Debug for IDFromStrError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "IDFromStrError(id of zero)")
-    }
-}
 
 impl fmt::Display for IDFromStrError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Attempted to construct a id of zero.")
+        write!(f, "attempted to construct an ID of zero")
     }
 }
 
