@@ -337,12 +337,28 @@ pub(crate) mod snowflake {
     }
 
     pub fn parse(x: &(impl AsRef<[u8]> + ?Sized)) -> Option<NonZeroU64> {
+        #[allow(clippy::items_after_statements)]
+        fn generic(mut n: u64, s: &[u8]) -> u64 {
+            for &b in s {
+                n = n * 10 + (b - b'0') as u64;
+            }
+            n
+        }
+
         if x.as_ref().len() > 19 {
+            #[cfg(test)]
+            {
+                return NonZeroU64::new(generic(0, x.as_ref()));
+            }
             // SAFETY: max snowflake is 9223372036854775807
             // unsafe { std::hint::unreachable_unchecked() }
             // being UB is faster, but unsounder
-            return None;
+            #[cfg(not(test))]
+            {
+                return None;
+            }
         }
+        #[allow(clippy::items_after_statements)]
         fn parse(s: [u8; 8]) -> u64 {
             let n = u64::from_ne_bytes(s);
             let n = ((n & 0x0f000f000f000f00) >> 8) + ((n & 0x000f000f000f000f) * 10);
@@ -362,13 +378,6 @@ pub(crate) mod snowflake {
             _ => unsafe { std::hint::unreachable_unchecked() },
         })
         .and_then(NonZeroU64::new)
-    }
-
-    fn generic(mut n: u64, s: &[u8]) -> u64 {
-        for &b in s {
-            n = n * 10 + (b - b'0') as u64;
-        }
-        n
     }
 
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NonZeroU64, D::Error> {
