@@ -5,6 +5,22 @@ use std::num::{NonZeroI64, NonZeroU64};
 
 use super::Timestamp;
 
+pub struct IDFromStrError;
+
+impl fmt::Debug for IDFromStrError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "IDFromStrError(id of zero, or too long)")
+    }
+}
+
+impl fmt::Display for IDFromStrError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Attempted to construct a id of zero, or id too long.")
+    }
+}
+
+impl std::error::Error for IDFromStrError {}
+
 macro_rules! id_u64 {
     ($($name:ident;)*) => {
         $(
@@ -107,10 +123,10 @@ macro_rules! id_u64 {
             }
 
             impl std::str::FromStr for $name {
-                type Err = ();
+                type Err = IDFromStrError;
 
                 fn from_str(s: &str) -> Result<Self, Self::Err> {
-                    Ok(Self(snowflake::parse(s).ok_or(())?))
+                    Ok(Self(snowflake::parse(s).ok_or(IDFromStrError)?))
                 }
             }
 
@@ -375,7 +391,7 @@ pub(crate) mod snowflake {
             // being UB is faster, but unsounder
             return None;
         }
-        Some(match as_chunks(x.as_ref()) {
+        NonZeroU64::new(match as_chunks(x.as_ref()) {
             // 16, ..4 (most flakes are length 18, so this is on top)
             (&[a, b], rest) => simple_parse(parse_eight(a) * 100000000 + parse_eight(b), rest),
             // 8, 4..8
@@ -387,7 +403,6 @@ pub(crate) mod snowflake {
             // 24
             _ => unsafe { std::hint::unreachable_unchecked() },
         })
-        .and_then(NonZeroU64::new)
     }
 
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NonZeroU64, D::Error> {
