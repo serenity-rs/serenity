@@ -127,7 +127,7 @@ impl CustomMessage {
     /// If not used, the default value is `false`.
     #[inline]
     pub fn mention_everyone(&mut self, mentions: bool) -> &mut Self {
-        self.msg.mention_everyone = mentions;
+        self.msg.set_mention_everyone(mentions);
 
         self
     }
@@ -157,7 +157,7 @@ impl CustomMessage {
     /// If not used, the default value is `false`.
     #[inline]
     pub fn pinned(&mut self, pinned: bool) -> &mut Self {
-        self.msg.pinned = pinned;
+        self.msg.set_pinned(pinned);
 
         self
     }
@@ -187,7 +187,7 @@ impl CustomMessage {
     /// If not used, the default value is `false`.
     #[inline]
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.msg.tts = tts;
+        self.msg.set_tts(tts);
 
         self
     }
