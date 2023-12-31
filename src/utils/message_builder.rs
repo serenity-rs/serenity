@@ -983,6 +983,7 @@ pub enum ContentModifier {
     Spoiler,
 }
 
+#[bool_to_bitflags::bool_to_bitflags]
 /// Describes formatting on string content
 #[derive(Clone, Debug, Default)]
 pub struct Content {
@@ -1049,22 +1050,22 @@ impl Content {
     pub fn apply(&mut self, modifier: &ContentModifier) {
         match *modifier {
             ContentModifier::Italic => {
-                self.italic = true;
+                self.set_italic(true);
             },
             ContentModifier::Bold => {
-                self.bold = true;
+                self.set_bold(true);
             },
             ContentModifier::Strikethrough => {
-                self.strikethrough = true;
+                self.set_strikethrough(true);
             },
             ContentModifier::Code => {
-                self.code = true;
+                self.set_code(true);
             },
             ContentModifier::Underline => {
-                self.underline = true;
+                self.set_underline(true);
             },
             ContentModifier::Spoiler => {
-                self.spoiler = true;
+                self.set_spoiler(true);
             },
         }
     }
@@ -1072,53 +1073,53 @@ impl Content {
 
 impl std::fmt::Display for Content {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.spoiler {
+        if self.spoiler() {
             fmt.write_str("||")?;
         }
 
-        if self.bold {
+        if self.bold() {
             fmt.write_str("**")?;
         }
 
-        if self.italic {
+        if self.italic() {
             fmt.write_char('*')?;
         }
 
-        if self.strikethrough {
+        if self.strikethrough() {
             fmt.write_str("~~")?;
         }
 
-        if self.underline {
+        if self.underline() {
             fmt.write_str("__")?;
         }
 
-        if self.code {
+        if self.code() {
             fmt.write_char('`')?;
         }
 
         fmt.write_str(&self.inner)?;
 
-        if self.code {
+        if self.code() {
             fmt.write_char('`')?;
         }
 
-        if self.underline {
+        if self.underline() {
             fmt.write_str("__")?;
         }
 
-        if self.strikethrough {
+        if self.strikethrough() {
             fmt.write_str("~~")?;
         }
 
-        if self.italic {
+        if self.italic() {
             fmt.write_char('*')?;
         }
 
-        if self.bold {
+        if self.bold() {
             fmt.write_str("**")?;
         }
 
-        if self.spoiler {
+        if self.spoiler() {
             fmt.write_str("||")?;
         }
 
@@ -1195,18 +1196,18 @@ mod test {
 
     #[test]
     fn mentions() {
-        let content_emoji = MessageBuilder::new()
-            .emoji(&Emoji {
-                animated: false,
-                available: true,
-                id: EmojiId::new(32),
-                name: "Rohrkatze".to_string().into(),
-                managed: false,
-                require_colons: true,
-                roles: vec![].into(),
-                user: None,
-            })
-            .build();
+        let mut emoji = Emoji {
+            id: EmojiId::new(32),
+            name: "Rohrkatze".to_string().into(),
+            roles: vec![].into(),
+            user: None,
+            __generated_flags: EmojiGeneratedFlags::empty(),
+        };
+
+        emoji.set_available(true);
+        emoji.set_require_colons(true);
+
+        let content_emoji = MessageBuilder::new().emoji(&emoji).build();
         let content_mentions = MessageBuilder::new()
             .channel(ChannelId::new(1))
             .mention(&UserId::new(2))

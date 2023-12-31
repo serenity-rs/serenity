@@ -9,8 +9,9 @@ use crate::model::utils::default_true;
 /// integration. Emojis created using the API only work within the guild it was created in.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/emoji#emoji-object).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Emoji {
     /// Whether the emoji is animated.
@@ -62,7 +63,7 @@ impl Emoji {
     #[inline]
     #[must_use]
     pub fn url(&self) -> String {
-        let extension = if self.animated { "gif" } else { "png" };
+        let extension = if self.animated() { "gif" } else { "png" };
         cdn!("/emojis/{}.{}", self.id, extension)
     }
 }
@@ -73,7 +74,7 @@ impl fmt::Display for Emoji {
     /// This is in the format of either `<:NAME:EMOJI_ID>` for normal emojis, or
     /// `<a:NAME:EMOJI_ID>` for animated emojis.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.animated {
+        if self.animated() {
             f.write_str("<a:")?;
         } else {
             f.write_str("<:")?;
