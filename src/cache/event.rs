@@ -33,7 +33,7 @@ use crate::model::event::{
     VoiceStateUpdateEvent,
 };
 use crate::model::gateway::ShardInfo;
-use crate::model::guild::{Guild, GuildMemberFlags, Member, Role};
+use crate::model::guild::{Guild, GuildMemberFlags, Member, MemberGeneratedFlags, Role};
 use crate::model::id::ShardId;
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
@@ -189,13 +189,13 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.nick.clone_from(&self.nick);
                 member.roles.clone_from(&self.roles);
                 member.user.clone_from(&self.user);
-                member.pending.clone_from(&self.pending);
                 member.premium_since.clone_from(&self.premium_since);
-                member.deaf.clone_from(&self.deaf);
-                member.mute.clone_from(&self.mute);
                 member.avatar.clone_from(&self.avatar);
                 member.communication_disabled_until.clone_from(&self.communication_disabled_until);
                 member.unusual_dm_activity_until.clone_from(&self.unusual_dm_activity_until);
+                member.set_pending(self.pending());
+                member.set_deaf(self.deaf());
+                member.set_mute(self.mute());
 
                 item
             } else {
@@ -203,22 +203,26 @@ impl CacheUpdate for GuildMemberUpdateEvent {
             };
 
             if item.is_none() {
-                guild.members.insert(self.user.id, Member {
-                    deaf: false,
+                let mut new_member = Member {
+                    __generated_flags: MemberGeneratedFlags::empty(),
                     guild_id: self.guild_id,
                     joined_at: Some(self.joined_at),
-                    mute: false,
                     nick: self.nick.clone(),
                     roles: self.roles.clone(),
                     user: self.user.clone(),
-                    pending: self.pending,
                     premium_since: self.premium_since,
                     permissions: None,
                     avatar: self.avatar,
                     communication_disabled_until: self.communication_disabled_until,
                     flags: GuildMemberFlags::default(),
                     unusual_dm_activity_until: self.unusual_dm_activity_until,
-                });
+                };
+
+                new_member.set_pending(self.pending());
+                new_member.set_deaf(self.deaf());
+                new_member.set_mute(self.mute());
+
+                guild.members.insert(self.user.id, new_member);
             }
 
             item
@@ -317,7 +321,7 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.system_channel_id = self.guild.system_channel_id;
             guild.verification_level = self.guild.verification_level;
             guild.widget_channel_id = self.guild.widget_channel_id;
-            guild.widget_enabled = self.guild.widget_enabled;
+            guild.set_widget_enabled(self.guild.widget_enabled());
         }
 
         None
@@ -415,20 +419,18 @@ impl CacheUpdate for PresenceUpdateEvent {
                 // Create a partial member instance out of the presence update data.
                 if let Some(user) = self.presence.user.to_user() {
                     guild.members.entry(self.presence.user.id).or_insert_with(|| Member {
-                        deaf: false,
                         guild_id,
                         joined_at: None,
-                        mute: false,
                         nick: None,
                         user,
                         roles: FixedArray::default(),
-                        pending: false,
                         premium_since: None,
                         permissions: None,
                         avatar: None,
                         communication_disabled_until: None,
                         flags: GuildMemberFlags::default(),
                         unusual_dm_activity_until: None,
+                        __generated_flags: MemberGeneratedFlags::empty(),
                     });
                 }
             }
