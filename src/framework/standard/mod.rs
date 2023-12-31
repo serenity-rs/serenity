@@ -203,8 +203,8 @@ impl StandardFramework {
     fn should_ignore(&self, msg: &Message) -> bool {
         let config = self.config.read();
 
-        (config.ignore_bots && msg.author.bot)
-            || (config.ignore_webhooks && msg.webhook_id.is_some())
+        (config.get_ignore_bots() && msg.author.bot())
+            || (config.get_ignore_webhooks() && msg.webhook_id.is_some())
     }
 
     async fn should_fail<'a>(
@@ -637,7 +637,7 @@ impl Framework for StandardFramework {
             return;
         }
 
-        if prefix.is_none() && !(config.no_dm_prefix && msg.is_private()) {
+        if prefix.is_none() && !(config.get_no_dm_prefix() && msg.is_private()) {
             if let Some(normal) = &self.normal_message {
                 normal(&mut ctx, &msg).await;
             }
@@ -684,7 +684,7 @@ impl Framework for StandardFramework {
 
         match invoke {
             Invoke::Help(name) => {
-                if !config.allow_dm && msg.is_private() {
+                if !config.get_allow_dm() && msg.is_private() {
                     return;
                 }
 

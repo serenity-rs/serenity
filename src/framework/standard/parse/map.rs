@@ -34,8 +34,11 @@ impl CommandMap {
                 map.min_length = std::cmp::min(len, map.min_length);
                 map.max_length = std::cmp::max(len, map.max_length);
 
-                let name =
-                    if conf.case_insensitive { name.to_lowercase() } else { (*name).to_string() };
+                let name = if conf.get_case_insensitive() {
+                    name.to_lowercase()
+                } else {
+                    (*name).to_string()
+                };
 
                 map.cmds.insert(name, (*cmd, Arc::clone(&sub_map)));
             }

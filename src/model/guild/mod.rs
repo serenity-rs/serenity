@@ -106,8 +106,9 @@ pub struct AfkMetadata {
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object) plus
 /// [extension](https://docs.discord.com/developers/events/gateway-events#guild-create).
+#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Guild {
     /// The unique Id identifying the guild.
