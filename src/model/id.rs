@@ -336,42 +336,52 @@ pub(crate) mod snowflake {
         (unsafe { std::slice::from_raw_parts(multiple_of_n.as_ptr().cast(), new_len) }, remainder)
     }
 
-    pub fn parse(x: &(impl AsRef<[u8]> + ?Sized)) -> Option<NonZeroU64> {
-        #[allow(clippy::items_after_statements)]
-        fn generic(mut n: u64, s: &[u8]) -> u64 {
-            for &b in s {
-                n = n * 10 + (b - b'0') as u64;
-            }
-            n
+    fn simple_parse(mut n: u64, s: &[u8]) -> u64 {
+        for &b in s {
+            n = n * 10 + (b - b'0') as u64;
         }
+        n
+    }
 
+    fn parse_eight(s: [u8; 8]) -> u64 {
+        // reinterpret as u64 ("92233721" => 92233721)
+        let n = u64::from_le_bytes(s);
+        // combine 4 pairs of single digits:
+        // split pieces into odd and even
+        //  1_7_3_2_ (le repr)
+        // _2_3_2_9
+        // then combine
+        // _21_37_23_92 (le repr, each byte as 2 digits)
+        let n = ((n & 0x0f000f000f000f00) >> 8) + ((n & 0x000f000f000f000f) * 10);
+        // combine 2 pairs of 2 digits:
+        // split again
+        // _21___23__
+        // ___37___92
+        // then combine
+        // __14|137__36|7 (le repr, pipes separating bytes)
+        let n = ((n & 0x00ff000000ff0000) >> 16) + ((n & 0x000000ff000000ff) * 100);
+        // combine pair of 4 digits
+        // split again
+        // __14|137____ (then moved to ______14|137, as u64:3721)
+        // ______36|07 (as u64: 9223)
+        // then combine
+        ((n & 0x0000ffff00000000) >> 32) + ((n & 0x000000000000ffff) * 10000)
+    }
+
+    pub fn parse(x: &(impl AsRef<[u8]> + ?Sized)) -> Option<NonZeroU64> {
         if x.as_ref().len() > 19 {
-            #[cfg(test)]
-            {
-                return NonZeroU64::new(generic(0, x.as_ref()));
-            }
             // SAFETY: max snowflake is 9223372036854775807
             // unsafe { std::hint::unreachable_unchecked() }
             // being UB is faster, but unsounder
-            #[cfg(not(test))]
-            {
-                return None;
-            }
-        }
-        #[allow(clippy::items_after_statements)]
-        fn parse(s: [u8; 8]) -> u64 {
-            let n = u64::from_ne_bytes(s);
-            let n = ((n & 0x0f000f000f000f00) >> 8) + ((n & 0x000f000f000f000f) * 10);
-            let n = ((n & 0x00ff000000ff0000) >> 16) + ((n & 0x000000ff000000ff) * 100);
-            ((n & 0x0000ffff00000000) >> 32) + ((n & 0x000000000000ffff) * 10000)
+            return None;
         }
         Some(match as_chunks(x.as_ref()) {
             // 16, ..4 (most flakes are length 18, so this is on top)
-            (&[a, b], rest) => generic(parse(a) * 100000000 + parse(b), rest),
+            (&[a, b], rest) => simple_parse(parse_eight(a) * 100000000 + parse_eight(b), rest),
             // 8, 4..8
-            (&[a], rest) => generic(parse(a), rest),
+            (&[a], rest) => simple_parse(parse_eight(a), rest),
             // omitting this shaves a ns
-            (&[], rest) => generic(0, rest),
+            (&[], rest) => simple_parse(0, rest),
             // SAFETY: as the max snowflake length is 19, it can either be split into [a, b](16),
             // rest, [a](8), rest or [], rest. [a, b, c], rest would require a snowflake of length
             // 24
