@@ -759,7 +759,7 @@
     <span class="doccomment">/// If the member is currently flagged for sending excessive DMs to non-friend server members
     /// in the last 24 hours.
     ///
-    /// Will be None if the user is not currently flagged.
+    /// Will be None or a time in the past if the user is not timed out.
     </span><span class="kw">pub </span>unusual_dm_activity_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 }
 
@@ -1295,7 +1295,7 @@
     <span class="doccomment">/// If the member is currently flagged for sending excessive DMs to non-friend server members
     /// in the last 24 hours.
     ///
-    /// Will be None if the user is not currently flagged.
+    /// Will be None or a time in the past if the user is not timed out.
     </span><span class="kw">pub </span>unusual_dm_activity_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 }
 
