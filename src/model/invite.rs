@@ -1,5 +1,7 @@
 //! Models for server and channel invites.
 
+use nonmax::NonMaxU64;
+
 use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
@@ -18,12 +20,12 @@ use crate::internal::prelude::*;
 #[non_exhaustive]
 pub struct Invite {
     /// The approximate number of [`Member`]s in the related [`Guild`].
-    pub approximate_member_count: Option<u64>,
+    pub approximate_member_count: Option<NonMaxU64>,
     /// The approximate number of [`Member`]s with an active session in the related [`Guild`].
     ///
     /// An active session is defined as an open, heartbeating WebSocket connection.
     /// These include [invisible][`OnlineStatus::Invisible`] members.
-    pub approximate_presence_count: Option<u64>,
+    pub approximate_presence_count: Option<NonMaxU64>,
     /// The unique code for the invite.
     pub code: FixedString,
     /// A representation of the minimal amount of information needed about the [`GuildChannel`]
@@ -219,7 +221,7 @@ pub struct InviteGuild {
     pub verification_level: VerificationLevel,
     pub vanity_url_code: Option<FixedString>,
     pub nsfw_level: NsfwLevel,
-    pub premium_subscription_count: Option<u64>,
+    pub premium_subscription_count: Option<NonMaxU64>,
 }
 
 #[cfg(feature = "model")]

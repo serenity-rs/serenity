@@ -8,6 +8,7 @@
 
 use std::collections::HashMap;
 
+use nonmax::NonMaxU64;
 use serde::de::Error as DeError;
 use serde::Serialize;
 
@@ -538,7 +539,7 @@ pub struct MessageUpdateEvent {
     pub thread: Option<Option<Box<GuildChannel>>>,
     pub components: Option<FixedArray<ActionRow>>,
     pub sticker_items: Option<FixedArray<StickerItem>>,
-    pub position: Option<Option<u64>>,
+    pub position: Option<Option<NonMaxU64>>,
     pub role_subscription_data: Option<Option<RoleSubscriptionData>>,
     pub guild_id: Option<GuildId>,
     pub member: Option<Option<Box<PartialMember>>>,
