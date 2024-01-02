@@ -298,7 +298,6 @@ pub mod comma_separated_string {
         Ok(vec)
     }
 
-    #[allow(clippy::ptr_arg)]
     pub fn serialize<S: Serializer>(
         vec: &FixedArray<FixedString>,
         serializer: S,
