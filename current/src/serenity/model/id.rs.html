@@ -407,11 +407,6 @@
 <a href="#405" id="405">405</a>
 <a href="#406" id="406">406</a>
 <a href="#407" id="407">407</a>
-<a href="#408" id="408">408</a>
-<a href="#409" id="409">409</a>
-<a href="#410" id="410">410</a>
-<a href="#411" id="411">411</a>
-<a href="#412" id="412">412</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
@@ -452,12 +447,7 @@
 
             <span class="kw">impl </span>Default <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
                 <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-                    <span class="comment">// Have the possible panic at compile time. `unwrap()` is not const-stable
-                    </span><span class="kw">const </span>ONE: NonZeroU64 = <span class="kw">match </span>NonZeroU64::new(<span class="number">1</span>) {
-                        <span class="prelude-val">Some</span>(x) =&gt; x,
-                        <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
-                    };
-                    <span class="self">Self</span>(ONE)
+                    <span class="self">Self</span>(NonZeroU64::MIN)
                 }
             }
 
