@@ -168,7 +168,6 @@ async fn find_prefix<'a>(
 /// - Nothing
 ///
 /// In all cases, whitespace after the prefix is cleared.
-#[allow(clippy::needless_lifetimes)] // Clippy and the compiler disagree
 pub async fn prefix<'a>(
     ctx: &Context,
     msg: &Message,
