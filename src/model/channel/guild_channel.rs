@@ -2,6 +2,8 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
+use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8};
+
 #[cfg(feature = "model")]
 use crate::builder::{
     Builder,
@@ -46,7 +48,7 @@ pub struct GuildChannel {
     /// The bitrate of the channel.
     ///
     /// **Note**: This is only available for voice and stage channels.
-    pub bitrate: Option<u32>,
+    pub bitrate: Option<NonMaxU32>,
     /// The Id of the parent category for a channel, or of the parent text channel for a thread.
     ///
     /// **Note**: This is only available for channels in a category and thread channels.
@@ -90,7 +92,7 @@ pub struct GuildChannel {
     /// The maximum number of members allowed in the channel.
     ///
     /// **Note**: This is only available for voice channels.
-    pub user_limit: Option<u32>,
+    pub user_limit: Option<NonMaxU8>,
     /// Used to tell if the channel is not safe for work.
     // This field can or can not be present sometimes, but if it isn't default to `false`.
     #[serde(default)]
@@ -100,7 +102,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available for text channels excluding news channels.
     #[doc(alias = "slowmode")]
     #[serde(default)]
-    pub rate_limit_per_user: Option<u16>,
+    pub rate_limit_per_user: Option<NonMaxU16>,
     /// The region override.
     ///
     /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
@@ -110,14 +112,12 @@ pub struct GuildChannel {
     pub video_quality_mode: Option<VideoQualityMode>,
     /// An approximate count of messages in the thread.
     ///
-    /// This is currently saturated at 255 to prevent breaking.
-    ///
     /// **Note**: This is only available on thread channels.
-    pub message_count: Option<u32>,
+    pub message_count: Option<NonMaxU32>,
     /// An approximate count of users in a thread, stops counting at 50.
     ///
     /// **Note**: This is only available on thread channels.
-    pub member_count: Option<u8>,
+    pub member_count: Option<NonMaxU8>,
     /// The thread metadata.
     ///
     /// **Note**: This is only available on thread channels.
@@ -139,7 +139,7 @@ pub struct GuildChannel {
     pub flags: ChannelFlags,
     /// The number of messages ever sent in a thread, it's similar to `message_count` on message
     /// creation, but will not decrement the number when a message is deleted.
-    pub total_message_sent: Option<u64>,
+    pub total_message_sent: Option<NonMaxU32>,
     /// The set of available tags.
     ///
     /// **Note**: This is only available in forum channels.
@@ -158,7 +158,7 @@ pub struct GuildChannel {
     /// is copied to the thread at creation time and does not live update.
     ///
     /// **Note**: This is only available in a forum or text channel.
-    pub default_thread_rate_limit_per_user: Option<u16>,
+    pub default_thread_rate_limit_per_user: Option<NonMaxU16>,
     /// The status of a voice channel.
     ///
     /// **Note**: This is only available in voice channels.
