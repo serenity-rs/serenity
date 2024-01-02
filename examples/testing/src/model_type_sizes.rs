@@ -1,7 +1,7 @@
 use serenity::model::prelude::*;
 
 pub fn print_ranking() {
-    let mut sizes = vec![
+    let sizes = [
         ("ActionExecution", std::mem::size_of::<ActionExecution>()),
         ("Activity", std::mem::size_of::<Activity>()),
         ("ActivityAssets", std::mem::size_of::<ActivityAssets>()),
@@ -266,8 +266,7 @@ pub fn print_ranking() {
         ("WebhookAction", std::mem::size_of::<WebhookAction>()),
         ("WebhookType", std::mem::size_of::<WebhookType>()),
     ];
-    sizes.sort_by_key(|&(_name, size)| size);
-    for (i, (name, size)) in sizes.iter().rev().take_while(|&&(_, size)| size >= 200).enumerate() {
+    for (i, (name, size)) in sizes.iter().enumerate() {
         println!("#{} {}: {} bytes", i + 1, name, size);
     }
 }

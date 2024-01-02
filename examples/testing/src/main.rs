@@ -387,6 +387,13 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() -> Result<(), serenity::Error> {
+    if let Some(arg) = std::env::args().nth(1) {
+        if arg == "--print-sizes" {
+            model_type_sizes::print_ranking();
+            return Ok(());
+        }
+    }
+
     env_logger::init();
     let token = std::env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
