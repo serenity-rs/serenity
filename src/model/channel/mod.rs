@@ -34,7 +34,6 @@ use crate::model::utils::is_false;
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 #[non_exhaustive]
-#[allow(clippy::large_enum_variant)] // https://github.com/rust-lang/rust-clippy/issues/9798
 pub enum Channel {
     /// A channel within a [`Guild`].
     Guild(GuildChannel),
