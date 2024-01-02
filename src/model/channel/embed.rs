@@ -1,3 +1,5 @@
+use nonmax::NonMaxU32;
+
 use crate::internal::prelude::*;
 use crate::model::{Colour, Timestamp};
 
@@ -171,9 +173,9 @@ pub struct EmbedImage {
     /// A proxied URL of the image.
     pub proxy_url: Option<FixedString>,
     /// The height of the image.
-    pub height: Option<u32>,
+    pub height: Option<NonMaxU32>,
     /// The width of the image.
-    pub width: Option<u32>,
+    pub width: Option<NonMaxU32>,
 }
 
 /// The provider of an embed.
@@ -203,9 +205,9 @@ pub struct EmbedThumbnail {
     /// A proxied URL of the thumbnail.
     pub proxy_url: Option<FixedString>,
     /// The height of the thumbnail in pixels.
-    pub height: Option<u32>,
+    pub height: Option<NonMaxU32>,
     /// The width of the thumbnail in pixels.
-    pub width: Option<u32>,
+    pub width: Option<NonMaxU32>,
 }
 
 /// Video information for an embed.
@@ -220,7 +222,7 @@ pub struct EmbedVideo {
     /// A proxied URL of the thumbnail.
     pub proxy_url: Option<FixedString>,
     /// The height of the video in pixels.
-    pub height: Option<u32>,
+    pub height: Option<NonMaxU32>,
     /// The width of the video in pixels.
-    pub width: Option<u32>,
+    pub width: Option<NonMaxU32>,
 }

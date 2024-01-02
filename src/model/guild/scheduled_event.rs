@@ -1,3 +1,5 @@
+use nonmax::NonMaxU64;
+
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -49,7 +51,7 @@ pub struct ScheduledEvent {
     ///
     /// Only populated if `with_user_count` is set to true provided when calling
     /// [`GuildId::scheduled_event`] or [`GuildId::scheduled_events`].
-    pub user_count: Option<u64>,
+    pub user_count: Option<NonMaxU64>,
     /// The hash of the event's cover image, if present.
     pub image: Option<ImageHash>,
 }

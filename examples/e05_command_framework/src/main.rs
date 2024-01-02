@@ -555,8 +555,11 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
             format!("Successfully set slow mode rate to `{slow_mode_rate_seconds}` seconds.")
         }
     } else if let Some(channel) = msg.channel_id.to_channel_cached(&ctx.cache) {
-        let slow_mode_rate = channel.rate_limit_per_user.unwrap_or(0);
-        format!("Current slow mode rate is `{slow_mode_rate}` seconds.")
+        if let Some(slow_mode_rate) = channel.rate_limit_per_user {
+            format!("Current slow mode rate is `{slow_mode_rate}` seconds.")
+        } else {
+            "There is no current slow mode rate for this channel.".to_string()
+        }
     } else {
         "Failed to find channel in cache.".to_string()
     };
