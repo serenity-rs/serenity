@@ -17,6 +17,7 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 
+use nonmax::NonMaxU64;
 #[cfg(feature = "model")]
 use tracing::{error, warn};
 
@@ -194,9 +195,9 @@ pub struct Guild {
     /// The maximum number of presences for the guild. The default value is currently 25000.
     ///
     /// **Note**: It is in effect when it is `None`.
-    pub max_presences: Option<u64>,
+    pub max_presences: Option<NonMaxU64>,
     /// The maximum number of members for the guild.
-    pub max_members: Option<u64>,
+    pub max_members: Option<NonMaxU64>,
     /// The vanity url code for the guild, if it has one.
     pub vanity_url_code: Option<FixedString>,
     /// The server's description, if it has one.
@@ -206,7 +207,7 @@ pub struct Guild {
     /// The server's premium boosting level.
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server.
-    pub premium_subscription_count: Option<u64>,
+    pub premium_subscription_count: Option<NonMaxU64>,
     /// The preferred locale of this guild only set if guild has the "DISCOVERABLE" feature,
     /// defaults to en-US.
     pub preferred_locale: FixedString,
@@ -216,13 +217,13 @@ pub struct Guild {
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     pub public_updates_channel_id: Option<ChannelId>,
     /// The maximum amount of users in a video channel.
-    pub max_video_channel_users: Option<u64>,
+    pub max_video_channel_users: Option<NonMaxU64>,
     /// The maximum amount of users in a stage video channel
-    pub max_stage_video_channel_users: Option<u64>,
+    pub max_stage_video_channel_users: Option<NonMaxU64>,
     /// Approximate number of members in this guild.
-    pub approximate_member_count: Option<u64>,
+    pub approximate_member_count: Option<NonMaxU64>,
     /// Approximate number of non-offline members in this guild.
-    pub approximate_presence_count: Option<u64>,
+    pub approximate_presence_count: Option<NonMaxU64>,
     /// The welcome screen of the guild.
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
