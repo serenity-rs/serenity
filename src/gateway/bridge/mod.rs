@@ -72,11 +72,11 @@ pub enum ShardQueuerMessage {
     /// Message to set the shard total.
     SetShardTotal(NonZeroU16),
     /// Message to start a shard.
-    Start(ShardId, bool),
+    Start { shard_id: ShardId, concurrent: bool },
     /// Message to shutdown the shard queuer.
     Shutdown,
     /// Message to dequeue/shutdown a shard.
-    ShutdownShard(ShardId, u16),
+    ShutdownShard { shard_id: ShardId, code: u16 },
 }
 
 /// Information about a [`ShardRunner`].

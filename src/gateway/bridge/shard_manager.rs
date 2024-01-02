@@ -235,9 +235,10 @@ impl ShardManager {
         {
             let mut shard_shutdown = self.shard_shutdown.lock().await;
 
-            drop(
-                self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)),
-            );
+            drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard {
+                shard_id,
+                code,
+            }));
             match timeout(TIMEOUT, shard_shutdown.next()).await {
                 Ok(Some(shutdown_shard_id)) => {
                     if shutdown_shard_id != shard_id {
@@ -304,8 +305,10 @@ impl ShardManager {
     fn boot(&self, shard_id: ShardId, concurrent: bool) {
         info!("Telling shard queuer to start shard {shard_id}");
 
-        let msg = ShardQueuerMessage::Start(shard_id, concurrent);
-        drop(self.shard_queuer.unbounded_send(msg));
+        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Start {
+            shard_id,
+            concurrent,
+        }));
     }
 
     /// Returns the gateway intents used for this gateway connection.

@@ -112,7 +112,10 @@ impl ShardQueuer {
                     Some(ShardQueuerMessage::SetShardTotal(shard_total)) => {
                         self.shard_total = shard_total;
                     },
-                    Some(ShardQueuerMessage::Start(shard_id, concurrent)) => {
+                    Some(ShardQueuerMessage::Start {
+                        shard_id,
+                        concurrent,
+                    }) => {
                         if concurrent {
                             // If we're starting multiple shards, we can start them concurrently
                             // according to `max_concurrency`, and want our batches to be of
@@ -129,12 +132,15 @@ impl ShardQueuer {
                             self.checked_start(shard_id).await;
                         }
                     },
-                    Some(ShardQueuerMessage::ShutdownShard(shard, code)) => {
+                    Some(ShardQueuerMessage::ShutdownShard {
+                        shard_id,
+                        code,
+                    }) => {
                         debug!(
                             "[Shard Queuer] Received to shutdown shard {} with code {}",
-                            shard.0, code
+                            shard_id.0, code
                         );
-                        self.shutdown(shard, code).await;
+                        self.shutdown(shard_id, code).await;
                     },
                     Some(ShardQueuerMessage::Shutdown) => {
                         debug!("[Shard Queuer] Received to shutdown all shards");
