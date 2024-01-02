@@ -2,6 +2,7 @@
 
 use std::mem::transmute;
 
+use nonmax::{NonMaxU32, NonMaxU64};
 use serde::ser::{Serialize, Serializer};
 
 mod change;
@@ -369,16 +370,16 @@ pub struct Options {
     pub application_id: Option<ApplicationId>,
     /// Number of days after which inactive members were kicked.
     #[serde(default, with = "optional_string")]
-    pub delete_member_days: Option<u64>,
+    pub delete_member_days: Option<NonMaxU32>,
     /// Number of members removed by the prune
     #[serde(default, with = "optional_string")]
-    pub members_removed: Option<u64>,
+    pub members_removed: Option<NonMaxU64>,
     /// Channel in which the messages were deleted
     #[serde(default)]
     pub channel_id: Option<ChannelId>,
     /// Number of deleted messages.
     #[serde(default, with = "optional_string")]
-    pub count: Option<u64>,
+    pub count: Option<NonMaxU64>,
     /// Id of the overwritten entity
     #[serde(default)]
     pub id: Option<GenericId>,
