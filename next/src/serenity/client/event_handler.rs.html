@@ -486,7 +486,6 @@
 <a href="#484" id="484">484</a>
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
-<a href="#487" id="487">487</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -522,8 +521,7 @@
 
         <span class="doccomment">/// This enum stores every possible event that an [`EventHandler`] can receive.
         </span><span class="attr">#[non_exhaustive]
-        #[allow(clippy::large_enum_variant)] </span><span class="comment">// TODO: do some boxing to fix this
-        </span><span class="attr">#[derive(Clone, Debug)]
+        #[derive(Clone, Debug)]
         </span><span class="kw">pub enum </span>FullEvent {
             $(
                 $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)*

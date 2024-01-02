@@ -334,7 +334,6 @@
 <a href="#332" id="332">332</a>
 <a href="#333" id="333">333</a>
 <a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::hash::Hash;
@@ -555,8 +554,7 @@
         <span class="prelude-val">Ok</span>(vec)
     }
 
-    <span class="attr">#[allow(clippy::ptr_arg)]
-    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(
+    <span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(
         vec: <span class="kw-2">&amp;</span>FixedArray&lt;FixedString&gt;,
         serializer: S,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {

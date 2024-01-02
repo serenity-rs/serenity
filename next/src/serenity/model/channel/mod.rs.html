@@ -621,7 +621,6 @@
 <a href="#619" id="619">619</a>
 <a href="#620" id="620">620</a>
 <a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
 </span><span class="kw">mod </span>attachment;
@@ -658,7 +657,6 @@
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 #[non_exhaustive]
-#[allow(clippy::large_enum_variant)] </span><span class="comment">// https://github.com/rust-lang/rust-clippy/issues/9798
 </span><span class="kw">pub enum </span>Channel {
     <span class="doccomment">/// A channel within a [`Guild`].
     </span>Guild(GuildChannel),

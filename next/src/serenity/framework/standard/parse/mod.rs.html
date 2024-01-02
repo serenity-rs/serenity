@@ -520,7 +520,6 @@
 <a href="#518" id="518">518</a>
 <a href="#519" id="519">519</a>
 <a href="#520" id="520">520</a>
-<a href="#521" id="521">521</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{Command, <span class="kw-2">*</span>};
 <span class="kw">use </span><span class="kw">crate</span>::client::Context;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -695,7 +694,6 @@
 /// - Nothing
 ///
 /// In all cases, whitespace after the prefix is cleared.
-</span><span class="attr">#[allow(clippy::needless_lifetimes)] </span><span class="comment">// Clippy and the compiler disagree
 </span><span class="kw">pub async fn </span>prefix&lt;<span class="lifetime">'a</span>&gt;(
     ctx: <span class="kw-2">&amp;</span>Context,
     msg: <span class="kw-2">&amp;</span>Message,

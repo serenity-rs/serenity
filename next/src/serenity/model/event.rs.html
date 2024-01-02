@@ -1330,7 +1330,6 @@
 <a href="#1328" id="1328">1328</a>
 <a href="#1329" id="1329">1329</a>
 <a href="#1330" id="1330">1330</a>
-<a href="#1331" id="1331">1331</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -2449,8 +2448,7 @@
 <span class="doccomment">/// Event received over a websocket connection
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#receive-events).
-</span><span class="attr">#[allow(clippy::large_enum_variant)]
-#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = <span class="string">"SCREAMING_SNAKE_CASE"</span>)]
 #[serde(tag = <span class="string">"t"</span>, content = <span class="string">"d"</span>)]
