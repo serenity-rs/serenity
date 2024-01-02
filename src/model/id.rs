@@ -38,12 +38,7 @@ macro_rules! id_u64 {
 
             impl Default for $name {
                 fn default() -> Self {
-                    // Have the possible panic at compile time. `unwrap()` is not const-stable
-                    const ONE: NonZeroU64 = match NonZeroU64::new(1) {
-                        Some(x) => x,
-                        None => unreachable!(),
-                    };
-                    Self(ONE)
+                    Self(NonZeroU64::MIN)
                 }
             }
 
