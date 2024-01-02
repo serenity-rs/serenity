@@ -568,6 +568,9 @@
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
 <a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 <span class="kw">use </span>std::num::NonZeroU16;
 
@@ -759,6 +762,7 @@
                 member.premium_since.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.premium_since);
                 member.avatar.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.avatar);
                 member.communication_disabled_until.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.communication_disabled_until);
+                member.unusual_dm_activity_until.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.unusual_dm_activity_until);
                 member.set_pending(<span class="self">self</span>.pending());
                 member.set_deaf(<span class="self">self</span>.deaf());
                 member.set_mute(<span class="self">self</span>.mute());
@@ -781,6 +785,7 @@
                     avatar: <span class="self">self</span>.avatar,
                     communication_disabled_until: <span class="self">self</span>.communication_disabled_until,
                     flags: GuildMemberFlags::default(),
+                    unusual_dm_activity_until: <span class="self">self</span>.unusual_dm_activity_until,
                 };
 
                 new_member.set_pending(<span class="self">self</span>.pending());
@@ -962,6 +967,7 @@
                         avatar: <span class="prelude-val">None</span>,
                         communication_disabled_until: <span class="prelude-val">None</span>,
                         flags: GuildMemberFlags::default(),
+                        unusual_dm_activity_until: <span class="prelude-val">None</span>,
                         __generated_flags: MemberGeneratedFlags::empty(),
                     });
                 }

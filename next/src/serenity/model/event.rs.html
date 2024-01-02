@@ -1330,6 +1330,7 @@
 <a href="#1328" id="1328">1328</a>
 <a href="#1329" id="1329">1329</a>
 <a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1601,6 +1602,7 @@
     </span><span class="kw">pub </span>mute: bool,
     <span class="kw">pub </span>avatar: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
     <span class="kw">pub </span>communication_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="kw">pub </span>unusual_dm_activity_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 }
 
 <span class="doccomment">/// Requires no gateway intents.
