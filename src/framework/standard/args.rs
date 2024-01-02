@@ -81,7 +81,6 @@ impl<'a> From<&'a str> for Delimiter {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[allow(clippy::enum_variant_names)]
 enum TokenKind {
     Argument,
     QuotedArgument,
