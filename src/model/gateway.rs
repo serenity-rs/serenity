@@ -1,6 +1,6 @@
 //! Models pertaining to the gateway.
 
-use std::num::NonZeroU16;
+use std::num::{NonZeroU16, NonZeroU64};
 
 use serde::ser::SerializeSeq;
 use url::Url;
@@ -402,8 +402,8 @@ impl serde::Serialize for ShardInfo {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityTimestamps {
-    pub end: Option<u64>,
-    pub start: Option<u64>,
+    pub end: Option<NonZeroU64>,
+    pub start: Option<NonZeroU64>,
 }
 
 bitflags! {
