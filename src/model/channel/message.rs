@@ -5,6 +5,8 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
+use nonmax::NonMaxU64;
+
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -128,7 +130,7 @@ pub struct Message {
     /// A generally increasing integer (there may be gaps or duplicates) that represents the
     /// approximate position of the message in a thread, it can be used to estimate the relative
     /// position of the message in a thread in company with total_message_sent on parent thread.
-    pub position: Option<u64>,
+    pub position: Option<NonMaxU64>,
     /// Data of the role subscription purchase or renewal that prompted this
     /// [`MessageType::RoleSubscriptionPurchase`] message.
     pub role_subscription_data: Option<RoleSubscriptionData>,

@@ -1,5 +1,9 @@
 use crate::model::prelude::*;
 
+use nonmax::{NonMaxU32, NonMaxU64};
+
+use super::*;
+
 /// Various information about integrations.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object),
@@ -20,11 +24,11 @@ pub struct Integration {
     pub enable_emoticons: Option<bool>,
     #[serde(rename = "expire_behavior")]
     pub expire_behaviour: Option<IntegrationExpireBehaviour>,
-    pub expire_grace_period: Option<u64>,
+    pub expire_grace_period: Option<NonMaxU32>,
     pub user: Option<User>,
     pub account: IntegrationAccount,
     pub synced_at: Option<Timestamp>,
-    pub subscriber_count: Option<u64>,
+    pub subscriber_count: Option<NonMaxU64>,
     pub revoked: Option<bool>,
     pub application: Option<IntegrationApplication>,
     pub scopes: Option<Vec<Scope>>,
