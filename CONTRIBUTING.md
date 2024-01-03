@@ -63,10 +63,9 @@ your code.
 
 ## Unsafe
 
-Code that defines or uses `unsafe` functions must be reasoned with comments.
-`unsafe` code can pose a potential for undefined behaviour related bugs and other
-kinds of bugs to sprout if misused, weakening security. If you commit code containing
-`unsafe`, you should confirm that its usage is necessary and correct.
+Unsafe code is forbidden, and safe alternatives must be found. This can be mitigated by using
+a third party crate to offload the burden of justifying the unsafe code, or finding a safe
+alternative.
 
 # Comment / Documentation style
 
