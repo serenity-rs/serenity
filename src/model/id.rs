@@ -111,7 +111,7 @@ macro_rules! id_u64 {
 
             impl From<$name> for NonZeroI64 {
                 fn from(id: $name) -> NonZeroI64 {
-                    unsafe {NonZeroI64::new_unchecked(id.get() as i64)}
+                    NonZeroI64::new(id.get() as i64).unwrap()
                 }
             }
 
