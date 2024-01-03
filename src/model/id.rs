@@ -339,17 +339,6 @@ pub(crate) mod snowflake {
     use serde::de::{Error, Visitor};
     use serde::{Deserializer, Serializer};
 
-    /// impl from std ([T]::as_chunks)
-    const fn as_chunks<T, const N: usize>(slice: &[T]) -> (&[[T; N]], &[T]) {
-        assert!(N != 0, "chunk size must be non-zero");
-        let len = slice.len() / N;
-        let (multiple_of_n, remainder) = slice.split_at(len * N);
-        let new_len = multiple_of_n.len() / N;
-        // SAFETY: We cast a slice of `new_len * N` elements into
-        // a slice of `new_len` many `N` elements chunks.
-        (unsafe { std::slice::from_raw_parts(multiple_of_n.as_ptr().cast(), new_len) }, remainder)
-    }
-
     fn simple_parse(mut n: u64, s: &[u8]) -> u64 {
         for &b in s {
             n = n * 10 + (b - b'0') as u64;
@@ -384,7 +373,7 @@ pub(crate) mod snowflake {
 
     // this parse is 4x faster than [`str::parse`], see <https://github.com/serenity-rs/serenity/pull/2677#issue-2060912973>
     pub fn parse(x: &(impl AsRef<[u8]> + ?Sized)) -> Option<NonZeroU64> {
-        NonZeroU64::new(match as_chunks(x.as_ref()) {
+        NonZeroU64::new(match pieced::as_with_rest(x.as_ref()) {
             // 16, ..4 (most flakes are length 18, so this is on top)
             (&[a, b], rest) => simple_parse(parse_eight(a) * 100000000 + parse_eight(b), rest),
             // 8, 4..8
