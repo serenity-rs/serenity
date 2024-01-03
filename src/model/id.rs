@@ -121,10 +121,7 @@ macro_rules! id_u64 {
                 type Err = IDFromStrError;
 
                 fn from_str(s: &str) -> Result<Self, Self::Err> {
-                    #[cfg(debug_assertions)]
-                    { return Ok(Self(s.parse::<u64>().ok().and_then(NonZeroU64::new).ok_or(IDFromStrError)?)) }
-                    #[cfg(not(debug_assertions))]
-                    { return Ok(Self(snowflake::parse(s).ok_or(IDFromStrError)?)) }
+                    Ok(Self(snowflake::parse(s).ok_or(IDFromStrError)?))
                 }
             }
 
