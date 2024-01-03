@@ -50,6 +50,7 @@
 //! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
+#![forbid(unsafe_code)]
 #![warn(
     unused,
     rust_2018_idioms,

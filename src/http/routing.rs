@@ -6,7 +6,7 @@ use crate::model::id::*;
 
 /// Used to group requests together for ratelimiting.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct RatelimitingBucket(Option<(std::mem::Discriminant<Route<'static>>, Option<NonZeroU64>)>);
+pub struct RatelimitingBucket(Option<(RouteKind, Option<NonZeroU64>)>);
 
 impl RatelimitingBucket {
     #[must_use]
@@ -41,7 +41,20 @@ macro_rules! routes {
             )+
         }
 
+        #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+        enum RouteKind {
+            $($name,)+
+        }
+
         impl<$lt> Route<$lt> {
+            fn kind(&self) -> RouteKind {
+                match self {
+                    $(
+                        Self::$name {..} => RouteKind::$name,
+                    )+
+                }
+            }
+
             #[must_use]
             pub fn path(self) -> Cow<'static, str> {
                 match self {
@@ -60,20 +73,12 @@ macro_rules! routes {
                     )+
                 };
 
-                // This avoids adding a lifetime on RatelimitingBucket and causing lifetime infection
-                // SAFETY: std::mem::discriminant erases lifetimes.
-                let discriminant = unsafe {
-                    std::mem::transmute::<Discriminant<Route<'a>>, Discriminant<Route<'static>>>(
-                        std::mem::discriminant(self),
-                    )
-                };
-
                 RatelimitingBucket(ratelimiting_kind.map(|r| {
                     let id = match r {
                         RatelimitingKind::PathAndId(id) => Some(id),
                         RatelimitingKind::Path => None,
                     };
-                    (discriminant, id)
+                    (self.kind(), id)
                 }))
             }
 
