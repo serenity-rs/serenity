@@ -19,7 +19,7 @@ impl LitExt for Lit {
     fn to_str(&self) -> String {
         match self {
             Self::Str(s) => s.value(),
-            Self::ByteStr(s) => unsafe { String::from_utf8_unchecked(s.value()) },
+            Self::ByteStr(s) => String::from_utf8_lossy(&s.value()).into_owned(),
             Self::Char(c) => c.value().to_string(),
             Self::Byte(b) => (b.value() as char).to_string(),
             _ => panic!("values must be a (byte)string or a char"),
