@@ -472,6 +472,14 @@
 <a href="#470" id="470">470</a>
 <a href="#471" id="471">471</a>
 <a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::num::NonZeroU64;
 
@@ -479,7 +487,7 @@
 
 <span class="doccomment">/// Used to group requests together for ratelimiting.
 </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-</span><span class="kw">pub struct </span>RatelimitingBucket(<span class="prelude-ty">Option</span>&lt;(std::mem::Discriminant&lt;Route&lt;<span class="lifetime">'static</span>&gt;&gt;, <span class="prelude-ty">Option</span>&lt;NonZeroU64&gt;)&gt;);
+</span><span class="kw">pub struct </span>RatelimitingBucket(<span class="prelude-ty">Option</span>&lt;(RouteKind, <span class="prelude-ty">Option</span>&lt;NonZeroU64&gt;)&gt;);
 
 <span class="kw">impl </span>RatelimitingBucket {
     <span class="attr">#[must_use]
@@ -514,7 +522,20 @@
             )+
         }
 
+        <span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+        </span><span class="kw">enum </span>RouteKind {
+            $(<span class="macro-nonterminal">$name</span>,)+
+        }
+
         <span class="kw">impl</span>&lt;<span class="macro-nonterminal">$lt</span>&gt; Route&lt;<span class="macro-nonterminal">$lt</span>&gt; {
+            <span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RouteKind {
+                <span class="kw">match </span><span class="self">self </span>{
+                    $(
+                        <span class="self">Self</span>::<span class="macro-nonterminal">$name </span>{..} =&gt; RouteKind::<span class="macro-nonterminal">$name</span>,
+                    )+
+                }
+            }
+
             <span class="attr">#[must_use]
             </span><span class="kw">pub fn </span>path(<span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">'static</span>, str&gt; {
                 <span class="kw">match </span><span class="self">self </span>{
@@ -533,17 +554,12 @@
                     )+
                 };
 
-                <span class="comment">// To avoid adding a lifetime on RatelimitingBucket and causing lifetime infection,
-                // we transmute the Discriminant&lt;Route&lt;'a&gt;&gt; to Discriminant&lt;Route&lt;'static&gt;&gt;.
-                // SAFETY: std::mem::discriminant erases lifetimes.
-                </span><span class="kw">let </span>discriminant = <span class="kw">unsafe </span>{ std::mem::transmute(std::mem::discriminant(<span class="self">self</span>)) };
-
                 RatelimitingBucket(ratelimiting_kind.map(|r| {
                     <span class="kw">let </span>id = <span class="kw">match </span>r {
                         RatelimitingKind::PathAndId(id) =&gt; <span class="prelude-val">Some</span>(id),
                         RatelimitingKind::Path =&gt; <span class="prelude-val">None</span>,
                     };
-                    (discriminant, id)
+                    (<span class="self">self</span>.kind(), id)
                 }))
             }
 

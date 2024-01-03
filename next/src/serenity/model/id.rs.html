@@ -499,7 +499,7 @@
 
             <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$name</span>&gt; <span class="kw">for </span>NonZeroI64 {
                 <span class="kw">fn </span>from(id: <span class="macro-nonterminal">$name</span>) -&gt; NonZeroI64 {
-                    <span class="kw">unsafe </span>{NonZeroI64::new_unchecked(id.get() <span class="kw">as </span>i64)}
+                    NonZeroI64::new(id.get() <span class="kw">as </span>i64).unwrap()
                 }
             }
 

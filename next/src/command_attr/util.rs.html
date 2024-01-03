@@ -321,7 +321,7 @@
     <span class="kw">fn </span>to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Str(s) =&gt; s.value(),
-            <span class="self">Self</span>::ByteStr(s) =&gt; <span class="kw">unsafe </span>{ String::from_utf8_unchecked(s.value()) },
+            <span class="self">Self</span>::ByteStr(s) =&gt; String::from_utf8_lossy(<span class="kw-2">&amp;</span>s.value()).into_owned(),
             <span class="self">Self</span>::Char(c) =&gt; c.value().to_string(),
             <span class="self">Self</span>::Byte(b) =&gt; (b.value() <span class="kw">as </span>char).to_string(),
             <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"values must be a (byte)string or a char"</span>),
