@@ -75,8 +75,21 @@ where
     D: Deserializer<'de>,
     Id: From<NonZeroU64>,
 {
-    let raw = Option::<u64>::deserialize(deserializer)?;
-    Ok(raw.and_then(NonZeroU64::new).map(Into::into))
+    #[derive(serde::Deserialize)]
+    #[serde(untagged)]
+    enum StringOrInt {
+        String(String),
+        Int(u64),
+    }
+
+    let raw = Option::<StringOrInt>::deserialize(deserializer)?;
+    let raw_int = match raw {
+        Some(StringOrInt::String(str)) => str.parse().map_err(serde::de::Error::custom)?,
+        Some(StringOrInt::Int(val)) => val,
+        None => return Ok(None),
+    };
+
+    Ok(NonZeroU64::new(raw_int).map(Id::from))
 }
 
 /// Used with `#[serde(with = "emojis")]`
