@@ -1,8 +1,8 @@
 //! A collection of newtypes defining type-strong IDs.
 
 use std::fmt;
-use std::num::{NonZeroI64, NonZeroU64};
 
+use nonmax::NonMaxU64;
 use serde::de::Error;
 
 use super::prelude::*;
@@ -20,33 +20,43 @@ macro_rules! newtype_display_impl {
 macro_rules! forward_fromstr_impl {
     ($name:ident, $wrapper:path) => {
         impl std::str::FromStr for $name {
-            type Err = <u64 as std::str::FromStr>::Err;
+            type Err = ParseIdError;
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
-                Ok(Self($wrapper(s.parse()?)))
+                s.parse().map($wrapper).map(Self).map_err(ParseIdError)
             }
         }
     };
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParseIdError(nonmax::ParseIntError);
+
+impl std::error::Error for ParseIdError {}
+impl std::fmt::Display for ParseIdError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
 macro_rules! id_u64 {
     ($($name:ident: $doc:literal;)*) => {
         $(
-            #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+            #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
             #[doc = $doc]
             pub struct $name(InnerId);
 
             impl $name {
                 #[doc = concat!("Creates a new ", stringify!($name), " from a u64.")]
                 /// # Panics
-                /// Panics if `id` is zero.
+                /// Panics if `id` is u64::MAX.
                 #[inline]
                 #[must_use]
                 #[track_caller]
                 pub const fn new(id: u64) -> Self {
-                    match NonZeroU64::new(id) {
+                    match NonMaxU64::new(id) {
                         Some(inner) => Self(InnerId(inner)),
-                        None => panic!(concat!("Attempted to call ", stringify!($name), "::new with invalid (0) value"))
+                        None => panic!(concat!("Attempted to call ", stringify!($name), "::new with invalid (u64::MAX) value"))
                     }
                 }
 
@@ -54,19 +64,16 @@ macro_rules! id_u64 {
                 #[inline]
                 #[must_use]
                 pub const fn get(self) -> u64 {
-                    self.0.0.get()
+                    // By wrapping `self.0.0` in a block, it forces a Copy, as NonMax::get takes &self.
+                    // If removed, the compiler will auto-ref to `&self.0`, which is a
+                    // reference to a packed field and therefore errors.
+                    {self.0.0}.get()
                 }
 
                 #[doc = concat!("Retrieves the time that the ", stringify!($name), " was created.")]
                 #[must_use]
                 pub fn created_at(&self) -> Timestamp {
                     Timestamp::from_discord_id(self.get())
-                }
-            }
-
-            impl Default for $name {
-                fn default() -> Self {
-                    Self(InnerId(NonZeroU64::MIN))
                 }
             }
 
@@ -91,27 +98,9 @@ macro_rules! id_u64 {
                 }
             }
 
-            impl From<NonZeroU64> for $name {
-                fn from(id: NonZeroU64) -> $name {
-                    $name(InnerId(id))
-                }
-            }
-
             impl PartialEq<u64> for $name {
                 fn eq(&self, u: &u64) -> bool {
                     self.get() == *u
-                }
-            }
-
-            impl From<$name> for NonZeroU64 {
-                fn from(id: $name) -> NonZeroU64 {
-                    id.0.0
-                }
-            }
-
-            impl From<$name> for NonZeroI64 {
-                fn from(id: $name) -> NonZeroI64 {
-                    NonZeroI64::new(id.get() as i64).unwrap()
                 }
             }
 
@@ -137,9 +126,9 @@ macro_rules! id_u64 {
 }
 
 /// The inner storage of an ID.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[repr(packed)]
-pub(crate) struct InnerId(NonZeroU64);
+pub(crate) struct InnerId(NonMaxU64);
 
 struct SnowflakeVisitor;
 
@@ -156,7 +145,7 @@ impl serde::de::Visitor<'_> for SnowflakeVisitor {
     }
 
     fn visit_u64<E: Error>(self, value: u64) -> Result<Self::Value, E> {
-        NonZeroU64::new(value)
+        NonMaxU64::new(value)
             .map(InnerId)
             .ok_or_else(|| Error::custom("invalid value, expected non-max"))
     }
@@ -212,7 +201,7 @@ id_u64! {
 /// This identifier is special, it simply models internal IDs for type safety,
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct ShardId(pub u16);
 
 impl ShardId {
@@ -236,7 +225,7 @@ newtype_display_impl!(ShardId, |this| this.0);
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 #[repr(packed)]
-pub struct AnswerId(u8);
+pub struct AnswerId(nonmax::NonMaxU8);
 
 impl AnswerId {
     /// Retrieves the value as a [`u64`].
@@ -244,7 +233,7 @@ impl AnswerId {
     /// Keep in mind that this is **not a snowflake** and the values are subject to change.
     #[must_use]
     pub fn get(self) -> u64 {
-        self.0.into()
+        { self.0 }.get().into()
     }
 }
 
@@ -253,7 +242,7 @@ forward_fromstr_impl!(AnswerId, std::convert::identity);
 
 #[cfg(test)]
 mod tests {
-    use std::num::NonZeroU64;
+    use nonmax::NonMaxU64;
 
     use super::{GuildId, InnerId};
 
@@ -285,7 +274,7 @@ mod tests {
         assert_json(&id, json!("175928847299117063"));
 
         let s = S {
-            id: InnerId(NonZeroU64::new(17_5928_8472_9911_7063).unwrap()),
+            id: InnerId(NonMaxU64::new(17_5928_8472_9911_7063).unwrap()),
         };
         assert_json(&s, json!({"id": "175928847299117063"}));
 
