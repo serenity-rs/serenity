@@ -353,7 +353,13 @@ impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
                             // but invoked in a DM, we have to do this fun deserialisation dance.
                             let id_str = map.next_value::<StrOrInt<'_>>()?;
                             let id_int = id_str.parse().map_err(A::Error::custom)?;
-                            let id = std::num::NonZeroU64::new(id_int).map(GuildId::from);
+                            let id = if id_int == 0 {
+                                None
+                            } else if id_int == u64::MAX {
+                                return Err(serde::de::Error::custom("GuildId cannot be u64::MAX"));
+                            } else {
+                                Some(GuildId::new(id_int))
+                            };
 
                             AuthorizingIntegrationOwner::GuildInstall(id)
                         },
