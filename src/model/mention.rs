@@ -206,8 +206,8 @@ mod test {
         #[cfg(feature = "model")]
         assert_eq!(channel.mention().to_string(), "<#4>");
         assert_eq!(member.mention().to_string(), "<@6>");
-        assert_eq!(role.mention().to_string(), "<@&1>");
-        assert_eq!(role.id.mention().to_string(), "<@&1>");
+        assert_eq!(role.mention().to_string(), "<@&0>");
+        assert_eq!(role.id.mention().to_string(), "<@&0>");
         assert_eq!(user.mention().to_string(), "<@6>");
         assert_eq!(user.id.mention().to_string(), "<@6>");
     }
