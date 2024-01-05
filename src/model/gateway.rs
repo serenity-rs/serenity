@@ -36,6 +36,7 @@ pub struct BotGateway {
 #[non_exhaustive]
 pub struct Activity {
     /// The ID of the application for the activity.
+    #[serde(deserialize_with = "deserialize_buggy_id")]
     pub application_id: Option<ApplicationId>,
     /// Images for the presence and their texts.
     pub assets: Option<ActivityAssets>,

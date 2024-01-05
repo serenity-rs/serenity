@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::hash::Hash;
 use std::marker::PhantomData;
+use std::num::NonZeroU64;
 
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 
@@ -65,6 +66,17 @@ where
     E: serde::de::Error,
 {
     remove_from_map_opt(map, key)?.ok_or_else(|| serde::de::Error::missing_field(key))
+}
+
+/// Workaround for Discord sending 0 value Ids as default values.
+/// This has been fixed properly on next by swapping to a NonMax based impl.
+pub fn deserialize_buggy_id<'de, D, Id>(deserializer: D) -> StdResult<Option<Id>, D::Error>
+where
+    D: Deserializer<'de>,
+    Id: From<NonZeroU64>,
+{
+    let raw = Option::<u64>::deserialize(deserializer)?;
+    Ok(raw.and_then(NonZeroU64::new).map(Into::into))
 }
 
 /// Used with `#[serde(with = "emojis")]`
