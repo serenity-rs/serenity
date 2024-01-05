@@ -2,7 +2,6 @@
 
 use std::borrow::Cow;
 use std::convert::TryFrom;
-use std::num::NonZeroU64;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
@@ -134,7 +133,8 @@ impl HttpBuilder {
     /// Use the given configuration to build the `Http` client.
     #[must_use]
     pub fn build(self) -> Http {
-        let application_id = AtomicU64::new(self.application_id.map_or(0, ApplicationId::get));
+        let application_id =
+            AtomicU64::new(self.application_id.map_or(u64::MAX, ApplicationId::get));
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());
@@ -200,7 +200,11 @@ impl Http {
 
     pub fn application_id(&self) -> Option<ApplicationId> {
         let application_id = self.application_id.load(Ordering::Relaxed);
-        NonZeroU64::new(application_id).map(ApplicationId::from)
+        if application_id == u64::MAX {
+            None
+        } else {
+            Some(ApplicationId::new(application_id))
+        }
     }
 
     fn try_application_id(&self) -> Result<ApplicationId> {
