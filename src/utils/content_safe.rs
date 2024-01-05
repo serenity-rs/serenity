@@ -257,7 +257,7 @@ mod tests {
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
         <@123invalid> <@> <@ ";
 
-        let without_user_mentions = "@Ferris <@!000000000000000000> @invalid-user @invalid-user \
+        let without_user_mentions = "@Ferris @invalid-user @invalid-user @invalid-user \
         <@!123123123123123123123> @invalid-user @invalid-user <@!invalid> \
         <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
