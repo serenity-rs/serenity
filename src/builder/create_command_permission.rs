@@ -101,7 +101,7 @@ impl CreateCommandPermission {
     /// Creates a permission overwrite for all channels in a guild
     pub fn all_channels(guild_id: GuildId, allow: bool) -> Self {
         Self(CommandPermission {
-            id: std::num::NonZeroU64::new(guild_id.get() - 1).expect("guild ID was 1").into(),
+            id: CommandPermissionId::new(guild_id.get() - 1),
             kind: CommandPermissionType::Channel,
             permission: allow,
         })
