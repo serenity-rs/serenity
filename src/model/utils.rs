@@ -1,7 +1,6 @@
 use std::fmt;
 use std::hash::Hash;
 use std::marker::PhantomData;
-use std::num::NonZeroU64;
 
 use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
@@ -69,21 +68,6 @@ where
     E: serde::de::Error,
 {
     remove_from_map_opt(map, key)?.ok_or_else(|| serde::de::Error::missing_field(key))
-}
-
-/// Workaround for Discord sending 0 value Ids as default values.
-/// This has been fixed properly on next by swapping to a NonMax based impl.
-pub fn deserialize_buggy_id<'de, D, Id>(deserializer: D) -> StdResult<Option<Id>, D::Error>
-where
-    D: Deserializer<'de>,
-    Id: From<NonZeroU64>,
-{
-    if let Some(val) = Option::<StrOrInt<'de>>::deserialize(deserializer)? {
-        let val = val.parse().map_err(serde::de::Error::custom)?;
-        Ok(NonZeroU64::new(val).map(Id::from))
-    } else {
-        Ok(None)
-    }
 }
 
 pub(super) enum StrOrInt<'de> {
