@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::path::Path;
 
 use tokio::fs::File;
@@ -19,18 +20,21 @@ use crate::model::id::AttachmentId;
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[non_exhaustive]
 #[must_use]
-pub struct CreateAttachment {
+pub struct CreateAttachment<'a> {
     pub(crate) id: u64, // Placeholder ID will be filled in when sending the request
-    pub filename: String,
-    pub description: Option<String>,
+    pub filename: Cow<'static, str>,
+    pub description: Option<Cow<'a, str>>,
 
     #[serde(skip)]
-    pub data: Vec<u8>,
+    pub data: Cow<'static, [u8]>,
 }
 
-impl CreateAttachment {
+impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
-    pub fn bytes(data: impl Into<Vec<u8>>, filename: impl Into<String>) -> CreateAttachment {
+    pub fn bytes(
+        data: impl Into<Cow<'static, [u8]>>,
+        filename: impl Into<Cow<'static, str>>,
+    ) -> Self {
         CreateAttachment {
             data: data.into(),
             filename: filename.into(),
@@ -44,7 +48,7 @@ impl CreateAttachment {
     /// # Errors
     ///
     /// [`Error::Io`] if reading the file fails.
-    pub async fn path(path: impl AsRef<Path>) -> Result<CreateAttachment> {
+    pub async fn path(path: impl AsRef<Path>) -> Result<Self> {
         let mut file = File::open(path.as_ref()).await?;
         let mut data = Vec::new();
         file.read_to_end(&mut data).await?;
@@ -54,7 +58,7 @@ impl CreateAttachment {
             .file_name()
             .ok_or_else(|| std::io::Error::other("attachment path must not be a directory"))?;
 
-        Ok(CreateAttachment::bytes(data, filename.to_string_lossy().to_string()))
+        Ok(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned()))
     }
 
     /// Builds an [`CreateAttachment`] by reading from a file handler.
@@ -62,7 +66,7 @@ impl CreateAttachment {
     /// # Errors
     ///
     /// [`Error::Io`] error if reading the file fails.
-    pub async fn file(file: &File, filename: impl Into<String>) -> Result<CreateAttachment> {
+    pub async fn file(file: &File, filename: impl Into<Cow<'static, str>>) -> Result<Self> {
         let mut data = Vec::new();
         file.try_clone().await?.read_to_end(&mut data).await?;
 
@@ -75,7 +79,7 @@ impl CreateAttachment {
     ///
     /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
-    pub async fn url(http: impl AsRef<Http>, url: &str) -> Result<CreateAttachment> {
+    pub async fn url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
         let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
 
         let response = http.as_ref().client.get(url.clone()).send().await?;
@@ -86,7 +90,7 @@ impl CreateAttachment {
             .and_then(Iterator::last)
             .ok_or_else(|| Error::Url(url.to_string()))?;
 
-        Ok(CreateAttachment::bytes(data, filename))
+        Ok(CreateAttachment::bytes(data, filename.to_owned()))
     }
 
     /// Converts the stored data to the base64 representation.
@@ -111,7 +115,7 @@ impl CreateAttachment {
     }
 
     /// Sets a description for the file (max 1024 characters).
-    pub fn description(mut self, description: impl Into<String>) -> Self {
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -124,8 +128,8 @@ struct ExistingAttachment {
 
 #[derive(Debug, Clone, serde::Serialize, PartialEq)]
 #[serde(untagged)]
-enum NewOrExisting {
-    New(CreateAttachment),
+enum NewOrExisting<'a> {
+    New(CreateAttachment<'a>),
     Existing(ExistingAttachment),
 }
 
@@ -151,7 +155,7 @@ enum NewOrExisting {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
+/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&msg).add(my_attachment)
 /// )).await?;
@@ -162,7 +166,7 @@ enum NewOrExisting {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
+/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::new().keep(msg.attachments[0].id)
 /// )).await?;
@@ -173,7 +177,7 @@ enum NewOrExisting {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -> Result<(), Error> {
+/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&msg).remove(msg.attachments[0].id)
 /// )).await?;
@@ -187,11 +191,11 @@ enum NewOrExisting {
 #[derive(Default, Debug, Clone, serde::Serialize, PartialEq)]
 #[serde(transparent)]
 #[must_use]
-pub struct EditAttachments {
-    new_and_existing_attachments: Vec<NewOrExisting>,
+pub struct EditAttachments<'a> {
+    new_and_existing_attachments: Vec<NewOrExisting<'a>>,
 }
 
-impl EditAttachments {
+impl<'a> EditAttachments<'a> {
     /// An empty attachments builder.
     ///
     /// Existing attachments are not kept by default, either. See [`Self::keep_all()`] or
@@ -250,7 +254,7 @@ impl EditAttachments {
 
     /// Adds a new attachment to the attachment list.
     #[allow(clippy::should_implement_trait)] // Clippy thinks add == std::ops::Add::add
-    pub fn add(mut self, attachment: CreateAttachment) -> Self {
+    pub fn add(mut self, attachment: CreateAttachment<'a>) -> Self {
         self.new_and_existing_attachments.push(NewOrExisting::New(attachment));
         self
     }
@@ -258,7 +262,7 @@ impl EditAttachments {
     /// Clones all new attachments into a new Vec, keeping only data and filename, because those
     /// are needed for the multipart form data. The data is taken out of `self` in the process, so
     /// this method can only be called once.
-    pub(crate) fn take_files(&mut self) -> Vec<CreateAttachment> {
+    pub(crate) fn take_files(&mut self) -> Vec<CreateAttachment<'a>> {
         let mut id_placeholder = 0;
 
         let mut files = Vec::new();

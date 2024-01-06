@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateForumTag;
@@ -34,14 +36,14 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<ChannelType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     position: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    topic: Option<String>,
+    topic: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     nsfw: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,11 +53,11 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     user_limit: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    permission_overwrites: Option<Vec<PermissionOverwriteData>>,
+    permission_overwrites: Option<Cow<'a, [PermissionOverwrite]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     parent_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rtc_region: Option<Option<String>>,
+    rtc_region: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     video_quality_mode: Option<VideoQualityMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,7 +65,7 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<ChannelFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    available_tags: Option<Vec<CreateForumTag>>,
+    available_tags: Option<Cow<'a, [CreateForumTag<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_reaction_emoji: Option<Option<ForumEmoji>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,7 +75,7 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     default_forum_layout: Option<ForumLayoutType>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    status: Option<String>,
+    status: Option<Cow<'a, str>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -110,7 +112,7 @@ impl<'a> EditChannel<'a> {
     /// This is for [voice] channels only.
     ///
     /// [voice]: ChannelType::Voice
-    pub fn voice_region(mut self, id: Option<String>) -> Self {
+    pub fn voice_region(mut self, id: Option<Cow<'a, str>>) -> Self {
         self.rtc_region = Some(id);
         self
     }
@@ -118,7 +120,7 @@ impl<'a> EditChannel<'a> {
     /// The name of the channel.
     ///
     /// Must be between 2 and 100 characters long.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = Some(name.into());
         self
     }
@@ -136,7 +138,7 @@ impl<'a> EditChannel<'a> {
     /// This is for [text] channels only.
     ///
     /// [text]: ChannelType::Text
-    pub fn topic(mut self, topic: impl Into<String>) -> Self {
+    pub fn topic(mut self, topic: impl Into<Cow<'a, str>>) -> Self {
         self.topic = Some(topic.into());
         self
     }
@@ -148,7 +150,7 @@ impl<'a> EditChannel<'a> {
     /// This is for [voice] channels only.
     ///
     /// [voice]: ChannelType::Voice
-    pub fn status(mut self, status: impl Into<String>) -> Self {
+    pub fn status(mut self, status: impl Into<Cow<'a, str>>) -> Self {
         self.status = Some(status.into());
         self
     }
@@ -231,16 +233,14 @@ impl<'a> EditChannel<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn permissions(mut self, perms: impl IntoIterator<Item = PermissionOverwrite>) -> Self {
-        let overwrites = perms.into_iter().map(Into::into).collect::<Vec<_>>();
-
-        self.permission_overwrites = Some(overwrites);
+    pub fn permissions(mut self, overwrites: impl Into<Cow<'a, [PermissionOverwrite]>>) -> Self {
+        self.permission_overwrites = Some(overwrites.into());
         self
     }
 
     /// If this is a forum channel, sets the tags that can be assigned to forum posts.
-    pub fn available_tags(mut self, tags: impl IntoIterator<Item = CreateForumTag>) -> Self {
-        self.available_tags = Some(tags.into_iter().collect());
+    pub fn available_tags(mut self, tags: impl Into<Cow<'a, [CreateForumTag<'a>]>>) -> Self {
+        self.available_tags = Some(tags.into());
         self
     }
 
@@ -336,7 +336,7 @@ impl Builder for EditChannel<'_> {
             }
         }
 
-        if let Some(status) = &self.status {
+        if let Some(status) = self.status.as_deref() {
             #[derive(Serialize)]
             struct EditVoiceStatusBody<'a> {
                 status: &'a str,
@@ -347,7 +347,7 @@ impl Builder for EditChannel<'_> {
                 .edit_voice_status(
                     ctx,
                     &EditVoiceStatusBody {
-                        status: status.as_str(),
+                        status,
                     },
                     self.audit_log_reason,
                 )

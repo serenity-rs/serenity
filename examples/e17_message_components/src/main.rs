@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::env;
 use std::time::Duration;
 
@@ -39,13 +40,13 @@ impl EventHandler for Handler {
                 &ctx,
                 CreateMessage::new().content("Please select your favorite animal").select_menu(
                     CreateSelectMenu::new("animal_select", CreateSelectMenuKind::String {
-                        options: vec![
+                        options: Cow::Borrowed(&[
                             CreateSelectMenuOption::new("🐈 meow", "Cat"),
                             CreateSelectMenuOption::new("🐕 woof", "Dog"),
                             CreateSelectMenuOption::new("🐎 neigh", "Horse"),
                             CreateSelectMenuOption::new("🦙 hoooooooonk", "Alpaca"),
                             CreateSelectMenuOption::new("🦀 crab rave", "Ferris"),
-                        ],
+                        ]),
                     })
                     .custom_id("animal_select")
                     .placeholder("No animal selected"),

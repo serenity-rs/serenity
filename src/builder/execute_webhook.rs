@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
 use super::{
@@ -58,26 +60,26 @@ use crate::model::prelude::*;
 /// [Discord docs](https://docs.discord.com/developers/resources/webhook#execute-webhook)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct ExecuteWebhook {
+pub struct ExecuteWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<String>,
+    content: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    username: Option<String>,
+    username: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar_url: Option<String>,
+    avatar_url: Option<Cow<'a, str>>,
     tts: bool,
-    embeds: Vec<CreateEmbed>,
+    embeds: Cow<'a, [CreateEmbed<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    allowed_mentions: Option<CreateAllowedMentions>,
+    allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
+    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    thread_name: Option<String>,
+    thread_name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    applied_tags: Option<Vec<ForumTagId>>,
-    attachments: EditAttachments,
+    applied_tags: Option<Cow<'a, [ForumTagId]>>,
+    attachments: EditAttachments<'a>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
@@ -85,7 +87,7 @@ pub struct ExecuteWebhook {
     with_components: Option<bool>,
 }
 
-impl ExecuteWebhook {
+impl<'a> ExecuteWebhook<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -100,7 +102,7 @@ impl ExecuteWebhook {
 
         check_overflow(self.embeds.len(), constants::EMBED_MAX_COUNT)
             .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-        for embed in &self.embeds {
+        for embed in self.embeds.iter() {
             embed.check_length()?;
         }
 
@@ -128,7 +130,7 @@ impl ExecuteWebhook {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn avatar_url(mut self, avatar_url: impl Into<String>) -> Self {
+    pub fn avatar_url(mut self, avatar_url: impl Into<Cow<'a, str>>) -> Self {
         self.avatar_url = Some(avatar_url.into());
         self
     }
@@ -159,7 +161,7 @@ impl ExecuteWebhook {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn content(mut self, content: impl Into<String>) -> Self {
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
     }
@@ -194,13 +196,13 @@ impl ExecuteWebhook {
     }
 
     /// Appends a file to the webhook message.
-    pub fn add_file(mut self, file: CreateAttachment) -> Self {
+    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
         self.attachments = self.attachments.add(file);
         self
     }
 
     /// Appends a list of files to the webhook message.
-    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         for file in files {
             self.attachments = self.attachments.add(file);
         }
@@ -211,13 +213,13 @@ impl ExecuteWebhook {
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         self.attachments = EditAttachments::new();
         self.add_files(files)
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions<'a>) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }
@@ -231,8 +233,8 @@ impl ExecuteWebhook {
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = Some(components.into());
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
@@ -242,13 +244,13 @@ impl ExecuteWebhook {
     /// Refer to the [struct-level documentation] for an example on how to use embeds.
     ///
     /// [struct-level documentation]: #examples
-    pub fn embed(self, embed: CreateEmbed) -> Self {
+    pub fn embed(self, embed: CreateEmbed<'a>) -> Self {
         self.embeds(vec![embed])
     }
 
     /// Set multiple embeds for the message.
-    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = embeds;
+    pub fn embeds(mut self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
+        self.embeds = embeds.into();
         self
     }
 
@@ -303,7 +305,7 @@ impl ExecuteWebhook {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn username(mut self, username: impl Into<String>) -> Self {
+    pub fn username(mut self, username: impl Into<Cow<'a, str>>) -> Self {
         self.username = Some(username.into());
         self
     }
@@ -340,13 +342,13 @@ impl ExecuteWebhook {
     }
 
     /// Name of thread to create (requires the webhook channel to be a forum channel)
-    pub fn thread_name(mut self, thread_name: String) -> Self {
+    pub fn thread_name(mut self, thread_name: Cow<'a, str>) -> Self {
         self.thread_name = Some(thread_name);
         self
     }
 
     /// Tags for thread being created (requires the webhook channel to be a forum channel)
-    pub fn applied_tags(mut self, applied_tags: Vec<ForumTagId>) -> Self {
+    pub fn applied_tags(mut self, applied_tags: Cow<'a, [ForumTagId]>) -> Self {
         self.applied_tags = Some(applied_tags);
         self
     }
@@ -360,7 +362,7 @@ impl ExecuteWebhook {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for ExecuteWebhook {
+impl Builder for ExecuteWebhook<'_> {
     type Context<'ctx> = (WebhookId, &'ctx str, bool);
     type Built = Option<Message>;
 

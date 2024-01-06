@@ -22,7 +22,7 @@ use crate::internal::prelude::*;
 #[must_use]
 pub struct Request<'a, const MAX_PARAMS: usize> {
     pub(super) body: Option<Vec<u8>>,
-    pub(super) multipart: Option<Multipart>,
+    pub(super) multipart: Option<Multipart<'a>>,
     pub(super) headers: Option<Headers>,
     pub(super) method: LightMethod,
     pub(super) route: Route<'a>,
@@ -50,7 +50,7 @@ impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
         self
     }
 
-    pub fn multipart(mut self, multipart: Option<Multipart>) -> Self {
+    pub fn multipart(mut self, multipart: Option<Multipart<'a>>) -> Self {
         self.multipart = multipart;
         self
     }

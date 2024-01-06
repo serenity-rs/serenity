@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -11,7 +13,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     archived: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -25,7 +27,7 @@ pub struct EditThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<ChannelFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    applied_tags: Option<Vec<ForumTagId>>,
+    applied_tags: Option<Cow<'a, [ForumTagId]>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -40,7 +42,7 @@ impl<'a> EditThread<'a> {
     /// The name of the thread.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = Some(name.into());
         self
     }
@@ -90,8 +92,8 @@ impl<'a> EditThread<'a> {
     }
 
     /// If this is a forum post, edits the assigned tags of this forum post.
-    pub fn applied_tags(mut self, applied_tags: impl IntoIterator<Item = ForumTagId>) -> Self {
-        self.applied_tags = Some(applied_tags.into_iter().collect());
+    pub fn applied_tags(mut self, applied_tags: impl Into<Cow<'a, [ForumTagId]>>) -> Self {
+        self.applied_tags = Some(applied_tags.into());
         self
     }
 

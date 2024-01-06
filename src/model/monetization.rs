@@ -140,7 +140,7 @@ impl Entitlement {
     #[cfg(feature = "model")]
     pub async fn list(
         cache_http: impl CacheHttp,
-        builder: GetEntitlements,
+        builder: GetEntitlements<'_>,
     ) -> Result<Vec<Entitlement>> {
         builder.execute(cache_http, ()).await
     }
