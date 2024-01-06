@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -13,7 +15,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditStageInstance<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    topic: Option<String>,
+    topic: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     privacy_level: Option<StageInstancePrivacyLevel>,
 
@@ -28,7 +30,7 @@ impl<'a> EditStageInstance<'a> {
     }
 
     /// Sets the topic of the stage channel instance.
-    pub fn topic(mut self, topic: impl Into<String>) -> Self {
+    pub fn topic(mut self, topic: impl Into<Cow<'a, str>>) -> Self {
         self.topic = Some(topic.into());
         self
     }

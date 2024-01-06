@@ -5,6 +5,6 @@ pub fn run(_options: &[ResolvedOption]) -> String {
     "Hey, I'm alive!".to_string()
 }
 
-pub fn register() -> CreateCommand {
+pub fn register() -> CreateCommand<'static> {
     CreateCommand::new("ping").description("A ping command")
 }

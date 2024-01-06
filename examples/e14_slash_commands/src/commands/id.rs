@@ -12,7 +12,7 @@ pub fn run(options: &[ResolvedOption]) -> String {
     }
 }
 
-pub fn register() -> CreateCommand {
+pub fn register() -> CreateCommand<'static> {
     CreateCommand::new("id").description("Get a user id").add_option(
         CreateCommandOption::new(CommandOptionType::User, "id", "The user to lookup")
             .required(true),

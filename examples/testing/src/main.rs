@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serenity::builder::*;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -98,10 +100,10 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                         CreateButton::new_link("https://google.com").emoji('🔍').label("Search"),
                     )
                     .select_menu(CreateSelectMenu::new("3", CreateSelectMenuKind::String {
-                        options: vec![
+                        options: Cow::Borrowed(&[
                             CreateSelectMenuOption::new("foo", "foo"),
                             CreateSelectMenuOption::new("bar", "bar"),
-                        ],
+                        ]),
                     })),
             )
             .await?;
@@ -162,7 +164,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         channel_id
             .edit_thread(
                 &ctx,
-                EditThread::new().applied_tags(forum.available_tags.iter().map(|t| t.id)),
+                EditThread::new()
+                    .applied_tags(forum.available_tags.iter().map(|t| t.id).collect::<Vec<_>>()),
             )
             .await?;
     } else if msg.content == "embedrace" {
@@ -337,10 +340,10 @@ async fn interaction(
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
                         .select_menu(CreateSelectMenu::new("0", CreateSelectMenuKind::String {
-                            options: vec![
+                            options: Cow::Borrowed(&[
                                 CreateSelectMenuOption::new("foo", "foo"),
                                 CreateSelectMenuOption::new("bar", "bar"),
-                            ],
+                            ]),
                         }))
                         .select_menu(CreateSelectMenu::new(
                             "1",

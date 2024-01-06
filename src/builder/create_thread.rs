@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -12,7 +14,7 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateThread<'a> {
-    name: String,
+    name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,7 +31,7 @@ pub struct CreateThread<'a> {
 
 impl<'a> CreateThread<'a> {
     /// Creates a builder with the given thread name, leaving all other fields empty.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
             name: name.into(),
             auto_archive_duration: None,
@@ -43,7 +45,7 @@ impl<'a> CreateThread<'a> {
     /// The name of the thread. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = name.into();
         self
     }

@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -14,9 +16,9 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditMember<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    nick: Option<String>,
+    nick: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    roles: Option<Vec<RoleId>>,
+    roles: Option<Cow<'a, [RoleId]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     mute: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,7 +26,7 @@ pub struct EditMember<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    communication_disabled_until: Option<Option<String>>,
+    communication_disabled_until: Option<Option<Timestamp>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<GuildMemberFlags>,
 
@@ -63,7 +65,7 @@ impl<'a> EditMember<'a> {
     /// **Note**: Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: Permissions::MANAGE_NICKNAMES
-    pub fn nickname(mut self, nickname: impl Into<String>) -> Self {
+    pub fn nickname(mut self, nickname: impl Into<Cow<'a, str>>) -> Self {
         self.nick = Some(nickname.into());
         self
     }
@@ -73,8 +75,8 @@ impl<'a> EditMember<'a> {
     /// **Note**: Requires the [Manage Roles] permission to modify.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub fn roles(mut self, roles: impl IntoIterator<Item = impl Into<RoleId>>) -> Self {
-        self.roles = Some(roles.into_iter().map(Into::into).collect());
+    pub fn roles(mut self, roles: impl Into<Cow<'a, [RoleId]>>) -> Self {
+        self.roles = Some(roles.into());
         self
     }
 
@@ -101,28 +103,16 @@ impl<'a> EditMember<'a> {
 
     /// Times the user out until `time`, an ISO8601-formatted datetime string.
     ///
-    /// `time` is considered invalid if it is not a valid ISO8601 timestamp or if it is greater
+    /// `time` is considered invalid if it is greater
     /// than 28 days from the current time.
     ///
     /// **Note**: Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
-    pub fn disable_communication_until(mut self, time: String) -> Self {
+    pub fn disable_communication_until(mut self, time: Timestamp) -> Self {
         self.communication_disabled_until = Some(Some(time));
         self
-    }
-
-    /// Times the user out until `time`.
-    ///
-    /// `time` is considered invalid if it is greater than 28 days from the current time.
-    ///
-    /// **Note**: Requires the [Moderate Members] permission.
-    ///
-    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
-    #[doc(alias = "timeout")]
-    pub fn disable_communication_until_datetime(self, time: Timestamp) -> Self {
-        self.disable_communication_until(time.to_string())
     }
 
     /// Allow a user to communicate, removing their timeout, if there is one.

@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateAttachment;
@@ -46,7 +48,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<FixedString>,
+    name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     permissions: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,9 +57,9 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<Option<FixedString>>,
+    icon: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    unicode_emoji: Option<Option<FixedString>>,
+    unicode_emoji: Option<Option<Cow<'a, str>>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     mentionable: Option<bool>,
@@ -75,15 +77,15 @@ impl<'a> EditRole<'a> {
     }
 
     /// Creates a new builder with the values of the given [`Role`].
-    pub fn from_role(role: &Role) -> Self {
+    pub fn from_role(role: &'a Role) -> Self {
         EditRole {
             hoist: Some(role.hoist()),
             mentionable: Some(role.mentionable()),
-            name: Some(role.name.clone()),
+            name: Some(Cow::Borrowed(&role.name)),
             permissions: Some(role.permissions.bits()),
             position: Some(role.position),
             colour: Some(role.colour),
-            unicode_emoji: role.unicode_emoji.as_ref().map(|v| Some(v.clone())),
+            unicode_emoji: role.unicode_emoji.as_ref().map(|v| Some(Cow::Borrowed(v.as_str()))),
             audit_log_reason: None,
             // TODO: Do we want to download role.icon?
             icon: None,
@@ -110,8 +112,8 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role's name.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into().into());
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
+        self.name = Some(name.into());
         self
     }
 
@@ -136,7 +138,7 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    pub fn icon(mut self, icon: Option<&CreateAttachment>) -> Self {
+    pub fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Self {
         self.icon = Some(icon.map(CreateAttachment::to_base64).map(Into::into));
         self.unicode_emoji = Some(None);
         self

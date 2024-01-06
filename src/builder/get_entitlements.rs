@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::internal::prelude::Result;
@@ -11,9 +13,9 @@ use crate::model::monetization::Entitlement;
 /// [`Http::get_entitlements`]: crate::http::Http::get_entitlements
 #[derive(Clone, Debug, Default)]
 #[must_use]
-pub struct GetEntitlements {
+pub struct GetEntitlements<'a> {
     user_id: Option<UserId>,
-    sku_ids: Option<Vec<SkuId>>,
+    sku_ids: Option<Cow<'a, [SkuId]>>,
     before: Option<EntitlementId>,
     after: Option<EntitlementId>,
     limit: Option<u8>,
@@ -21,7 +23,7 @@ pub struct GetEntitlements {
     exclude_ended: Option<bool>,
 }
 
-impl GetEntitlements {
+impl<'a> GetEntitlements<'a> {
     /// Filters the returned entitlements by the given [`UserId`].
     pub fn user_id(mut self, user_id: UserId) -> Self {
         self.user_id = Some(user_id);
@@ -29,8 +31,8 @@ impl GetEntitlements {
     }
 
     /// Filters the returned entitlements by the given [`SkuId`]s.
-    pub fn sku_ids(mut self, sku_ids: Vec<SkuId>) -> Self {
-        self.sku_ids = Some(sku_ids);
+    pub fn sku_ids(mut self, sku_ids: impl Into<Cow<'a, [SkuId]>>) -> Self {
+        self.sku_ids = Some(sku_ids.into());
         self
     }
 
@@ -69,7 +71,7 @@ impl GetEntitlements {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl super::Builder for GetEntitlements {
+impl super::Builder for GetEntitlements<'_> {
     type Context<'ctx> = ();
     type Built = Vec<Entitlement>;
 
@@ -81,7 +83,7 @@ impl super::Builder for GetEntitlements {
         let http = cache_http.http();
         http.get_entitlements(
             self.user_id,
-            self.sku_ids,
+            self.sku_ids.as_deref(),
             self.before,
             self.after,
             self.limit,
