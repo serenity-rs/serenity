@@ -49,7 +49,7 @@ impl EventHandler for Handler {
         );
 
         let commands = guild_id
-            .set_commands(&ctx.http, vec![
+            .set_commands(&ctx.http, &[
                 commands::ping::register(),
                 commands::id::register(),
                 commands::welcome::register(),

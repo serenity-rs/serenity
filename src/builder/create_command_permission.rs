@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -14,21 +16,21 @@ use crate::model::prelude::*;
 // `permissions` is added to the HTTP endpoint
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditCommandPermissions {
-    permissions: Vec<CreateCommandPermission>,
+pub struct EditCommandPermissions<'a> {
+    permissions: Cow<'a, [CreateCommandPermission]>,
 }
 
-impl EditCommandPermissions {
-    pub fn new(permissions: Vec<CreateCommandPermission>) -> Self {
+impl<'a> EditCommandPermissions<'a> {
+    pub fn new(permissions: impl Into<Cow<'a, [CreateCommandPermission]>>) -> Self {
         Self {
-            permissions,
+            permissions: permissions.into(),
         }
     }
 }
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for EditCommandPermissions {
+impl Builder for EditCommandPermissions<'_> {
     type Context<'ctx> = (GuildId, CommandId);
     type Built = CommandPermissions;
 
