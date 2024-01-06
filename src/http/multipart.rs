@@ -5,7 +5,7 @@ use reqwest::multipart::{Form, Part};
 use crate::builder::CreateAttachment;
 use crate::internal::prelude::*;
 
-impl CreateAttachment {
+impl CreateAttachment<'_> {
     fn into_part(self) -> Result<Part> {
         let mut part = Part::bytes(self.data);
         part = guess_mime_str(part, &self.filename)?;
@@ -15,18 +15,18 @@ impl CreateAttachment {
 }
 
 #[derive(Clone, Debug)]
-pub enum MultipartUpload {
+pub enum MultipartUpload<'a> {
     /// A file sent with the form data as an individual upload. For example, a sticker.
-    File(CreateAttachment),
+    File(CreateAttachment<'a>),
     /// Files sent with the form as message attachments.
-    Attachments(Vec<CreateAttachment>),
+    Attachments(Vec<CreateAttachment<'a>>),
 }
 
 /// Holder for multipart body. Contains upload data, multipart fields, and payload_json for
 /// creating requests with attachments.
 #[derive(Clone, Debug)]
-pub struct Multipart {
-    pub upload: MultipartUpload,
+pub struct Multipart<'a> {
+    pub upload: MultipartUpload<'a>,
     /// Multipart text fields that are sent with the form data as individual fields. If a certain
     /// endpoint does not support passing JSON body via `payload_json`, this must be used instead.
     pub fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
@@ -34,7 +34,7 @@ pub struct Multipart {
     pub payload_json: Option<String>,
 }
 
-impl Multipart {
+impl Multipart<'_> {
     pub(crate) fn build_form(self) -> Result<Form> {
         let mut multipart = Form::new();
 

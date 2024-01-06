@@ -1,7 +1,7 @@
 use serenity::builder::{CreateCommand, CreateCommandOption};
 use serenity::model::application::CommandOptionType;
 
-pub fn register() -> CreateCommand {
+pub fn register() -> CreateCommand<'static> {
     CreateCommand::new("numberinput")
         .description("Test command for number input")
         .add_option(

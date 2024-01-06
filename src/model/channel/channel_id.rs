@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
@@ -351,7 +352,7 @@ impl ChannelId {
         self,
         cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
-        builder: EditMessage,
+        builder: EditMessage<'_>,
     ) -> Result<Message> {
         builder.execute(cache_http, (self, message_id.into(), None)).await
     }
@@ -646,7 +647,7 @@ impl ChannelId {
     pub async fn say(
         self,
         cache_http: impl CacheHttp,
-        content: impl Into<String>,
+        content: impl Into<Cow<'_, str>>,
     ) -> Result<Message> {
         let builder = CreateMessage::new().content(content);
         self.send_message(cache_http, builder).await
@@ -718,11 +719,11 @@ impl ChannelId {
     /// reasons.
     ///
     /// [`File`]: tokio::fs::File
-    pub async fn send_files(
+    pub async fn send_files<'a>(
         self,
         cache_http: impl CacheHttp,
-        files: impl IntoIterator<Item = CreateAttachment>,
-        builder: CreateMessage,
+        files: impl IntoIterator<Item = CreateAttachment<'a>>,
+        builder: CreateMessage<'a>,
     ) -> Result<Message> {
         self.send_message(cache_http, builder.files(files)).await
     }
@@ -739,7 +740,7 @@ impl ChannelId {
     pub async fn send_message(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateMessage,
+        builder: CreateMessage<'_>,
     ) -> Result<Message> {
         builder.execute(cache_http, (self, None)).await
     }

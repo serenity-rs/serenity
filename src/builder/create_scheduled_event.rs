@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateAttachment;
@@ -14,14 +16,14 @@ pub struct CreateScheduledEvent<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entity_metadata: Option<ScheduledEventMetadata>,
-    name: String,
+    entity_metadata: Option<CreateScheduledEventMetadata<'a>>,
+    name: Cow<'a, str>,
     privacy_level: ScheduledEventPrivacyLevel,
-    scheduled_start_time: String,
+    scheduled_start_time: Timestamp,
     #[serde(skip_serializing_if = "Option::is_none")]
-    scheduled_end_time: Option<String>,
+    scheduled_end_time: Option<Timestamp>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    description: Option<Cow<'a, str>>,
     entity_type: ScheduledEventType,
     #[serde(skip_serializing_if = "Option::is_none")]
     image: Option<String>,
@@ -35,13 +37,13 @@ impl<'a> CreateScheduledEvent<'a> {
     /// empty.
     pub fn new(
         kind: ScheduledEventType,
-        name: impl Into<String>,
+        name: impl Into<Cow<'a, str>>,
         scheduled_start_time: impl Into<Timestamp>,
     ) -> Self {
         Self {
             name: name.into(),
             entity_type: kind,
-            scheduled_start_time: scheduled_start_time.into().to_string(),
+            scheduled_start_time: scheduled_start_time.into(),
 
             image: None,
             channel_id: None,
@@ -66,13 +68,13 @@ impl<'a> CreateScheduledEvent<'a> {
     }
 
     /// Sets the name of the scheduled event, replacing the current value as set in [`Self::new`].
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = name.into();
         self
     }
 
     /// Sets the description of the scheduled event.
-    pub fn description(mut self, description: impl Into<String>) -> Self {
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -80,14 +82,14 @@ impl<'a> CreateScheduledEvent<'a> {
     /// Sets the start time of the scheduled event, replacing the current value as set in
     /// [`Self::new`].
     pub fn start_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
-        self.scheduled_start_time = timestamp.into().to_string();
+        self.scheduled_start_time = timestamp.into();
         self
     }
 
     /// Sets the end time of the scheduled event. Required if [`Self::kind`] is
     /// [`ScheduledEventType::External`].
     pub fn end_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
-        self.scheduled_end_time = Some(timestamp.into().to_string());
+        self.scheduled_end_time = Some(timestamp.into());
         self
     }
 
@@ -102,15 +104,15 @@ impl<'a> CreateScheduledEvent<'a> {
     /// [`Self::kind`] is [`ScheduledEventType::External`].
     ///
     /// [`External`]: ScheduledEventType::External
-    pub fn location(mut self, location: impl Into<String>) -> Self {
-        self.entity_metadata = Some(ScheduledEventMetadata {
-            location: Some(location.into().into()),
+    pub fn location(mut self, location: impl Into<Cow<'a, str>>) -> Self {
+        self.entity_metadata = Some(CreateScheduledEventMetadata {
+            location: Some(location.into()),
         });
         self
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: &CreateAttachment) -> Self {
+    pub fn image(mut self, image: &CreateAttachment<'_>) -> Self {
         self.image = Some(image.to_base64());
         self
     }
@@ -148,4 +150,9 @@ impl Builder for CreateScheduledEvent<'_> {
 
         cache_http.http().create_scheduled_event(ctx, &self, self.audit_log_reason).await
     }
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub(crate) struct CreateScheduledEventMetadata<'a> {
+    pub(crate) location: Option<Cow<'a, str>>,
 }
