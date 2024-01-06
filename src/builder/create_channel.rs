@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -14,12 +16,12 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateChannel<'a> {
-    name: String,
+    name: Cow<'a, str>,
     #[serde(rename = "type")]
     kind: ChannelType,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    topic: Option<String>,
+    topic: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     bitrate: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,22 +30,22 @@ pub struct CreateChannel<'a> {
     rate_limit_per_user: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     position: Option<u16>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    permission_overwrites: Vec<PermissionOverwriteData>,
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    permission_overwrites: Cow<'a, [PermissionOverwrite]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     parent_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     nsfw: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rtc_region: Option<String>,
+    rtc_region: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     video_quality_mode: Option<VideoQualityMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_reaction_emoji: Option<ForumEmoji>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    available_tags: Vec<ForumTag>,
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    available_tags: Cow<'a, [ForumTag]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_sort_order: Option<SortOrder>,
 
@@ -54,7 +56,7 @@ pub struct CreateChannel<'a> {
 impl<'a> CreateChannel<'a> {
     /// Creates a builder with the given name, setting [`Self::kind`] to [`ChannelType::Text`] and
     /// leaving all other fields empty.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
             name: name.into(),
             nsfw: None,
@@ -65,13 +67,13 @@ impl<'a> CreateChannel<'a> {
             user_limit: None,
             rate_limit_per_user: None,
             kind: ChannelType::Text,
-            permission_overwrites: Vec::new(),
+            permission_overwrites: Cow::default(),
             audit_log_reason: None,
             rtc_region: None,
             video_quality_mode: None,
             default_auto_archive_duration: None,
             default_reaction_emoji: None,
-            available_tags: Vec::new(),
+            available_tags: Cow::default(),
             default_sort_order: None,
         }
     }
@@ -79,7 +81,7 @@ impl<'a> CreateChannel<'a> {
     /// Specify how to call this new channel, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = name.into();
         self
     }
@@ -103,7 +105,7 @@ impl<'a> CreateChannel<'a> {
     /// Channel topic (0-1024 characters)
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::News`], [`ChannelType::Forum`]
-    pub fn topic(mut self, topic: impl Into<String>) -> Self {
+    pub fn topic(mut self, topic: impl Into<Cow<'a, str>>) -> Self {
         self.topic = Some(topic.into());
         self
     }
@@ -190,8 +192,8 @@ impl<'a> CreateChannel<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn permissions(mut self, perms: impl IntoIterator<Item = PermissionOverwrite>) -> Self {
-        self.permission_overwrites = perms.into_iter().map(Into::into).collect();
+    pub fn permissions(mut self, perms: impl Into<Cow<'a, [PermissionOverwrite]>>) -> Self {
+        self.permission_overwrites = perms.into();
         self
     }
 
@@ -204,7 +206,7 @@ impl<'a> CreateChannel<'a> {
     /// Channel voice region id of the voice or stage channel, automatic when not set
     ///
     /// Only for [`ChannelType::Voice`] and [`ChannelType::Stage`]
-    pub fn rtc_region(mut self, rtc_region: String) -> Self {
+    pub fn rtc_region(mut self, rtc_region: Cow<'a, str>) -> Self {
         self.rtc_region = Some(rtc_region);
         self
     }
@@ -240,8 +242,8 @@ impl<'a> CreateChannel<'a> {
     /// Set of tags that can be used in a forum channel
     ///
     /// Only for [`ChannelType::Forum`]
-    pub fn available_tags(mut self, available_tags: impl IntoIterator<Item = ForumTag>) -> Self {
-        self.available_tags = available_tags.into_iter().collect();
+    pub fn available_tags(mut self, available_tags: impl Into<Cow<'a, [ForumTag]>>) -> Self {
+        self.available_tags = available_tags.into();
         self
     }
 

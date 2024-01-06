@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
 use super::{
@@ -37,22 +39,22 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
 #[derive(Clone, Debug, Default, Serialize, PartialEq)]
 #[must_use]
-pub struct EditMessage {
+pub struct EditMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<String>,
+    content: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    embeds: Option<Vec<CreateEmbed>>,
+    embeds: Option<Cow<'a, [CreateEmbed<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    allowed_mentions: Option<CreateAllowedMentions>,
+    allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
+    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    attachments: Option<EditAttachments>,
+    attachments: Option<EditAttachments<'a>>,
 }
 
-impl EditMessage {
+impl<'a> EditMessage<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -68,7 +70,7 @@ impl EditMessage {
         if let Some(embeds) = &self.embeds {
             check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
                 .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-            for embed in embeds {
+            for embed in embeds.iter() {
                 embed.check_length()?;
             }
         }
@@ -80,7 +82,7 @@ impl EditMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(mut self, content: impl Into<String>) -> Self {
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
     }
@@ -89,8 +91,8 @@ impl EditMessage {
     ///
     /// **Note**: This will keep all existing embeds. Use [`Self::embed()`] to replace existing
     /// embeds.
-    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.get_or_insert_with(Vec::new).push(embed);
+    pub fn add_embed(mut self, embed: CreateEmbed<'a>) -> Self {
+        self.embeds.get_or_insert_with(Cow::default).to_mut().push(embed);
         self
     }
 
@@ -98,8 +100,8 @@ impl EditMessage {
     ///
     /// **Note**: This will keep all existing embeds. Use [`Self::embeds()`] to replace existing
     /// embeds.
-    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.get_or_insert_with(Vec::new).extend(embeds);
+    pub fn add_embeds(mut self, embeds: impl IntoIterator<Item = CreateEmbed<'a>>) -> Self {
+        self.embeds.get_or_insert_with(Cow::default).to_mut().extend(embeds);
         self
     }
 
@@ -107,7 +109,7 @@ impl EditMessage {
     ///
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embed()`] to keep existing
     /// embeds.
-    pub fn embed(self, embed: CreateEmbed) -> Self {
+    pub fn embed(self, embed: CreateEmbed<'a>) -> Self {
         self.embeds(vec![embed])
     }
 
@@ -115,8 +117,8 @@ impl EditMessage {
     ///
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
-    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = Some(embeds);
+    pub fn embeds(mut self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
+        self.embeds = Some(embeds.into());
         self
     }
 
@@ -163,14 +165,14 @@ impl EditMessage {
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions<'a>) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = Some(components.into());
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
@@ -182,7 +184,7 @@ impl EditMessage {
     }
 
     /// Sets attachments, see [`EditAttachments`] for more details.
-    pub fn attachments(mut self, attachments: EditAttachments) -> Self {
+    pub fn attachments(mut self, attachments: EditAttachments<'a>) -> Self {
         self.attachments = Some(attachments);
         self
     }
@@ -190,7 +192,7 @@ impl EditMessage {
     /// Adds a new attachment to the message.
     ///
     /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
-    pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
+    pub fn new_attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).add(attachment));
         self
@@ -220,7 +222,7 @@ impl EditMessage {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for EditMessage {
+impl Builder for EditMessage<'_> {
     type Context<'ctx> = (ChannelId, MessageId, Option<UserId>);
     type Built = Message;
 
