@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateMessage;
@@ -11,14 +13,14 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateForumPost<'a> {
-    name: String,
+    name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_archive_duration: Option<AutoArchiveDuration>,
     #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<u16>,
-    message: CreateMessage,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    applied_tags: Vec<ForumTagId>,
+    message: CreateMessage<'a>,
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    applied_tags: Cow<'a, [ForumTagId]>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -26,13 +28,13 @@ pub struct CreateForumPost<'a> {
 
 impl<'a> CreateForumPost<'a> {
     /// Creates a builder with the given name and message content, leaving all other fields empty.
-    pub fn new(name: impl Into<String>, message: CreateMessage) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>, message: CreateMessage<'a>) -> Self {
         Self {
             name: name.into(),
             message,
             auto_archive_duration: None,
             rate_limit_per_user: None,
-            applied_tags: Vec::new(),
+            applied_tags: Cow::default(),
             audit_log_reason: None,
         }
     }
@@ -40,7 +42,7 @@ impl<'a> CreateForumPost<'a> {
     /// The name of the forum post. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = name.into();
         self
     }
@@ -48,7 +50,7 @@ impl<'a> CreateForumPost<'a> {
     /// The contents of the first message in the forum post.
     ///
     /// See [`CreateMessage`] for restrictions around message size.
-    pub fn message(mut self, message: CreateMessage) -> Self {
+    pub fn message(mut self, message: CreateMessage<'a>) -> Self {
         self.message = message;
         self
     }
@@ -75,15 +77,12 @@ impl<'a> CreateForumPost<'a> {
     }
 
     pub fn add_applied_tag(mut self, applied_tag: ForumTagId) -> Self {
-        self.applied_tags.push(applied_tag);
+        self.applied_tags.to_mut().push(applied_tag);
         self
     }
 
-    pub fn set_applied_tags(
-        mut self,
-        applied_tags: impl IntoIterator<Item = impl Into<ForumTagId>>,
-    ) -> Self {
-        self.applied_tags = applied_tags.into_iter().map(Into::into).collect();
+    pub fn set_applied_tags(mut self, applied_tags: impl Into<Cow<'a, [ForumTagId]>>) -> Self {
+        self.applied_tags = applied_tags.into();
         self
     }
 

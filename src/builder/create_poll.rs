@@ -1,4 +1,6 @@
-use crate::model::channel::{PollLayoutType, PollMedia, PollMediaEmoji};
+use std::borrow::Cow;
+
+use crate::model::channel::{PollLayoutType, PollMediaEmoji};
 
 #[derive(serde::Serialize, Clone, Debug)]
 pub struct NeedsQuestion;
@@ -24,15 +26,15 @@ use sealed::*;
 
 /// "Only text is supported."
 #[derive(serde::Serialize, Clone, Debug)]
-struct CreatePollMedia {
-    text: String,
+struct CreatePollMedia<'a> {
+    text: Cow<'a, str>,
 }
 
 #[derive(serde::Serialize, Clone, Debug)]
 #[must_use = "Builders do nothing unless built"]
-pub struct CreatePoll<Stage: Sealed> {
-    question: CreatePollMedia,
-    answers: Vec<CreatePollAnswer>,
+pub struct CreatePoll<'a, Stage: Sealed> {
+    question: CreatePollMedia<'a>,
+    answers: Cow<'a, [CreatePollAnswer<'a>]>,
     duration: u8,
     allow_multiselect: bool,
     layout_type: Option<PollLayoutType>,
@@ -41,16 +43,16 @@ pub struct CreatePoll<Stage: Sealed> {
     _stage: Stage,
 }
 
-impl Default for CreatePoll<NeedsQuestion> {
+impl Default for CreatePoll<'_, NeedsQuestion> {
     /// See the documentation of [`Self::new`].
     fn default() -> Self {
         // Producing dummy values is okay as we must transition through all `Stage`s before firing,
         // which fills in the values with real values.
         Self {
             question: CreatePollMedia {
-                text: String::default(),
+                text: Cow::default(),
             },
-            answers: Vec::default(),
+            answers: Cow::default(),
             duration: u8::default(),
             allow_multiselect: false,
             layout_type: None,
@@ -60,7 +62,7 @@ impl Default for CreatePoll<NeedsQuestion> {
     }
 }
 
-impl CreatePoll<NeedsQuestion> {
+impl<'a> CreatePoll<'a, NeedsQuestion> {
     /// Creates a builder for creating a Poll.
     ///
     /// This must be transitioned through in order, to provide all required fields.
@@ -84,7 +86,7 @@ impl CreatePoll<NeedsQuestion> {
     }
 
     /// Sets the question to be polled.
-    pub fn question(self, text: impl Into<String>) -> CreatePoll<NeedsAnswers> {
+    pub fn question(self, text: impl Into<Cow<'a, str>>) -> CreatePoll<'a, NeedsAnswers> {
         CreatePoll {
             question: CreatePollMedia {
                 text: text.into(),
@@ -98,12 +100,15 @@ impl CreatePoll<NeedsQuestion> {
     }
 }
 
-impl CreatePoll<NeedsAnswers> {
+impl<'a> CreatePoll<'a, NeedsAnswers> {
     /// Sets the answers that can be picked from.
-    pub fn answers(self, answers: Vec<CreatePollAnswer>) -> CreatePoll<NeedsDuration> {
+    pub fn answers(
+        self,
+        answers: impl Into<Cow<'a, [CreatePollAnswer<'a>]>>,
+    ) -> CreatePoll<'a, NeedsDuration> {
         CreatePoll {
             question: self.question,
-            answers,
+            answers: answers.into(),
             duration: self.duration,
             allow_multiselect: self.allow_multiselect,
             layout_type: self.layout_type,
@@ -112,11 +117,11 @@ impl CreatePoll<NeedsAnswers> {
     }
 }
 
-impl CreatePoll<NeedsDuration> {
+impl<'a> CreatePoll<'a, NeedsDuration> {
     /// Sets the duration for the Poll to run for.
     ///
     /// This must be less than a week, and will be rounded to hours towards zero.
-    pub fn duration(self, duration: std::time::Duration) -> CreatePoll<Ready> {
+    pub fn duration(self, duration: std::time::Duration) -> CreatePoll<'a, Ready> {
         let hours = duration.as_secs() / 3600;
 
         CreatePoll {
@@ -130,7 +135,7 @@ impl CreatePoll<NeedsDuration> {
     }
 }
 
-impl<Stage: Sealed> CreatePoll<Stage> {
+impl<Stage: Sealed> CreatePoll<'_, Stage> {
     /// Sets the layout type for the Poll to take.
     ///
     /// This is currently only ever [`PollLayoutType::Default`], and is optional.
@@ -147,12 +152,18 @@ impl<Stage: Sealed> CreatePoll<Stage> {
 }
 
 #[derive(serde::Serialize, Clone, Debug, Default)]
-#[must_use = "Builders do nothing unless built"]
-pub struct CreatePollAnswer {
-    poll_media: PollMedia,
+struct CreatePollAnswerMedia<'a> {
+    text: Option<Cow<'a, str>>,
+    emoji: Option<PollMediaEmoji>,
 }
 
-impl CreatePollAnswer {
+#[derive(serde::Serialize, Clone, Debug, Default)]
+#[must_use = "Builders do nothing unless built"]
+pub struct CreatePollAnswer<'a> {
+    poll_media: CreatePollAnswerMedia<'a>,
+}
+
+impl<'a> CreatePollAnswer<'a> {
     /// Creates a builder for a Poll answer.
     ///
     /// [`Self::text`] or [`Self::emoji`] must be provided.
@@ -160,7 +171,7 @@ impl CreatePollAnswer {
         Self::default()
     }
 
-    pub fn text(mut self, text: impl Into<String>) -> Self {
+    pub fn text(mut self, text: impl Into<Cow<'a, str>>) -> Self {
         self.poll_media.text = Some(text.into());
         self
     }

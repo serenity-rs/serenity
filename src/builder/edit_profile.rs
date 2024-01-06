@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateAttachment;
@@ -14,16 +16,16 @@ use crate::model::user::CurrentUser;
 /// [Discord docs](https://discord.com/developers/docs/resources/user#modify-current-user)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditProfile {
+pub struct EditProfile<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    username: Option<String>,
+    username: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     avatar: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     banner: Option<Option<String>>,
 }
 
-impl EditProfile {
+impl<'a> EditProfile<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -46,7 +48,7 @@ impl EditProfile {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn avatar(mut self, avatar: &CreateAttachment) -> Self {
+    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
         self.avatar = Some(Some(avatar.to_base64()));
         self
     }
@@ -62,13 +64,13 @@ impl EditProfile {
     /// When modifying the username, if another user has the same _new_ username and current
     /// discriminator, a new unique discriminator will be assigned. If there are no available
     /// discriminators with the requested username, an error will occur.
-    pub fn username(mut self, username: impl Into<String>) -> Self {
+    pub fn username(mut self, username: impl Into<Cow<'a, str>>) -> Self {
         self.username = Some(username.into());
         self
     }
 
     /// Sets the banner of the current user.
-    pub fn banner(mut self, banner: &CreateAttachment) -> Self {
+    pub fn banner(mut self, banner: &CreateAttachment<'_>) -> Self {
         self.banner = Some(Some(banner.to_base64()));
         self
     }
@@ -82,7 +84,7 @@ impl EditProfile {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for EditProfile {
+impl Builder for EditProfile<'_> {
     type Context<'ctx> = ();
     type Built = CurrentUser;
 

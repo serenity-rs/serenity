@@ -160,7 +160,7 @@ impl Command {
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     pub async fn create_global_command(
         cache_http: impl CacheHttp,
-        builder: CreateCommand,
+        builder: CreateCommand<'_>,
     ) -> Result<Command> {
         builder.execute(cache_http, (None, None)).await
     }
@@ -172,7 +172,7 @@ impl Command {
     /// Returns the same errors as [`Self::create_global_command`].
     pub async fn set_global_commands(
         http: impl AsRef<Http>,
-        commands: Vec<CreateCommand>,
+        commands: &[CreateCommand<'_>],
     ) -> Result<Vec<Command>> {
         http.as_ref().create_global_commands(&commands).await
     }
@@ -185,7 +185,7 @@ impl Command {
     pub async fn edit_global_command(
         cache_http: impl CacheHttp,
         command_id: CommandId,
-        builder: CreateCommand,
+        builder: CreateCommand<'_>,
     ) -> Result<Command> {
         builder.execute(cache_http, (None, Some(command_id))).await
     }
@@ -271,7 +271,6 @@ enum_number! {
 /// The parameters for an [`Command`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
-#[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
@@ -280,15 +279,15 @@ pub struct CommandOption {
     #[serde(rename = "type")]
     pub kind: CommandOptionType,
     /// The option name.
-    pub name: FixedString,
+    pub name: FixedString<u8>,
     /// Localizations of the option name with locale as the key
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<std::collections::HashMap<String, String>>,
+    pub name_localizations: Option<HashMap<FixedString<u8>, FixedString<u8>>>,
     /// The option description.
-    pub description: FixedString,
+    pub description: FixedString<u16>,
     /// Localizations of the option description with locale as the key
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description_localizations: Option<std::collections::HashMap<String, String>>,
+    pub description_localizations: Option<HashMap<FixedString<u16>, FixedString<u16>>>,
     /// Whether the parameter is optional or required.
     #[serde(default)]
     pub required: bool,
@@ -299,7 +298,7 @@ pub struct CommandOption {
     /// [`String`]: CommandOptionType::String
     /// [`Integer`]: CommandOptionType::Integer
     #[serde(default)]
-    pub choices: Vec<CommandOptionChoice>,
+    pub choices: FixedArray<CommandOptionChoice, u8>,
     /// The nested options.
     ///
     /// **Note**: Only available for [`SubCommand`] or [`SubCommandGroup`].
@@ -364,7 +363,7 @@ pub struct CommandOptionChoice {
     pub name: FixedString,
     /// Localizations of the choice name, with locale as key
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<std::collections::HashMap<String, String>>,
+    pub name_localizations: Option<HashMap<String, String>>,
     /// The choice value.
     pub value: Value,
 }

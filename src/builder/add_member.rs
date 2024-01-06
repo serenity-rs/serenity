@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -11,25 +13,25 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#add-guild-member).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct AddMember {
-    access_token: String,
+pub struct AddMember<'a> {
+    access_token: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    nick: Option<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    roles: Vec<RoleId>,
+    nick: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "<[RoleId]>::is_empty")]
+    roles: Cow<'a, [RoleId]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     mute: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     deaf: Option<bool>,
 }
 
-impl AddMember {
+impl<'a> AddMember<'a> {
     /// Constructs a new builder with the given access token, leaving all other fields empty.
-    pub fn new(access_token: String) -> Self {
+    pub fn new(access_token: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            access_token,
+            access_token: access_token.into(),
+            roles: Cow::default(),
             nick: None,
-            roles: Vec::new(),
             mute: None,
             deaf: None,
         }
@@ -38,7 +40,7 @@ impl AddMember {
     /// Sets the OAuth2 access token for this request, replacing the current one.
     ///
     /// Requires the access token to have the `guilds.join` scope granted.
-    pub fn access_token(mut self, access_token: impl Into<String>) -> Self {
+    pub fn access_token(mut self, access_token: impl Into<Cow<'a, str>>) -> Self {
         self.access_token = access_token.into();
         self
     }
@@ -48,7 +50,7 @@ impl AddMember {
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES
-    pub fn nickname(mut self, nickname: impl Into<String>) -> Self {
+    pub fn nickname(mut self, nickname: impl Into<Cow<'a, str>>) -> Self {
         self.nick = Some(nickname.into());
         self
     }
@@ -58,8 +60,8 @@ impl AddMember {
     /// Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES
-    pub fn roles(mut self, roles: impl IntoIterator<Item = impl Into<RoleId>>) -> Self {
-        self.roles = roles.into_iter().map(Into::into).collect();
+    pub fn roles(mut self, roles: impl Into<Cow<'a, [RoleId]>>) -> Self {
+        self.roles = roles.into();
         self
     }
 
@@ -86,7 +88,7 @@ impl AddMember {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for AddMember {
+impl Builder for AddMember<'_> {
     type Context<'ctx> = (GuildId, UserId);
     type Built = Option<Member>;
 

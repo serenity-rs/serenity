@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateAttachment;
@@ -14,7 +16,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: Option<Cow<'a, str>>,
     // [Omitting region because Discord deprecated it]
     #[serde(skip_serializing_if = "Option::is_none")]
     verification_level: Option<VerificationLevel>,
@@ -31,11 +33,11 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     owner_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    splash: Option<Option<String>>,
+    splash: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    discovery_splash: Option<Option<String>>,
+    discovery_splash: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    banner: Option<Option<String>>,
+    banner: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     system_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,11 +47,11 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     public_updates_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    preferred_locale: Option<Option<String>>,
+    preferred_locale: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    features: Option<Vec<String>>,
+    features: Option<Cow<'a, [Cow<'a, str>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    description: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     premium_progress_bar_enabled: Option<bool>,
 
@@ -100,7 +102,7 @@ impl<'a> EditGuild<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn icon(mut self, icon: Option<&CreateAttachment>) -> Self {
+    pub fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Self {
         self.icon = Some(icon.map(CreateAttachment::to_base64));
         self
     }
@@ -114,7 +116,7 @@ impl<'a> EditGuild<'a> {
     /// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 characters.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = Some(name.into());
         self
     }
@@ -125,7 +127,7 @@ impl<'a> EditGuild<'a> {
     /// this through a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn description(mut self, name: impl Into<String>) -> Self {
+    pub fn description(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(name.into());
         self
     }
@@ -136,8 +138,8 @@ impl<'a> EditGuild<'a> {
     /// this through a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn features(mut self, features: Vec<String>) -> Self {
-        self.features = Some(features);
+    pub fn features(mut self, features: impl Into<Cow<'a, [Cow<'a, str>]>>) -> Self {
+        self.features = Some(features.into());
         self
     }
 
@@ -158,7 +160,7 @@ impl<'a> EditGuild<'a> {
     /// through a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn splash(mut self, splash: Option<String>) -> Self {
+    pub fn splash(mut self, splash: Option<Cow<'a, str>>) -> Self {
         self.splash = Some(splash);
         self
     }
@@ -171,7 +173,7 @@ impl<'a> EditGuild<'a> {
     /// a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn discovery_splash(mut self, splash: Option<String>) -> Self {
+    pub fn discovery_splash(mut self, splash: Option<Cow<'a, str>>) -> Self {
         self.discovery_splash = Some(splash);
         self
     }
@@ -184,7 +186,7 @@ impl<'a> EditGuild<'a> {
     /// guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn banner(mut self, banner: Option<String>) -> Self {
+    pub fn banner(mut self, banner: Option<Cow<'a, str>>) -> Self {
         self.banner = Some(banner);
         self
     }
@@ -216,7 +218,7 @@ impl<'a> EditGuild<'a> {
     /// If this is not set, the locale will default to "en-US";
     ///
     /// **Note**: This feature is for Community guilds only.
-    pub fn preferred_locale(mut self, locale: Option<String>) -> Self {
+    pub fn preferred_locale(mut self, locale: Option<Cow<'a, str>>) -> Self {
         self.preferred_locale = Some(locale);
         self
     }

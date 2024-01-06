@@ -14,6 +14,8 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -21,24 +23,38 @@ use crate::model::prelude::*;
 /// A builder to create an embed in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 #[must_use]
-pub struct CreateEmbed {
-    inner: Embed,
-    fields: Vec<EmbedField>,
+pub struct CreateEmbed<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    title: Option<Cow<'a, str>>,
+    #[serde(rename = "type")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    kind: Option<&'static str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    timestamp: Option<Timestamp>,
+    #[serde(rename = "color")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    colour: Option<Colour>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    footer: Option<CreateEmbedFooter<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    image: Option<CreateEmbedImage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    thumbnail: Option<CreateEmbedImage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    author: Option<CreateEmbedAuthor<'a>>,
+    /// No point using a Cow slice, as there is no set_fields method
+    /// and CreateEmbedField is not public.
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    fields: Vec<CreateEmbedField<'a>>,
 }
 
-impl serde::Serialize for CreateEmbed {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        let owned_self = self.clone();
-
-        let mut embed = owned_self.inner;
-        embed.fields = owned_self.fields.into();
-        embed.serialize(serializer)
-    }
-}
-
-impl CreateEmbed {
+impl<'a> CreateEmbed<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -47,8 +63,8 @@ impl CreateEmbed {
     /// Set the author of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more information.
-    pub fn author(mut self, author: CreateEmbedAuthor) -> Self {
-        self.inner.author = Some(author.0);
+    pub fn author(mut self, author: CreateEmbedAuthor<'a>) -> Self {
+        self.author = Some(author);
         self
     }
 
@@ -63,7 +79,7 @@ impl CreateEmbed {
     /// Set the colour of the left-hand side of the embed.
     #[inline]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self.inner.colour = Some(colour.into());
+        self.colour = Some(colour.into());
         self
     }
 
@@ -71,8 +87,8 @@ impl CreateEmbed {
     ///
     /// **Note**: This can't be longer than 4096 characters.
     #[inline]
-    pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.inner.description = Some(description.into().into());
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
         self
     }
 
@@ -83,11 +99,15 @@ impl CreateEmbed {
     #[inline]
     pub fn field(
         mut self,
-        name: impl Into<String>,
-        value: impl Into<String>,
+        name: impl Into<Cow<'a, str>>,
+        value: impl Into<Cow<'a, str>>,
         inline: bool,
     ) -> Self {
-        self.fields.push(EmbedField::new(name, value, inline));
+        self.fields.push(CreateEmbedField {
+            name: name.into(),
+            value: value.into(),
+            inline,
+        });
         self
     }
 
@@ -96,11 +116,15 @@ impl CreateEmbed {
     /// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.
     pub fn fields<N, V>(mut self, fields: impl IntoIterator<Item = (N, V, bool)>) -> Self
     where
-        N: Into<String>,
-        V: Into<String>,
+        N: Into<Cow<'a, str>>,
+        V: Into<Cow<'a, str>>,
     {
-        let fields =
-            fields.into_iter().map(|(name, value, inline)| EmbedField::new(name, value, inline));
+        let fields = fields.into_iter().map(|(name, value, inline)| CreateEmbedField {
+            name: name.into(),
+            value: value.into(),
+            inline,
+        });
+
         self.fields.extend(fields);
         self
     }
@@ -108,8 +132,8 @@ impl CreateEmbed {
     /// Set the footer of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedFooter`] for more information.
-    pub fn footer(mut self, footer: CreateEmbedFooter) -> Self {
-        self.inner.footer = Some(footer.0);
+    pub fn footer(mut self, footer: CreateEmbedFooter<'a>) -> Self {
+        self.footer = Some(footer);
         self
     }
 
@@ -118,24 +142,18 @@ impl CreateEmbed {
     /// Refer [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files)
     /// for rules on naming local attachments.
     #[inline]
-    pub fn image(mut self, url: impl Into<String>) -> Self {
-        self.inner.image = Some(EmbedImage {
-            url: url.into().into(),
-            proxy_url: None,
-            height: None,
-            width: None,
+    pub fn image(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+        self.image = Some(CreateEmbedImage {
+            url: url.into(),
         });
         self
     }
 
     /// Set the thumbnail of the embed.
     #[inline]
-    pub fn thumbnail(mut self, url: impl Into<String>) -> Self {
-        self.inner.thumbnail = Some(EmbedThumbnail {
-            url: url.into().into(),
-            proxy_url: None,
-            height: None,
-            width: None,
+    pub fn thumbnail(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+        self.thumbnail = Some(CreateEmbedImage {
+            url: url.into(),
         });
         self
     }
@@ -156,21 +174,21 @@ impl CreateEmbed {
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.inner.timestamp = Some(timestamp.into());
+        self.timestamp = Some(timestamp.into());
         self
     }
 
     /// Set the title of the embed.
     #[inline]
-    pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.inner.title = Some(title.into().into());
+    pub fn title(mut self, title: impl Into<Cow<'a, str>>) -> Self {
+        self.title = Some(title.into());
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
-    pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.inner.url = Some(url.into().into());
+    pub fn url(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+        self.url = Some(url.into());
         self
     }
 
@@ -192,11 +210,11 @@ impl CreateEmbed {
     #[cfg(feature = "http")]
     pub(super) fn check_length(&self) -> Result<()> {
         let mut length = 0;
-        if let Some(ref author) = self.inner.author {
+        if let Some(ref author) = self.author {
             length += author.name.chars().count();
         }
 
-        if let Some(ref description) = self.inner.description {
+        if let Some(ref description) = self.description {
             length += description.chars().count();
         }
 
@@ -205,11 +223,11 @@ impl CreateEmbed {
             length += field.value.chars().count();
         }
 
-        if let Some(ref footer) = self.inner.footer {
+        if let Some(ref footer) = self.footer {
             length += footer.text.chars().count();
         }
 
-        if let Some(ref title) = self.inner.title {
+        if let Some(ref title) = self.title {
             length += title.chars().count();
         }
 
@@ -218,83 +236,93 @@ impl CreateEmbed {
     }
 }
 
-impl Default for CreateEmbed {
+impl Default for CreateEmbed<'_> {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> Self {
         Self {
             fields: Vec::new(),
-            inner: Embed {
-                fields: FixedArray::new(),
-                description: None,
-                thumbnail: None,
-                timestamp: None,
-                kind: Some("rich".to_string().into()),
-                author: None,
-                colour: None,
-                footer: None,
-                image: None,
-                title: None,
-                url: None,
-                video: None,
-                provider: None,
-            },
+            description: None,
+            thumbnail: None,
+            timestamp: None,
+            kind: Some("rich"),
+            author: None,
+            colour: None,
+            footer: None,
+            image: None,
+            title: None,
+            url: None,
         }
     }
 }
 
-impl From<Embed> for CreateEmbed {
-    fn from(mut embed: Embed) -> Self {
+impl From<Embed> for CreateEmbed<'_> {
+    fn from(embed: Embed) -> Self {
         Self {
-            fields: std::mem::take(&mut embed.fields).into_vec(),
-            inner: embed,
+            fields: embed.fields.into_iter().map(Into::into).collect(),
+            description: embed.description.map(FixedString::into_string).map(Into::into),
+            thumbnail: embed.thumbnail.map(Into::into),
+            timestamp: embed.timestamp,
+            kind: Some("rich"),
+            author: embed.author.map(Into::into),
+            colour: embed.colour,
+            footer: embed.footer.map(Into::into),
+            image: embed.image.map(Into::into),
+            title: embed.title.map(FixedString::into_string).map(Into::into),
+            url: embed.url.map(FixedString::into_string).map(Into::into),
         }
     }
 }
 
 /// A builder to create the author data of an embed. See [`CreateEmbed::author`]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 #[must_use]
-pub struct CreateEmbedAuthor(EmbedAuthor);
+pub struct CreateEmbedAuthor<'a> {
+    name: Cow<'a, str>,
+    url: Option<Cow<'a, str>>,
+    icon_url: Option<Cow<'a, str>>,
+}
 
-impl CreateEmbedAuthor {
+impl<'a> CreateEmbedAuthor<'a> {
     /// Creates an author object with the given name, leaving all other fields empty.
-    pub fn new(name: impl Into<String>) -> Self {
-        Self(EmbedAuthor {
-            name: name.into().into(),
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            name: name.into(),
             icon_url: None,
             url: None,
-            // Has no builder method because I think this field is only relevant when receiving (?)
-            proxy_icon_url: None,
-        })
+        }
     }
 
     /// Set the author's name, replacing the current value as set in [`Self::new`].
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.0.name = name.into().into();
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
+        self.name = name.into();
         self
     }
 
     /// Set the URL of the author's icon.
-    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.0.icon_url = Some(icon_url.into().into());
+    pub fn icon_url(mut self, icon_url: impl Into<Cow<'a, str>>) -> Self {
+        self.icon_url = Some(icon_url.into());
         self
     }
 
     /// Set the author's URL.
-    pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.0.url = Some(url.into().into());
+    pub fn url(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+        self.url = Some(url.into());
         self
     }
 }
 
-impl From<EmbedAuthor> for CreateEmbedAuthor {
+impl From<EmbedAuthor> for CreateEmbedAuthor<'_> {
     fn from(author: EmbedAuthor) -> Self {
-        Self(author)
+        Self {
+            name: author.name.into_string().into(),
+            url: author.url.map(|f| f.into_string().into()),
+            icon_url: author.icon_url.map(|f| f.into_string().into()),
+        }
     }
 }
 
 #[cfg(feature = "model")]
-impl From<User> for CreateEmbedAuthor {
+impl From<User> for CreateEmbedAuthor<'_> {
     fn from(user: User) -> Self {
         let avatar_icon = user.face();
         Self::new(user.name).icon_url(avatar_icon)
@@ -302,7 +330,7 @@ impl From<User> for CreateEmbedAuthor {
 }
 
 #[cfg(feature = "model")]
-impl From<&User> for CreateEmbedAuthor {
+impl From<&User> for CreateEmbedAuthor<'_> {
     fn from(user: &User) -> Self {
         let avatar_icon = user.face();
         Self::new(user.name.clone()).icon_url(avatar_icon)
@@ -310,38 +338,90 @@ impl From<&User> for CreateEmbedAuthor {
 }
 
 /// A builder to create the footer data for an embed. See [`CreateEmbed::footer`]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 #[must_use]
-pub struct CreateEmbedFooter(EmbedFooter);
+pub struct CreateEmbedFooter<'a> {
+    text: Cow<'a, str>,
+    icon_url: Option<Cow<'a, str>>,
+}
 
-impl CreateEmbedFooter {
+impl<'a> CreateEmbedFooter<'a> {
     /// Creates a new footer object with the given text, leaving all other fields empty.
-    pub fn new(text: impl Into<String>) -> Self {
-        Self(EmbedFooter {
-            text: text.into().into(),
+    pub fn new(text: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            text: text.into(),
             icon_url: None,
-            // Has no builder method because I think this field is only relevant when receiving (?)
-            proxy_icon_url: None,
-        })
+        }
     }
 
     /// Set the footer's text, replacing the current value as set in [`Self::new`].
-    pub fn text(mut self, text: impl Into<String>) -> Self {
-        self.0.text = text.into().into();
+    pub fn text(mut self, text: impl Into<Cow<'a, str>>) -> Self {
+        self.text = text.into();
         self
     }
 
     /// Set the icon URL's value.
     ///
     /// Refer [`CreateEmbed::image`] for rules on naming local attachments.
-    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.0.icon_url = Some(icon_url.into().into());
+    pub fn icon_url(mut self, icon_url: impl Into<Cow<'a, str>>) -> Self {
+        self.icon_url = Some(icon_url.into());
         self
     }
 }
 
-impl From<EmbedFooter> for CreateEmbedFooter {
+impl From<EmbedFooter> for CreateEmbedFooter<'_> {
     fn from(footer: EmbedFooter) -> Self {
-        Self(footer)
+        Self {
+            text: footer.text.into_string().into(),
+            icon_url: footer.icon_url.map(|f| f.into_string().into()),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+struct CreateEmbedField<'a> {
+    name: Cow<'a, str>,
+    value: Cow<'a, str>,
+    inline: bool,
+}
+
+impl<'a> From<&'a EmbedField> for CreateEmbedField<'a> {
+    fn from(field: &'a EmbedField) -> Self {
+        Self {
+            name: field.name.as_str().into(),
+            value: field.value.as_str().into(),
+            inline: field.inline,
+        }
+    }
+}
+
+impl From<EmbedField> for CreateEmbedField<'_> {
+    fn from(field: EmbedField) -> Self {
+        Self {
+            name: field.name.into_string().into(),
+            value: field.value.into_string().into(),
+            inline: field.inline,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+struct CreateEmbedImage<'a> {
+    url: Cow<'a, str>,
+}
+
+impl From<EmbedImage> for CreateEmbedImage<'_> {
+    fn from(field: EmbedImage) -> Self {
+        Self {
+            url: field.url.into_string().into(),
+        }
+    }
+}
+
+impl From<EmbedThumbnail> for CreateEmbedImage<'_> {
+    fn from(field: EmbedThumbnail) -> Self {
+        Self {
+            url: field.url.into_string().into(),
+        }
     }
 }
