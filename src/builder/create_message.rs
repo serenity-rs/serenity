@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::create_poll::Ready;
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
@@ -53,33 +55,33 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#create-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateMessage {
+pub struct CreateMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<String>,
+    content: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     nonce: Option<Nonce>,
     tts: bool,
-    embeds: Vec<CreateEmbed>,
+    embeds: Cow<'a, [CreateEmbed<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    allowed_mentions: Option<CreateAllowedMentions>,
+    allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     message_reference: Option<MessageReference>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
-    sticker_ids: Vec<StickerId>,
+    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
+    sticker_ids: Cow<'a, [StickerId]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
-    pub(crate) attachments: EditAttachments,
+    pub(crate) attachments: EditAttachments<'a>,
     enforce_nonce: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    poll: Option<CreatePoll<super::create_poll::Ready>>,
+    poll: Option<CreatePoll<'a, Ready>>,
 
     // The following fields are handled separately.
     #[serde(skip)]
-    reactions: Vec<ReactionType>,
+    reactions: Cow<'a, [ReactionType]>,
 }
 
-impl CreateMessage {
+impl<'a> CreateMessage<'a> {
     pub fn new() -> Self {
         Self::default()
     }
@@ -93,7 +95,7 @@ impl CreateMessage {
 
         check_overflow(self.embeds.len(), constants::EMBED_MAX_COUNT)
             .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-        for embed in &self.embeds {
+        for embed in self.embeds.iter() {
             embed.check_length()?;
         }
 
@@ -107,7 +109,7 @@ impl CreateMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(mut self, content: impl Into<String>) -> Self {
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
     }
@@ -116,8 +118,8 @@ impl CreateMessage {
     ///
     /// **Note**: This will keep all existing embeds. Use [`Self::embed()`] to replace existing
     /// embeds.
-    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.push(embed);
+    pub fn add_embed(mut self, embed: CreateEmbed<'a>) -> Self {
+        self.embeds.to_mut().push(embed);
         self
     }
 
@@ -125,8 +127,8 @@ impl CreateMessage {
     ///
     /// **Note**: This will keep all existing embeds. Use [`Self::embeds()`] to replace existing
     /// embeds.
-    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.extend(embeds);
+    pub fn add_embeds(mut self, embeds: impl IntoIterator<Item = CreateEmbed<'a>>) -> Self {
+        self.embeds.to_mut().extend(embeds);
         self
     }
 
@@ -134,7 +136,7 @@ impl CreateMessage {
     ///
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embed()`] to keep existing
     /// embeds.
-    pub fn embed(self, embed: CreateEmbed) -> Self {
+    pub fn embed(self, embed: CreateEmbed<'a>) -> Self {
         self.embeds(vec![embed])
     }
 
@@ -142,8 +144,8 @@ impl CreateMessage {
     ///
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
-    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = embeds;
+    pub fn embeds(mut self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
+        self.embeds = embeds.into();
         self
     }
 
@@ -159,11 +161,8 @@ impl CreateMessage {
 
     /// Adds a list of reactions to create after the message's sent.
     #[inline]
-    pub fn reactions<R: Into<ReactionType>>(
-        mut self,
-        reactions: impl IntoIterator<Item = R>,
-    ) -> Self {
-        self.reactions = reactions.into_iter().map(Into::into).collect();
+    pub fn reactions(mut self, reactions: impl Into<Cow<'a, [ReactionType]>>) -> Self {
+        self.reactions = reactions.into();
         self
     }
 
@@ -172,7 +171,7 @@ impl CreateMessage {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn add_file(mut self, file: CreateAttachment) -> Self {
+    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
         self.attachments = self.attachments.add(file);
         self
     }
@@ -182,7 +181,7 @@ impl CreateMessage {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         for file in files {
             self.attachments = self.attachments.add(file);
         }
@@ -197,13 +196,13 @@ impl CreateMessage {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         self.attachments = EditAttachments::new();
         self.add_files(files)
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions<'a>) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }
@@ -215,8 +214,8 @@ impl CreateMessage {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = Some(components.into());
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
@@ -241,11 +240,8 @@ impl CreateMessage {
     ///
     /// **Note**: This will replace all existing stickers. Use [`Self::add_sticker_id()`] or
     /// [`Self::add_sticker_ids()`] to keep existing stickers.
-    pub fn sticker_ids<T: Into<StickerId>>(
-        mut self,
-        sticker_ids: impl IntoIterator<Item = T>,
-    ) -> Self {
-        self.sticker_ids = sticker_ids.into_iter().map(Into::into).collect();
+    pub fn sticker_ids(mut self, sticker_ids: impl Into<Cow<'a, [StickerId]>>) -> Self {
+        self.sticker_ids = sticker_ids.into();
         self
     }
 
@@ -256,7 +252,7 @@ impl CreateMessage {
     /// **Note**: This will keep all existing stickers. Use [`Self::sticker_id()`] to replace
     /// existing sticker.
     pub fn add_sticker_id(mut self, sticker_id: impl Into<StickerId>) -> Self {
-        self.sticker_ids.push(sticker_id.into());
+        self.sticker_ids.to_mut().push(sticker_id.into());
         self
     }
 
@@ -270,9 +266,7 @@ impl CreateMessage {
         mut self,
         sticker_ids: impl IntoIterator<Item = T>,
     ) -> Self {
-        for sticker_id in sticker_ids {
-            self = self.add_sticker_id(sticker_id);
-        }
+        self.sticker_ids.to_mut().extend(sticker_ids.into_iter().map(Into::into));
         self
     }
 
@@ -294,7 +288,7 @@ impl CreateMessage {
     }
 
     /// Sets the [`Poll`] for this message.
-    pub fn poll(mut self, poll: CreatePoll<Ready>) -> Self {
+    pub fn poll(mut self, poll: CreatePoll<'a, Ready>) -> Self {
         self.poll = Some(poll);
         self
     }
@@ -302,7 +296,7 @@ impl CreateMessage {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for CreateMessage {
+impl Builder for CreateMessage<'_> {
     type Context<'ctx> = (ChannelId, Option<GuildId>);
     type Built = Message;
 
@@ -351,8 +345,8 @@ impl Builder for CreateMessage {
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut message = http.send_message(channel_id, files, &self).await?;
 
-        for reaction in self.reactions {
-            http.create_reaction(channel_id, message.id, &reaction).await?;
+        for reaction in self.reactions.iter() {
+            http.create_reaction(channel_id, message.id, reaction).await?;
         }
 
         // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort

@@ -12,7 +12,7 @@ pub fn run(options: &[ResolvedOption]) -> String {
     }
 }
 
-pub fn register() -> CreateCommand {
+pub fn register() -> CreateCommand<'static> {
     CreateCommand::new("attachmentinput")
         .description("Test command for attachment input")
         .add_option(
