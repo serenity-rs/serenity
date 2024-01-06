@@ -501,7 +501,7 @@ impl PartialGuild {
     pub async fn create_command(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateCommand,
+        builder: CreateCommand<'_>,
     ) -> Result<Command> {
         self.id.create_command(cache_http, builder).await
     }
@@ -514,7 +514,7 @@ impl PartialGuild {
     pub async fn set_commands(
         &self,
         http: impl AsRef<Http>,
-        commands: Vec<CreateCommand>,
+        commands: &[CreateCommand<'_>],
     ) -> Result<Vec<Command>> {
         self.id.set_commands(http, commands).await
     }
@@ -532,7 +532,7 @@ impl PartialGuild {
         &self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
-        builder: EditCommandPermissions,
+        builder: EditCommandPermissions<'_>,
     ) -> Result<CommandPermissions> {
         self.id.edit_command_permissions(cache_http, command_id, builder).await
     }
@@ -582,7 +582,7 @@ impl PartialGuild {
         &self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
-        builder: CreateCommand,
+        builder: CreateCommand<'_>,
     ) -> Result<Command> {
         self.id.edit_command(cache_http, command_id, builder).await
     }
