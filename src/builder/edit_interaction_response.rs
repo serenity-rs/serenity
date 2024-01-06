@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::{
@@ -17,9 +19,9 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditInteractionResponse(EditWebhookMessage);
+pub struct EditInteractionResponse<'a>(EditWebhookMessage<'a>);
 
-impl EditInteractionResponse {
+impl<'a> EditInteractionResponse<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -29,21 +31,21 @@ impl EditInteractionResponse {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(self, content: impl Into<String>) -> Self {
+    pub fn content(self, content: impl Into<Cow<'a, str>>) -> Self {
         Self(self.0.content(content))
     }
 
     /// Adds an embed for the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    pub fn add_embed(self, embed: CreateEmbed) -> Self {
+    pub fn add_embed(self, embed: CreateEmbed<'a>) -> Self {
         Self(self.0.add_embed(embed))
     }
 
     /// Adds multiple embeds to the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    pub fn add_embeds(self, embeds: Vec<CreateEmbed>) -> Self {
+    pub fn add_embeds(self, embeds: impl IntoIterator<Item = CreateEmbed<'a>>) -> Self {
         Self(self.0.add_embeds(embeds))
     }
 
@@ -51,7 +53,7 @@ impl EditInteractionResponse {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    pub fn embed(self, embed: CreateEmbed) -> Self {
+    pub fn embed(self, embed: CreateEmbed<'a>) -> Self {
         Self(self.0.embed(embed))
     }
 
@@ -61,30 +63,30 @@ impl EditInteractionResponse {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
-    pub fn embeds(self, embeds: Vec<CreateEmbed>) -> Self {
+    pub fn embeds(self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
         Self(self.0.embeds(embeds))
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions(self, allowed_mentions: CreateAllowedMentions) -> Self {
+    pub fn allowed_mentions(self, allowed_mentions: CreateAllowedMentions<'a>) -> Self {
         Self(self.0.allowed_mentions(allowed_mentions))
     }
 
     /// Sets the components of this message.
-    pub fn components(self, components: Vec<CreateActionRow>) -> Self {
+    pub fn components(self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
         Self(self.0.components(components))
     }
     super::button_and_select_menu_convenience_methods!(self.0.components);
 
     /// Sets attachments, see [`EditAttachments`] for more details.
-    pub fn attachments(self, attachments: EditAttachments) -> Self {
+    pub fn attachments(self, attachments: EditAttachments<'a>) -> Self {
         Self(self.0.attachments(attachments))
     }
 
     /// Adds a new attachment to the message.
     ///
     /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
-    pub fn new_attachment(self, attachment: CreateAttachment) -> Self {
+    pub fn new_attachment(self, attachment: CreateAttachment<'a>) -> Self {
         Self(self.0.new_attachment(attachment))
     }
 
@@ -101,7 +103,7 @@ impl EditInteractionResponse {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for EditInteractionResponse {
+impl Builder for EditInteractionResponse<'_> {
     type Context<'ctx> = &'ctx str;
     type Built = Message;
 
