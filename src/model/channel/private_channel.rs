@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
@@ -151,7 +152,7 @@ impl PrivateChannel {
         &self,
         cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
-        builder: EditMessage,
+        builder: EditMessage<'_>,
     ) -> Result<Message> {
         self.id.edit_message(cache_http, message_id, builder).await
     }
@@ -263,7 +264,7 @@ impl PrivateChannel {
     pub async fn say(
         &self,
         cache_http: impl CacheHttp,
-        content: impl Into<String>,
+        content: impl Into<Cow<'_, str>>,
     ) -> Result<Message> {
         self.id.say(cache_http, content).await
     }
@@ -279,11 +280,11 @@ impl PrivateChannel {
     ///
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
     #[inline]
-    pub async fn send_files(
+    pub async fn send_files<'a>(
         self,
         cache_http: impl CacheHttp,
-        files: impl IntoIterator<Item = CreateAttachment>,
-        builder: CreateMessage,
+        files: impl IntoIterator<Item = CreateAttachment<'a>>,
+        builder: CreateMessage<'a>,
     ) -> Result<Message> {
         self.id.send_files(cache_http, files, builder).await
     }
@@ -303,7 +304,7 @@ impl PrivateChannel {
     pub async fn send_message(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateMessage,
+        builder: CreateMessage<'_>,
     ) -> Result<Message> {
         self.id.send_message(cache_http, builder).await
     }

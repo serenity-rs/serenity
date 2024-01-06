@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -14,45 +16,73 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateCommandOption(CommandOption);
+pub struct CreateCommandOption<'a> {
+    #[serde(rename = "type")]
+    kind: CommandOptionType,
+    name: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    description: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    #[serde(default)]
+    required: bool,
+    #[serde(default)]
+    choices: Cow<'a, [CreateCommandOptionChoice<'a>]>,
+    #[serde(default)]
+    options: Cow<'a, [CreateCommandOption<'a>]>,
+    #[serde(default)]
+    channel_types: Cow<'a, [ChannelType]>,
+    #[serde(default)]
+    min_value: Option<serde_json::Number>,
+    #[serde(default)]
+    max_value: Option<serde_json::Number>,
+    #[serde(default)]
+    min_length: Option<u16>,
+    #[serde(default)]
+    max_length: Option<u16>,
+    #[serde(default)]
+    autocomplete: bool,
+}
 
-impl CreateCommandOption {
+impl<'a> CreateCommandOption<'a> {
     /// Creates a new builder with the given option type, name, and description, leaving all other
     /// fields empty.
     pub fn new(
         kind: CommandOptionType,
-        name: impl Into<String>,
-        description: impl Into<String>,
+        name: impl Into<Cow<'a, str>>,
+        description: impl Into<Cow<'a, str>>,
     ) -> Self {
-        Self(CommandOption {
+        Self {
             kind,
-            name: name.into().into(),
+            name: name.into(),
             name_localizations: None,
-            description: description.into().into(),
+            description: description.into(),
             description_localizations: None,
-            __generated_flags: CommandOptionGeneratedFlags::empty(),
+            required: false,
+            autocomplete: false,
             min_value: None,
             max_value: None,
             min_length: None,
             max_length: None,
 
-            channel_types: FixedArray::default(),
-            choices: Vec::new(),
-            options: Vec::new(),
-        })
+            channel_types: Cow::default(),
+            choices: Cow::default(),
+            options: Cow::default(),
+        }
     }
 
     /// Sets the `CommandOptionType`, replacing the current value as set in [`Self::new`].
     pub fn kind(mut self, kind: CommandOptionType) -> Self {
-        self.0.kind = kind;
+        self.kind = kind;
         self
     }
 
     /// Sets the name of the option, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.0.name = name.into().into();
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
+        self.name = name.into();
         self
     }
 
@@ -66,8 +96,12 @@ impl CreateCommandOption {
     /// .name_localized("zh-CN", "岁数")
     /// # ;
     /// ```
-    pub fn name_localized(mut self, locale: impl Into<String>, name: impl Into<String>) -> Self {
-        let map = self.0.name_localizations.get_or_insert_with(Default::default);
+    pub fn name_localized(
+        mut self,
+        locale: impl Into<Cow<'a, str>>,
+        name: impl Into<Cow<'a, str>>,
+    ) -> Self {
+        let map = self.name_localizations.get_or_insert_with(Default::default);
         map.insert(locale.into(), name.into());
         self
     }
@@ -75,8 +109,8 @@ impl CreateCommandOption {
     /// Sets the description for the option, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 1 and 100 characters.
-    pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.0.description = description.into().into();
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = description.into();
         self
     }
     /// Specifies a localized description of the option.
@@ -91,10 +125,10 @@ impl CreateCommandOption {
     /// ```
     pub fn description_localized(
         mut self,
-        locale: impl Into<String>,
-        description: impl Into<String>,
+        locale: impl Into<Cow<'a, str>>,
+        description: impl Into<Cow<'a, str>>,
     ) -> Self {
-        let map = self.0.description_localizations.get_or_insert_with(Default::default);
+        let map = self.description_localizations.get_or_insert_with(Default::default);
         map.insert(locale.into(), description.into());
         self
     }
@@ -103,7 +137,7 @@ impl CreateCommandOption {
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(mut self, required: bool) -> Self {
-        self.0.set_required(required);
+        self.required = required;
         self
     }
 
@@ -111,9 +145,9 @@ impl CreateCommandOption {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
-        self.add_choice(CommandOptionChoice {
-            name: name.into().into(),
+    pub fn add_int_choice(self, name: impl Into<Cow<'a, str>>, value: i64) -> Self {
+        self.add_choice(CreateCommandOptionChoice {
+            name: name.into(),
             value: Value::from(value),
             name_localizations: None,
         })
@@ -122,16 +156,14 @@ impl CreateCommandOption {
     /// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.
     pub fn add_int_choice_localized(
         self,
-        name: impl Into<String>,
+        name: impl Into<Cow<'a, str>>,
         value: i64,
-        locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
+        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>>>,
     ) -> Self {
-        self.add_choice(CommandOptionChoice {
-            name: name.into().into(),
-            value: Value::from(value),
-            name_localizations: Some(
-                locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
-            ),
+        self.add_choice(CreateCommandOptionChoice {
+            name: name.into(),
+            value: value.into(),
+            name_localizations: Some(locales.into()),
         })
     }
 
@@ -139,9 +171,13 @@ impl CreateCommandOption {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be up to 100 characters.
-    pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
-        self.add_choice(CommandOptionChoice {
-            name: name.into().into(),
+    pub fn add_string_choice(
+        self,
+        name: impl Into<Cow<'a, str>>,
+        value: impl Into<String>,
+    ) -> Self {
+        self.add_choice(CreateCommandOptionChoice {
+            name: name.into(),
             value: Value::String(value.into()),
             name_localizations: None,
         })
@@ -150,16 +186,14 @@ impl CreateCommandOption {
     /// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.
     pub fn add_string_choice_localized(
         self,
-        name: impl Into<String>,
+        name: impl Into<Cow<'a, str>>,
         value: impl Into<String>,
-        locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
+        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>>>,
     ) -> Self {
-        self.add_choice(CommandOptionChoice {
-            name: name.into().into(),
+        self.add_choice(CreateCommandOptionChoice {
+            name: name.into(),
             value: Value::String(value.into()),
-            name_localizations: Some(
-                locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
-            ),
+            name_localizations: Some(locales.into()),
         })
     }
 
@@ -167,9 +201,9 @@ impl CreateCommandOption {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
-        self.add_choice(CommandOptionChoice {
-            name: name.into().into(),
+    pub fn add_number_choice(self, name: impl Into<Cow<'a, str>>, value: f64) -> Self {
+        self.add_choice(CreateCommandOptionChoice {
+            name: name.into(),
             value: Value::from(value),
             name_localizations: None,
         })
@@ -178,21 +212,19 @@ impl CreateCommandOption {
     /// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.
     pub fn add_number_choice_localized(
         self,
-        name: impl Into<String>,
+        name: impl Into<Cow<'a, str>>,
         value: f64,
-        locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
+        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>>>,
     ) -> Self {
-        self.add_choice(CommandOptionChoice {
-            name: name.into().into(),
+        self.add_choice(CreateCommandOptionChoice {
+            name: name.into(),
             value: Value::from(value),
-            name_localizations: Some(
-                locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
-            ),
+            name_localizations: Some(locales.into()),
         })
     }
 
-    fn add_choice(mut self, value: CommandOptionChoice) -> Self {
-        self.0.choices.push(value);
+    fn add_choice(mut self, value: CreateCommandOptionChoice<'a>) -> Self {
+        self.choices.to_mut().push(value);
         self
     }
 
@@ -202,7 +234,7 @@ impl CreateCommandOption {
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     pub fn set_autocomplete(mut self, value: bool) -> Self {
-        self.0.set_autocomplete(value);
+        self.autocomplete = value;
         self
     }
 
@@ -218,9 +250,9 @@ impl CreateCommandOption {
     /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
     pub fn set_sub_options(
         mut self,
-        sub_options: impl IntoIterator<Item = CreateCommandOption>,
+        sub_options: impl Into<Cow<'a, [CreateCommandOption<'a>]>>,
     ) -> Self {
-        self.0.options = sub_options.into_iter().map(|o| o.0).collect();
+        self.options = sub_options.into();
         self
     }
 
@@ -231,40 +263,40 @@ impl CreateCommandOption {
     ///
     /// [`SubCommandGroup`]: crate::model::application::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::CommandOptionType::SubCommand
-    pub fn add_sub_option(mut self, sub_option: CreateCommandOption) -> Self {
-        self.0.options.push(sub_option.0);
+    pub fn add_sub_option(mut self, sub_option: CreateCommandOption<'a>) -> Self {
+        self.options.to_mut().push(sub_option);
         self
     }
 
     /// If the option is a [`Channel`], it will only be able to show these types.
     ///
     /// [`Channel`]: crate::model::application::CommandOptionType::Channel
-    pub fn channel_types(mut self, channel_types: Vec<ChannelType>) -> Self {
-        self.0.channel_types = channel_types.into();
+    pub fn channel_types(mut self, channel_types: impl Into<Cow<'a, [ChannelType]>>) -> Self {
+        self.channel_types = channel_types.into();
         self
     }
 
     /// Sets the minimum permitted value for this integer option
     pub fn min_int_value(mut self, value: i64) -> Self {
-        self.0.min_value = Some(value.into());
+        self.min_value = Some(value.into());
         self
     }
 
     /// Sets the maximum permitted value for this integer option
     pub fn max_int_value(mut self, value: i64) -> Self {
-        self.0.max_value = Some(value.into());
+        self.max_value = Some(value.into());
         self
     }
 
     /// Sets the minimum permitted value for this number option
     pub fn min_number_value(mut self, value: f64) -> Self {
-        self.0.min_value = serde_json::Number::from_f64(value);
+        self.min_value = serde_json::Number::from_f64(value);
         self
     }
 
     /// Sets the maximum permitted value for this number option
     pub fn max_number_value(mut self, value: f64) -> Self {
-        self.0.max_value = serde_json::Number::from_f64(value);
+        self.max_value = serde_json::Number::from_f64(value);
         self
     }
 
@@ -272,7 +304,7 @@ impl CreateCommandOption {
     ///
     /// The value of `min_length` must be greater or equal to `0`.
     pub fn min_length(mut self, value: u16) -> Self {
-        self.0.min_length = Some(value);
+        self.min_length = Some(value);
 
         self
     }
@@ -281,7 +313,7 @@ impl CreateCommandOption {
     ///
     /// The value of `max_length` must be greater or equal to `1`.
     pub fn max_length(mut self, value: u16) -> Self {
-        self.0.max_length = Some(value);
+        self.max_length = Some(value);
 
         self
     }
@@ -298,15 +330,15 @@ impl CreateCommandOption {
 /// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command-json-params)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateCommand {
-    name: FixedString,
-    name_localizations: HashMap<String, String>,
+pub struct CreateCommand<'a> {
+    name: Cow<'a, str>,
+    name_localizations: HashMap<Cow<'a, str>, Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    description_localizations: HashMap<String, String>,
-    options: Vec<CreateCommandOption>,
+    description: Option<Cow<'a, str>>,
+    description_localizations: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    options: Cow<'a, [CreateCommandOption<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_member_permissions: Option<String>,
+    default_member_permissions: Option<Permissions>,
     #[serde(skip_serializing_if = "Option::is_none")]
     dm_permission: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -321,13 +353,13 @@ pub struct CreateCommand {
     handler: Option<EntryPointHandlerType>,
 }
 
-impl CreateCommand {
+impl<'a> CreateCommand<'a> {
     /// Creates a new builder with the given name, leaving all other fields empty.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
             kind: None,
 
-            name: name.into().into(),
+            name: name.into(),
             name_localizations: HashMap::new(),
             description: None,
             description_localizations: HashMap::new(),
@@ -337,7 +369,7 @@ impl CreateCommand {
             integration_types: None,
             contexts: None,
 
-            options: Vec::new(),
+            options: Cow::default(),
             nsfw: false,
             handler: None,
         }
@@ -349,8 +381,8 @@ impl CreateCommand {
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two
     /// global commands of the same app cannot have the same name. Two guild-specific commands of
     /// the same app cannot have the same name.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = name.into().into();
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
+        self.name = name.into();
         self
     }
 
@@ -363,7 +395,11 @@ impl CreateCommand {
     /// .name_localized("el", "γενέθλια")
     /// # ;
     /// ```
-    pub fn name_localized(mut self, locale: impl Into<String>, name: impl Into<String>) -> Self {
+    pub fn name_localized(
+        mut self,
+        locale: impl Into<Cow<'a, str>>,
+        name: impl Into<Cow<'a, str>>,
+    ) -> Self {
         self.name_localizations.insert(locale.into(), name.into());
         self
     }
@@ -376,7 +412,7 @@ impl CreateCommand {
 
     /// Specifies the default permissions required to execute the command.
     pub fn default_member_permissions(mut self, permissions: Permissions) -> Self {
-        self.default_member_permissions = Some(permissions.bits().to_string());
+        self.default_member_permissions = Some(permissions);
         self
     }
 
@@ -390,7 +426,7 @@ impl CreateCommand {
     /// Specifies the description of the application command.
     ///
     /// **Note**: Must be between 1 and 100 characters long.
-    pub fn description(mut self, description: impl Into<String>) -> Self {
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -405,8 +441,8 @@ impl CreateCommand {
     /// ```
     pub fn description_localized(
         mut self,
-        locale: impl Into<String>,
-        description: impl Into<String>,
+        locale: impl Into<Cow<'a, str>>,
+        description: impl Into<Cow<'a, str>>,
     ) -> Self {
         self.description_localizations.insert(locale.into(), description.into());
         self
@@ -415,16 +451,16 @@ impl CreateCommand {
     /// Adds an application command option for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    pub fn add_option(mut self, option: CreateCommandOption) -> Self {
-        self.options.push(option);
+    pub fn add_option(mut self, option: CreateCommandOption<'a>) -> Self {
+        self.options.to_mut().push(option);
         self
     }
 
     /// Sets all the application command options for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    pub fn set_options(mut self, options: Vec<CreateCommandOption>) -> Self {
-        self.options = options;
+    pub fn set_options(mut self, options: impl Into<Cow<'a, [CreateCommandOption<'a>]>>) -> Self {
+        self.options = options.into();
         self
     }
 
@@ -470,7 +506,7 @@ impl CreateCommand {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for CreateCommand {
+impl Builder for CreateCommand<'_> {
     type Context<'ctx> = (Option<GuildId>, Option<CommandId>);
     type Built = Command;
 
@@ -503,4 +539,12 @@ impl Builder for CreateCommand {
             (None, None) => http.create_global_command(&self).await,
         }
     }
+}
+
+#[derive(Clone, Debug, Serialize)]
+struct CreateCommandOptionChoice<'a> {
+    pub name: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    pub value: Value,
 }
