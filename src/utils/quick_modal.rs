@@ -104,10 +104,15 @@ impl CreateQuickModal {
         );
         builder.execute(ctx, (interaction_id, token)).await?;
 
-        let modal_interaction = ModalInteractionCollector::new(&ctx.shard)
-            .custom_ids(vec![modal_custom_id])
-            .next()
-            .await;
+        let collector =
+            ModalInteractionCollector::new(&ctx.shard).custom_ids(vec![modal_custom_id]);
+
+        let collector = match self.timeout {
+            Some(timeout) => collector.timeout(timeout),
+            None => collector,
+        };
+
+        let modal_interaction = collector.next().await;
 
         let Some(modal_interaction) = modal_interaction else { return Ok(None) };
 
