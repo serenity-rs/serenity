@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use arrayvec::ArrayVec;
 use serde::{Deserialize, Serialize};
 
@@ -34,17 +36,20 @@ impl ParseAction {
 /// ```rust,no_run
 /// # use serenity::builder::CreateMessage;
 /// # use serenity::model::channel::Message;
+/// # use serenity::model::id::*;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// use serenity::builder::CreateAllowedMentions as Am;
 ///
 /// // Mention only the user 110372470472613888
 /// # let m = CreateMessage::new();
-/// m.allowed_mentions(Am::new().users(vec![110372470472613888]));
+/// m.allowed_mentions(Am::new().users([UserId::new(110372470472613888)].as_slice()));
 ///
 /// // Mention all users and the role 182894738100322304
 /// # let m = CreateMessage::new();
-/// m.allowed_mentions(Am::new().all_users(true).roles(vec![182894738100322304]));
+/// m.allowed_mentions(
+///     Am::new().all_users(true).roles([RoleId::new(182894738100322304)].as_slice()),
+/// );
 ///
 /// // Mention all roles and nothing else
 /// # let m = CreateMessage::new();
@@ -57,13 +62,15 @@ impl ParseAction {
 /// // Mention everyone and the users 182891574139682816, 110372470472613888
 /// # let m = CreateMessage::new();
 /// m.allowed_mentions(
-///     Am::new().everyone(true).users(vec![182891574139682816, 110372470472613888]),
+///     Am::new()
+///         .everyone(true)
+///         .users([UserId::new(182891574139682816), UserId::new(110372470472613888)].as_slice()),
 /// );
 ///
 /// // Mention everyone and the message author.
 /// # let m = CreateMessage::new();
 /// # let msg: Message = unimplemented!();
-/// m.allowed_mentions(Am::new().everyone(true).users(vec![msg.author.id]));
+/// m.allowed_mentions(Am::new().everyone(true).users([msg.author.id].as_slice()));
 /// # Ok(())
 /// # }
 /// ```
@@ -71,15 +78,15 @@ impl ParseAction {
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object).
 #[derive(Clone, Debug, Default, Serialize, PartialEq)]
 #[must_use]
-pub struct CreateAllowedMentions {
+pub struct CreateAllowedMentions<'a> {
     parse: ArrayVec<ParseValue, 3>,
-    users: Vec<UserId>,
-    roles: Vec<RoleId>,
+    users: Cow<'a, [UserId]>,
+    roles: Cow<'a, [RoleId]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     replied_user: Option<bool>,
 }
 
-impl CreateAllowedMentions {
+impl<'a> CreateAllowedMentions<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -113,29 +120,29 @@ impl CreateAllowedMentions {
 
     /// Sets the *specific* users that will be allowed mentionable.
     #[inline]
-    pub fn users(mut self, users: impl IntoIterator<Item = impl Into<UserId>>) -> Self {
-        self.users = users.into_iter().map(Into::into).collect();
+    pub fn users(mut self, users: impl Into<Cow<'a, [UserId]>>) -> Self {
+        self.users = users.into();
         self
     }
 
     /// Clear the list of mentionable users.
     #[inline]
     pub fn empty_users(mut self) -> Self {
-        self.users.clear();
+        self.users = Cow::default();
         self
     }
 
     /// Sets the *specific* roles that will be allowed mentionable.
     #[inline]
-    pub fn roles(mut self, roles: impl IntoIterator<Item = impl Into<RoleId>>) -> Self {
-        self.roles = roles.into_iter().map(Into::into).collect();
+    pub fn roles(mut self, roles: impl Into<Cow<'a, [RoleId]>>) -> Self {
+        self.roles = roles.into();
         self
     }
 
     /// Clear the list of mentionable roles.
     #[inline]
     pub fn empty_roles(mut self) -> Self {
-        self.roles.clear();
+        self.roles = Cow::default();
         self
     }
 

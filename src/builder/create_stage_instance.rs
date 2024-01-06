@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -13,7 +15,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct CreateStageInstance<'a> {
     channel_id: Option<ChannelId>, // required field, filled in Builder impl
-    topic: String,
+    topic: Cow<'a, str>,
     privacy_level: StageInstancePrivacyLevel,
     #[serde(skip_serializing_if = "Option::is_none")]
     send_start_notification: Option<bool>,
@@ -24,7 +26,7 @@ pub struct CreateStageInstance<'a> {
 
 impl<'a> CreateStageInstance<'a> {
     /// Creates a builder with the provided topic.
-    pub fn new(topic: impl Into<String>) -> Self {
+    pub fn new(topic: impl Into<Cow<'a, str>>) -> Self {
         Self {
             channel_id: None,
             topic: topic.into(),
@@ -36,7 +38,7 @@ impl<'a> CreateStageInstance<'a> {
 
     /// Sets the topic of the stage channel instance, replacing the current value as set in
     /// [`Self::new`].
-    pub fn topic(mut self, topic: impl Into<String>) -> Self {
+    pub fn topic(mut self, topic: impl Into<Cow<'a, str>>) -> Self {
         self.topic = topic.into();
         self
     }

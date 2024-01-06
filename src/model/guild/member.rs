@@ -213,12 +213,12 @@ impl Member {
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
-    pub async fn disable_communication_until_datetime(
+    pub async fn disable_communication_until(
         &mut self,
         cache_http: impl CacheHttp,
         time: Timestamp,
     ) -> Result<()> {
-        let builder = EditMember::new().disable_communication_until_datetime(time);
+        let builder = EditMember::new().disable_communication_until(time);
         match self.guild_id.edit_member(cache_http, self.user.id, builder).await {
             Ok(_) => {
                 self.communication_disabled_until = Some(time);

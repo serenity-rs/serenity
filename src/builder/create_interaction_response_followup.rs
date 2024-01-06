@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::create_poll::Ready;
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
@@ -20,26 +22,26 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateInteractionResponseFollowup {
+pub struct CreateInteractionResponseFollowup<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<String>,
+    content: Option<Cow<'a, str>>,
     // [Omitting username: not supported in interaction followups]
     // [Omitting avatar_url: not supported in interaction followups]
     #[serde(skip_serializing_if = "Option::is_none")]
     tts: Option<bool>,
-    embeds: Vec<CreateEmbed>,
+    embeds: Cow<'a, [CreateEmbed<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    allowed_mentions: Option<CreateAllowedMentions>,
+    allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
+    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    poll: Option<CreatePoll<Ready>>,
-    attachments: EditAttachments,
+    poll: Option<CreatePoll<'a, Ready>>,
+    attachments: EditAttachments<'a>,
 }
 
-impl CreateInteractionResponseFollowup {
+impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -54,7 +56,7 @@ impl CreateInteractionResponseFollowup {
 
         check_overflow(self.embeds.len(), constants::EMBED_MAX_COUNT)
             .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-        for embed in &self.embeds {
+        for embed in self.embeds.iter() {
             embed.check_length()?;
         }
 
@@ -65,7 +67,7 @@ impl CreateInteractionResponseFollowup {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(mut self, content: impl Into<String>) -> Self {
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
     }
@@ -81,13 +83,13 @@ impl CreateInteractionResponseFollowup {
     }
 
     /// Appends a file to the message.
-    pub fn add_file(mut self, file: CreateAttachment) -> Self {
+    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
         self.attachments = self.attachments.add(file);
         self
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         for file in files {
             self.attachments = self.attachments.add(file);
         }
@@ -98,20 +100,20 @@ impl CreateInteractionResponseFollowup {
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         self.attachments = EditAttachments::new();
         self.add_files(files)
     }
 
     /// Adds an embed to the message.
-    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.push(embed);
+    pub fn add_embed(mut self, embed: CreateEmbed<'a>) -> Self {
+        self.embeds.to_mut().push(embed);
         self
     }
 
     /// Adds multiple embeds to the message.
-    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.extend(embeds);
+    pub fn add_embeds(mut self, embeds: impl IntoIterator<Item = CreateEmbed<'a>>) -> Self {
+        self.embeds.to_mut().extend(embeds);
         self
     }
 
@@ -119,7 +121,7 @@ impl CreateInteractionResponseFollowup {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    pub fn embed(self, embed: CreateEmbed) -> Self {
+    pub fn embed(self, embed: CreateEmbed<'a>) -> Self {
         self.embeds(vec![embed])
     }
 
@@ -127,13 +129,13 @@ impl CreateInteractionResponseFollowup {
     ///
     /// Calling this multiple times will overwrite the embed list. To append embeds, call
     /// [`Self::add_embeds`] instead.
-    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = embeds;
+    pub fn embeds(mut self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
+        self.embeds = embeds.into();
         self
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions<'a>) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }
@@ -161,14 +163,14 @@ impl CreateInteractionResponseFollowup {
     /// Adds a poll to the message. Only one poll can be added per message.
     ///
     /// See [`CreatePoll`] for more information on creating and configuring a poll.
-    pub fn poll(mut self, poll: CreatePoll<Ready>) -> Self {
+    pub fn poll(mut self, poll: CreatePoll<'a, Ready>) -> Self {
         self.poll = Some(poll);
         self
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = Some(components.into());
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
@@ -176,7 +178,7 @@ impl CreateInteractionResponseFollowup {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for CreateInteractionResponseFollowup {
+impl Builder for CreateInteractionResponseFollowup<'_> {
     type Context<'ctx> = (Option<MessageId>, &'ctx str);
     type Built = Message;
 

@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::builder::{
     Builder as _,
     CreateActionRow,
@@ -34,15 +36,15 @@ pub struct QuickModalResponse {
 /// ```
 #[cfg(feature = "collector")]
 #[must_use]
-pub struct CreateQuickModal {
-    title: String,
+pub struct CreateQuickModal<'a> {
+    title: Cow<'a, str>,
     timeout: Option<std::time::Duration>,
-    input_texts: Vec<CreateInputText>,
+    input_texts: Vec<CreateInputText<'a>>,
 }
 
 #[cfg(feature = "collector")]
-impl CreateQuickModal {
-    pub fn new(title: impl Into<String>) -> Self {
+impl<'a> CreateQuickModal<'a> {
+    pub fn new(title: impl Into<Cow<'a, str>>) -> Self {
         Self {
             title: title.into(),
             timeout: None,
@@ -63,7 +65,7 @@ impl CreateQuickModal {
     ///
     /// As the `custom_id` field of [`CreateInputText`], just supply an empty string. All custom
     /// IDs are overwritten by [`CreateQuickModal`] when sending the modal.
-    pub fn field(mut self, input_text: CreateInputText) -> Self {
+    pub fn field(mut self, input_text: CreateInputText<'a>) -> Self {
         self.input_texts.push(input_text);
         self
     }
@@ -71,14 +73,14 @@ impl CreateQuickModal {
     /// Convenience method to add a single-line input text field.
     ///
     /// Wraps [`Self::field`].
-    pub fn short_field(self, label: impl Into<String>) -> Self {
+    pub fn short_field(self, label: impl Into<Cow<'a, str>>) -> Self {
         self.field(CreateInputText::new(InputTextStyle::Short, label, ""))
     }
 
     /// Convenience method to add a multi-line input text field.
     ///
     /// Wraps [`Self::field`].
-    pub fn paragraph_field(self, label: impl Into<String>) -> Self {
+    pub fn paragraph_field(self, label: impl Into<Cow<'a, str>>) -> Self {
         self.field(CreateInputText::new(InputTextStyle::Paragraph, label, ""))
     }
 
@@ -100,7 +102,7 @@ impl CreateQuickModal {
                     .map(|(i, input_text)| {
                         CreateActionRow::InputText(input_text.custom_id(i.to_string()))
                     })
-                    .collect(),
+                    .collect::<Vec<_>>(),
             ),
         );
         builder.execute(ctx, (interaction_id, token)).await?;
