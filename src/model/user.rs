@@ -177,7 +177,11 @@ impl CurrentUser {
     ///
     /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
     /// if there is an error in deserializing the API response.
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditProfile) -> Result<()> {
+    pub async fn edit(
+        &mut self,
+        cache_http: impl CacheHttp,
+        builder: EditProfile<'_>,
+    ) -> Result<()> {
         *self = builder.execute(cache_http, ()).await?;
         Ok(())
     }
@@ -462,7 +466,7 @@ impl User {
     pub async fn direct_message(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateMessage,
+        builder: CreateMessage<'_>,
     ) -> Result<Message> {
         self.create_dm_channel(&cache_http).await?.send_message(cache_http, builder).await
     }
@@ -470,7 +474,11 @@ impl User {
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
-    pub async fn dm(&self, cache_http: impl CacheHttp, builder: CreateMessage) -> Result<Message> {
+    pub async fn dm(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'_>,
+    ) -> Result<Message> {
         self.direct_message(cache_http, builder).await
     }
 
