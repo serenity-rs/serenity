@@ -116,7 +116,7 @@ impl CommandInteraction {
     pub async fn create_response(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateInteractionResponse,
+        builder: CreateInteractionResponse<'_>,
     ) -> Result<()> {
         builder.execute(cache_http, (self.id, &self.token)).await
     }
@@ -133,7 +133,7 @@ impl CommandInteraction {
     pub async fn edit_response(
         &self,
         cache_http: impl CacheHttp,
-        builder: EditInteractionResponse,
+        builder: EditInteractionResponse<'_>,
     ) -> Result<Message> {
         builder.execute(cache_http, &self.token).await
     }
@@ -162,7 +162,7 @@ impl CommandInteraction {
     pub async fn create_followup(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateInteractionResponseFollowup,
+        builder: CreateInteractionResponseFollowup<'_>,
     ) -> Result<Message> {
         builder.execute(cache_http, (None, &self.token)).await
     }
@@ -180,7 +180,7 @@ impl CommandInteraction {
         &self,
         cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
-        builder: CreateInteractionResponseFollowup,
+        builder: CreateInteractionResponseFollowup<'_>,
     ) -> Result<Message> {
         builder.execute(cache_http, (Some(message_id.into()), &self.token)).await
     }
@@ -246,7 +246,7 @@ impl CommandInteraction {
     pub async fn quick_modal(
         &self,
         ctx: &Context,
-        builder: CreateQuickModal,
+        builder: CreateQuickModal<'_>,
     ) -> Result<Option<QuickModalResponse>> {
         builder.execute(ctx, self.id, &self.token).await
     }
