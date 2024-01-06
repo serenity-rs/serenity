@@ -1,6 +1,8 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
-use super::CreateAttachment;
+use super::{CreateAttachment, CreateScheduledEventMetadata};
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
@@ -14,17 +16,17 @@ pub struct EditScheduledEvent<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    entity_metadata: Option<Option<ScheduledEventMetadata>>,
+    entity_metadata: Option<Option<CreateScheduledEventMetadata<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     privacy_level: Option<ScheduledEventPrivacyLevel>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    scheduled_start_time: Option<String>,
+    scheduled_start_time: Option<Timestamp>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    scheduled_end_time: Option<String>,
+    scheduled_end_time: Option<Timestamp>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    description: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     entity_type: Option<ScheduledEventType>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,7 +56,7 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the name of the scheduled event.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = Some(name.into());
         self
     }
@@ -66,7 +68,7 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the description of the scheduled event.
-    pub fn description(mut self, description: impl Into<String>) -> Self {
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -74,7 +76,7 @@ impl<'a> EditScheduledEvent<'a> {
     /// Sets the start time of the scheduled event.
     #[inline]
     pub fn start_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
-        self.scheduled_start_time = Some(timestamp.into().to_string());
+        self.scheduled_start_time = Some(timestamp.into());
         self
     }
 
@@ -86,7 +88,7 @@ impl<'a> EditScheduledEvent<'a> {
     /// [`External`]: ScheduledEventType::External
     #[inline]
     pub fn end_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
-        self.scheduled_end_time = Some(timestamp.into().to_string());
+        self.scheduled_end_time = Some(timestamp.into());
         self
     }
 
@@ -146,15 +148,15 @@ impl<'a> EditScheduledEvent<'a> {
     ///
     /// [`kind`]: EditScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
-    pub fn location(mut self, location: impl Into<String>) -> Self {
-        self.entity_metadata = Some(Some(ScheduledEventMetadata {
-            location: Some(location.into().into()),
+    pub fn location(mut self, location: impl Into<Cow<'a, str>>) -> Self {
+        self.entity_metadata = Some(Some(CreateScheduledEventMetadata {
+            location: Some(location.into()),
         }));
         self
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: &CreateAttachment) -> Self {
+    pub fn image(mut self, image: &CreateAttachment<'_>) -> Self {
         self.image = Some(image.to_base64());
         self
     }

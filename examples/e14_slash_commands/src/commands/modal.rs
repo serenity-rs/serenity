@@ -26,6 +26,6 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<(), 
     Ok(())
 }
 
-pub fn register() -> CreateCommand {
+pub fn register() -> CreateCommand<'static> {
     CreateCommand::new("modal").description("Asks some details about you")
 }

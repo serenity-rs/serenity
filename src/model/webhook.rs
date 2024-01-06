@@ -418,7 +418,7 @@ impl Webhook {
         &self,
         cache_http: impl CacheHttp,
         wait: bool,
-        builder: ExecuteWebhook,
+        builder: ExecuteWebhook<'_>,
     ) -> Result<Option<Message>> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         builder.execute(cache_http, (self.id, token, wait)).await
@@ -461,7 +461,7 @@ impl Webhook {
         &self,
         cache_http: impl CacheHttp,
         message_id: MessageId,
-        builder: EditWebhookMessage,
+        builder: EditWebhookMessage<'_>,
     ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
         builder.execute(cache_http, (self.id, token, message_id)).await

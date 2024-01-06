@@ -169,7 +169,7 @@ impl GuildId {
         self,
         cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
-        builder: AddMember,
+        builder: AddMember<'_>,
     ) -> Result<Option<Member>> {
         builder.execute(cache_http, (self, user_id.into())).await
     }
@@ -1532,7 +1532,7 @@ impl GuildId {
     pub async fn create_command(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateCommand,
+        builder: CreateCommand<'_>,
     ) -> Result<Command> {
         builder.execute(cache_http, (Some(self), None)).await
     }
@@ -1545,7 +1545,7 @@ impl GuildId {
     pub async fn set_commands(
         self,
         http: impl AsRef<Http>,
-        commands: Vec<CreateCommand>,
+        commands: &[CreateCommand<'_>],
     ) -> Result<Vec<Command>> {
         http.as_ref().create_guild_commands(self, &commands).await
     }
@@ -1561,7 +1561,7 @@ impl GuildId {
         self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
-        builder: EditCommandPermissions,
+        builder: EditCommandPermissions<'_>,
     ) -> Result<CommandPermissions> {
         builder.execute(cache_http, (self, command_id)).await
     }
@@ -1609,7 +1609,7 @@ impl GuildId {
         self,
         cache_http: impl CacheHttp,
         command_id: CommandId,
-        builder: CreateCommand,
+        builder: CreateCommand<'_>,
     ) -> Result<Command> {
         builder.execute(cache_http, (Some(self), Some(command_id))).await
     }
