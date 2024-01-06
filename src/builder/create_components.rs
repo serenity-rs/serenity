@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::json::{self, json};
@@ -8,14 +10,14 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
 #[derive(Clone, Debug, PartialEq)]
 #[must_use]
-pub enum CreateActionRow {
-    Buttons(Vec<CreateButton>),
-    SelectMenu(CreateSelectMenu),
+pub enum CreateActionRow<'a> {
+    Buttons(Vec<CreateButton<'a>>),
+    SelectMenu(CreateSelectMenu<'a>),
     /// Only valid in modals!
-    InputText(CreateInputText),
+    InputText(CreateInputText<'a>),
 }
 
-impl serde::Serialize for CreateActionRow {
+impl<'a> serde::Serialize for CreateActionRow<'a> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         use serde::ser::Error as _;
 
@@ -34,51 +36,62 @@ impl serde::Serialize for CreateActionRow {
 /// A builder for creating a button component in a message
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
-pub struct CreateButton(Button);
+pub struct CreateButton<'a> {
+    style: ButtonStyle,
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    label: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    custom_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    emoji: Option<ReactionType>,
+    #[serde(default)]
+    disabled: bool,
+}
 
-impl CreateButton {
+impl<'a> CreateButton<'a> {
     /// Creates a link button to the given URL. You must also set [`Self::label`] and/or
     /// [`Self::emoji`] after this.
     ///
     /// Clicking this button _will not_ trigger an interaction event in your bot.
-    pub fn new_link(url: impl Into<String>) -> Self {
-        Self(Button {
+    pub fn new_link(url: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            style: ButtonStyle::Unknown(5),
             kind: ComponentType::Button,
-            data: ButtonKind::Link {
-                url: url.into().into(),
-            },
+            url: Some(url.into()),
+            custom_id: None,
             label: None,
             emoji: None,
             disabled: false,
-        })
+        }
     }
 
     /// Creates a normal button with the given custom ID. You must also set [`Self::label`] and/or
     /// [`Self::emoji`] after this.
-    pub fn new(custom_id: impl Into<String>) -> Self {
-        Self(Button {
+    pub fn new(custom_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
             kind: ComponentType::Button,
-            data: ButtonKind::NonLink {
-                style: ButtonStyle::Primary,
-                custom_id: custom_id.into().into(),
-            },
+            style: ButtonStyle::Primary,
+            custom_id: Some(custom_id.into()),
+            url: None,
             label: None,
             emoji: None,
             disabled: false,
-        })
+        }
     }
 
     /// Sets the custom id of the button, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
     ///
     /// Has no effect on link buttons.
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        if let ButtonKind::NonLink {
-            custom_id, ..
-        } = &mut self.0.data
-        {
-            *custom_id = id.into().into();
+    pub fn custom_id(mut self, id: impl Into<Cow<'a, str>>) -> Self {
+        if self.url.is_none() {
+            self.custom_id = Some(id.into());
         }
+
         self
     }
 
@@ -86,30 +99,28 @@ impl CreateButton {
     ///
     /// Has no effect on link buttons.
     pub fn style(mut self, new_style: ButtonStyle) -> Self {
-        if let ButtonKind::NonLink {
-            style, ..
-        } = &mut self.0.data
-        {
-            *style = new_style;
+        if self.url.is_none() {
+            self.style = new_style;
         }
+
         self
     }
 
     /// Sets label of the button.
-    pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.0.label = Some(label.into().into());
+    pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
+        self.label = Some(label.into());
         self
     }
 
     /// Sets emoji of the button.
     pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
-        self.0.emoji = Some(emoji.into());
+        self.emoji = Some(emoji.into());
         self
     }
 
     /// Sets the disabled state for the button.
     pub fn disabled(mut self, disabled: bool) -> Self {
-        self.0.disabled = disabled;
+        self.disabled = disabled;
         self
     }
 }
@@ -129,33 +140,50 @@ impl Serialize for CreateSelectMenuDefault {
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug, PartialEq)]
-pub enum CreateSelectMenuKind {
-    String { options: Vec<CreateSelectMenuOption> },
-    User { default_users: Option<Vec<UserId>> },
-    Role { default_roles: Option<Vec<RoleId>> },
-    Mentionable { default_users: Option<Vec<UserId>>, default_roles: Option<Vec<RoleId>> },
-    Channel { channel_types: Option<Vec<ChannelType>>, default_channels: Option<Vec<ChannelId>> },
+pub enum CreateSelectMenuKind<'a> {
+    String {
+        options: Cow<'a, [CreateSelectMenuOption<'a>]>,
+    },
+    User {
+        default_users: Option<Cow<'a, [UserId]>>,
+    },
+    Role {
+        default_roles: Option<Cow<'a, [RoleId]>>,
+    },
+    Mentionable {
+        default_users: Option<Cow<'a, [UserId]>>,
+        default_roles: Option<Cow<'a, [RoleId]>>,
+    },
+    Channel {
+        channel_types: Option<Cow<'a, [ChannelType]>>,
+        default_channels: Option<Cow<'a, [ChannelId]>>,
+    },
 }
 
-impl Serialize for CreateSelectMenuKind {
+impl<'a> Serialize for CreateSelectMenuKind<'a> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         #[derive(Serialize)]
         struct Json<'a> {
             #[serde(rename = "type")]
             kind: u8,
             #[serde(skip_serializing_if = "Option::is_none")]
-            options: Option<&'a [CreateSelectMenuOption]>,
+            options: Option<&'a [CreateSelectMenuOption<'a>]>,
             #[serde(skip_serializing_if = "Option::is_none")]
             channel_types: Option<&'a [ChannelType]>,
-            #[serde(skip_serializing_if = "Vec::is_empty")]
-            default_values: Vec<CreateSelectMenuDefault>,
+            #[serde(skip_serializing_if = "<[_]>::is_empty")]
+            default_values: &'a [CreateSelectMenuDefault],
         }
 
-        fn map<I: Into<Mention> + Copy>(
-            values: &Option<Vec<I>>,
-        ) -> impl Iterator<Item = CreateSelectMenuDefault> + '_ {
+        fn map<'a>(
+            values: &'a Option<Cow<'a, [impl Into<Mention> + Copy]>>,
+        ) -> impl Iterator<Item = CreateSelectMenuDefault> + 'a {
             // Calling `.iter().flatten()` on the `Option` treats `None` like an empty vec
-            values.iter().flatten().map(|&i| CreateSelectMenuDefault(i.into()))
+            values
+                .as_ref()
+                .map(|s| s.iter())
+                .into_iter()
+                .flatten()
+                .map(|&i| CreateSelectMenuDefault(i.into()))
         }
 
         #[rustfmt::skip]
@@ -188,7 +216,7 @@ impl Serialize for CreateSelectMenuKind {
                 Self::Channel { channel_types, default_channels: _ } => channel_types.as_deref(),
                 _ => None,
             },
-            default_values,
+            default_values: &default_values,
         };
 
         json.serialize(serializer)
@@ -200,10 +228,10 @@ impl Serialize for CreateSelectMenuKind {
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
-pub struct CreateSelectMenu {
-    custom_id: String,
+pub struct CreateSelectMenu<'a> {
+    custom_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    placeholder: Option<String>,
+    placeholder: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     min_values: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -212,13 +240,13 @@ pub struct CreateSelectMenu {
     disabled: Option<bool>,
 
     #[serde(flatten)]
-    kind: CreateSelectMenuKind,
+    kind: CreateSelectMenuKind<'a>,
 }
 
-impl CreateSelectMenu {
+impl<'a> CreateSelectMenu<'a> {
     /// Creates a builder with given custom id (a developer-defined identifier), and a list of
     /// options, leaving all other fields empty.
-    pub fn new(custom_id: impl Into<String>, kind: CreateSelectMenuKind) -> Self {
+    pub fn new(custom_id: impl Into<Cow<'a, str>>, kind: CreateSelectMenuKind<'a>) -> Self {
         Self {
             custom_id: custom_id.into(),
             placeholder: None,
@@ -230,14 +258,14 @@ impl CreateSelectMenu {
     }
 
     /// The placeholder of the select menu.
-    pub fn placeholder(mut self, label: impl Into<String>) -> Self {
+    pub fn placeholder(mut self, label: impl Into<Cow<'a, str>>) -> Self {
         self.placeholder = Some(label.into());
         self
     }
 
     /// Sets the custom id of the select menu, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
+    pub fn custom_id(mut self, id: impl Into<Cow<'a, str>>) -> Self {
         self.custom_id = id.into();
         self
     }
@@ -266,21 +294,21 @@ impl CreateSelectMenu {
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
-pub struct CreateSelectMenuOption {
-    label: String,
-    value: String,
+pub struct CreateSelectMenuOption<'a> {
+    label: Cow<'a, str>,
+    value: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    description: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     emoji: Option<ReactionType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default: Option<bool>,
 }
 
-impl CreateSelectMenuOption {
+impl<'a> CreateSelectMenuOption<'a> {
     /// Creates a select menu option with the given label and value, leaving all other fields
     /// empty.
-    pub fn new(label: impl Into<String>, value: impl Into<String>) -> Self {
+    pub fn new(label: impl Into<Cow<'a, str>>, value: impl Into<Cow<'a, str>>) -> Self {
         Self {
             label: label.into(),
             value: value.into(),
@@ -291,19 +319,19 @@ impl CreateSelectMenuOption {
     }
 
     /// Sets the label of this option, replacing the current value as set in [`Self::new`].
-    pub fn label(mut self, label: impl Into<String>) -> Self {
+    pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
         self.label = label.into();
         self
     }
 
     /// Sets the value of this option, replacing the current value as set in [`Self::new`].
-    pub fn value(mut self, value: impl Into<String>) -> Self {
+    pub fn value(mut self, value: impl Into<Cow<'a, str>>) -> Self {
         self.value = value.into();
         self
     }
 
     /// Sets the description shown on this option.
-    pub fn description(mut self, description: impl Into<String>) -> Self {
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -326,20 +354,33 @@ impl CreateSelectMenuOption {
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
-pub struct CreateInputText(InputText);
+pub struct CreateInputText<'a> {
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    custom_id: Cow<'a, str>,
+    style: InputTextStyle,
+    label: Option<Cow<'a, str>>,
+    min_length: Option<u16>,
+    max_length: Option<u16>,
+    required: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    value: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    placeholder: Option<Cow<'a, str>>,
+}
 
-impl CreateInputText {
+impl<'a> CreateInputText<'a> {
     /// Creates a text input with the given style, label, and custom id (a developer-defined
     /// identifier), leaving all other fields empty.
     pub fn new(
         style: InputTextStyle,
-        label: impl Into<String>,
-        custom_id: impl Into<String>,
+        label: impl Into<Cow<'a, str>>,
+        custom_id: impl Into<Cow<'a, str>>,
     ) -> Self {
-        Self(InputText {
-            style: Some(style),
-            label: Some(label.into().into()),
-            custom_id: custom_id.into().into(),
+        Self {
+            style,
+            label: Some(label.into()),
+            custom_id: custom_id.into(),
 
             placeholder: None,
             min_length: None,
@@ -348,55 +389,55 @@ impl CreateInputText {
             required: true,
 
             kind: ComponentType::InputText,
-        })
+        }
     }
 
     /// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     pub fn style(mut self, kind: InputTextStyle) -> Self {
-        self.0.style = Some(kind);
+        self.style = kind;
         self
     }
 
     /// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
-    pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.0.label = Some(label.into().into());
+    pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
+        self.label = Some(label.into());
         self
     }
 
     /// Sets the custom id of the input text, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.0.custom_id = id.into().into();
+    pub fn custom_id(mut self, id: impl Into<Cow<'a, str>>) -> Self {
+        self.custom_id = id.into();
         self
     }
 
     /// Sets the placeholder of this input text.
-    pub fn placeholder(mut self, label: impl Into<String>) -> Self {
-        self.0.placeholder = Some(label.into().into());
+    pub fn placeholder(mut self, label: impl Into<Cow<'a, str>>) -> Self {
+        self.placeholder = Some(label.into());
         self
     }
 
     /// Sets the minimum length required for the input text
     pub fn min_length(mut self, min: u16) -> Self {
-        self.0.min_length = Some(min);
+        self.min_length = Some(min);
         self
     }
 
     /// Sets the maximum length required for the input text
     pub fn max_length(mut self, max: u16) -> Self {
-        self.0.max_length = Some(max);
+        self.max_length = Some(max);
         self
     }
 
     /// Sets the value of this input text.
-    pub fn value(mut self, value: impl Into<String>) -> Self {
-        self.0.value = Some(value.into().into());
+    pub fn value(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.value = Some(value.into());
         self
     }
 
     /// Sets if the input text is required
     pub fn required(mut self, required: bool) -> Self {
-        self.0.required = required;
+        self.required = required;
         self
     }
 }
