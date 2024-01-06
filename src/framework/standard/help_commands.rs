@@ -1004,7 +1004,7 @@ async fn send_grouped_commands_embed(
 
         flatten_group_to_string(&mut embed_text, group, 0, help_options)?;
 
-        embed = embed.field(group.name, &embed_text, true);
+        embed = embed.field(group.name, embed_text, true);
     }
 
     let builder = CreateMessage::new().embed(embed);

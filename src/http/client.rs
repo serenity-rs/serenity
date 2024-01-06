@@ -433,7 +433,7 @@ impl Http {
         &self,
         channel_id: ChannelId,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment>,
+        files: Vec<CreateAttachment<'_>>,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         self.fire(Request {
@@ -486,7 +486,7 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment>,
+        files: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -686,7 +686,7 @@ impl Http {
         interaction_id: InteractionId,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment>,
+        files: Vec<CreateAttachment<'_>>,
     ) -> Result<()> {
         let mut request = Request {
             body: None,
@@ -867,15 +867,15 @@ impl Http {
     pub async fn create_sticker(
         &self,
         guild_id: GuildId,
-        map: impl IntoIterator<Item = (&'static str, String)>,
-        file: CreateAttachment,
+        map: impl IntoIterator<Item = (&'static str, Cow<'static, str>)>,
+        file: CreateAttachment<'_>,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 upload: MultipartUpload::File(file),
-                fields: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+                fields: map.into_iter().map(|(k, v)| (k.into(), v)).collect(),
                 payload_json: None,
             }),
             headers: audit_log_reason.map(reason_into_header),
@@ -1567,7 +1567,7 @@ impl Http {
         interaction_token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment>,
+        new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -1856,7 +1856,7 @@ impl Http {
         channel_id: ChannelId,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment>,
+        new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -2002,7 +2002,7 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment>,
+        new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -2447,7 +2447,7 @@ impl Http {
         thread_id: Option<ChannelId>,
         token: &str,
         wait: bool,
-        files: Vec<CreateAttachment>,
+        files: Vec<CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
         let mut params = ArrayVec::<_, 2>::new();
@@ -2524,7 +2524,7 @@ impl Http {
         token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment>,
+        new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
         let mut params = ArrayVec::<_, 1>::new();
         if let Some(thread_id) = thread_id {
@@ -4345,7 +4345,7 @@ impl Http {
     pub async fn send_message(
         &self,
         channel_id: ChannelId,
-        files: Vec<CreateAttachment>,
+        files: Vec<CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
         let mut request = Request {
