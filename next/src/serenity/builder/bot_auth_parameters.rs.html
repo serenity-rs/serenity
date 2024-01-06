@@ -110,7 +110,20 @@
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>arrayvec::ArrayVec;
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::fmt::Write;
+
+<span class="kw">use </span>arrayvec::ArrayVec;
 <span class="kw">use </span>url::Url;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -120,18 +133,28 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::application::Scope;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
+<span class="kw">fn </span>join_to_string(sep: char, iter: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw">impl </span>std::fmt::Display&gt;) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = String::new();
+    <span class="kw">for </span>item <span class="kw">in </span>iter {
+        <span class="macro">write!</span>(buf, <span class="string">"{item}{sep}"</span>).unwrap();
+    }
+
+    buf.truncate(buf.len() - <span class="number">1</span>);
+    buf
+}
+
 <span class="doccomment">/// A builder for constructing an invite link with custom OAuth2 scopes.
 </span><span class="attr">#[derive(Debug, Clone, Default)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateBotAuthParameters {
+</span><span class="kw">pub struct </span>CreateBotAuthParameters&lt;<span class="lifetime">'a</span>&gt; {
     client_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
-    scopes: Vec&lt;Scope&gt;,
+    scopes: Cow&lt;<span class="lifetime">'a</span>, [Scope]&gt;,
     permissions: Permissions,
     guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     disable_guild_select: bool,
 }
 
-<span class="kw">impl </span>CreateBotAuthParameters {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateBotAuthParameters&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -148,10 +171,7 @@
         }
 
         <span class="kw">if </span>!<span class="self">self</span>.scopes.is_empty() {
-            valid_data.push((
-                <span class="string">"scope"</span>,
-                <span class="self">self</span>.scopes.iter().map(ToString::to_string).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">" "</span>),
-            ));
+            valid_data.push((<span class="string">"scope"</span>, join_to_string(<span class="string">','</span>, <span class="self">self</span>.scopes.iter())));
         }
 
         <span class="kw">if </span>bits != <span class="number">0 </span>{
@@ -197,8 +217,8 @@
     /// **Note**: This needs to include the [`Bot`] scope.
     ///
     /// [`Bot`]: Scope::Bot
-    </span><span class="kw">pub fn </span>scopes(<span class="kw-2">mut </span><span class="self">self</span>, scopes: <span class="kw-2">&amp;</span>[Scope]) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.scopes = scopes.to_vec();
+    </span><span class="kw">pub fn </span>scopes(<span class="kw-2">mut </span><span class="self">self</span>, scopes: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [Scope]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.scopes = scopes.into();
         <span class="self">self
     </span>}
 

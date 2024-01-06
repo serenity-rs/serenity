@@ -101,7 +101,11 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -115,7 +119,7 @@
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateWebhook&lt;<span class="lifetime">'a</span>&gt; {
-    name: String,
+    name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>avatar: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
@@ -125,7 +129,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateWebhook&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new builder with the given webhook name, leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
             avatar: <span class="prelude-val">None</span>,
@@ -136,13 +140,13 @@
     <span class="doccomment">/// Set the webhook's name, replacing the current value as set in [`Self::new`].
     ///
     /// This must be between 1-80 characters.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = name.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the webhook's default avatar.
-    </span><span class="kw">pub fn </span>avatar(<span class="kw-2">mut </span><span class="self">self</span>, avatar: <span class="kw-2">&amp;</span>CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>avatar(<span class="kw-2">mut </span><span class="self">self</span>, avatar: <span class="kw-2">&amp;</span>CreateAttachment&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.avatar = <span class="prelude-val">Some</span>(avatar.to_base64());
         <span class="self">self
     </span>}

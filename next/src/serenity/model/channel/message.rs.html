@@ -1143,9 +1143,15 @@
 <a href="#1141" id="1141">1141</a>
 <a href="#1142" id="1142">1142</a>
 <a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
-</span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+</span><span class="kw">use </span>std::borrow::Cow;
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::fmt::Display;
 <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">use </span>std::fmt::Write;
@@ -1494,7 +1500,11 @@
     /// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: EditMessage) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>edit(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        builder: EditMessage&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
@@ -1740,7 +1750,7 @@
     </span><span class="kw">pub async fn </span>reply(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        content: <span class="kw">impl </span>Into&lt;String&gt;,
+        content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>._reply(cache_http, content, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)).<span class="kw">await
     </span>}
@@ -1764,7 +1774,7 @@
     </span><span class="kw">pub async fn </span>reply_ping(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        content: <span class="kw">impl </span>Into&lt;String&gt;,
+        content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>._reply(cache_http, content, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="kw">await
     </span>}
@@ -1800,7 +1810,7 @@
     </span><span class="kw">async fn </span>_reply(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        content: <span class="kw">impl </span>Into&lt;String&gt;,
+        content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;,
         inlined: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]

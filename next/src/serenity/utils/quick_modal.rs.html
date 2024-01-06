@@ -144,7 +144,11 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::builder::{
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="kw">use </span><span class="kw">crate</span>::builder::{
     Builder <span class="kw">as _</span>,
     CreateActionRow,
     CreateInputText,
@@ -180,15 +184,15 @@
 /// ```
 </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateQuickModal {
-    title: String,
+</span><span class="kw">pub struct </span>CreateQuickModal&lt;<span class="lifetime">'a</span>&gt; {
+    title: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     timeout: <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt;,
-    input_texts: Vec&lt;CreateInputText&gt;,
+    input_texts: Vec&lt;CreateInputText&lt;<span class="lifetime">'a</span>&gt;&gt;,
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-</span><span class="kw">impl </span>CreateQuickModal {
-    <span class="kw">pub fn </span>new(title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateQuickModal&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new(title: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             title: title.into(),
             timeout: <span class="prelude-val">None</span>,
@@ -209,7 +213,7 @@
     ///
     /// As the `custom_id` field of [`CreateInputText`], just supply an empty string. All custom
     /// IDs are overwritten by [`CreateQuickModal`] when sending the modal.
-    </span><span class="kw">pub fn </span>field(<span class="kw-2">mut </span><span class="self">self</span>, input_text: CreateInputText) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>field(<span class="kw-2">mut </span><span class="self">self</span>, input_text: CreateInputText&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.input_texts.push(input_text);
         <span class="self">self
     </span>}
@@ -217,14 +221,14 @@
     <span class="doccomment">/// Convenience method to add a single-line input text field.
     ///
     /// Wraps [`Self::field`].
-    </span><span class="kw">pub fn </span>short_field(<span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>short_field(<span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.field(CreateInputText::new(InputTextStyle::Short, label, <span class="string">""</span>))
     }
 
     <span class="doccomment">/// Convenience method to add a multi-line input text field.
     ///
     /// Wraps [`Self::field`].
-    </span><span class="kw">pub fn </span>paragraph_field(<span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>paragraph_field(<span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.field(CreateInputText::new(InputTextStyle::Paragraph, label, <span class="string">""</span>))
     }
 
@@ -246,7 +250,7 @@
                     .map(|(i, input_text)| {
                         CreateActionRow::InputText(input_text.custom_id(i.to_string()))
                     })
-                    .collect(),
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
             ),
         );
         builder.execute(ctx, (interaction_id, token)).<span class="kw">await</span><span class="question-mark">?</span>;

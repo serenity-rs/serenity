@@ -2010,7 +2010,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        builder: AddMember,
+        builder: AddMember&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Member&gt;&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, user_id.into())).<span class="kw">await
     </span>}
@@ -3329,7 +3329,7 @@
     </span><span class="kw">pub async fn </span>create_command(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateCommand,
+        builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         builder.execute(cache_http, (<span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">None</span>)).<span class="kw">await
     </span>}
@@ -3342,7 +3342,7 @@
     </span><span class="kw">pub async fn </span>set_commands(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        commands: Vec&lt;CreateCommand&gt;,
+        commands: <span class="kw-2">&amp;</span>[CreateCommand&lt;<span class="lifetime">'_</span>&gt;],
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         http.as_ref().create_guild_commands(<span class="self">self</span>, <span class="kw-2">&amp;</span>commands).<span class="kw">await
     </span>}
@@ -3358,7 +3358,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         command_id: CommandId,
-        builder: EditCommandPermissions,
+        builder: EditCommandPermissions&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, command_id)).<span class="kw">await
     </span>}
@@ -3406,7 +3406,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         command_id: CommandId,
-        builder: CreateCommand,
+        builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         builder.execute(cache_http, (<span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">Some</span>(command_id))).<span class="kw">await
     </span>}

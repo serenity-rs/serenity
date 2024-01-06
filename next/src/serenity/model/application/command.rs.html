@@ -422,7 +422,6 @@
 <a href="#420" id="420">420</a>
 <a href="#421" id="421">421</a>
 <a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
@@ -568,7 +567,7 @@
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     </span><span class="kw">pub async fn </span>create_global_command(
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateCommand,
+        builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         builder.execute(cache_http, (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)).<span class="kw">await
     </span>}
@@ -580,7 +579,7 @@
     /// Returns the same errors as [`Self::create_global_command`].
     </span><span class="kw">pub async fn </span>set_global_commands(
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        commands: Vec&lt;CreateCommand&gt;,
+        commands: <span class="kw-2">&amp;</span>[CreateCommand&lt;<span class="lifetime">'_</span>&gt;],
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         http.as_ref().create_global_commands(<span class="kw-2">&amp;</span>commands).<span class="kw">await
     </span>}
@@ -593,7 +592,7 @@
     </span><span class="kw">pub async fn </span>edit_global_command(
         cache_http: <span class="kw">impl </span>CacheHttp,
         command_id: CommandId,
-        builder: CreateCommand,
+        builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         builder.execute(cache_http, (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(command_id))).<span class="kw">await
     </span>}
@@ -662,8 +661,7 @@
 <span class="doccomment">/// The parameters for an [`Command`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
-</span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
-#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>CommandOption {
@@ -671,15 +669,15 @@
     </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span><span class="kw">pub </span>kind: CommandOptionType,
     <span class="doccomment">/// The option name.
-    </span><span class="kw">pub </span>name: FixedString,
+    </span><span class="kw">pub </span>name: FixedString&lt;u8&gt;,
     <span class="doccomment">/// Localizations of the option name with locale as the key
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
+    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;FixedString&lt;u8&gt;, FixedString&lt;u8&gt;&gt;&gt;,
     <span class="doccomment">/// The option description.
-    </span><span class="kw">pub </span>description: FixedString,
+    </span><span class="kw">pub </span>description: FixedString&lt;u16&gt;,
     <span class="doccomment">/// Localizations of the option description with locale as the key
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
+    </span><span class="kw">pub </span>description_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;FixedString&lt;u16&gt;, FixedString&lt;u16&gt;&gt;&gt;,
     <span class="doccomment">/// Whether the parameter is optional or required.
     </span><span class="attr">#[serde(default)]
     </span><span class="kw">pub </span>required: bool,
@@ -690,7 +688,7 @@
     /// [`String`]: CommandOptionType::String
     /// [`Integer`]: CommandOptionType::Integer
     </span><span class="attr">#[serde(default)]
-    </span><span class="kw">pub </span>choices: Vec&lt;CommandOptionChoice&gt;,
+    </span><span class="kw">pub </span>choices: FixedArray&lt;CommandOptionChoice, u8&gt;,
     <span class="doccomment">/// The nested options.
     ///
     /// **Note**: Only available for [`SubCommand`] or [`SubCommandGroup`].
@@ -755,7 +753,7 @@
     </span><span class="kw">pub </span>name: FixedString,
     <span class="doccomment">/// Localizations of the choice name, with locale as key
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;std::collections::HashMap&lt;String, String&gt;&gt;,
+    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;String, String&gt;&gt;,
     <span class="doccomment">/// The choice value.
     </span><span class="kw">pub </span>value: Value,
 }

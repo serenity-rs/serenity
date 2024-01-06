@@ -402,7 +402,50 @@
 <a href="#400" id="400">400</a>
 <a href="#401" id="401">401</a>
 <a href="#402" id="402">402</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="kw">use </span>serde::Serialize;
 
 <span class="kw">use </span><span class="kw">crate</span>::json::{<span class="self">self</span>, json};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -412,14 +455,14 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
 </span><span class="attr">#[derive(Clone, Debug)]
 #[must_use]
-</span><span class="kw">pub enum </span>CreateActionRow {
-    Buttons(Vec&lt;CreateButton&gt;),
-    SelectMenu(CreateSelectMenu),
+</span><span class="kw">pub enum </span>CreateActionRow&lt;<span class="lifetime">'a</span>&gt; {
+    Buttons(Vec&lt;CreateButton&lt;<span class="lifetime">'a</span>&gt;&gt;),
+    SelectMenu(CreateSelectMenu&lt;<span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Only valid in modals!
-    </span>InputText(CreateInputText),
+    </span>InputText(CreateInputText&lt;<span class="lifetime">'a</span>&gt;),
 }
 
-<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>CreateActionRow {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; serde::Serialize <span class="kw">for </span>CreateActionRow&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
         <span class="kw">use </span>serde::ser::Error <span class="kw">as _</span>;
 
@@ -438,51 +481,62 @@
 <span class="doccomment">/// A builder for creating a button component in a message
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateButton(Button);
+</span><span class="kw">pub struct </span>CreateButton&lt;<span class="lifetime">'a</span>&gt; {
+    style: ButtonStyle,
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
+    </span>kind: ComponentType,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>url: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>label: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>custom_id: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
+    <span class="attr">#[serde(default)]
+    </span>disabled: bool,
+}
 
-<span class="kw">impl </span>CreateButton {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateButton&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a link button to the given URL. You must also set [`Self::label`] and/or
     /// [`Self::emoji`] after this.
     ///
     /// Clicking this button _will not_ trigger an interaction event in your bot.
-    </span><span class="kw">pub fn </span>new_link(url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Button {
+    </span><span class="kw">pub fn </span>new_link(url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            style: ButtonStyle::Unknown(<span class="number">5</span>),
             kind: ComponentType::Button,
-            data: ButtonKind::Link {
-                url: url.into().into(),
-            },
+            url: <span class="prelude-val">Some</span>(url.into()),
+            custom_id: <span class="prelude-val">None</span>,
             label: <span class="prelude-val">None</span>,
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
-        })
+        }
     }
 
     <span class="doccomment">/// Creates a normal button with the given custom ID. You must also set [`Self::label`] and/or
     /// [`Self::emoji`] after this.
-    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(Button {
+    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
             kind: ComponentType::Button,
-            data: ButtonKind::NonLink {
-                style: ButtonStyle::Primary,
-                custom_id: custom_id.into().into(),
-            },
+            style: ButtonStyle::Primary,
+            custom_id: <span class="prelude-val">Some</span>(custom_id.into()),
+            url: <span class="prelude-val">None</span>,
             label: <span class="prelude-val">None</span>,
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
-        })
+        }
     }
 
     <span class="doccomment">/// Sets the custom id of the button, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
     ///
     /// Has no effect on link buttons.
-    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">if let </span>ButtonKind::NonLink {
-            custom_id, ..
-        } = <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>.data
-        {
-            <span class="kw-2">*</span>custom_id = id.into().into();
+    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.url.is_none() {
+            <span class="self">self</span>.custom_id = <span class="prelude-val">Some</span>(id.into());
         }
+
         <span class="self">self
     </span>}
 
@@ -490,30 +544,28 @@
     ///
     /// Has no effect on link buttons.
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, new_style: ButtonStyle) -&gt; <span class="self">Self </span>{
-        <span class="kw">if let </span>ButtonKind::NonLink {
-            style, ..
-        } = <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>.data
-        {
-            <span class="kw-2">*</span>style = new_style;
+        <span class="kw">if </span><span class="self">self</span>.url.is_none() {
+            <span class="self">self</span>.style = new_style;
         }
+
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets label of the button.
-    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.label = <span class="prelude-val">Some</span>(label.into().into());
+    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.label = <span class="prelude-val">Some</span>(label.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets emoji of the button.
     </span><span class="kw">pub fn </span>emoji(<span class="kw-2">mut </span><span class="self">self</span>, emoji: <span class="kw">impl </span>Into&lt;ReactionType&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.emoji = <span class="prelude-val">Some</span>(emoji.into());
+        <span class="self">self</span>.emoji = <span class="prelude-val">Some</span>(emoji.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the disabled state for the button.
     </span><span class="kw">pub fn </span>disabled(<span class="kw-2">mut </span><span class="self">self</span>, disabled: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.disabled = disabled;
+        <span class="self">self</span>.disabled = disabled;
         <span class="self">self
     </span>}
 }
@@ -533,33 +585,50 @@
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 </span><span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">pub enum </span>CreateSelectMenuKind {
-    String { options: Vec&lt;CreateSelectMenuOption&gt; },
-    User { default_users: <span class="prelude-ty">Option</span>&lt;Vec&lt;UserId&gt;&gt; },
-    Role { default_roles: <span class="prelude-ty">Option</span>&lt;Vec&lt;RoleId&gt;&gt; },
-    Mentionable { default_users: <span class="prelude-ty">Option</span>&lt;Vec&lt;UserId&gt;&gt;, default_roles: <span class="prelude-ty">Option</span>&lt;Vec&lt;RoleId&gt;&gt; },
-    Channel { channel_types: <span class="prelude-ty">Option</span>&lt;Vec&lt;ChannelType&gt;&gt;, default_channels: <span class="prelude-ty">Option</span>&lt;Vec&lt;ChannelId&gt;&gt; },
+</span><span class="kw">pub enum </span>CreateSelectMenuKind&lt;<span class="lifetime">'a</span>&gt; {
+    String {
+        options: Cow&lt;<span class="lifetime">'a</span>, [CreateSelectMenuOption&lt;<span class="lifetime">'a</span>&gt;]&gt;,
+    },
+    User {
+        default_users: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [UserId]&gt;&gt;,
+    },
+    Role {
+        default_roles: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;&gt;,
+    },
+    Mentionable {
+        default_users: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [UserId]&gt;&gt;,
+        default_roles: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;&gt;,
+    },
+    Channel {
+        channel_types: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [ChannelType]&gt;&gt;,
+        default_channels: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [ChannelId]&gt;&gt;,
+    },
 }
 
-<span class="kw">impl </span>Serialize <span class="kw">for </span>CreateSelectMenuKind {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Serialize <span class="kw">for </span>CreateSelectMenuKind&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
         <span class="attr">#[derive(Serialize)]
         </span><span class="kw">struct </span>Json&lt;<span class="lifetime">'a</span>&gt; {
             <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
             </span>kind: u8,
             <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-            </span>options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[CreateSelectMenuOption]&gt;,
+            </span>options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[CreateSelectMenuOption&lt;<span class="lifetime">'a</span>&gt;]&gt;,
             <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
             </span>channel_types: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[ChannelType]&gt;,
-            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Vec::is_empty"</span>)]
-            </span>default_values: Vec&lt;CreateSelectMenuDefault&gt;,
+            <span class="attr">#[serde(skip_serializing_if = <span class="string">"&lt;[_]&gt;::is_empty"</span>)]
+            </span>default_values: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[CreateSelectMenuDefault],
         }
 
-        <span class="kw">fn </span>map&lt;I: Into&lt;Mention&gt; + Copy&gt;(
-            values: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Vec&lt;I&gt;&gt;,
-        ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CreateSelectMenuDefault&gt; + <span class="lifetime">'_ </span>{
+        <span class="kw">fn </span>map&lt;<span class="lifetime">'a</span>&gt;(
+            values: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [<span class="kw">impl </span>Into&lt;Mention&gt; + Copy]&gt;&gt;,
+        ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CreateSelectMenuDefault&gt; + <span class="lifetime">'a </span>{
             <span class="comment">// Calling `.iter().flatten()` on the `Option` treats `None` like an empty vec
-            </span>values.iter().flatten().map(|<span class="kw-2">&amp;</span>i| CreateSelectMenuDefault(i.into()))
+            </span>values
+                .as_ref()
+                .map(|s| s.iter())
+                .into_iter()
+                .flatten()
+                .map(|<span class="kw-2">&amp;</span>i| CreateSelectMenuDefault(i.into()))
         }
 
         <span class="attr">#[rustfmt::skip]
@@ -592,7 +661,7 @@
                 <span class="self">Self</span>::Channel { channel_types, default_channels: <span class="kw">_ </span>} =&gt; channel_types.as_deref(),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
-            default_values,
+            default_values: <span class="kw-2">&amp;</span>default_values,
         };
 
         json.serialize(serializer)
@@ -604,10 +673,10 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateSelectMenu {
-    custom_id: String,
+</span><span class="kw">pub struct </span>CreateSelectMenu&lt;<span class="lifetime">'a</span>&gt; {
+    custom_id: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>placeholder: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>placeholder: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>min_values: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -616,13 +685,13 @@
     </span>disabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
     <span class="attr">#[serde(flatten)]
-    </span>kind: CreateSelectMenuKind,
+    </span>kind: CreateSelectMenuKind&lt;<span class="lifetime">'a</span>&gt;,
 }
 
-<span class="kw">impl </span>CreateSelectMenu {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateSelectMenu&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a builder with given custom id (a developer-defined identifier), and a list of
     /// options, leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;String&gt;, kind: CreateSelectMenuKind) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;, kind: CreateSelectMenuKind&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             custom_id: custom_id.into(),
             placeholder: <span class="prelude-val">None</span>,
@@ -634,14 +703,14 @@
     }
 
     <span class="doccomment">/// The placeholder of the select menu.
-    </span><span class="kw">pub fn </span>placeholder(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>placeholder(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.placeholder = <span class="prelude-val">Some</span>(label.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the custom id of the select menu, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
-    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.custom_id = id.into();
         <span class="self">self
     </span>}
@@ -670,21 +739,21 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateSelectMenuOption {
-    label: String,
-    value: String,
+</span><span class="kw">pub struct </span>CreateSelectMenuOption&lt;<span class="lifetime">'a</span>&gt; {
+    label: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    value: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>description: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>default: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl </span>CreateSelectMenuOption {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateSelectMenuOption&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a select menu option with the given label and value, leaving all other fields
     /// empty.
-    </span><span class="kw">pub fn </span>new(label: <span class="kw">impl </span>Into&lt;String&gt;, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;, value: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             label: label.into(),
             value: value.into(),
@@ -695,19 +764,19 @@
     }
 
     <span class="doccomment">/// Sets the label of this option, replacing the current value as set in [`Self::new`].
-    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.label = label.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the value of this option, replacing the current value as set in [`Self::new`].
-    </span><span class="kw">pub fn </span>value(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.value = value.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the description shown on this option.
-    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
         <span class="self">self
     </span>}
@@ -730,20 +799,33 @@
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateInputText(InputText);
+</span><span class="kw">pub struct </span>CreateInputText&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
+    </span>kind: ComponentType,
+    custom_id: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    style: InputTextStyle,
+    label: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    min_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    max_length: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    required: bool,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>value: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>placeholder: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+}
 
-<span class="kw">impl </span>CreateInputText {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateInputText&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a text input with the given style, label, and custom id (a developer-defined
     /// identifier), leaving all other fields empty.
     </span><span class="kw">pub fn </span>new(
         style: InputTextStyle,
-        label: <span class="kw">impl </span>Into&lt;String&gt;,
-        custom_id: <span class="kw">impl </span>Into&lt;String&gt;,
+        label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+        custom_id: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(InputText {
-            style: <span class="prelude-val">Some</span>(style),
-            label: <span class="prelude-val">Some</span>(label.into().into()),
-            custom_id: custom_id.into().into(),
+        <span class="self">Self </span>{
+            style,
+            label: <span class="prelude-val">Some</span>(label.into()),
+            custom_id: custom_id.into(),
 
             placeholder: <span class="prelude-val">None</span>,
             min_length: <span class="prelude-val">None</span>,
@@ -752,55 +834,55 @@
             required: <span class="bool-val">true</span>,
 
             kind: ComponentType::InputText,
-        })
+        }
     }
 
     <span class="doccomment">/// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, kind: InputTextStyle) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.style = <span class="prelude-val">Some</span>(kind);
+        <span class="self">self</span>.style = kind;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
-    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.label = <span class="prelude-val">Some</span>(label.into().into());
+    </span><span class="kw">pub fn </span>label(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.label = <span class="prelude-val">Some</span>(label.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the custom id of the input text, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
-    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.custom_id = id.into().into();
+    </span><span class="kw">pub fn </span>custom_id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.custom_id = id.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the placeholder of this input text.
-    </span><span class="kw">pub fn </span>placeholder(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.placeholder = <span class="prelude-val">Some</span>(label.into().into());
+    </span><span class="kw">pub fn </span>placeholder(<span class="kw-2">mut </span><span class="self">self</span>, label: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.placeholder = <span class="prelude-val">Some</span>(label.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the minimum length required for the input text
     </span><span class="kw">pub fn </span>min_length(<span class="kw-2">mut </span><span class="self">self</span>, min: u16) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.min_length = <span class="prelude-val">Some</span>(min);
+        <span class="self">self</span>.min_length = <span class="prelude-val">Some</span>(min);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the maximum length required for the input text
     </span><span class="kw">pub fn </span>max_length(<span class="kw-2">mut </span><span class="self">self</span>, max: u16) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.max_length = <span class="prelude-val">Some</span>(max);
+        <span class="self">self</span>.max_length = <span class="prelude-val">Some</span>(max);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the value of this input text.
-    </span><span class="kw">pub fn </span>value(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.value = <span class="prelude-val">Some</span>(value.into().into());
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.value = <span class="prelude-val">Some</span>(value.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets if the input text is required
     </span><span class="kw">pub fn </span>required(<span class="kw-2">mut </span><span class="self">self</span>, required: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.required = required;
+        <span class="self">self</span>.required = required;
         <span class="self">self
     </span>}
 }

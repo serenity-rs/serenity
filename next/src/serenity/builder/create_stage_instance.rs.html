@@ -89,7 +89,11 @@
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -104,7 +108,7 @@
 #[must_use]
 </span><span class="kw">pub struct </span>CreateStageInstance&lt;<span class="lifetime">'a</span>&gt; {
     channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;, <span class="comment">// required field, filled in Builder impl
-    </span>topic: String,
+    </span>topic: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     privacy_level: StageInstancePrivacyLevel,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>send_start_notification: <span class="prelude-ty">Option</span>&lt;bool&gt;,
@@ -115,7 +119,7 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateStageInstance&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a builder with the provided topic.
-    </span><span class="kw">pub fn </span>new(topic: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(topic: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             channel_id: <span class="prelude-val">None</span>,
             topic: topic.into(),
@@ -127,7 +131,7 @@
 
     <span class="doccomment">/// Sets the topic of the stage channel instance, replacing the current value as set in
     /// [`Self::new`].
-    </span><span class="kw">pub fn </span>topic(<span class="kw-2">mut </span><span class="self">self</span>, topic: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>topic(<span class="kw-2">mut </span><span class="self">self</span>, topic: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.topic = topic.into();
         <span class="self">self
     </span>}

@@ -182,7 +182,7 @@
 #[must_use]
 </span><span class="kw">pub struct </span>Request&lt;<span class="lifetime">'a</span>, <span class="kw">const </span>MAX_PARAMS: usize&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) body: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) multipart: <span class="prelude-ty">Option</span>&lt;Multipart&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) multipart: <span class="prelude-ty">Option</span>&lt;Multipart&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) headers: <span class="prelude-ty">Option</span>&lt;Headers&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) method: LightMethod,
     <span class="kw">pub</span>(<span class="kw">super</span>) route: Route&lt;<span class="lifetime">'a</span>&gt;,
@@ -210,7 +210,7 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>multipart(<span class="kw-2">mut </span><span class="self">self</span>, multipart: <span class="prelude-ty">Option</span>&lt;Multipart&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>multipart(<span class="kw-2">mut </span><span class="self">self</span>, multipart: <span class="prelude-ty">Option</span>&lt;Multipart&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.multipart = multipart;
         <span class="self">self
     </span>}

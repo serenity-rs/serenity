@@ -1223,7 +1223,9 @@
 <a href="#1221" id="1221">1221</a>
 <a href="#1222" id="1222">1222</a>
 <a href="#1223" id="1223">1223</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href="#1224" id="1224">1224</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1575,7 +1577,7 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
-        builder: EditMessage,
+        builder: EditMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         builder.execute(cache_http, (<span class="self">self</span>, message_id.into())).<span class="kw">await
     </span>}
@@ -1870,7 +1872,7 @@
     </span><span class="kw">pub async fn </span>say(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        content: <span class="kw">impl </span>Into&lt;String&gt;,
+        content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span>builder = CreateMessage::new().content(content);
         <span class="self">self</span>.send_message(cache_http, builder).<span class="kw">await
@@ -1942,11 +1944,11 @@
     /// reasons.
     ///
     /// [`File`]: tokio::fs::File
-    </span><span class="kw">pub async fn </span>send_files(
+    </span><span class="kw">pub async fn </span>send_files&lt;<span class="lifetime">'a</span>&gt;(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;,
-        builder: CreateMessage,
+        files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;,
+        builder: CreateMessage&lt;<span class="lifetime">'a</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.send_message(cache_http, builder.files(files)).<span class="kw">await
     </span>}
@@ -1963,7 +1965,7 @@
     </span><span class="kw">pub async fn </span>send_message(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateMessage,
+        builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">None</span>)).<span class="kw">await</span>;

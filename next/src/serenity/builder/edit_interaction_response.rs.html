@@ -132,7 +132,11 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
@@ -151,9 +155,9 @@
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>EditInteractionResponse(EditWebhookMessage);
+</span><span class="kw">pub struct </span>EditInteractionResponse&lt;<span class="lifetime">'a</span>&gt;(EditWebhookMessage&lt;<span class="lifetime">'a</span>&gt;);
 
-<span class="kw">impl </span>EditInteractionResponse {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; EditInteractionResponse&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -163,21 +167,21 @@
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>content(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>content(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.content(content))
     }
 
     <span class="doccomment">/// Adds an embed for the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    </span><span class="kw">pub fn </span>add_embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_embed(<span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.add_embed(embed))
     }
 
     <span class="doccomment">/// Adds multiple embeds to the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    </span><span class="kw">pub fn </span>add_embeds(<span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_embeds(<span class="self">self</span>, embeds: <span class="kw">impl </span>IntoIterator&lt;Item = CreateEmbed&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.add_embeds(embeds))
     }
 
@@ -185,7 +189,7 @@
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.embed(embed))
     }
 
@@ -195,30 +199,30 @@
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
-    </span><span class="kw">pub fn </span>embeds(<span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>embeds(<span class="self">self</span>, embeds: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateEmbed&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.embeds(embeds))
     }
 
     <span class="doccomment">/// Set the allowed mentions for the message.
-    </span><span class="kw">pub fn </span>allowed_mentions(<span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="self">self</span>, allowed_mentions: CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.allowed_mentions(allowed_mentions))
     }
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>components(<span class="self">self</span>, components: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.components(components))
     }
     <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.<span class="number">0</span>.components);
 
     <span class="doccomment">/// Sets attachments, see [`EditAttachments`] for more details.
-    </span><span class="kw">pub fn </span>attachments(<span class="self">self</span>, attachments: EditAttachments) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>attachments(<span class="self">self</span>, attachments: EditAttachments&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.attachments(attachments))
     }
 
     <span class="doccomment">/// Adds a new attachment to the message.
     ///
     /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
-    </span><span class="kw">pub fn </span>new_attachment(<span class="self">self</span>, attachment: CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_attachment(<span class="self">self</span>, attachment: CreateAttachment&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.new_attachment(attachment))
     }
 
@@ -235,7 +239,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditInteractionResponse {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditInteractionResponse&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str;
     <span class="kw">type </span>Built = Message;
 

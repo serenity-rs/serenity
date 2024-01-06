@@ -197,7 +197,11 @@
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
     CreateActionRow,
@@ -217,24 +221,24 @@
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateInteractionResponseFollowup {
+</span><span class="kw">pub struct </span>CreateInteractionResponseFollowup&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>content: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="comment">// [Omitting username: not supported in interaction followups]
     // [Omitting avatar_url: not supported in interaction followups]
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>tts: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    embeds: Vec&lt;CreateEmbed&gt;,
+    embeds: Cow&lt;<span class="lifetime">'a</span>, [CreateEmbed&lt;<span class="lifetime">'a</span>&gt;]&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
+    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
+    </span>components: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
-    attachments: EditAttachments,
+    attachments: EditAttachments&lt;<span class="lifetime">'a</span>&gt;,
 }
 
-<span class="kw">impl </span>CreateInteractionResponseFollowup {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateInteractionResponseFollowup&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -249,7 +253,7 @@
 
         check_overflow(<span class="self">self</span>.embeds.len(), constants::EMBED_MAX_COUNT)
             .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
-        <span class="kw">for </span>embed <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.embeds {
+        <span class="kw">for </span>embed <span class="kw">in </span><span class="self">self</span>.embeds.iter() {
             embed.check_length()<span class="question-mark">?</span>;
         }
 
@@ -260,7 +264,7 @@
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
         <span class="self">self
     </span>}
@@ -276,13 +280,13 @@
     </span>}
 
     <span class="doccomment">/// Appends a file to the message.
-    </span><span class="kw">pub fn </span>add_file(<span class="kw-2">mut </span><span class="self">self</span>, file: CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_file(<span class="kw-2">mut </span><span class="self">self</span>, file: CreateAttachment&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.attachments = <span class="self">self</span>.attachments.add(file);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Appends a list of files to the message.
-    </span><span class="kw">pub fn </span>add_files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">for </span>file <span class="kw">in </span>files {
             <span class="self">self</span>.attachments = <span class="self">self</span>.attachments.add(file);
         }
@@ -293,20 +297,20 @@
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    </span><span class="kw">pub fn </span>files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.attachments = EditAttachments::new();
         <span class="self">self</span>.add_files(files)
     }
 
     <span class="doccomment">/// Adds an embed to the message.
-    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.push(embed);
+    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.to_mut().push(embed);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Adds multiple embeds to the message.
-    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.extend(embeds);
+    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: <span class="kw">impl </span>IntoIterator&lt;Item = CreateEmbed&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.to_mut().extend(embeds);
         <span class="self">self
     </span>}
 
@@ -314,7 +318,7 @@
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.embeds(<span class="macro">vec!</span>[embed])
     }
 
@@ -322,13 +326,13 @@
     ///
     /// Calling this multiple times will overwrite the embed list. To append embeds, call
     /// [`Self::add_embeds`] instead.
-    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds = embeds;
+    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateEmbed&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds = embeds.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the allowed mentions for the message.
-    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.allowed_mentions = <span class="prelude-val">Some</span>(allowed_mentions);
         <span class="self">self
     </span>}
@@ -354,8 +358,8 @@
     </span>}
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components.into());
         <span class="self">self
     </span>}
     <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.components);
@@ -363,7 +367,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateInteractionResponseFollowup {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateInteractionResponseFollowup&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (<span class="prelude-ty">Option</span>&lt;MessageId&gt;, <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str);
     <span class="kw">type </span>Built = Message;
 

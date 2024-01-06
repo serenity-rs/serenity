@@ -346,13 +346,9 @@
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
 <a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
     CreateActionRow,
@@ -405,30 +401,30 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#create-message)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateMessage {
+</span><span class="kw">pub struct </span>CreateMessage&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>content: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>nonce: <span class="prelude-ty">Option</span>&lt;Nonce&gt;,
     tts: bool,
-    embeds: Vec&lt;CreateEmbed&gt;,
+    embeds: Cow&lt;<span class="lifetime">'a</span>, [CreateEmbed&lt;<span class="lifetime">'a</span>&gt;]&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
+    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>message_reference: <span class="prelude-ty">Option</span>&lt;MessageReference&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
-    sticker_ids: Vec&lt;StickerId&gt;,
+    </span>components: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;,
+    sticker_ids: Cow&lt;<span class="lifetime">'a</span>, [StickerId]&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
-    attachments: EditAttachments,
+    attachments: EditAttachments&lt;<span class="lifetime">'a</span>&gt;,
 
     <span class="comment">// The following fields are handled separately.
     </span><span class="attr">#[serde(skip)]
-    </span>reactions: Vec&lt;ReactionType&gt;,
+    </span>reactions: Cow&lt;<span class="lifetime">'a</span>, [ReactionType]&gt;,
 }
 
-<span class="kw">impl </span>CreateMessage {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateMessage&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
     }
@@ -442,7 +438,7 @@
 
         check_overflow(<span class="self">self</span>.embeds.len(), constants::EMBED_MAX_COUNT)
             .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
-        <span class="kw">for </span>embed <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.embeds {
+        <span class="kw">for </span>embed <span class="kw">in </span><span class="self">self</span>.embeds.iter() {
             embed.check_length()<span class="question-mark">?</span>;
         }
 
@@ -456,7 +452,7 @@
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
         <span class="self">self
     </span>}
@@ -465,8 +461,8 @@
     ///
     /// **Note**: This will keep all existing embeds. Use [`Self::embed()`] to replace existing
     /// embeds.
-    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.push(embed);
+    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.to_mut().push(embed);
         <span class="self">self
     </span>}
 
@@ -474,8 +470,8 @@
     ///
     /// **Note**: This will keep all existing embeds. Use [`Self::embeds()`] to replace existing
     /// embeds.
-    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.extend(embeds);
+    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: <span class="kw">impl </span>IntoIterator&lt;Item = CreateEmbed&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.to_mut().extend(embeds);
         <span class="self">self
     </span>}
 
@@ -483,7 +479,7 @@
     ///
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embed()`] to keep existing
     /// embeds.
-    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.embeds(<span class="macro">vec!</span>[embed])
     }
 
@@ -491,8 +487,8 @@
     ///
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
-    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds = embeds;
+    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateEmbed&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds = embeds.into();
         <span class="self">self
     </span>}
 
@@ -508,11 +504,8 @@
 
     <span class="doccomment">/// Adds a list of reactions to create after the message's sent.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>reactions&lt;R: Into&lt;ReactionType&gt;&gt;(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        reactions: <span class="kw">impl </span>IntoIterator&lt;Item = R&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.reactions = reactions.into_iter().map(Into::into).collect();
+    </span><span class="kw">pub fn </span>reactions(<span class="kw-2">mut </span><span class="self">self</span>, reactions: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [ReactionType]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.reactions = reactions.into();
         <span class="self">self
     </span>}
 
@@ -521,7 +514,7 @@
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    </span><span class="kw">pub fn </span>add_file(<span class="kw-2">mut </span><span class="self">self</span>, file: CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_file(<span class="kw-2">mut </span><span class="self">self</span>, file: CreateAttachment&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.attachments = <span class="self">self</span>.attachments.add(file);
         <span class="self">self
     </span>}
@@ -531,7 +524,7 @@
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    </span><span class="kw">pub fn </span>add_files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">for </span>file <span class="kw">in </span>files {
             <span class="self">self</span>.attachments = <span class="self">self</span>.attachments.add(file);
         }
@@ -546,13 +539,13 @@
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    </span><span class="kw">pub fn </span>files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.attachments = EditAttachments::new();
         <span class="self">self</span>.add_files(files)
     }
 
     <span class="doccomment">/// Set the allowed mentions for the message.
-    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.allowed_mentions = <span class="prelude-val">Some</span>(allowed_mentions);
         <span class="self">self
     </span>}
@@ -564,8 +557,8 @@
     </span>}
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components.into());
         <span class="self">self
     </span>}
     <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.components);
@@ -590,11 +583,8 @@
     ///
     /// **Note**: This will replace all existing stickers. Use [`Self::add_sticker_id()`] or
     /// [`Self::add_sticker_ids()`] to keep existing stickers.
-    </span><span class="kw">pub fn </span>sticker_ids&lt;T: Into&lt;StickerId&gt;&gt;(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        sticker_ids: <span class="kw">impl </span>IntoIterator&lt;Item = T&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.sticker_ids = sticker_ids.into_iter().map(Into::into).collect();
+    </span><span class="kw">pub fn </span>sticker_ids(<span class="kw-2">mut </span><span class="self">self</span>, sticker_ids: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [StickerId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.sticker_ids = sticker_ids.into();
         <span class="self">self
     </span>}
 
@@ -605,7 +595,7 @@
     /// **Note**: This will keep all existing stickers. Use [`Self::sticker_id()`] to replace
     /// existing sticker.
     </span><span class="kw">pub fn </span>add_sticker_id(<span class="kw-2">mut </span><span class="self">self</span>, sticker_id: <span class="kw">impl </span>Into&lt;StickerId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.sticker_ids.push(sticker_id.into());
+        <span class="self">self</span>.sticker_ids.to_mut().push(sticker_id.into());
         <span class="self">self
     </span>}
 
@@ -619,9 +609,7 @@
         <span class="kw-2">mut </span><span class="self">self</span>,
         sticker_ids: <span class="kw">impl </span>IntoIterator&lt;Item = T&gt;,
     ) -&gt; <span class="self">Self </span>{
-        <span class="kw">for </span>sticker_id <span class="kw">in </span>sticker_ids {
-            <span class="self">self </span>= <span class="self">self</span>.add_sticker_id(sticker_id);
-        }
+        <span class="self">self</span>.sticker_ids.to_mut().extend(sticker_ids.into_iter().map(Into::into));
         <span class="self">self
     </span>}
 
@@ -635,7 +623,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateMessage {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateMessage&lt;<span class="lifetime">'_</span>&gt; {
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (ChannelId, <span class="prelude-ty">Option</span>&lt;GuildId&gt;);
     <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
@@ -688,8 +676,8 @@
         <span class="attr">#[cfg_attr(not(feature = <span class="string">"cache"</span>), allow(unused_mut))]
         </span><span class="kw">let </span><span class="kw-2">mut </span>message = http.send_message(channel_id, files, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">for </span>reaction <span class="kw">in </span><span class="self">self</span>.reactions {
-            http.create_reaction(channel_id, message.id, <span class="kw-2">&amp;</span>reaction).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">for </span>reaction <span class="kw">in </span><span class="self">self</span>.reactions.iter() {
+            http.create_reaction(channel_id, message.id, reaction).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="comment">// HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort

@@ -194,9 +194,13 @@
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
-<span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
+<span class="kw">use super</span>::{CreateAttachment, CreateScheduledEventMetadata};
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -210,17 +214,17 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>channel_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>entity_metadata: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ScheduledEventMetadata&gt;&gt;,
+    </span>entity_metadata: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;CreateScheduledEventMetadata&lt;<span class="lifetime">'a</span>&gt;&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>privacy_level: <span class="prelude-ty">Option</span>&lt;ScheduledEventPrivacyLevel&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>scheduled_start_time: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>scheduled_start_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>scheduled_end_time: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>scheduled_end_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>description: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>entity_type: <span class="prelude-ty">Option</span>&lt;ScheduledEventType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -250,7 +254,7 @@
     </span>}
 
     <span class="doccomment">/// Sets the name of the scheduled event.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
@@ -262,7 +266,7 @@
     </span>}
 
     <span class="doccomment">/// Sets the description of the scheduled event.
-    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
         <span class="self">self
     </span>}
@@ -270,7 +274,7 @@
     <span class="doccomment">/// Sets the start time of the scheduled event.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>start_time(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: <span class="kw">impl </span>Into&lt;Timestamp&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.scheduled_start_time = <span class="prelude-val">Some</span>(timestamp.into().to_string());
+        <span class="self">self</span>.scheduled_start_time = <span class="prelude-val">Some</span>(timestamp.into());
         <span class="self">self
     </span>}
 
@@ -282,7 +286,7 @@
     /// [`External`]: ScheduledEventType::External
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>end_time(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: <span class="kw">impl </span>Into&lt;Timestamp&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.scheduled_end_time = <span class="prelude-val">Some</span>(timestamp.into().to_string());
+        <span class="self">self</span>.scheduled_end_time = <span class="prelude-val">Some</span>(timestamp.into());
         <span class="self">self
     </span>}
 
@@ -342,15 +346,15 @@
     ///
     /// [`kind`]: EditScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
-    </span><span class="kw">pub fn </span>location(<span class="kw-2">mut </span><span class="self">self</span>, location: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.entity_metadata = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(ScheduledEventMetadata {
-            location: <span class="prelude-val">Some</span>(location.into().into()),
+    </span><span class="kw">pub fn </span>location(<span class="kw-2">mut </span><span class="self">self</span>, location: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.entity_metadata = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(CreateScheduledEventMetadata {
+            location: <span class="prelude-val">Some</span>(location.into()),
         }));
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the cover image for the scheduled event.
-    </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, image: <span class="kw-2">&amp;</span>CreateAttachment&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.image = <span class="prelude-val">Some</span>(image.to_base64());
         <span class="self">self
     </span>}

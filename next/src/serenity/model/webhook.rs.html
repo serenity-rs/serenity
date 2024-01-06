@@ -1015,7 +1015,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         wait: bool,
-        builder: ExecuteWebhook,
+        builder: ExecuteWebhook&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Message&gt;&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         builder.execute(cache_http, (<span class="self">self</span>.id, token, wait)).<span class="kw">await
@@ -1058,7 +1058,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: MessageId,
-        builder: EditWebhookMessage,
+        builder: EditWebhookMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
         builder.execute(cache_http, (<span class="self">self</span>.id, token, message_id)).<span class="kw">await

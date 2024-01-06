@@ -108,7 +108,11 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -121,25 +125,25 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#add-guild-member).
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>AddMember {
-    access_token: String,
+</span><span class="kw">pub struct </span>AddMember&lt;<span class="lifetime">'a</span>&gt; {
+    access_token: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>nick: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Vec::is_empty"</span>)]
-    </span>roles: Vec&lt;RoleId&gt;,
+    </span>nick: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"&lt;[RoleId]&gt;::is_empty"</span>)]
+    </span>roles: Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>mute: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>deaf: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl </span>AddMember {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; AddMember&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Constructs a new builder with the given access token, leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(access_token: String) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(access_token: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            access_token,
+            access_token: access_token.into(),
+            roles: Cow::default(),
             nick: <span class="prelude-val">None</span>,
-            roles: Vec::new(),
             mute: <span class="prelude-val">None</span>,
             deaf: <span class="prelude-val">None</span>,
         }
@@ -148,7 +152,7 @@
     <span class="doccomment">/// Sets the OAuth2 access token for this request, replacing the current one.
     ///
     /// Requires the access token to have the `guilds.join` scope granted.
-    </span><span class="kw">pub fn </span>access_token(<span class="kw-2">mut </span><span class="self">self</span>, access_token: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>access_token(<span class="kw-2">mut </span><span class="self">self</span>, access_token: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.access_token = access_token.into();
         <span class="self">self
     </span>}
@@ -158,7 +162,7 @@
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES
-    </span><span class="kw">pub fn </span>nickname(<span class="kw-2">mut </span><span class="self">self</span>, nickname: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>nickname(<span class="kw-2">mut </span><span class="self">self</span>, nickname: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.nick = <span class="prelude-val">Some</span>(nickname.into());
         <span class="self">self
     </span>}
@@ -168,8 +172,8 @@
     /// Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES
-    </span><span class="kw">pub fn </span>roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;RoleId&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.roles = roles.into_iter().map(Into::into).collect();
+    </span><span class="kw">pub fn </span>roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.roles = roles.into();
         <span class="self">self
     </span>}
 
@@ -196,7 +200,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>AddMember {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>AddMember&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (GuildId, UserId);
     <span class="kw">type </span>Built = <span class="prelude-ty">Option</span>&lt;Member&gt;;
 

@@ -191,7 +191,11 @@
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -239,7 +243,7 @@
 #[must_use]
 </span><span class="kw">pub struct </span>EditRole&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>name: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>permissions: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -248,9 +252,9 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>hoist: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>icon: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;FixedString&gt;&gt;,
+    </span>icon: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>unicode_emoji: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;FixedString&gt;&gt;,
+    </span>unicode_emoji: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
 
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>mentionable: <span class="prelude-ty">Option</span>&lt;bool&gt;,
@@ -268,15 +272,15 @@
     }
 
     <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].
-    </span><span class="kw">pub fn </span>from_role(role: <span class="kw-2">&amp;</span>Role) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>from_role(role: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Role) -&gt; <span class="self">Self </span>{
         EditRole {
             hoist: <span class="prelude-val">Some</span>(role.hoist()),
             mentionable: <span class="prelude-val">Some</span>(role.mentionable()),
-            name: <span class="prelude-val">Some</span>(role.name.clone()),
+            name: <span class="prelude-val">Some</span>(Cow::Borrowed(<span class="kw-2">&amp;</span>role.name)),
             permissions: <span class="prelude-val">Some</span>(role.permissions.bits()),
             position: <span class="prelude-val">Some</span>(role.position),
             colour: <span class="prelude-val">Some</span>(role.colour),
-            unicode_emoji: role.unicode_emoji.as_ref().map(|v| <span class="prelude-val">Some</span>(v.clone())),
+            unicode_emoji: role.unicode_emoji.as_ref().map(|v| <span class="prelude-val">Some</span>(Cow::Borrowed(v.as_str()))),
             audit_log_reason: <span class="prelude-val">None</span>,
             <span class="comment">// TODO: Do we want to download role.icon?
             </span>icon: <span class="prelude-val">None</span>,
@@ -303,8 +307,8 @@
     </span>}
 
     <span class="doccomment">/// Set the role's name.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into().into());
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
 
@@ -329,7 +333,7 @@
     </span>}
 
     <span class="doccomment">/// Set the role icon to a custom image.
-    </span><span class="kw">pub fn </span>icon(<span class="kw-2">mut </span><span class="self">self</span>, icon: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>icon(<span class="kw-2">mut </span><span class="self">self</span>, icon: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.icon = <span class="prelude-val">Some</span>(icon.map(CreateAttachment::to_base64).map(Into::into));
         <span class="self">self</span>.unicode_emoji = <span class="prelude-val">Some</span>(<span class="prelude-val">None</span>);
         <span class="self">self

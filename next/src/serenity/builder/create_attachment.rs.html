@@ -284,7 +284,12 @@
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::path::Path;
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::path::Path;
 
 <span class="kw">use </span>tokio::fs::File;
 <span class="kw">use </span>tokio::io::AsyncReadExt;
@@ -307,18 +312,21 @@
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateAttachment {
+</span><span class="kw">pub struct </span>CreateAttachment&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) id: u64, <span class="comment">// Placeholder ID will be filled in when sending the request
-    </span><span class="kw">pub </span>filename: String,
-    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span><span class="kw">pub </span>filename: Cow&lt;<span class="lifetime">'static</span>, str&gt;,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 
     <span class="attr">#[serde(skip)]
-    </span><span class="kw">pub </span>data: Vec&lt;u8&gt;,
+    </span><span class="kw">pub </span>data: Cow&lt;<span class="lifetime">'static</span>, [u8]&gt;,
 }
 
-<span class="kw">impl </span>CreateAttachment {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateAttachment&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Builds an [`CreateAttachment`] from the raw attachment data.
-    </span><span class="kw">pub fn </span>bytes(data: <span class="kw">impl </span>Into&lt;Vec&lt;u8&gt;&gt;, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; CreateAttachment {
+    </span><span class="kw">pub fn </span>bytes(
+        data: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, [u8]&gt;&gt;,
+        filename: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
         CreateAttachment {
             data: data.into(),
             filename: filename.into(),
@@ -332,7 +340,7 @@
     /// # Errors
     ///
     /// [`Error::Io`] if reading the file fails.
-    </span><span class="kw">pub async fn </span>path(path: <span class="kw">impl </span>AsRef&lt;Path&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;CreateAttachment&gt; {
+    </span><span class="kw">pub async fn </span>path(path: <span class="kw">impl </span>AsRef&lt;Path&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>file = File::open(path.as_ref()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::new();
         file.read_to_end(<span class="kw-2">&amp;mut </span>data).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -344,7 +352,7 @@
             )
         })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(CreateAttachment::bytes(data, filename.to_string_lossy().to_string()))
+        <span class="prelude-val">Ok</span>(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned()))
     }
 
     <span class="doccomment">/// Builds an [`CreateAttachment`] by reading from a file handler.
@@ -352,7 +360,7 @@
     /// # Errors
     ///
     /// [`Error::Io`] error if reading the file fails.
-    </span><span class="kw">pub async fn </span>file(file: <span class="kw-2">&amp;</span>File, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;CreateAttachment&gt; {
+    </span><span class="kw">pub async fn </span>file(file: <span class="kw-2">&amp;</span>File, filename: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::new();
         file.try_clone().<span class="kw">await</span><span class="question-mark">?</span>.read_to_end(<span class="kw-2">&amp;mut </span>data).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -365,7 +373,7 @@
     ///
     /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
     </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">pub async fn </span>url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;CreateAttachment&gt; {
+    </span><span class="kw">pub async fn </span>url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>url = Url::parse(url).map_err(|<span class="kw">_</span>| Error::Url(url.to_string()))<span class="question-mark">?</span>;
 
         <span class="kw">let </span>response = http.as_ref().client.get(url.clone()).send().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -376,7 +384,7 @@
             .and_then(Iterator::last)
             .ok_or_else(|| Error::Url(url.to_string()))<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(CreateAttachment::bytes(data, filename))
+        <span class="prelude-val">Ok</span>(CreateAttachment::bytes(data, filename.to_owned()))
     }
 
     <span class="doccomment">/// Converts the stored data to the base64 representation.
@@ -394,7 +402,7 @@
     }
 
     <span class="doccomment">/// Sets a description for the file (max 1024 characters).
-    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
         <span class="self">self
     </span>}
@@ -407,8 +415,8 @@
 
 <span class="attr">#[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
-</span><span class="kw">enum </span>NewOrExisting {
-    New(CreateAttachment),
+</span><span class="kw">enum </span>NewOrExisting&lt;<span class="lifetime">'a</span>&gt; {
+    New(CreateAttachment&lt;<span class="lifetime">'a</span>&gt;),
     Existing(ExistingAttachment),
 }
 
@@ -434,7 +442,7 @@
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -&gt; Result&lt;(), Error&gt; {
+/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment&lt;'_&gt;) -&gt; Result&lt;(), Error&gt; {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&amp;msg).add(my_attachment)
 /// )).await?;
@@ -445,7 +453,7 @@
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -&gt; Result&lt;(), Error&gt; {
+/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment&lt;'_&gt;) -&gt; Result&lt;(), Error&gt; {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::new().keep(msg.attachments[0].id)
 /// )).await?;
@@ -456,7 +464,7 @@
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment) -&gt; Result&lt;(), Error&gt; {
+/// # async fn _foo(ctx: Http, mut msg: Message, my_attachment: CreateAttachment&lt;'_&gt;) -&gt; Result&lt;(), Error&gt; {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&amp;msg).remove(msg.attachments[0].id)
 /// )).await?;
@@ -470,11 +478,11 @@
 </span><span class="attr">#[derive(Default, Debug, Clone, serde::Serialize)]
 #[serde(transparent)]
 #[must_use]
-</span><span class="kw">pub struct </span>EditAttachments {
-    new_and_existing_attachments: Vec&lt;NewOrExisting&gt;,
+</span><span class="kw">pub struct </span>EditAttachments&lt;<span class="lifetime">'a</span>&gt; {
+    new_and_existing_attachments: Vec&lt;NewOrExisting&lt;<span class="lifetime">'a</span>&gt;&gt;,
 }
 
-<span class="kw">impl </span>EditAttachments {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; EditAttachments&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// An empty attachments builder.
     ///
     /// Existing attachments are not kept by default, either. See [`Self::keep_all()`] or
@@ -533,7 +541,7 @@
 
     <span class="doccomment">/// Adds a new attachment to the attachment list.
     </span><span class="attr">#[allow(clippy::should_implement_trait)] </span><span class="comment">// Clippy thinks add == std::ops::Add::add
-    </span><span class="kw">pub fn </span>add(<span class="kw-2">mut </span><span class="self">self</span>, attachment: CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add(<span class="kw-2">mut </span><span class="self">self</span>, attachment: CreateAttachment&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.new_and_existing_attachments.push(NewOrExisting::New(attachment));
         <span class="self">self
     </span>}
@@ -541,7 +549,7 @@
     <span class="doccomment">/// Clones all new attachments into a new Vec, keeping only data and filename, because those
     /// are needed for the multipart form data. The data is taken out of `self` in the process, so
     /// this method can only be called once.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_files(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;CreateAttachment&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_files(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>id_placeholder = <span class="number">0</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>files = Vec::new();

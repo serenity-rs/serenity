@@ -109,7 +109,11 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -125,21 +129,21 @@
 // `permissions` is added to the HTTP endpoint
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>EditCommandPermissions {
-    permissions: Vec&lt;CreateCommandPermission&gt;,
+</span><span class="kw">pub struct </span>EditCommandPermissions&lt;<span class="lifetime">'a</span>&gt; {
+    permissions: Cow&lt;<span class="lifetime">'a</span>, [CreateCommandPermission]&gt;,
 }
 
-<span class="kw">impl </span>EditCommandPermissions {
-    <span class="kw">pub fn </span>new(permissions: Vec&lt;CreateCommandPermission&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; EditCommandPermissions&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new(permissions: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateCommandPermission]&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            permissions,
+            permissions: permissions.into(),
         }
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditCommandPermissions {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditCommandPermissions&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (GuildId, CommandId);
     <span class="kw">type </span>Built = CommandPermissions;
 

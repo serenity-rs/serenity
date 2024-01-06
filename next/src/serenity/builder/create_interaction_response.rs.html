@@ -427,7 +427,19 @@
 <a href="#425" id="425">425</a>
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
     CreateActionRow,
@@ -446,7 +458,7 @@
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
 </span><span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">pub enum </span>CreateInteractionResponse {
+</span><span class="kw">pub enum </span>CreateInteractionResponse&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Acknowledges a Ping (only required when your bot uses an HTTP endpoint URL).
     ///
     /// Corresponds to Discord's `PONG`.
@@ -454,12 +466,12 @@
     <span class="doccomment">/// Responds to an interaction with a message.
     ///
     /// Corresponds to Discord's `CHANNEL_MESSAGE_WITH_SOURCE`.
-    </span>Message(CreateInteractionResponseMessage),
+    </span>Message(CreateInteractionResponseMessage&lt;<span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Acknowledges the interaction in order to edit a response later. The user sees a loading
     /// state.
     ///
     /// Corresponds to Discord's `DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE`.
-    </span>Defer(CreateInteractionResponseMessage),
+    </span>Defer(CreateInteractionResponseMessage&lt;<span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Only valid for component-based interactions (seems to work for modal submit interactions
     /// too even though it's not documented).
     ///
@@ -473,19 +485,19 @@
     /// Edits the message the component was attached to.
     ///
     /// Corresponds to Discord's `UPDATE_MESSAGE`.
-    </span>UpdateMessage(CreateInteractionResponseMessage),
+    </span>UpdateMessage(CreateInteractionResponseMessage&lt;<span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Only valid for autocomplete interactions.
     ///
     /// Responds to the autocomplete interaction with suggested choices.
     ///
     /// Corresponds to Discord's `APPLICATION_COMMAND_AUTOCOMPLETE_RESULT`.
-    </span>Autocomplete(CreateAutocompleteResponse),
+    </span>Autocomplete(CreateAutocompleteResponse&lt;<span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Not valid for Modal and Ping interactions
     ///
     /// Responds to the interaction with a popup modal.
     ///
     /// Corresponds to Discord's `MODAL`.
-    </span>Modal(CreateModal),
+    </span>Modal(CreateModal&lt;<span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Not valid for autocomplete and Ping interactions. Only available for applications with
     /// monetization enabled.
     ///
@@ -495,7 +507,7 @@
     </span>PremiumRequired,
 }
 
-<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>CreateInteractionResponse {
+<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>CreateInteractionResponse&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
         <span class="kw">use </span>serde::ser::Error <span class="kw">as _</span>;
 
@@ -526,7 +538,7 @@
     }
 }
 
-<span class="kw">impl </span>CreateInteractionResponse {
+<span class="kw">impl </span>CreateInteractionResponse&lt;<span class="lifetime">'_</span>&gt; {
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if let </span>CreateInteractionResponse::Message(data)
@@ -542,7 +554,7 @@
                 check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
                     .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
 
-                <span class="kw">for </span>embed <span class="kw">in </span>embeds {
+                <span class="kw">for </span>embed <span class="kw">in </span>embeds.iter() {
                     embed.check_length()<span class="question-mark">?</span>;
                 }
             }
@@ -553,7 +565,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateInteractionResponse {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateInteractionResponse&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (InteractionId, <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str);
     <span class="kw">type </span>Built = ();
 
@@ -587,23 +599,23 @@
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages).
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateInteractionResponseMessage {
+</span><span class="kw">pub struct </span>CreateInteractionResponseMessage&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>tts: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>content: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>embeds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateEmbed&gt;&gt;,
+    </span>embeds: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateEmbed&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&gt;,
+    </span>allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;InteractionResponseFlags&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateActionRow&gt;&gt;,
-    attachments: EditAttachments,
+    </span>components: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;,
+    attachments: EditAttachments&lt;<span class="lifetime">'a</span>&gt;,
 }
 
-<span class="kw">impl </span>CreateInteractionResponseMessage {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateInteractionResponseMessage&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -620,13 +632,13 @@
     </span>}
 
     <span class="doccomment">/// Appends a file to the message.
-    </span><span class="kw">pub fn </span>add_file(<span class="kw-2">mut </span><span class="self">self</span>, file: CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_file(<span class="kw-2">mut </span><span class="self">self</span>, file: CreateAttachment&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.attachments = <span class="self">self</span>.attachments.add(file);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Appends a list of files to the message.
-    </span><span class="kw">pub fn </span>add_files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">for </span>file <span class="kw">in </span>files {
             <span class="self">self</span>.attachments = <span class="self">self</span>.attachments.add(file);
         }
@@ -637,7 +649,7 @@
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    </span><span class="kw">pub fn </span>files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>files(<span class="kw-2">mut </span><span class="self">self</span>, files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.attachments = EditAttachments::new();
         <span class="self">self</span>.add_files(files)
     }
@@ -646,7 +658,7 @@
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
         <span class="self">self
     </span>}
@@ -654,16 +666,16 @@
     <span class="doccomment">/// Adds an embed to the message.
     ///
     /// Calling this while editing a message will overwrite existing embeds.
-    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.get_or_insert_with(Vec::new).push(embed);
+    </span><span class="kw">pub fn </span>add_embed(<span class="kw-2">mut </span><span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.get_or_insert_with(Cow::default).to_mut().push(embed);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Adds multiple embeds for the message.
     ///
     /// Calling this while editing a message will overwrite existing embeds.
-    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds.get_or_insert_with(Vec::new).extend(embeds);
+    </span><span class="kw">pub fn </span>add_embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: <span class="kw">impl </span>IntoIterator&lt;Item = CreateEmbed&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds.get_or_insert_with(Cow::default).to_mut().extend(embeds);
         <span class="self">self
     </span>}
 
@@ -671,7 +683,7 @@
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>embed(<span class="self">self</span>, embed: CreateEmbed&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.embeds(<span class="macro">vec!</span>[embed])
     }
 
@@ -679,13 +691,13 @@
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
-    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: Vec&lt;CreateEmbed&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.embeds = <span class="prelude-val">Some</span>(embeds);
+    </span><span class="kw">pub fn </span>embeds(<span class="kw-2">mut </span><span class="self">self</span>, embeds: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateEmbed&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.embeds = <span class="prelude-val">Some</span>(embeds.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the allowed mentions for the message.
-    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>allowed_mentions(<span class="kw-2">mut </span><span class="self">self</span>, allowed_mentions: CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.allowed_mentions = <span class="prelude-val">Some</span>(allowed_mentions);
         <span class="self">self
     </span>}
@@ -711,8 +723,8 @@
     </span>}
 
     <span class="doccomment">/// Sets the components of this message.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components);
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = <span class="prelude-val">Some</span>(components.into());
         <span class="self">self
     </span>}
     <span class="macro">super::button_and_select_menu_convenience_methods!</span>(<span class="self">self</span>.components);
@@ -722,31 +734,35 @@
 // [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 </span><span class="attr">#[must_use]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(transparent)]
-</span><span class="kw">pub struct </span>AutocompleteChoice(CommandOptionChoice);
-<span class="kw">impl </span>AutocompleteChoice {
-    <span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;, value: <span class="kw">impl </span>Into&lt;Value&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(CommandOptionChoice {
-            name: name.into().into(),
+</span><span class="kw">pub struct </span>AutocompleteChoice&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;, Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
+    <span class="kw">pub </span>value: Value,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; AutocompleteChoice&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;, value: <span class="kw">impl </span>Into&lt;Value&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
             name_localizations: <span class="prelude-val">None</span>,
             value: value.into(),
-        })
+        }
     }
 
     <span class="kw">pub fn </span>add_localized_name(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        locale: <span class="kw">impl </span>Into&lt;String&gt;,
-        localized_name: <span class="kw">impl </span>Into&lt;String&gt;,
+        locale: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+        localized_name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0
-            </span>.name_localizations
+        <span class="self">self</span>.name_localizations
             .get_or_insert_with(Default::default)
             .insert(locale.into(), localized_name.into());
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl</span>&lt;S: Into&lt;String&gt;&gt; From&lt;S&gt; <span class="kw">for </span>AutocompleteChoice {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt; From&lt;S&gt; <span class="kw">for </span>AutocompleteChoice&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(value: S) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>value = value.into();
         <span class="kw">let </span>name = value.clone();
@@ -757,11 +773,11 @@
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateAutocompleteResponse {
-    choices: Vec&lt;AutocompleteChoice&gt;,
+</span><span class="kw">pub struct </span>CreateAutocompleteResponse&lt;<span class="lifetime">'a</span>&gt; {
+    choices: Cow&lt;<span class="lifetime">'a</span>, [AutocompleteChoice&lt;<span class="lifetime">'a</span>&gt;]&gt;,
 }
 
-<span class="kw">impl </span>CreateAutocompleteResponse {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateAutocompleteResponse&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -772,8 +788,8 @@
     /// See the official docs on [`Application Command Option Choices`] for more information.
     ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
-    </span><span class="kw">pub fn </span>set_choices(<span class="kw-2">mut </span><span class="self">self</span>, choices: Vec&lt;AutocompleteChoice&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.choices = choices;
+    </span><span class="kw">pub fn </span>set_choices(<span class="kw-2">mut </span><span class="self">self</span>, choices: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [AutocompleteChoice&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.choices = choices.into();
         <span class="self">self
     </span>}
 
@@ -781,7 +797,7 @@
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    </span><span class="kw">pub fn </span>add_int_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: i64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_int_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;, value: i64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(AutocompleteChoice::new(name, value))
     }
 
@@ -789,7 +805,11 @@
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be up to 100 characters.
-    </span><span class="kw">pub fn </span>add_string_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_string_choice(
+        <span class="self">self</span>,
+        name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+        value: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(AutocompleteChoice::new(name, value.into()))
     }
 
@@ -797,19 +817,19 @@
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    </span><span class="kw">pub fn </span>add_number_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, value: f64) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>add_number_choice(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;, value: f64) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.add_choice(AutocompleteChoice::new(name, value))
     }
 
-    <span class="kw">fn </span>add_choice(<span class="kw-2">mut </span><span class="self">self</span>, value: AutocompleteChoice) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.choices.push(value);
+    <span class="kw">fn </span>add_choice(<span class="kw-2">mut </span><span class="self">self</span>, value: AutocompleteChoice&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.choices.to_mut().push(value);
         <span class="self">self
     </span>}
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateAutocompleteResponse {
+</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateAutocompleteResponse&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (InteractionId, <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str);
     <span class="kw">type </span>Built = ();
 
@@ -830,17 +850,17 @@
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal).
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateModal {
-    components: Vec&lt;CreateActionRow&gt;,
-    custom_id: String,
-    title: String,
+</span><span class="kw">pub struct </span>CreateModal&lt;<span class="lifetime">'a</span>&gt; {
+    components: Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;,
+    custom_id: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    title: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
 }
 
-<span class="kw">impl </span>CreateModal {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateModal&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new modal.
-    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;String&gt;, title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(custom_id: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;, title: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            components: Vec::new(),
+            components: Cow::default(),
             custom_id: custom_id.into(),
             title: title.into(),
         }
@@ -849,8 +869,8 @@
     <span class="doccomment">/// Sets the components of this message.
     ///
     /// Overwrites existing components.
-    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: Vec&lt;CreateActionRow&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.components = components;
+    </span><span class="kw">pub fn </span>components(<span class="kw-2">mut </span><span class="self">self</span>, components: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateActionRow&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.components = components.into();
         <span class="self">self
     </span>}
 }

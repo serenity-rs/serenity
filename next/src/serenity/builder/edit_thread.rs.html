@@ -123,7 +123,11 @@
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -136,7 +140,7 @@
 #[must_use]
 </span><span class="kw">pub struct </span>EditThread&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>archived: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -150,7 +154,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;ChannelFlags&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>applied_tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;ForumTagId&gt;&gt;,
+    </span>applied_tags: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [ForumTagId]&gt;&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
@@ -165,7 +169,7 @@
     <span class="doccomment">/// The name of the thread.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
@@ -215,8 +219,8 @@
     </span>}
 
     <span class="doccomment">/// If this is a forum post, edits the assigned tags of this forum post.
-    </span><span class="kw">pub fn </span>applied_tags(<span class="kw-2">mut </span><span class="self">self</span>, applied_tags: <span class="kw">impl </span>IntoIterator&lt;Item = ForumTagId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.applied_tags = <span class="prelude-val">Some</span>(applied_tags.into_iter().collect());
+    </span><span class="kw">pub fn </span>applied_tags(<span class="kw-2">mut </span><span class="self">self</span>, applied_tags: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [ForumTagId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.applied_tags = <span class="prelude-val">Some</span>(applied_tags.into());
         <span class="self">self
     </span>}
 

@@ -138,7 +138,14 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
@@ -160,17 +167,20 @@
 /// ```rust,no_run
 /// # use serenity::builder::CreateMessage;
 /// # use serenity::model::channel::Message;
+/// # use serenity::model::id::*;
 /// #
 /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
 /// use serenity::builder::CreateAllowedMentions as Am;
 ///
 /// // Mention only the user 110372470472613888
 /// # let m = CreateMessage::new();
-/// m.allowed_mentions(Am::new().users(vec![110372470472613888]));
+/// m.allowed_mentions(Am::new().users([UserId::new(110372470472613888)].as_slice()));
 ///
 /// // Mention all users and the role 182894738100322304
 /// # let m = CreateMessage::new();
-/// m.allowed_mentions(Am::new().all_users(true).roles(vec![182894738100322304]));
+/// m.allowed_mentions(
+///     Am::new().all_users(true).roles([RoleId::new(182894738100322304)].as_slice()),
+/// );
 ///
 /// // Mention all roles and nothing else
 /// # let m = CreateMessage::new();
@@ -183,13 +193,15 @@
 /// // Mention everyone and the users 182891574139682816, 110372470472613888
 /// # let m = CreateMessage::new();
 /// m.allowed_mentions(
-///     Am::new().everyone(true).users(vec![182891574139682816, 110372470472613888]),
+///     Am::new()
+///         .everyone(true)
+///         .users([UserId::new(182891574139682816), UserId::new(110372470472613888)].as_slice()),
 /// );
 ///
 /// // Mention everyone and the message author.
 /// # let m = CreateMessage::new();
 /// # let msg: Message = unimplemented!();
-/// m.allowed_mentions(Am::new().everyone(true).users(vec![msg.author.id]));
+/// m.allowed_mentions(Am::new().everyone(true).users([msg.author.id].as_slice()));
 /// # Ok(())
 /// # }
 /// ```
@@ -197,15 +209,15 @@
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object).
 </span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateAllowedMentions {
+</span><span class="kw">pub struct </span>CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt; {
     parse: HashSet&lt;ParseValue&gt;,
-    users: Vec&lt;UserId&gt;,
-    roles: Vec&lt;RoleId&gt;,
+    users: Cow&lt;<span class="lifetime">'a</span>, [UserId]&gt;,
+    roles: Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>replied_user: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl </span>CreateAllowedMentions {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateAllowedMentions&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -243,29 +255,29 @@
 
     <span class="doccomment">/// Sets the *specific* users that will be allowed mentionable.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>users(<span class="kw-2">mut </span><span class="self">self</span>, users: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;UserId&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.users = users.into_iter().map(Into::into).collect();
+    </span><span class="kw">pub fn </span>users(<span class="kw-2">mut </span><span class="self">self</span>, users: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [UserId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.users = users.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Clear the list of mentionable users.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>empty_users(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.users.clear();
+        <span class="self">self</span>.users = Cow::default();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the *specific* roles that will be allowed mentionable.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;RoleId&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.roles = roles.into_iter().map(Into::into).collect();
+    </span><span class="kw">pub fn </span>roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.roles = roles.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Clear the list of mentionable roles.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>empty_roles(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.roles.clear();
+        <span class="self">self</span>.roles = Cow::default();
         <span class="self">self
     </span>}
 

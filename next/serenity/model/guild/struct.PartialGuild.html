@@ -268,7 +268,7 @@ long, or if the image is too large.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_command" class="method"><a class="src rightside" href="../../../src/serenity/model/guild/partial_guild.rs.html#505-511">source</a><h4 class="code-header">pub async fn <a href="#method.create_command" class="fn">create_command</a>(
     &amp;self,
     cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>,
-    builder: <a class="struct" href="../../builder/struct.CreateCommand.html" title="struct serenity::builder::CreateCommand">CreateCommand</a>
+    builder: <a class="struct" href="../../builder/struct.CreateCommand.html" title="struct serenity::builder::CreateCommand">CreateCommand</a>&lt;'_&gt;
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Create a guild specific application <a href="../application/struct.Command.html" title="struct serenity::model::application::Command"><code>Command</code></a>.</p>
 <p><strong>Note</strong>: Unlike global commands, guild commands will update instantly.</p>
 <h5 id="errors-13"><a href="#errors-13">Errors</a></h5>
@@ -276,7 +276,7 @@ long, or if the image is too large.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.set_commands" class="method"><a class="src rightside" href="../../../src/serenity/model/guild/partial_guild.rs.html#518-524">source</a><h4 class="code-header">pub async fn <a href="#method.set_commands" class="fn">set_commands</a>(
     &amp;self,
     http: impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="../../http/struct.Http.html" title="struct serenity::http::Http">Http</a>&gt;,
-    commands: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../builder/struct.CreateCommand.html" title="struct serenity::builder::CreateCommand">CreateCommand</a>&gt;
+    commands: &amp;[<a class="struct" href="../../builder/struct.CreateCommand.html" title="struct serenity::builder::CreateCommand">CreateCommand</a>&lt;'_&gt;]
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Override all guild application commands.</p>
 <h5 id="errors-14"><a href="#errors-14">Errors</a></h5>
 <p>Returns the same errors as <a href="struct.PartialGuild.html#method.create_command" title="method serenity::model::guild::PartialGuild::create_command"><code>Self::create_command</code></a>.</p>
@@ -284,7 +284,7 @@ long, or if the image is too large.</p>
     &amp;self,
     cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>,
     command_id: <a class="struct" href="../id/struct.CommandId.html" title="struct serenity::model::id::CommandId">CommandId</a>,
-    builder: <a class="struct" href="../../builder/struct.EditCommandPermissions.html" title="struct serenity::builder::EditCommandPermissions">EditCommandPermissions</a>
+    builder: <a class="struct" href="../../builder/struct.EditCommandPermissions.html" title="struct serenity::builder::EditCommandPermissions">EditCommandPermissions</a>&lt;'_&gt;
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../application/struct.CommandPermissions.html" title="struct serenity::model::application::CommandPermissions">CommandPermissions</a>&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Overwrites permissions for a specific command.</p>
 <p><strong>Note</strong>: It will update instantly.</p>
 <h5 id="errors-15"><a href="#errors-15">Errors</a></h5>
@@ -309,7 +309,7 @@ long, or if the image is too large.</p>
     &amp;self,
     cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>,
     command_id: <a class="struct" href="../id/struct.CommandId.html" title="struct serenity::model::id::CommandId">CommandId</a>,
-    builder: <a class="struct" href="../../builder/struct.CreateCommand.html" title="struct serenity::builder::CreateCommand">CreateCommand</a>
+    builder: <a class="struct" href="../../builder/struct.CreateCommand.html" title="struct serenity::builder::CreateCommand">CreateCommand</a>&lt;'_&gt;
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Edit a guild application command, given its Id.</p>
 <h5 id="errors-19"><a href="#errors-19">Errors</a></h5>
 <p>See <a href="../../builder/struct.CreateCommand.html#method.execute"><code>CreateCommand::execute</code></a> for a list of possible errors.</p>

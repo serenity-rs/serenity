@@ -329,7 +329,9 @@
 <a href="#327" id="327">327</a>
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateForumTag;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -365,14 +367,14 @@
 #[must_use]
 </span><span class="kw">pub struct </span>EditChannel&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     #[serde(rename = <span class="string">"type"</span>)]
     </span>kind: <span class="prelude-ty">Option</span>&lt;ChannelType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>position: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>topic: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>topic: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>nsfw: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -382,11 +384,11 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>user_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>permission_overwrites: <span class="prelude-ty">Option</span>&lt;Vec&lt;PermissionOverwriteData&gt;&gt;,
+    </span>permission_overwrites: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [PermissionOverwrite]&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>parent_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>rtc_region: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
+    </span>rtc_region: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>video_quality_mode: <span class="prelude-ty">Option</span>&lt;VideoQualityMode&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -394,7 +396,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;ChannelFlags&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>available_tags: <span class="prelude-ty">Option</span>&lt;Vec&lt;CreateForumTag&gt;&gt;,
+    </span>available_tags: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateForumTag&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ForumEmoji&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -404,7 +406,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>default_forum_layout: <span class="prelude-ty">Option</span>&lt;ForumLayoutType&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>status: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>status: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
@@ -441,7 +443,7 @@
     /// This is for [voice] channels only.
     ///
     /// [voice]: ChannelType::Voice
-    </span><span class="kw">pub fn </span>voice_region(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>voice_region(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.rtc_region = <span class="prelude-val">Some</span>(id);
         <span class="self">self
     </span>}
@@ -449,7 +451,7 @@
     <span class="doccomment">/// The name of the channel.
     ///
     /// Must be between 2 and 100 characters long.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
@@ -467,7 +469,7 @@
     /// This is for [text] channels only.
     ///
     /// [text]: ChannelType::Text
-    </span><span class="kw">pub fn </span>topic(<span class="kw-2">mut </span><span class="self">self</span>, topic: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>topic(<span class="kw-2">mut </span><span class="self">self</span>, topic: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.topic = <span class="prelude-val">Some</span>(topic.into());
         <span class="self">self
     </span>}
@@ -550,16 +552,14 @@
     /// # Ok(())
     /// # }
     /// ```
-    </span><span class="kw">pub fn </span>permissions(<span class="kw-2">mut </span><span class="self">self</span>, perms: <span class="kw">impl </span>IntoIterator&lt;Item = PermissionOverwrite&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>overwrites = perms.into_iter().map(Into::into).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-
-        <span class="self">self</span>.permission_overwrites = <span class="prelude-val">Some</span>(overwrites);
+    </span><span class="kw">pub fn </span>permissions(<span class="kw-2">mut </span><span class="self">self</span>, overwrites: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [PermissionOverwrite]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.permission_overwrites = <span class="prelude-val">Some</span>(overwrites.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// If this is a forum channel, sets the tags that can be assigned to forum posts.
-    </span><span class="kw">pub fn </span>available_tags(<span class="kw-2">mut </span><span class="self">self</span>, tags: <span class="kw">impl </span>IntoIterator&lt;Item = CreateForumTag&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.available_tags = <span class="prelude-val">Some</span>(tags.into_iter().collect());
+    </span><span class="kw">pub fn </span>available_tags(<span class="kw-2">mut </span><span class="self">self</span>, tags: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateForumTag&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.available_tags = <span class="prelude-val">Some</span>(tags.into());
         <span class="self">self
     </span>}
 

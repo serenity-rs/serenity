@@ -105,7 +105,7 @@ webhook.edit(<span class="kw-2">&amp;</span>http, builder).<span class="kw">awai
     &amp;self,
     cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>,
     wait: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,
-    builder: <a class="struct" href="../../builder/struct.ExecuteWebhook.html" title="struct serenity::builder::ExecuteWebhook">ExecuteWebhook</a>
+    builder: <a class="struct" href="../../builder/struct.ExecuteWebhook.html" title="struct serenity::builder::ExecuteWebhook">ExecuteWebhook</a>&lt;'_&gt;
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Executes a webhook with the fields set via the given builder.</p>
 <h5 id="examples-4"><a href="#examples-4">Examples</a></h5>
 <p>Execute a webhook with message content of <code>test</code>:</p>
@@ -153,7 +153,7 @@ does not belong to the current webhook.</p>
     &amp;self,
     cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>,
     message_id: <a class="struct" href="../id/struct.MessageId.html" title="struct serenity::model::id::MessageId">MessageId</a>,
-    builder: <a class="struct" href="../../builder/struct.EditWebhookMessage.html" title="struct serenity::builder::EditWebhookMessage">EditWebhookMessage</a>
+    builder: <a class="struct" href="../../builder/struct.EditWebhookMessage.html" title="struct serenity::builder::EditWebhookMessage">EditWebhookMessage</a>&lt;'_&gt;
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Edits a webhook message with the fields set via the given builder.</p>
 <p><strong>Note</strong>: Message contents must be under 2000 unicode code points.</p>
 <h5 id="errors-7"><a href="#errors-7">Errors</a></h5>

@@ -114,8 +114,9 @@
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
 <a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateMessage;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -128,14 +129,14 @@
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateForumPost&lt;<span class="lifetime">'a</span>&gt; {
-    name: String,
+    name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>auto_archive_duration: <span class="prelude-ty">Option</span>&lt;AutoArchiveDuration&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
-    message: CreateMessage,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Vec::is_empty"</span>)]
-    </span>applied_tags: Vec&lt;ForumTagId&gt;,
+    message: CreateMessage&lt;<span class="lifetime">'a</span>&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"&lt;[_]&gt;::is_empty"</span>)]
+    </span>applied_tags: Cow&lt;<span class="lifetime">'a</span>, [ForumTagId]&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
@@ -143,13 +144,13 @@
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateForumPost&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a builder with the given name and message content, leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;, message: CreateMessage) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;, message: CreateMessage&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
             message,
             auto_archive_duration: <span class="prelude-val">None</span>,
             rate_limit_per_user: <span class="prelude-val">None</span>,
-            applied_tags: Vec::new(),
+            applied_tags: Cow::default(),
             audit_log_reason: <span class="prelude-val">None</span>,
         }
     }
@@ -157,7 +158,7 @@
     <span class="doccomment">/// The name of the forum post. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = name.into();
         <span class="self">self
     </span>}
@@ -165,7 +166,7 @@
     <span class="doccomment">/// The contents of the first message in the forum post.
     ///
     /// See [`CreateMessage`] for restrictions around message size.
-    </span><span class="kw">pub fn </span>message(<span class="kw-2">mut </span><span class="self">self</span>, message: CreateMessage) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>message(<span class="kw-2">mut </span><span class="self">self</span>, message: CreateMessage&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.message = message;
         <span class="self">self
     </span>}
@@ -192,15 +193,12 @@
     </span>}
 
     <span class="kw">pub fn </span>add_applied_tag(<span class="kw-2">mut </span><span class="self">self</span>, applied_tag: ForumTagId) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.applied_tags.push(applied_tag);
+        <span class="self">self</span>.applied_tags.to_mut().push(applied_tag);
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>set_applied_tags(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        applied_tags: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;ForumTagId&gt;&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.applied_tags = applied_tags.into_iter().map(Into::into).collect();
+    <span class="kw">pub fn </span>set_applied_tags(<span class="kw-2">mut </span><span class="self">self</span>, applied_tags: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [ForumTagId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.applied_tags = applied_tags.into();
         <span class="self">self
     </span>}
 

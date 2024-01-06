@@ -283,7 +283,11 @@
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -299,12 +303,12 @@
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateChannel&lt;<span class="lifetime">'a</span>&gt; {
-    name: String,
+    name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span>kind: ChannelType,
 
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>topic: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>topic: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>bitrate: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -313,22 +317,22 @@
     </span>rate_limit_per_user: <span class="prelude-ty">Option</span>&lt;u16&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>position: <span class="prelude-ty">Option</span>&lt;u16&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Vec::is_empty"</span>)]
-    </span>permission_overwrites: Vec&lt;PermissionOverwriteData&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"&lt;[_]&gt;::is_empty"</span>)]
+    </span>permission_overwrites: Cow&lt;<span class="lifetime">'a</span>, [PermissionOverwrite]&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>parent_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>nsfw: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>rtc_region: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>rtc_region: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>video_quality_mode: <span class="prelude-ty">Option</span>&lt;VideoQualityMode&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>default_auto_archive_duration: <span class="prelude-ty">Option</span>&lt;AutoArchiveDuration&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>default_reaction_emoji: <span class="prelude-ty">Option</span>&lt;ForumEmoji&gt;,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Vec::is_empty"</span>)]
-    </span>available_tags: Vec&lt;ForumTag&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"&lt;[_]&gt;::is_empty"</span>)]
+    </span>available_tags: Cow&lt;<span class="lifetime">'a</span>, [ForumTag]&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>default_sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
 
@@ -339,7 +343,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateChannel&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a builder with the given name, setting [`Self::kind`] to [`ChannelType::Text`] and
     /// leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name: name.into(),
             nsfw: <span class="prelude-val">None</span>,
@@ -350,13 +354,13 @@
             user_limit: <span class="prelude-val">None</span>,
             rate_limit_per_user: <span class="prelude-val">None</span>,
             kind: ChannelType::Text,
-            permission_overwrites: Vec::new(),
+            permission_overwrites: Cow::default(),
             audit_log_reason: <span class="prelude-val">None</span>,
             rtc_region: <span class="prelude-val">None</span>,
             video_quality_mode: <span class="prelude-val">None</span>,
             default_auto_archive_duration: <span class="prelude-val">None</span>,
             default_reaction_emoji: <span class="prelude-val">None</span>,
-            available_tags: Vec::new(),
+            available_tags: Cow::default(),
             default_sort_order: <span class="prelude-val">None</span>,
         }
     }
@@ -364,7 +368,7 @@
     <span class="doccomment">/// Specify how to call this new channel, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = name.into();
         <span class="self">self
     </span>}
@@ -388,7 +392,7 @@
     <span class="doccomment">/// Channel topic (0-1024 characters)
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::News`], [`ChannelType::Forum`]
-    </span><span class="kw">pub fn </span>topic(<span class="kw-2">mut </span><span class="self">self</span>, topic: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>topic(<span class="kw-2">mut </span><span class="self">self</span>, topic: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.topic = <span class="prelude-val">Some</span>(topic.into());
         <span class="self">self
     </span>}
@@ -475,8 +479,8 @@
     /// # Ok(())
     /// # }
     /// ```
-    </span><span class="kw">pub fn </span>permissions(<span class="kw-2">mut </span><span class="self">self</span>, perms: <span class="kw">impl </span>IntoIterator&lt;Item = PermissionOverwrite&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.permission_overwrites = perms.into_iter().map(Into::into).collect();
+    </span><span class="kw">pub fn </span>permissions(<span class="kw-2">mut </span><span class="self">self</span>, perms: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [PermissionOverwrite]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.permission_overwrites = perms.into();
         <span class="self">self
     </span>}
 
@@ -489,7 +493,7 @@
     <span class="doccomment">/// Channel voice region id of the voice or stage channel, automatic when not set
     ///
     /// Only for [`ChannelType::Voice`] and [`ChannelType::Stage`]
-    </span><span class="kw">pub fn </span>rtc_region(<span class="kw-2">mut </span><span class="self">self</span>, rtc_region: String) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>rtc_region(<span class="kw-2">mut </span><span class="self">self</span>, rtc_region: Cow&lt;<span class="lifetime">'a</span>, str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.rtc_region = <span class="prelude-val">Some</span>(rtc_region);
         <span class="self">self
     </span>}
@@ -525,8 +529,8 @@
     <span class="doccomment">/// Set of tags that can be used in a forum channel
     ///
     /// Only for [`ChannelType::Forum`]
-    </span><span class="kw">pub fn </span>available_tags(<span class="kw-2">mut </span><span class="self">self</span>, available_tags: <span class="kw">impl </span>IntoIterator&lt;Item = ForumTag&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.available_tags = available_tags.into_iter().collect();
+    </span><span class="kw">pub fn </span>available_tags(<span class="kw-2">mut </span><span class="self">self</span>, available_tags: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [ForumTag]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.available_tags = available_tags.into();
         <span class="self">self
     </span>}
 

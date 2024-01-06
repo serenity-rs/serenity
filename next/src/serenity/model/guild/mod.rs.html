@@ -3308,7 +3308,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        builder: AddMember,
+        builder: AddMember&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Member&gt;&gt; {
         <span class="self">self</span>.id.add_member(cache_http, user_id, builder).<span class="kw">await
     </span>}
@@ -3488,7 +3488,7 @@
     </span><span class="kw">pub async fn </span>create_command(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateCommand,
+        builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         <span class="self">self</span>.id.create_command(cache_http, builder).<span class="kw">await
     </span>}
@@ -3501,7 +3501,7 @@
     </span><span class="kw">pub async fn </span>set_commands(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        commands: Vec&lt;CreateCommand&gt;,
+        commands: <span class="kw-2">&amp;</span>[CreateCommand&lt;<span class="lifetime">'_</span>&gt;],
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         <span class="self">self</span>.id.set_commands(http, commands).<span class="kw">await
     </span>}
@@ -3519,7 +3519,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         command_id: CommandId,
-        builder: EditCommandPermissions,
+        builder: EditCommandPermissions&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
         <span class="self">self</span>.id.edit_command_permissions(cache_http, command_id, builder).<span class="kw">await
     </span>}
@@ -3569,7 +3569,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         command_id: CommandId,
-        builder: CreateCommand,
+        builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         <span class="self">self</span>.id.edit_command(cache_http, command_id, builder).<span class="kw">await
     </span>}

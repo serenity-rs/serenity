@@ -46,7 +46,9 @@
 <a href="#44" id="44">44</a>
 <a href="#45" id="45">45</a>
 <a href="#46" id="46">46</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<a href="#47" id="47">47</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object-forum-tag-structure)
@@ -54,17 +56,17 @@
 /// Contrary to the [`ForumTag`] struct, only the name field is required.
 </span><span class="attr">#[must_use]
 #[derive(Clone, Debug, Serialize)]
-</span><span class="kw">pub struct </span>CreateForumTag {
-    name: FixedString,
+</span><span class="kw">pub struct </span>CreateForumTag&lt;<span class="lifetime">'a</span>&gt; {
+    name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     moderated: bool,
     emoji_id: <span class="prelude-ty">Option</span>&lt;EmojiId&gt;,
-    emoji_name: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+    emoji_name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 }
 
-<span class="kw">impl </span>CreateForumTag {
-    <span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateForumTag&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            name: name.into().into(),
+            name: name.into(),
             moderated: <span class="bool-val">false</span>,
             emoji_id: <span class="prelude-val">None</span>,
             emoji_name: <span class="prelude-val">None</span>,
@@ -86,7 +88,7 @@
             },
             ReactionType::Unicode(unicode_emoji) =&gt; {
                 <span class="self">self</span>.emoji_id = <span class="prelude-val">None</span>;
-                <span class="self">self</span>.emoji_name = <span class="prelude-val">Some</span>(unicode_emoji);
+                <span class="self">self</span>.emoji_name = <span class="prelude-val">Some</span>(unicode_emoji.into_string().into());
             },
         }
         <span class="self">self

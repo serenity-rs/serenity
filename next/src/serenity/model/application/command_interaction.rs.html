@@ -996,7 +996,7 @@
     </span><span class="kw">pub async fn </span>create_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateInteractionResponse,
+        builder: CreateInteractionResponse&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         builder.execute(cache_http, (<span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
     </span>}
@@ -1013,7 +1013,7 @@
     </span><span class="kw">pub async fn </span>edit_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditInteractionResponse,
+        builder: EditInteractionResponse&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         builder.execute(cache_http, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
@@ -1042,7 +1042,7 @@
     </span><span class="kw">pub async fn </span>create_followup(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateInteractionResponseFollowup,
+        builder: CreateInteractionResponseFollowup&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         builder.execute(cache_http, (<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
     </span>}
@@ -1060,7 +1060,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
-        builder: CreateInteractionResponseFollowup,
+        builder: CreateInteractionResponseFollowup&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         builder.execute(cache_http, (<span class="prelude-val">Some</span>(message_id.into()), <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
     </span>}
@@ -1126,7 +1126,7 @@
     </span><span class="kw">pub async fn </span>quick_modal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         ctx: <span class="kw-2">&amp;</span>Context,
-        builder: CreateQuickModal,
+        builder: CreateQuickModal&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;QuickModalResponse&gt;&gt; {
         builder.execute(ctx, <span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}

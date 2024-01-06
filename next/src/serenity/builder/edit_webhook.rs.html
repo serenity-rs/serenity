@@ -138,7 +138,7 @@
     </span>}
 
     <span class="doccomment">/// Set the webhook's default avatar.
-    </span><span class="kw">pub fn </span>avatar(<span class="kw-2">mut </span><span class="self">self</span>, avatar: <span class="kw-2">&amp;</span>CreateAttachment) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>avatar(<span class="kw-2">mut </span><span class="self">self</span>, avatar: <span class="kw-2">&amp;</span>CreateAttachment&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.avatar = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(avatar.to_base64()));
         <span class="self">self
     </span>}

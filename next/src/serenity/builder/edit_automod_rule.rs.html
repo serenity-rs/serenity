@@ -147,8 +147,9 @@
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -170,18 +171,18 @@
 #[must_use]
 </span><span class="kw">pub struct </span>EditAutoModRule&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     event_type: EventType,
     <span class="attr">#[serde(flatten, skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>trigger: <span class="prelude-ty">Option</span>&lt;Trigger&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>actions: <span class="prelude-ty">Option</span>&lt;Vec&lt;Action&gt;&gt;,
+    </span>actions: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [Action]&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>exempt_roles: <span class="prelude-ty">Option</span>&lt;Vec&lt;RoleId&gt;&gt;,
+    </span>exempt_roles: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>exempt_channels: <span class="prelude-ty">Option</span>&lt;Vec&lt;ChannelId&gt;&gt;,
+    </span>exempt_channels: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [ChannelId]&gt;&gt;,
 
     <span class="attr">#[serde(skip)]
     </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
@@ -194,7 +195,7 @@
     }
 
     <span class="doccomment">/// The display name of the rule.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
@@ -214,8 +215,8 @@
     </span>}
 
     <span class="doccomment">/// Set the actions which will execute when the rule is triggered.
-    </span><span class="kw">pub fn </span>actions(<span class="kw-2">mut </span><span class="self">self</span>, actions: Vec&lt;Action&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.actions = <span class="prelude-val">Some</span>(actions);
+    </span><span class="kw">pub fn </span>actions(<span class="kw-2">mut </span><span class="self">self</span>, actions: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [Action]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.actions = <span class="prelude-val">Some</span>(actions.into());
         <span class="self">self
     </span>}
 
@@ -228,19 +229,16 @@
     <span class="doccomment">/// Set roles that should not be affected by the rule.
     ///
     /// Maximum of 20.
-    </span><span class="kw">pub fn </span>exempt_roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;RoleId&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.exempt_roles = <span class="prelude-val">Some</span>(roles.into_iter().map(Into::into).collect());
+    </span><span class="kw">pub fn </span>exempt_roles(<span class="kw-2">mut </span><span class="self">self</span>, roles: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [RoleId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exempt_roles = <span class="prelude-val">Some</span>(roles.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set channels that should not be affected by the rule.
     ///
     /// Maximum of 50.
-    </span><span class="kw">pub fn </span>exempt_channels(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        channels: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;ChannelId&gt;&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.exempt_channels = <span class="prelude-val">Some</span>(channels.into_iter().map(Into::into).collect());
+    </span><span class="kw">pub fn </span>exempt_channels(<span class="kw-2">mut </span><span class="self">self</span>, channels: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [ChannelId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exempt_channels = <span class="prelude-val">Some</span>(channels.into());
         <span class="self">self
     </span>}
 

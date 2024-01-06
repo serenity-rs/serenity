@@ -341,7 +341,11 @@
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
 <a href="#341" id="341">341</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -357,7 +361,7 @@
 #[must_use]
 </span><span class="kw">pub struct </span>EditGuild&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="comment">// [Omitting region because Discord deprecated it]
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>verification_level: <span class="prelude-ty">Option</span>&lt;VerificationLevel&gt;,
@@ -374,11 +378,11 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>owner_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>splash: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
+    </span>splash: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>discovery_splash: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
+    </span>discovery_splash: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>banner: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
+    </span>banner: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>system_channel_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -388,11 +392,11 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>public_updates_channel_id: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>preferred_locale: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
+    </span>preferred_locale: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>features: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+    </span>features: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [Cow&lt;<span class="lifetime">'a</span>, str&gt;]&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    </span>description: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>premium_progress_bar_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
@@ -443,7 +447,7 @@
     /// # Ok(())
     /// # }
     /// ```
-    </span><span class="kw">pub fn </span>icon(<span class="kw-2">mut </span><span class="self">self</span>, icon: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CreateAttachment&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>icon(<span class="kw-2">mut </span><span class="self">self</span>, icon: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.icon = <span class="prelude-val">Some</span>(icon.map(CreateAttachment::to_base64));
         <span class="self">self
     </span>}
@@ -457,7 +461,7 @@
     <span class="doccomment">/// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 characters.
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.name = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
@@ -468,7 +472,7 @@
     /// this through a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.description = <span class="prelude-val">Some</span>(name.into());
         <span class="self">self
     </span>}
@@ -479,8 +483,8 @@
     /// this through a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    </span><span class="kw">pub fn </span>features(<span class="kw-2">mut </span><span class="self">self</span>, features: Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.features = <span class="prelude-val">Some</span>(features);
+    </span><span class="kw">pub fn </span>features(<span class="kw-2">mut </span><span class="self">self</span>, features: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [Cow&lt;<span class="lifetime">'a</span>, str&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.features = <span class="prelude-val">Some</span>(features.into());
         <span class="self">self
     </span>}
 
@@ -501,7 +505,7 @@
     /// through a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    </span><span class="kw">pub fn </span>splash(<span class="kw-2">mut </span><span class="self">self</span>, splash: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>splash(<span class="kw-2">mut </span><span class="self">self</span>, splash: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.splash = <span class="prelude-val">Some</span>(splash);
         <span class="self">self
     </span>}
@@ -514,7 +518,7 @@
     /// a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    </span><span class="kw">pub fn </span>discovery_splash(<span class="kw-2">mut </span><span class="self">self</span>, splash: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>discovery_splash(<span class="kw-2">mut </span><span class="self">self</span>, splash: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.discovery_splash = <span class="prelude-val">Some</span>(splash);
         <span class="self">self
     </span>}
@@ -527,7 +531,7 @@
     /// guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    </span><span class="kw">pub fn </span>banner(<span class="kw-2">mut </span><span class="self">self</span>, banner: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>banner(<span class="kw-2">mut </span><span class="self">self</span>, banner: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.banner = <span class="prelude-val">Some</span>(banner);
         <span class="self">self
     </span>}
@@ -559,7 +563,7 @@
     /// If this is not set, the locale will default to "en-US";
     ///
     /// **Note**: This feature is for Community guilds only.
-    </span><span class="kw">pub fn </span>preferred_locale(<span class="kw-2">mut </span><span class="self">self</span>, locale: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>preferred_locale(<span class="kw-2">mut </span><span class="self">self</span>, locale: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.preferred_locale = <span class="prelude-val">Some</span>(locale);
         <span class="self">self
     </span>}

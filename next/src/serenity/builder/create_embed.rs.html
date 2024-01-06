@@ -324,6 +324,86 @@
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Developer note:
 //!
 //! This is a set of embed builders for rich embeds.
@@ -340,31 +420,47 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
-</span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+</span><span class="kw">use </span>std::borrow::Cow;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder to create an embed in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateEmbed {
-    inner: Embed,
-    fields: Vec&lt;EmbedField&gt;,
+</span><span class="kw">pub struct </span>CreateEmbed&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>title: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
+    #[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>kind: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>description: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>url: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="attr">#[serde(rename = <span class="string">"color"</span>)]
+    #[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>footer: <span class="prelude-ty">Option</span>&lt;CreateEmbedFooter&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>image: <span class="prelude-ty">Option</span>&lt;CreateEmbedImage&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>thumbnail: <span class="prelude-ty">Option</span>&lt;CreateEmbedImage&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    </span>author: <span class="prelude-ty">Option</span>&lt;CreateEmbedAuthor&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    <span class="doccomment">/// No point using a Cow slice, as there is no set_fields method
+    /// and CreateEmbedField is not public.
+    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"&lt;[_]&gt;::is_empty"</span>)]
+    </span>fields: Vec&lt;CreateEmbedField&lt;<span class="lifetime">'a</span>&gt;&gt;,
 }
 
-<span class="kw">impl </span>serde::Serialize <span class="kw">for </span>CreateEmbed {
-    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
-        <span class="kw">let </span>owned_self = <span class="self">self</span>.clone();
-
-        <span class="kw">let </span><span class="kw-2">mut </span>embed = owned_self.inner;
-        embed.fields = owned_self.fields.into();
-        embed.serialize(serializer)
-    }
-}
-
-<span class="kw">impl </span>CreateEmbed {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateEmbed&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Equivalent to [`Self::default`].
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
@@ -373,8 +469,8 @@
     <span class="doccomment">/// Set the author of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more information.
-    </span><span class="kw">pub fn </span>author(<span class="kw-2">mut </span><span class="self">self</span>, author: CreateEmbedAuthor) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.author = <span class="prelude-val">Some</span>(author.<span class="number">0</span>);
+    </span><span class="kw">pub fn </span>author(<span class="kw-2">mut </span><span class="self">self</span>, author: CreateEmbedAuthor&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.author = <span class="prelude-val">Some</span>(author);
         <span class="self">self
     </span>}
 
@@ -389,7 +485,7 @@
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>colour&lt;C: Into&lt;Colour&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.colour = <span class="prelude-val">Some</span>(colour.into());
+        <span class="self">self</span>.colour = <span class="prelude-val">Some</span>(colour.into());
         <span class="self">self
     </span>}
 
@@ -397,8 +493,8 @@
     ///
     /// **Note**: This can't be longer than 4096 characters.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.description = <span class="prelude-val">Some</span>(description.into().into());
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
         <span class="self">self
     </span>}
 
@@ -409,11 +505,15 @@
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>field(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        name: <span class="kw">impl </span>Into&lt;String&gt;,
-        value: <span class="kw">impl </span>Into&lt;String&gt;,
+        name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+        value: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
         inline: bool,
     ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.fields.push(EmbedField::new(name, value, inline));
+        <span class="self">self</span>.fields.push(CreateEmbedField {
+            name: name.into(),
+            value: value.into(),
+            inline,
+        });
         <span class="self">self
     </span>}
 
@@ -422,11 +522,15 @@
     /// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.
     </span><span class="kw">pub fn </span>fields&lt;N, V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, fields: <span class="kw">impl </span>IntoIterator&lt;Item = (N, V, bool)&gt;) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>N: Into&lt;String&gt;,
-        V: Into&lt;String&gt;,
+        </span>N: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+        V: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
-        <span class="kw">let </span>fields =
-            fields.into_iter().map(|(name, value, inline)| EmbedField::new(name, value, inline));
+        <span class="kw">let </span>fields = fields.into_iter().map(|(name, value, inline)| CreateEmbedField {
+            name: name.into(),
+            value: value.into(),
+            inline,
+        });
+
         <span class="self">self</span>.fields.extend(fields);
         <span class="self">self
     </span>}
@@ -434,31 +538,25 @@
     <span class="doccomment">/// Set the footer of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedFooter`] for more information.
-    </span><span class="kw">pub fn </span>footer(<span class="kw-2">mut </span><span class="self">self</span>, footer: CreateEmbedFooter) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.footer = <span class="prelude-val">Some</span>(footer.<span class="number">0</span>);
+    </span><span class="kw">pub fn </span>footer(<span class="kw-2">mut </span><span class="self">self</span>, footer: CreateEmbedFooter&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.footer = <span class="prelude-val">Some</span>(footer);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the image associated with the embed. This only supports HTTP(S).
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.image = <span class="prelude-val">Some</span>(EmbedImage {
-            url: url.into().into(),
-            proxy_url: <span class="prelude-val">None</span>,
-            height: <span class="prelude-val">None</span>,
-            width: <span class="prelude-val">None</span>,
+    </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.image = <span class="prelude-val">Some</span>(CreateEmbedImage {
+            url: url.into(),
         });
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the thumbnail of the embed. This only supports HTTP(S).
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>thumbnail(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.thumbnail = <span class="prelude-val">Some</span>(EmbedThumbnail {
-            url: url.into().into(),
-            proxy_url: <span class="prelude-val">None</span>,
-            height: <span class="prelude-val">None</span>,
-            width: <span class="prelude-val">None</span>,
+    </span><span class="kw">pub fn </span>thumbnail(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thumbnail = <span class="prelude-val">Some</span>(CreateEmbedImage {
+            url: url.into(),
         });
         <span class="self">self
     </span>}
@@ -479,21 +577,21 @@
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>timestamp&lt;T: Into&lt;Timestamp&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: T) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.timestamp = <span class="prelude-val">Some</span>(timestamp.into());
+        <span class="self">self</span>.timestamp = <span class="prelude-val">Some</span>(timestamp.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the title of the embed.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.title = <span class="prelude-val">Some</span>(title.into().into());
+    </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the URL to direct to when clicking on the title.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.inner.url = <span class="prelude-val">Some</span>(url.into().into());
+    </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.url = <span class="prelude-val">Some</span>(url.into());
         <span class="self">self
     </span>}
 
@@ -513,11 +611,11 @@
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">0</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>author) = <span class="self">self</span>.inner.author {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>author) = <span class="self">self</span>.author {
             length += author.name.chars().count();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>description) = <span class="self">self</span>.inner.description {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>description) = <span class="self">self</span>.description {
             length += description.chars().count();
         }
 
@@ -526,11 +624,11 @@
             length += field.value.chars().count();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>footer) = <span class="self">self</span>.inner.footer {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>footer) = <span class="self">self</span>.footer {
             length += footer.text.chars().count();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.inner.title {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.title {
             length += title.chars().count();
         }
 
@@ -539,35 +637,39 @@
     }
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>CreateEmbed {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>CreateEmbed&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a builder with default values, setting the `type` to `rich`.
     </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             fields: Vec::new(),
-            inner: Embed {
-                fields: FixedArray::new(),
-                description: <span class="prelude-val">None</span>,
-                thumbnail: <span class="prelude-val">None</span>,
-                timestamp: <span class="prelude-val">None</span>,
-                kind: <span class="prelude-val">Some</span>(<span class="string">"rich"</span>.to_string().into()),
-                author: <span class="prelude-val">None</span>,
-                colour: <span class="prelude-val">None</span>,
-                footer: <span class="prelude-val">None</span>,
-                image: <span class="prelude-val">None</span>,
-                title: <span class="prelude-val">None</span>,
-                url: <span class="prelude-val">None</span>,
-                video: <span class="prelude-val">None</span>,
-                provider: <span class="prelude-val">None</span>,
-            },
+            description: <span class="prelude-val">None</span>,
+            thumbnail: <span class="prelude-val">None</span>,
+            timestamp: <span class="prelude-val">None</span>,
+            kind: <span class="prelude-val">Some</span>(<span class="string">"rich"</span>),
+            author: <span class="prelude-val">None</span>,
+            colour: <span class="prelude-val">None</span>,
+            footer: <span class="prelude-val">None</span>,
+            image: <span class="prelude-val">None</span>,
+            title: <span class="prelude-val">None</span>,
+            url: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl </span>From&lt;Embed&gt; <span class="kw">for </span>CreateEmbed {
-    <span class="kw">fn </span>from(<span class="kw-2">mut </span>embed: Embed) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Embed&gt; <span class="kw">for </span>CreateEmbed&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(embed: Embed) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            fields: std::mem::take(<span class="kw-2">&amp;mut </span>embed.fields).into_vec(),
-            inner: embed,
+            fields: embed.fields.into_iter().map(Into::into).collect(),
+            description: embed.description.map(FixedString::into_string).map(Into::into),
+            thumbnail: embed.thumbnail.map(Into::into),
+            timestamp: embed.timestamp,
+            kind: <span class="prelude-val">Some</span>(<span class="string">"rich"</span>),
+            author: embed.author.map(Into::into),
+            colour: embed.colour,
+            footer: embed.footer.map(Into::into),
+            image: embed.image.map(Into::into),
+            title: embed.title.map(FixedString::into_string).map(Into::into),
+            url: embed.url.map(FixedString::into_string).map(Into::into),
         }
     }
 }
@@ -575,77 +677,135 @@
 <span class="doccomment">/// A builder to create the author data of an emebd. See [`CreateEmbed::author`]
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateEmbedAuthor(EmbedAuthor);
+</span><span class="kw">pub struct </span>CreateEmbedAuthor&lt;<span class="lifetime">'a</span>&gt; {
+    name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    url: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+    icon_url: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+}
 
-<span class="kw">impl </span>CreateEmbedAuthor {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateEmbedAuthor&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates an author object with the given name, leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(EmbedAuthor {
-            name: name.into().into(),
+    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: name.into(),
             icon_url: <span class="prelude-val">None</span>,
             url: <span class="prelude-val">None</span>,
-            <span class="comment">// Has no builder method because I think this field is only relevant when receiving (?)
-            </span>proxy_icon_url: <span class="prelude-val">None</span>,
-        })
+        }
     }
 
     <span class="doccomment">/// Set the author's name, replacing the current value as set in [`Self::new`].
-    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.name = name.into().into();
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.name = name.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the URL of the author's icon.
-    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into().into());
+    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the author's URL.
-    </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.url = <span class="prelude-val">Some</span>(url.into().into());
+    </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.url = <span class="prelude-val">Some</span>(url.into());
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl </span>From&lt;EmbedAuthor&gt; <span class="kw">for </span>CreateEmbedAuthor {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;EmbedAuthor&gt; <span class="kw">for </span>CreateEmbedAuthor&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(author: EmbedAuthor) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(author)
+        <span class="self">Self </span>{
+            name: author.name.into_string().into(),
+            url: author.url.map(|f| f.into_string().into()),
+            icon_url: author.icon_url.map(|f| f.into_string().into()),
+        }
     }
 }
 
 <span class="doccomment">/// A builder to create the footer data for an embed. See [`CreateEmbed::footer`]
 </span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
-</span><span class="kw">pub struct </span>CreateEmbedFooter(EmbedFooter);
+</span><span class="kw">pub struct </span>CreateEmbedFooter&lt;<span class="lifetime">'a</span>&gt; {
+    text: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    icon_url: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+}
 
-<span class="kw">impl </span>CreateEmbedFooter {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateEmbedFooter&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new footer object with the given text, leaving all other fields empty.
-    </span><span class="kw">pub fn </span>new(text: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(EmbedFooter {
-            text: text.into().into(),
+    </span><span class="kw">pub fn </span>new(text: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            text: text.into(),
             icon_url: <span class="prelude-val">None</span>,
-            <span class="comment">// Has no builder method because I think this field is only relevant when receiving (?)
-            </span>proxy_icon_url: <span class="prelude-val">None</span>,
-        })
+        }
     }
 
     <span class="doccomment">/// Set the footer's text, replacing the current value as set in [`Self::new`].
-    </span><span class="kw">pub fn </span>text(<span class="kw-2">mut </span><span class="self">self</span>, text: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.text = text.into().into();
+    </span><span class="kw">pub fn </span>text(<span class="kw-2">mut </span><span class="self">self</span>, text: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.text = text.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the icon URL's value. This only supports HTTP(S).
-    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.<span class="number">0</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into().into());
+    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into());
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl </span>From&lt;EmbedFooter&gt; <span class="kw">for </span>CreateEmbedFooter {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;EmbedFooter&gt; <span class="kw">for </span>CreateEmbedFooter&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(footer: EmbedFooter) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>(footer)
+        <span class="self">Self </span>{
+            text: footer.text.into_string().into(),
+            icon_url: footer.icon_url.map(|f| f.into_string().into()),
+        }
+    }
+}
+
+<span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="kw">struct </span>CreateEmbedField&lt;<span class="lifetime">'a</span>&gt; {
+    name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    value: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+    inline: bool,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>EmbedField&gt; <span class="kw">for </span>CreateEmbedField&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(field: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>EmbedField) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: field.name.as_str().into(),
+            value: field.value.as_str().into(),
+            inline: field.inline,
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;EmbedField&gt; <span class="kw">for </span>CreateEmbedField&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(field: EmbedField) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: field.name.into_string().into(),
+            value: field.value.into_string().into(),
+            inline: field.inline,
+        }
+    }
+}
+
+<span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="kw">struct </span>CreateEmbedImage&lt;<span class="lifetime">'a</span>&gt; {
+    url: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;EmbedImage&gt; <span class="kw">for </span>CreateEmbedImage&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(field: EmbedImage) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            url: field.url.into_string().into(),
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;EmbedThumbnail&gt; <span class="kw">for </span>CreateEmbedImage&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(field: EmbedThumbnail) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            url: field.url.into_string().into(),
+        }
     }
 }
 </code></pre></div></section></main></body></html>

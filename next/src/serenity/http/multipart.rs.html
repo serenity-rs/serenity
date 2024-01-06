@@ -79,7 +79,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::builder::CreateAttachment;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
-<span class="kw">impl </span>CreateAttachment {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateAttachment&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>into_part(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Part&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>part = Part::bytes(<span class="self">self</span>.data);
         part = guess_mime_str(part, <span class="kw-2">&amp;</span><span class="self">self</span>.filename)<span class="question-mark">?</span>;
@@ -89,18 +89,18 @@
 }
 
 <span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">pub enum </span>MultipartUpload {
+</span><span class="kw">pub enum </span>MultipartUpload&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// A file sent with the form data as an individual upload. For example, a sticker.
-    </span>File(CreateAttachment),
+    </span>File(CreateAttachment&lt;<span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Files sent with the form as message attachments.
-    </span>Attachments(Vec&lt;CreateAttachment&gt;),
+    </span>Attachments(Vec&lt;CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;),
 }
 
 <span class="doccomment">/// Holder for multipart body. Contains upload data, multipart fields, and payload_json for
 /// creating requests with attachments.
 </span><span class="attr">#[derive(Clone, Debug)]
-</span><span class="kw">pub struct </span>Multipart {
-    <span class="kw">pub </span>upload: MultipartUpload,
+</span><span class="kw">pub struct </span>Multipart&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>upload: MultipartUpload&lt;<span class="lifetime">'a</span>&gt;,
     <span class="doccomment">/// Multipart text fields that are sent with the form data as individual fields. If a certain
     /// endpoint does not support passing JSON body via `payload_json`, this must be used instead.
     </span><span class="kw">pub </span>fields: Vec&lt;(Cow&lt;<span class="lifetime">'static</span>, str&gt;, Cow&lt;<span class="lifetime">'static</span>, str&gt;)&gt;,
@@ -108,7 +108,7 @@
     </span><span class="kw">pub </span>payload_json: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl </span>Multipart {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Multipart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_form(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Form&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>multipart = Form::new();
 

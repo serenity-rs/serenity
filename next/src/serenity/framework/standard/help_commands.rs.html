@@ -2421,7 +2421,7 @@
 
         flatten_group_to_string(<span class="kw-2">&amp;mut </span>embed_text, group, <span class="number">0</span>, help_options)<span class="question-mark">?</span>;
 
-        embed = embed.field(group.name, <span class="kw-2">&amp;</span>embed_text, <span class="bool-val">true</span>);
+        embed = embed.field(group.name, embed_text, <span class="bool-val">true</span>);
     }
 
     <span class="kw">let </span>builder = CreateMessage::new().embed(embed);

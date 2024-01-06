@@ -5187,7 +5187,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interaction_token: <span class="kw-2">&amp;</span>str,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-        files: Vec&lt;CreateAttachment&gt;,
+        files: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
@@ -5387,7 +5387,7 @@
         interaction_id: InteractionId,
         interaction_token: <span class="kw-2">&amp;</span>str,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-        files: Vec&lt;CreateAttachment&gt;,
+        files: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
@@ -5568,15 +5568,15 @@
     </span><span class="kw">pub async fn </span>create_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
-        map: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)&gt;,
-        file: CreateAttachment,
+        map: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, Cow&lt;<span class="lifetime">'static</span>, str&gt;)&gt;,
+        file: CreateAttachment&lt;<span class="lifetime">'_</span>&gt;,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">Some</span>(Multipart {
                 upload: MultipartUpload::File(file),
-                fields: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
+                fields: map.into_iter().map(|(k, v)| (k.into(), v)).collect(),
                 payload_json: <span class="prelude-val">None</span>,
             }),
             headers: audit_log_reason.map(reason_into_header),
@@ -6268,7 +6268,7 @@
         interaction_token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-        new_attachments: Vec&lt;CreateAttachment&gt;,
+        new_attachments: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
@@ -6557,7 +6557,7 @@
         channel_id: ChannelId,
         message_id: MessageId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-        new_attachments: Vec&lt;CreateAttachment&gt;,
+        new_attachments: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
@@ -6703,7 +6703,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         interaction_token: <span class="kw-2">&amp;</span>str,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-        new_attachments: Vec&lt;CreateAttachment&gt;,
+        new_attachments: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
@@ -7148,7 +7148,7 @@
         thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         token: <span class="kw-2">&amp;</span>str,
         wait: bool,
-        files: Vec&lt;CreateAttachment&gt;,
+        files: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Message&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
@@ -7225,7 +7225,7 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
-        new_attachments: Vec&lt;CreateAttachment&gt;,
+        new_attachments: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">1</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
@@ -9046,7 +9046,7 @@
     </span><span class="kw">pub async fn </span>send_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
-        files: Vec&lt;CreateAttachment&gt;,
+        files: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
