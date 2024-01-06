@@ -1,5 +1,6 @@
 //! Models relating to Discord channels.
 
+use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -350,7 +351,11 @@ impl Message {
     /// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditMessage) -> Result<()> {
+    pub async fn edit(
+        &mut self,
+        cache_http: impl CacheHttp,
+        builder: EditMessage<'_>,
+    ) -> Result<()> {
         if let Some(flags) = self.flags {
             if flags.contains(MessageFlags::IS_VOICE_MESSAGE) {
                 return Err(Error::Model(ModelError::CannotEditVoiceMessage));
@@ -590,7 +595,7 @@ impl Message {
     pub async fn reply(
         &self,
         cache_http: impl CacheHttp,
-        content: impl Into<String>,
+        content: impl Into<Cow<'_, str>>,
     ) -> Result<Message> {
         self._reply(cache_http, content, Some(false)).await
     }
@@ -614,7 +619,7 @@ impl Message {
     pub async fn reply_ping(
         &self,
         cache_http: impl CacheHttp,
-        content: impl Into<String>,
+        content: impl Into<Cow<'_, str>>,
     ) -> Result<Message> {
         self._reply(cache_http, content, Some(true)).await
     }
@@ -650,7 +655,7 @@ impl Message {
     async fn _reply(
         &self,
         cache_http: impl CacheHttp,
-        content: impl Into<String>,
+        content: impl Into<Cow<'_, str>>,
         inlined: Option<bool>,
     ) -> Result<Message> {
         #[cfg(feature = "cache")]
