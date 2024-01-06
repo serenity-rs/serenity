@@ -126,8 +126,8 @@ macro_rules! button_and_select_menu_convenience_methods {
         ///
         /// Convenience method that wraps [`Self::components`]. Arranges buttons in action rows
         /// automatically.
-        pub fn button(mut $self, button: super::CreateButton) -> Self {
-            let rows = $self$(.$components_path)+.get_or_insert_with(Vec::new);
+        pub fn button(mut $self, button: super::CreateButton<'a>) -> Self {
+            let rows = $self$(.$components_path)+.get_or_insert_with(Cow::default).to_mut();
             let row_with_space_left = rows.last_mut().and_then(|row| match row {
                 super::CreateActionRow::Buttons(buttons) if buttons.len() < 5 => Some(buttons),
                 _ => None,
@@ -142,9 +142,10 @@ macro_rules! button_and_select_menu_convenience_methods {
         /// Adds an interactive select menu to this message.
         ///
         /// Convenience method that wraps [`Self::components`].
-        pub fn select_menu(mut $self, select_menu: super::CreateSelectMenu) -> Self {
+        pub fn select_menu(mut $self, select_menu: super::CreateSelectMenu<'a>) -> Self {
             $self$(.$components_path)+
-                .get_or_insert_with(Vec::new)
+                .get_or_insert_with(Cow::default)
+                .to_mut()
                 .push(super::CreateActionRow::SelectMenu(select_menu));
             $self
         }

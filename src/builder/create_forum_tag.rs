@@ -1,4 +1,5 @@
-use crate::internal::prelude::*;
+use std::borrow::Cow;
+
 use crate::model::prelude::*;
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object-forum-tag-structure)
@@ -6,17 +7,17 @@ use crate::model::prelude::*;
 /// Contrary to the [`ForumTag`] struct, only the name field is required.
 #[must_use]
 #[derive(Clone, Debug, Serialize)]
-pub struct CreateForumTag {
-    name: FixedString,
+pub struct CreateForumTag<'a> {
+    name: Cow<'a, str>,
     moderated: bool,
     emoji_id: Option<EmojiId>,
-    emoji_name: Option<FixedString>,
+    emoji_name: Option<Cow<'a, str>>,
 }
 
-impl CreateForumTag {
-    pub fn new(name: impl Into<String>) -> Self {
+impl<'a> CreateForumTag<'a> {
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            name: name.into().into(),
+            name: name.into(),
             moderated: false,
             emoji_id: None,
             emoji_name: None,
@@ -38,7 +39,7 @@ impl CreateForumTag {
             },
             ReactionType::Unicode(unicode_emoji) => {
                 self.emoji_id = None;
-                self.emoji_name = Some(unicode_emoji);
+                self.emoji_name = Some(unicode_emoji.into_string().into());
             },
         }
         self
