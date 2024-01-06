@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
 use super::{
@@ -17,7 +19,7 @@ use crate::model::prelude::*;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
 #[derive(Clone, Debug)]
-pub enum CreateInteractionResponse {
+pub enum CreateInteractionResponse<'a> {
     /// Acknowledges a Ping (only required when your bot uses an HTTP endpoint URL).
     ///
     /// Corresponds to Discord's `PONG`.
@@ -25,12 +27,12 @@ pub enum CreateInteractionResponse {
     /// Responds to an interaction with a message.
     ///
     /// Corresponds to Discord's `CHANNEL_MESSAGE_WITH_SOURCE`.
-    Message(CreateInteractionResponseMessage),
+    Message(CreateInteractionResponseMessage<'a>),
     /// Acknowledges the interaction in order to edit a response later. The user sees a loading
     /// state.
     ///
     /// Corresponds to Discord's `DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE`.
-    Defer(CreateInteractionResponseMessage),
+    Defer(CreateInteractionResponseMessage<'a>),
     /// Only valid for component-based interactions (seems to work for modal submit interactions
     /// too even though it's not documented).
     ///
@@ -44,19 +46,19 @@ pub enum CreateInteractionResponse {
     /// Edits the message the component was attached to.
     ///
     /// Corresponds to Discord's `UPDATE_MESSAGE`.
-    UpdateMessage(CreateInteractionResponseMessage),
+    UpdateMessage(CreateInteractionResponseMessage<'a>),
     /// Only valid for autocomplete interactions.
     ///
     /// Responds to the autocomplete interaction with suggested choices.
     ///
     /// Corresponds to Discord's `APPLICATION_COMMAND_AUTOCOMPLETE_RESULT`.
-    Autocomplete(CreateAutocompleteResponse),
+    Autocomplete(CreateAutocompleteResponse<'a>),
     /// Not valid for Modal and Ping interactions
     ///
     /// Responds to the interaction with a popup modal.
     ///
     /// Corresponds to Discord's `MODAL`.
-    Modal(CreateModal),
+    Modal(CreateModal<'a>),
     /// Not valid for autocomplete and Ping interactions. Only available for applications with
     /// monetization enabled.
     ///
@@ -66,7 +68,7 @@ pub enum CreateInteractionResponse {
     PremiumRequired,
 }
 
-impl serde::Serialize for CreateInteractionResponse {
+impl serde::Serialize for CreateInteractionResponse<'_> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         use serde::ser::Error as _;
 
@@ -97,7 +99,7 @@ impl serde::Serialize for CreateInteractionResponse {
     }
 }
 
-impl CreateInteractionResponse {
+impl CreateInteractionResponse<'_> {
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<()> {
         if let CreateInteractionResponse::Message(data)
@@ -113,7 +115,7 @@ impl CreateInteractionResponse {
                 check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
                     .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
 
-                for embed in embeds {
+                for embed in embeds.iter() {
                     embed.check_length()?;
                 }
             }
@@ -124,7 +126,7 @@ impl CreateInteractionResponse {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for CreateInteractionResponse {
+impl Builder for CreateInteractionResponse<'_> {
     type Context<'ctx> = (InteractionId, &'ctx str);
     type Built = ();
 
@@ -158,23 +160,23 @@ impl Builder for CreateInteractionResponse {
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateInteractionResponseMessage {
+pub struct CreateInteractionResponseMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     tts: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<String>,
+    content: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    embeds: Option<Vec<CreateEmbed>>,
+    embeds: Option<Cow<'a, [CreateEmbed<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    allowed_mentions: Option<CreateAllowedMentions>,
+    allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<InteractionResponseFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Vec<CreateActionRow>>,
-    attachments: EditAttachments,
+    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
+    attachments: EditAttachments<'a>,
 }
 
-impl CreateInteractionResponseMessage {
+impl<'a> CreateInteractionResponseMessage<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -191,13 +193,13 @@ impl CreateInteractionResponseMessage {
     }
 
     /// Appends a file to the message.
-    pub fn add_file(mut self, file: CreateAttachment) -> Self {
+    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
         self.attachments = self.attachments.add(file);
         self
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         for file in files {
             self.attachments = self.attachments.add(file);
         }
@@ -208,7 +210,7 @@ impl CreateInteractionResponseMessage {
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
         self.attachments = EditAttachments::new();
         self.add_files(files)
     }
@@ -217,7 +219,7 @@ impl CreateInteractionResponseMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(mut self, content: impl Into<String>) -> Self {
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
     }
@@ -225,16 +227,16 @@ impl CreateInteractionResponseMessage {
     /// Adds an embed to the message.
     ///
     /// Calling this while editing a message will overwrite existing embeds.
-    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.get_or_insert_with(Vec::new).push(embed);
+    pub fn add_embed(mut self, embed: CreateEmbed<'a>) -> Self {
+        self.embeds.get_or_insert_with(Cow::default).to_mut().push(embed);
         self
     }
 
     /// Adds multiple embeds for the message.
     ///
     /// Calling this while editing a message will overwrite existing embeds.
-    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.get_or_insert_with(Vec::new).extend(embeds);
+    pub fn add_embeds(mut self, embeds: impl IntoIterator<Item = CreateEmbed<'a>>) -> Self {
+        self.embeds.get_or_insert_with(Cow::default).to_mut().extend(embeds);
         self
     }
 
@@ -242,7 +244,7 @@ impl CreateInteractionResponseMessage {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    pub fn embed(self, embed: CreateEmbed) -> Self {
+    pub fn embed(self, embed: CreateEmbed<'a>) -> Self {
         self.embeds(vec![embed])
     }
 
@@ -250,13 +252,13 @@ impl CreateInteractionResponseMessage {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
-    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = Some(embeds);
+    pub fn embeds(mut self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
+        self.embeds = Some(embeds.into());
         self
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions<'a>) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }
@@ -282,8 +284,8 @@ impl CreateInteractionResponseMessage {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = Some(components.into());
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
@@ -293,31 +295,35 @@ impl CreateInteractionResponseMessage {
 // [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 #[must_use]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(transparent)]
-pub struct AutocompleteChoice(CommandOptionChoice);
-impl AutocompleteChoice {
-    pub fn new(name: impl Into<String>, value: impl Into<Value>) -> Self {
-        Self(CommandOptionChoice {
-            name: name.into().into(),
+pub struct AutocompleteChoice<'a> {
+    pub name: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    pub value: Value,
+}
+
+impl<'a> AutocompleteChoice<'a> {
+    pub fn new(name: impl Into<Cow<'a, str>>, value: impl Into<Value>) -> Self {
+        Self {
+            name: name.into(),
             name_localizations: None,
             value: value.into(),
-        })
+        }
     }
 
     pub fn add_localized_name(
         mut self,
-        locale: impl Into<String>,
-        localized_name: impl Into<String>,
+        locale: impl Into<Cow<'a, str>>,
+        localized_name: impl Into<Cow<'a, str>>,
     ) -> Self {
-        self.0
-            .name_localizations
+        self.name_localizations
             .get_or_insert_with(Default::default)
             .insert(locale.into(), localized_name.into());
         self
     }
 }
 
-impl<S: Into<String>> From<S> for AutocompleteChoice {
+impl<'a, S: Into<Cow<'a, str>>> From<S> for AutocompleteChoice<'a> {
     fn from(value: S) -> Self {
         let value = value.into();
         let name = value.clone();
@@ -328,11 +334,11 @@ impl<S: Into<String>> From<S> for AutocompleteChoice {
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateAutocompleteResponse {
-    choices: Vec<AutocompleteChoice>,
+pub struct CreateAutocompleteResponse<'a> {
+    choices: Cow<'a, [AutocompleteChoice<'a>]>,
 }
 
-impl CreateAutocompleteResponse {
+impl<'a> CreateAutocompleteResponse<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -343,8 +349,8 @@ impl CreateAutocompleteResponse {
     /// See the official docs on [`Application Command Option Choices`] for more information.
     ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
-    pub fn set_choices(mut self, choices: Vec<AutocompleteChoice>) -> Self {
-        self.choices = choices;
+    pub fn set_choices(mut self, choices: impl Into<Cow<'a, [AutocompleteChoice<'a>]>>) -> Self {
+        self.choices = choices.into();
         self
     }
 
@@ -352,7 +358,7 @@ impl CreateAutocompleteResponse {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
+    pub fn add_int_choice(self, name: impl Into<Cow<'a, str>>, value: i64) -> Self {
         self.add_choice(AutocompleteChoice::new(name, value))
     }
 
@@ -360,7 +366,11 @@ impl CreateAutocompleteResponse {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be up to 100 characters.
-    pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
+    pub fn add_string_choice(
+        self,
+        name: impl Into<Cow<'a, str>>,
+        value: impl Into<Cow<'a, str>>,
+    ) -> Self {
         self.add_choice(AutocompleteChoice::new(name, value.into()))
     }
 
@@ -368,19 +378,19 @@ impl CreateAutocompleteResponse {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
     /// characters. Value must be between -2^53 and 2^53.
-    pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
+    pub fn add_number_choice(self, name: impl Into<Cow<'a, str>>, value: f64) -> Self {
         self.add_choice(AutocompleteChoice::new(name, value))
     }
 
-    fn add_choice(mut self, value: AutocompleteChoice) -> Self {
-        self.choices.push(value);
+    fn add_choice(mut self, value: AutocompleteChoice<'a>) -> Self {
+        self.choices.to_mut().push(value);
         self
     }
 }
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for CreateAutocompleteResponse {
+impl Builder for CreateAutocompleteResponse<'_> {
     type Context<'ctx> = (InteractionId, &'ctx str);
     type Built = ();
 
@@ -401,17 +411,17 @@ impl Builder for CreateAutocompleteResponse {
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateModal {
-    components: Vec<CreateActionRow>,
-    custom_id: String,
-    title: String,
+pub struct CreateModal<'a> {
+    components: Cow<'a, [CreateActionRow<'a>]>,
+    custom_id: Cow<'a, str>,
+    title: Cow<'a, str>,
 }
 
-impl CreateModal {
+impl<'a> CreateModal<'a> {
     /// Creates a new modal.
-    pub fn new(custom_id: impl Into<String>, title: impl Into<String>) -> Self {
+    pub fn new(custom_id: impl Into<Cow<'a, str>>, title: impl Into<Cow<'a, str>>) -> Self {
         Self {
-            components: Vec::new(),
+            components: Cow::default(),
             custom_id: custom_id.into(),
             title: title.into(),
         }
@@ -420,8 +430,8 @@ impl CreateModal {
     /// Sets the components of this message.
     ///
     /// Overwrites existing components.
-    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = components;
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = components.into();
         self
     }
 }

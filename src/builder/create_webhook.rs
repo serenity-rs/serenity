@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateAttachment;
@@ -12,7 +14,7 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateWebhook<'a> {
-    name: String,
+    name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     avatar: Option<String>,
 
@@ -22,7 +24,7 @@ pub struct CreateWebhook<'a> {
 
 impl<'a> CreateWebhook<'a> {
     /// Creates a new builder with the given webhook name, leaving all other fields empty.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
             name: name.into(),
             avatar: None,
@@ -33,13 +35,13 @@ impl<'a> CreateWebhook<'a> {
     /// Set the webhook's name, replacing the current value as set in [`Self::new`].
     ///
     /// This must be between 1-80 characters.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = name.into();
         self
     }
 
     /// Set the webhook's default avatar.
-    pub fn avatar(mut self, avatar: &CreateAttachment) -> Self {
+    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
         self.avatar = Some(avatar.to_base64());
         self
     }

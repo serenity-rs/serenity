@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
 use super::{
@@ -20,23 +22,23 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditWebhookMessage {
+pub struct EditWebhookMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<String>,
+    content: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    embeds: Option<Vec<CreateEmbed>>,
+    embeds: Option<Cow<'a, [CreateEmbed<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    allowed_mentions: Option<CreateAllowedMentions>,
+    allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) components: Option<Vec<CreateActionRow>>,
+    pub(crate) components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) attachments: Option<EditAttachments>,
+    pub(crate) attachments: Option<EditAttachments<'a>>,
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
 }
 
-impl EditWebhookMessage {
+impl<'a> EditWebhookMessage<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -52,7 +54,7 @@ impl EditWebhookMessage {
         if let Some(embeds) = &self.embeds {
             check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
                 .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-            for embed in embeds {
+            for embed in embeds.iter() {
                 embed.check_length()?;
             }
         }
@@ -64,7 +66,7 @@ impl EditWebhookMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(mut self, content: impl Into<String>) -> Self {
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
     }
@@ -80,16 +82,16 @@ impl EditWebhookMessage {
     /// Adds an embed for the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.get_or_insert(Vec::new()).push(embed);
+    pub fn add_embed(mut self, embed: CreateEmbed<'a>) -> Self {
+        self.embeds.get_or_insert_with(Cow::default).to_mut().push(embed);
         self
     }
 
     /// Adds multiple embeds to the message.
     ///
     /// Embeds from the original message are reset when adding new embeds and must be re-added.
-    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.get_or_insert(Vec::new()).extend(embeds);
+    pub fn add_embeds(mut self, embeds: impl IntoIterator<Item = CreateEmbed<'a>>) -> Self {
+        self.embeds.get_or_insert_with(Cow::default).to_mut().extend(embeds);
         self
     }
 
@@ -97,9 +99,8 @@ impl EditWebhookMessage {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    pub fn embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds = Some(vec![embed]);
-        self
+    pub fn embed(self, embed: CreateEmbed<'a>) -> Self {
+        self.embeds(vec![embed])
     }
 
     /// Sets the embeds for the message.
@@ -108,13 +109,13 @@ impl EditWebhookMessage {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
-    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = Some(embeds);
+    pub fn embeds(mut self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
+        self.embeds = Some(embeds.into());
         self
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions<'a>) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }
@@ -125,14 +126,14 @@ impl EditWebhookMessage {
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
-        self.components = Some(components);
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = Some(components.into());
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Sets attachments, see [`EditAttachments`] for more details.
-    pub fn attachments(mut self, attachments: EditAttachments) -> Self {
+    pub fn attachments(mut self, attachments: EditAttachments<'a>) -> Self {
         self.attachments = Some(attachments);
         self
     }
@@ -140,7 +141,7 @@ impl EditWebhookMessage {
     /// Adds a new attachment to the message.
     ///
     /// Resets existing attachments. See the documentation for [`EditAttachments`] for details.
-    pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
+    pub fn new_attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
         let attachments = self.attachments.get_or_insert_with(Default::default);
         self.attachments = Some(std::mem::take(attachments).add(attachment));
         self
@@ -162,7 +163,7 @@ impl EditWebhookMessage {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl Builder for EditWebhookMessage {
+impl Builder for EditWebhookMessage<'_> {
     type Context<'ctx> = (WebhookId, &'ctx str, MessageId);
     type Built = Message;
 
