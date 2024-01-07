@@ -254,7 +254,7 @@ impl Http {
                     guild_id,
                     user_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -287,7 +287,7 @@ impl Http {
                 role_id,
                 user_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -319,7 +319,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: [("delete_message_seconds", delete_message_seconds.to_string())].into(),
+            params: &[("delete_message_seconds", delete_message_seconds.to_string())],
         })
         .await
     }
@@ -342,7 +342,7 @@ impl Http {
             route: Route::GuildBulkBan {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -363,7 +363,7 @@ impl Http {
             route: Route::ChannelTyping {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -392,7 +392,7 @@ impl Http {
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -409,7 +409,7 @@ impl Http {
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
             route: Route::StageInstances,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -433,7 +433,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -455,7 +455,7 @@ impl Http {
             route: Route::ChannelThreads {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -490,7 +490,7 @@ impl Http {
             route: Route::ChannelForumPosts {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -516,7 +516,7 @@ impl Http {
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -535,7 +535,7 @@ impl Http {
             route: Route::Emojis {
                 application_id: self.try_application_id()?,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -558,7 +558,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: [].into(),
+            params: &[],
         };
 
         if files.is_empty() {
@@ -593,7 +593,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -611,7 +611,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -631,7 +631,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -676,7 +676,7 @@ impl Http {
             headers: None,
             method: LightMethod::Post,
             route: Route::Guilds,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -702,7 +702,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -731,7 +731,7 @@ impl Http {
                 guild_id,
                 integration_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -758,7 +758,7 @@ impl Http {
                 interaction_id,
                 token: interaction_token,
             },
-            params: [].into(),
+            params: &[],
         };
 
         if files.is_empty() {
@@ -800,7 +800,7 @@ impl Http {
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -824,7 +824,7 @@ impl Http {
                 channel_id,
                 target_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -839,7 +839,7 @@ impl Http {
             headers: None,
             method: LightMethod::Post,
             route: Route::UserMeDmChannels,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -861,7 +861,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: None,
+            params: &[],
         })
         .await
     }
@@ -881,7 +881,7 @@ impl Http {
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -914,7 +914,7 @@ impl Http {
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -943,7 +943,7 @@ impl Http {
             route: Route::GuildStickers {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -982,7 +982,7 @@ impl Http {
             route: Route::Entitlements {
                 application_id: self.try_application_id()?,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1029,7 +1029,7 @@ impl Http {
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1048,7 +1048,7 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1067,7 +1067,7 @@ impl Http {
             route: Route::StageInstance {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1090,7 +1090,7 @@ impl Http {
                 guild_id,
                 emoji_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1106,7 +1106,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 emoji_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1127,7 +1127,7 @@ impl Http {
                 token: interaction_token,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1143,7 +1143,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1158,7 +1158,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1179,7 +1179,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1200,7 +1200,7 @@ impl Http {
                 guild_id,
                 integration_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1219,7 +1219,7 @@ impl Http {
             route: Route::Invite {
                 code,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1240,7 +1240,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1260,7 +1260,7 @@ impl Http {
             route: Route::ChannelMessagesBulkDelete {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1297,7 +1297,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1319,7 +1319,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1338,7 +1338,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1359,7 +1359,7 @@ impl Http {
                 channel_id,
                 target_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1383,7 +1383,7 @@ impl Http {
                 user_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1405,7 +1405,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1426,7 +1426,7 @@ impl Http {
                 guild_id,
                 role_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1451,7 +1451,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1474,7 +1474,7 @@ impl Http {
                 guild_id,
                 sticker_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1491,7 +1491,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 entitlement_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1528,7 +1528,7 @@ impl Http {
             route: Route::Webhook {
                 webhook_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1569,7 +1569,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1591,7 +1591,7 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1611,7 +1611,7 @@ impl Http {
             route: Route::StageInstance {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1637,7 +1637,7 @@ impl Http {
                 guild_id,
                 emoji_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1661,7 +1661,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 emoji_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1688,7 +1688,7 @@ impl Http {
                 token: interaction_token,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         };
 
         if new_attachments.is_empty() {
@@ -1724,7 +1724,7 @@ impl Http {
                 token: interaction_token,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1750,7 +1750,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1772,7 +1772,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1800,7 +1800,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1828,7 +1828,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1849,7 +1849,7 @@ impl Http {
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1876,7 +1876,7 @@ impl Http {
             route: Route::GuildMfa {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
         .map(|mfa: GuildMfaLevel| mfa.level)
@@ -1899,7 +1899,7 @@ impl Http {
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1921,7 +1921,7 @@ impl Http {
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -1946,7 +1946,7 @@ impl Http {
                     guild_id,
                     user_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -1976,7 +1976,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         };
 
         if new_attachments.is_empty() {
@@ -2009,7 +2009,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2031,7 +2031,7 @@ impl Http {
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2056,7 +2056,7 @@ impl Http {
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2078,7 +2078,7 @@ impl Http {
             route: Route::ChannelFollowNews {
                 channel_id: news_channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2097,7 +2097,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2122,7 +2122,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 token: interaction_token,
             },
-            params: [].into(),
+            params: &[],
         };
 
         if new_attachments.is_empty() {
@@ -2148,7 +2148,7 @@ impl Http {
             headers: None,
             method: LightMethod::Patch,
             route: Route::UserMe,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2171,7 +2171,7 @@ impl Http {
                     guild_id,
                     role_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -2205,7 +2205,7 @@ impl Http {
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -2242,7 +2242,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2269,7 +2269,7 @@ impl Http {
                     guild_id,
                     sticker_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -2295,7 +2295,7 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2345,7 +2345,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2396,7 +2396,7 @@ impl Http {
             route: Route::GuildVoiceStateMe {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2418,7 +2418,7 @@ impl Http {
             route: Route::ChannelVoiceStatus {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2469,7 +2469,7 @@ impl Http {
             route: Route::Webhook {
                 webhook_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2517,7 +2517,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2633,7 +2633,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params,
+            params: &params,
         };
 
         if files.is_empty() {
@@ -2678,7 +2678,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -2708,7 +2708,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params,
+            params: &params,
         };
 
         if new_attachments.is_empty() {
@@ -2747,7 +2747,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -2769,7 +2769,7 @@ impl Http {
                 headers: None,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesActive,
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -2813,7 +2813,7 @@ impl Http {
             route: Route::GuildBans {
                 guild_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -2849,7 +2849,7 @@ impl Http {
             route: Route::GuildAuditLogs {
                 guild_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -2866,7 +2866,7 @@ impl Http {
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2884,7 +2884,7 @@ impl Http {
                 guild_id,
                 rule_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2908,7 +2908,7 @@ impl Http {
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2934,7 +2934,7 @@ impl Http {
                 guild_id,
                 rule_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2957,7 +2957,7 @@ impl Http {
                 guild_id,
                 rule_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2970,7 +2970,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::GatewayBot,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -2985,7 +2985,7 @@ impl Http {
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3003,7 +3003,7 @@ impl Http {
             route: Route::ChannelThreadMembers {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3018,7 +3018,7 @@ impl Http {
             route: Route::GuildThreadsActive {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3046,7 +3046,7 @@ impl Http {
             route: Route::ChannelArchivedPublicThreads {
                 channel_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -3074,7 +3074,7 @@ impl Http {
             route: Route::ChannelArchivedPrivateThreads {
                 channel_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -3102,7 +3102,7 @@ impl Http {
             route: Route::ChannelJoinedPrivateThreads {
                 channel_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -3117,7 +3117,7 @@ impl Http {
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3132,7 +3132,7 @@ impl Http {
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3152,7 +3152,7 @@ impl Http {
                 channel_id,
                 user_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3172,7 +3172,7 @@ impl Http {
                 channel_id,
                 user_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3192,7 +3192,7 @@ impl Http {
                 channel_id,
                 user_id,
             },
-            params: [("with_member", with_member.to_string())].into(),
+            params: &[("with_member", with_member.to_string())],
         })
         .await
     }
@@ -3226,7 +3226,7 @@ impl Http {
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3241,7 +3241,7 @@ impl Http {
             route: Route::Channel {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3256,7 +3256,7 @@ impl Http {
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3271,7 +3271,7 @@ impl Http {
             route: Route::StageInstance {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3310,7 +3310,7 @@ impl Http {
                     message_id,
                     answer_id,
                 },
-                params,
+                params: &params,
             })
             .await?;
 
@@ -3331,7 +3331,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3346,7 +3346,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::Oauth2ApplicationCurrent,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3359,7 +3359,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMe,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3374,7 +3374,7 @@ impl Http {
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3390,7 +3390,7 @@ impl Http {
                 guild_id,
                 emoji_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3412,7 +3412,7 @@ impl Http {
                 route: Route::Emojis {
                     application_id: self.try_application_id()?,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -3430,7 +3430,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 emoji_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3481,7 +3481,7 @@ impl Http {
             route: Route::Entitlements {
                 application_id: self.try_application_id()?,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -3494,7 +3494,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::Gateway,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3509,7 +3509,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3524,7 +3524,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: [("with_localizations", String::from("true"))].into(),
+            params: &[("with_localizations", String::from("true"))],
         })
         .await
     }
@@ -3540,7 +3540,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3555,7 +3555,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3570,7 +3570,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: [("with_counts", String::from("true"))].into(),
+            params: &[("with_counts", String::from("true"))],
         })
         .await
     }
@@ -3586,7 +3586,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3606,7 +3606,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: [("with_localizations", String::from("true"))].into(),
+            params: &[("with_localizations", String::from("true"))],
         })
         .await
     }
@@ -3627,7 +3627,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3646,7 +3646,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3667,7 +3667,7 @@ impl Http {
                 guild_id,
                 command_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3684,7 +3684,7 @@ impl Http {
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3699,7 +3699,7 @@ impl Http {
             route: Route::GuildPreview {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3714,7 +3714,7 @@ impl Http {
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3729,7 +3729,7 @@ impl Http {
             route: Route::GuildIntegrations {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3744,7 +3744,7 @@ impl Http {
             route: Route::GuildInvites {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3764,7 +3764,7 @@ impl Http {
             route: Route::GuildVanityUrl {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
         .map(|x: GuildVanityUrl| x.code)
@@ -3799,7 +3799,7 @@ impl Http {
                 route: Route::GuildMembers {
                     guild_id,
                 },
-                params,
+                params: &params,
             })
             .await?;
 
@@ -3824,7 +3824,7 @@ impl Http {
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: [("days", days.to_string())].into(),
+            params: &[("days", days.to_string())],
         })
         .await
     }
@@ -3840,7 +3840,7 @@ impl Http {
             route: Route::GuildRegions {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -3857,7 +3857,7 @@ impl Http {
                     guild_id,
                     role_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -3879,7 +3879,7 @@ impl Http {
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -3914,7 +3914,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: [("with_user_count", with_user_count.to_string())].into(),
+            params: &[("with_user_count", with_user_count.to_string())],
         })
         .await
     }
@@ -3937,7 +3937,7 @@ impl Http {
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: [("with_user_count", with_user_count.to_string())].into(),
+            params: &[("with_user_count", with_user_count.to_string())],
         })
         .await
     }
@@ -3989,7 +3989,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -4005,7 +4005,7 @@ impl Http {
                 route: Route::GuildStickers {
                     guild_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -4036,7 +4036,7 @@ impl Http {
                     guild_id,
                     sticker_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -4076,7 +4076,7 @@ impl Http {
             route: Route::GuildWebhooks {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4129,7 +4129,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMeGuilds,
-            params,
+            params: &params,
         })
         .await
     }
@@ -4173,7 +4173,7 @@ impl Http {
                 route: Route::UserMeGuildMember {
                     guild_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -4220,7 +4220,7 @@ impl Http {
             route: Route::Invite {
                 code,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -4237,7 +4237,7 @@ impl Http {
                     guild_id,
                     user_id,
                 },
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -4263,7 +4263,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4295,7 +4295,7 @@ impl Http {
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -4310,7 +4310,7 @@ impl Http {
             route: Route::StickerPack {
                 sticker_pack_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4328,7 +4328,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::StickerPacks,
-            params: [].into(),
+            params: &[],
         })
         .await
         .map(|s: StickerPacks| s.sticker_packs)
@@ -4344,7 +4344,7 @@ impl Http {
             route: Route::ChannelPins {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4373,7 +4373,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params,
+            params: &params,
         })
         .await
     }
@@ -4388,7 +4388,7 @@ impl Http {
             route: Route::Skus {
                 application_id: self.try_application_id()?,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4403,7 +4403,7 @@ impl Http {
             route: Route::Sticker {
                 sticker_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4425,7 +4425,7 @@ impl Http {
                 headers: None,
                 method: LightMethod::Get,
                 route: Route::StatusIncidentsUnresolved,
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -4449,7 +4449,7 @@ impl Http {
                 headers: None,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesUpcoming,
-                params: [].into(),
+                params: &[],
             })
             .await?;
 
@@ -4466,7 +4466,7 @@ impl Http {
             route: Route::User {
                 user_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4483,7 +4483,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMeConnections,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4496,7 +4496,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::UserMeDmChannels,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4509,7 +4509,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::VoiceRegions,
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4543,7 +4543,7 @@ impl Http {
             route: Route::Webhook {
                 webhook_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4583,7 +4583,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4620,7 +4620,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4641,7 +4641,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4656,7 +4656,7 @@ impl Http {
             route: Route::UserMeGuild {
                 guild_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4680,7 +4680,7 @@ impl Http {
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params: [].into(),
+            params: &[],
         };
 
         if files.is_empty() {
@@ -4712,7 +4712,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4733,7 +4733,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4760,7 +4760,7 @@ impl Http {
                 user_id,
                 role_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4782,11 +4782,10 @@ impl Http {
                 route: Route::GuildMembersSearch {
                     guild_id,
                 },
-                params: [
+                params: &[
                     ("query", query.to_string()),
                     ("limit", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()),
-                ]
-                .into(),
+                ],
             })
             .await?;
 
@@ -4816,7 +4815,7 @@ impl Http {
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: [("days", days.to_string())].into(),
+            params: &[("days", days.to_string())],
         })
         .await
     }
@@ -4836,7 +4835,7 @@ impl Http {
                 guild_id,
                 integration_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4897,7 +4896,7 @@ impl Http {
                 channel_id,
                 message_id,
             },
-            params: [].into(),
+            params: &[],
         })
         .await
     }
@@ -4927,7 +4926,7 @@ impl Http {
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post, []).body(Some(bytes));
+    /// let mut request = Request::new(route, LightMethod::Post, &[]).body(Some(bytes));
     ///
     /// let message: Message = http.fire(request).await?;
     ///
@@ -4939,10 +4938,7 @@ impl Http {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn fire<T: DeserializeOwned, const MAX_PARAMS: usize>(
-        &self,
-        req: Request<'_, MAX_PARAMS>,
-    ) -> Result<T> {
+    pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
         decode_resp(response).await
     }
@@ -4970,7 +4966,7 @@ impl Http {
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post, []).body(Some(bytes));
+    /// let mut request = Request::new(route, LightMethod::Post, &[]).body(Some(bytes));
     ///
     /// let response = http.request(request).await?;
     ///
@@ -4979,10 +4975,7 @@ impl Http {
     /// # }
     /// ```
     #[instrument]
-    pub async fn request<const MAX_PARAMS: usize>(
-        &self,
-        req: Request<'_, MAX_PARAMS>,
-    ) -> Result<ReqwestResponse> {
+    pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
@@ -5005,11 +4998,7 @@ impl Http {
     ///
     /// This is a function that performs a light amount of work and returns an empty tuple, so it's
     /// called "self.wind" to denote that it's lightweight.
-    pub(super) async fn wind<const MAX_PARAMS: usize>(
-        &self,
-        expected: u16,
-        req: Request<'_, MAX_PARAMS>,
-    ) -> Result<()> {
+    pub(super) async fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
         let route = req.route;
         let method = req.method.reqwest_method();
         let response = self.request(req).await?;
