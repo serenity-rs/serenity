@@ -25,22 +25,18 @@ pub struct Request<'a> {
     pub(super) headers: Option<Headers>,
     pub(super) method: LightMethod,
     pub(super) route: Route<'a>,
-    pub(super) params: &'a [(&'static str, String)],
+    pub(super) params: Option<&'a [(&'static str, String)]>,
 }
 
 impl<'a> Request<'a> {
-    pub fn new(
-        route: Route<'a>,
-        method: LightMethod,
-        params: &'a [(&'static str, String)],
-    ) -> Self {
+    pub fn new(route: Route<'a>, method: LightMethod) -> Self {
         Self {
             body: None,
             multipart: None,
             headers: None,
             method,
             route,
-            params,
+            params: None,
         }
     }
 
@@ -60,7 +56,11 @@ impl<'a> Request<'a> {
     }
 
     pub fn params(mut self, params: &'a [(&'static str, String)]) -> Self {
-        self.params = params;
+        if params.is_empty() {
+            self.params = None;
+        } else {
+            self.params = Some(params);
+        }
         self
     }
 
@@ -78,9 +78,9 @@ impl<'a> Request<'a> {
             path = path.replace("https://discord.com", proxy.trim_end_matches('/'));
         }
 
-        if !self.params.is_empty() {
+        if let Some(params) = self.params {
             path += "?";
-            for (param, value) in self.params {
+            for (param, value) in params {
                 write!(path, "&{param}={value}").unwrap();
             }
         }
@@ -138,11 +138,7 @@ impl<'a> Request<'a> {
     }
 
     #[must_use]
-    pub fn params_ref(&self) -> Option<&[(&'static str, String)]> {
-        if self.params.is_empty() {
-            None
-        } else {
-            Some(self.params)
-        }
+    pub fn params_ref(&self) -> Option<&'a [(&'static str, String)]> {
+        self.params
     }
 }
