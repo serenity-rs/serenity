@@ -144,10 +144,6 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::Write;
 
 <span class="kw">use </span>reqwest::header::{
@@ -175,22 +171,18 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) headers: <span class="prelude-ty">Option</span>&lt;Headers&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) method: LightMethod,
     <span class="kw">pub</span>(<span class="kw">super</span>) route: Route&lt;<span class="lifetime">'a</span>&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) params: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)],
+    <span class="kw">pub</span>(<span class="kw">super</span>) params: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)]&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Request&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">pub fn </span>new(
-        route: Route&lt;<span class="lifetime">'a</span>&gt;,
-        method: LightMethod,
-        params: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)],
-    ) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(route: Route&lt;<span class="lifetime">'a</span>&gt;, method: LightMethod) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
             headers: <span class="prelude-val">None</span>,
             method,
             route,
-            params,
+            params: <span class="prelude-val">None</span>,
         }
     }
 
@@ -210,7 +202,11 @@
     </span>}
 
     <span class="kw">pub fn </span>params(<span class="kw-2">mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)]) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.params = params;
+        <span class="kw">if </span>params.is_empty() {
+            <span class="self">self</span>.params = <span class="prelude-val">None</span>;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.params = <span class="prelude-val">Some</span>(params);
+        }
         <span class="self">self
     </span>}
 
@@ -228,9 +224,9 @@
             </span>path = path.replace(<span class="string">"https://discord.com"</span>, proxy.trim_end_matches(<span class="string">'/'</span>));
         }
 
-        <span class="kw">if </span>!<span class="self">self</span>.params.is_empty() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(params) = <span class="self">self</span>.params {
             path += <span class="string">"?"</span>;
-            <span class="kw">for </span>(param, value) <span class="kw">in </span><span class="self">self</span>.params {
+            <span class="kw">for </span>(param, value) <span class="kw">in </span>params {
                 <span class="macro">write!</span>(path, <span class="string">"&amp;{param}={value}"</span>).unwrap();
             }
         }
@@ -288,12 +284,8 @@
     }
 
     <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>params_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)]&gt; {
-        <span class="kw">if </span><span class="self">self</span>.params.is_empty() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.params)
-        }
+    </span><span class="kw">pub fn </span>params_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)]&gt; {
+        <span class="self">self</span>.params
     }
 }
 </code></pre></div></section></main></body></html>

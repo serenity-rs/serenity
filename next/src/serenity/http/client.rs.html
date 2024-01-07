@@ -4691,13 +4691,6 @@
 <a href="#4689" id="4689">4689</a>
 <a href="#4690" id="4690">4690</a>
 <a href="#4691" id="4691">4691</a>
-<a href="#4692" id="4692">4692</a>
-<a href="#4693" id="4693">4693</a>
-<a href="#4694" id="4694">4694</a>
-<a href="#4695" id="4695">4695</a>
-<a href="#4696" id="4696">4696</a>
-<a href="#4697" id="4697">4697</a>
-<a href="#4698" id="4698">4698</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4940,7 +4933,7 @@
                     guild_id,
                     user_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -4973,7 +4966,7 @@
                 role_id,
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5003,7 +4996,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"delete_message_days"</span>, delete_message_days.to_string())],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"delete_message_days"</span>, delete_message_days.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -5024,7 +5017,7 @@
             route: Route::ChannelTyping {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5053,7 +5046,7 @@
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5070,7 +5063,7 @@
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
             route: Route::StageInstances,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5094,7 +5087,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5116,7 +5109,7 @@
             route: Route::ChannelThreads {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5138,7 +5131,7 @@
             route: Route::ChannelForumPosts {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5164,7 +5157,7 @@
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5187,7 +5180,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -5222,7 +5215,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5240,7 +5233,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5260,7 +5253,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5305,7 +5298,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Post,
             route: Route::Guilds,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5331,7 +5324,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5360,7 +5353,7 @@
                 guild_id,
                 integration_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5387,7 +5380,7 @@
                 interaction_id,
                 token: interaction_token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -5429,7 +5422,7 @@
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5453,7 +5446,7 @@
                 channel_id,
                 target_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5468,7 +5461,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Post,
             route: Route::UserMeDmChannels,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5490,7 +5483,7 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5511,7 +5504,7 @@
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -5544,7 +5537,7 @@
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5573,7 +5566,7 @@
             route: Route::GuildStickers {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5603,7 +5596,7 @@
             route: Route::Entitlements {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5650,7 +5643,7 @@
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5669,7 +5662,7 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5688,7 +5681,7 @@
             route: Route::StageInstance {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5711,7 +5704,7 @@
                 guild_id,
                 emoji_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5732,7 +5725,7 @@
                 token: interaction_token,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5748,7 +5741,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5763,7 +5756,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5784,7 +5777,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5805,7 +5798,7 @@
                 guild_id,
                 integration_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5824,7 +5817,7 @@
             route: Route::Invite {
                 code,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5845,7 +5838,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5865,7 +5858,7 @@
             route: Route::ChannelMessagesBulkDelete {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5902,7 +5895,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5924,7 +5917,7 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5943,7 +5936,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5964,7 +5957,7 @@
                 channel_id,
                 target_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -5988,7 +5981,7 @@
                 user_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6010,7 +6003,7 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6031,7 +6024,7 @@
                 guild_id,
                 role_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6056,7 +6049,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6079,7 +6072,7 @@
                 guild_id,
                 sticker_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6096,7 +6089,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 entitlement_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6133,7 +6126,7 @@
             route: Route::Webhook {
                 webhook_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6174,7 +6167,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6196,7 +6189,7 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6216,7 +6209,7 @@
             route: Route::StageInstance {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6242,7 +6235,7 @@
                 guild_id,
                 emoji_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6269,7 +6262,7 @@
                 token: interaction_token,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -6305,7 +6298,7 @@
                 token: interaction_token,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6331,7 +6324,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6353,7 +6346,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6381,7 +6374,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6409,7 +6402,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6430,7 +6423,7 @@
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6457,7 +6450,7 @@
             route: Route::GuildMfa {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
         </span>.map(|mfa: GuildMfaLevel| mfa.level)
@@ -6480,7 +6473,7 @@
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6502,7 +6495,7 @@
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6527,7 +6520,7 @@
                     guild_id,
                     user_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6557,7 +6550,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -6590,7 +6583,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6612,7 +6605,7 @@
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6637,7 +6630,7 @@
             route: Route::GuildMemberMe {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6659,7 +6652,7 @@
             route: Route::ChannelFollowNews {
                 channel_id: news_channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6678,7 +6671,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6703,7 +6696,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 token: interaction_token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -6729,7 +6722,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Patch,
             route: Route::UserMe,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6752,7 +6745,7 @@
                     guild_id,
                     role_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6786,7 +6779,7 @@
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6823,7 +6816,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6850,7 +6843,7 @@
                     guild_id,
                     sticker_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -6876,7 +6869,7 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6926,7 +6919,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -6977,7 +6970,7 @@
             route: Route::GuildVoiceStateMe {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7028,7 +7021,7 @@
             route: Route::Webhook {
                 webhook_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7076,7 +7069,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7156,7 +7149,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -7186,11 +7179,6 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">1</span>&gt;::new();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
-            params.push((<span class="string">"thread_id"</span>, thread_id.to_string()));
-        }
-
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7201,7 +7189,10 @@
                 token,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: thread_id
+                .map(|thread_id| [(<span class="string">"thread_id"</span>, thread_id.to_string())])
+                .as_ref()
+                .map(&lt;[<span class="kw">_</span>; <span class="number">1</span>]&gt;::as_slice),
         })
         .<span class="kw">await
     </span>}
@@ -7216,10 +7207,7 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">1</span>&gt;::new();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
-            params.push((<span class="string">"thread_id"</span>, thread_id.to_string()));
-        }
+        <span class="kw">let </span>params = thread_id.map(|thread_id| [(<span class="string">"thread_id"</span>, thread_id.to_string())]);
 
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
@@ -7231,7 +7219,7 @@
                 token,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: params.as_ref().map(&lt;[<span class="kw">_</span>; <span class="number">1</span>]&gt;::as_slice),
         };
 
         <span class="kw">if </span>new_attachments.is_empty() {
@@ -7255,11 +7243,6 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">1</span>&gt;::new();
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
-            params.push((<span class="string">"thread_id"</span>, thread_id.to_string()));
-        }
-
         <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7270,7 +7253,10 @@
                 token,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: thread_id
+                .map(|thread_id| [(<span class="string">"thread_id"</span>, thread_id.to_string())])
+                .as_ref()
+                .map(&lt;[<span class="kw">_</span>; <span class="number">1</span>]&gt;::as_slice),
         })
         .<span class="kw">await
     </span>}
@@ -7292,7 +7278,7 @@
                 headers: <span class="prelude-val">None</span>,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesActive,
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -7336,7 +7322,7 @@
             route: Route::GuildBans {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -7372,7 +7358,7 @@
             route: Route::GuildAuditLogs {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -7389,7 +7375,7 @@
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7407,7 +7393,7 @@
                 guild_id,
                 rule_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7431,7 +7417,7 @@
             route: Route::GuildAutomodRules {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7457,7 +7443,7 @@
                 guild_id,
                 rule_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7480,7 +7466,7 @@
                 guild_id,
                 rule_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7493,7 +7479,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::GatewayBot,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7508,7 +7494,7 @@
             route: Route::ChannelInvites {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7526,7 +7512,7 @@
             route: Route::ChannelThreadMembers {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7541,7 +7527,7 @@
             route: Route::GuildThreadsActive {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7569,7 +7555,7 @@
             route: Route::ChannelArchivedPublicThreads {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -7597,7 +7583,7 @@
             route: Route::ChannelArchivedPrivateThreads {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -7625,7 +7611,7 @@
             route: Route::ChannelJoinedPrivateThreads {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -7640,7 +7626,7 @@
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7655,7 +7641,7 @@
             route: Route::ChannelThreadMemberMe {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7675,7 +7661,7 @@
                 channel_id,
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7695,7 +7681,7 @@
                 channel_id,
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7729,7 +7715,7 @@
             route: Route::ChannelWebhooks {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7744,7 +7730,7 @@
             route: Route::Channel {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7759,7 +7745,7 @@
             route: Route::GuildChannels {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7774,7 +7760,7 @@
             route: Route::StageInstance {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7789,7 +7775,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::Oauth2ApplicationCurrent,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7802,7 +7788,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMe,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7817,7 +7803,7 @@
             route: Route::GuildEmojis {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7833,7 +7819,7 @@
                 guild_id,
                 emoji_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7885,7 +7871,7 @@
             route: Route::Entitlements {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -7898,7 +7884,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::Gateway,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7913,7 +7899,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7928,7 +7914,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, String::from(<span class="string">"true"</span>))],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, String::from(<span class="string">"true"</span>))]),
         })
         .<span class="kw">await
     </span>}
@@ -7944,7 +7930,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7959,7 +7945,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -7974,7 +7960,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"with_counts"</span>, String::from(<span class="string">"true"</span>))],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_counts"</span>, String::from(<span class="string">"true"</span>))]),
         })
         .<span class="kw">await
     </span>}
@@ -7990,7 +7976,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8010,7 +7996,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, String::from(<span class="string">"true"</span>))],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, String::from(<span class="string">"true"</span>))]),
         })
         .<span class="kw">await
     </span>}
@@ -8031,7 +8017,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8050,7 +8036,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8071,7 +8057,7 @@
                 guild_id,
                 command_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8088,7 +8074,7 @@
             route: Route::GuildWidget {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8103,7 +8089,7 @@
             route: Route::GuildPreview {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8118,7 +8104,7 @@
             route: Route::GuildWelcomeScreen {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8133,7 +8119,7 @@
             route: Route::GuildIntegrations {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8148,7 +8134,7 @@
             route: Route::GuildInvites {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8168,7 +8154,7 @@
             route: Route::GuildVanityUrl {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
         </span>.map(|x: GuildVanityUrl| x.code)
@@ -8203,7 +8189,7 @@
                 route: Route::GuildMembers {
                     guild_id,
                 },
-                params: <span class="kw-2">&amp;</span>params,
+                params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8228,7 +8214,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, days.to_string())],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, days.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -8244,7 +8230,7 @@
             route: Route::GuildRegions {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8260,7 +8246,7 @@
                 route: Route::GuildRoles {
                     guild_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8295,7 +8281,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, with_user_count.to_string())],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, with_user_count.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -8318,7 +8304,7 @@
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, with_user_count.to_string())],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, with_user_count.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -8370,7 +8356,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -8386,7 +8372,7 @@
                 route: Route::GuildStickers {
                     guild_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8417,7 +8403,7 @@
                     guild_id,
                     sticker_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8457,7 +8443,7 @@
             route: Route::GuildWebhooks {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8510,7 +8496,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMeGuilds,
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -8554,7 +8540,7 @@
                 route: Route::UserMeGuildMember {
                     guild_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8601,7 +8587,7 @@
             route: Route::Invite {
                 code,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -8618,7 +8604,7 @@
                     guild_id,
                     user_id,
                 },
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8644,7 +8630,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8676,7 +8662,7 @@
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -8694,7 +8680,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::StickerPacks,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
         </span>.map(|s: StickerPacks| s.sticker_packs)
@@ -8710,7 +8696,7 @@
             route: Route::ChannelPins {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8739,7 +8725,7 @@
                 message_id,
                 reaction: <span class="kw-2">&amp;</span>reaction_type.as_data(),
             },
-            params: <span class="kw-2">&amp;</span>params,
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
         })
         .<span class="kw">await
     </span>}
@@ -8754,7 +8740,7 @@
             route: Route::Skus {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8769,7 +8755,7 @@
             route: Route::Sticker {
                 sticker_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8791,7 +8777,7 @@
                 headers: <span class="prelude-val">None</span>,
                 method: LightMethod::Get,
                 route: Route::StatusIncidentsUnresolved,
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8815,7 +8801,7 @@
                 headers: <span class="prelude-val">None</span>,
                 method: LightMethod::Get,
                 route: Route::StatusMaintenancesUpcoming,
-                params: <span class="kw-2">&amp;</span>[],
+                params: <span class="prelude-val">None</span>,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -8832,7 +8818,7 @@
             route: Route::User {
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8849,7 +8835,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMeConnections,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8862,7 +8848,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::UserMeDmChannels,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8875,7 +8861,7 @@
             headers: <span class="prelude-val">None</span>,
             method: LightMethod::Get,
             route: Route::VoiceRegions,
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8909,7 +8895,7 @@
             route: Route::Webhook {
                 webhook_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8949,7 +8935,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8986,7 +8972,7 @@
                 webhook_id,
                 token,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9007,7 +8993,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9022,7 +9008,7 @@
             route: Route::UserMeGuild {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9046,7 +9032,7 @@
             route: Route::ChannelMessages {
                 channel_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">if </span>files.is_empty() {
@@ -9078,7 +9064,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9099,7 +9085,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9126,7 +9112,7 @@
                 user_id,
                 role_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9148,10 +9134,10 @@
                 route: Route::GuildMembersSearch {
                     guild_id,
                 },
-                params: <span class="kw-2">&amp;</span>[
+                params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[
                     (<span class="string">"query"</span>, query.to_string()),
                     (<span class="string">"limit"</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()),
-                ],
+                ]),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -9181,7 +9167,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, days.to_string())],
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, days.to_string())]),
         })
         .<span class="kw">await
     </span>}
@@ -9201,7 +9187,7 @@
                 guild_id,
                 integration_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9262,7 +9248,7 @@
                 channel_id,
                 message_id,
             },
-            params: <span class="kw-2">&amp;</span>[],
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -9292,7 +9278,7 @@
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post, &amp;[]).body(Some(bytes));
+    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
     ///
     /// let message: Message = http.fire(request).await?;
     ///
@@ -9332,7 +9318,7 @@
     /// let channel_id = ChannelId::new(381880193700069377);
     /// let route = Route::ChannelMessages { channel_id };
     ///
-    /// let mut request = Request::new(route, LightMethod::Post, &amp;[]).body(Some(bytes));
+    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
     ///
     /// let response = http.request(request).await?;
     ///
