@@ -1,6 +1,5 @@
 use std::fmt::Write;
 
-use arrayvec::ArrayVec;
 use reqwest::header::{
     HeaderMap as Headers,
     HeaderValue,
@@ -20,20 +19,20 @@ use crate::internal::prelude::*;
 
 #[derive(Clone, Debug)]
 #[must_use]
-pub struct Request<'a, const MAX_PARAMS: usize> {
+pub struct Request<'a> {
     pub(super) body: Option<Vec<u8>>,
     pub(super) multipart: Option<Multipart<'a>>,
     pub(super) headers: Option<Headers>,
     pub(super) method: LightMethod,
     pub(super) route: Route<'a>,
-    pub(super) params: ArrayVec<(&'static str, String), MAX_PARAMS>,
+    pub(super) params: &'a [(&'static str, String)],
 }
 
-impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
+impl<'a> Request<'a> {
     pub fn new(
         route: Route<'a>,
         method: LightMethod,
-        params: [(&'static str, String); MAX_PARAMS],
+        params: &'a [(&'static str, String)],
     ) -> Self {
         Self {
             body: None,
@@ -41,7 +40,7 @@ impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
             headers: None,
             method,
             route,
-            params: params.into(),
+            params,
         }
     }
 
@@ -60,8 +59,8 @@ impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
         self
     }
 
-    pub fn params(mut self, params: [(&'static str, String); MAX_PARAMS]) -> Self {
-        self.params = params.into();
+    pub fn params(mut self, params: &'a [(&'static str, String)]) -> Self {
+        self.params = params;
         self
     }
 
@@ -143,16 +142,7 @@ impl<'a, const MAX_PARAMS: usize> Request<'a, MAX_PARAMS> {
         if self.params.is_empty() {
             None
         } else {
-            Some(&self.params)
-        }
-    }
-
-    #[must_use]
-    pub fn params_mut(&mut self) -> Option<&mut [(&'static str, String)]> {
-        if self.params.is_empty() {
-            None
-        } else {
-            Some(&mut self.params)
+            Some(self.params)
         }
     }
 }
