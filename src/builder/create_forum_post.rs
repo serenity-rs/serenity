@@ -106,10 +106,14 @@ impl<'a> Builder for CreateForumPost<'a> {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     async fn execute(
-        self,
+        mut self,
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
-        cache_http.http().create_forum_post(ctx, &self, self.audit_log_reason).await
+        let files = self.message.attachments.take_files();
+        cache_http
+            .http()
+            .create_forum_post_with_attachments(ctx, &self, files, self.audit_log_reason)
+            .await
     }
 }
