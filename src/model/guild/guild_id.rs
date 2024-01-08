@@ -33,6 +33,7 @@ use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
+use crate::json::SerializeIter;
 #[cfg(feature = "model")]
 use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
@@ -1217,18 +1218,18 @@ impl GuildId {
         http: impl AsRef<Http>,
         channels: impl IntoIterator<Item = (ChannelId, u64)>,
     ) -> Result<()> {
-        let items = channels
-            .into_iter()
-            .map(|(id, pos)| {
-                json!({
-                    "id": id,
-                    "position": pos,
-                })
-            })
-            .collect::<Vec<_>>()
-            .into();
+        #[derive(serde::Serialize)]
+        struct ChannelPosEdit {
+            id: ChannelId,
+            position: u64,
+        }
 
-        http.as_ref().edit_guild_channel_positions(self, &items).await
+        let iter = channels.into_iter().map(|(id, position)| ChannelPosEdit {
+            id,
+            position,
+        });
+
+        http.as_ref().edit_guild_channel_positions(self, &SerializeIter::new(iter)).await
     }
 
     /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
