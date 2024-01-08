@@ -276,7 +276,7 @@ impl Builder for CreateMessage<'_> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
+    /// Returns a [`ModelError::TooLarge`] if the message contents are over the above limits.
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.

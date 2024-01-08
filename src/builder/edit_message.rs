@@ -228,7 +228,7 @@ impl Builder for EditMessage<'_> {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
+    /// Returns a [`ModelError::TooLarge`] if the message contents are over the above limits.
     ///
     /// Returns [`Error::Http`] if the user lacks permission, as well as if invalid data is given.
     ///
