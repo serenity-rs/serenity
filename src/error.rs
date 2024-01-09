@@ -57,7 +57,7 @@ pub enum Error {
     Http(HttpError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
-    Tungstenite(TungsteniteError),
+    Tungstenite(Box<TungsteniteError>),
 }
 
 #[cfg(feature = "gateway")]
@@ -88,7 +88,7 @@ impl From<ModelError> for Error {
 #[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error {
-        Error::Tungstenite(e)
+        Error::Tungstenite(Box::new(e))
     }
 }
 

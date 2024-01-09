@@ -1002,7 +1002,8 @@ async fn send_grouped_commands_embed(
     for group in groups {
         let mut embed_text = String::default();
 
-        flatten_group_to_string(&mut embed_text, group, 0, help_options).expect("String::write should never fail");
+        flatten_group_to_string(&mut embed_text, group, 0, help_options)
+            .expect("String::write should never fail");
 
         embed = embed.field(group.name, embed_text, true);
     }

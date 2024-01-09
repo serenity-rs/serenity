@@ -4,10 +4,11 @@ use std::path::Path;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
-use crate::all::Message;
-use crate::error::Result;
+#[allow(unused)] // Error is used in docs
+use crate::error::{Error, Result};
 #[cfg(feature = "http")]
 use crate::http::Http;
+use crate::model::channel::Message;
 use crate::model::id::AttachmentId;
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
@@ -77,7 +78,7 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// # Errors
     ///
-    /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
+    /// Returns [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
     pub async fn url(
         http: impl AsRef<Http>,
