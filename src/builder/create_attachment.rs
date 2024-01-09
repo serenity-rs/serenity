@@ -3,12 +3,8 @@ use std::path::Path;
 
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
-#[cfg(feature = "http")]
-use url::Url;
 
 use crate::all::Message;
-#[cfg(feature = "http")]
-use crate::error::Error;
 use crate::error::Result;
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -83,18 +79,15 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
-    pub async fn url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
-        let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-
-        let response = http.as_ref().client.get(url.clone()).send().await?;
+    pub async fn url(
+        http: impl AsRef<Http>,
+        url: impl reqwest::IntoUrl,
+        filename: impl Into<Cow<'static, str>>,
+    ) -> Result<Self> {
+        let response = http.as_ref().client.get(url).send().await?;
         let data = response.bytes().await?.to_vec();
 
-        let filename = url
-            .path_segments()
-            .and_then(Iterator::last)
-            .ok_or_else(|| Error::Url(url.to_string()))?;
-
-        Ok(CreateAttachment::bytes(data, filename.to_owned()))
+        Ok(CreateAttachment::bytes(data, filename))
     }
 
     /// Converts the stored data to the base64 representation.

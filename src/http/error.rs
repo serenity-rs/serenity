@@ -74,10 +74,6 @@ pub enum HttpError {
     InvalidHeader(InvalidHeaderValue),
     /// Reqwest's Error contain information on why sending a request failed.
     Request(ReqwestError),
-    /// When using a proxy with an invalid scheme.
-    InvalidScheme,
-    /// When using a proxy with an invalid port.
-    InvalidPort,
     /// When an application id was expected but missing.
     ApplicationIdMissing,
 }
@@ -165,8 +161,6 @@ impl fmt::Display for HttpError {
             Self::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
             Self::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
             Self::Request(_) => f.write_str("Error while sending HTTP request."),
-            Self::InvalidScheme => f.write_str("Invalid Url scheme."),
-            Self::InvalidPort => f.write_str("Invalid port."),
             Self::ApplicationIdMissing => f.write_str("Application id was expected but missing."),
         }
     }
