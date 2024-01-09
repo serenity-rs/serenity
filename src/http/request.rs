@@ -9,7 +9,6 @@ use reqwest::header::{
     USER_AGENT,
 };
 use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
-use tracing::instrument;
 
 use super::multipart::Multipart;
 use super::routing::Route;
@@ -64,7 +63,7 @@ impl<'a> Request<'a> {
         self
     }
 
-    #[instrument(skip(token))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(token)))]
     pub fn build(
         self,
         client: &Client,

@@ -32,7 +32,7 @@ use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
 use tokio::sync::RwLock;
-use tracing::{debug, error, info, instrument};
+use tracing::{debug, error, info};
 use typemap_rev::{TypeMap, TypeMapKey};
 
 pub use self::context::Context;
@@ -304,7 +304,7 @@ impl IntoFuture for ClientBuilder {
 
     type IntoFuture = BoxFuture<'static, Result<Client>>;
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn into_future(self) -> Self::IntoFuture {
         let data = Arc::new(RwLock::new(self.data));
         #[cfg(feature = "framework")]
@@ -632,7 +632,7 @@ impl Client {
     /// ```
     ///
     /// [gateway docs]: crate::gateway#sharding
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start(&mut self) -> Result<()> {
         self.start_connection(0, 0, NonZeroU16::MIN).await
     }
@@ -673,7 +673,7 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_autosharded(&mut self) -> Result<()> {
         let (end, total) = {
             let res = self.http.get_bot_gateway().await?;
@@ -737,7 +737,7 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_shard(&mut self, shard: u16, shards: u16) -> Result<()> {
         self.start_connection(shard, shard, check_shard_total(shards)).await
     }
@@ -778,7 +778,7 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_shards(&mut self, total_shards: u16) -> Result<()> {
         self.start_connection(0, total_shards - 1, check_shard_total(total_shards)).await
     }
@@ -819,12 +819,12 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_shard_range(&mut self, range: Range<u16>, total_shards: u16) -> Result<()> {
         self.start_connection(range.start, range.end, check_shard_total(total_shards)).await
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn start_connection(
         &mut self,
         start_shard: u16,
