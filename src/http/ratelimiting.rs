@@ -323,6 +323,9 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
+    /// # Errors
+    ///
+    /// Errors if unable to parse response headers.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(ratelimit_callback)))]
     pub async fn post_hook(
         &mut self,

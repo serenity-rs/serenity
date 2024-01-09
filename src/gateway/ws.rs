@@ -212,6 +212,9 @@ impl WsClient {
         .await
     }
 
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn send_heartbeat(&mut self, shard_info: &ShardInfo, seq: Option<u64>) -> Result<()> {
         trace!("[{:?}] Sending heartbeat d: {:?}", shard_info, seq);
@@ -223,6 +226,9 @@ impl WsClient {
         .await
     }
 
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, token)))]
     pub async fn send_identify(
         &mut self,
@@ -261,6 +267,9 @@ impl WsClient {
         self.send_json(&msg).await
     }
 
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn send_presence_update(
         &mut self,
@@ -284,6 +293,9 @@ impl WsClient {
         .await
     }
 
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, token)))]
     pub async fn send_resume(
         &mut self,

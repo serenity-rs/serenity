@@ -632,6 +632,9 @@ impl Shard {
     /// # }
     /// ```
     ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    ///
     /// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk
     /// [`Guild`]: crate::model::guild::Guild
     /// [`Member`]: crate::model::guild::Member
@@ -654,6 +657,9 @@ impl Shard {
     /// Sets the shard as going into identifying stage, which sets:
     /// - the time that the last heartbeat sent as being now
     /// - the `stage` to [`ConnectionStage::Identifying`]
+    ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client
@@ -669,6 +675,9 @@ impl Shard {
     /// Initializes a new WebSocket client.
     ///
     /// This will set the stage of the shard before and after instantiation of the client.
+    /// # Errors
+    ///
+    /// Errors if unable to establish a websocket connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn initialize(&mut self) -> Result<WsClient> {
         debug!("[{:?}] Initializing.", self.shard_info);
@@ -689,7 +698,7 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn reset(&mut self) {
+    pub fn reset(&mut self) {
         self.last_heartbeat_sent = Some(Instant::now());
         self.last_heartbeat_ack = None;
         self.heartbeat_interval = None;
@@ -699,6 +708,9 @@ impl Shard {
         self.seq = 0;
     }
 
+    /// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn resume(&mut self) -> Result<()> {
         debug!("[{:?}] Attempting to resume", self.shard_info);
@@ -714,16 +726,22 @@ impl Shard {
         }
     }
 
+    /// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn reconnect(&mut self) -> Result<()> {
         info!("[{:?}] Attempting to reconnect", self.shard_info());
 
-        self.reset().await;
+        self.reset();
         self.client = self.initialize().await?;
 
         Ok(())
     }
 
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn update_presence(&mut self) -> Result<()> {
         self.client.send_presence_update(&self.shard_info, &self.presence).await

@@ -171,20 +171,13 @@ impl ShardManager {
     /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
     /// queued.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn initialize(
-        &self,
-        shard_index: u16,
-        shard_init: u16,
-        shard_total: NonZeroU16,
-    ) -> Result<()> {
+    pub fn initialize(&self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         let shard_to = shard_index + shard_init;
 
         self.set_shard_total(shard_total);
         for shard_id in shard_index..shard_to {
             self.boot(ShardId(shard_id));
         }
-
-        Ok(())
     }
 
     /// Restarts a shard runner.

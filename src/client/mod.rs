@@ -32,7 +32,7 @@ use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
 use tokio::sync::RwLock;
-use tracing::{debug, error, info};
+use tracing::debug;
 use typemap_rev::{TypeMap, TypeMapKey};
 
 pub use self::context::Context;
@@ -631,6 +631,10 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    ///
     /// [gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start(&mut self) -> Result<()> {
@@ -842,15 +846,7 @@ impl Client {
 
         debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
 
-        if let Err(why) = self.shard_manager.initialize(start_shard, init, total_shards) {
-            error!("Failed to boot a shard: {:?}", why);
-            info!("Shutting down all shards");
-
-            self.shard_manager.shutdown_all().await;
-
-            return Err(Error::Client(ClientError::ShardBootFailure));
-        }
-
+        self.shard_manager.initialize(start_shard, init, total_shards);
         if let Some(Err(err)) = self.shard_manager_return_value.next().await {
             return Err(Error::Gateway(err));
         }
