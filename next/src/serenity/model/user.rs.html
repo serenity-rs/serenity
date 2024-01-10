@@ -861,18 +861,6 @@
 <a href="#859" id="859">859</a>
 <a href="#860" id="860">860</a>
 <a href="#861" id="861">861</a>
-<a href="#862" id="862">862</a>
-<a href="#863" id="863">863</a>
-<a href="#864" id="864">864</a>
-<a href="#865" id="865">865</a>
-<a href="#866" id="866">866</a>
-<a href="#867" id="867">867</a>
-<a href="#868" id="868">868</a>
-<a href="#869" id="869">869</a>
-<a href="#870" id="870">870</a>
-<a href="#871" id="871">871</a>
-<a href="#872" id="872">872</a>
-<a href="#873" id="873">873</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1252,8 +1240,7 @@
     <span class="doccomment">/// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         avatar_url(<span class="prelude-val">None</span>, <span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
     }
@@ -1264,8 +1251,7 @@
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
     /// [`crate::http::Http::get_user`].
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>banner_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         banner_url(<span class="self">self</span>.id, <span class="self">self</span>.banner.as_ref())
     }
@@ -1278,7 +1264,6 @@
     /// # Errors
     ///
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_dm_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="kw">if </span><span class="self">self</span>.bot() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MessagingBot));
@@ -1288,8 +1273,7 @@
     </span>}
 
     <span class="doccomment">/// Retrieves the time that this user was created at.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>created_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Timestamp {
         <span class="self">self</span>.id.created_at()
     }
@@ -1297,8 +1281,7 @@
     <span class="doccomment">/// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>default_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         default_avatar_url(<span class="self">self</span>)
     }
@@ -1349,7 +1332,6 @@
 
     <span class="doccomment">/// This is an alias of [`Self::direct_message`].
     </span><span class="attr">#[allow(clippy::missing_errors_doc)]
-    #[inline]
     </span><span class="kw">pub async fn </span>dm(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1397,7 +1379,6 @@
     /// exist in the given [`Guild`], or if the given [`User`] is not in that [`Guild`].
     ///
     /// May also return an [`Error::Json`] if there is an error in deserializing the API response.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>has_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1414,7 +1395,6 @@
     /// # Errors
     ///
     /// See [`UserId::to_user`] for what errors may be returned.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.id.to_user(cache_http).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1424,8 +1404,7 @@
     <span class="doccomment">/// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>static_avatar_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         static_avatar_url(<span class="self">self</span>.id, <span class="self">self</span>.avatar.as_ref())
     }
@@ -1454,8 +1433,7 @@
     ///     }
     /// }
     /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         tag(<span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="self">self</span>.discriminator)
     }
@@ -1463,7 +1441,6 @@
     <span class="doccomment">/// Returns the user's nickname in the given `guild_id`.
     ///
     /// If none is used, it returns [`None`].
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>nick_in(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1567,7 +1544,6 @@
     /// otherwise cannot be fetched.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserializing the user.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_user(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;User&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
         </span>{

@@ -309,17 +309,6 @@
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 
 <span class="kw">use </span>proc_macro2::Span;
@@ -381,8 +370,7 @@
 }
 
 <span class="kw">impl </span>Values {
-    <span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>new(name: Ident, kind: ValueKind, literals: Vec&lt;Lit&gt;, span: Span) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>new(name: Ident, kind: ValueKind, literals: Vec&lt;Lit&gt;, span: Span) -&gt; <span class="self">Self </span>{
         Values {
             name,
             literals,
@@ -462,8 +450,7 @@
     }
 }
 
-<span class="attr">#[inline]
-</span><span class="kw">fn </span>is_form_acceptable(expect: <span class="kw-2">&amp;</span>[ValueKind], kind: ValueKind) -&gt; bool {
+<span class="kw">fn </span>is_form_acceptable(expect: <span class="kw-2">&amp;</span>[ValueKind], kind: ValueKind) -&gt; bool {
     <span class="kw">if </span>expect.contains(<span class="kw-2">&amp;</span>ValueKind::List) &amp;&amp; kind == ValueKind::SingleList {
         <span class="bool-val">true
     </span>} <span class="kw">else </span>{
@@ -471,8 +458,7 @@
     }
 }
 
-<span class="attr">#[inline]
-</span><span class="kw">fn </span>validate(values: <span class="kw-2">&amp;</span>Values, forms: <span class="kw-2">&amp;</span>[ValueKind]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<span class="kw">fn </span>validate(values: <span class="kw-2">&amp;</span>Values, forms: <span class="kw-2">&amp;</span>[ValueKind]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
     <span class="kw">if </span>!is_form_acceptable(forms, values.kind) {
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
             values.span,
@@ -484,8 +470,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attr">#[inline]
-</span><span class="kw">pub fn </span>parse&lt;T: AttributeOption&gt;(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
+<span class="kw">pub fn </span>parse&lt;T: AttributeOption&gt;(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
     T::parse(values)
 }
 
@@ -502,8 +487,7 @@
 }
 
 <span class="kw">impl </span>AttributeOption <span class="kw">for </span>String {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         validate(<span class="kw-2">&amp;</span>values, <span class="kw-2">&amp;</span>[ValueKind::Equals, ValueKind::SingleList])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(values.literals[<span class="number">0</span>].to_str())
@@ -511,8 +495,7 @@
 }
 
 <span class="kw">impl </span>AttributeOption <span class="kw">for </span>bool {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         validate(<span class="kw-2">&amp;</span>values, <span class="kw-2">&amp;</span>[ValueKind::Name, ValueKind::SingleList])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(values.literals.first().map_or(<span class="bool-val">true</span>, LitExt::to_bool))
@@ -520,8 +503,7 @@
 }
 
 <span class="kw">impl </span>AttributeOption <span class="kw">for </span>Ident {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         validate(<span class="kw-2">&amp;</span>values, <span class="kw-2">&amp;</span>[ValueKind::SingleList])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(values.literals[<span class="number">0</span>].to_ident())
@@ -529,8 +511,7 @@
 }
 
 <span class="kw">impl </span>AttributeOption <span class="kw">for </span>Vec&lt;Ident&gt; {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         validate(<span class="kw-2">&amp;</span>values, <span class="kw-2">&amp;</span>[ValueKind::List])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(values.literals.iter().map(LitExt::to_ident).collect())
@@ -576,8 +557,7 @@
 }
 
 <span class="kw">impl </span>AttributeOption <span class="kw">for </span>Checks {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         &lt;Vec&lt;Ident&gt; <span class="kw">as </span>AttributeOption&gt;::parse(values).map(Checks)
     }
 }
@@ -601,8 +581,7 @@
 }
 
 <span class="kw">impl</span>&lt;T: AttributeOption&gt; AttributeOption <span class="kw">for </span>AsOption&lt;T&gt; {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Ok</span>(AsOption(<span class="prelude-val">Some</span>(T::parse(values)<span class="question-mark">?</span>)))
     }
 }
@@ -630,8 +609,7 @@
             }
 
             <span class="kw">impl </span>AttributeOption <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$n</span>&gt; {
-                <span class="attr">#[inline]
-                </span><span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+                <span class="kw">fn </span>parse(values: Values) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
                     &lt;<span class="macro-nonterminal">$n </span><span class="kw">as </span>AttributeOption&gt;::parse(values).map(<span class="prelude-val">Some</span>)
                 }
             }

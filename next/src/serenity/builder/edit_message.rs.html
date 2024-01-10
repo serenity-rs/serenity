@@ -247,7 +247,6 @@
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -316,7 +315,6 @@
     <span class="doccomment">/// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>content(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content = <span class="prelude-val">Some</span>(content.into());
         <span class="self">self

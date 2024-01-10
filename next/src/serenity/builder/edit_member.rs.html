@@ -160,7 +160,6 @@
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -248,7 +247,6 @@
     /// **Note**: Requires the [Move Members] permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>voice_channel(<span class="kw-2">mut </span><span class="self">self</span>, channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.channel_id = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(channel_id.into()));
         <span class="self">self

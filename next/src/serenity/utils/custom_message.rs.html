@@ -192,26 +192,6 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
-<a href="#210" id="210">210</a>
-<a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::Timestamp;
 
@@ -228,8 +208,7 @@
 <span class="kw">impl </span>CustomMessage {
     <span class="doccomment">/// Constructs a new instance of this builder, alongside a message with dummy data. Use the
     /// methods to replace the individual bits of this message with valid data.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
     }
@@ -237,8 +216,7 @@
     <span class="doccomment">/// Assign the dummy message a proper ID for identification.
     ///
     /// If not used, the default value is `MessageId::new(1)`.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: MessageId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.id = id;
 
@@ -248,7 +226,6 @@
     <span class="doccomment">/// Assign the dummy message files attached to it.
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>attachments(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attachments: Vec&lt;Attachment&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.attachments = attachments.into();
 
@@ -258,7 +235,6 @@
     <span class="doccomment">/// Assign the dummy message its author.
     ///
     /// If not used, the default value is a dummy [`User`].
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>author(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: User) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.author = user;
 
@@ -268,7 +244,6 @@
     <span class="doccomment">/// Assign the dummy message its origin channel's ID.
     ///
     /// If not used, the default value is `ChannelId::new(1)`.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>channel_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.channel_id = channel_id;
 
@@ -278,7 +253,6 @@
     <span class="doccomment">/// Assign the dummy message its contents.
     ///
     /// If not used, the default value is an empty string (`String::default()`).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>content(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.content = s.into().into();
 
@@ -288,7 +262,6 @@
     <span class="doccomment">/// Assign the dummy message the timestamp it was edited.
     ///
     /// If not used, the default value is [`None`] (not all messages are edited).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>edited_timestamp&lt;T: Into&lt;Timestamp&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: T) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.edited_timestamp = <span class="prelude-val">Some</span>(timestamp.into());
 
@@ -298,7 +271,6 @@
     <span class="doccomment">/// Assign the dummy message embeds.
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>embeds(<span class="kw-2">&amp;mut </span><span class="self">self</span>, embeds: Vec&lt;Embed&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.embeds = embeds.into();
 
@@ -308,7 +280,6 @@
     <span class="doccomment">/// Assign the dummy message its origin guild's ID.
     ///
     /// If not used, the default value is [`None`] (not all messages are sent in guilds).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>guild_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.guild_id = <span class="prelude-val">Some</span>(guild_id);
 
@@ -318,7 +289,6 @@
     <span class="doccomment">/// Assign the dummy message its type.
     ///
     /// If not used, the default value is [`MessageType::Regular`].
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;mut </span><span class="self">self</span>, kind: MessageType) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.kind = kind;
 
@@ -330,7 +300,6 @@
     /// If not used, the default value is [`None`] (not all messages are sent in guilds).
     ///
     /// [author]: Self::author
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>member(<span class="kw-2">&amp;mut </span><span class="self">self</span>, member: PartialMember) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.member = <span class="prelude-val">Some</span>(Box::new(member));
 
@@ -340,7 +309,6 @@
     <span class="doccomment">/// Assign the dummy message a flag whether it mentions everyone (`@everyone`).
     ///
     /// If not used, the default value is `false`.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>mention_everyone(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mentions: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.set_mention_everyone(mentions);
 
@@ -350,7 +318,6 @@
     <span class="doccomment">/// Assign the dummy message a list of roles it mentions.
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>mention_roles(<span class="kw-2">&amp;mut </span><span class="self">self</span>, roles: Vec&lt;RoleId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.mention_roles = roles.into();
 
@@ -360,7 +327,6 @@
     <span class="doccomment">/// Assign the dummy message a list of mentions.
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>mentions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mentions: Vec&lt;User&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.mentions = mentions.into();
 
@@ -370,7 +336,6 @@
     <span class="doccomment">/// Assign the dummy message a flag whether it's been pinned.
     ///
     /// If not used, the default value is `false`.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>pinned(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pinned: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.set_pinned(pinned);
 
@@ -380,7 +345,6 @@
     <span class="doccomment">/// Assign the dummy message a list of emojis it was reacted with.
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>reactions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, reactions: Vec&lt;MessageReaction&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.reactions = reactions.into();
 
@@ -390,7 +354,6 @@
     <span class="doccomment">/// Assign the dummy message the timestamp it was created at.
     ///
     /// If not used, the default value is the current local time.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>timestamp&lt;T: Into&lt;Timestamp&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: T) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.timestamp = timestamp.into();
 
@@ -400,7 +363,6 @@
     <span class="doccomment">/// Assign the dummy message a flag whether it'll be read by a Text-To-Speech program.
     ///
     /// If not used, the default value is `false`.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>tts(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tts: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.set_tts(tts);
 
@@ -410,7 +372,6 @@
     <span class="doccomment">/// Assign the dummy message the webhook author's ID.
     ///
     /// If not used, the default value is [`None`] (not all messages are sent by webhooks).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>webhook_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: WebhookId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.msg.webhook_id = <span class="prelude-val">Some</span>(id);
 
@@ -418,8 +379,7 @@
     </span>}
 
     <span class="doccomment">/// Consume this builder and return the constructed message.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; Message {
         <span class="self">self</span>.msg
     }

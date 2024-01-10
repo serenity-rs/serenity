@@ -393,16 +393,6 @@
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
 <a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-<a href="#399" id="399">399</a>
-<a href="#400" id="400">400</a>
-<a href="#401" id="401">401</a>
-<a href="#402" id="402">402</a>
-<a href="#403" id="403">403</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Developer note:
 //!
 //! This is a set of embed builders for rich embeds.
@@ -476,13 +466,11 @@
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.
     ///
     /// This is an alias of [`Self::colour`].
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>color&lt;C: Into&lt;Colour&gt;&gt;(<span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.colour(colour)
     }
 
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>colour&lt;C: Into&lt;Colour&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, colour: C) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.colour = <span class="prelude-val">Some</span>(colour.into());
         <span class="self">self
@@ -491,7 +479,6 @@
     <span class="doccomment">/// Set the description of the embed.
     ///
     /// **Note**: This can't be longer than 4096 characters.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.description = <span class="prelude-val">Some</span>(description.into());
         <span class="self">self
@@ -501,7 +488,6 @@
     ///
     /// **Note**: Maximum amount of characters you can put is 256 in a field name and 1024 in a
     /// field value.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>field(
         <span class="kw-2">mut </span><span class="self">self</span>,
         name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
@@ -543,7 +529,6 @@
     </span>}
 
     <span class="doccomment">/// Set the image associated with the embed. This only supports HTTP(S).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.image = <span class="prelude-val">Some</span>(CreateEmbedImage {
             url: url.into(),
@@ -552,7 +537,6 @@
     </span>}
 
     <span class="doccomment">/// Set the thumbnail of the embed. This only supports HTTP(S).
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>thumbnail(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumbnail = <span class="prelude-val">Some</span>(CreateEmbedImage {
             url: url.into(),
@@ -574,21 +558,18 @@
     /// let timestamp: Timestamp = "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
     /// let embed = CreateEmbed::new().title("hello").timestamp(timestamp);
     /// ```
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>timestamp&lt;T: Into&lt;Timestamp&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: T) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.timestamp = <span class="prelude-val">Some</span>(timestamp.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the title of the embed.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>title(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.title = <span class="prelude-val">Some</span>(title.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the URL to direct to when clicking on the title.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.url = <span class="prelude-val">Some</span>(url.into());
         <span class="self">self
@@ -600,7 +581,6 @@
     /// with the provided filename. Or else this won't work.
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>attachment(<span class="self">self</span>, filename: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>filename = filename.into();
         filename.insert_str(<span class="number">0</span>, <span class="string">"attachment://"</span>);

@@ -965,31 +965,6 @@
 <a href="#963" id="963">963</a>
 <a href="#964" id="964">964</a>
 <a href="#965" id="965">965</a>
-<a href="#966" id="966">966</a>
-<a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
-<a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
-<a href="#975" id="975">975</a>
-<a href="#976" id="976">976</a>
-<a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
-<a href="#979" id="979">979</a>
-<a href="#980" id="980">980</a>
-<a href="#981" id="981">981</a>
-<a href="#982" id="982">982</a>
-<a href="#983" id="983">983</a>
-<a href="#984" id="984">984</a>
-<a href="#985" id="985">985</a>
-<a href="#986" id="986">986</a>
-<a href="#987" id="987">987</a>
-<a href="#988" id="988">988</a>
-<a href="#989" id="989">989</a>
-<a href="#990" id="990">990</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
@@ -1035,8 +1010,7 @@
 }
 
 <span class="kw">impl </span>Delimiter {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">'_</span>, str&gt; {
+    <span class="kw">fn </span>to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">'_</span>, str&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Single(c) =&gt; Cow::Owned(c.to_string()),
             <span class="self">Self</span>::Multiple(s) =&gt; Cow::Borrowed(s),
@@ -1045,22 +1019,19 @@
 }
 
 <span class="kw">impl </span>From&lt;char&gt; <span class="kw">for </span>Delimiter {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(c: char) -&gt; Delimiter {
+    <span class="kw">fn </span>from(c: char) -&gt; Delimiter {
         Delimiter::Single(c)
     }
 }
 
 <span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Delimiter {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(s: String) -&gt; Delimiter {
+    <span class="kw">fn </span>from(s: String) -&gt; Delimiter {
         Delimiter::Multiple(Cow::Owned(s))
     }
 }
 
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; <span class="kw">for </span>Delimiter {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; Delimiter {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; Delimiter {
         Delimiter::Multiple(Cow::Borrowed(s))
     }
 }
@@ -1078,8 +1049,7 @@
 }
 
 <span class="kw">impl </span>Token {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>new(kind: TokenKind, start: usize, end: usize) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>new(kind: TokenKind, start: usize, end: usize) -&gt; <span class="self">Self </span>{
         Token {
             kind,
             span: (start, end),
@@ -1378,13 +1348,11 @@
         }
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, usize) {
+    <span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, usize) {
         <span class="self">self</span>.args[<span class="self">self</span>.offset].span
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="kw">fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">let </span>(start, end) = <span class="self">self</span>.span();
 
         <span class="kw-2">&amp;</span><span class="self">self</span>.message[start..end]
@@ -1406,7 +1374,6 @@
     <span class="doccomment">/// Go one step behind. This decrements the offset pointer.
     ///
     /// Does nothing if the offset pointer is `0`.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>rewind(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">if </span><span class="self">self</span>.offset == <span class="number">0 </span>{
             <span class="kw">return </span><span class="self">self</span>;
@@ -1418,7 +1385,6 @@
     </span>}
 
     <span class="doccomment">/// Go back to the starting point.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>restore(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.offset = <span class="number">0</span>;
     }
@@ -1478,8 +1444,7 @@
     /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -1606,7 +1571,6 @@
     ///
     /// May return either [`Error::Parse`] if a parse error occurs, or
     /// [`Error::Eos`] if there are no further remaining args.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>parse&lt;T: FromStr&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, T::Err&gt; {
         T::from_str(<span class="self">self</span>.current().ok_or(Error::Eos)<span class="question-mark">?</span>).map_err(Error::Parse)
     }
@@ -1633,7 +1597,6 @@
     /// # Errors
     ///
     /// May return the same errors as `parse`.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>single&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, T::Err&gt; {
         <span class="kw">let </span>p = <span class="self">self</span>.parse::&lt;T&gt;()<span class="question-mark">?</span>;
         <span class="self">self</span>.advance();
@@ -1659,7 +1622,6 @@
     /// # Errors
     ///
     /// May return the same errors as [`Self::parse`].
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>single_quoted&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, T::Err&gt; {
         <span class="kw">let </span>p = <span class="self">self</span>.quoted().parse::&lt;T&gt;()<span class="question-mark">?</span>;
         <span class="self">self</span>.advance();
@@ -1689,7 +1651,6 @@
     ///
     /// assert!(args.is_empty());
     /// ```
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>iter&lt;T: FromStr&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">'_</span>, T&gt; {
         Iter {
             args: <span class="self">self</span>,
@@ -1713,8 +1674,7 @@
     ///
     /// assert_eq!(protagonists, "Harry, Hermione, Ronald");
     /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">'_</span>&gt; {
         RawArguments {
             tokens: <span class="kw-2">&amp;</span><span class="self">self</span>.args,
@@ -1736,8 +1696,7 @@
     ///
     /// assert_eq!(&amp;*horror_movies, &amp;["Saw", "The Mist", "A Quiet Place"]);
     /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>raw_quoted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawArguments&lt;<span class="lifetime">'_</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>raw = <span class="self">self</span>.raw();
         raw.quoted = <span class="bool-val">true</span>;
@@ -1835,15 +1794,13 @@
     }
 
     <span class="doccomment">/// Get the original, unmodified message passed to the command.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw-2">&amp;</span><span class="self">self</span>.message
     }
 
     <span class="doccomment">/// Starting from the offset, return the remainder of available arguments.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>rest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.remains().unwrap_or_default()
     }
@@ -1851,8 +1808,7 @@
     <span class="doccomment">/// Starting from the offset, return the remainder of available arguments.
     ///
     /// Returns [`None`] if there are no remaining arguments.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>remains(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -1869,22 +1825,19 @@
     ///
     /// The value returned is to be assumed to stay static. However, if [`Self::find`] was called
     /// previously, and was successful, then the value is subtracted by one.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.args.len()
     }
 
     <span class="doccomment">/// Assert that there are no more arguments left.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.offset &gt;= <span class="self">self</span>.len()
     }
 
     <span class="doccomment">/// Return the amount of arguments still available.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
             <span class="kw">return </span><span class="number">0</span>;
@@ -1916,7 +1869,6 @@
     }
 
     <span class="doccomment">/// Remove surrounding quotation marks from all of the arguments.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>quoted(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self</span>.state {
             State::None =&gt; <span class="self">self</span>.state = State::Quoted,
@@ -1928,7 +1880,6 @@
     </span>}
 
     <span class="doccomment">/// Trim leading and trailing whitespace off all arguments.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>trimmed(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="kw">match </span><span class="self">self</span>.state {
             State::None =&gt; <span class="self">self</span>.state = State::Trimmed,
@@ -1965,8 +1916,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>RawArguments&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str;
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">let </span>(start, end) = <span class="self">self</span>.tokens.first()<span class="question-mark">?</span>.span;
 
         <span class="self">self</span>.tokens = <span class="kw-2">&amp;</span><span class="self">self</span>.tokens[<span class="number">1</span>..];

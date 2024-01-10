@@ -1446,9 +1446,6 @@
 <a href="#1444" id="1444">1444</a>
 <a href="#1445" id="1445">1445</a>
 <a href="#1446" id="1446">1446</a>
-<a href="#1447" id="1447">1447</a>
-<a href="#1448" id="1448">1448</a>
-<a href="#1449" id="1449">1449</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self </span><span class="kw">as </span>fmt, Write};
 <span class="kw">use </span>std::ops::Add;
 
@@ -1564,7 +1561,6 @@
     /// [`Channel`]: crate::model::channel::Channel
     /// [`GuildChannel`]: crate::model::channel::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>._channel(channel.into())
     }
@@ -1631,13 +1627,11 @@
     ///     "testing"
     /// );
     /// ```
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into())
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>_push&lt;C: std::fmt::Display + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw-2">&amp;</span>C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    <span class="kw">fn </span>_push&lt;C: std::fmt::Display + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw-2">&amp;</span>C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">"{content}"</span>).unwrap();
 
         <span class="self">self

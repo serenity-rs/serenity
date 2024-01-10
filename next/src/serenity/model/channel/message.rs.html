@@ -1140,19 +1140,6 @@
 <a href="#1138" id="1138">1138</a>
 <a href="#1139" id="1139">1139</a>
 <a href="#1140" id="1140">1140</a>
-<a href="#1141" id="1141">1141</a>
-<a href="#1142" id="1142">1142</a>
-<a href="#1143" id="1143">1143</a>
-<a href="#1144" id="1144">1144</a>
-<a href="#1145" id="1145">1145</a>
-<a href="#1146" id="1146">1146</a>
-<a href="#1147" id="1147">1147</a>
-<a href="#1148" id="1148">1148</a>
-<a href="#1149" id="1149">1149</a>
-<a href="#1150" id="1150">1150</a>
-<a href="#1151" id="1151">1151</a>
-<a href="#1152" id="1152">1152</a>
-<a href="#1153" id="1153">1153</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1356,7 +1343,6 @@
     /// # Errors
     ///
     /// Can return an error if the HTTP request fails.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
         <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await
     </span>}
@@ -1427,7 +1413,6 @@
     /// permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_reaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1595,7 +1580,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reaction_users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1622,8 +1606,7 @@
     /// **Only use this for messages from the gateway (event handler)!** Not for returned Message
     /// objects from HTTP requests, like [`ChannelId::send_message`], because [`Self::guild_id`] is
     /// never set for those, which this method relies on.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_private(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.guild_id.is_none()
     }
@@ -1695,7 +1678,6 @@
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     /// [permissions]: crate::model::permissions
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>react(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1756,7 +1738,6 @@
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reply(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1780,7 +1761,6 @@
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reply_ping(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1807,7 +1787,6 @@
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reply_mention(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1851,15 +1830,13 @@
     </span>}
 
     <span class="doccomment">/// Checks whether the message mentions passed [`UserId`].
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>mentions_user_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; bool {
         <span class="kw">let </span>id = id.into();
         <span class="self">self</span>.mentions.iter().any(|mentioned_user| mentioned_user.id == id)
     }
 
     <span class="doccomment">/// Checks whether the message mentions passed [`User`].
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>mentions_user(<span class="kw-2">&amp;</span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>User) -&gt; bool {
         <span class="self">self</span>.mentions_user_id(user.id)
     }
@@ -1912,15 +1889,13 @@
     <span class="doccomment">/// Tries to return author's nickname in the current channel's guild.
     ///
     /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>author_nick(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="self">self</span>.author.nick_in(cache_http, <span class="self">self</span>.guild_id<span class="question-mark">?</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message. The
     /// link will be valid for messages in either private channels or guilds.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>link(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="self">self</span>.id.link(<span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id)
     }
@@ -1928,7 +1903,6 @@
     <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`] if Discord does not provide it.
     ///
     /// [`guild_id`]: Self::guild_id
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>link_ensured(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; String {
         <span class="self">self</span>.id.link_ensured(cache_http, <span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id).<span class="kw">await
     </span>}

@@ -2688,51 +2688,6 @@
 <a href="#2686" id="2686">2686</a>
 <a href="#2687" id="2687">2687</a>
 <a href="#2688" id="2688">2688</a>
-<a href="#2689" id="2689">2689</a>
-<a href="#2690" id="2690">2690</a>
-<a href="#2691" id="2691">2691</a>
-<a href="#2692" id="2692">2692</a>
-<a href="#2693" id="2693">2693</a>
-<a href="#2694" id="2694">2694</a>
-<a href="#2695" id="2695">2695</a>
-<a href="#2696" id="2696">2696</a>
-<a href="#2697" id="2697">2697</a>
-<a href="#2698" id="2698">2698</a>
-<a href="#2699" id="2699">2699</a>
-<a href="#2700" id="2700">2700</a>
-<a href="#2701" id="2701">2701</a>
-<a href="#2702" id="2702">2702</a>
-<a href="#2703" id="2703">2703</a>
-<a href="#2704" id="2704">2704</a>
-<a href="#2705" id="2705">2705</a>
-<a href="#2706" id="2706">2706</a>
-<a href="#2707" id="2707">2707</a>
-<a href="#2708" id="2708">2708</a>
-<a href="#2709" id="2709">2709</a>
-<a href="#2710" id="2710">2710</a>
-<a href="#2711" id="2711">2711</a>
-<a href="#2712" id="2712">2712</a>
-<a href="#2713" id="2713">2713</a>
-<a href="#2714" id="2714">2714</a>
-<a href="#2715" id="2715">2715</a>
-<a href="#2716" id="2716">2716</a>
-<a href="#2717" id="2717">2717</a>
-<a href="#2718" id="2718">2718</a>
-<a href="#2719" id="2719">2719</a>
-<a href="#2720" id="2720">2720</a>
-<a href="#2721" id="2721">2721</a>
-<a href="#2722" id="2722">2722</a>
-<a href="#2723" id="2723">2723</a>
-<a href="#2724" id="2724">2724</a>
-<a href="#2725" id="2725">2725</a>
-<a href="#2726" id="2726">2726</a>
-<a href="#2727" id="2727">2727</a>
-<a href="#2728" id="2728">2728</a>
-<a href="#2729" id="2729">2729</a>
-<a href="#2730" id="2730">2730</a>
-<a href="#2731" id="2731">2731</a>
-<a href="#2732" id="2732">2732</a>
-<a href="#2733" id="2733">2733</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -3027,7 +2982,6 @@
     /// Returns an [`Error::Http`] if the guild is unavailable.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>automod_rules(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Rule&gt;&gt; {
         <span class="self">self</span>.id.automod_rules(http).<span class="kw">await
     </span>}
@@ -3041,7 +2995,6 @@
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>automod_rule(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3063,7 +3016,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_automod_rule(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3081,7 +3033,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_automod_rule(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3101,7 +3052,6 @@
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_automod_rule(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3215,7 +3165,6 @@
     /// Otherwise returns [`Error::Http`] if the member cannot be banned.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>ban(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3232,7 +3181,6 @@
     ///
     /// In addition to the possible reasons [`Self::ban`] may return an error, an
     /// [`ModelError::TooLarge`] may also be returned if the reason is too long.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>ban_with_reason(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3303,7 +3251,6 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>add_member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3323,7 +3270,6 @@
     /// or if an invalid value is given.
     ///
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>audit_logs(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3340,7 +3286,6 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is currently unavailable.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>channels(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3446,7 +3391,6 @@
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`CreateAttachment`]: crate::builder::CreateAttachment
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3465,7 +3409,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_integration(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3484,7 +3427,6 @@
     /// See [`CreateCommand::execute`] for a list of possible errors.
     ///
     /// [`CreateCommand::execute`]: ../../builder/struct.CreateCommand.html#method.execute
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_command(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3707,7 +3649,6 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3726,7 +3667,6 @@
     /// that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_integration(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3746,7 +3686,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete the role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3766,7 +3705,6 @@
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_scheduled_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3788,7 +3726,6 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3858,7 +3795,6 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -3881,7 +3817,6 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3950,7 +3885,6 @@
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -3976,7 +3910,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_role_position(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -4039,7 +3972,6 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -4091,7 +4023,6 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>get(
         cache_http: <span class="kw">impl </span>CacheHttp,
         guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
@@ -4112,7 +4043,6 @@
     ///
     /// [`position`]: Role::position
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>greater_member_hierarchy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
@@ -4185,7 +4115,6 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is unavailable
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>emojis(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Emoji&gt;&gt; {
         <span class="self">self</span>.id.emojis(http).<span class="kw">await
     </span>}
@@ -4198,7 +4127,6 @@
     /// guild is unavailable.
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="self">self</span>.id.emoji(http, emoji_id).<span class="kw">await
     </span>}
@@ -4214,7 +4142,6 @@
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>integrations(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Integration&gt;&gt; {
         <span class="self">self</span>.id.integrations(http).<span class="kw">await
     </span>}
@@ -4244,8 +4171,7 @@
 
     <span class="doccomment">/// Checks if the guild is 'large'. A guild is considered large if it has more than 250
     /// members.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>is_large(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.members.len() &gt; LARGE_THRESHOLD <span class="kw">as </span>usize
     }
@@ -4259,7 +4185,6 @@
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>kick(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.kick(http, user_id).<span class="kw">await
     </span>}
@@ -4268,7 +4193,6 @@
     ///
     /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
     /// the reason is too long.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>kick_with_reason(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -4286,7 +4210,6 @@
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild or the access token
     /// lacks the necessary scope.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>current_user_member(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="self">self</span>.id.current_user_member(http).<span class="kw">await
     </span>}
@@ -4297,7 +4220,6 @@
     ///
     /// May return an [`Error::Http`] if the current user cannot leave the guild, or currently is
     /// not in the guild.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>leave(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.leave(http).<span class="kw">await
     </span>}
@@ -4311,7 +4233,6 @@
     ///
     /// Returns an [`Error::Http`] if the user is not in the guild or if the guild is otherwise
     /// unavailable.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -4339,7 +4260,6 @@
     /// [`ModelError::TooSmall`] or [`ModelError::TooLarge`] if the limit is not within range.
     ///
     /// [`User`]: crate::model::user::User
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -4617,8 +4537,7 @@
     /// # Errors
     ///
     /// See [`Guild::member`].
-    </span><span class="attr">#[inline]
-    #[cfg(feature = <span class="string">"cache"</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
         <span class="self">Self</span>::_user_permissions_in(<span class="prelude-val">None</span>, member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
@@ -4634,7 +4553,6 @@
     /// currently in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>move_member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -4649,8 +4567,7 @@
     /// # Errors
     ///
     /// Returns [`Error::Model`] if the [`Member`] has a non-existent role for some reason.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>user_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
         <span class="self">Self</span>::_user_permissions_in(<span class="prelude-val">Some</span>(channel), member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
     }
@@ -4766,7 +4683,6 @@
     /// Returns an [`Error::Http`] if the current user is lacking permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>reorder_channels(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -4786,7 +4702,6 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>search_members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -4887,7 +4802,6 @@
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>))]
-    #[inline]
     </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; u16 {
         <span class="self">self</span>.id.shard_id(<span class="kw-2">&amp;</span>cache)
     }
@@ -4911,7 +4825,6 @@
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
     </span><span class="attr">#[cfg(all(feature = <span class="string">"utils"</span>, not(feature = <span class="string">"cache"</span>)))]
-    #[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_count: u16) -&gt; u16 {
         <span class="self">self</span>.id.shard_id(shard_count)
@@ -4933,7 +4846,6 @@
     /// [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>start_integration_sync(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -5008,7 +4920,6 @@
     ///
     /// Will return [`Error::Http`] if the current user is lacking permissions. Can also return an
     /// [`Error::Json`] if there is an error deserializing the API response.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>vanity_url(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
         <span class="self">self</span>.id.vanity_url(http).<span class="kw">await
     </span>}
@@ -5023,7 +4934,6 @@
     ///
     /// Will return an [`Error::Http`] if the current user is lacking permissions. Can also return
     /// an [`Error::Json`] if there is an error deserializing the API response.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
         <span class="self">self</span>.id.webhooks(http).<span class="kw">await
     </span>}

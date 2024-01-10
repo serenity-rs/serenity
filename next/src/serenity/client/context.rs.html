@@ -358,13 +358,6 @@
 <a href="#356" id="356">356</a>
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -472,7 +465,6 @@
     ///
     /// [`Online`]: OnlineStatus::Online
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>online(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::Online);
     }
@@ -501,7 +493,6 @@
     ///
     /// [`Idle`]: OnlineStatus::Idle
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>idle(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::Idle);
     }
@@ -530,7 +521,6 @@
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>dnd(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::DoNotDisturb);
     }
@@ -559,7 +549,6 @@
     ///
     /// [`Invisible`]: OnlineStatus::Invisible
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>invisible(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_status(OnlineStatus::Invisible);
     }
@@ -592,7 +581,6 @@
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>reset_presence(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.shard.set_presence(<span class="prelude-val">None</span>, OnlineStatus::Online);
     }
@@ -622,7 +610,6 @@
     /// }
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>set_activity(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;) {
         <span class="self">self</span>.shard.set_activity(activity);
     }
@@ -672,7 +659,6 @@
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Idle`]: OnlineStatus::Idle
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>set_presence(<span class="kw-2">&amp;</span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;, status: OnlineStatus) {
         <span class="self">self</span>.shard.set_presence(activity, status);
     }

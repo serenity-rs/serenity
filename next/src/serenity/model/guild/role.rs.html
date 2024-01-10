@@ -257,10 +257,6 @@
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::fmt;
 
@@ -342,7 +338,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete this role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         http.as_ref().delete_role(<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
@@ -360,15 +355,13 @@
     /// Returns [`Error::Http`] if the current user does not have permission to Manage Roles.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, builder: EditRole&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.guild_id.edit_role(http.as_ref(), <span class="self">self</span>.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Check that the role has the given permission.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>has_permission(<span class="kw-2">&amp;</span><span class="self">self</span>, permission: Permissions) -&gt; bool {
         <span class="self">self</span>.permissions.contains(permission)
     }
@@ -378,8 +371,7 @@
     /// The 'precise' argument is used to check if the role's permissions are precisely equivalent
     /// to the given permissions. If you need only check that the role has at least the given
     /// permissions, pass `false`.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>has_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, permissions: Permissions, precise: bool) -&gt; bool {
         <span class="kw">if </span>precise {
             <span class="self">self</span>.permissions == permissions

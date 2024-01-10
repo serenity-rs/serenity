@@ -876,8 +876,6 @@
 <a href="#874" id="874">874</a>
 <a href="#875" id="875">875</a>
 <a href="#876" id="876">876</a>
-<a href="#877" id="877">877</a>
-<a href="#878" id="878">878</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>help_commands;
 <span class="kw">pub mod </span>macros {
     <span class="kw">pub use </span>command_attr::{check, command, group, help, hook};
@@ -998,8 +996,7 @@
 }
 
 <span class="kw">impl </span>StandardFramework {
-    <span class="attr">#[inline]
-    #[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         StandardFramework::default()
     }
@@ -1066,7 +1063,6 @@
     ///     .await;
     /// # }
     /// ```
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>bucket(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;, builder: BucketBuilder) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.buckets.lock().<span class="kw">await</span>.insert(name.into(), builder.construct());
         <span class="self">self

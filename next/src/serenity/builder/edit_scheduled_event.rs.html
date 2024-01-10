@@ -194,8 +194,6 @@
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -272,7 +270,6 @@
     </span>}
 
     <span class="doccomment">/// Sets the start time of the scheduled event.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>start_time(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: <span class="kw">impl </span>Into&lt;Timestamp&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.scheduled_start_time = <span class="prelude-val">Some</span>(timestamp.into());
         <span class="self">self
@@ -284,7 +281,6 @@
     ///
     /// [`kind`]: EditScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>end_time(<span class="kw-2">mut </span><span class="self">self</span>, timestamp: <span class="kw">impl </span>Into&lt;Timestamp&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.scheduled_end_time = <span class="prelude-val">Some</span>(timestamp.into());
         <span class="self">self

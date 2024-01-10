@@ -576,9 +576,6 @@
 <a href="#574" id="574">574</a>
 <a href="#575" id="575">575</a>
 <a href="#576" id="576">576</a>
-<a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::collections::HashSet;
 
@@ -877,8 +874,7 @@
     /// let framework = StandardFramework::new().group(&amp;PENG_GROUP);
     /// framework.configure(Configuration::new().disabled_commands(disabled));
     /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>disabled_commands(<span class="kw-2">mut </span><span class="self">self</span>, commands: HashSet&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.disabled_commands = commands;
         <span class="self">self
@@ -938,8 +934,7 @@
     /// ```
     ///
     /// [`Context::data`]: crate::client::Context::data
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>dynamic_prefix(<span class="kw-2">mut </span><span class="self">self</span>, dynamic_prefix: DynamicPrefixHook) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.dynamic_prefixes.push(dynamic_prefix);
         <span class="self">self
@@ -1051,8 +1046,7 @@
     /// let framework = StandardFramework::new();
     /// framework.configure(Configuration::new().prefixes(vec!["!".into(), "&gt;".into(), "+".into()]));
     /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>prefixes(<span class="kw-2">mut </span><span class="self">self</span>, prefixes: Vec&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.prefixes = prefixes;
         <span class="self">self

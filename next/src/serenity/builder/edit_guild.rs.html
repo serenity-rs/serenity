@@ -340,9 +340,6 @@
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -412,7 +409,6 @@
 
     <span class="doccomment">/// Set the "AFK voice channel" that users are to move to if they have been AFK for an amount
     /// of time, configurable by [`Self::afk_timeout`]. Pass [`None`] to unset the current value.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>afk_channel(<span class="kw-2">mut </span><span class="self">self</span>, channel: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.afk_channel_id = <span class="prelude-val">Some</span>(channel);
         <span class="self">self
@@ -491,7 +487,6 @@
     <span class="doccomment">/// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>owner(<span class="kw-2">mut </span><span class="self">self</span>, user_id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.owner_id = <span class="prelude-val">Some</span>(user_id.into());
         <span class="self">self
@@ -611,7 +606,6 @@
     /// # Ok(())
     /// # }
     /// ```
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>verification_level(<span class="kw-2">mut </span><span class="self">self</span>, verification_level: <span class="kw">impl </span>Into&lt;VerificationLevel&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.verification_level = <span class="prelude-val">Some</span>(verification_level.into());
         <span class="self">self

@@ -764,17 +764,6 @@
 <a href="#762" id="762">762</a>
 <a href="#763" id="763">763</a>
 <a href="#764" id="764">764</a>
-<a href="#765" id="765">765</a>
-<a href="#766" id="766">766</a>
-<a href="#767" id="767">767</a>
-<a href="#768" id="768">768</a>
-<a href="#769" id="769">769</a>
-<a href="#770" id="770">770</a>
-<a href="#771" id="771">771</a>
-<a href="#772" id="772">772</a>
-<a href="#773" id="773">773</a>
-<a href="#774" id="774">774</a>
-<a href="#775" id="775">775</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -992,8 +981,7 @@
 
 <span class="kw">impl </span>Cache {
     <span class="doccomment">/// Creates a new cache.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default()
     }
@@ -1126,7 +1114,6 @@
     }
 
     <span class="doccomment">/// Retrieves a [`GuildChannel`] from the cache based on the given Id.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: C) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>._channel(id.into())
     }
@@ -1193,7 +1180,6 @@
     ///     println!("Guild name: {}", guild.name);
     /// };
     /// ```
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>guild&lt;G: Into&lt;GuildId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: G) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>._guild(id.into())
     }
@@ -1250,7 +1236,6 @@
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
@@ -1264,8 +1249,7 @@
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(member))
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">pub fn </span>guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>._guild_roles(guild_id.into())
     }
 
@@ -1275,13 +1259,11 @@
     }
 
     <span class="doccomment">/// This method clones and returns all unavailable guilds.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>unavailable_guilds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReadOnlyMapRef&lt;<span class="lifetime">'_</span>, GuildId, ()&gt; {
         <span class="self">self</span>.unavailable_guilds.as_read_only()
     }
 
     <span class="doccomment">/// This method returns all channels from a guild of with the given `guild_id`.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>guild_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>._guild_channels(guild_id.into())
     }
@@ -1297,7 +1279,6 @@
     }
 
     <span class="doccomment">/// Returns the number of shards.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>shard_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NonZeroU16 {
         <span class="self">self</span>.shard_data.read().total
     }
@@ -1325,7 +1306,6 @@
     /// ```
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>message&lt;C, M&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: C, message_id: M) -&gt; <span class="prelude-ty">Option</span>&lt;MessageRef&lt;<span class="lifetime">'_</span>&gt;&gt;
     <span class="kw">where
         </span>C: Into&lt;ChannelId&gt;,
@@ -1366,7 +1346,6 @@
     ///
     /// [`Guild`]: crate::model::guild::Guild
     /// [`roles`]: crate::model::guild::Guild::roles
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>role&lt;G, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: G, role_id: R) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRoleRef&lt;<span class="lifetime">'_</span>&gt;&gt;
     <span class="kw">where
         </span>G: Into&lt;GuildId&gt;,
@@ -1406,7 +1385,6 @@
     }
 
     <span class="doccomment">/// This method provides a reference to the user used by the bot.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>current_user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CurrentUserRef&lt;<span class="lifetime">'_</span>&gt; {
         CacheRef::from_guard(<span class="self">self</span>.user.read())
     }

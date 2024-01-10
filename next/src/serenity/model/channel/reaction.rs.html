@@ -562,10 +562,6 @@
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
 <a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="attr">#[cfg(doc)]
@@ -643,7 +639,6 @@
     /// exists.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
         <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await
     </span>}
@@ -730,7 +725,6 @@
     /// the message was deleted.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.channel_id.message(cache_http, <span class="self">self</span>.message_id).<span class="kw">await
     </span>}
@@ -781,7 +775,6 @@
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: crate::model::permissions
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>users&lt;R, U&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -894,8 +887,7 @@
     ///
     /// **Note**: This is mainly for use internally. There is otherwise most likely little use for
     /// it.
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     #[cfg(feature = <span class="string">"http"</span>)]
     </span><span class="kw">pub fn </span>as_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{

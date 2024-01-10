@@ -1414,8 +1414,6 @@
 <a href="#1412" id="1412">1412</a>
 <a href="#1413" id="1413">1413</a>
 <a href="#1414" id="1414">1414</a>
-<a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.
 //!
 //! # Example
@@ -1559,8 +1557,7 @@
 <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">impl </span>Suggestions {
     <span class="doccomment">/// Immutably borrow inner [`Vec`].
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>as_vec(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;SuggestedCommandName&gt; {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
     </span>}
@@ -1629,8 +1626,7 @@
 }
 
 <span class="doccomment">/// Checks if `search_on` starts with `word` and is then cleanly followed by a `" "`.
-</span><span class="attr">#[inline]
-#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
+</span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"http"</span>))]
 </span><span class="kw">fn </span>starts_with_whole_word(search_on: <span class="kw-2">&amp;</span>str, word: <span class="kw-2">&amp;</span>str) -&gt; bool {
     search_on.starts_with(word)
         &amp;&amp; search_on.get(word.len()..=word.len()).is_some_and(|slice| slice == <span class="string">" "</span>)

@@ -222,8 +222,6 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
 
@@ -256,8 +254,7 @@
     /// If you are using the [`Client`], you do not need to do this.
     ///
     /// [`Client`]: crate::Client
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(shard: <span class="kw-2">&amp;</span>ShardRunner) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             tx: shard.runner_tx(),
@@ -430,7 +427,6 @@
     }
 
     <span class="doccomment">/// Sends a message to the shard.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>send_to_shard(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: ShardRunnerMessage) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.tx.unbounded_send(msg) {
             <span class="macro">tracing::warn!</span>(<span class="string">"failed to send ShardRunnerMessage to shard: {}"</span>, e);

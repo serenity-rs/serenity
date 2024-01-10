@@ -559,15 +559,6 @@
 <a href="#557" id="557">557</a>
 <a href="#558" id="558">558</a>
 <a href="#559" id="559">559</a>
-<a href="#560" id="560">560</a>
-<a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -611,8 +602,7 @@
 }
 
 <span class="kw">impl </span>WebhookType {
-    <span class="attr">#[inline]
-    #[must_use]
+    <span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Incoming =&gt; <span class="string">"incoming"</span>,
@@ -689,7 +679,6 @@
 </span><span class="kw">impl </span>WebhookGuild {
     <span class="doccomment">/// Tries to find the [`Guild`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>to_guild_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         cache.as_ref().guild(<span class="self">self</span>.id)
     }
@@ -702,7 +691,6 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_partial_guild(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
@@ -724,7 +712,6 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_partial_guild_with_counts(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -747,7 +734,6 @@
 </span><span class="kw">impl </span>WebhookChannel {
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         cache.as_ref().channel(<span class="self">self</span>.id)
     }
@@ -763,7 +749,6 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
@@ -901,7 +886,6 @@
     ///
     /// Returns [`Error::Http`] if the webhook does not exist, the token is invalid, or if the
     /// webhook could not otherwise be deleted.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>http = http.as_ref();
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.token {
@@ -1010,7 +994,6 @@
     /// is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1131,7 +1114,6 @@
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_webhook(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         http.as_ref().get_webhook(<span class="self">self</span>).<span class="kw">await
     </span>}

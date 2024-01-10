@@ -415,9 +415,6 @@
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
 <a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models for server and channel invites.
 
 </span><span class="kw">use </span>nonmax::NonMaxU64;
@@ -494,7 +491,6 @@
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create(
         cache_http: <span class="kw">impl </span>CacheHttp,
         channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
@@ -655,7 +651,6 @@
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>))]
-    #[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; u16 {
         <span class="self">self</span>.id.shard_id(<span class="kw-2">&amp;</span>cache)
@@ -680,7 +675,6 @@
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
     </span><span class="attr">#[cfg(all(feature = <span class="string">"utils"</span>, not(feature = <span class="string">"cache"</span>)))]
-    #[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_count: u16) -&gt; u16 {
         <span class="self">self</span>.id.shard_id(shard_count)

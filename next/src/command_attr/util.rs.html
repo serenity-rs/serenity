@@ -278,16 +278,6 @@
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>proc_macro::TokenStream;
 <span class="kw">use </span>proc_macro2::{Span, TokenStream <span class="kw">as </span>TokenStream2};
 <span class="kw">use </span>quote::{format_ident, quote, ToTokens};
@@ -336,8 +326,7 @@
         }
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>to_ident(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ident {
+    <span class="kw">fn </span>to_ident(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ident {
         Ident::new(<span class="kw-2">&amp;</span><span class="self">self</span>.to_str(), <span class="self">self</span>.span())
     }
 }
@@ -349,26 +338,22 @@
 }
 
 <span class="kw">impl </span>IdentExt2 <span class="kw">for </span>Ident {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>to_string_non_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="kw">fn </span>to_string_non_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>ident_string = <span class="self">self</span>.to_string();
         ident_string.trim_start_matches(<span class="string">"r#"</span>).into()
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>to_uppercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>to_uppercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="comment">// This should be valid because keywords are lowercase.
         </span><span class="macro">format_ident!</span>(<span class="string">"{}"</span>, <span class="self">self</span>.to_string_non_raw().to_uppercase())
     }
 
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>with_suffix(<span class="kw-2">&amp;</span><span class="self">self</span>, suffix: <span class="kw-2">&amp;</span>str) -&gt; Ident {
+    <span class="kw">fn </span>with_suffix(<span class="kw-2">&amp;</span><span class="self">self</span>, suffix: <span class="kw-2">&amp;</span>str) -&gt; Ident {
         <span class="macro">format_ident!</span>(<span class="string">"{}_{}"</span>, <span class="self">self</span>.to_uppercase(), suffix)
     }
 }
 
-<span class="attr">#[inline]
-</span><span class="kw">pub fn </span>into_stream(e: <span class="kw-2">&amp;</span>Error) -&gt; TokenStream {
+<span class="kw">pub fn </span>into_stream(e: <span class="kw-2">&amp;</span>Error) -&gt; TokenStream {
     e.to_compile_error().into()
 }
 
@@ -421,8 +406,7 @@
 </span><span class="kw">pub struct </span>AsOption&lt;T&gt;(<span class="kw">pub </span><span class="prelude-ty">Option</span>&lt;T&gt;);
 
 <span class="kw">impl</span>&lt;T&gt; AsOption&lt;T&gt; {
-    <span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>map&lt;U&gt;(<span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(T) -&gt; U) -&gt; AsOption&lt;U&gt; {
+    <span class="kw">pub fn </span>map&lt;U&gt;(<span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(T) -&gt; U) -&gt; AsOption&lt;U&gt; {
         AsOption(<span class="self">self</span>.<span class="number">0</span>.map(f))
     }
 }
@@ -437,8 +421,7 @@
 }
 
 <span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>AsOption&lt;T&gt; {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         AsOption(<span class="prelude-val">None</span>)
     }
 }
@@ -464,8 +447,7 @@
     }
 }
 
-<span class="attr">#[inline]
-</span><span class="kw">pub fn </span>generate_type_validation(have: <span class="kw-2">&amp;</span>Type, expect: <span class="kw-2">&amp;</span>Type) -&gt; syn::Stmt {
+<span class="kw">pub fn </span>generate_type_validation(have: <span class="kw-2">&amp;</span>Type, expect: <span class="kw-2">&amp;</span>Type) -&gt; syn::Stmt {
     <span class="macro">parse_quote! </span>{
         <span class="macro">serenity::static_assertions::assert_type_eq_all!</span>(#have, #expect);
     }
@@ -537,14 +519,12 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attr">#[inline]
-</span><span class="kw">pub fn </span>create_return_type_validation(r#fn: <span class="kw-2">&amp;mut </span>CommandFun, expect: <span class="kw-2">&amp;</span>Type) {
+<span class="kw">pub fn </span>create_return_type_validation(r#fn: <span class="kw-2">&amp;mut </span>CommandFun, expect: <span class="kw-2">&amp;</span>Type) {
     <span class="kw">let </span>stmt = generate_type_validation(<span class="kw-2">&amp;</span>r#fn.ret, expect);
     r#fn.body.insert(<span class="number">0</span>, stmt);
 }
 
-<span class="attr">#[inline]
-</span><span class="kw">pub fn </span>populate_fut_lifetimes_on_refs(args: <span class="kw-2">&amp;mut </span>Vec&lt;Argument&gt;) {
+<span class="kw">pub fn </span>populate_fut_lifetimes_on_refs(args: <span class="kw-2">&amp;mut </span>Vec&lt;Argument&gt;) {
     <span class="kw">for </span>arg <span class="kw">in </span>args {
         <span class="kw">if let </span>Type::Reference(reference) = <span class="kw-2">&amp;mut </span>arg.kind {
             reference.lifetime = <span class="prelude-val">Some</span>(Lifetime::new(<span class="string">"'fut"</span>, Span::call_site()));

@@ -1201,24 +1201,6 @@
 <a href="#1199" id="1199">1199</a>
 <a href="#1200" id="1200">1200</a>
 <a href="#1201" id="1201">1201</a>
-<a href="#1202" id="1202">1202</a>
-<a href="#1203" id="1203">1203</a>
-<a href="#1204" id="1204">1204</a>
-<a href="#1205" id="1205">1205</a>
-<a href="#1206" id="1206">1206</a>
-<a href="#1207" id="1207">1207</a>
-<a href="#1208" id="1208">1208</a>
-<a href="#1209" id="1209">1209</a>
-<a href="#1210" id="1210">1210</a>
-<a href="#1211" id="1211">1211</a>
-<a href="#1212" id="1212">1212</a>
-<a href="#1213" id="1213">1213</a>
-<a href="#1214" id="1214">1214</a>
-<a href="#1215" id="1215">1215</a>
-<a href="#1216" id="1216">1216</a>
-<a href="#1217" id="1217">1217</a>
-<a href="#1218" id="1218">1218</a>
-<a href="#1219" id="1219">1219</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1282,7 +1264,6 @@
     /// channel.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>broadcast_typing(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         http.as_ref().broadcast_typing(<span class="self">self</span>).<span class="kw">await
     </span>}
@@ -1339,7 +1320,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>create_reaction(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1358,7 +1338,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
         http.as_ref().delete_channel(<span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
@@ -1375,7 +1354,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_message(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1458,7 +1436,6 @@
     /// permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_reaction(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1485,7 +1462,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_reactions(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1503,7 +1479,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>delete_reaction_emoji(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -1545,7 +1520,6 @@
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1568,7 +1542,6 @@
     ///
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>edit_message(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1598,7 +1571,6 @@
 
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    #[inline]
     </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         cache.as_ref().channel(<span class="self">self</span>)
     }
@@ -1614,7 +1586,6 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
@@ -1651,7 +1622,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>invites(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
         http.as_ref().get_channel_invites(<span class="self">self</span>).<span class="kw">await
     </span>}
@@ -1668,7 +1638,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>message(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -1773,7 +1742,6 @@
     /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>pin(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         http.as_ref().pin_message(<span class="self">self</span>, message_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
@@ -1809,7 +1777,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>pins(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
         http.as_ref().get_pins(<span class="self">self</span>).<span class="kw">await
     </span>}
@@ -1858,7 +1825,6 @@
     ///
     /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>say(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
@@ -2015,7 +1981,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>unpin(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
@@ -2033,7 +1998,6 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>webhooks(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
         http.as_ref().get_channel_webhooks(<span class="self">self</span>).<span class="kw">await
     </span>}

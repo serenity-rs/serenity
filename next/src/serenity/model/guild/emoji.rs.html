@@ -100,7 +100,6 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
@@ -163,8 +162,7 @@
     /// println!("Direct link to emoji image: {}", emoji.url());
     /// # }
     /// ```
-    </span><span class="attr">#[inline]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>extension = <span class="kw">if </span><span class="self">self</span>.animated() { <span class="string">"gif" </span>} <span class="kw">else </span>{ <span class="string">"png" </span>};
         <span class="macro">cdn!</span>(<span class="string">"/emojis/{}.{}"</span>, <span class="self">self</span>.id, extension)
