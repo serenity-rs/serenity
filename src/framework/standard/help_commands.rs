@@ -897,7 +897,7 @@ fn flatten_group_to_string(
     group: &GroupCommandsPair,
     nest_level: usize,
     help_options: &HelpOptions,
-) -> Result<(), Error> {
+) -> Result<(), std::fmt::Error> {
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
@@ -1002,7 +1002,8 @@ async fn send_grouped_commands_embed(
     for group in groups {
         let mut embed_text = String::default();
 
-        flatten_group_to_string(&mut embed_text, group, 0, help_options)?;
+        flatten_group_to_string(&mut embed_text, group, 0, help_options)
+            .expect("String::write should never fail");
 
         embed = embed.field(group.name, embed_text, true);
     }

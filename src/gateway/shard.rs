@@ -202,17 +202,16 @@ impl Shard {
                 Ok(())
             },
             Err(why) => {
-                match why {
-                    Error::Tungstenite(TungsteniteError::Io(err)) => {
+                if let Error::Tungstenite(err) = &why {
+                    if let TungsteniteError::Io(err) = &**err {
                         if err.raw_os_error() != Some(32) {
                             debug!("[{:?}] Err heartbeating: {:?}", self.shard_info, err);
+                            return Err(Error::Gateway(GatewayError::HeartbeatFailed));
                         }
-                    },
-                    other => {
-                        warn!("[{:?}] Other err w/ keepalive: {:?}", self.shard_info, other);
-                    },
+                    }
                 }
 
+                warn!("[{:?}] Other err w/ keepalive: {:?}", self.shard_info, why);
                 Err(Error::Gateway(GatewayError::HeartbeatFailed))
             },
         }
