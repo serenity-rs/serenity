@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::create_poll::Ready;
 #[cfg(feature = "http")]
-use super::{check_overflow, Builder};
+use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -11,8 +11,6 @@ use super::{
     CreatePoll,
     EditAttachments,
 };
-#[cfg(feature = "http")]
-use crate::constants;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
@@ -112,26 +110,15 @@ impl serde::Serialize for CreateInteractionResponse<'_> {
 
 impl CreateInteractionResponse<'_> {
     #[cfg(feature = "http")]
-    fn check_length(&self) -> Result<()> {
+    fn check_length(&self) -> Result<(), ModelError> {
         if let CreateInteractionResponse::Message(data)
         | CreateInteractionResponse::Defer(data)
         | CreateInteractionResponse::UpdateMessage(data) = self
         {
-            if let Some(content) = &data.content {
-                check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
-                    .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
-            }
-
-            if let Some(embeds) = &data.embeds {
-                check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
-                    .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-
-                for embed in embeds.iter() {
-                    embed.check_length()?;
-                }
-            }
+            super::check_lengths(data.content.as_deref(), data.embeds.as_deref(), 0)
+        } else {
+            Ok(())
         }
-        Ok(())
     }
 }
 

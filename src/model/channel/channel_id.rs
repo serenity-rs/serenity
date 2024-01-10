@@ -174,8 +174,8 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete 0 or more
-    /// than 100 messages.
+    /// Returns [`ModelError::TooSmall`] or [`ModelError::TooLarge`] if an attempt was made to
+    /// delete either 0 or more than 100 messages.
     ///
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
@@ -185,17 +185,17 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_ids: &[MessageId],
     ) -> Result<()> {
+        use crate::model::error::{Maximum, Minimum};
+
         #[derive(serde::Serialize)]
         struct DeleteMessages<'a> {
             messages: &'a [MessageId],
         }
 
-        let len = message_ids.len();
-        if len == 0 || len > 100 {
-            return Err(Error::Model(ModelError::BulkDeleteAmount));
-        }
+        Minimum::BulkDeleteAmount.check_underflow(message_ids.len())?;
+        Maximum::BulkDeleteAmount.check_overflow(message_ids.len())?;
 
-        if len == 1 {
+        if message_ids.len() == 1 {
             self.delete_message(http, message_ids[0]).await
         } else {
             let req = DeleteMessages {
@@ -636,7 +636,7 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+    /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
     #[inline]
     pub async fn say(

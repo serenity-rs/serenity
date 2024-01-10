@@ -17,7 +17,7 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 
-use nonmax::NonMaxU64;
+use nonmax::{NonMaxU16, NonMaxU64};
 #[cfg(feature = "model")]
 use tracing::{error, warn};
 
@@ -478,7 +478,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days' worth of messages
+    /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
     /// to delete is over the maximum.
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
@@ -504,7 +504,7 @@ impl Guild {
     /// # Errors
     ///
     /// In addition to the possible reasons [`Self::ban`] may return an error, an
-    /// [`Error::ExceededLimit`] may also be returned if the reason is too long.
+    /// [`ModelError::TooLarge`] may also be returned if the reason is too long.
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -1665,7 +1665,7 @@ impl Guild {
     pub async fn members(
         &self,
         http: impl AsRef<Http>,
-        limit: Option<u64>,
+        limit: Option<NonMaxU16>,
         after: Option<UserId>,
     ) -> Result<Vec<Member>> {
         self.id.members(http, limit, after).await
@@ -2150,7 +2150,7 @@ impl Guild {
         &self,
         http: impl AsRef<Http>,
         query: &str,
-        limit: Option<u64>,
+        limit: Option<NonMaxU16>,
     ) -> Result<Vec<Member>> {
         self.id.search_members(http, query, limit).await
     }
