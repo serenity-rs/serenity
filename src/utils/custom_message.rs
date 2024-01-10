@@ -35,8 +35,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn attachments(&mut self, attachments: impl IntoIterator<Item = Attachment>) -> &mut Self {
-        self.msg.attachments = attachments.into_iter().collect();
+    pub fn attachments(&mut self, attachments: Vec<Attachment>) -> &mut Self {
+        self.msg.attachments = attachments.into();
 
         self
     }
@@ -85,8 +85,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn embeds(&mut self, embeds: impl IntoIterator<Item = Embed>) -> &mut Self {
-        self.msg.embeds = embeds.into_iter().collect();
+    pub fn embeds(&mut self, embeds: Vec<Embed>) -> &mut Self {
+        self.msg.embeds = embeds.into();
 
         self
     }
@@ -137,8 +137,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn mention_roles(&mut self, roles: impl IntoIterator<Item = RoleId>) -> &mut Self {
-        self.msg.mention_roles = roles.into_iter().collect();
+    pub fn mention_roles(&mut self, roles: Vec<RoleId>) -> &mut Self {
+        self.msg.mention_roles = roles.into();
 
         self
     }
@@ -147,8 +147,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn mentions(&mut self, mentions: impl IntoIterator<Item = User>) -> &mut Self {
-        self.msg.mentions = mentions.into_iter().collect();
+    pub fn mentions(&mut self, mentions: Vec<User>) -> &mut Self {
+        self.msg.mentions = mentions.into();
 
         self
     }
@@ -167,8 +167,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     #[inline]
-    pub fn reactions(&mut self, reactions: impl IntoIterator<Item = MessageReaction>) -> &mut Self {
-        self.msg.reactions = reactions.into_iter().collect();
+    pub fn reactions(&mut self, reactions: Vec<MessageReaction>) -> &mut Self {
+        self.msg.reactions = reactions.into();
 
         self
     }
