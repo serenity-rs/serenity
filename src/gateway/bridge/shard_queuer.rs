@@ -8,7 +8,7 @@ use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::StreamExt;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, timeout, Duration, Instant};
-use tracing::{debug, info, instrument, warn};
+use tracing::{debug, info, warn};
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "voice")]
@@ -100,7 +100,7 @@ impl ShardQueuer {
     /// over.
     ///
     /// **Note**: This should be run in its own thread due to the blocking nature of the loop.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn run(&mut self) {
         // The duration to timeout from reads over the Rx channel. This can be done in a loop, and
         // if the read times out then a shard can be started if one is presently waiting in the
@@ -135,7 +135,7 @@ impl ShardQueuer {
         }
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn check_last_start(&mut self) {
         let Some(instant) = self.last_start else { return };
 
@@ -152,7 +152,7 @@ impl ShardQueuer {
         sleep(to_sleep).await;
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn checked_start(&mut self, shard_id: ShardId) {
         debug!("[Shard Queuer] Checked start for shard {shard_id}");
 
@@ -167,7 +167,7 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn start(&mut self, shard_id: ShardId) -> Result<()> {
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
@@ -212,7 +212,7 @@ impl ShardQueuer {
         Ok(())
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn shutdown_runners(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -236,7 +236,7 @@ impl ShardQueuer {
     /// **Note**: If the receiving end of an mpsc channel - owned by the shard runner - no longer
     /// exists, then the shard runner will not know it should shut down. This _should never happen_.
     /// It may already be stopped.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
