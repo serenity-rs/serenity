@@ -52,7 +52,6 @@ impl<'a> EditWebhookMessage<'a> {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    #[inline]
     pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
@@ -60,7 +59,6 @@ impl<'a> EditWebhookMessage<'a> {
 
     /// Edits a message within a given thread. If the provided thread Id doesn't belong to the
     /// current webhook, the API will return an error.
-    #[inline]
     pub fn in_thread(mut self, thread_id: impl Into<ChannelId>) -> Self {
         self.thread_id = Some(thread_id.into());
         self

@@ -91,7 +91,6 @@ pub enum Mention {
 macro_rules! mention {
     ($i:ident: $($t:ty, $e:expr;)*) => {$(
         impl From<$t> for Mention {
-            #[inline(always)]
             fn from($i: $t) -> Self {
                 $e
             }
@@ -162,7 +161,6 @@ where
 macro_rules! mentionable {
     ($i:ident: $t:ty, $e:expr) => {
         impl Mentionable for $t {
-            #[inline(always)]
             fn mention(&self) -> Mention {
                 let $i = self;
                 $e.into()

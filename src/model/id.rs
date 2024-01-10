@@ -50,7 +50,6 @@ macro_rules! id_u64 {
                 #[doc = concat!("Creates a new ", stringify!($name), " from a u64.")]
                 /// # Panics
                 /// Panics if `id` is u64::MAX.
-                #[inline]
                 #[must_use]
                 #[track_caller]
                 pub const fn new(id: u64) -> Self {
@@ -61,7 +60,6 @@ macro_rules! id_u64 {
                 }
 
                 /// Retrieves the inner `id` as a [`u64`].
-                #[inline]
                 #[must_use]
                 pub const fn get(self) -> u64 {
                     // By wrapping `self.0.0` in a block, it forces a Copy, as NonMax::get takes &self.

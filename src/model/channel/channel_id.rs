@@ -61,7 +61,6 @@ impl ChannelId {
     /// channel.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    #[inline]
     pub async fn broadcast_typing(self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().broadcast_typing(self).await
     }
@@ -118,7 +117,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
-    #[inline]
     pub async fn create_reaction(
         self,
         http: impl AsRef<Http>,
@@ -137,7 +135,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<Channel> {
         http.as_ref().delete_channel(self, None).await
     }
@@ -154,7 +151,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_message(
         self,
         http: impl AsRef<Http>,
@@ -238,7 +234,6 @@ impl ChannelId {
     /// permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_reaction(
         self,
         http: impl AsRef<Http>,
@@ -265,7 +260,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_reactions(
         self,
         http: impl AsRef<Http>,
@@ -283,7 +277,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_reaction_emoji(
         self,
         http: impl AsRef<Http>,
@@ -325,7 +318,6 @@ impl ChannelId {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn edit(
         self,
         cache_http: impl CacheHttp,
@@ -348,7 +340,6 @@ impl ChannelId {
     ///
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    #[inline]
     pub async fn edit_message(
         self,
         cache_http: impl CacheHttp,
@@ -378,7 +369,6 @@ impl ChannelId {
 
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
-    #[inline]
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
         #[allow(deprecated)]
@@ -394,7 +384,6 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
-    #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
         #[cfg(feature = "temp_cache")]
         {
@@ -431,7 +420,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    #[inline]
     pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
         http.as_ref().get_channel_invites(self).await
     }
@@ -448,7 +436,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn message(
         self,
         cache_http: impl CacheHttp,
@@ -553,7 +540,6 @@ impl ChannelId {
     /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
         http.as_ref().pin_message(self, message_id.into(), None).await
     }
@@ -589,7 +575,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn pins(self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
         http.as_ref().get_pins(self).await
     }
@@ -638,7 +623,6 @@ impl ChannelId {
     ///
     /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
-    #[inline]
     pub async fn say(
         self,
         cache_http: impl CacheHttp,
@@ -791,7 +775,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn unpin(
         self,
         http: impl AsRef<Http>,
@@ -809,7 +792,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    #[inline]
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         http.as_ref().get_channel_webhooks(self).await
     }
