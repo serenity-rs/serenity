@@ -4334,7 +4334,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
         limit: u8,
-        after: Option<u64>,
+        after: Option<UserId>,
     ) -> Result<Vec<User>> {
         let mut params = ArrayVec::<_, 2>::new();
         params.push(("limit", limit.to_string()));
