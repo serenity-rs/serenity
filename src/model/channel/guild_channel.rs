@@ -385,10 +385,10 @@ impl GuildChannel {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn delete_messages<T: AsRef<MessageId>>(
+    pub async fn delete_messages(
         &self,
         http: impl AsRef<Http>,
-        message_ids: impl IntoIterator<Item = T>,
+        message_ids: &[MessageId],
     ) -> Result<()> {
         self.id.delete_messages(http, message_ids).await
     }

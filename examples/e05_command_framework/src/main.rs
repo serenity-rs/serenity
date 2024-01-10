@@ -289,7 +289,7 @@ async fn main() {
             // In this case, if "," would be first, a message would never be delimited at ", ",
             // forcing you to trim your arguments if you want to avoid whitespaces at the start of
             // each.
-            .delimiters(vec![", ", ","])
+            .delimiters(vec![", ".into(), ",".into()])
             // Sets the bot's owners. These will be used for commands that are owners only.
             .owners(owners),
     );
