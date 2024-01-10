@@ -620,18 +620,12 @@ impl ChannelId {
         message_id: impl Into<MessageId>,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
-        after: impl Into<Option<UserId>>,
+        after: Option<UserId>,
     ) -> Result<Vec<User>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
         http.as_ref()
-            .get_reaction_users(
-                self,
-                message_id.into(),
-                &reaction_type.into(),
-                limit,
-                after.into().map(UserId::get),
-            )
+            .get_reaction_users(self, message_id.into(), &reaction_type.into(), limit, after)
             .await
     }
 

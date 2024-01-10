@@ -489,7 +489,7 @@ impl Message {
         http: impl AsRef<Http>,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
-        after: impl Into<Option<UserId>>,
+        after: Option<UserId>,
     ) -> Result<Vec<User>> {
         self.channel_id.reaction_users(http, self.id, reaction_type, limit, after).await
     }

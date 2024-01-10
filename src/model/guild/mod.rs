@@ -1666,7 +1666,7 @@ impl Guild {
         &self,
         http: impl AsRef<Http>,
         limit: Option<u64>,
-        after: impl Into<Option<UserId>>,
+        after: Option<UserId>,
     ) -> Result<Vec<Member>> {
         self.id.members(http, limit, after).await
     }
