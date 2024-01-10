@@ -119,35 +119,30 @@ impl<'a> CreateAllowedMentions<'a> {
     }
 
     /// Sets the *specific* users that will be allowed mentionable.
-    #[inline]
     pub fn users(mut self, users: impl Into<Cow<'a, [UserId]>>) -> Self {
         self.users = users.into();
         self
     }
 
     /// Clear the list of mentionable users.
-    #[inline]
     pub fn empty_users(mut self) -> Self {
         self.users = Cow::default();
         self
     }
 
     /// Sets the *specific* roles that will be allowed mentionable.
-    #[inline]
     pub fn roles(mut self, roles: impl Into<Cow<'a, [RoleId]>>) -> Self {
         self.roles = roles.into();
         self
     }
 
     /// Clear the list of mentionable roles.
-    #[inline]
     pub fn empty_roles(mut self) -> Self {
         self.roles = Cow::default();
         self
     }
 
     /// Makes the reply mention/ping the user.
-    #[inline]
     pub fn replied_user(mut self, mention_user: bool) -> Self {
         self.replied_user = Some(mention_user);
         self
