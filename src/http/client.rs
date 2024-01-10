@@ -5,6 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
 use arrayvec::ArrayVec;
+use nonmax::NonMaxU16;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::header::{HeaderMap as Headers, HeaderValue};
 #[cfg(feature = "utils")]
@@ -3753,15 +3754,9 @@ impl Http {
     pub async fn get_guild_members(
         &self,
         guild_id: GuildId,
-        limit: Option<u64>,
-        after: Option<u64>,
+        limit: Option<NonMaxU16>,
+        after: Option<UserId>,
     ) -> Result<Vec<Member>> {
-        if let Some(l) = limit {
-            if !(1..=constants::MEMBER_FETCH_LIMIT).contains(&l) {
-                return Err(Error::NotInRange("limit", l, 1, constants::MEMBER_FETCH_LIMIT));
-            }
-        }
-
         let mut params = ArrayVec::<_, 2>::new();
         params.push(("limit", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()));
         if let Some(after) = after {
@@ -4749,7 +4744,7 @@ impl Http {
         &self,
         guild_id: GuildId,
         query: &str,
-        limit: Option<u64>,
+        limit: Option<NonMaxU16>,
     ) -> Result<Vec<Member>> {
         let mut value: Value = self
             .fire(Request {

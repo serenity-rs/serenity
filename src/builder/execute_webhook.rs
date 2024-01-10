@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::{check_overflow, Builder};
+use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -9,8 +9,6 @@ use super::{
     CreateEmbed,
     EditAttachments,
 };
-#[cfg(feature = "http")]
-use crate::constants;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
@@ -90,19 +88,8 @@ impl<'a> ExecuteWebhook<'a> {
     }
 
     #[cfg(feature = "http")]
-    fn check_length(&self) -> Result<()> {
-        if let Some(content) = &self.content {
-            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
-                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
-        }
-
-        check_overflow(self.embeds.len(), constants::EMBED_MAX_COUNT)
-            .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-        for embed in self.embeds.iter() {
-            embed.check_length()?;
-        }
-
-        Ok(())
+    fn check_length(&self) -> Result<(), ModelError> {
+        super::check_lengths(self.content.as_deref(), Some(&self.embeds), 0)
     }
 
     /// Override the default avatar of the webhook with an image URL.

@@ -5,6 +5,97 @@ use std::fmt;
 
 use super::Permissions;
 
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
+pub enum Maximum {
+    EmbedLength,
+    EmbedCount,
+    MessageLength,
+    StickerCount,
+    WebhookName,
+    AuditLogReason,
+    DeleteMessageDays,
+    BulkDeleteAmount,
+}
+
+impl Maximum {
+    pub(crate) fn check_overflow(self, value: usize) -> Result<(), Error> {
+        let max = self.value();
+        if value > max {
+            Err(Error::TooLarge {
+                maximum: self,
+                value,
+            })
+        } else {
+            Ok(())
+        }
+    }
+
+    pub(crate) fn value(self) -> usize {
+        match self {
+            Self::EmbedCount => crate::constants::EMBED_MAX_COUNT,
+            Self::EmbedLength => crate::constants::EMBED_MAX_LENGTH,
+            Self::MessageLength => crate::constants::MESSAGE_CODE_LIMIT,
+            Self::StickerCount => crate::constants::STICKER_MAX_COUNT,
+            Self::WebhookName | Self::BulkDeleteAmount => 100,
+            Self::AuditLogReason => 512,
+            Self::DeleteMessageDays => 7,
+        }
+    }
+}
+
+impl fmt::Display for Maximum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::EmbedCount => f.write_str("Embed count"),
+            Self::EmbedLength => f.write_str("Embed length"),
+            Self::MessageLength => f.write_str("Message length"),
+            Self::StickerCount => f.write_str("Sticker count"),
+            Self::WebhookName => f.write_str("Webhook name"),
+            Self::AuditLogReason => f.write_str("Audit log reason"),
+            Self::DeleteMessageDays => f.write_str("Delete message days"),
+            Self::BulkDeleteAmount => f.write_str("Message bulk delete count"),
+        }
+    }
+}
+
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
+pub enum Minimum {
+    WebhookName,
+    BulkDeleteAmount,
+}
+
+impl Minimum {
+    pub(crate) fn check_underflow(self, value: usize) -> Result<(), Error> {
+        let min = self.value();
+        if value < min {
+            Err(Error::TooSmall {
+                minimum: self,
+                value,
+            })
+        } else {
+            Ok(())
+        }
+    }
+
+    pub(crate) fn value(self) -> usize {
+        match self {
+            Self::WebhookName => 2,
+            Self::BulkDeleteAmount => 1,
+        }
+    }
+}
+
+impl fmt::Display for Minimum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::WebhookName => f.write_str("Webhook name"),
+            Self::BulkDeleteAmount => f.write_str("Bulk delete amount"),
+        }
+    }
+}
+
 /// An error returned from the [`model`] module.
 ///
 /// This is always wrapped within the library's [`Error::Model`] variant.
@@ -30,11 +121,13 @@ use super::Permissions;
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },
-///             Err(Error::Model(ModelError::DeleteMessageDaysAmount(amount))) => {
-///                 println!("Failed deleting {} days' worth of messages", amount);
+///             Err(Error::Model(ModelError::TooLarge {
+///                 value, ..
+///             })) => {
+///                 println!("Failed deleting {value} days' worth of messages");
 ///             },
 ///             Err(why) => {
-///                 println!("Unexpected error: {:?}", why);
+///                 println!("Unexpected error: {why:?}");
 ///             },
 ///         }
 ///     }
@@ -48,14 +141,10 @@ use super::Permissions;
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Error {
-    /// When attempting to delete below or above the minimum or maximum allowed number of messages.
-    BulkDeleteAmount,
-    /// When attempting to delete a number of days' worth of messages that is not allowed.
-    DeleteMessageDaysAmount(u8),
-    /// When attempting to send a message with over 10 embeds.
-    EmbedAmount,
-    /// Indicates that the textual content of an embed exceeds the maximum length.
-    EmbedTooLarge(usize),
+    /// Indicates that the `minimum` has been missed by the `value`.
+    TooSmall { minimum: Minimum, value: usize },
+    /// Indicates that the `maximum` has been exceeded by the `value`.
+    TooLarge { maximum: Maximum, value: usize },
     /// An indication that a [`Guild`] could not be found by [Id][`GuildId`] in the [`Cache`].
     ///
     /// [`Guild`]: super::guild::Guild
@@ -120,13 +209,6 @@ pub enum Error {
     ///
     /// [`Guild`]: super::guild::Guild
     WrongGuild,
-    /// Indicates that a [`Message`]s content was too long and will not successfully send, as the
-    /// length is over 2000 codepoints.
-    ///
-    /// The number of code points larger than the limit is provided.
-    ///
-    /// [`Message`]: super::channel::Message
-    MessageTooLong(usize),
     /// Indicates that the current user is attempting to Direct Message another bot user, which is
     /// disallowed by the API.
     MessagingBot,
@@ -134,10 +216,6 @@ pub enum Error {
     ///
     /// [`ChannelType`]: super::channel::ChannelType
     InvalidChannelType,
-    /// Indicates that the webhook name is under the 2 characters limit.
-    NameTooShort,
-    /// Indicates that the webhook name is over the 100 characters limit.
-    NameTooLong,
     /// Indicates that the bot is not author of the message. This error is returned in
     /// private/direct channels.
     NotAuthor,
@@ -147,8 +225,6 @@ pub enum Error {
     DeleteNitroSticker,
     /// Indicates that the sticker file is missing.
     NoStickerFileSet,
-    /// When attempting to send a message with over 3 stickers.
-    StickerAmount,
     /// When attempting to edit a voice message.
     CannotEditVoiceMessage,
 }
@@ -171,10 +247,14 @@ impl Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::BulkDeleteAmount => f.write_str("Too few/many messages to bulk delete."),
-            Self::DeleteMessageDaysAmount(_) => f.write_str("Invalid delete message days."),
-            Self::EmbedAmount => f.write_str("Too many embeds in a message."),
-            Self::EmbedTooLarge(_) => f.write_str("Embed too large."),
+            Self::TooSmall {
+                minimum,
+                value,
+            } => write!(f, "The {minimum} minimum has been missed by {value}"),
+            Self::TooLarge {
+                maximum,
+                value,
+            } => write!(f, "The {maximum} maximum has been overflowed by {value}"),
             Self::GuildNotFound => f.write_str("Guild not found in the cache."),
             Self::RoleNotFound => f.write_str("Role not found in the cache."),
             Self::MemberNotFound => f.write_str("Member not found in the cache."),
@@ -187,17 +267,13 @@ impl fmt::Display for Error {
             Self::InvalidUser => f.write_str("The current user cannot perform the action."),
             Self::ItemMissing => f.write_str("The required item is missing from the cache."),
             Self::WrongGuild => f.write_str("Provided member or channel is from the wrong guild."),
-            Self::MessageTooLong(_) => f.write_str("Message too large."),
             Self::MessageAlreadyCrossposted => f.write_str("Message already crossposted."),
             Self::CannotCrosspostMessage => f.write_str("Cannot crosspost this message type."),
             Self::MessagingBot => f.write_str("Attempted to message another bot user."),
-            Self::NameTooShort => f.write_str("Name is under the character limit."),
-            Self::NameTooLong => f.write_str("Name is over the character limit."),
             Self::NotAuthor => f.write_str("The bot is not author of this message."),
             Self::NoTokenSet => f.write_str("Token is not set."),
             Self::DeleteNitroSticker => f.write_str("Cannot delete an official sticker."),
             Self::NoStickerFileSet => f.write_str("Sticker file is not set."),
-            Self::StickerAmount => f.write_str("Too many stickers in a message."),
             Self::CannotEditVoiceMessage => f.write_str("Cannot edit voice message."),
         }
     }

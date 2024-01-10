@@ -137,7 +137,7 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the `dmd` is greater than 7. Can also
+    /// Returns a [`ModelError::TooLarge`] if the `dmd` is greater than 7. Can also
     /// return [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
@@ -152,7 +152,7 @@ impl Member {
     /// # Errors
     ///
     /// In addition to the errors [`Self::ban`] may return, can also return
-    /// [`Error::ExceededLimit`] if the length of the reason is greater than 512.
+    /// [`ModelError::TooLarge`] if the length of the reason is greater than 512.
     #[inline]
     pub async fn ban_with_reason(
         &self,
