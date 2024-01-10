@@ -1,4 +1,4 @@
-use nonmax::NonMaxU64;
+use nonmax::{NonMaxU16, NonMaxU64};
 use serde::Serialize;
 
 #[cfg(feature = "model")]
@@ -289,7 +289,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days' worth of messages
+    /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
     /// to delete is over the maximum.
     ///
     /// Also may return [`Error::Http`] if the current user lacks permission.
@@ -1111,7 +1111,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         query: &str,
-        limit: Option<u64>,
+        limit: Option<NonMaxU16>,
     ) -> Result<Vec<Member>> {
         self.id.search_members(http, query, limit).await
     }
@@ -1282,7 +1282,7 @@ impl PartialGuild {
     pub async fn members(
         &self,
         http: impl AsRef<Http>,
-        limit: Option<u64>,
+        limit: Option<NonMaxU16>,
         after: Option<UserId>,
     ) -> Result<Vec<Member>> {
         self.id.members(http, limit, after).await
