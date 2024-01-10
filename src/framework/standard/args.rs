@@ -43,7 +43,6 @@ pub enum Delimiter {
 }
 
 impl Delimiter {
-    #[inline]
     fn to_str(&self) -> Cow<'_, str> {
         match self {
             Self::Single(c) => Cow::Owned(c.to_string()),
@@ -53,21 +52,18 @@ impl Delimiter {
 }
 
 impl From<char> for Delimiter {
-    #[inline]
     fn from(c: char) -> Delimiter {
         Delimiter::Single(c)
     }
 }
 
 impl From<String> for Delimiter {
-    #[inline]
     fn from(s: String) -> Delimiter {
         Delimiter::Multiple(Cow::Owned(s))
     }
 }
 
 impl From<&'static str> for Delimiter {
-    #[inline]
     fn from(s: &'static str) -> Delimiter {
         Delimiter::Multiple(Cow::Borrowed(s))
     }
@@ -86,7 +82,6 @@ struct Token {
 }
 
 impl Token {
-    #[inline]
     fn new(kind: TokenKind, start: usize, end: usize) -> Self {
         Token {
             kind,
@@ -386,12 +381,10 @@ impl Args {
         }
     }
 
-    #[inline]
     fn span(&self) -> (usize, usize) {
         self.args[self.offset].span
     }
 
-    #[inline]
     fn slice(&self) -> &str {
         let (start, end) = self.span();
 
@@ -414,7 +407,6 @@ impl Args {
     /// Go one step behind. This decrements the offset pointer.
     ///
     /// Does nothing if the offset pointer is `0`.
-    #[inline]
     pub fn rewind(&mut self) -> &mut Self {
         if self.offset == 0 {
             return self;
@@ -426,7 +418,6 @@ impl Args {
     }
 
     /// Go back to the starting point.
-    #[inline]
     pub fn restore(&mut self) {
         self.offset = 0;
     }
@@ -486,7 +477,6 @@ impl Args {
     /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
-    #[inline]
     #[must_use]
     pub fn current(&self) -> Option<&str> {
         if self.is_empty() {
@@ -614,7 +604,6 @@ impl Args {
     ///
     /// May return either [`Error::Parse`] if a parse error occurs, or
     /// [`Error::Eos`] if there are no further remaining args.
-    #[inline]
     pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
         T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
     }
@@ -641,7 +630,6 @@ impl Args {
     /// # Errors
     ///
     /// May return the same errors as `parse`.
-    #[inline]
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.parse::<T>()?;
         self.advance();
@@ -667,7 +655,6 @@ impl Args {
     /// # Errors
     ///
     /// May return the same errors as [`Self::parse`].
-    #[inline]
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.quoted().parse::<T>()?;
         self.advance();
@@ -697,7 +684,6 @@ impl Args {
     ///
     /// assert!(args.is_empty());
     /// ```
-    #[inline]
     pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
         Iter {
             args: self,
@@ -721,7 +707,6 @@ impl Args {
     ///
     /// assert_eq!(protagonists, "Harry, Hermione, Ronald");
     /// ```
-    #[inline]
     #[must_use]
     pub fn raw(&self) -> RawArguments<'_> {
         RawArguments {
@@ -744,7 +729,6 @@ impl Args {
     ///
     /// assert_eq!(&*horror_movies, &["Saw", "The Mist", "A Quiet Place"]);
     /// ```
-    #[inline]
     #[must_use]
     pub fn raw_quoted(&self) -> RawArguments<'_> {
         let mut raw = self.raw();
@@ -843,14 +827,12 @@ impl Args {
     }
 
     /// Get the original, unmodified message passed to the command.
-    #[inline]
     #[must_use]
     pub fn message(&self) -> &str {
         &self.message
     }
 
     /// Starting from the offset, return the remainder of available arguments.
-    #[inline]
     #[must_use]
     pub fn rest(&self) -> &str {
         self.remains().unwrap_or_default()
@@ -859,7 +841,6 @@ impl Args {
     /// Starting from the offset, return the remainder of available arguments.
     ///
     /// Returns [`None`] if there are no remaining arguments.
-    #[inline]
     #[must_use]
     pub fn remains(&self) -> Option<&str> {
         if self.is_empty() {
@@ -877,21 +858,18 @@ impl Args {
     ///
     /// The value returned is to be assumed to stay static. However, if [`Self::find`] was called
     /// previously, and was successful, then the value is subtracted by one.
-    #[inline]
     #[must_use]
     pub fn len(&self) -> usize {
         self.args.len()
     }
 
     /// Assert that there are no more arguments left.
-    #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.offset >= self.len()
     }
 
     /// Return the amount of arguments still available.
-    #[inline]
     #[must_use]
     pub fn remaining(&self) -> usize {
         if self.is_empty() {
@@ -924,7 +902,6 @@ impl<T: FromStr> Iter<'_, T> {
     }
 
     /// Remove surrounding quotation marks from all of the arguments.
-    #[inline]
     pub fn quoted(&mut self) -> &mut Self {
         match self.state {
             State::None => self.state = State::Quoted,
@@ -936,7 +913,6 @@ impl<T: FromStr> Iter<'_, T> {
     }
 
     /// Trim leading and trailing whitespace off all arguments.
-    #[inline]
     pub fn trimmed(&mut self) -> &mut Self {
         match self.state {
             State::None => self.state = State::Trimmed,
@@ -973,7 +949,6 @@ pub struct RawArguments<'a> {
 impl<'a> Iterator for RawArguments<'a> {
     type Item = &'a str;
 
-    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let (start, end) = self.tokens.first()?.span;
 

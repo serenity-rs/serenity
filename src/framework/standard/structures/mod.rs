@@ -87,7 +87,6 @@ impl fmt::Debug for Command {
 }
 
 impl PartialEq for Command {
-    #[inline]
     fn eq(&self, other: &Command) -> bool {
         (self.fun as usize == other.fun as usize) && (self.options == other.options)
     }
@@ -117,7 +116,6 @@ impl fmt::Debug for HelpCommand {
 }
 
 impl PartialEq for HelpCommand {
-    #[inline]
     fn eq(&self, other: &HelpCommand) -> bool {
         (self.fun as usize == other.fun as usize) && (self.options == other.options)
     }

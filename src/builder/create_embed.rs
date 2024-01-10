@@ -71,13 +71,11 @@ impl<'a> CreateEmbed<'a> {
     /// Set the colour of the left-hand side of the embed.
     ///
     /// This is an alias of [`Self::colour`].
-    #[inline]
     pub fn color<C: Into<Colour>>(self, colour: C) -> Self {
         self.colour(colour)
     }
 
     /// Set the colour of the left-hand side of the embed.
-    #[inline]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
         self.colour = Some(colour.into());
         self
@@ -86,7 +84,6 @@ impl<'a> CreateEmbed<'a> {
     /// Set the description of the embed.
     ///
     /// **Note**: This can't be longer than 4096 characters.
-    #[inline]
     pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
@@ -96,7 +93,6 @@ impl<'a> CreateEmbed<'a> {
     ///
     /// **Note**: Maximum amount of characters you can put is 256 in a field name and 1024 in a
     /// field value.
-    #[inline]
     pub fn field(
         mut self,
         name: impl Into<Cow<'a, str>>,
@@ -141,7 +137,6 @@ impl<'a> CreateEmbed<'a> {
     ///
     /// Refer [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files)
     /// for rules on naming local attachments.
-    #[inline]
     pub fn image(mut self, url: impl Into<Cow<'a, str>>) -> Self {
         self.image = Some(CreateEmbedImage {
             url: url.into(),
@@ -150,7 +145,6 @@ impl<'a> CreateEmbed<'a> {
     }
 
     /// Set the thumbnail of the embed.
-    #[inline]
     pub fn thumbnail(mut self, url: impl Into<Cow<'a, str>>) -> Self {
         self.thumbnail = Some(CreateEmbedImage {
             url: url.into(),
@@ -172,21 +166,18 @@ impl<'a> CreateEmbed<'a> {
     /// let timestamp: Timestamp = "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
     /// let embed = CreateEmbed::new().title("hello").timestamp(timestamp);
     /// ```
-    #[inline]
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
         self.timestamp = Some(timestamp.into());
         self
     }
 
     /// Set the title of the embed.
-    #[inline]
     pub fn title(mut self, title: impl Into<Cow<'a, str>>) -> Self {
         self.title = Some(title.into());
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
-    #[inline]
     pub fn url(mut self, url: impl Into<Cow<'a, str>>) -> Self {
         self.url = Some(url.into());
         self
@@ -200,7 +191,6 @@ impl<'a> CreateEmbed<'a> {
     /// Refer [`Self::image`] for rules on naming local attachments.
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
-    #[inline]
     pub fn attachment(self, filename: impl Into<String>) -> Self {
         let mut filename = filename.into();
         filename.insert_str(0, "attachment://");

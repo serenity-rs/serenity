@@ -107,7 +107,6 @@ impl Member {
     /// Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn add_role(&self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
         http.as_ref().add_member_role(self.guild_id, self.user.id, role_id.into(), None).await
     }
@@ -141,7 +140,6 @@ impl Member {
     /// return [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    #[inline]
     pub async fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
         self.ban_with_reason(http, dmd, "").await
     }
@@ -153,7 +151,6 @@ impl Member {
     ///
     /// In addition to the errors [`Self::ban`] may return, can also return
     /// [`ModelError::TooLarge`] if the length of the reason is greater than 512.
-    #[inline]
     pub async fn ban_with_reason(
         &self,
         http: impl AsRef<Http>,
@@ -231,14 +228,12 @@ impl Member {
     /// Calculates the member's display name.
     ///
     /// The nickname takes priority over the member's username if it exists.
-    #[inline]
     #[must_use]
     pub fn display_name(&self) -> &str {
         self.nick.as_ref().or(self.user.global_name.as_ref()).unwrap_or(&self.user.name)
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
-    #[inline]
     #[must_use]
     #[deprecated = "Use User::tag to get the correct Discord username format or Self::display_name for the name that users will see."]
     pub fn distinct(&self) -> String {
@@ -338,7 +333,6 @@ impl Member {
     /// Otherwise will return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    #[inline]
     pub async fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
         self.kick_with_reason(cache_http, "").await
     }
@@ -509,7 +503,6 @@ impl Member {
     /// does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().remove_ban(self.guild_id, self.user.id, None).await
     }
@@ -517,7 +510,6 @@ impl Member {
     /// Returns the formatted URL of the member's per guild avatar, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the member has a GIF avatar.
-    #[inline]
     #[must_use]
     pub fn avatar_url(&self) -> Option<String> {
         avatar_url(Some(self.guild_id), self.user.id, self.avatar.as_ref())
@@ -528,7 +520,6 @@ impl Member {
     ///
     /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it then falls back
     /// to [`User::face()`].
-    #[inline]
     #[must_use]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.user.face())
