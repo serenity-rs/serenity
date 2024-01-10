@@ -1,5 +1,7 @@
 //! A set of constants used by the library.
 
+use nonmax::NonMaxU16;
+
 /// The maximum length of the textual size of an embed.
 pub const EMBED_MAX_LENGTH: usize = 6000;
 
@@ -19,7 +21,10 @@ pub const LARGE_THRESHOLD: u8 = 250;
 pub const MESSAGE_CODE_LIMIT: usize = 2000;
 
 /// The maximum number of members the bot can fetch at once
-pub const MEMBER_FETCH_LIMIT: u64 = 1000;
+pub const MEMBER_FETCH_LIMIT: NonMaxU16 = match NonMaxU16::new(1000) {
+    Some(m) => m,
+    None => unreachable!(),
+};
 
 /// The [UserAgent] sent along with every request.
 ///
