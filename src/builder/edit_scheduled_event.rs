@@ -74,7 +74,6 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the start time of the scheduled event.
-    #[inline]
     pub fn start_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
         self.scheduled_start_time = Some(timestamp.into());
         self
@@ -86,7 +85,6 @@ impl<'a> EditScheduledEvent<'a> {
     ///
     /// [`kind`]: EditScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
-    #[inline]
     pub fn end_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
         self.scheduled_end_time = Some(timestamp.into());
         self
