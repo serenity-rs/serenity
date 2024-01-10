@@ -730,7 +730,7 @@ impl Framework for StandardFramework {
                                 v.push(Delimiter::Single(delim.chars().next().unwrap()));
                             } else {
                                 // This too.
-                                v.push(Delimiter::Multiple((*delim).to_string()));
+                                v.push(Delimiter::Multiple(Cow::Borrowed(delim)));
                             }
                         }
 
