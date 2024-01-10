@@ -63,8 +63,8 @@ impl Builder for CreateWebhook<'_> {
     ///
     /// # Errors
     ///
-    /// If the provided name is less than 2 characters, returns [`ModelError::NameTooShort`]. If it
-    /// is more than 100 characters, returns [`ModelError::NameTooLong`].
+    /// If the provided name is less than 2 characters, returns [`ModelError::TooSmall`]. If it
+    /// is more than 100 characters, returns [`ModelError::TooLarge`].
     ///
     /// Returns a [`Error::Http`] if the current user lacks permission, or if invalid data is
     /// given.
@@ -76,11 +76,8 @@ impl Builder for CreateWebhook<'_> {
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
-        if self.name.len() < 2 {
-            return Err(Error::Model(ModelError::NameTooShort));
-        } else if self.name.len() > 100 {
-            return Err(Error::Model(ModelError::NameTooLong));
-        }
+        crate::model::error::Minimum::WebhookName.check_underflow(self.name.chars().count())?;
+        crate::model::error::Maximum::WebhookName.check_overflow(self.name.chars().count())?;
 
         cache_http.http().create_webhook(ctx, &self, self.audit_log_reason).await
     }
