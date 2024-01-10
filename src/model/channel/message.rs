@@ -348,7 +348,7 @@ impl Message {
     /// the author. Otherwise returns [`Error::Http`] if the user lacks permission, as well as if
     /// invalid data is given.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.
+    /// Returns a [`ModelError::TooLarge`] if the message contents are too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn edit(
@@ -488,7 +488,12 @@ impl Message {
     /// inner value of how many unicode code points the message is over.
     #[must_use]
     pub fn overflow_length(content: &str) -> Option<usize> {
-        crate::builder::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
+        let char_count = content.chars().count();
+        if char_count > constants::MESSAGE_CODE_LIMIT {
+            Some(constants::MESSAGE_CODE_LIMIT - char_count)
+        } else {
+            None
+        }
     }
 
     /// Pins this message to its channel.
@@ -586,7 +591,7 @@ impl Message {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
@@ -610,7 +615,7 @@ impl Message {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
@@ -637,7 +642,7 @@ impl Message {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
