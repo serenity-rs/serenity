@@ -5550,7 +5550,7 @@
     </span><span class="kw">pub async fn </span>create_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
-        map: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, Cow&lt;<span class="lifetime">'static</span>, str&gt;)&gt;,
+        fields: Vec&lt;(Cow&lt;<span class="lifetime">'static</span>, str&gt;, Cow&lt;<span class="lifetime">'static</span>, str&gt;)&gt;,
         file: CreateAttachment&lt;<span class="lifetime">'_</span>&gt;,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
@@ -5558,8 +5558,8 @@
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">Some</span>(Multipart {
                 upload: MultipartUpload::File(file),
-                fields: map.into_iter().map(|(k, v)| (k.into(), v)).collect(),
                 payload_json: <span class="prelude-val">None</span>,
+                fields,
             }),
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -5847,7 +5847,7 @@
     </span><span class="kw">pub async fn </span>delete_messages(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
-        map: <span class="kw-2">&amp;</span>Value,
+        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.wind(<span class="number">204</span>, Request {
@@ -6411,7 +6411,7 @@
     </span><span class="kw">pub async fn </span>edit_guild_channel_positions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
-        value: <span class="kw-2">&amp;</span>Value,
+        value: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>body = to_vec(value)<span class="question-mark">?</span>;
 

@@ -990,13 +990,6 @@
 <a href="#988" id="988">988</a>
 <a href="#989" id="989">989</a>
 <a href="#990" id="990">990</a>
-<a href="#991" id="991">991</a>
-<a href="#992" id="992">992</a>
-<a href="#993" id="993">993</a>
-<a href="#994" id="994">994</a>
-<a href="#995" id="995">995</a>
-<a href="#996" id="996">996</a>
-<a href="#997" id="997">997</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
@@ -1038,7 +1031,7 @@
 </span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub enum </span>Delimiter {
     Single(char),
-    Multiple(String),
+    Multiple(Cow&lt;<span class="lifetime">'static</span>, str&gt;),
 }
 
 <span class="kw">impl </span>Delimiter {
@@ -1061,21 +1054,14 @@
 <span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Delimiter {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>from(s: String) -&gt; Delimiter {
-        Delimiter::Multiple(s)
+        Delimiter::Multiple(Cow::Owned(s))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>String&gt; <span class="kw">for </span>Delimiter {
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; <span class="kw">for </span>Delimiter {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>String) -&gt; Delimiter {
-        Delimiter::Multiple(s.clone())
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Delimiter {
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; Delimiter {
-        Delimiter::Multiple(s.to_string())
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; Delimiter {
+        Delimiter::Multiple(Cow::Borrowed(s))
     }
 }
 
@@ -1352,7 +1338,7 @@
             .iter()
             .filter(|d| <span class="kw">match </span>d {
                 Delimiter::Single(c) =&gt; message.contains(<span class="kw-2">*</span>c),
-                Delimiter::Multiple(s) =&gt; message.contains(s),
+                Delimiter::Multiple(s) =&gt; message.contains(s.as_ref()),
             })
             .map(Delimiter::to_str)
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();

@@ -1604,7 +1604,7 @@
                                 </span>v.push(Delimiter::Single(delim.chars().next().unwrap()));
                             } <span class="kw">else </span>{
                                 <span class="comment">// This too.
-                                </span>v.push(Delimiter::Multiple((<span class="kw-2">*</span>delim).to_string()));
+                                </span>v.push(Delimiter::Multiple(Cow::Borrowed(delim)));
                             }
                         }
 

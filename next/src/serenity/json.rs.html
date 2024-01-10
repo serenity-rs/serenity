@@ -204,14 +204,47 @@
 <a href="#202" id="202">202</a>
 <a href="#203" id="203">203</a>
 <a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module exports different types for JSON interactions. It encapsulates the differences
 //! between serde_json and simd-json to allow ignoring those in the rest of the codebase.
 
 </span><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::cell::Cell;
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::hash::{BuildHasher, Hash};
 
 <span class="kw">use </span>serde::de::DeserializeOwned;
+<span class="kw">use </span>serde::ser::SerializeSeq <span class="kw">as _</span>;
 <span class="attr">#[cfg(test)]
 </span><span class="kw">use </span>serde::Deserialize;
 <span class="kw">use </span>serde::Serialize;
@@ -243,6 +276,35 @@
 }
 
 <span class="kw">pub use </span>export::<span class="kw-2">*</span>;
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SerializeIter&lt;I&gt;(Cell&lt;<span class="prelude-ty">Option</span>&lt;I&gt;&gt;);
+
+<span class="kw">impl</span>&lt;I&gt; SerializeIter&lt;I&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(Cell::new(<span class="prelude-val">Some</span>(iter)))
+    }
+}
+
+<span class="kw">impl</span>&lt;Iter, Item&gt; serde::Serialize <span class="kw">for </span>SerializeIter&lt;Iter&gt;
+<span class="kw">where
+    </span>Iter: Iterator&lt;Item = Item&gt;,
+    Item: serde::Serialize,
+{
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(iter) = <span class="self">self</span>.<span class="number">0</span>.take() <span class="kw">else </span>{
+            <span class="kw">return </span>serializer.serialize_seq(<span class="prelude-val">Some</span>(<span class="number">0</span>))<span class="question-mark">?</span>.end();
+        };
+
+        <span class="kw">let </span>(lower, upper) = iter.size_hint();
+        <span class="kw">let </span><span class="kw-2">mut </span>serializer = serializer.serialize_seq(<span class="prelude-val">Some</span>(upper.unwrap_or(lower)))<span class="question-mark">?</span>;
+
+        <span class="kw">for </span>item <span class="kw">in </span>iter {
+            serializer.serialize_element(<span class="kw-2">&amp;</span>item)<span class="question-mark">?</span>;
+        }
+
+        serializer.end()
+    }
+}
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>decode_resp&lt;T: serde::de::DeserializeOwned&gt;(

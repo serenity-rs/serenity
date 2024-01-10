@@ -579,9 +579,8 @@
 <a href="#577" id="577">577</a>
 <a href="#578" id="578">578</a>
 <a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::collections::HashSet;
 
 <span class="kw">use </span>futures::future::BoxFuture;
 
@@ -701,7 +700,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) dynamic_prefixes: Vec&lt;DynamicPrefixHook&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) on_mention: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) owners: HashSet&lt;UserId&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) prefixes: Vec&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) prefixes: Vec&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) delimiters: Vec&lt;Delimiter&gt;,
     <span class="doccomment">/// If set to false, bot will ignore any private messages.
     ///
@@ -1029,7 +1028,7 @@
     /// framework.configure(Configuration::new().prefix("!"));
     /// ```
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>prefix(<span class="kw-2">mut </span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>prefix(<span class="kw-2">mut </span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>p = prefix.into();
         <span class="self">self</span>.prefixes = <span class="kw">if </span>p.is_empty() { <span class="macro">vec!</span>[] } <span class="kw">else </span>{ <span class="macro">vec!</span>[p] };
         <span class="self">self
@@ -1050,12 +1049,12 @@
     /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().prefixes(vec!["!", "&gt;", "+"]));
+    /// framework.configure(Configuration::new().prefixes(vec!["!".into(), "&gt;".into(), "+".into()]));
     /// ```
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub fn </span>prefixes(<span class="kw-2">mut </span><span class="self">self</span>, prefixes: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;String&gt;&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.prefixes = prefixes.into_iter().map(Into::into).filter(|p| !p.is_empty()).collect();
+    </span><span class="kw">pub fn </span>prefixes(<span class="kw-2">mut </span><span class="self">self</span>, prefixes: Vec&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.prefixes = prefixes;
         <span class="self">self
     </span>}
 
@@ -1093,16 +1092,11 @@
     /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().delimiters(vec![", ", " "]));
+    /// framework.configure(Configuration::new().delimiters(vec![", ".into(), " ".into()]));
     /// ```
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>delimiters(
-        <span class="kw-2">mut </span><span class="self">self</span>,
-        delimiters: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw">impl </span>Into&lt;Delimiter&gt;&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.delimiters.clear();
-        <span class="self">self</span>.delimiters.extend(delimiters.into_iter().map(Into::into));
-
+    </span><span class="kw">pub fn </span>delimiters(<span class="kw-2">mut </span><span class="self">self</span>, delimiters: Vec&lt;Delimiter&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.delimiters = delimiters;
         <span class="self">self
     </span>}
 
@@ -1118,7 +1112,9 @@
         <span class="self">self </span>= <span class="self">self</span>.case_insensitive(cs);
 
         <span class="kw">for </span>prefix <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.prefixes {
-            <span class="kw-2">*</span>prefix = prefix.to_lowercase();
+            <span class="kw">if </span>prefix.chars().any(|c| !c.is_lowercase()) {
+                <span class="kw-2">*</span>prefix = Cow::Owned(prefix.to_lowercase());
+            }
         }
 
         <span class="self">self
@@ -1156,7 +1152,7 @@
             dynamic_prefixes: Vec::new(),
             on_mention: <span class="prelude-val">None</span>,
             owners: HashSet::default(),
-            prefixes: <span class="macro">vec!</span>[String::from(<span class="string">"~"</span>)],
+            prefixes: <span class="macro">vec!</span>[Cow::Borrowed(<span class="string">"~"</span>)],
         };
 
         config.allow_dm(<span class="bool-val">true</span>).by_space(<span class="bool-val">true</span>).ignore_bots(<span class="bool-val">true</span>).ignore_webhooks(<span class="bool-val">true</span>)

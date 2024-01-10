@@ -1557,10 +1557,10 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub async fn </span>delete_messages&lt;T: AsRef&lt;MessageId&gt;&gt;(
+    </span><span class="kw">pub async fn </span>delete_messages(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_ids: <span class="kw">impl </span>IntoIterator&lt;Item = T&gt;,
+        message_ids: <span class="kw-2">&amp;</span>[MessageId],
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_messages(http, message_ids).<span class="kw">await
     </span>}

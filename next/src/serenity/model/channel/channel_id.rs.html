@@ -1218,6 +1218,7 @@
 <a href="#1216" id="1216">1216</a>
 <a href="#1217" id="1217">1217</a>
 <a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1250,8 +1251,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, Typing};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1401,26 +1400,29 @@
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete_messages&lt;T: AsRef&lt;MessageId&gt;&gt;(
+    </span><span class="kw">pub async fn </span>delete_messages(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_ids: <span class="kw">impl </span>IntoIterator&lt;Item = T&gt;,
+        message_ids: <span class="kw-2">&amp;</span>[MessageId],
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>ids =
-            message_ids.into_iter().map(|message_id| <span class="kw-2">*</span>message_id.as_ref()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>DeleteMessages&lt;<span class="lifetime">'a</span>&gt; {
+            messages: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[MessageId],
+        }
 
-        <span class="kw">let </span>len = ids.len();
-
+        <span class="kw">let </span>len = message_ids.len();
         <span class="kw">if </span>len == <span class="number">0 </span>|| len &gt; <span class="number">100 </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::BulkDeleteAmount));
         }
 
-        <span class="kw">if </span>ids.len() == <span class="number">1 </span>{
-            <span class="self">self</span>.delete_message(http, ids[<span class="number">0</span>]).<span class="kw">await
+        <span class="kw">if </span>len == <span class="number">1 </span>{
+            <span class="self">self</span>.delete_message(http, message_ids[<span class="number">0</span>]).<span class="kw">await
         </span>} <span class="kw">else </span>{
-            <span class="kw">let </span>map = <span class="macro">json!</span>({ <span class="string">"messages"</span>: ids });
+            <span class="kw">let </span>req = DeleteMessages {
+                messages: message_ids,
+            };
 
-            http.as_ref().delete_messages(<span class="self">self</span>, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
+            http.as_ref().delete_messages(<span class="self">self</span>, <span class="kw-2">&amp;</span>req, <span class="prelude-val">None</span>).<span class="kw">await
         </span>}
     }
 

@@ -1835,6 +1835,7 @@
 <a href="#1833" id="1833">1833</a>
 <a href="#1834" id="1834">1834</a>
 <a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1870,6 +1871,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
+<span class="kw">use </span><span class="kw">crate</span>::json::SerializeIter;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -3054,18 +3056,18 @@
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         channels: <span class="kw">impl </span>IntoIterator&lt;Item = (ChannelId, u64)&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>items = channels
-            .into_iter()
-            .map(|(id, pos)| {
-                <span class="macro">json!</span>({
-                    <span class="string">"id"</span>: id,
-                    <span class="string">"position"</span>: pos,
-                })
-            })
-            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-            .into();
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>ChannelPosEdit {
+            id: ChannelId,
+            position: u64,
+        }
 
-        http.as_ref().edit_guild_channel_positions(<span class="self">self</span>, <span class="kw-2">&amp;</span>items).<span class="kw">await
+        <span class="kw">let </span>iter = channels.into_iter().map(|(id, position)| ChannelPosEdit {
+            id,
+            position,
+        });
+
+        http.as_ref().edit_guild_channel_positions(<span class="self">self</span>, <span class="kw-2">&amp;</span>SerializeIter::new(iter)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
