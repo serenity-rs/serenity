@@ -1291,8 +1291,7 @@ impl GuildId {
                     "position": pos,
                 })
             })
-            .collect::<Vec<_>>()
-            .into();
+            .collect::<Vec<_>>();
 
         http.as_ref().edit_guild_channel_positions(self, &items).await
     }

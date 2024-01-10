@@ -39,7 +39,7 @@ type Result<T, E> = ::std::result::Result<T, Error<E>>;
 #[derive(Debug, Clone)]
 pub enum Delimiter {
     Single(char),
-    Multiple(String),
+    Multiple(Cow<'static, str>),
 }
 
 impl Delimiter {
@@ -62,21 +62,14 @@ impl From<char> for Delimiter {
 impl From<String> for Delimiter {
     #[inline]
     fn from(s: String) -> Delimiter {
-        Delimiter::Multiple(s)
+        Delimiter::Multiple(Cow::Owned(s))
     }
 }
 
-impl<'a> From<&'a String> for Delimiter {
+impl From<&'static str> for Delimiter {
     #[inline]
-    fn from(s: &'a String) -> Delimiter {
-        Delimiter::Multiple(s.clone())
-    }
-}
-
-impl<'a> From<&'a str> for Delimiter {
-    #[inline]
-    fn from(s: &'a str) -> Delimiter {
-        Delimiter::Multiple(s.to_string())
+    fn from(s: &'static str) -> Delimiter {
+        Delimiter::Multiple(Cow::Borrowed(s))
     }
 }
 
@@ -353,7 +346,7 @@ impl Args {
             .iter()
             .filter(|d| match d {
                 Delimiter::Single(c) => message.contains(*c),
-                Delimiter::Multiple(s) => message.contains(s),
+                Delimiter::Multiple(s) => message.contains(s.as_ref()),
             })
             .map(Delimiter::to_str)
             .collect::<Vec<_>>();

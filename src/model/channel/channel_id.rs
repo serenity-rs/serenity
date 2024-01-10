@@ -30,8 +30,6 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json::json;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
@@ -182,26 +180,29 @@ impl ChannelId {
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages<T: AsRef<MessageId>>(
+    pub async fn delete_messages(
         self,
         http: impl AsRef<Http>,
-        message_ids: impl IntoIterator<Item = T>,
+        message_ids: &[MessageId],
     ) -> Result<()> {
-        let ids =
-            message_ids.into_iter().map(|message_id| *message_id.as_ref()).collect::<Vec<_>>();
+        #[derive(serde::Serialize)]
+        struct DeleteMessages<'a> {
+            messages: &'a [MessageId],
+        }
 
-        let len = ids.len();
-
+        let len = message_ids.len();
         if len == 0 || len > 100 {
             return Err(Error::Model(ModelError::BulkDeleteAmount));
         }
 
-        if ids.len() == 1 {
-            self.delete_message(http, ids[0]).await
+        if len == 1 {
+            self.delete_message(http, message_ids[0]).await
         } else {
-            let map = json!({ "messages": ids });
+            let req = DeleteMessages {
+                messages: message_ids,
+            };
 
-            http.as_ref().delete_messages(self, &map, None).await
+            http.as_ref().delete_messages(self, &req, None).await
         }
     }
 
