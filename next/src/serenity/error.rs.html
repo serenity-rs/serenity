@@ -150,37 +150,8 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
-<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Error <span class="kw">as </span>FormatError};
+<span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::io::Error <span class="kw">as </span>IoError;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -212,10 +183,6 @@
 </span><span class="attr">#[derive(Debug)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Error {
-    <span class="doccomment">/// An error while decoding a payload.
-    </span>Decode(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, Value),
-    <span class="doccomment">/// There was an error with a format.
-    </span>Format(FormatError),
     <span class="doccomment">/// An [`std::io`] error.
     </span>Io(IoError),
     <span class="attr">#[cfg_attr(not(feature = <span class="string">"simd_json"</span>), doc = <span class="string">"An error from the [`serde_json`] crate."</span>)]
@@ -225,20 +192,6 @@
     ///
     /// [`model`]: crate::model
     </span>Model(ModelError),
-    <span class="doccomment">/// The input is not in the specified range. Returned by [`GuildId::members`],
-    /// [`Guild::members`] and [`PartialGuild::members`]
-    ///
-    /// (param_name, value, range_min, range_max)
-    ///
-    /// [`GuildId::members`]: crate::model::id::GuildId::members
-    /// [`Guild::members`]: crate::model::guild::Guild::members
-    /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
-    </span>NotInRange(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, u64, u64, u64),
-    <span class="doccomment">/// Some other error. This is only used for "Expected value \&lt;TYPE\&gt;" errors, when a more
-    /// detailed error can not be easily provided via the [`Error::Decode`] variant.
-    </span>Other(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str),
-    <span class="doccomment">/// An error from the [`url`] crate.
-    </span>Url(String),
     <span class="doccomment">/// A [client] error.
     ///
     /// [client]: crate::client
@@ -256,13 +209,7 @@
     </span>Http(HttpError),
     <span class="doccomment">/// An error from the `tungstenite` crate.
     </span><span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    </span>Tungstenite(TungsteniteError),
-}
-
-<span class="kw">impl </span>From&lt;FormatError&gt; <span class="kw">for </span>Error {
-    <span class="kw">fn </span>from(e: FormatError) -&gt; Error {
-        Error::Format(e)
-    }
+    </span>Tungstenite(Box&lt;TungsteniteError&gt;),
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
@@ -293,7 +240,7 @@
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">impl </span>From&lt;TungsteniteError&gt; <span class="kw">for </span>Error {
     <span class="kw">fn </span>from(e: TungsteniteError) -&gt; Error {
-        Error::Tungstenite(e)
+        Error::Tungstenite(Box::new(e))
     }
 }
 
@@ -321,13 +268,9 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Decode(msg, <span class="kw">_</span>) | <span class="self">Self</span>::Other(msg) =&gt; f.write_str(msg),
-            <span class="self">Self</span>::NotInRange(..) =&gt; f.write_str(<span class="string">"Input is not in the specified range"</span>),
-            <span class="self">Self</span>::Format(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Io(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Json(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Model(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
-            <span class="self">Self</span>::Url(msg) =&gt; f.write_str(msg),
             <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
             </span><span class="self">Self</span>::Client(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
@@ -344,7 +287,6 @@
     <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument)]
     </span><span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">'static</span>)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Format(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="self">Self</span>::Io(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="self">Self</span>::Json(inner) =&gt; <span class="prelude-val">Some</span>(inner),
             <span class="self">Self</span>::Model(inner) =&gt; <span class="prelude-val">Some</span>(inner),

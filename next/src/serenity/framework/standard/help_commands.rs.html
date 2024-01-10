@@ -1415,6 +1415,7 @@
 <a href="#1413" id="1413">1413</a>
 <a href="#1414" id="1414">1414</a>
 <a href="#1415" id="1415">1415</a>
+<a href="#1416" id="1416">1416</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.
 //!
 //! # Example
@@ -2314,7 +2315,7 @@
     group: <span class="kw-2">&amp;</span>GroupCommandsPair,
     nest_level: usize,
     help_options: <span class="kw-2">&amp;</span>HelpOptions,
-) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), std::fmt::Error&gt; {
     <span class="kw">let </span>repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     <span class="kw">if </span>nest_level &gt; <span class="number">0 </span>{
@@ -2419,7 +2420,8 @@
     <span class="kw">for </span>group <span class="kw">in </span>groups {
         <span class="kw">let </span><span class="kw-2">mut </span>embed_text = String::default();
 
-        flatten_group_to_string(<span class="kw-2">&amp;mut </span>embed_text, group, <span class="number">0</span>, help_options)<span class="question-mark">?</span>;
+        flatten_group_to_string(<span class="kw-2">&amp;mut </span>embed_text, group, <span class="number">0</span>, help_options)
+            .expect(<span class="string">"String::write should never fail"</span>);
 
         embed = embed.field(group.name, embed_text, <span class="bool-val">true</span>);
     }

@@ -282,26 +282,17 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::path::Path;
 
 <span class="kw">use </span>tokio::fs::File;
 <span class="kw">use </span>tokio::io::AsyncReadExt;
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span>url::Url;
 
-<span class="kw">use </span><span class="kw">crate</span>::all::Message;
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::error::Error;
-<span class="kw">use </span><span class="kw">crate</span>::error::Result;
+<span class="attr">#[allow(unused)] </span><span class="comment">// Error is used in docs
+</span><span class="kw">use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
+<span class="kw">use </span><span class="kw">crate</span>::model::channel::Message;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::AttachmentId;
 
 <span class="doccomment">/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
@@ -371,20 +362,17 @@
     ///
     /// # Errors
     ///
-    /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
+    /// Returns [`Error::Http`] if downloading the data fails.
     </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">pub async fn </span>url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>url = Url::parse(url).map_err(|<span class="kw">_</span>| Error::Url(url.to_string()))<span class="question-mark">?</span>;
-
-        <span class="kw">let </span>response = http.as_ref().client.get(url.clone()).send().<span class="kw">await</span><span class="question-mark">?</span>;
+    </span><span class="kw">pub async fn </span>url(
+        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        url: <span class="kw">impl </span>reqwest::IntoUrl,
+        filename: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>response = http.as_ref().client.get(url).send().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>data = response.bytes().<span class="kw">await</span><span class="question-mark">?</span>.to_vec();
 
-        <span class="kw">let </span>filename = url
-            .path_segments()
-            .and_then(Iterator::last)
-            .ok_or_else(|| Error::Url(url.to_string()))<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(CreateAttachment::bytes(data, filename.to_owned()))
+        <span class="prelude-val">Ok</span>(CreateAttachment::bytes(data, filename))
     }
 
     <span class="doccomment">/// Converts the stored data to the base64 representation.

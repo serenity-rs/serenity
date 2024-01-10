@@ -856,6 +856,34 @@
 <a href="#854" id="854">854</a>
 <a href="#855" id="855">855</a>
 <a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -915,6 +943,8 @@
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::gateway::GatewayIntents;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::ApplicationId;
+<span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
 <span class="kw">use </span><span class="kw">crate</span>::model::user::OnlineStatus;
 <span class="kw">use </span><span class="kw">crate</span>::utils::check_shard_total;
 
@@ -1491,7 +1521,9 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
@@ -1532,7 +1564,9 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
@@ -1596,7 +1630,9 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
@@ -1637,7 +1673,9 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
@@ -1678,7 +1716,9 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
@@ -1695,9 +1735,25 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
-            <span class="kw">let </span>user = <span class="self">self</span>.http.get_current_user().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+            </span><span class="kw">let </span>cache_user_id = {
+                <span class="kw">let </span>cache_user = <span class="self">self</span>.cache.current_user();
+                <span class="kw">if </span>cache_user.id == UserId::default() {
+                    <span class="prelude-val">Some</span>(cache_user.id)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
+            };
 
-            voice_manager.initialise(total_shards, user.id).<span class="kw">await</span>;
+            <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
+            </span><span class="kw">let </span>cache_user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt; = <span class="prelude-val">None</span>;
+
+            <span class="kw">let </span>user_id = <span class="kw">match </span>cache_user_id {
+                <span class="prelude-val">Some</span>(u) =&gt; u,
+                <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.http.get_current_user().<span class="kw">await</span><span class="question-mark">?</span>.id,
+            };
+
+            voice_manager.initialise(total_shards, user_id).<span class="kw">await</span>;
         }
 
         <span class="kw">let </span>init = end_shard - start_shard + <span class="number">1</span>;

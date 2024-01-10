@@ -270,18 +270,6 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Error enum definition wrapping potential model implementation errors.
 
 </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
@@ -489,10 +477,6 @@
     ///
     /// [`Cache`]: crate::cache::Cache
     </span>ItemMissing,
-    <span class="doccomment">/// Indicates that a member, role or channel from the wrong [`Guild`] was provided.
-    ///
-    /// [`Guild`]: super::guild::Guild
-    </span>WrongGuild,
     <span class="doccomment">/// Indicates that the current user is attempting to Direct Message another bot user, which is
     /// disallowed by the API.
     </span>MessagingBot,
@@ -500,15 +484,10 @@
     ///
     /// [`ChannelType`]: super::channel::ChannelType
     </span>InvalidChannelType,
-    <span class="doccomment">/// Indicates that the bot is not author of the message. This error is returned in
-    /// private/direct channels.
-    </span>NotAuthor,
     <span class="doccomment">/// Indicates that the webhook token is missing.
     </span>NoTokenSet,
     <span class="doccomment">/// When attempting to delete a built in nitro sticker instead of a guild sticker.
     </span>DeleteNitroSticker,
-    <span class="doccomment">/// Indicates that the sticker file is missing.
-    </span>NoStickerFileSet,
     <span class="doccomment">/// When attempting to edit a voice message.
     </span>CannotEditVoiceMessage,
 }
@@ -550,14 +529,11 @@
             } =&gt; f.write_str(<span class="string">"Invalid permissions."</span>),
             <span class="self">Self</span>::InvalidUser =&gt; f.write_str(<span class="string">"The current user cannot perform the action."</span>),
             <span class="self">Self</span>::ItemMissing =&gt; f.write_str(<span class="string">"The required item is missing from the cache."</span>),
-            <span class="self">Self</span>::WrongGuild =&gt; f.write_str(<span class="string">"Provided member or channel is from the wrong guild."</span>),
             <span class="self">Self</span>::MessageAlreadyCrossposted =&gt; f.write_str(<span class="string">"Message already crossposted."</span>),
             <span class="self">Self</span>::CannotCrosspostMessage =&gt; f.write_str(<span class="string">"Cannot crosspost this message type."</span>),
             <span class="self">Self</span>::MessagingBot =&gt; f.write_str(<span class="string">"Attempted to message another bot user."</span>),
-            <span class="self">Self</span>::NotAuthor =&gt; f.write_str(<span class="string">"The bot is not author of this message."</span>),
             <span class="self">Self</span>::NoTokenSet =&gt; f.write_str(<span class="string">"Token is not set."</span>),
             <span class="self">Self</span>::DeleteNitroSticker =&gt; f.write_str(<span class="string">"Cannot delete an official sticker."</span>),
-            <span class="self">Self</span>::NoStickerFileSet =&gt; f.write_str(<span class="string">"Sticker file is not set."</span>),
             <span class="self">Self</span>::CannotEditVoiceMessage =&gt; f.write_str(<span class="string">"Cannot edit voice message."</span>),
         }
     }

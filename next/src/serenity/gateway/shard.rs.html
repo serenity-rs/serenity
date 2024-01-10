@@ -759,7 +759,6 @@
 <a href="#757" id="757">757</a>
 <a href="#758" id="758">758</a>
 <a href="#759" id="759">759</a>
-<a href="#760" id="760">760</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -963,17 +962,16 @@
                 <span class="prelude-val">Ok</span>(())
             },
             <span class="prelude-val">Err</span>(why) =&gt; {
-                <span class="kw">match </span>why {
-                    Error::Tungstenite(TungsteniteError::Io(err)) =&gt; {
+                <span class="kw">if let </span>Error::Tungstenite(err) = <span class="kw-2">&amp;</span>why {
+                    <span class="kw">if let </span>TungsteniteError::Io(err) = <span class="kw-2">&amp;**</span>err {
                         <span class="kw">if </span>err.raw_os_error() != <span class="prelude-val">Some</span>(<span class="number">32</span>) {
                             <span class="macro">debug!</span>(<span class="string">"[{:?}] Err heartbeating: {:?}"</span>, <span class="self">self</span>.shard_info, err);
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Gateway(GatewayError::HeartbeatFailed));
                         }
-                    },
-                    other =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">"[{:?}] Other err w/ keepalive: {:?}"</span>, <span class="self">self</span>.shard_info, other);
-                    },
+                    }
                 }
 
+                <span class="macro">warn!</span>(<span class="string">"[{:?}] Other err w/ keepalive: {:?}"</span>, <span class="self">self</span>.shard_info, why);
                 <span class="prelude-val">Err</span>(Error::Gateway(GatewayError::HeartbeatFailed))
             },
         }

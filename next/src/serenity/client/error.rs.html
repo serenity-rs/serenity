@@ -25,9 +25,6 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
-<a href="#28" id="28">28</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
 
@@ -42,15 +39,12 @@
 </span><span class="kw">pub enum </span>Error {
     <span class="doccomment">/// When a shard has completely failed to reboot after resume and/or reconnect attempts.
     </span>ShardBootFailure,
-    <span class="doccomment">/// When all shards that the client is responsible for have shutdown with an error.
-    </span>Shutdown,
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::ShardBootFailure =&gt; f.write_str(<span class="string">"Failed to (re-)boot a shard"</span>),
-            <span class="self">Self</span>::Shutdown =&gt; f.write_str(<span class="string">"The clients shards shutdown"</span>),
         }
     }
 }

@@ -145,7 +145,6 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::Write;
 
 <span class="kw">use </span>reqwest::header::{
@@ -156,7 +155,7 @@
     CONTENT_TYPE,
     USER_AGENT,
 };
-<span class="kw">use </span>reqwest::{Client, RequestBuilder <span class="kw">as </span>ReqwestRequestBuilder, Url};
+<span class="kw">use </span>reqwest::{Client, RequestBuilder <span class="kw">as </span>ReqwestRequestBuilder};
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::Multipart;
 <span class="kw">use </span><span class="kw">super</span>::routing::Route;
@@ -235,8 +234,7 @@
             }
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>builder = client
-            .request(<span class="self">self</span>.method.reqwest_method(), Url::parse(<span class="kw-2">&amp;</span>path).map_err(HttpError::Url)<span class="question-mark">?</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = client.request(<span class="self">self</span>.method.reqwest_method(), path);
 
         <span class="kw">let </span><span class="kw-2">mut </span>headers = <span class="self">self</span>.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));

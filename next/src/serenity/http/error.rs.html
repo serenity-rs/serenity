@@ -278,10 +278,6 @@
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
 
@@ -297,29 +293,29 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>DiscordJsonError {
     <span class="doccomment">/// The error code.
-    </span><span class="kw">pub </span>code: isize,
+    </span><span class="kw">pub </span>code: i32,
     <span class="doccomment">/// The error message.
-    </span><span class="kw">pub </span>message: String,
+    </span><span class="kw">pub </span>message: FixedString,
     <span class="doccomment">/// The full explained errors with their path in the request body.
     </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_errors"</span>)]
-    </span><span class="kw">pub </span>errors: Vec&lt;DiscordJsonSingleError&gt;,
+    </span><span class="kw">pub </span>errors: FixedArray&lt;DiscordJsonSingleError&gt;,
 }
 
 <span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 </span><span class="kw">pub struct </span>DiscordJsonSingleError {
     <span class="doccomment">/// The error code.
-    </span><span class="kw">pub </span>code: String,
+    </span><span class="kw">pub </span>code: FixedString&lt;u8&gt;,
     <span class="doccomment">/// The error message.
-    </span><span class="kw">pub </span>message: String,
+    </span><span class="kw">pub </span>message: FixedString,
     <span class="doccomment">/// The path to the error in the request body itself, dot separated.
-    </span><span class="kw">pub </span>path: String,
+    </span><span class="kw">pub </span>path: FixedString,
 }
 
 <span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ErrorResponse {
     <span class="kw">pub </span>status_code: StatusCode,
-    <span class="kw">pub </span>url: String,
+    <span class="kw">pub </span>url: FixedString&lt;u16&gt;,
     <span class="kw">pub </span>method: Method,
     <span class="kw">pub </span>error: DiscordJsonError,
 }
@@ -329,12 +325,12 @@
     </span><span class="kw">pub async fn </span>from_response(r: Response, method: Method) -&gt; <span class="self">Self </span>{
         ErrorResponse {
             status_code: r.status(),
-            url: r.url().to_string(),
+            url: r.url().to_string().into(),
             method,
             error: decode_resp(r).<span class="kw">await</span>.unwrap_or_else(|e| DiscordJsonError {
                 code: -<span class="number">1</span>,
-                message: <span class="macro">format!</span>(<span class="string">"[Serenity] Could not decode json when receiving error response from discord:, {e}"</span>),
-                errors: <span class="macro">vec!</span>[],
+                errors: FixedArray::empty(),
+                message: <span class="macro">format!</span>(<span class="string">"[Serenity] Could not decode json when receiving error response from discord:, {e}"</span>).into(),
             }),
         }
     }
@@ -358,10 +354,6 @@
     </span>InvalidHeader(InvalidHeaderValue),
     <span class="doccomment">/// Reqwest's Error contain information on why sending a request failed.
     </span>Request(ReqwestError),
-    <span class="doccomment">/// When using a proxy with an invalid scheme.
-    </span>InvalidScheme,
-    <span class="doccomment">/// When using a proxy with an invalid port.
-    </span>InvalidPort,
     <span class="doccomment">/// When an application id was expected but missing.
     </span>ApplicationIdMissing,
 }
@@ -449,8 +441,6 @@
             <span class="self">Self</span>::InvalidWebhook =&gt; f.write_str(<span class="string">"Provided URL is not a valid webhook."</span>),
             <span class="self">Self</span>::InvalidHeader(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Provided value is an invalid header value."</span>),
             <span class="self">Self</span>::Request(<span class="kw">_</span>) =&gt; f.write_str(<span class="string">"Error while sending HTTP request."</span>),
-            <span class="self">Self</span>::InvalidScheme =&gt; f.write_str(<span class="string">"Invalid Url scheme."</span>),
-            <span class="self">Self</span>::InvalidPort =&gt; f.write_str(<span class="string">"Invalid port."</span>),
             <span class="self">Self</span>::ApplicationIdMissing =&gt; f.write_str(<span class="string">"Application id was expected but missing."</span>),
         }
     }
@@ -469,18 +459,18 @@
 <span class="attr">#[allow(clippy::missing_errors_doc)]
 </span><span class="kw">pub fn </span>deserialize_errors&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
     deserializer: D,
-) -&gt; StdResult&lt;Vec&lt;DiscordJsonSingleError&gt;, D::Error&gt; {
+) -&gt; StdResult&lt;FixedArray&lt;DiscordJsonSingleError&gt;, D::Error&gt; {
     <span class="kw">let </span>map: Value = Value::deserialize(deserializer)<span class="question-mark">?</span>;
 
     <span class="kw">if </span>!map.is_object() {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(FixedArray::empty());
     }
 
     <span class="kw">let </span><span class="kw-2">mut </span>errors = Vec::new();
     <span class="kw">let </span><span class="kw-2">mut </span>path = Vec::new();
     loop_errors(<span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span>errors, <span class="kw-2">&amp;mut </span>path).map_err(D::Error::custom)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(errors)
+    <span class="prelude-val">Ok</span>(errors.into())
 }
 
 <span class="kw">fn </span>make_error(
@@ -499,14 +489,16 @@
                 .ok_or(<span class="string">"expected code"</span>)<span class="question-mark">?
                 </span>.as_str()
                 .ok_or(<span class="string">"expected string"</span>)<span class="question-mark">?
-                </span>.to_owned(),
+                </span>.to_owned()
+                .into(),
             message: error_object
                 .get(<span class="string">"message"</span>)
                 .ok_or(<span class="string">"expected message"</span>)<span class="question-mark">?
                 </span>.as_str()
                 .ok_or(<span class="string">"expected string"</span>)<span class="question-mark">?
-                </span>.to_owned(),
-            path: path.join(<span class="string">"."</span>),
+                </span>.to_owned()
+                .into(),
+            path: path.join(<span class="string">"."</span>).into(),
         });
     }
     <span class="prelude-val">Ok</span>(())
@@ -541,8 +533,8 @@
     </span><span class="kw">async fn </span>test_error_response_into() {
         <span class="kw">let </span>error = DiscordJsonError {
             code: <span class="number">43121215</span>,
-            message: String::from(<span class="string">"This is a Ferris error"</span>),
-            errors: <span class="macro">vec!</span>[],
+            message: String::from(<span class="string">"This is a Ferris error"</span>).into(),
+            errors: FixedArray::empty(),
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Builder::new();
@@ -556,7 +548,7 @@
 
         <span class="kw">let </span>known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(<span class="number">403</span>).unwrap(),
-            url: String::from(<span class="string">"https://ferris.crab/"</span>),
+            url: String::from(<span class="string">"https://ferris.crab/"</span>).into(),
             method: Method::POST,
             error,
         };

@@ -490,7 +490,7 @@ and default value is 1000.</p>
 <p>Optionally pass in <code>after</code> to offset the results by a <a href="../user/struct.User.html" title="struct serenity::model::user::User"><code>User</code></a>’s Id.</p>
 <h5 id="errors-48"><a href="#errors-48">Errors</a></h5>
 <p>Returns an <a href="../../prelude/enum.SerenityError.html#variant.Http" title="variant serenity::prelude::SerenityError::Http"><code>Error::Http</code></a> if the API returns an error, may also return
-<a href="../../prelude/enum.SerenityError.html#variant.NotInRange" title="variant serenity::prelude::SerenityError::NotInRange"><code>Error::NotInRange</code></a> if the input is not within range.</p>
+<a href="../error/enum.Error.html#variant.TooSmall" title="variant serenity::model::error::Error::TooSmall"><code>ModelError::TooSmall</code></a> or <a href="../error/enum.Error.html#variant.TooLarge" title="variant serenity::model::error::Error::TooLarge"><code>ModelError::TooLarge</code></a> if the limit is not within range.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.members_iter" class="method"><a class="src rightside" href="../../../src/serenity/model/guild/guild_id.rs.html#1134-1136">source</a><h4 class="code-header">pub fn <a href="#method.members_iter" class="fn">members_iter</a>&lt;H: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="../../http/struct.Http.html" title="struct serenity::http::Http">Http</a>&gt;&gt;(
     self,
     http: H
