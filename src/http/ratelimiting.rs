@@ -46,7 +46,7 @@ use reqwest::{Client, Response, StatusCode};
 use secrecy::{ExposeSecret, SecretString};
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, Duration};
-use tracing::{debug, instrument};
+use tracing::debug;
 
 pub use super::routing::RatelimitingBucket;
 use super::{HttpError, LightMethod, Request};
@@ -178,7 +178,7 @@ impl Ratelimiter {
     /// # Errors
     ///
     /// Only error kind that may be returned is [`Error::Http`].
-    #[instrument]
+    #[cfg_attr(feature = "tracing_instrument", instrument)]
     pub async fn perform(&self, req: Request<'_>) -> Result<Response> {
         loop {
             // This will block if another thread hit the global ratelimit.
@@ -277,7 +277,7 @@ pub struct Ratelimit {
 }
 
 impl Ratelimit {
-    #[instrument(skip(ratelimit_callback))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(ratelimit_callback)))]
     pub async fn pre_hook(
         &mut self,
         req: &Request<'_>,
@@ -323,7 +323,10 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
-    #[instrument(skip(ratelimit_callback))]
+    /// # Errors
+    ///
+    /// Errors if unable to parse response headers.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(ratelimit_callback)))]
     pub async fn post_hook(
         &mut self,
         response: &Response,
