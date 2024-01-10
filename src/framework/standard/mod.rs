@@ -27,7 +27,6 @@ use structures::buckets::{Bucket, RateLimitAction};
 pub use structures::*;
 use tokio::sync::Mutex;
 use tokio::time::sleep;
-use tracing::instrument;
 use uwl::Stream;
 
 use self::buckets::{RateLimitInfo, RevertBucket};
@@ -607,7 +606,7 @@ impl StandardFramework {
 
 #[async_trait]
 impl Framework for StandardFramework {
-    #[instrument(skip(self, event))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, event)))]
     async fn dispatch(&self, mut ctx: Context, event: FullEvent) {
         let FullEvent::Message {
             new_message: msg,
