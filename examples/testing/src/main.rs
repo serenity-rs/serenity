@@ -57,7 +57,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         let mut msg = channel_id
             .send_message(
                 &ctx,
-                CreateMessage::new().add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                CreateMessage::new()
+                    .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
             )
             .await?;
         // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
@@ -69,13 +70,15 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         let mut msg = channel_id
             .send_message(
                 ctx,
-                CreateMessage::new().add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                CreateMessage::new()
+                    .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
             )
             .await?;
         msg.edit(
             ctx,
             EditMessage::new().attachments(
-                EditAttachments::keep_all(&msg).add(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
+                EditAttachments::keep_all(&msg)
+                    .add(CreateAttachment::url(ctx, IMAGE_URL_2, "testing1.png").await?),
             ),
         )
         .await?;
@@ -196,7 +199,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 ctx,
                 CreateMessage::new()
                     .flags(MessageFlags::IS_VOICE_MESSAGE)
-                    .add_file(CreateAttachment::url(ctx, audio_url).await?),
+                    .add_file(CreateAttachment::url(ctx, audio_url, "testing.ogg").await?),
             )
             .await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
@@ -256,7 +259,7 @@ async fn interaction(
                 &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
-                        .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                        .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
                 ),
             )
             .await?;
@@ -270,7 +273,7 @@ async fn interaction(
                 &ctx,
                 EditInteractionResponse::new().attachments(
                     EditAttachments::keep_all(&msg)
-                        .add(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
+                        .add(CreateAttachment::url(ctx, IMAGE_URL_2, "testing1.png").await?),
                 ),
             )
             .await?;
@@ -311,7 +314,7 @@ async fn interaction(
                 ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
-                        .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                        .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
                 ),
             )
             .await?;
@@ -320,7 +323,7 @@ async fn interaction(
             .edit_response(
                 ctx,
                 EditInteractionResponse::new()
-                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
+                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2, "testing1.png").await?),
             )
             .await?;
 
@@ -328,7 +331,7 @@ async fn interaction(
             .create_followup(
                 ctx,
                 CreateInteractionResponseFollowup::new()
-                    .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                    .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
             )
             .await?;
     } else if interaction.data.name == "editembeds" {

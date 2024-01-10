@@ -8,7 +8,7 @@ use reqwest::header::{
     CONTENT_TYPE,
     USER_AGENT,
 };
-use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
+use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
 
 use super::multipart::Multipart;
 use super::routing::Route;
@@ -87,8 +87,7 @@ impl<'a> Request<'a> {
             }
         }
 
-        let mut builder = client
-            .request(self.method.reqwest_method(), Url::parse(&path).map_err(HttpError::Url)?);
+        let mut builder = client.request(self.method.reqwest_method(), path);
 
         let mut headers = self.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
