@@ -44,15 +44,6 @@ pub enum Error {
     ///
     /// [`model`]: crate::model
     Model(ModelError),
-    /// Input exceeded a limit. Providing the input and the limit that's not supposed to be
-    /// exceeded.
-    ///
-    /// *This only exists for the [`GuildId::ban`] and [`Member::ban`] functions. For their cases,
-    /// it's the "reason".*
-    ///
-    /// [`GuildId::ban`]: crate::model::id::GuildId::ban
-    /// [`Member::ban`]: crate::model::guild::Member::ban
-    ExceededLimit(String, u32),
     /// The input is not in the specified range. Returned by [`GuildId::members`],
     /// [`Guild::members`] and [`PartialGuild::members`]
     ///
@@ -150,7 +141,6 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Decode(msg, _) | Self::Other(msg) => f.write_str(msg),
-            Self::ExceededLimit(..) => f.write_str("Input exceeded a limit"),
             Self::NotInRange(..) => f.write_str("Input is not in the specified range"),
             Self::Format(inner) => fmt::Display::fmt(&inner, f),
             Self::Io(inner) => fmt::Display::fmt(&inner, f),
