@@ -75,7 +75,6 @@ impl Reaction {
     /// exists.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
         self.channel_id.to_channel(cache_http).await
     }
@@ -162,7 +161,6 @@ impl Reaction {
     /// the message was deleted.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn message(&self, cache_http: impl CacheHttp) -> Result<Message> {
         self.channel_id.message(cache_http, self.message_id).await
     }
@@ -213,7 +211,6 @@ impl Reaction {
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: crate::model::permissions
-    #[inline]
     pub async fn users<R, U>(
         &self,
         http: impl AsRef<Http>,
@@ -326,7 +323,6 @@ impl ReactionType {
     ///
     /// **Note**: This is mainly for use internally. There is otherwise most likely little use for
     /// it.
-    #[inline]
     #[must_use]
     #[cfg(feature = "http")]
     pub fn as_data(&self) -> String {
