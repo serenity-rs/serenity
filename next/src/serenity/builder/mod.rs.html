@@ -151,6 +151,22 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to use.
 //!
 //! These are used when not all parameters are required, all parameters are optional, and/or sane
@@ -164,6 +180,8 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::model::ModelError;
 
 <span class="doccomment">/// Common trait for all HTTP request builders in this module.
 </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -181,12 +199,26 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_overflow(len: usize, max: usize) -&gt; StdResult&lt;(), usize&gt; {
-    <span class="kw">if </span>len &gt; max {
-        <span class="prelude-val">Err</span>(len - max)
-    } <span class="kw">else </span>{
-        <span class="prelude-val">Ok</span>(())
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_lengths(
+    content: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    embeds: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[CreateEmbed&lt;<span class="lifetime">'_</span>&gt;]&gt;,
+    stickers: usize,
+) -&gt; StdResult&lt;(), ModelError&gt; {
+    <span class="kw">use </span><span class="kw">crate</span>::model::error::Maximum;
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = content {
+        Maximum::MessageLength.check_overflow(content.chars().count())<span class="question-mark">?</span>;
     }
+
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(embeds) = embeds {
+        Maximum::EmbedCount.check_overflow(embeds.len())<span class="question-mark">?</span>;
+
+        <span class="kw">for </span>embed <span class="kw">in </span>embeds {
+            Maximum::EmbedLength.check_overflow(embed.get_length())<span class="question-mark">?</span>;
+        }
+    }
+
+    Maximum::StickerCount.check_overflow(stickers)
 }
 
 <span class="kw">mod </span>add_member;

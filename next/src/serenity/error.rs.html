@@ -179,16 +179,6 @@
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Error <span class="kw">as </span>FormatError};
 <span class="kw">use </span>std::io::Error <span class="kw">as </span>IoError;
@@ -235,15 +225,6 @@
     ///
     /// [`model`]: crate::model
     </span>Model(ModelError),
-    <span class="doccomment">/// Input exceeded a limit. Providing the input and the limit that's not supposed to be
-    /// exceeded.
-    ///
-    /// *This only exists for the [`GuildId::ban`] and [`Member::ban`] functions. For their cases,
-    /// it's the "reason".*
-    ///
-    /// [`GuildId::ban`]: crate::model::id::GuildId::ban
-    /// [`Member::ban`]: crate::model::guild::Member::ban
-    </span>ExceededLimit(String, u32),
     <span class="doccomment">/// The input is not in the specified range. Returned by [`GuildId::members`],
     /// [`Guild::members`] and [`PartialGuild::members`]
     ///
@@ -341,7 +322,6 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Decode(msg, <span class="kw">_</span>) | <span class="self">Self</span>::Other(msg) =&gt; f.write_str(msg),
-            <span class="self">Self</span>::ExceededLimit(..) =&gt; f.write_str(<span class="string">"Input exceeded a limit"</span>),
             <span class="self">Self</span>::NotInRange(..) =&gt; f.write_str(<span class="string">"Input is not in the specified range"</span>),
             <span class="self">Self</span>::Format(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),
             <span class="self">Self</span>::Io(inner) =&gt; fmt::Display::fmt(<span class="kw-2">&amp;</span>inner, f),

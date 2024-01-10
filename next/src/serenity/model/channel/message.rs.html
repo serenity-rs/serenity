@@ -1148,6 +1148,11 @@
 <a href="#1146" id="1146">1146</a>
 <a href="#1147" id="1147">1147</a>
 <a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1497,7 +1502,7 @@
     /// the author. Otherwise returns [`Error::Http`] if the user lacks permission, as well as if
     /// invalid data is given.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.
+    /// Returns a [`ModelError::TooLarge`] if the message contents are too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>edit(
@@ -1644,7 +1649,12 @@
     /// inner value of how many unicode code points the message is over.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>overflow_length(content: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
-        <span class="kw">crate</span>::builder::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
+        <span class="kw">let </span>char_count = content.chars().count();
+        <span class="kw">if </span>char_count &gt; constants::MESSAGE_CODE_LIMIT {
+            <span class="prelude-val">Some</span>(constants::MESSAGE_CODE_LIMIT - char_count)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
     <span class="doccomment">/// Pins this message to its channel.
@@ -1742,7 +1752,7 @@
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
@@ -1766,7 +1776,7 @@
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
@@ -1793,7 +1803,7 @@
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// does not have the required permissions.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES

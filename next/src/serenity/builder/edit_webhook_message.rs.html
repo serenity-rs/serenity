@@ -182,25 +182,10 @@
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use super</span>::{check_overflow, Builder};
+</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -208,8 +193,6 @@
     CreateEmbed,
     EditAttachments,
 };
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -244,21 +227,8 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
-            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
-                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
-        }
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(embeds) = <span class="kw-2">&amp;</span><span class="self">self</span>.embeds {
-            check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
-                .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
-            <span class="kw">for </span>embed <span class="kw">in </span>embeds.iter() {
-                embed.check_length()<span class="question-mark">?</span>;
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(())
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), ModelError&gt; {
+        <span class="kw">super</span>::check_lengths(<span class="self">self</span>.content.as_deref(), <span class="self">self</span>.embeds.as_deref(), <span class="number">0</span>)
     }
 
     <span class="doccomment">/// Set the content of the message.

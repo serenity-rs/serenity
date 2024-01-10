@@ -4686,11 +4686,6 @@
 <a href="#4684" id="4684">4684</a>
 <a href="#4685" id="4685">4685</a>
 <a href="#4686" id="4686">4686</a>
-<a href="#4687" id="4687">4687</a>
-<a href="#4688" id="4688">4688</a>
-<a href="#4689" id="4689">4689</a>
-<a href="#4690" id="4690">4690</a>
-<a href="#4691" id="4691">4691</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4699,6 +4694,7 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>arrayvec::ArrayVec;
+<span class="kw">use </span>nonmax::NonMaxU16;
 <span class="kw">use </span>percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 <span class="kw">use </span>reqwest::header::{HeaderMap <span class="kw">as </span>Headers, HeaderValue};
 <span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
@@ -8165,15 +8161,9 @@
     </span><span class="kw">pub async fn </span>get_guild_members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
-        limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-        after: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
+        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(l) = limit {
-            <span class="kw">if </span>!(<span class="number">1</span>..=constants::MEMBER_FETCH_LIMIT).contains(<span class="kw-2">&amp;</span>l) {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::NotInRange(<span class="string">"limit"</span>, l, <span class="number">1</span>, constants::MEMBER_FETCH_LIMIT));
-            }
-        }
-
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         params.push((<span class="string">"limit"</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()));
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
@@ -9123,7 +9113,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
         query: <span class="kw-2">&amp;</span>str,
-        limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
             </span>.fire(Request {

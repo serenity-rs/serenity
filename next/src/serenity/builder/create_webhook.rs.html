@@ -100,9 +100,6 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -171,8 +168,8 @@
     /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the corresponding
     /// channel is not of type [`Text`] or [`News`].
     ///
-    /// If the provided name is less than 2 characters, returns [`ModelError::NameTooShort`]. If it
-    /// is more than 100 characters, returns [`ModelError::NameTooLong`].
+    /// If the provided name is less than 2 characters, returns [`ModelError::TooSmall`]. If it
+    /// is more than 100 characters, returns [`ModelError::TooLarge`].
     ///
     /// Returns a [`Error::Http`] if the current user lacks permission, or if invalid data is
     /// given.
@@ -197,11 +194,8 @@
             }
         }
 
-        <span class="kw">if </span><span class="self">self</span>.name.len() &lt; <span class="number">2 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::NameTooShort));
-        } <span class="kw">else if </span><span class="self">self</span>.name.len() &gt; <span class="number">100 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::NameTooLong));
-        }
+        <span class="kw">crate</span>::model::error::Minimum::WebhookName.check_underflow(<span class="self">self</span>.name.chars().count())<span class="question-mark">?</span>;
+        <span class="kw">crate</span>::model::error::Maximum::WebhookName.check_overflow(<span class="self">self</span>.name.chars().count())<span class="question-mark">?</span>;
 
         cache_http.http().create_webhook(ctx, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}

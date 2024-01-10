@@ -1394,8 +1394,8 @@
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
-    /// than 100 messages.
+    /// Returns [`ModelError::TooSmall`] or [`ModelError::TooLarge`] if an attempt was made to
+    /// delete either 0 or more than 100 messages.
     ///
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
@@ -1405,17 +1405,17 @@
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         message_ids: <span class="kw-2">&amp;</span>[MessageId],
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::model::error::{Maximum, Minimum};
+
         <span class="attr">#[derive(serde::Serialize)]
         </span><span class="kw">struct </span>DeleteMessages&lt;<span class="lifetime">'a</span>&gt; {
             messages: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[MessageId],
         }
 
-        <span class="kw">let </span>len = message_ids.len();
-        <span class="kw">if </span>len == <span class="number">0 </span>|| len &gt; <span class="number">100 </span>{
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::BulkDeleteAmount));
-        }
+        Minimum::BulkDeleteAmount.check_underflow(message_ids.len())<span class="question-mark">?</span>;
+        Maximum::BulkDeleteAmount.check_overflow(message_ids.len())<span class="question-mark">?</span>;
 
-        <span class="kw">if </span>len == <span class="number">1 </span>{
+        <span class="kw">if </span>message_ids.len() == <span class="number">1 </span>{
             <span class="self">self</span>.delete_message(http, message_ids[<span class="number">0</span>]).<span class="kw">await
         </span>} <span class="kw">else </span>{
             <span class="kw">let </span>req = DeleteMessages {
@@ -1856,7 +1856,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+    /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>say(

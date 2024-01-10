@@ -330,26 +330,10 @@
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use super</span>::{check_overflow, Builder};
+</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -357,8 +341,6 @@
     CreateEmbed,
     EditAttachments,
 };
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -430,22 +412,8 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
-            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
-                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
-        }
-
-        check_overflow(<span class="self">self</span>.embeds.len(), constants::EMBED_MAX_COUNT)
-            .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
-        <span class="kw">for </span>embed <span class="kw">in </span><span class="self">self</span>.embeds.iter() {
-            embed.check_length()<span class="question-mark">?</span>;
-        }
-
-        check_overflow(<span class="self">self</span>.sticker_ids.len(), constants::STICKER_MAX_COUNT)
-            .map_err(|<span class="kw">_</span>| Error::Model(ModelError::StickerAmount))<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
+    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), ModelError&gt; {
+        <span class="kw">super</span>::check_lengths(<span class="self">self</span>.content.as_deref(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.embeds), <span class="self">self</span>.sticker_ids.len())
     }
 
     <span class="doccomment">/// Set the content of the message.
@@ -640,7 +608,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the message contents are over the above limits.
+    /// Returns a [`ModelError::TooLarge`] if the message contents are over the above limits.
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.

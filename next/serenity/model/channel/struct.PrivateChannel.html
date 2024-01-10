@@ -37,8 +37,8 @@ closing a private channel on the client, which can be re-opened.</p>
 <p>Requires the <a href="../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES" title="associated constant serenity::model::permissions::Permissions::MANAGE_MESSAGES">Manage Messages</a> permission.</p>
 <p><strong>Note</strong>: Messages that are older than 2 weeks can’t be deleted using this method.</p>
 <h5 id="errors-1"><a href="#errors-1">Errors</a></h5>
-<p>Returns <a href="../error/enum.Error.html#variant.BulkDeleteAmount" title="variant serenity::model::error::Error::BulkDeleteAmount"><code>ModelError::BulkDeleteAmount</code></a> if an attempt was made to delete either 0 or more
-than 100 messages.</p>
+<p>Returns <a href="../error/enum.Error.html#variant.TooSmall" title="variant serenity::model::error::Error::TooSmall"><code>ModelError::TooSmall</code></a> or <a href="../error/enum.Error.html#variant.TooLarge" title="variant serenity::model::error::Error::TooLarge"><code>ModelError::TooLarge</code></a> if an attempt was made to
+delete either 0 or more than 100 messages.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.delete_permission" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/private_channel.rs.html#109-115">source</a><h4 class="code-header">pub async fn <a href="#method.delete_permission" class="fn">delete_permission</a>(
     &amp;self,
     http: impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="../../http/struct.Http.html" title="struct serenity::http::Http">Http</a>&gt;,
@@ -119,7 +119,7 @@ useful for pagination.</p>
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Sends a message with just the given message content in the channel.</p>
 <p><strong>Note</strong>: Message content must be under 2000 unicode code points.</p>
 <h5 id="errors-8"><a href="#errors-8">Errors</a></h5>
-<p>Returns a <a href="../error/enum.Error.html#variant.MessageTooLong" title="variant serenity::model::error::Error::MessageTooLong"><code>ModelError::MessageTooLong</code></a> if the content length is over the above limit. See
+<p>Returns a <a href="../error/enum.Error.html#variant.TooLarge" title="variant serenity::model::error::Error::TooLarge"><code>ModelError::TooLarge</code></a> if the content length is over the above limit. See
 <a href="../../builder/struct.CreateMessage.html#method.execute"><code>CreateMessage::execute</code></a> for more details.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.send_files" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/private_channel.rs.html#286-293">source</a><h4 class="code-header">pub async fn <a href="#method.send_files" class="fn">send_files</a>&lt;'a&gt;(
     self,

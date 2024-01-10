@@ -356,23 +356,10 @@
 <a href="#354" id="354">354</a>
 <a href="#355" id="355">355</a>
 <a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use super</span>::{check_overflow, Builder};
+</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -380,8 +367,6 @@
     CreateEmbed,
     EditAttachments,
 };
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -461,19 +446,8 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span><span class="self">self</span>.content {
-            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
-                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
-        }
-
-        check_overflow(<span class="self">self</span>.embeds.len(), constants::EMBED_MAX_COUNT)
-            .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
-        <span class="kw">for </span>embed <span class="kw">in </span><span class="self">self</span>.embeds.iter() {
-            embed.check_length()<span class="question-mark">?</span>;
-        }
-
-        <span class="prelude-val">Ok</span>(())
+    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), ModelError&gt; {
+        <span class="kw">super</span>::check_lengths(<span class="self">self</span>.content.as_deref(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.embeds), <span class="number">0</span>)
     }
 
     <span class="doccomment">/// Override the default avatar of the webhook with an image URL.

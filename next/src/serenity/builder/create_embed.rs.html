@@ -403,7 +403,6 @@
 <a href="#401" id="401">401</a>
 <a href="#402" id="402">402</a>
 <a href="#403" id="403">403</a>
-<a href="#404" id="404">404</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Developer note:
 //!
 //! This is a set of embed builders for rich embeds.
@@ -609,13 +608,13 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>get_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">0</span>;
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>author) = <span class="self">self</span>.author {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(author) = <span class="kw-2">&amp;</span><span class="self">self</span>.author {
             length += author.name.chars().count();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>description) = <span class="self">self</span>.description {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(description) = <span class="kw-2">&amp;</span><span class="self">self</span>.description {
             length += description.chars().count();
         }
 
@@ -624,16 +623,15 @@
             length += field.value.chars().count();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>footer) = <span class="self">self</span>.footer {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(footer) = <span class="kw-2">&amp;</span><span class="self">self</span>.footer {
             length += footer.text.chars().count();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>title) = <span class="self">self</span>.title {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(title) = <span class="kw-2">&amp;</span><span class="self">self</span>.title {
             length += title.chars().count();
         }
 
-        <span class="kw">super</span>::check_overflow(length, <span class="kw">crate</span>::constants::EMBED_MAX_LENGTH)
-            .map_err(|overflow| Error::Model(ModelError::EmbedTooLarge(overflow)))
+        length
     }
 }
 

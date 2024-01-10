@@ -118,9 +118,16 @@
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of constants used by the library.
 
-/// The maximum length of the textual size of an embed.
+</span><span class="kw">use </span>nonmax::NonMaxU16;
+
+<span class="doccomment">/// The maximum length of the textual size of an embed.
 </span><span class="kw">pub const </span>EMBED_MAX_LENGTH: usize = <span class="number">6000</span>;
 
 <span class="doccomment">/// The maximum number of embeds in a message.
@@ -139,7 +146,10 @@
 </span><span class="kw">pub const </span>MESSAGE_CODE_LIMIT: usize = <span class="number">2000</span>;
 
 <span class="doccomment">/// The maximum number of members the bot can fetch at once
-</span><span class="kw">pub const </span>MEMBER_FETCH_LIMIT: u64 = <span class="number">1000</span>;
+</span><span class="kw">pub const </span>MEMBER_FETCH_LIMIT: NonMaxU16 = <span class="kw">match </span>NonMaxU16::new(<span class="number">1000</span>) {
+    <span class="prelude-val">Some</span>(m) =&gt; m,
+    <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
+};
 
 <span class="doccomment">/// The [UserAgent] sent along with every request.
 ///

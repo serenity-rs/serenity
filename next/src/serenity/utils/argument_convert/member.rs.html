@@ -88,6 +88,7 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span><span class="kw">super</span>::ArgumentConvert;
@@ -153,8 +154,9 @@
         <span class="comment">// Following code is inspired by discord.py's MemberConvert::query_member_named
 
         // If string is a username+discriminator
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>((name, discrim)) = <span class="kw">crate</span>::utils::parse_user_tag(s) {
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(member_results) = guild_id.search_members(ctx.http(), name, <span class="prelude-val">Some</span>(<span class="number">100</span>)).<span class="kw">await </span>{
+        </span><span class="kw">let </span>limit = nonmax::NonMaxU16::new(<span class="number">100</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((name, discrim)) = <span class="kw">crate</span>::utils::parse_user_tag(s) {
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(member_results) = guild_id.search_members(ctx.http(), name, limit).<span class="kw">await </span>{
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = member_results.into_iter().find(|m| {
                     m.user.name.eq_ignore_ascii_case(name) &amp;&amp; m.user.discriminator == discrim
                 }) {
@@ -164,7 +166,7 @@
         }
 
         <span class="comment">// If string is username or nickname
-        </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(member_results) = guild_id.search_members(ctx.http(), s, <span class="prelude-val">Some</span>(<span class="number">100</span>)).<span class="kw">await </span>{
+        </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(member_results) = guild_id.search_members(ctx.http(), s, limit).<span class="kw">await </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = member_results.into_iter().find(|m| {
                 m.user.name.eq_ignore_ascii_case(s)
                     || m.nick.as_ref().is_some_and(|nick| nick.eq_ignore_ascii_case(s))

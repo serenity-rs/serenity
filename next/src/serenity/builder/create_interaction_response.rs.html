@@ -424,23 +424,10 @@
 <a href="#422" id="422">422</a>
 <a href="#423" id="423">423</a>
 <a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
-<a href="#435" id="435">435</a>
-<a href="#436" id="436">436</a>
-<a href="#437" id="437">437</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use super</span>::{check_overflow, Builder};
+</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -448,8 +435,6 @@
     CreateEmbed,
     EditAttachments,
 };
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
@@ -540,26 +525,15 @@
 
 <span class="kw">impl </span>CreateInteractionResponse&lt;<span class="lifetime">'_</span>&gt; {
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">fn </span>check_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), ModelError&gt; {
         <span class="kw">if let </span>CreateInteractionResponse::Message(data)
         | CreateInteractionResponse::Defer(data)
         | CreateInteractionResponse::UpdateMessage(data) = <span class="self">self
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(content) = <span class="kw-2">&amp;</span>data.content {
-                check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
-                    .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))<span class="question-mark">?</span>;
-            }
-
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(embeds) = <span class="kw-2">&amp;</span>data.embeds {
-                check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
-                    .map_err(|<span class="kw">_</span>| Error::Model(ModelError::EmbedAmount))<span class="question-mark">?</span>;
-
-                <span class="kw">for </span>embed <span class="kw">in </span>embeds.iter() {
-                    embed.check_length()<span class="question-mark">?</span>;
-                }
-            }
+            <span class="kw">super</span>::check_lengths(data.content.as_deref(), data.embeds.as_deref(), <span class="number">0</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(())
         }
-        <span class="prelude-val">Ok</span>(())
     }
 }
 

@@ -2752,7 +2752,7 @@
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use </span>nonmax::NonMaxU64;
+<span class="kw">use </span>nonmax::{NonMaxU16, NonMaxU64};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>tracing::{error, warn};
 
@@ -3205,7 +3205,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days' worth of messages
+    /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
     /// to delete is over the maximum.
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
@@ -3231,7 +3231,7 @@
     /// # Errors
     ///
     /// In addition to the possible reasons [`Self::ban`] may return an error, an
-    /// [`Error::ExceededLimit`] may also be returned if the reason is too long.
+    /// [`ModelError::TooLarge`] may also be returned if the reason is too long.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>ban_with_reason(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4343,7 +4343,7 @@
     </span><span class="kw">pub async fn </span>members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
         <span class="self">self</span>.id.members(http, limit, after).<span class="kw">await
@@ -4791,7 +4791,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         query: <span class="kw-2">&amp;</span>str,
-        limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
         <span class="self">self</span>.id.search_members(http, query, limit).<span class="kw">await
     </span>}
