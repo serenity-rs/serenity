@@ -1,5 +1,5 @@
 use std::error::Error as StdError;
-use std::fmt::{self, Error as FormatError};
+use std::fmt;
 use std::io::Error as IoError;
 
 #[cfg(feature = "http")]
@@ -31,10 +31,6 @@ pub type Result<T, E = Error> = StdResult<T, E>;
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
-    /// An error while decoding a payload.
-    Decode(&'static str, Value),
-    /// There was an error with a format.
-    Format(FormatError),
     /// An [`std::io`] error.
     Io(IoError),
     #[cfg_attr(not(feature = "simd_json"), doc = "An error from the [`serde_json`] crate.")]
@@ -44,20 +40,6 @@ pub enum Error {
     ///
     /// [`model`]: crate::model
     Model(ModelError),
-    /// The input is not in the specified range. Returned by [`GuildId::members`],
-    /// [`Guild::members`] and [`PartialGuild::members`]
-    ///
-    /// (param_name, value, range_min, range_max)
-    ///
-    /// [`GuildId::members`]: crate::model::id::GuildId::members
-    /// [`Guild::members`]: crate::model::guild::Guild::members
-    /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
-    NotInRange(&'static str, u64, u64, u64),
-    /// Some other error. This is only used for "Expected value \<TYPE\>" errors, when a more
-    /// detailed error can not be easily provided via the [`Error::Decode`] variant.
-    Other(&'static str),
-    /// An error from the [`url`] crate.
-    Url(String),
     /// A [client] error.
     ///
     /// [client]: crate::client
@@ -75,13 +57,7 @@ pub enum Error {
     Http(HttpError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
-    Tungstenite(TungsteniteError),
-}
-
-impl From<FormatError> for Error {
-    fn from(e: FormatError) -> Error {
-        Error::Format(e)
-    }
+    Tungstenite(Box<TungsteniteError>),
 }
 
 #[cfg(feature = "gateway")]
@@ -112,7 +88,7 @@ impl From<ModelError> for Error {
 #[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error {
-        Error::Tungstenite(e)
+        Error::Tungstenite(Box::new(e))
     }
 }
 
@@ -140,13 +116,9 @@ impl From<ReqwestError> for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Decode(msg, _) | Self::Other(msg) => f.write_str(msg),
-            Self::NotInRange(..) => f.write_str("Input is not in the specified range"),
-            Self::Format(inner) => fmt::Display::fmt(&inner, f),
             Self::Io(inner) => fmt::Display::fmt(&inner, f),
             Self::Json(inner) => fmt::Display::fmt(&inner, f),
             Self::Model(inner) => fmt::Display::fmt(&inner, f),
-            Self::Url(msg) => f.write_str(msg),
             #[cfg(feature = "client")]
             Self::Client(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
@@ -163,7 +135,6 @@ impl StdError for Error {
     #[cfg_attr(feature = "tracing_instrument", instrument)]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
-            Self::Format(inner) => Some(inner),
             Self::Io(inner) => Some(inner),
             Self::Json(inner) => Some(inner),
             Self::Model(inner) => Some(inner),

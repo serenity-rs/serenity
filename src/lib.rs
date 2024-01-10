@@ -66,7 +66,6 @@
 #![allow(
     // Allowed to avoid breaking changes.
     clippy::module_name_repetitions,
-    clippy::result_large_err,
     clippy::unused_self,
     // Allowed as they are too pedantic
     clippy::cast_possible_truncation,
