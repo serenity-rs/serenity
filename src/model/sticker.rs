@@ -55,7 +55,6 @@ impl StickerItem {
     ///
     /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does
     /// not exist, or is otherwise unavailable.
-    #[inline]
     pub async fn to_sticker(&self, http: impl AsRef<Http>) -> Result<Sticker> {
         self.id.to_sticker(http).await
     }
@@ -63,7 +62,6 @@ impl StickerItem {
     /// Retrieves the URL to the sticker image.
     ///
     /// **Note**: This will only be `None` if the format_type is unknown.
-    #[inline]
     #[must_use]
     pub fn image_url(&self) -> Option<String> {
         sticker_url(self.id, self.format_type)
@@ -166,7 +164,6 @@ impl Sticker {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
             guild_id.delete_sticker(http, self.id).await
@@ -206,7 +203,6 @@ impl Sticker {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    #[inline]
     pub async fn edit(
         &mut self,
         cache_http: impl CacheHttp,
@@ -223,7 +219,6 @@ impl Sticker {
     /// Retrieves the URL to the sticker image.
     ///
     /// **Note**: This will only be `None` if the format_type is unknown.
-    #[inline]
     #[must_use]
     pub fn image_url(&self) -> Option<String> {
         sticker_url(self.id, self.format_type)

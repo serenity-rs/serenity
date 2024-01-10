@@ -30,7 +30,6 @@ impl<'a> EditInteractionResponse<'a> {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    #[inline]
     pub fn content(self, content: impl Into<Cow<'a, str>>) -> Self {
         Self(self.0.content(content))
     }

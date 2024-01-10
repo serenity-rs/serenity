@@ -30,7 +30,6 @@ impl ShardMessenger {
     /// If you are using the [`Client`], you do not need to do this.
     ///
     /// [`Client`]: crate::Client
-    #[inline]
     #[must_use]
     pub fn new(shard: &ShardRunner) -> Self {
         Self {
@@ -204,7 +203,6 @@ impl ShardMessenger {
     }
 
     /// Sends a message to the shard.
-    #[inline]
     pub fn send_to_shard(&self, msg: ShardRunnerMessage) {
         if let Err(e) = self.tx.unbounded_send(msg) {
             tracing::warn!("failed to send ShardRunnerMessage to shard: {}", e);

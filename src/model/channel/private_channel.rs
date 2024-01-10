@@ -44,7 +44,6 @@ impl PrivateChannel {
     ///
     /// See [ChannelId::broadcast_typing] for more details.
     #[allow(clippy::missing_errors_doc)]
-    #[inline]
     pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
         self.id.broadcast_typing(http).await
     }
@@ -57,7 +56,6 @@ impl PrivateChannel {
     ///
     /// Returns [`Error::Http`] if the reaction cannot be added, or if a message with that Id does
     /// not exist.
-    #[inline]
     pub async fn create_reaction(
         &self,
         http: impl AsRef<Http>,
@@ -70,7 +68,6 @@ impl PrivateChannel {
     /// Deletes the channel. This does not delete the contents of the channel, and is equivalent to
     /// closing a private channel on the client, which can be re-opened.
     #[allow(clippy::missing_errors_doc)]
-    #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
         self.id.delete(http).await?.private().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
@@ -89,7 +86,6 @@ impl PrivateChannel {
     /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_messages(
         &self,
         http: impl AsRef<Http>,
@@ -104,7 +100,6 @@ impl PrivateChannel {
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     #[allow(clippy::missing_errors_doc)]
-    #[inline]
     pub async fn delete_permission(
         &self,
         http: impl AsRef<Http>,
@@ -120,7 +115,6 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the reaction is not from the current user.
-    #[inline]
     pub async fn delete_reaction(
         &self,
         http: impl AsRef<Http>,
@@ -147,7 +141,6 @@ impl PrivateChannel {
     /// reasons.
     ///
     /// [`EditMessage::execute`]: ../../builder/struct.EditMessage.html#method.execute
-    #[inline]
     pub async fn edit_message(
         &self,
         cache_http: impl CacheHttp,
@@ -158,7 +151,6 @@ impl PrivateChannel {
     }
 
     /// Determines if the channel is NSFW.
-    #[inline]
     #[must_use]
     #[allow(clippy::unused_self)]
     #[deprecated = "This always returns false"]
@@ -171,7 +163,6 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if a message with that Id does not exist in this channel.
-    #[inline]
     pub async fn message(
         &self,
         cache_http: impl CacheHttp,
@@ -190,7 +181,6 @@ impl PrivateChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn messages(
         &self,
         cache_http: impl CacheHttp,
@@ -217,7 +207,6 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if a message with the given Id does not exist in the channel.
-    #[inline]
     pub async fn reaction_users(
         &self,
         http: impl AsRef<Http>,
@@ -234,7 +223,6 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
-    #[inline]
     pub async fn pin(
         &self,
         http: impl AsRef<Http>,
@@ -245,7 +233,6 @@ impl PrivateChannel {
 
     /// Retrieves the list of messages that have been pinned in the private channel.
     #[allow(clippy::missing_errors_doc)]
-    #[inline]
     pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
         self.id.pins(http).await
     }
@@ -260,7 +247,6 @@ impl PrivateChannel {
     /// [`CreateMessage::execute`] for more details.
     ///
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
-    #[inline]
     pub async fn say(
         &self,
         cache_http: impl CacheHttp,
@@ -279,7 +265,6 @@ impl PrivateChannel {
     /// reasons.
     ///
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
-    #[inline]
     pub async fn send_files<'a>(
         self,
         cache_http: impl CacheHttp,
@@ -300,7 +285,6 @@ impl PrivateChannel {
     /// reasons.
     ///
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
-    #[inline]
     pub async fn send_message(
         &self,
         cache_http: impl CacheHttp,
@@ -359,7 +343,6 @@ impl PrivateChannel {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
     /// or if the channel already has the limit of 50 pinned messages.
-    #[inline]
     pub async fn unpin(
         &self,
         http: impl AsRef<Http>,
