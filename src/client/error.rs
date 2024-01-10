@@ -12,15 +12,12 @@ use std::fmt;
 pub enum Error {
     /// When a shard has completely failed to reboot after resume and/or reconnect attempts.
     ShardBootFailure,
-    /// When all shards that the client is responsible for have shutdown with an error.
-    Shutdown,
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::ShardBootFailure => f.write_str("Failed to (re-)boot a shard"),
-            Self::Shutdown => f.write_str("The clients shards shutdown"),
         }
     }
 }
