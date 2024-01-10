@@ -377,7 +377,6 @@ impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
-    #[inline]
     #[must_use]
     pub fn avatar_url(&self) -> Option<String> {
         avatar_url(None, self.id, self.avatar.as_ref())
@@ -389,7 +388,6 @@ impl User {
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
     /// [`crate::http::Http::get_user`].
-    #[inline]
     #[must_use]
     pub fn banner_url(&self) -> Option<String> {
         banner_url(self.id, self.banner.as_ref())
@@ -403,7 +401,6 @@ impl User {
     /// # Errors
     ///
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
-    #[inline]
     pub async fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         if self.bot() {
             return Err(Error::Model(ModelError::MessagingBot));
@@ -413,7 +410,6 @@ impl User {
     }
 
     /// Retrieves the time that this user was created at.
-    #[inline]
     #[must_use]
     pub fn created_at(&self) -> Timestamp {
         self.id.created_at()
@@ -422,7 +418,6 @@ impl User {
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
-    #[inline]
     #[must_use]
     pub fn default_avatar_url(&self) -> String {
         default_avatar_url(self)
@@ -474,7 +469,6 @@ impl User {
 
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
-    #[inline]
     pub async fn dm(
         &self,
         cache_http: impl CacheHttp,
@@ -522,7 +516,6 @@ impl User {
     /// exist in the given [`Guild`], or if the given [`User`] is not in that [`Guild`].
     ///
     /// May also return an [`Error::Json`] if there is an error in deserializing the API response.
-    #[inline]
     pub async fn has_role(
         &self,
         cache_http: impl CacheHttp,
@@ -539,7 +532,6 @@ impl User {
     /// # Errors
     ///
     /// See [`UserId::to_user`] for what errors may be returned.
-    #[inline]
     pub async fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
         *self = self.id.to_user(cache_http).await?;
 
@@ -549,7 +541,6 @@ impl User {
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
     /// This will always produce a WEBP image URL.
-    #[inline]
     #[must_use]
     pub fn static_avatar_url(&self) -> Option<String> {
         static_avatar_url(self.id, self.avatar.as_ref())
@@ -579,7 +570,6 @@ impl User {
     ///     }
     /// }
     /// ```
-    #[inline]
     #[must_use]
     pub fn tag(&self) -> String {
         tag(&self.name, self.discriminator)
@@ -588,7 +578,6 @@ impl User {
     /// Returns the user's nickname in the given `guild_id`.
     ///
     /// If none is used, it returns [`None`].
-    #[inline]
     pub async fn nick_in(
         &self,
         cache_http: impl CacheHttp,
@@ -692,7 +681,6 @@ impl UserId {
     /// otherwise cannot be fetched.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserializing the user.
-    #[inline]
     pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "temp_cache")]
         {

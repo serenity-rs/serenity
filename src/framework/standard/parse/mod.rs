@@ -97,7 +97,6 @@ fn permissions_in(
     permissions
 }
 
-#[inline]
 fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
     if config.get_case_insensitive() {
         Cow::Owned(s.to_lowercase())
@@ -358,7 +357,6 @@ fn parse_group<'a>(
     .boxed()
 }
 
-#[inline]
 async fn handle_command<'a>(
     stream: &'a mut Stream<'_>,
     ctx: &'a Context,
@@ -391,7 +389,6 @@ async fn handle_command<'a>(
     }
 }
 
-#[inline]
 async fn handle_group<'a>(
     stream: &mut Stream<'_>,
     ctx: &'a Context,
