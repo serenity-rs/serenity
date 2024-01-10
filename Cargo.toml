@@ -108,7 +108,7 @@ framework = ["client", "model", "utils"]
 # Enables gateway support, which allows bots to listen for Discord events.
 gateway = ["flate2"]
 # Enables HTTP, which enables bots to execute actions on Discord.
-http = ["mime_guess", "percent-encoding"]
+http = ["dashmap", "mime_guess", "percent-encoding"]
 # Enables wrapper methods around HTTP requests on model types.
 # Requires "builder" to configure the requests and "http" to execute them.
 # Note: the model type definitions themselves are always active, regardless of this feature.
