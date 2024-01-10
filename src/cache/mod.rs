@@ -215,7 +215,6 @@ pub struct Cache {
 
 impl Cache {
     /// Creates a new cache.
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -349,7 +348,6 @@ impl Cache {
     }
 
     /// Retrieves a [`GuildChannel`] from the cache based on the given Id.
-    #[inline]
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannelRef<'_>> {
         self._channel(id.into())
@@ -408,7 +406,6 @@ impl Cache {
     ///     println!("Guild name: {}", guild.name);
     /// };
     /// ```
-    #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<GuildRef<'_>> {
         self._guild(id.into())
     }
@@ -465,7 +462,6 @@ impl Cache {
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
-    #[inline]
     #[deprecated = "Use Cache::guild and Guild::members instead"]
     pub fn member(
         &self,
@@ -480,7 +476,6 @@ impl Cache {
         Some(CacheRef::from_mapped_ref(member))
     }
 
-    #[inline]
     #[deprecated = "Use Cache::guild and Guild::roles instead"]
     pub fn guild_roles(&self, guild_id: impl Into<GuildId>) -> Option<GuildRolesRef<'_>> {
         self._guild_roles(guild_id.into())
@@ -492,13 +487,11 @@ impl Cache {
     }
 
     /// This method clones and returns all unavailable guilds.
-    #[inline]
     pub fn unavailable_guilds(&self) -> ReadOnlyMapRef<'_, GuildId, ()> {
         self.unavailable_guilds.as_read_only()
     }
 
     /// This method returns all channels from a guild of with the given `guild_id`.
-    #[inline]
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn guild_channels(&self, guild_id: impl Into<GuildId>) -> Option<GuildChannelsRef<'_>> {
         self._guild_channels(guild_id.into())
@@ -515,7 +508,6 @@ impl Cache {
     }
 
     /// Returns the number of shards.
-    #[inline]
     pub fn shard_count(&self) -> NonZeroU16 {
         self.shard_data.read().total
     }
@@ -543,7 +535,6 @@ impl Cache {
     /// ```
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
-    #[inline]
     pub fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<MessageRef<'_>>
     where
         C: Into<ChannelId>,
@@ -584,7 +575,6 @@ impl Cache {
     ///
     /// [`Guild`]: crate::model::guild::Guild
     /// [`roles`]: crate::model::guild::Guild::roles
-    #[inline]
     #[deprecated = "Use Cache::guild and Guild::roles instead"]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<GuildRoleRef<'_>>
     where
@@ -625,7 +615,6 @@ impl Cache {
     }
 
     /// This method provides a reference to the user used by the bot.
-    #[inline]
     pub fn current_user(&self) -> CurrentUserRef<'_> {
         CacheRef::from_guard(self.user.read())
     }

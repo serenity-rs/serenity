@@ -67,7 +67,6 @@ impl<'a> EditGuild<'a> {
 
     /// Set the "AFK voice channel" that users are to move to if they have been AFK for an amount
     /// of time, configurable by [`Self::afk_timeout`]. Pass [`None`] to unset the current value.
-    #[inline]
     pub fn afk_channel(mut self, channel: Option<ChannelId>) -> Self {
         self.afk_channel_id = Some(channel);
         self
@@ -146,7 +145,6 @@ impl<'a> EditGuild<'a> {
     /// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
-    #[inline]
     pub fn owner(mut self, user_id: impl Into<UserId>) -> Self {
         self.owner_id = Some(user_id.into());
         self
@@ -266,7 +264,6 @@ impl<'a> EditGuild<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    #[inline]
     pub fn verification_level(mut self, verification_level: impl Into<VerificationLevel>) -> Self {
         self.verification_level = Some(verification_level.into());
         self

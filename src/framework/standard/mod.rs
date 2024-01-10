@@ -124,7 +124,6 @@ pub struct StandardFramework {
 }
 
 impl StandardFramework {
-    #[inline]
     #[must_use]
     pub fn new() -> Self {
         StandardFramework::default()
@@ -192,7 +191,6 @@ impl StandardFramework {
     ///     .await;
     /// # }
     /// ```
-    #[inline]
     pub async fn bucket(self, name: impl Into<String>, builder: BucketBuilder) -> Self {
         self.buckets.lock().await.insert(name.into(), builder.construct());
         self
