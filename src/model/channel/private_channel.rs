@@ -224,7 +224,7 @@ impl PrivateChannel {
         message_id: impl Into<MessageId>,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
-        after: impl Into<Option<UserId>>,
+        after: Option<UserId>,
     ) -> Result<Vec<User>> {
         self.id.reaction_users(http, message_id, reaction_type, limit, after).await
     }
