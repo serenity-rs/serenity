@@ -34,7 +34,6 @@ pub enum OnlyIn {
 }
 
 impl OnlyIn {
-    #[inline]
     pub fn from_str(s: &str, span: Span) -> Result<Self> {
         match s {
             "guilds" | "guild" => Ok(OnlyIn::Guild),
@@ -461,7 +460,6 @@ pub struct Options {
 }
 
 impl Options {
-    #[inline]
     pub fn new() -> Self {
         Self {
             help_available: true,
@@ -635,7 +633,6 @@ pub struct GroupOptions {
 }
 
 impl GroupOptions {
-    #[inline]
     pub fn new() -> Self {
         Self {
             help_available: true,
