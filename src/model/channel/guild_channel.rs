@@ -216,7 +216,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user does not have the required permissions.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    #[inline]
     pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
         self.id.broadcast_typing(http).await
     }
@@ -240,7 +239,6 @@ impl GuildChannel {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    #[inline]
     #[cfg(feature = "utils")]
     pub async fn create_invite(
         &self,
@@ -330,7 +328,6 @@ impl GuildChannel {
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
-    #[inline]
     pub async fn create_permission(
         &self,
         http: impl AsRef<Http>,
@@ -377,7 +374,6 @@ impl GuildChannel {
     /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_messages(
         &self,
         http: impl AsRef<Http>,
@@ -395,7 +391,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
-    #[inline]
     pub async fn delete_permission(
         &self,
         http: impl AsRef<Http>,
@@ -413,7 +408,6 @@ impl GuildChannel {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission. [Manage Messages]:
     /// Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_reaction(
         &self,
         http: impl AsRef<Http>,
@@ -435,7 +429,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_reactions(
         &self,
         http: impl AsRef<Http>,
@@ -498,7 +491,6 @@ impl GuildChannel {
     ///
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    #[inline]
     pub async fn edit_message(
         &self,
         cache_http: impl CacheHttp,
@@ -633,7 +625,6 @@ impl GuildChannel {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn follow(
         &self,
         http: impl AsRef<Http>,
@@ -644,7 +635,6 @@ impl GuildChannel {
 
     /// Attempts to find this channel's guild in the Cache.
     #[cfg(feature = "cache")]
-    #[inline]
     pub fn guild<'a>(&self, cache: &'a impl AsRef<Cache>) -> Option<cache::GuildRef<'a>> {
         cache.as_ref().guild(self.guild_id)
     }
@@ -658,7 +648,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    #[inline]
     pub async fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
         self.id.invites(http).await
     }
@@ -667,7 +656,6 @@ impl GuildChannel {
     ///
     /// Only [text channels][`ChannelType::Text`] are taken into consideration as being NSFW.
     /// [voice channels][`ChannelType::Voice`] are never NSFW.
-    #[inline]
     #[must_use]
     pub fn is_nsfw(&self) -> bool {
         self.kind == ChannelType::Text && self.nsfw
@@ -683,7 +671,6 @@ impl GuildChannel {
     /// given Id does not exist in the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn message(
         &self,
         cache_http: impl CacheHttp,
@@ -702,7 +689,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn messages(
         &self,
         cache_http: impl CacheHttp,
@@ -753,7 +739,6 @@ impl GuildChannel {
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "cache")]
-    #[inline]
     pub fn permissions_for_user(
         &self,
         cache: impl AsRef<Cache>,
@@ -775,7 +760,6 @@ impl GuildChannel {
     /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn pin(
         &self,
         http: impl AsRef<Http>,
@@ -794,7 +778,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
         self.id.pins(http).await
     }
@@ -838,7 +821,6 @@ impl GuildChannel {
     ///
     /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
-    #[inline]
     pub async fn say(
         &self,
         cache_http: impl CacheHttp,
@@ -855,7 +837,6 @@ impl GuildChannel {
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    #[inline]
     pub async fn send_files<'a>(
         self,
         cache_http: impl CacheHttp,
@@ -936,7 +917,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn unpin(
         &self,
         http: impl AsRef<Http>,
@@ -954,7 +934,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    #[inline]
     pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         self.id.webhooks(http).await
     }
@@ -971,7 +950,6 @@ impl GuildChannel {
     /// Other [`ChannelType`]s lack the concept of [`Member`]s and will return:
     /// [`ModelError::InvalidChannelType`].
     #[cfg(feature = "cache")]
-    #[inline]
     pub fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
         let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;

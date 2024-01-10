@@ -51,22 +51,18 @@ impl CommandMap {
 impl ParseMap for CommandMap {
     type Storage = (&'static Command, Arc<CommandMap>);
 
-    #[inline]
     fn min_length(&self) -> usize {
         self.min_length
     }
 
-    #[inline]
     fn max_length(&self) -> usize {
         self.max_length
     }
 
-    #[inline]
     fn get(&self, name: &str) -> Option<Self::Storage> {
         self.cmds.get(name).cloned()
     }
 
-    #[inline]
     fn is_empty(&self) -> bool {
         self.cmds.is_empty()
     }
@@ -106,22 +102,18 @@ impl GroupMap {
 impl ParseMap for GroupMap {
     type Storage = (&'static CommandGroup, Arc<GroupMap>, Arc<CommandMap>);
 
-    #[inline]
     fn min_length(&self) -> usize {
         self.min_length
     }
 
-    #[inline]
     fn max_length(&self) -> usize {
         self.max_length
     }
 
-    #[inline]
     fn get(&self, name: &str) -> Option<Self::Storage> {
         self.groups.get(&name).cloned()
     }
 
-    #[inline]
     fn is_empty(&self) -> bool {
         self.groups.is_empty()
     }
