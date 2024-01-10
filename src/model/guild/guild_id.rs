@@ -1141,9 +1141,9 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         limit: Option<u64>,
-        after: impl Into<Option<UserId>>,
+        after: Option<UserId>,
     ) -> Result<Vec<Member>> {
-        http.as_ref().get_guild_members(self, limit, after.into().map(UserId::get)).await
+        http.as_ref().get_guild_members(self, limit, after.map(UserId::get)).await
     }
 
     /// Streams over all the members in a guild.
