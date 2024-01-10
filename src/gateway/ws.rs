@@ -62,7 +62,7 @@ struct PresenceUpdateMessage<'a> {
     afk: bool,
     status: &'a str,
     since: SystemTime,
-    activities: &'a [&'a ActivityData],
+    activities: &'a [ActivityData],
 }
 
 #[derive(Serialize)]
@@ -231,8 +231,8 @@ impl WsClient {
         intents: GatewayIntents,
         presence: &PresenceData,
     ) -> Result<()> {
-        let activities: Vec<_> = presence.activity.iter().collect();
         let now = SystemTime::now();
+        let activities = presence.activity.as_ref().map(std::slice::from_ref).unwrap_or_default();
 
         debug!("[{:?}] Identifying", shard);
 
@@ -253,7 +253,7 @@ impl WsClient {
                     afk: false,
                     since: now,
                     status: presence.status.name(),
-                    activities: &activities,
+                    activities,
                 },
             },
         };
@@ -267,18 +267,18 @@ impl WsClient {
         shard_info: &ShardInfo,
         presence: &PresenceData,
     ) -> Result<()> {
-        let activities: Vec<_> = presence.activity.iter().collect();
         let now = SystemTime::now();
+        let activities = presence.activity.as_ref().map(std::slice::from_ref).unwrap_or_default();
 
-        debug!("[{:?}] Sending presence update", shard_info);
+        debug!("[{shard_info:?}] Sending presence update");
 
         self.send_json(&WebSocketMessage {
             op: Opcode::PresenceUpdate,
             d: WebSocketMessageData::PresenceUpdate(PresenceUpdateMessage {
                 afk: false,
                 since: now,
+                activities,
                 status: presence.status.name(),
-                activities: &activities,
             }),
         })
         .await
