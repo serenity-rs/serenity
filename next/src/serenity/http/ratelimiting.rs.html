@@ -498,6 +498,17 @@
 <a href="#496" id="496">496</a>
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
 //! routes - such as getting the current user's channels - for the most part, with the exception
 //! being major parameters.
@@ -535,16 +546,16 @@
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
-</span><span class="kw">use </span>std::collections::HashMap;
+</span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::str::{<span class="self">self</span>, FromStr};
-<span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::SystemTime;
 
+<span class="kw">use </span>dashmap::DashMap;
 <span class="kw">use </span>reqwest::header::HeaderMap;
 <span class="kw">use </span>reqwest::{Client, Response, StatusCode};
 <span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
-<span class="kw">use </span>tokio::sync::{Mutex, RwLock};
+<span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tokio::time::{sleep, Duration};
 <span class="kw">use </span>tracing::debug;
 
@@ -560,7 +571,7 @@
     <span class="kw">pub </span>timeout: std::time::Duration,
     <span class="kw">pub </span>limit: i64,
     <span class="kw">pub </span>method: LightMethod,
-    <span class="kw">pub </span>path: String,
+    <span class="kw">pub </span>path: Cow&lt;<span class="lifetime">'static</span>, str&gt;,
     <span class="kw">pub </span>global: bool,
 }
 
@@ -583,10 +594,8 @@
 /// [`reset`]: Ratelimit::reset
 </span><span class="kw">pub struct </span>Ratelimiter {
     client: Client,
-    global: Arc&lt;Mutex&lt;()&gt;&gt;,
-    <span class="comment">// When futures is implemented, make tasks clear out their respective entry when the 'reset'
-    // passes.
-    </span>routes: Arc&lt;RwLock&lt;HashMap&lt;RatelimitingBucket, Arc&lt;Mutex&lt;Ratelimit&gt;&gt;&gt;&gt;&gt;,
+    global: Mutex&lt;()&gt;,
+    routes: DashMap&lt;RatelimitingBucket, Ratelimit&gt;,
     token: SecretString,
     absolute_ratelimits: bool,
     ratelimit_callback: Box&lt;<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync&gt;,
@@ -617,8 +626,8 @@
     <span class="kw">fn </span>_new(client: Client, token: String) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             client,
-            global: Arc::default(),
-            routes: Arc::default(),
+            global: Mutex::default(),
+            routes: DashMap::new(),
             token: SecretString::new(token),
             ratelimit_callback: Box::new(|<span class="kw">_</span>| {}),
             absolute_ratelimits: <span class="bool-val">false</span>,
@@ -656,14 +665,13 @@
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
     /// let routes = http.ratelimiter.unwrap().routes();
-    /// let reader = routes.read().await;
     ///
     /// let channel_id = ChannelId::new(7);
     /// let route = Route::Channel {
     ///     channel_id,
     /// };
-    /// if let Some(route) = reader.get(&amp;route.ratelimiting_bucket()) {
-    ///     if let Some(reset) = route.lock().await.reset() {
+    /// if let Some(route) = routes.get(&amp;route.ratelimiting_bucket()) {
+    ///     if let Some(reset) = route.reset() {
     ///         println!("Reset time at: {:?}", reset);
     ///     }
     /// }
@@ -671,8 +679,8 @@
     /// # }
     /// ```
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>routes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Arc&lt;RwLock&lt;HashMap&lt;RatelimitingBucket, Arc&lt;Mutex&lt;Ratelimit&gt;&gt;&gt;&gt;&gt; {
-        Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.routes)
+    </span><span class="kw">pub fn </span>routes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DashMap&lt;RatelimitingBucket, Ratelimit&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.routes
     }
 
     <span class="doccomment">/// # Errors
@@ -691,10 +699,14 @@
             // - sleep if there is 0 remaining
             // - then, perform the request
             </span><span class="kw">let </span>ratelimiting_bucket = req.route.ratelimiting_bucket();
-            <span class="kw">let </span>bucket =
-                Arc::clone(<span class="self">self</span>.routes.write().<span class="kw">await</span>.entry(ratelimiting_bucket).or_default());
+            <span class="kw">let </span>delay_time = {
+                <span class="kw">let </span><span class="kw-2">mut </span>bucket = <span class="self">self</span>.routes.entry(ratelimiting_bucket).or_default();
+                bucket.pre_hook(<span class="kw-2">&amp;</span>req, <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimit_callback)
+            };
 
-            bucket.lock().<span class="kw">await</span>.pre_hook(<span class="kw-2">&amp;</span>req, <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimit_callback).<span class="kw">await</span>;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(delay_time) = delay_time {
+                sleep(delay_time).<span class="kw">await</span>;
+            }
 
             <span class="kw">let </span>request = req.clone().build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="self">self</span>.token.expose_secret(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
             <span class="kw">let </span>response = <span class="self">self</span>.client.execute(request.build()<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -730,7 +742,7 @@
                             timeout: Duration::from_secs_f64(retry_after),
                             limit: <span class="number">50</span>,
                             method: req.method,
-                            path: req.route.path().to_string(),
+                            path: req.route.path(),
                             global: <span class="bool-val">true</span>,
                         });
                         sleep(Duration::from_secs_f64(retry_after)).<span class="kw">await</span>;
@@ -741,12 +753,24 @@
                     </span>},
                 )
             } <span class="kw">else </span>{
-                bucket
-                    .lock()
-                    .<span class="kw">await
-                    </span>.post_hook(<span class="kw-2">&amp;</span>response, <span class="kw-2">&amp;</span>req, <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimit_callback, <span class="self">self</span>.absolute_ratelimits)
-                    .<span class="kw">await
-            </span>};
+                <span class="kw">let </span>delay_time = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>bucket) = <span class="self">self</span>.routes.get_mut(<span class="kw-2">&amp;</span>ratelimiting_bucket)
+                {
+                    bucket.post_hook(
+                        <span class="kw-2">&amp;</span>response,
+                        <span class="kw-2">&amp;</span>req,
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimit_callback,
+                        <span class="self">self</span>.absolute_ratelimits,
+                    )
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+                };
+
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(delay_time)) = delay_time {
+                    sleep(delay_time).<span class="kw">await</span>;
+                };
+
+                delay_time.map(|d| d.is_some())
+            };
 
             <span class="kw">if </span>!redo.unwrap_or(<span class="bool-val">true</span>) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(response);
@@ -777,20 +801,21 @@
 }
 
 <span class="kw">impl </span>Ratelimit {
-    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(ratelimit_callback)))]
-    </span><span class="kw">pub async fn </span>pre_hook(
+    <span class="attr">#[must_use]
+    #[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(ratelimit_callback)))]
+    </span><span class="kw">pub fn </span>pre_hook(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         req: <span class="kw-2">&amp;</span>Request&lt;<span class="lifetime">'_</span>&gt;,
         ratelimit_callback: <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync),
-    ) {
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt; {
         <span class="kw">if </span><span class="self">self</span>.limit() == <span class="number">0 </span>{
-            <span class="kw">return</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
         <span class="kw">let </span><span class="prelude-val">Some</span>(reset) = <span class="self">self</span>.reset <span class="kw">else </span>{
             <span class="comment">// We're probably in the past.
             </span><span class="self">self</span>.remaining = <span class="self">self</span>.limit;
-            <span class="kw">return</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         };
 
         <span class="kw">let </span><span class="prelude-val">Ok</span>(delay) = reset.duration_since(SystemTime::now()) <span class="kw">else </span>{
@@ -798,7 +823,7 @@
             </span><span class="kw">if </span><span class="self">self</span>.remaining() != <span class="number">0 </span>{
                 <span class="self">self</span>.remaining -= <span class="number">1</span>;
             }
-            <span class="kw">return</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         };
 
         <span class="kw">if </span><span class="self">self</span>.remaining() == <span class="number">0 </span>{
@@ -811,29 +836,28 @@
                 timeout: delay,
                 limit: <span class="self">self</span>.limit,
                 method: req.method,
-                path: req.route.path().to_string(),
+                path: req.route.path(),
                 global: <span class="bool-val">false</span>,
             });
 
-            sleep(delay).<span class="kw">await</span>;
-
-            <span class="kw">return</span>;
-        }
-
-        <span class="self">self</span>.remaining -= <span class="number">1</span>;
+            <span class="prelude-val">Some</span>(delay)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.remaining -= <span class="number">1</span>;
+            <span class="prelude-val">None
+        </span>}
     }
 
     <span class="doccomment">/// # Errors
     ///
     /// Errors if unable to parse response headers.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(ratelimit_callback)))]
-    </span><span class="kw">pub async fn </span>post_hook(
+    </span><span class="kw">pub fn </span>post_hook(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         response: <span class="kw-2">&amp;</span>Response,
         req: <span class="kw-2">&amp;</span>Request&lt;<span class="lifetime">'_</span>&gt;,
         ratelimit_callback: <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync),
         absolute_ratelimits: bool,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Duration&gt;&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = parse_header(response.headers(), <span class="string">"x-ratelimit-limit"</span>)<span class="question-mark">? </span>{
             <span class="self">self</span>.limit = limit;
         }
@@ -859,7 +883,7 @@
         }
 
         <span class="prelude-val">Ok</span>(<span class="kw">if </span>response.status() != StatusCode::TOO_MANY_REQUESTS {
-            <span class="bool-val">false
+            <span class="prelude-val">None
         </span>} <span class="kw">else if let </span><span class="prelude-val">Some</span>(retry_after) = parse_header::&lt;f64&gt;(response.headers(), <span class="string">"retry-after"</span>)<span class="question-mark">? </span>{
             <span class="macro">debug!</span>(
                 <span class="string">"Ratelimited on route {:?} for {:?}s"</span>,
@@ -870,15 +894,13 @@
                 timeout: Duration::from_secs_f64(retry_after),
                 limit: <span class="self">self</span>.limit,
                 method: req.method,
-                path: req.route.path().to_string(),
+                path: req.route.path(),
                 global: <span class="bool-val">false</span>,
             });
 
-            sleep(Duration::from_secs_f64(retry_after)).<span class="kw">await</span>;
-
-            <span class="bool-val">true
-        </span>} <span class="kw">else </span>{
-            <span class="bool-val">false
+            <span class="prelude-val">Some</span>(Duration::from_secs_f64(retry_after))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
         </span>})
     }
 
