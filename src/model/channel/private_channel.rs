@@ -85,8 +85,8 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
-    /// than 100 messages.
+    /// Returns [`ModelError::TooSmall`] or [`ModelError::TooLarge`] if an attempt was made to
+    /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -256,7 +256,7 @@ impl PrivateChannel {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+    /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
     ///
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute

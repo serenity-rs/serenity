@@ -208,13 +208,13 @@ impl<'a> CreateEmbed<'a> {
     }
 
     #[cfg(feature = "http")]
-    pub(super) fn check_length(&self) -> Result<()> {
+    pub(super) fn get_length(&self) -> usize {
         let mut length = 0;
-        if let Some(ref author) = self.author {
+        if let Some(author) = &self.author {
             length += author.name.chars().count();
         }
 
-        if let Some(ref description) = self.description {
+        if let Some(description) = &self.description {
             length += description.chars().count();
         }
 
@@ -223,16 +223,15 @@ impl<'a> CreateEmbed<'a> {
             length += field.value.chars().count();
         }
 
-        if let Some(ref footer) = self.footer {
+        if let Some(footer) = &self.footer {
             length += footer.text.chars().count();
         }
 
-        if let Some(ref title) = self.title {
+        if let Some(title) = &self.title {
             length += title.chars().count();
         }
 
-        super::check_overflow(length, crate::constants::EMBED_MAX_LENGTH)
-            .map_err(|overflow| Error::Model(ModelError::EmbedTooLarge(overflow)))
+        length
     }
 }
 
