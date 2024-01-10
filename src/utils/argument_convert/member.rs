@@ -63,8 +63,9 @@ impl ArgumentConvert for Member {
         // Following code is inspired by discord.py's MemberConvert::query_member_named
 
         // If string is a username+discriminator
+        let limit = nonmax::NonMaxU16::new(100);
         if let Some((name, discrim)) = crate::utils::parse_user_tag(s) {
-            if let Ok(member_results) = guild_id.search_members(ctx.http(), name, Some(100)).await {
+            if let Ok(member_results) = guild_id.search_members(ctx.http(), name, limit).await {
                 if let Some(member) = member_results.into_iter().find(|m| {
                     m.user.name.eq_ignore_ascii_case(name) && m.user.discriminator == discrim
                 }) {
@@ -74,7 +75,7 @@ impl ArgumentConvert for Member {
         }
 
         // If string is username or nickname
-        if let Ok(member_results) = guild_id.search_members(ctx.http(), s, Some(100)).await {
+        if let Ok(member_results) = guild_id.search_members(ctx.http(), s, limit).await {
             if let Some(member) = member_results.into_iter().find(|m| {
                 m.user.name.eq_ignore_ascii_case(s)
                     || m.nick.as_ref().is_some_and(|nick| nick.eq_ignore_ascii_case(s))

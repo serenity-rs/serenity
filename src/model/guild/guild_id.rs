@@ -2,6 +2,7 @@ use std::fmt;
 
 #[cfg(feature = "model")]
 use futures::stream::Stream;
+use nonmax::NonMaxU16;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -200,7 +201,7 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of days' worth of messages
+    /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
     /// to delete is over the maximum.
     ///
     /// Also can return [`Error::Http`] if the current user lacks permission.
@@ -217,7 +218,7 @@ impl GuildId {
     /// # Errors
     ///
     /// In addition to the reasons [`Self::ban`] may return an error, may also return
-    /// [`Error::ExceededLimit`] if `reason` is too long.
+    /// [`ModelError::TooLarge`] if `reason` is too long.
     #[inline]
     pub async fn ban_with_reason(
         self,
@@ -236,14 +237,11 @@ impl GuildId {
         dmd: u8,
         reason: Option<&str>,
     ) -> Result<()> {
-        if dmd > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
-        }
+        use crate::model::error::Maximum;
 
+        Maximum::DeleteMessageDays.check_overflow(dmd.into())?;
         if let Some(reason) = reason {
-            if reason.chars().count() > 512 {
-                return Err(Error::ExceededLimit(reason.to_string(), 512));
-            }
+            Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
 
         http.as_ref().ban_user(self, user, dmd, reason).await
@@ -1140,10 +1138,10 @@ impl GuildId {
     pub async fn members(
         self,
         http: impl AsRef<Http>,
-        limit: Option<u64>,
+        limit: Option<NonMaxU16>,
         after: Option<UserId>,
     ) -> Result<Vec<Member>> {
-        http.as_ref().get_guild_members(self, limit, after.map(UserId::get)).await
+        http.as_ref().get_guild_members(self, limit, after).await
     }
 
     /// Streams over all the members in a guild.
@@ -1284,7 +1282,7 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         query: &str,
-        limit: Option<u64>,
+        limit: Option<NonMaxU16>,
     ) -> Result<Vec<Member>> {
         http.as_ref().search_guild_members(self, query, limit).await
     }
@@ -1795,13 +1793,13 @@ impl<H: AsRef<Http>> MembersIter<H> {
     /// not return duplicate items.  If there are no more members to be fetched, then this marks
     /// `self.after` as None, indicating that no more calls ought to be made.
     async fn refresh(&mut self) -> Result<()> {
-        // Number of profiles to fetch
-        let grab_size: u64 = 1000;
+        let grab_size = crate::constants::MEMBER_FETCH_LIMIT;
 
+        // Number of profiles to fetch
         self.buffer = self.guild_id.members(&self.http, Some(grab_size), self.after).await?;
 
         // Get the last member.  If shorter than 1000, there are no more results anyway
-        self.after = self.buffer.get(grab_size as usize - 1).map(|member| member.user.id);
+        self.after = self.buffer.get(grab_size.get() as usize - 1).map(|member| member.user.id);
 
         // Reverse to optimize pop()
         self.buffer.reverse();
