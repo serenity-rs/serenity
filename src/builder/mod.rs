@@ -11,6 +11,8 @@
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
+#[cfg(feature = "http")]
+use crate::model::ModelError;
 
 /// Common trait for all HTTP request builders in this module.
 #[cfg(feature = "http")]
@@ -28,12 +30,26 @@ pub trait Builder {
 }
 
 #[cfg(feature = "http")]
-pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
-    if len > max {
-        Err(len - max)
-    } else {
-        Ok(())
+pub(crate) fn check_lengths(
+    content: Option<&str>,
+    embeds: Option<&[CreateEmbed<'_>]>,
+    stickers: usize,
+) -> StdResult<(), ModelError> {
+    use crate::model::error::Maximum;
+
+    if let Some(content) = content {
+        Maximum::MessageLength.check_overflow(content.chars().count())?;
     }
+
+    if let Some(embeds) = embeds {
+        Maximum::EmbedCount.check_overflow(embeds.len())?;
+
+        for embed in embeds {
+            Maximum::EmbedLength.check_overflow(embed.get_length())?;
+        }
+    }
+
+    Maximum::StickerCount.check_overflow(stickers)
 }
 
 mod add_member;
