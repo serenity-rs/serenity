@@ -209,7 +209,6 @@ impl Message {
     /// # Errors
     ///
     /// Can return an error if the HTTP request fails.
-    #[inline]
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
         self.channel_id.to_channel(cache_http).await
     }
@@ -281,7 +280,6 @@ impl Message {
     /// permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    #[inline]
     pub async fn delete_reaction(
         &self,
         http: impl AsRef<Http>,
@@ -442,7 +440,6 @@ impl Message {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    #[inline]
     pub async fn reaction_users(
         &self,
         http: impl AsRef<Http>,
@@ -469,7 +466,6 @@ impl Message {
     /// **Only use this for messages from the gateway (event handler)!** Not for returned Message
     /// objects from HTTP requests, like [`ChannelId::send_message`], because [`Self::guild_id`] is
     /// never set for those, which this method relies on.
-    #[inline]
     #[must_use]
     #[deprecated = "Check if guild_id is None if the message is received from the gateway."]
     pub fn is_private(&self) -> bool {
@@ -543,7 +539,6 @@ impl Message {
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     /// [permissions]: crate::model::permissions
-    #[inline]
     pub async fn react(
         &self,
         cache_http: impl CacheHttp,
@@ -564,7 +559,6 @@ impl Message {
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
     /// [permissions]: crate::model::permissions
-    #[inline]
     pub async fn super_react(
         &self,
         cache_http: impl CacheHttp,
@@ -647,7 +641,6 @@ impl Message {
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    #[inline]
     pub async fn reply(
         &self,
         cache_http: impl CacheHttp,
@@ -671,7 +664,6 @@ impl Message {
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    #[inline]
     pub async fn reply_ping(
         &self,
         cache_http: impl CacheHttp,
@@ -698,7 +690,6 @@ impl Message {
     /// limit, containing the number of unicode code points over the limit.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    #[inline]
     pub async fn reply_mention(
         &self,
         cache_http: impl CacheHttp,
@@ -742,14 +733,12 @@ impl Message {
     }
 
     /// Checks whether the message mentions passed [`UserId`].
-    #[inline]
     pub fn mentions_user_id(&self, id: impl Into<UserId>) -> bool {
         let id = id.into();
         self.mentions.iter().any(|mentioned_user| mentioned_user.id == id)
     }
 
     /// Checks whether the message mentions passed [`User`].
-    #[inline]
     #[must_use]
     pub fn mentions_user(&self, user: &User) -> bool {
         self.mentions_user_id(user.id)
@@ -812,14 +801,12 @@ impl Message {
     /// Tries to return author's nickname in the current channel's guild.
     ///
     /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
-    #[inline]
     pub async fn author_nick(&self, cache_http: impl CacheHttp) -> Option<String> {
         self.author.nick_in(cache_http, self.guild_id?).await
     }
 
     /// Returns a link referencing this message. When clicked, users will jump to the message. The
     /// link will be valid for messages in either private channels or guilds.
-    #[inline]
     #[must_use]
     pub fn link(&self) -> String {
         self.id.link(self.channel_id, self.guild_id)
@@ -828,7 +815,6 @@ impl Message {
     /// Same as [`Self::link`] but tries to find the [`GuildId`] if Discord does not provide it.
     ///
     /// [`guild_id`]: Self::guild_id
-    #[inline]
     #[allow(deprecated)]
     #[deprecated = "Use Self::link if Message was recieved via an event, otherwise use MessageId::link to provide the guild_id yourself."]
     pub async fn link_ensured(&self, cache_http: impl CacheHttp) -> String {
