@@ -6,7 +6,6 @@ use std::io::Error as IoError;
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
 #[cfg(feature = "gateway")]
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
-use tracing::instrument;
 
 #[cfg(feature = "client")]
 use crate::client::ClientError;
@@ -171,7 +170,7 @@ impl fmt::Display for Error {
 }
 
 impl StdError for Error {
-    #[instrument]
+    #[cfg_attr(feature = "tracing_instrument", instrument)]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Self::Format(inner) => Some(inner),
