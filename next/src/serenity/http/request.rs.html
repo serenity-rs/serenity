@@ -144,6 +144,8 @@
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::Write;
 
 <span class="kw">use </span>reqwest::header::{
@@ -155,7 +157,6 @@
     USER_AGENT,
 };
 <span class="kw">use </span>reqwest::{Client, RequestBuilder <span class="kw">as </span>ReqwestRequestBuilder, Url};
-<span class="kw">use </span>tracing::instrument;
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::Multipart;
 <span class="kw">use </span><span class="kw">super</span>::routing::Route;
@@ -210,7 +211,10 @@
         <span class="self">self
     </span>}
 
-    <span class="attr">#[instrument(skip(token))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if the given proxy URL is invalid, or the token cannot be parsed into a HTTP header.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(token)))]
     </span><span class="kw">pub fn </span>build(
         <span class="self">self</span>,
         client: <span class="kw-2">&amp;</span>Client,

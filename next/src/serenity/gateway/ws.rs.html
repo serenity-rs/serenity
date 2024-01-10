@@ -307,6 +307,18 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env::consts;
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span>std::io::Read;
@@ -329,7 +341,7 @@
 <span class="kw">use </span>tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span>tracing::warn;
-<span class="kw">use </span>tracing::{debug, instrument, trace};
+<span class="kw">use </span>tracing::{debug, trace};
 <span class="kw">use </span>url::Url;
 
 <span class="kw">use super</span>::{ActivityData, ChunkGuildFilter, PresenceData};
@@ -521,7 +533,10 @@
         .<span class="kw">await
     </span>}
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>send_heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_info: <span class="kw-2">&amp;</span>ShardInfo, seq: <span class="prelude-ty">Option</span>&lt;u64&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">trace!</span>(<span class="string">"[{:?}] Sending heartbeat d: {:?}"</span>, shard_info, seq);
 
@@ -532,7 +547,10 @@
         .<span class="kw">await
     </span>}
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>, token))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>, token)))]
     </span><span class="kw">pub async fn </span>send_identify(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         shard: <span class="kw-2">&amp;</span>ShardInfo,
@@ -570,7 +588,10 @@
         <span class="self">self</span>.send_json(<span class="kw-2">&amp;</span>msg).<span class="kw">await
     </span>}
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>send_presence_update(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         shard_info: <span class="kw-2">&amp;</span>ShardInfo,
@@ -593,7 +614,10 @@
         .<span class="kw">await
     </span>}
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>, token))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>, token)))]
     </span><span class="kw">pub async fn </span>send_resume(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         shard_info: <span class="kw-2">&amp;</span>ShardInfo,

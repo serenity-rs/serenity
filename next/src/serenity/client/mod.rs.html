@@ -856,10 +856,6 @@
 <a href="#854" id="854">854</a>
 <a href="#855" id="855">855</a>
 <a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -894,7 +890,7 @@
 <span class="kw">use </span>futures::future::BoxFuture;
 <span class="kw">use </span>futures::StreamExt <span class="kw">as _</span>;
 <span class="kw">use </span>tokio::sync::RwLock;
-<span class="kw">use </span>tracing::{debug, error, info, instrument};
+<span class="kw">use </span>tracing::debug;
 <span class="kw">use </span>typemap_rev::{TypeMap, TypeMapKey};
 
 <span class="kw">pub use </span><span class="self">self</span>::context::Context;
@@ -1166,7 +1162,7 @@
 
     <span class="kw">type </span>IntoFuture = BoxFuture&lt;<span class="lifetime">'static</span>, <span class="prelude-ty">Result</span>&lt;Client&gt;&gt;;
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">fn </span>into_future(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoFuture {
         <span class="kw">let </span>data = Arc::new(RwLock::new(<span class="self">self</span>.data));
         <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
@@ -1493,8 +1489,12 @@
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    ///
     /// [gateway docs]: crate::gateway#sharding
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.start_connection(<span class="number">0</span>, <span class="number">0</span>, NonZeroU16::MIN).<span class="kw">await
     </span>}
@@ -1535,7 +1535,7 @@
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>start_autosharded(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>(end, total) = {
             <span class="kw">let </span>res = <span class="self">self</span>.http.get_bot_gateway().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1599,7 +1599,7 @@
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [gateway docs]: crate::gateway#sharding
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>start_shard(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard: u16, shards: u16) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.start_connection(shard, shard, check_shard_total(shards)).<span class="kw">await
     </span>}
@@ -1640,7 +1640,7 @@
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>start_shards(<span class="kw-2">&amp;mut </span><span class="self">self</span>, total_shards: u16) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.start_connection(<span class="number">0</span>, total_shards - <span class="number">1</span>, check_shard_total(total_shards)).<span class="kw">await
     </span>}
@@ -1681,12 +1681,12 @@
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
     ///
     /// [Gateway docs]: crate::gateway#sharding
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>start_shard_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;u16&gt;, total_shards: u16) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.start_connection(range.start, range.end, check_shard_total(total_shards)).<span class="kw">await
     </span>}
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">async fn </span>start_connection(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         start_shard: u16,
@@ -1704,15 +1704,7 @@
 
         <span class="macro">debug!</span>(<span class="string">"Initializing shard info: {} - {}/{}"</span>, start_shard, init, total_shards);
 
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard_manager.initialize(start_shard, init, total_shards) {
-            <span class="macro">error!</span>(<span class="string">"Failed to boot a shard: {:?}"</span>, why);
-            <span class="macro">info!</span>(<span class="string">"Shutting down all shards"</span>);
-
-            <span class="self">self</span>.shard_manager.shutdown_all().<span class="kw">await</span>;
-
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Client(ClientError::ShardBootFailure));
-        }
-
+        <span class="self">self</span>.shard_manager.initialize(start_shard, init, total_shards);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)) = <span class="self">self</span>.shard_manager_return_value.next().<span class="kw">await </span>{
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Gateway(err));
         }

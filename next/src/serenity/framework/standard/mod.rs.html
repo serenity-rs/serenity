@@ -878,7 +878,6 @@
 <a href="#876" id="876">876</a>
 <a href="#877" id="877">877</a>
 <a href="#878" id="878">878</a>
-<a href="#879" id="879">879</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>help_commands;
 <span class="kw">pub mod </span>macros {
     <span class="kw">pub use </span>command_attr::{check, command, group, help, hook};
@@ -903,7 +902,6 @@
 <span class="kw">pub use </span>structures::<span class="kw-2">*</span>;
 <span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tokio::time::sleep;
-<span class="kw">use </span>tracing::instrument;
 <span class="kw">use </span>uwl::Stream;
 
 <span class="kw">use </span><span class="self">self</span>::buckets::{RateLimitInfo, RevertBucket};
@@ -1483,7 +1481,7 @@
 
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Framework <span class="kw">for </span>StandardFramework {
-    <span class="attr">#[instrument(skip(<span class="self">self</span>, event))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>, event)))]
     </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>ctx: Context, event: FullEvent) {
         <span class="kw">let </span>FullEvent::Message {
             new_message: msg,

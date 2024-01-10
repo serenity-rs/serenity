@@ -364,6 +364,7 @@
 <a href="#362" id="362">362</a>
 <a href="#363" id="363">363</a>
 <a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -407,7 +408,8 @@
     </span><span class="kw">pub </span>cache: Arc&lt;Cache&gt;,
 }
 
-<span class="comment">// Used by the #[instrument] macro on client::dispatch::handle_event
+<span class="comment">// Used by the #[cfg_attr(feature = "tracing_instrument", instrument)] macro on
+// client::dispatch::handle_event
 </span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Context {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         f.debug_struct(<span class="string">"Context"</span>)

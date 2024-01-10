@@ -4706,7 +4706,7 @@
 <span class="kw">use </span>reqwest::{Client, ClientBuilder, Response <span class="kw">as </span>ReqwestResponse, StatusCode};
 <span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
 <span class="kw">use </span>serde::de::DeserializeOwned;
-<span class="kw">use </span>tracing::{debug, instrument, trace};
+<span class="kw">use </span>tracing::{debug, trace};
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::{Multipart, MultipartUpload};
 <span class="kw">use </span><span class="kw">super</span>::ratelimiting::Ratelimiter;
@@ -9326,7 +9326,7 @@
     /// # Ok(())
     /// # }
     /// ```
-    </span><span class="attr">#[instrument]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument)]
     </span><span class="kw">pub async fn </span>request(<span class="kw-2">&amp;</span><span class="self">self</span>, req: Request&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ReqwestResponse&gt; {
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimiter {

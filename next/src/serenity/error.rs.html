@@ -189,7 +189,6 @@
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Error <span class="kw">as </span>FormatError};
 <span class="kw">use </span>std::io::Error <span class="kw">as </span>IoError;
@@ -198,7 +197,6 @@
 </span><span class="kw">use </span>reqwest::{header::InvalidHeaderValue, Error <span class="kw">as </span>ReqwestError};
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
-<span class="kw">use </span>tracing::instrument;
 
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::client::ClientError;
@@ -363,7 +361,7 @@
 }
 
 <span class="kw">impl </span>StdError <span class="kw">for </span>Error {
-    <span class="attr">#[instrument]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument)]
     </span><span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">'static</span>)&gt; {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Format(inner) =&gt; <span class="prelude-val">Some</span>(inner),

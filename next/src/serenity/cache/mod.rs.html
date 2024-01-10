@@ -775,7 +775,6 @@
 <a href="#773" id="773">773</a>
 <a href="#774" id="774">774</a>
 <a href="#775" id="775">775</a>
-<a href="#776" id="776">776</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -814,7 +813,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">use </span>mini_moka::sync::Cache <span class="kw">as </span>MokaCache;
 <span class="kw">use </span>parking_lot::RwLock;
-<span class="kw">use </span>tracing::instrument;
 
 <span class="kw">pub use </span><span class="self">self</span>::cache_update::CacheUpdate;
 <span class="kw">pub use </span><span class="self">self</span>::settings::Settings;
@@ -1012,7 +1010,7 @@
     ///
     /// let cache = Cache::new_with_settings(settings);
     /// ```
-    </span><span class="attr">#[instrument]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument)]
     </span><span class="kw">pub fn </span>new_with_settings(settings: Settings) -&gt; <span class="self">Self </span>{
         <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
         </span><span class="kw">fn </span>temp_cache&lt;K, V&gt;(ttl: Duration) -&gt; MokaCache&lt;K, V, BuildHasher&gt;
@@ -1451,7 +1449,7 @@
     /// Refer to the [`CacheUpdate` examples].
     ///
     /// [`CacheUpdate` examples]: CacheUpdate#examples
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>, e))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>, e)))]
     </span><span class="kw">pub fn </span>update&lt;E: CacheUpdate&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, e: <span class="kw-2">&amp;mut </span>E) -&gt; <span class="prelude-ty">Option</span>&lt;E::Output&gt; {
         e.update(<span class="self">self</span>)
     }

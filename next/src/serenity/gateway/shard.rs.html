@@ -742,12 +742,30 @@
 <a href="#740" id="740">740</a>
 <a href="#741" id="741">741</a>
 <a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
 <span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
-<span class="kw">use </span>tracing::{debug, error, info, instrument, trace, warn};
+<span class="kw">use </span>tracing::{debug, error, info, trace, warn};
 <span class="kw">use </span>url::Url;
 
 <span class="kw">use super</span>::{
@@ -935,7 +953,7 @@
     /// # Errors
     ///
     /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending a heartbeat.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span><span class="self">self</span>.client.send_heartbeat(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="prelude-val">Some</span>(<span class="self">self</span>.seq)).<span class="kw">await </span>{
             <span class="prelude-val">Ok</span>(()) =&gt; {
@@ -983,20 +1001,20 @@
     }
 
     <span class="attr">#[inline]
-    #[instrument(skip(<span class="self">self</span>))]
+    #[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub fn </span>set_activity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;) {
         <span class="self">self</span>.presence.activity = activity;
     }
 
     <span class="attr">#[inline]
-    #[instrument(skip(<span class="self">self</span>))]
+    #[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub fn </span>set_presence(<span class="kw-2">&amp;mut </span><span class="self">self</span>, activity: <span class="prelude-ty">Option</span>&lt;ActivityData&gt;, status: OnlineStatus) {
         <span class="self">self</span>.set_activity(activity);
         <span class="self">self</span>.set_status(status);
     }
 
     <span class="attr">#[inline]
-    #[instrument(skip(<span class="self">self</span>))]
+    #[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub fn </span>set_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>status: OnlineStatus) {
         <span class="kw">if </span>status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
@@ -1018,7 +1036,7 @@
         <span class="self">self</span>.stage
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">fn </span>handle_gateway_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seq: u64, event: <span class="kw-2">&amp;</span>Event) -&gt; <span class="prelude-ty">Option</span>&lt;ShardAction&gt; {
         <span class="kw">if </span>seq &gt; <span class="self">self</span>.seq + <span class="number">1 </span>{
             <span class="macro">warn!</span>(<span class="string">"[{:?}] Sequence off; them: {}, us: {}"</span>, <span class="self">self</span>.shard_info, seq, <span class="self">self</span>.seq);
@@ -1051,7 +1069,7 @@
         <span class="prelude-val">None
     </span>}
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">fn </span>handle_heartbeat_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: u64) -&gt; ShardAction {
         <span class="macro">info!</span>(<span class="string">"[{:?}] Received shard heartbeat"</span>, <span class="self">self</span>.shard_info);
 
@@ -1075,7 +1093,7 @@
         ShardAction::Heartbeat
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">fn </span>handle_gateway_closed(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         data: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CloseFrame&lt;<span class="lifetime">'static</span>&gt;&gt;,
@@ -1180,7 +1198,7 @@
     ///
     /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too many guilds
     /// assigned to it.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub fn </span>handle_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span>&lt;GatewayEvent&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ShardAction&gt;&gt; {
         <span class="kw">match </span>event {
             <span class="prelude-val">Ok</span>(GatewayEvent::Dispatch(seq, event)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.handle_gateway_dispatch(<span class="kw-2">*</span>seq, event)),
@@ -1248,7 +1266,7 @@
     /// `false` is returned under one of the following conditions:
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>do_heartbeat(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span><span class="prelude-val">Some</span>(heartbeat_interval) = <span class="self">self</span>.heartbeat_interval <span class="kw">else </span>{
             <span class="comment">// No Hello received yet
@@ -1285,7 +1303,7 @@
     <span class="doccomment">/// Calculates the heartbeat latency between the shard and the gateway.
     </span><span class="comment">// Shamelessly stolen from brayzure's commit in eris:
     // &lt;https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6&gt;
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub fn </span>latency(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;StdDuration&gt; {
         <span class="kw">if let </span>(<span class="prelude-val">Some</span>(sent), <span class="prelude-val">Some</span>(received)) = (<span class="self">self</span>.last_heartbeat_sent, <span class="self">self</span>.last_heartbeat_ack) {
             <span class="kw">if </span>received &gt; sent {
@@ -1376,10 +1394,13 @@
     /// # }
     /// ```
     ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    ///
     /// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk
     /// [`Guild`]: crate::model::guild::Guild
     /// [`Member`]: crate::model::guild::Member
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>chunk_guild(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         guild_id: GuildId,
@@ -1398,7 +1419,10 @@
     <span class="doccomment">/// Sets the shard as going into identifying stage, which sets:
     /// - the time that the last heartbeat sent as being now
     /// - the `stage` to [`ConnectionStage::Identifying`]
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>identify(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.client
             .send_identify(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="self">self</span>.intents, <span class="kw-2">&amp;</span><span class="self">self</span>.presence)
@@ -1413,7 +1437,10 @@
     <span class="doccomment">/// Initializes a new WebSocket client.
     ///
     /// This will set the stage of the shard before and after instantiation of the client.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    /// # Errors
+    ///
+    /// Errors if unable to establish a websocket connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>initialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;WsClient&gt; {
         <span class="macro">debug!</span>(<span class="string">"[{:?}] Initializing."</span>, <span class="self">self</span>.shard_info);
 
@@ -1432,8 +1459,8 @@
         <span class="prelude-val">Ok</span>(client)
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub async fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
+    </span><span class="kw">pub fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.last_heartbeat_sent = <span class="prelude-val">Some</span>(Instant::now());
         <span class="self">self</span>.last_heartbeat_ack = <span class="prelude-val">None</span>;
         <span class="self">self</span>.heartbeat_interval = <span class="prelude-val">None</span>;
@@ -1443,7 +1470,10 @@
         <span class="self">self</span>.seq = <span class="number">0</span>;
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>resume(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">debug!</span>(<span class="string">"[{:?}] Attempting to resume"</span>, <span class="self">self</span>.shard_info);
 
@@ -1458,17 +1488,23 @@
         }
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>reconnect(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">info!</span>(<span class="string">"[{:?}] Attempting to reconnect"</span>, <span class="self">self</span>.shard_info());
 
-        <span class="self">self</span>.reset().<span class="kw">await</span>;
+        <span class="self">self</span>.reset();
         <span class="self">self</span>.client = <span class="self">self</span>.initialize().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="doccomment">/// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>update_presence(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.client.send_presence_update(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="kw-2">&amp;</span><span class="self">self</span>.presence).<span class="kw">await
     </span>}

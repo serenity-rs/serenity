@@ -374,13 +374,6 @@
 <a href="#372" id="372">372</a>
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::sync::Arc;
@@ -392,7 +385,7 @@
 <span class="kw">use </span>futures::{SinkExt, StreamExt};
 <span class="kw">use </span>tokio::sync::{Mutex, RwLock};
 <span class="kw">use </span>tokio::time::timeout;
-<span class="kw">use </span>tracing::{info, instrument, warn};
+<span class="kw">use </span>tracing::{info, warn};
 <span class="kw">use </span>typemap_rev::TypeMap;
 
 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
@@ -553,21 +546,14 @@
     ///
     /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
     /// queued.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">pub fn </span>initialize(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        shard_index: u16,
-        shard_init: u16,
-        shard_total: NonZeroU16,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
+    </span><span class="kw">pub fn </span>initialize(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         <span class="kw">let </span>shard_to = shard_index + shard_init;
 
         <span class="self">self</span>.set_shard_total(shard_total);
         <span class="kw">for </span>shard_id <span class="kw">in </span>shard_index..shard_to {
             <span class="self">self</span>.boot(ShardId(shard_id));
         }
-
-        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Restarts a shard runner.
@@ -590,7 +576,7 @@
     /// ```
     ///
     /// [`ShardRunner`]: super::ShardRunner
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>restart(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId) {
         <span class="macro">info!</span>(<span class="string">"Restarting shard {shard_id}"</span>);
         <span class="self">self</span>.shutdown(shard_id, <span class="number">4000</span>).<span class="kw">await</span>;
@@ -601,7 +587,7 @@
     /// valid [`ShardRunner`].
     ///
     /// [`ShardRunner`]: super::ShardRunner
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>shards_instantiated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ShardId&gt; {
         <span class="self">self</span>.runners.lock().<span class="kw">await</span>.keys().copied().collect()
     }
@@ -614,7 +600,7 @@
     /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
     /// - no longer exists, then the shard runner will not know it should shut down. This _should
     /// never happen_. It may already be stopped.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId, code: u16) {
         <span class="kw">const </span>TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(<span class="number">5</span>);
 
@@ -656,7 +642,7 @@
     ///
     /// If you only need to shutdown a select number of shards, prefer looping over the
     /// [`Self::shutdown`] method.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>shutdown_all(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let </span>keys = {
             <span class="kw">let </span>runners = <span class="self">self</span>.runners.lock().<span class="kw">await</span>;
@@ -688,7 +674,7 @@
         drop(<span class="self">self</span>.shard_queuer.unbounded_send(msg));
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">fn </span>boot(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId) {
         <span class="macro">info!</span>(<span class="string">"Telling shard queuer to start shard {shard_id}"</span>);
 

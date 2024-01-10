@@ -500,6 +500,16 @@
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
 <a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -508,7 +518,7 @@
 <span class="kw">use </span>tokio_tungstenite::tungstenite;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
-<span class="kw">use </span>tracing::{debug, error, info, instrument, trace, warn};
+<span class="kw">use </span>tracing::{debug, error, info, trace, warn};
 <span class="kw">use </span>typemap_rev::TypeMap;
 
 <span class="kw">use </span><span class="kw">super</span>::event::ShardStageUpdateEvent;
@@ -595,14 +605,17 @@
     ///
     /// 6. Go back to 1.
     ///
+    /// # Errors
+    /// Returns errors if the internal WS connection drops in a non-recoverable way.
+    ///
     /// [`ShardManager`]: super::ShardManager
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">info!</span>(<span class="string">"[ShardRunner {:?}] Running"</span>, <span class="self">self</span>.shard.shard_info());
 
         <span class="kw">loop </span>{
             <span class="macro">trace!</span>(<span class="string">"[ShardRunner {:?}] loop iteration started."</span>, <span class="self">self</span>.shard.shard_info());
-            <span class="kw">if </span>!<span class="self">self</span>.recv().<span class="kw">await</span><span class="question-mark">? </span>{
+            <span class="kw">if </span>!<span class="self">self</span>.recv().<span class="kw">await </span>{
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
 
@@ -610,7 +623,8 @@
             </span><span class="kw">if </span>!<span class="self">self</span>.shard.do_heartbeat().<span class="kw">await </span>{
                 <span class="macro">warn!</span>(<span class="string">"[ShardRunner {:?}] Error heartbeating"</span>, <span class="self">self</span>.shard.shard_info(),);
 
-                <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                <span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
 
             <span class="kw">let </span>pre = <span class="self">self</span>.shard.stage();
@@ -635,7 +649,8 @@
 
             <span class="kw">match </span>action {
                 <span class="prelude-val">Some</span>(ShardAction::Reconnect(ReconnectType::Reidentify)) =&gt; {
-                    <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                    <span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 },
                 <span class="prelude-val">Some</span>(other) =&gt; {
                     <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.action(<span class="kw-2">&amp;</span>other).<span class="kw">await </span>{
@@ -646,7 +661,10 @@
                             e
                         );
                         <span class="kw">match </span><span class="self">self</span>.shard.reconnection_type() {
-                            ReconnectType::Reidentify =&gt; <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>,
+                            ReconnectType::Reidentify =&gt; {
+                                <span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+                            },
                             ReconnectType::Resume =&gt; {
                                 <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.shard.resume().<span class="kw">await </span>{
                                     <span class="macro">warn!</span>(
@@ -655,7 +673,8 @@
                                         why
                                     );
 
-                                    <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                                    <span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                                 }
                             },
                         };
@@ -679,7 +698,8 @@
             }
 
             <span class="kw">if </span>!successful &amp;&amp; !<span class="self">self</span>.shard.stage().is_connecting() {
-                <span class="kw">return </span><span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                <span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
             <span class="macro">trace!</span>(<span class="string">"[ShardRunner {:?}] loop iteration reached the end."</span>, <span class="self">self</span>.shard.shard_info());
         }
@@ -698,10 +718,13 @@
     /// # Errors
     ///
     /// Returns
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>, action))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>, action)))]
     </span><span class="kw">async fn </span>action(<span class="kw-2">&amp;mut </span><span class="self">self</span>, action: <span class="kw-2">&amp;</span>ShardAction) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span><span class="kw-2">*</span>action {
-            ShardAction::Reconnect(ReconnectType::Reidentify) =&gt; <span class="self">self</span>.request_restart().<span class="kw">await</span>,
+            ShardAction::Reconnect(ReconnectType::Reidentify) =&gt; {
+                <span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                <span class="prelude-val">Ok</span>(())
+            },
             ShardAction::Reconnect(ReconnectType::Resume) =&gt; <span class="self">self</span>.shard.resume().<span class="kw">await</span>,
             ShardAction::Heartbeat =&gt; <span class="self">self</span>.shard.heartbeat().<span class="kw">await</span>,
             ShardAction::Identify =&gt; <span class="self">self</span>.shard.identify().<span class="kw">await</span>,
@@ -714,7 +737,7 @@
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">async fn </span>checked_shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: ShardId, close_code: u16) -&gt; bool {
         <span class="comment">// First verify the ID so we know for certain this runner is to shutdown.
         </span><span class="kw">if </span>id != <span class="self">self</span>.shard.shard_info().id {
@@ -771,7 +794,7 @@
     //
     // This always returns true, except in the case that the shard manager asked the runner to
     // shutdown.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">async fn </span>handle_rx_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: ShardRunnerMessage) -&gt; bool {
         <span class="kw">match </span>msg {
             ShardRunnerMessage::Restart(id) =&gt; <span class="self">self</span>.checked_shutdown(id, <span class="number">4000</span>).<span class="kw">await</span>,
@@ -822,7 +845,7 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
-    #[instrument(skip(<span class="self">self</span>))]
+    #[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">async fn </span>handle_voice_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
             <span class="kw">match </span>event {
@@ -855,13 +878,13 @@
     // Requests a restart if the sending half of the channel disconnects. This should _never_
     // happen, as the sending half is kept on the runner.
     // Returns whether the shard runner is in a state that can continue.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">async fn </span>recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
+    </span><span class="kw">async fn </span>recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
         <span class="kw">loop </span>{
             <span class="kw">match </span><span class="self">self</span>.runner_rx.try_next() {
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(value)) =&gt; {
                     <span class="kw">if </span>!<span class="self">self</span>.handle_rx_value(value).<span class="kw">await </span>{
-                        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+                        <span class="kw">return </span><span class="bool-val">false</span>;
                     }
                 },
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
@@ -870,21 +893,20 @@
                         <span class="self">self</span>.shard.shard_info(),
                     );
 
-                    drop(<span class="self">self</span>.request_restart().<span class="kw">await</span>);
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+                    <span class="self">self</span>.request_restart().<span class="kw">await</span>;
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 },
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
             }
         }
 
         <span class="comment">// There are no longer any values available.
-
-        </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
-    }
+        </span><span class="bool-val">true
+    </span>}
 
     <span class="doccomment">/// Returns a received event, as well as whether reading the potentially present event was
     /// successful.
-    </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">async fn </span>recv_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;Event&gt;, <span class="prelude-ty">Option</span>&lt;ShardAction&gt;, bool)&gt; {
         <span class="kw">let </span>gw_event = <span class="kw">match </span><span class="self">self</span>.shard.client.recv_json().<span class="kw">await </span>{
             <span class="prelude-val">Ok</span>(inner) =&gt; <span class="prelude-val">Ok</span>(inner),
@@ -956,8 +978,8 @@
         <span class="prelude-val">Ok</span>((event, action, <span class="bool-val">true</span>))
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
-    </span><span class="kw">async fn </span>request_restart(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
+    </span><span class="kw">async fn </span>request_restart(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">debug!</span>(<span class="string">"[ShardRunner {:?}] Requesting restart"</span>, <span class="self">self</span>.shard.shard_info());
 
         <span class="self">self</span>.update_manager().<span class="kw">await</span>;
@@ -969,11 +991,9 @@
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(voice_manager) = <span class="kw-2">&amp;</span><span class="self">self</span>.voice_manager {
             voice_manager.deregister_shard(shard_id.<span class="number">0</span>).<span class="kw">await</span>;
         }
-
-        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attr">#[instrument(skip(<span class="self">self</span>))]
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">async fn </span>update_manager(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.manager
             .update_shard_latency_and_stage(
