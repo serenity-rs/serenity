@@ -205,10 +205,6 @@ pub enum Error {
     ///
     /// [`Cache`]: crate::cache::Cache
     ItemMissing,
-    /// Indicates that a member, role or channel from the wrong [`Guild`] was provided.
-    ///
-    /// [`Guild`]: super::guild::Guild
-    WrongGuild,
     /// Indicates that the current user is attempting to Direct Message another bot user, which is
     /// disallowed by the API.
     MessagingBot,
@@ -216,15 +212,10 @@ pub enum Error {
     ///
     /// [`ChannelType`]: super::channel::ChannelType
     InvalidChannelType,
-    /// Indicates that the bot is not author of the message. This error is returned in
-    /// private/direct channels.
-    NotAuthor,
     /// Indicates that the webhook token is missing.
     NoTokenSet,
     /// When attempting to delete a built in nitro sticker instead of a guild sticker.
     DeleteNitroSticker,
-    /// Indicates that the sticker file is missing.
-    NoStickerFileSet,
     /// When attempting to edit a voice message.
     CannotEditVoiceMessage,
 }
@@ -266,14 +257,11 @@ impl fmt::Display for Error {
             } => f.write_str("Invalid permissions."),
             Self::InvalidUser => f.write_str("The current user cannot perform the action."),
             Self::ItemMissing => f.write_str("The required item is missing from the cache."),
-            Self::WrongGuild => f.write_str("Provided member or channel is from the wrong guild."),
             Self::MessageAlreadyCrossposted => f.write_str("Message already crossposted."),
             Self::CannotCrosspostMessage => f.write_str("Cannot crosspost this message type."),
             Self::MessagingBot => f.write_str("Attempted to message another bot user."),
-            Self::NotAuthor => f.write_str("The bot is not author of this message."),
             Self::NoTokenSet => f.write_str("Token is not set."),
             Self::DeleteNitroSticker => f.write_str("Cannot delete an official sticker."),
-            Self::NoStickerFileSet => f.write_str("Sticker file is not set."),
             Self::CannotEditVoiceMessage => f.write_str("Cannot edit voice message."),
         }
     }
