@@ -388,7 +388,7 @@ impl ShardRunner {
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gw_event = match self.shard.client.recv_json().await {
             Ok(inner) => Ok(inner),
-            Err(Error::Tungstenite(TungsteniteError::Io(_))) => {
+            Err(Error::Tungstenite(tung_err)) if matches!(*tung_err, TungsteniteError::Io(_)) => {
                 debug!("Attempting to auto-reconnect");
 
                 match self.shard.reconnection_type() {
