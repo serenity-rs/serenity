@@ -4,6 +4,7 @@ use std::fmt::Display as _;
 use std::fmt::{self, Write as _};
 use std::str::FromStr;
 
+use nonmax::NonMaxU8;
 #[cfg(feature = "http")]
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::de::Error as DeError;
@@ -246,7 +247,7 @@ impl Reaction {
         &self,
         http: impl AsRef<Http>,
         reaction_type: R,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
         after: Option<U>,
     ) -> Result<Vec<User>>
     where
@@ -260,10 +261,10 @@ impl Reaction {
         &self,
         http: impl AsRef<Http>,
         reaction_type: &ReactionType,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
-        let mut limit = limit.unwrap_or(50);
+        let mut limit = limit.map_or(50, |limit| limit.get());
 
         if limit > 100 {
             limit = 100;
@@ -271,13 +272,7 @@ impl Reaction {
         }
 
         http.as_ref()
-            .get_reaction_users(
-                self.channel_id,
-                self.message_id,
-                reaction_type,
-                limit,
-                after.map(UserId::get),
-            )
+            .get_reaction_users(self.channel_id, self.message_id, reaction_type, limit, after)
             .await
     }
 }
