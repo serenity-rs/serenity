@@ -13,29 +13,29 @@ use crate::json::*;
 #[non_exhaustive]
 pub struct DiscordJsonError {
     /// The error code.
-    pub code: isize,
+    pub code: i32,
     /// The error message.
-    pub message: String,
+    pub message: FixedString,
     /// The full explained errors with their path in the request body.
     #[serde(default, deserialize_with = "deserialize_errors")]
-    pub errors: Vec<DiscordJsonSingleError>,
+    pub errors: FixedArray<DiscordJsonSingleError>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub struct DiscordJsonSingleError {
     /// The error code.
-    pub code: String,
+    pub code: FixedString<u8>,
     /// The error message.
-    pub message: String,
+    pub message: FixedString,
     /// The path to the error in the request body itself, dot separated.
-    pub path: String,
+    pub path: FixedString,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub struct ErrorResponse {
     pub status_code: StatusCode,
-    pub url: String,
+    pub url: FixedString<u16>,
     pub method: Method,
     pub error: DiscordJsonError,
 }
@@ -45,12 +45,12 @@ impl ErrorResponse {
     pub async fn from_response(r: Response, method: Method) -> Self {
         ErrorResponse {
             status_code: r.status(),
-            url: r.url().to_string(),
+            url: r.url().to_string().into(),
             method,
             error: decode_resp(r).await.unwrap_or_else(|e| DiscordJsonError {
                 code: -1,
-                message: format!("[Serenity] Could not decode json when receiving error response from discord:, {e}"),
-                errors: vec![],
+                errors: FixedArray::empty(),
+                message: format!("[Serenity] Could not decode json when receiving error response from discord:, {e}").into(),
             }),
         }
     }
@@ -74,10 +74,6 @@ pub enum HttpError {
     InvalidHeader(InvalidHeaderValue),
     /// Reqwest's Error contain information on why sending a request failed.
     Request(ReqwestError),
-    /// When using a proxy with an invalid scheme.
-    InvalidScheme,
-    /// When using a proxy with an invalid port.
-    InvalidPort,
     /// When an application id was expected but missing.
     ApplicationIdMissing,
 }
@@ -165,8 +161,6 @@ impl fmt::Display for HttpError {
             Self::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
             Self::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
             Self::Request(_) => f.write_str("Error while sending HTTP request."),
-            Self::InvalidScheme => f.write_str("Invalid Url scheme."),
-            Self::InvalidPort => f.write_str("Invalid port."),
             Self::ApplicationIdMissing => f.write_str("Application id was expected but missing."),
         }
     }
@@ -185,18 +179,18 @@ impl StdError for HttpError {
 #[allow(clippy::missing_errors_doc)]
 pub fn deserialize_errors<'de, D: Deserializer<'de>>(
     deserializer: D,
-) -> StdResult<Vec<DiscordJsonSingleError>, D::Error> {
+) -> StdResult<FixedArray<DiscordJsonSingleError>, D::Error> {
     let map: Value = Value::deserialize(deserializer)?;
 
     if !map.is_object() {
-        return Ok(vec![]);
+        return Ok(FixedArray::empty());
     }
 
     let mut errors = Vec::new();
     let mut path = Vec::new();
     loop_errors(&map, &mut errors, &mut path).map_err(D::Error::custom)?;
 
-    Ok(errors)
+    Ok(errors.into())
 }
 
 fn make_error(
@@ -215,14 +209,16 @@ fn make_error(
                 .ok_or("expected code")?
                 .as_str()
                 .ok_or("expected string")?
-                .to_owned(),
+                .to_owned()
+                .into(),
             message: error_object
                 .get("message")
                 .ok_or("expected message")?
                 .as_str()
                 .ok_or("expected string")?
-                .to_owned(),
-            path: path.join("."),
+                .to_owned()
+                .into(),
+            path: path.join(".").into(),
         });
     }
     Ok(())
@@ -256,8 +252,8 @@ mod test {
     async fn test_error_response_into() {
         let error = DiscordJsonError {
             code: 43121215,
-            message: String::from("This is a Ferris error"),
-            errors: vec![],
+            message: String::from("This is a Ferris error").into(),
+            errors: FixedArray::empty(),
         };
 
         let mut builder = Builder::new();
@@ -271,7 +267,7 @@ mod test {
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),
-            url: String::from("https://ferris.crab/"),
+            url: String::from("https://ferris.crab/").into(),
             method: Method::POST,
             error,
         };
