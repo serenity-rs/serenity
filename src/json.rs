@@ -2,10 +2,12 @@
 //! between serde_json and simd-json to allow ignoring those in the rest of the codebase.
 
 use std::borrow::Cow;
+use std::cell::Cell;
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
 use serde::de::DeserializeOwned;
+use serde::ser::SerializeSeq as _;
 #[cfg(test)]
 use serde::Deserialize;
 use serde::Serialize;
@@ -37,6 +39,35 @@ mod export {
 }
 
 pub use export::*;
+
+pub(crate) struct SerializeIter<I>(Cell<Option<I>>);
+
+impl<I> SerializeIter<I> {
+    pub(crate) fn new(iter: I) -> Self {
+        Self(Cell::new(Some(iter)))
+    }
+}
+
+impl<Iter, Item> serde::Serialize for SerializeIter<Iter>
+where
+    Iter: Iterator<Item = Item>,
+    Item: serde::Serialize,
+{
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let Some(iter) = self.0.take() else {
+            return serializer.serialize_seq(Some(0))?.end();
+        };
+
+        let (lower, upper) = iter.size_hint();
+        let mut serializer = serializer.serialize_seq(Some(upper.unwrap_or(lower)))?;
+
+        for item in iter {
+            serializer.serialize_element(&item)?;
+        }
+
+        serializer.end()
+    }
+}
 
 #[cfg(feature = "http")]
 pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
