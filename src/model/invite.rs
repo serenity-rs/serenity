@@ -74,7 +74,6 @@ impl Invite {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    #[inline]
     pub async fn create(
         cache_http: impl CacheHttp,
         channel_id: impl Into<ChannelId>,
@@ -235,7 +234,6 @@ impl InviteGuild {
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
-    #[inline]
     #[must_use]
     pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
         self.id.shard_id(&cache)
@@ -260,7 +258,6 @@ impl InviteGuild {
     /// assert_eq!(guild.shard_id(17), 7);
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
-    #[inline]
     #[must_use]
     pub fn shard_id(&self, shard_count: u16) -> u16 {
         self.id.shard_id(shard_count)

@@ -85,7 +85,6 @@ impl<'a> EditMember<'a> {
     /// **Note**: Requires the [Move Members] permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    #[inline]
     pub fn voice_channel(mut self, channel_id: impl Into<ChannelId>) -> Self {
         self.channel_id = Some(Some(channel_id.into()));
         self

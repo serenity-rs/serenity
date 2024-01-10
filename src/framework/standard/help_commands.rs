@@ -141,7 +141,6 @@ pub struct Suggestions(pub Vec<SuggestedCommandName>);
 #[cfg(all(feature = "cache", feature = "http"))]
 impl Suggestions {
     /// Immutably borrow inner [`Vec`].
-    #[inline]
     #[must_use]
     pub fn as_vec(&self) -> &Vec<SuggestedCommandName> {
         &self.0
@@ -211,7 +210,6 @@ pub fn has_all_requirements(cache: impl AsRef<Cache>, cmd: &CommandOptions, msg:
 }
 
 /// Checks if `search_on` starts with `word` and is then cleanly followed by a `" "`.
-#[inline]
 #[cfg(all(feature = "cache", feature = "http"))]
 fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
     search_on.starts_with(word)

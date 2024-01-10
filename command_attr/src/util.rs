@@ -34,7 +34,6 @@ impl LitExt for Lit {
         }
     }
 
-    #[inline]
     fn to_ident(&self) -> Ident {
         Ident::new(&self.to_str(), self.span())
     }
@@ -47,25 +46,21 @@ pub trait IdentExt2: Sized {
 }
 
 impl IdentExt2 for Ident {
-    #[inline]
     fn to_string_non_raw(&self) -> String {
         let ident_string = self.to_string();
         ident_string.trim_start_matches("r#").into()
     }
 
-    #[inline]
     fn to_uppercase(&self) -> Self {
         // This should be valid because keywords are lowercase.
         format_ident!("{}", self.to_string_non_raw().to_uppercase())
     }
 
-    #[inline]
     fn with_suffix(&self, suffix: &str) -> Ident {
         format_ident!("{}_{}", self.to_uppercase(), suffix)
     }
 }
 
-#[inline]
 pub fn into_stream(e: &Error) -> TokenStream {
     e.to_compile_error().into()
 }
@@ -95,7 +90,6 @@ impl<T: Parse> Parse for Parenthesised<T> {
 pub struct AsOption<T>(pub Option<T>);
 
 impl<T> AsOption<T> {
-    #[inline]
     pub fn map<U>(self, f: impl FnOnce(T) -> U) -> AsOption<U> {
         AsOption(self.0.map(f))
     }
@@ -111,7 +105,6 @@ impl<T: ToTokens> ToTokens for AsOption<T> {
 }
 
 impl<T> Default for AsOption<T> {
-    #[inline]
     fn default() -> Self {
         AsOption(None)
     }
@@ -138,7 +131,6 @@ impl ToTokens for Argument {
     }
 }
 
-#[inline]
 pub fn generate_type_validation(have: &Type, expect: &Type) -> syn::Stmt {
     parse_quote! {
         serenity::static_assertions::assert_type_eq_all!(#have, #expect);
@@ -211,13 +203,11 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
     Ok(())
 }
 
-#[inline]
 pub fn create_return_type_validation(r#fn: &mut CommandFun, expect: &Type) {
     let stmt = generate_type_validation(&r#fn.ret, expect);
     r#fn.body.insert(0, stmt);
 }
 
-#[inline]
 pub fn populate_fut_lifetimes_on_refs(args: &mut Vec<Argument>) {
     for arg in args {
         if let Type::Reference(reference) = &mut arg.kind {

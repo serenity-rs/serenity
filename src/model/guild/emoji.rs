@@ -60,7 +60,6 @@ impl Emoji {
     /// println!("Direct link to emoji image: {}", emoji.url());
     /// # }
     /// ```
-    #[inline]
     #[must_use]
     pub fn url(&self) -> String {
         let extension = if self.animated() { "gif" } else { "png" };

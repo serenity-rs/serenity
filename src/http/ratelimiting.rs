@@ -394,28 +394,24 @@ impl Ratelimit {
     }
 
     /// The total number of requests that can be made in a period of time.
-    #[inline]
     #[must_use]
     pub const fn limit(&self) -> i64 {
         self.limit
     }
 
     /// The number of requests remaining in the period of time.
-    #[inline]
     #[must_use]
     pub const fn remaining(&self) -> i64 {
         self.remaining
     }
 
     /// The absolute time in milliseconds when the interval resets.
-    #[inline]
     #[must_use]
     pub const fn reset(&self) -> Option<SystemTime> {
         self.reset
     }
 
     /// The total time in milliseconds when the interval resets.
-    #[inline]
     #[must_use]
     pub const fn reset_after(&self) -> Option<Duration> {
         self.reset_after
