@@ -57,6 +57,8 @@ use crate::internal::prelude::*;
 #[cfg(feature = "gateway")]
 use crate::model::gateway::GatewayIntents;
 use crate::model::id::ApplicationId;
+#[cfg(feature = "voice")]
+use crate::model::id::UserId;
 use crate::model::user::OnlineStatus;
 use crate::utils::check_shard_total;
 
@@ -633,7 +635,9 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -674,7 +678,9 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -738,7 +744,9 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -779,7 +787,9 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -820,7 +830,9 @@ impl Client {
     ///
     /// # Errors
     ///
-    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Gateway`] when all shards have shutdown due to an error.
+    /// Returns [`Error::Http`] if fetching the current User fails when initialising a voice
+    /// manager.
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -837,9 +849,25 @@ impl Client {
     ) -> Result<()> {
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
-            let user = self.http.get_current_user().await?;
+            #[cfg(feature = "cache")]
+            let cache_user_id = {
+                let cache_user = self.cache.current_user();
+                if cache_user.id == UserId::default() {
+                    Some(cache_user.id)
+                } else {
+                    None
+                }
+            };
 
-            voice_manager.initialise(total_shards, user.id).await;
+            #[cfg(not(feature = "cache"))]
+            let cache_user_id: Option<UserId> = None;
+
+            let user_id = match cache_user_id {
+                Some(u) => u,
+                None => self.http.get_current_user().await?.id,
+            };
+
+            voice_manager.initialise(total_shards, user_id).await;
         }
 
         let init = end_shard - start_shard + 1;
