@@ -37,7 +37,6 @@ use dashmap::DashMap;
 #[cfg(feature = "temp_cache")]
 use mini_moka::sync::Cache as MokaCache;
 use parking_lot::RwLock;
-use tracing::instrument;
 
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
@@ -237,7 +236,7 @@ impl Cache {
     ///
     /// let cache = Cache::new_with_settings(settings);
     /// ```
-    #[instrument]
+    #[cfg_attr(feature = "tracing_instrument", instrument)]
     pub fn new_with_settings(settings: Settings) -> Self {
         #[cfg(feature = "temp_cache")]
         fn temp_cache<K, V>(ttl: Duration) -> MokaCache<K, V, BuildHasher>
@@ -676,7 +675,7 @@ impl Cache {
     /// Refer to the [`CacheUpdate` examples].
     ///
     /// [`CacheUpdate` examples]: CacheUpdate#examples
-    #[instrument(skip(self, e))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, e)))]
     pub fn update<E: CacheUpdate>(&self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }
