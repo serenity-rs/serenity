@@ -88,7 +88,6 @@ impl<'a> CreateMessage<'a> {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    #[inline]
     pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
@@ -140,7 +139,6 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Adds a list of reactions to create after the message's sent.
-    #[inline]
     pub fn reactions(mut self, reactions: impl Into<Cow<'a, [ReactionType]>>) -> Self {
         self.reactions = reactions.into();
         self

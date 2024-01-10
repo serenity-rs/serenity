@@ -79,7 +79,6 @@ impl Role {
     /// Returns [`Error::Http`] if the current user lacks permission to delete this role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_role(self.guild_id, self.id, None).await
     }
@@ -97,14 +96,12 @@ impl Role {
     /// Returns [`Error::Http`] if the current user does not have permission to Manage Roles.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
     pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditRole<'_>) -> Result<()> {
         *self = self.guild_id.edit_role(http.as_ref(), self.id, builder).await?;
         Ok(())
     }
 
     /// Check that the role has the given permission.
-    #[inline]
     #[must_use]
     pub fn has_permission(&self, permission: Permissions) -> bool {
         self.permissions.contains(permission)
@@ -115,7 +112,6 @@ impl Role {
     /// The 'precise' argument is used to check if the role's permissions are precisely equivalent
     /// to the given permissions. If you need only check that the role has at least the given
     /// permissions, pass `false`.
-    #[inline]
     #[must_use]
     pub fn has_permissions(&self, permissions: Permissions, precise: bool) -> bool {
         if precise {
