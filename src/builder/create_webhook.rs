@@ -66,8 +66,8 @@ impl<'a> Builder for CreateWebhook<'a> {
     /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the corresponding
     /// channel is not of type [`Text`] or [`News`].
     ///
-    /// If the provided name is less than 2 characters, returns [`ModelError::NameTooShort`]. If it
-    /// is more than 100 characters, returns [`ModelError::NameTooLong`].
+    /// If the provided name is less than 2 characters, returns [`ModelError::TooSmall`]. If it
+    /// is more than 100 characters, returns [`ModelError::TooLarge`].
     ///
     /// Returns a [`Error::Http`] if the current user lacks permission, or if invalid data is
     /// given.
@@ -92,11 +92,8 @@ impl<'a> Builder for CreateWebhook<'a> {
             }
         }
 
-        if self.name.len() < 2 {
-            return Err(Error::Model(ModelError::NameTooShort));
-        } else if self.name.len() > 100 {
-            return Err(Error::Model(ModelError::NameTooLong));
-        }
+        crate::model::error::Minimum::WebhookName.check_underflow(self.name.chars().count())?;
+        crate::model::error::Maximum::WebhookName.check_overflow(self.name.chars().count())?;
 
         cache_http.http().create_webhook(ctx, &self, self.audit_log_reason).await
     }
