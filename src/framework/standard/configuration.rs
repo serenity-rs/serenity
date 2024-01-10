@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::HashSet;
 
 use futures::future::BoxFuture;
@@ -118,7 +119,7 @@ pub struct Configuration {
     pub(crate) dynamic_prefixes: Vec<DynamicPrefixHook>,
     pub(crate) on_mention: Option<String>,
     pub(crate) owners: HashSet<UserId>,
-    pub(crate) prefixes: Vec<String>,
+    pub(crate) prefixes: Vec<Cow<'static, str>>,
     pub(crate) delimiters: Vec<Delimiter>,
     /// If set to false, bot will ignore any private messages.
     ///
@@ -446,7 +447,7 @@ impl Configuration {
     /// framework.configure(Configuration::new().prefix("!"));
     /// ```
     #[must_use]
-    pub fn prefix(mut self, prefix: impl Into<String>) -> Self {
+    pub fn prefix(mut self, prefix: impl Into<Cow<'static, str>>) -> Self {
         let p = prefix.into();
         self.prefixes = if p.is_empty() { vec![] } else { vec![p] };
         self
@@ -467,12 +468,12 @@ impl Configuration {
     /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().prefixes(vec!["!", ">", "+"]));
+    /// framework.configure(Configuration::new().prefixes(vec!["!".into(), ">".into(), "+".into()]));
     /// ```
     #[inline]
     #[must_use]
-    pub fn prefixes(mut self, prefixes: impl IntoIterator<Item = impl Into<String>>) -> Self {
-        self.prefixes = prefixes.into_iter().map(Into::into).filter(|p| !p.is_empty()).collect();
+    pub fn prefixes(mut self, prefixes: Vec<Cow<'static, str>>) -> Self {
+        self.prefixes = prefixes;
         self
     }
 
@@ -510,16 +511,11 @@ impl Configuration {
     /// use serenity::framework::standard::{Configuration, StandardFramework};
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(Configuration::new().delimiters(vec![", ", " "]));
+    /// framework.configure(Configuration::new().delimiters(vec![", ".into(), " ".into()]));
     /// ```
     #[must_use]
-    pub fn delimiters(
-        mut self,
-        delimiters: impl IntoIterator<Item = impl Into<Delimiter>>,
-    ) -> Self {
-        self.delimiters.clear();
-        self.delimiters.extend(delimiters.into_iter().map(Into::into));
-
+    pub fn delimiters(mut self, delimiters: Vec<Delimiter>) -> Self {
+        self.delimiters = delimiters;
         self
     }
 
@@ -535,7 +531,9 @@ impl Configuration {
         self = self.case_insensitive(cs);
 
         for prefix in &mut self.prefixes {
-            *prefix = prefix.to_lowercase();
+            if prefix.chars().any(|c| !c.is_lowercase()) {
+                *prefix = Cow::Owned(prefix.to_lowercase());
+            }
         }
 
         self
@@ -573,7 +571,7 @@ impl Default for Configuration {
             dynamic_prefixes: Vec::new(),
             on_mention: None,
             owners: HashSet::default(),
-            prefixes: vec![String::from("~")],
+            prefixes: vec![Cow::Borrowed("~")],
         };
 
         config.allow_dm(true).by_space(true).ignore_bots(true).ignore_webhooks(true)

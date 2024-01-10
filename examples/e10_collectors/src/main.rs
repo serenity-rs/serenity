@@ -69,7 +69,7 @@ async fn main() {
             .with_whitespace(true)
             .on_mention(Some(bot_id))
             .prefix("~")
-            .delimiters(vec![", ", ","]),
+            .delimiters(vec![", ".into(), ",".into()]),
     );
 
     let intents = GatewayIntents::GUILD_MESSAGES
