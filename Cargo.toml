@@ -140,6 +140,9 @@ temp_cache = ["cache", "mini-moka", "typesize?/mini_moka"]
 
 typesize = ["dep:typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize"]
 
+# Enables compile-time heavy instrument macros from tracing
+tracing_instrument = ["tracing/attributes"]
+
 # Removed feature (https://github.com/serenity-rs/serenity/pull/2246)
 absolute_ratelimits = []
 

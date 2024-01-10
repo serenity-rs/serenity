@@ -42,7 +42,8 @@ pub struct Context {
     pub cache: Arc<Cache>,
 }
 
-// Used by the #[instrument] macro on client::dispatch::handle_event
+// Used by the #[cfg_attr(feature = "tracing_instrument", instrument)] macro on
+// client::dispatch::handle_event
 impl fmt::Debug for Context {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Context")

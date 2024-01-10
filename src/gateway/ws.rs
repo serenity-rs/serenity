@@ -20,7 +20,7 @@ use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
 #[cfg(feature = "client")]
 use tracing::warn;
-use tracing::{debug, instrument, trace};
+use tracing::{debug, trace};
 use url::Url;
 
 use super::{ActivityData, ChunkGuildFilter, PresenceData};
@@ -239,7 +239,7 @@ impl WsClient {
     /// # Errors
     ///
     /// Errors if there is a problem with the WS connection.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn send_heartbeat(&mut self, shard_info: &ShardInfo, seq: Option<u64>) -> Result<()> {
         trace!("[{:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
@@ -253,7 +253,7 @@ impl WsClient {
     /// # Errors
     ///
     /// Errors if there is a problem with the WS connection.
-    #[instrument(skip(self, token))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, token)))]
     pub async fn send_identify(
         &mut self,
         shard: &ShardInfo,
@@ -294,7 +294,7 @@ impl WsClient {
     /// # Errors
     ///
     /// Errors if there is a problem with the WS connection.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn send_presence_update(
         &mut self,
         shard_info: &ShardInfo,
@@ -320,7 +320,7 @@ impl WsClient {
     /// # Errors
     ///
     /// Errors if there is a problem with the WS connection.
-    #[instrument(skip(self, token))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, token)))]
     pub async fn send_resume(
         &mut self,
         shard_info: &ShardInfo,
