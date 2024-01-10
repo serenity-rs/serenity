@@ -3,15 +3,12 @@ use std::path::Path;
 
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
-#[cfg(feature = "http")]
-use url::Url;
 
-use crate::all::Message;
-#[cfg(feature = "http")]
-use crate::error::Error;
-use crate::error::Result;
+#[allow(unused)] // Error is used in docs
+use crate::error::{Error, Result};
 #[cfg(feature = "http")]
 use crate::http::Http;
+use crate::model::channel::Message;
 use crate::model::id::AttachmentId;
 
 /// A builder for creating a new attachment from a file path, file data, or URL.
@@ -79,20 +76,17 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// # Errors
     ///
-    /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
+    /// Returns [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
-    pub async fn url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
-        let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-
-        let response = http.as_ref().client.get(url.clone()).send().await?;
+    pub async fn url(
+        http: impl AsRef<Http>,
+        url: impl reqwest::IntoUrl,
+        filename: impl Into<Cow<'static, str>>,
+    ) -> Result<Self> {
+        let response = http.as_ref().client.get(url).send().await?;
         let data = response.bytes().await?.to_vec();
 
-        let filename = url
-            .path_segments()
-            .and_then(Iterator::last)
-            .ok_or_else(|| Error::Url(url.to_string()))?;
-
-        Ok(CreateAttachment::bytes(data, filename.to_owned()))
+        Ok(CreateAttachment::bytes(data, filename))
     }
 
     /// Converts the stored data to the base64 representation.
