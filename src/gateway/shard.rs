@@ -167,19 +167,16 @@ impl Shard {
     }
 
     /// Retrieves the current presence of the shard.
-    #[inline]
     pub fn presence(&self) -> &PresenceData {
         &self.presence
     }
 
     /// Retrieves the value of when the last heartbeat was sent.
-    #[inline]
     pub fn last_heartbeat_sent(&self) -> Option<Instant> {
         self.last_heartbeat_sent
     }
 
     /// Retrieves the value of when the last heartbeat ack was received.
-    #[inline]
     pub fn last_heartbeat_ack(&self) -> Option<Instant> {
         self.last_heartbeat_ack
     }
@@ -218,40 +215,33 @@ impl Shard {
     }
 
     /// Returns the heartbeat interval dictated by Discord, if the Hello packet has been received.
-    #[inline]
     pub fn heartbeat_interval(&self) -> Option<std::time::Duration> {
         self.heartbeat_interval
     }
 
-    #[inline]
     pub fn last_heartbeat_acknowledged(&self) -> bool {
         self.last_heartbeat_acknowledged
     }
 
-    #[inline]
     pub fn seq(&self) -> u64 {
         self.seq
     }
 
-    #[inline]
     pub fn session_id(&self) -> Option<&str> {
         self.session_id.as_deref()
     }
 
-    #[inline]
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn set_activity(&mut self, activity: Option<ActivityData>) {
         self.presence.activity = activity;
     }
 
-    #[inline]
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn set_presence(&mut self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.set_activity(activity);
         self.set_status(status);
     }
 
-    #[inline]
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn set_status(&mut self, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {

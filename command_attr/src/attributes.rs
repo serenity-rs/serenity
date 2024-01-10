@@ -59,7 +59,6 @@ pub struct Values {
 }
 
 impl Values {
-    #[inline]
     pub fn new(name: Ident, kind: ValueKind, literals: Vec<Lit>, span: Span) -> Self {
         Values {
             name,
@@ -140,7 +139,6 @@ impl<T: fmt::Display> fmt::Display for DisplaySlice<'_, T> {
     }
 }
 
-#[inline]
 fn is_form_acceptable(expect: &[ValueKind], kind: ValueKind) -> bool {
     if expect.contains(&ValueKind::List) && kind == ValueKind::SingleList {
         true
@@ -149,7 +147,6 @@ fn is_form_acceptable(expect: &[ValueKind], kind: ValueKind) -> bool {
     }
 }
 
-#[inline]
 fn validate(values: &Values, forms: &[ValueKind]) -> Result<()> {
     if !is_form_acceptable(forms, values.kind) {
         return Err(Error::new(
@@ -162,7 +159,6 @@ fn validate(values: &Values, forms: &[ValueKind]) -> Result<()> {
     Ok(())
 }
 
-#[inline]
 pub fn parse<T: AttributeOption>(values: Values) -> Result<T> {
     T::parse(values)
 }
@@ -180,7 +176,6 @@ impl AttributeOption for Vec<String> {
 }
 
 impl AttributeOption for String {
-    #[inline]
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::Equals, ValueKind::SingleList])?;
 
@@ -189,7 +184,6 @@ impl AttributeOption for String {
 }
 
 impl AttributeOption for bool {
-    #[inline]
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::Name, ValueKind::SingleList])?;
 
@@ -198,7 +192,6 @@ impl AttributeOption for bool {
 }
 
 impl AttributeOption for Ident {
-    #[inline]
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::SingleList])?;
 
@@ -207,7 +200,6 @@ impl AttributeOption for Ident {
 }
 
 impl AttributeOption for Vec<Ident> {
-    #[inline]
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::List])?;
 
@@ -254,7 +246,6 @@ impl AttributeOption for HelpBehaviour {
 }
 
 impl AttributeOption for Checks {
-    #[inline]
     fn parse(values: Values) -> Result<Self> {
         <Vec<Ident> as AttributeOption>::parse(values).map(Checks)
     }
@@ -279,7 +270,6 @@ impl AttributeOption for Permissions {
 }
 
 impl<T: AttributeOption> AttributeOption for AsOption<T> {
-    #[inline]
     fn parse(values: Values) -> Result<Self> {
         Ok(AsOption(Some(T::parse(values)?)))
     }
@@ -308,7 +298,6 @@ macro_rules! attr_option_num {
             }
 
             impl AttributeOption for Option<$n> {
-                #[inline]
                 fn parse(values: Values) -> Result<Self> {
                     <$n as AttributeOption>::parse(values).map(Some)
                 }
