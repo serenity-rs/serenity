@@ -55,7 +55,6 @@ pub(crate) enum Bucket {
 }
 
 impl Bucket {
-    #[inline]
     pub async fn take(&mut self, ctx: &Context, msg: &Message) -> Option<RateLimitInfo> {
         match self {
             Self::Global(counter) => counter.take(ctx, msg, 0).await,
@@ -80,7 +79,6 @@ impl Bucket {
         }
     }
 
-    #[inline]
     pub async fn give(&mut self, ctx: &Context, msg: &Message) {
         match self {
             Self::Global(counter) => counter.give(ctx, msg, 0).await,
@@ -140,21 +138,18 @@ pub enum RateLimitAction {
 
 impl RateLimitInfo {
     /// Gets the duration of the rate limit in seconds.
-    #[inline]
     #[must_use]
     pub fn as_secs(&self) -> u64 {
         self.rate_limit.as_secs()
     }
 
     /// Gets the duration of the rate limit in milliseconds.
-    #[inline]
     #[must_use]
     pub fn as_millis(&self) -> u128 {
         self.rate_limit.as_millis()
     }
 
     /// Gets the duration of the rate limit in microseconds.
-    #[inline]
     #[must_use]
     pub fn as_micros(&self) -> u128 {
         self.rate_limit.as_micros()
@@ -419,7 +414,6 @@ impl BucketBuilder {
     /// The "break" time between invocations of a command.
     ///
     /// Expressed in seconds.
-    #[inline]
     #[must_use]
     pub fn delay(mut self, secs: u64) -> Self {
         self.delay = Duration::from_secs(secs);
@@ -429,7 +423,6 @@ impl BucketBuilder {
     /// How long the bucket will apply for.
     ///
     /// Expressed in seconds.
-    #[inline]
     #[must_use]
     pub fn time_span(mut self, secs: u64) -> Self {
         self.time_span = Duration::from_secs(secs);
@@ -437,7 +430,6 @@ impl BucketBuilder {
     }
 
     /// Number of invocations allowed per [`Self::time_span`].
-    #[inline]
     #[must_use]
     pub fn limit(mut self, n: u32) -> Self {
         self.limit = n;
@@ -446,7 +438,6 @@ impl BucketBuilder {
 
     /// Middleware confirming (or denying) that the bucket is eligible to apply. For instance, to
     /// limit the bucket to just one user.
-    #[inline]
     #[must_use]
     pub fn check(mut self, check: Check) -> Self {
         self.check = Some(check);
@@ -512,7 +503,6 @@ impl BucketBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    #[inline]
     #[must_use]
     pub fn delay_action(mut self, action: DelayHook) -> Self {
         self.delay_action = Some(action);
@@ -524,7 +514,6 @@ impl BucketBuilder {
     }
 
     /// Limit the bucket for a specific type of `target`.
-    #[inline]
     #[must_use]
     pub fn limit_for(mut self, target: LimitedFor) -> Self {
         self.limited_for = target;
@@ -535,7 +524,6 @@ impl BucketBuilder {
     /// delayed `amount` times instead of stopping command dispatch.
     ///
     /// By default this value is `0` and rate limits will cancel instead.
-    #[inline]
     #[must_use]
     pub fn await_ratelimits(mut self, amount: u32) -> Self {
         self.await_ratelimits = amount;
@@ -543,7 +531,6 @@ impl BucketBuilder {
     }
 
     /// Constructs the bucket.
-    #[inline]
     pub(crate) fn construct(self) -> Bucket {
         let counter = TicketCounter {
             ratelimit: Ratelimit {

@@ -106,7 +106,6 @@ impl Context {
     ///
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
-    #[inline]
     pub fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
     }
@@ -135,7 +134,6 @@ impl Context {
     ///
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
-    #[inline]
     pub fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
     }
@@ -164,7 +162,6 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     #[cfg(feature = "gateway")]
-    #[inline]
     pub fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
     }
@@ -193,7 +190,6 @@ impl Context {
     ///
     /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
-    #[inline]
     pub fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
     }
@@ -226,7 +222,6 @@ impl Context {
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
-    #[inline]
     pub fn reset_presence(&self) {
         self.shard.set_presence(None, OnlineStatus::Online);
     }
@@ -256,7 +251,6 @@ impl Context {
     /// }
     /// ```
     #[cfg(feature = "gateway")]
-    #[inline]
     pub fn set_activity(&self, activity: Option<ActivityData>) {
         self.shard.set_activity(activity);
     }
@@ -306,7 +300,6 @@ impl Context {
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
-    #[inline]
     pub fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
     }

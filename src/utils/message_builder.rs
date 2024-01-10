@@ -113,7 +113,6 @@ impl MessageBuilder {
     /// [`Channel`]: crate::model::channel::Channel
     /// [`GuildChannel`]: crate::model::channel::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
-    #[inline]
     pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
         self.channel_(channel.into())
     }
@@ -180,12 +179,10 @@ impl MessageBuilder {
     ///     "testing"
     /// );
     /// ```
-    #[inline]
     pub fn push(&mut self, content: impl Into<Content>) -> &mut Self {
         self.push_(&content.into())
     }
 
-    #[inline]
     fn push_<C: std::fmt::Display + ?Sized>(&mut self, content: &C) -> &mut Self {
         write!(self.0, "{content}").unwrap();
 

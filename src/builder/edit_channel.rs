@@ -181,7 +181,6 @@ impl<'a> EditChannel<'a> {
     ///
     /// [text]: ChannelType::Text
     /// [voice]: ChannelType::Voice
-    #[inline]
     pub fn category(mut self, category: Option<ChannelId>) -> Self {
         self.parent_id = Some(category);
         self

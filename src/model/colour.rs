@@ -88,7 +88,6 @@ impl Colour {
     ///
     /// assert_eq!(colour.tuple(), (100, 76, 67));
     /// ```
-    #[inline]
     #[must_use]
     pub const fn new(value: u32) -> Colour {
         Colour(value)
