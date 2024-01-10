@@ -41,7 +41,6 @@ enum_number! {
 }
 
 impl WebhookType {
-    #[inline]
     #[must_use]
     pub fn name(&self) -> &str {
         match self {
@@ -119,7 +118,6 @@ pub struct WebhookGuild {
 impl WebhookGuild {
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
-    #[inline]
     pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
         cache.as_ref().guild(self.id)
     }
@@ -132,7 +130,6 @@ impl WebhookGuild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    #[inline]
     pub async fn to_partial_guild(self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
@@ -154,7 +151,6 @@ impl WebhookGuild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    #[inline]
     pub async fn to_partial_guild_with_counts(
         self,
         http: impl AsRef<Http>,
@@ -177,7 +173,6 @@ pub struct WebhookChannel {
 impl WebhookChannel {
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
-    #[inline]
     pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
         cache.as_ref().channel(self.id)
     }
@@ -193,7 +188,6 @@ impl WebhookChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
-    #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
@@ -331,7 +325,6 @@ impl Webhook {
     ///
     /// Returns [`Error::Http`] if the webhook does not exist, the token is invalid, or if the
     /// webhook could not otherwise be deleted.
-    #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         let http = http.as_ref();
         match &self.token {
@@ -440,7 +433,6 @@ impl Webhook {
     /// is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    #[inline]
     pub async fn execute(
         &self,
         cache_http: impl CacheHttp,
@@ -561,7 +553,6 @@ impl WebhookId {
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
-    #[inline]
     pub async fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> {
         http.as_ref().get_webhook(self).await
     }
