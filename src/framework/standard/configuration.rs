@@ -296,7 +296,6 @@ impl Configuration {
     /// let framework = StandardFramework::new().group(&PENG_GROUP);
     /// framework.configure(Configuration::new().disabled_commands(disabled));
     /// ```
-    #[inline]
     #[must_use]
     pub fn disabled_commands(mut self, commands: HashSet<String>) -> Self {
         self.disabled_commands = commands;
@@ -357,7 +356,6 @@ impl Configuration {
     /// ```
     ///
     /// [`Context::data`]: crate::client::Context::data
-    #[inline]
     #[must_use]
     pub fn dynamic_prefix(mut self, dynamic_prefix: DynamicPrefixHook) -> Self {
         self.dynamic_prefixes.push(dynamic_prefix);
@@ -470,7 +468,6 @@ impl Configuration {
     /// let framework = StandardFramework::new();
     /// framework.configure(Configuration::new().prefixes(vec!["!".into(), ">".into(), "+".into()]));
     /// ```
-    #[inline]
     #[must_use]
     pub fn prefixes(mut self, prefixes: Vec<Cow<'static, str>>) -> Self {
         self.prefixes = prefixes;
