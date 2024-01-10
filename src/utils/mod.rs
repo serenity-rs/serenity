@@ -426,7 +426,6 @@ pub(crate) fn user_has_guild_perms(
 /// Tries to find a user's permissions using the cache. Unlike [`user_has_perms`], this function
 /// will return `true` even when the permissions are not in the cache.
 #[cfg(all(feature = "cache", feature = "model"))]
-#[inline]
 pub(crate) fn user_has_perms_cache(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
@@ -484,7 +483,6 @@ pub(crate) fn user_perms(cache: impl AsRef<Cache>, channel_id: ChannelId) -> Res
 ///
 /// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);
 /// ```
-#[inline]
 #[must_use]
 pub fn shard_id(guild_id: GuildId, shard_count: u16) -> u16 {
     let shard_count = check_shard_total(shard_count);
