@@ -1658,7 +1658,7 @@ impl Guild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error, may also return
-    /// [`Error::NotInRange`] if the input is not within range.
+    /// [`ModelError::TooSmall`] or [`ModelError::TooLarge`] if the limit is not within range.
     ///
     /// [`User`]: crate::model::user::User
     #[inline]
