@@ -102,7 +102,12 @@ impl Builder for CreateSticker<'_> {
             Permissions::CREATE_GUILD_EXPRESSIONS,
         )?;
 
-        let map = [("name", self.name), ("tags", self.tags), ("description", self.description)];
+        let map = vec![
+            ("name".into(), self.name),
+            ("tags".into(), self.tags),
+            ("description".into(), self.description),
+        ];
+
         cache_http.http().create_sticker(ctx, map, self.file, self.audit_log_reason).await
     }
 }

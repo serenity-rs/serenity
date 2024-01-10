@@ -924,7 +924,7 @@ impl Http {
     pub async fn create_sticker(
         &self,
         guild_id: GuildId,
-        map: impl IntoIterator<Item = (&'static str, Cow<'static, str>)>,
+        fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
         file: CreateAttachment<'_>,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
@@ -932,8 +932,8 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 upload: MultipartUpload::File(file),
-                fields: map.into_iter().map(|(k, v)| (k.into(), v)).collect(),
                 payload_json: None,
+                fields,
             }),
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -1246,7 +1246,7 @@ impl Http {
     pub async fn delete_messages(
         &self,
         channel_id: ChannelId,
-        map: &Value,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1834,7 +1834,7 @@ impl Http {
     pub async fn edit_guild_channel_positions(
         &self,
         guild_id: GuildId,
-        value: &Value,
+        value: &impl serde::Serialize,
     ) -> Result<()> {
         let body = to_vec(value)?;
 
