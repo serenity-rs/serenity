@@ -136,7 +136,6 @@ impl Channel {
     }
 
     /// Determines if the channel is NSFW.
-    #[inline]
     #[must_use]
     #[cfg(feature = "model")]
     pub fn is_nsfw(&self) -> bool {
@@ -147,7 +146,6 @@ impl Channel {
     }
 
     /// Retrieves the Id of the inner [`GuildChannel`], or [`PrivateChannel`].
-    #[inline]
     #[must_use]
     pub const fn id(&self) -> ChannelId {
         match self {
@@ -159,7 +157,6 @@ impl Channel {
     /// Retrieves the position of the inner [`GuildChannel`].
     ///
     /// In DMs (private channel) it will return None.
-    #[inline]
     #[must_use]
     pub const fn position(&self) -> Option<u16> {
         match self {
@@ -252,7 +249,6 @@ enum_number! {
 }
 
 impl ChannelType {
-    #[inline]
     #[must_use]
     pub const fn name(&self) -> &str {
         match *self {
