@@ -12,7 +12,7 @@ use reqwest::Url;
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
-use tracing::{debug, instrument, warn};
+use tracing::{debug, warn};
 
 use super::multipart::{Multipart, MultipartUpload};
 use super::ratelimiting::Ratelimiter;
@@ -4952,7 +4952,7 @@ impl Http {
     /// # Ok(())
     /// # }
     /// ```
-    #[instrument]
+    #[cfg_attr(feature = "tracing_instrument", instrument)]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
         let response = if let Some(ratelimiter) = &self.ratelimiter {

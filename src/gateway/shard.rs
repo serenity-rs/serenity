@@ -3,7 +3,7 @@ use std::time::{Duration as StdDuration, Instant};
 
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
-use tracing::{debug, error, info, instrument, trace, warn};
+use tracing::{debug, error, info, trace, warn};
 use url::Url;
 
 use super::{
@@ -192,7 +192,7 @@ impl Shard {
     /// # Errors
     ///
     /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending a heartbeat.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn heartbeat(&mut self) -> Result<()> {
         match self.client.send_heartbeat(&self.shard_info, Some(self.seq)).await {
             Ok(()) => {
@@ -240,20 +240,20 @@ impl Shard {
     }
 
     #[inline]
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn set_activity(&mut self, activity: Option<ActivityData>) {
         self.presence.activity = activity;
     }
 
     #[inline]
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn set_presence(&mut self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.set_activity(activity);
         self.set_status(status);
     }
 
     #[inline]
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn set_status(&mut self, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
@@ -275,7 +275,7 @@ impl Shard {
         self.stage
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn handle_gateway_dispatch(&mut self, seq: u64, event: &Event) -> Option<ShardAction> {
         if seq > self.seq + 1 {
             warn!("[{:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
@@ -308,7 +308,7 @@ impl Shard {
         None
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn handle_heartbeat_event(&mut self, s: u64) -> ShardAction {
         info!("[{:?}] Received shard heartbeat", self.shard_info);
 
@@ -332,7 +332,7 @@ impl Shard {
         ShardAction::Heartbeat
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn handle_gateway_closed(
         &mut self,
         data: Option<&CloseFrame<'static>>,
@@ -437,7 +437,7 @@ impl Shard {
     ///
     /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too many guilds
     /// assigned to it.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn handle_event(&mut self, event: &Result<GatewayEvent>) -> Result<Option<ShardAction>> {
         match event {
             Ok(GatewayEvent::Dispatch(seq, event)) => Ok(self.handle_gateway_dispatch(*seq, event)),
@@ -505,7 +505,7 @@ impl Shard {
     /// `false` is returned under one of the following conditions:
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn do_heartbeat(&mut self) -> bool {
         let Some(heartbeat_interval) = self.heartbeat_interval else {
             // No Hello received yet
@@ -542,7 +542,7 @@ impl Shard {
     /// Calculates the heartbeat latency between the shard and the gateway.
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn latency(&self) -> Option<StdDuration> {
         if let (Some(sent), Some(received)) = (self.last_heartbeat_sent, self.last_heartbeat_ack) {
             if received > sent {
@@ -633,10 +633,13 @@ impl Shard {
     /// # }
     /// ```
     ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    ///
     /// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk
     /// [`Guild`]: crate::model::guild::Guild
     /// [`Member`]: crate::model::guild::Member
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn chunk_guild(
         &mut self,
         guild_id: GuildId,
@@ -655,7 +658,10 @@ impl Shard {
     /// Sets the shard as going into identifying stage, which sets:
     /// - the time that the last heartbeat sent as being now
     /// - the `stage` to [`ConnectionStage::Identifying`]
-    #[instrument(skip(self))]
+    ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client
             .send_identify(&self.shard_info, &self.token, self.intents, &self.presence)
@@ -670,7 +676,10 @@ impl Shard {
     /// Initializes a new WebSocket client.
     ///
     /// This will set the stage of the shard before and after instantiation of the client.
-    #[instrument(skip(self))]
+    /// # Errors
+    ///
+    /// Errors if unable to establish a websocket connection.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn initialize(&mut self) -> Result<WsClient> {
         debug!("[{:?}] Initializing.", self.shard_info);
 
@@ -689,8 +698,8 @@ impl Shard {
         Ok(client)
     }
 
-    #[instrument(skip(self))]
-    pub async fn reset(&mut self) {
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    pub fn reset(&mut self) {
         self.last_heartbeat_sent = Some(Instant::now());
         self.last_heartbeat_ack = None;
         self.heartbeat_interval = None;
@@ -700,7 +709,10 @@ impl Shard {
         self.seq = 0;
     }
 
-    #[instrument(skip(self))]
+    /// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn resume(&mut self) -> Result<()> {
         debug!("[{:?}] Attempting to resume", self.shard_info);
 
@@ -715,17 +727,23 @@ impl Shard {
         }
     }
 
-    #[instrument(skip(self))]
+    /// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn reconnect(&mut self) -> Result<()> {
         info!("[{:?}] Attempting to reconnect", self.shard_info());
 
-        self.reset().await;
+        self.reset();
         self.client = self.initialize().await?;
 
         Ok(())
     }
 
-    #[instrument(skip(self))]
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn update_presence(&mut self) -> Result<()> {
         self.client.send_presence_update(&self.shard_info, &self.presence).await
     }

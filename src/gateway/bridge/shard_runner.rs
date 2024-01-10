@@ -6,7 +6,7 @@ use tokio::sync::RwLock;
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
-use tracing::{debug, error, info, instrument, trace, warn};
+use tracing::{debug, error, info, trace, warn};
 use typemap_rev::TypeMap;
 
 use super::event::ShardStageUpdateEvent;
@@ -93,8 +93,11 @@ impl ShardRunner {
     ///
     /// 6. Go back to 1.
     ///
+    /// # Errors
+    /// Returns errors if the internal WS connection drops in a non-recoverable way.
+    ///
     /// [`ShardManager`]: super::ShardManager
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn run(&mut self) -> Result<()> {
         info!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
@@ -203,7 +206,7 @@ impl ShardRunner {
     /// # Errors
     ///
     /// Returns
-    #[instrument(skip(self, action))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, action)))]
     async fn action(&mut self, action: &ShardAction) -> Result<()> {
         match *action {
             ShardAction::Reconnect(ReconnectType::Reidentify) => {
@@ -222,7 +225,7 @@ impl ShardRunner {
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
         // First verify the ID so we know for certain this runner is to shutdown.
         if id != self.shard.shard_info().id {
@@ -279,7 +282,7 @@ impl ShardRunner {
     //
     // This always returns true, except in the case that the shard manager asked the runner to
     // shutdown.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn handle_rx_value(&mut self, msg: ShardRunnerMessage) -> bool {
         match msg {
             ShardRunnerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
@@ -320,7 +323,7 @@ impl ShardRunner {
     }
 
     #[cfg(feature = "voice")]
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn handle_voice_event(&self, event: &Event) {
         if let Some(voice_manager) = &self.voice_manager {
             match event {
@@ -353,7 +356,7 @@ impl ShardRunner {
     // Requests a restart if the sending half of the channel disconnects. This should _never_
     // happen, as the sending half is kept on the runner.
     // Returns whether the shard runner is in a state that can continue.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn recv(&mut self) -> bool {
         loop {
             match self.runner_rx.try_next() {
@@ -376,13 +379,12 @@ impl ShardRunner {
         }
 
         // There are no longer any values available.
-
         true
     }
 
     /// Returns a received event, as well as whether reading the potentially present event was
     /// successful.
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gw_event = match self.shard.client.recv_json().await {
             Ok(inner) => Ok(inner),
@@ -454,7 +456,7 @@ impl ShardRunner {
         Ok((event, action, true))
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn request_restart(&mut self) {
         debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
 
@@ -469,7 +471,7 @@ impl ShardRunner {
         }
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn update_manager(&self) {
         self.manager
             .update_shard_latency_and_stage(
