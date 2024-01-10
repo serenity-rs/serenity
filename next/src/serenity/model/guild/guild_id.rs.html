@@ -2939,9 +2939,9 @@
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
-        after: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;UserId&gt;&gt;,
+        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
-        http.as_ref().get_guild_members(<span class="self">self</span>, limit, after.into().map(UserId::get)).<span class="kw">await
+        http.as_ref().get_guild_members(<span class="self">self</span>, limit, after.map(UserId::get)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Streams over all the members in a guild.

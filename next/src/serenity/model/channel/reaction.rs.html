@@ -566,11 +566,6 @@
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="attr">#[cfg(doc)]
@@ -578,6 +573,7 @@
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write <span class="kw">as _</span>};
 <span class="kw">use </span>std::str::FromStr;
 
+<span class="kw">use </span>nonmax::NonMaxU8;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span>percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 <span class="kw">use </span>serde::de::{Deserialize, Error <span class="kw">as </span>DeError};
@@ -790,7 +786,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         reaction_type: R,
-        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
         after: <span class="prelude-ty">Option</span>&lt;U&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt;
     <span class="kw">where
@@ -804,10 +800,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
-        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>limit = limit.unwrap_or(<span class="number">50</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>limit = limit.map_or(<span class="number">50</span>, |limit| limit.get());
 
         <span class="kw">if </span>limit &gt; <span class="number">100 </span>{
             limit = <span class="number">100</span>;
@@ -815,13 +811,7 @@
         }
 
         http.as_ref()
-            .get_reaction_users(
-                <span class="self">self</span>.channel_id,
-                <span class="self">self</span>.message_id,
-                reaction_type,
-                limit,
-                after.map(UserId::get),
-            )
+            .get_reaction_users(<span class="self">self</span>.channel_id, <span class="self">self</span>.message_id, reaction_type, limit, after)
             .<span class="kw">await
     </span>}
 }

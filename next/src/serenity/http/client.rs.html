@@ -8708,7 +8708,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
         limit: u8,
-        after: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         params.push((<span class="string">"limit"</span>, limit.to_string()));

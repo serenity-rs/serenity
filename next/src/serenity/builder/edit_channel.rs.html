@@ -501,8 +501,8 @@
     /// [text]: ChannelType::Text
     /// [voice]: ChannelType::Voice
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>category&lt;C: Into&lt;<span class="prelude-ty">Option</span>&lt;ChannelId&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, category: C) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.parent_id = <span class="prelude-val">Some</span>(category.into());
+    </span><span class="kw">pub fn </span>category(<span class="kw-2">mut </span><span class="self">self</span>, category: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.parent_id = <span class="prelude-val">Some</span>(category);
         <span class="self">self
     </span>}
 

@@ -1218,12 +1218,6 @@
 <a href="#1216" id="1216">1216</a>
 <a href="#1217" id="1217">1217</a>
 <a href="#1218" id="1218">1218</a>
-<a href="#1219" id="1219">1219</a>
-<a href="#1220" id="1220">1220</a>
-<a href="#1221" id="1221">1221</a>
-<a href="#1222" id="1222">1222</a>
-<a href="#1223" id="1223">1223</a>
-<a href="#1224" id="1224">1224</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1845,18 +1839,12 @@
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
-        after: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;UserId&gt;&gt;,
+        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
         <span class="kw">let </span>limit = limit.map_or(<span class="number">50</span>, |x| <span class="kw">if </span>x &gt; <span class="number">100 </span>{ <span class="number">100 </span>} <span class="kw">else </span>{ x });
 
         http.as_ref()
-            .get_reaction_users(
-                <span class="self">self</span>,
-                message_id.into(),
-                <span class="kw-2">&amp;</span>reaction_type.into(),
-                limit,
-                after.into().map(UserId::get),
-            )
+            .get_reaction_users(<span class="self">self</span>, message_id.into(), <span class="kw-2">&amp;</span>reaction_type.into(), limit, after)
             .<span class="kw">await
     </span>}
 

@@ -2004,7 +2004,7 @@
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
-        after: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;UserId&gt;&gt;,
+        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
         <span class="self">self</span>.id.reaction_users(http, message_id, reaction_type, limit, after).<span class="kw">await
     </span>}
