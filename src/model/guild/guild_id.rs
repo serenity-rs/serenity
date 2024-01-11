@@ -62,12 +62,8 @@ impl GuildId {
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rule(
-        self,
-        http: impl AsRef<Http>,
-        rule_id: impl Into<RuleId>,
-    ) -> Result<Rule> {
-        http.as_ref().get_automod_rule(self, rule_id.into()).await
+    pub async fn automod_rule(self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<Rule> {
+        http.as_ref().get_automod_rule(self, rule_id).await
     }
 
     /// Creates an auto moderation [`Rule`] in the guild.
@@ -130,10 +126,10 @@ impl GuildId {
     pub async fn edit_automod_rule(
         self,
         cache_http: impl CacheHttp,
-        rule_id: impl Into<RuleId>,
+        rule_id: RuleId,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
-        builder.execute(cache_http, (self, Some(rule_id.into()))).await
+        builder.execute(cache_http, (self, Some(rule_id))).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.
@@ -146,12 +142,8 @@ impl GuildId {
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn delete_automod_rule(
-        self,
-        http: impl AsRef<Http>,
-        rule_id: impl Into<RuleId>,
-    ) -> Result<()> {
-        http.as_ref().delete_automod_rule(self, rule_id.into(), None).await
+    pub async fn delete_automod_rule(self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<()> {
+        http.as_ref().delete_automod_rule(self, rule_id, None).await
     }
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
@@ -165,10 +157,10 @@ impl GuildId {
     pub async fn add_member(
         self,
         cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
         builder: AddMember<'_>,
     ) -> Result<Option<Member>> {
-        builder.execute(cache_http, (self, user_id.into())).await
+        builder.execute(cache_http, (self, user_id)).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -203,8 +195,8 @@ impl GuildId {
     /// Also can return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
-        self._ban(http, user.into(), dmd, None).await
+    pub async fn ban(self, http: impl AsRef<Http>, user: UserId, dmd: u8) -> Result<()> {
+        self._ban(http, user, dmd, None).await
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
@@ -217,11 +209,11 @@ impl GuildId {
     pub async fn ban_with_reason(
         self,
         http: impl AsRef<Http>,
-        user: impl Into<UserId>,
+        user: UserId,
         dmd: u8,
-        reason: impl AsRef<str>,
+        reason: &str,
     ) -> Result<()> {
-        self._ban(http, user.into(), dmd, Some(reason.as_ref())).await
+        self._ban(http, user, dmd, Some(reason)).await
     }
 
     async fn _ban(
@@ -378,10 +370,9 @@ impl GuildId {
     pub async fn create_integration(
         self,
         http: impl AsRef<Http>,
-        integration_id: impl Into<IntegrationId>,
+        integration_id: IntegrationId,
         kind: &str,
     ) -> Result<()> {
-        let integration_id = integration_id.into();
         let map = json!({
             "id": integration_id,
             "type": kind,
@@ -473,12 +464,8 @@ impl GuildId {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_emoji(
-        self,
-        http: impl AsRef<Http>,
-        emoji_id: impl Into<EmojiId>,
-    ) -> Result<()> {
-        http.as_ref().delete_emoji(self, emoji_id.into(), None).await
+    pub async fn delete_emoji(self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<()> {
+        http.as_ref().delete_emoji(self, emoji_id, None).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -494,9 +481,9 @@ impl GuildId {
     pub async fn delete_integration(
         self,
         http: impl AsRef<Http>,
-        integration_id: impl Into<IntegrationId>,
+        integration_id: IntegrationId,
     ) -> Result<()> {
-        http.as_ref().delete_guild_integration(self, integration_id.into(), None).await
+        http.as_ref().delete_guild_integration(self, integration_id, None).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -511,12 +498,8 @@ impl GuildId {
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete_role(
-        self,
-        http: impl AsRef<Http>,
-        role_id: impl Into<RoleId>,
-    ) -> Result<()> {
-        http.as_ref().delete_role(self, role_id.into(), None).await
+    pub async fn delete_role(self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+        http.as_ref().delete_role(self, role_id, None).await
     }
 
     /// Deletes a specified scheduled event in the guild.
@@ -533,9 +516,9 @@ impl GuildId {
     pub async fn delete_scheduled_event(
         self,
         http: impl AsRef<Http>,
-        event_id: impl Into<ScheduledEventId>,
+        event_id: ScheduledEventId,
     ) -> Result<()> {
-        http.as_ref().delete_scheduled_event(self, event_id.into()).await
+        http.as_ref().delete_scheduled_event(self, event_id).await
     }
 
     /// Deletes a [`Sticker`] by id from the guild.
@@ -551,12 +534,8 @@ impl GuildId {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_sticker(
-        self,
-        http: impl AsRef<Http>,
-        sticker_id: impl Into<StickerId>,
-    ) -> Result<()> {
-        http.as_ref().delete_sticker(self, sticker_id.into(), None).await
+    pub async fn delete_sticker(self, http: impl AsRef<Http>, sticker_id: StickerId) -> Result<()> {
+        http.as_ref().delete_sticker(self, sticker_id, None).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -593,14 +572,14 @@ impl GuildId {
     pub async fn edit_emoji(
         self,
         http: impl AsRef<Http>,
-        emoji_id: impl Into<EmojiId>,
+        emoji_id: EmojiId,
         name: &str,
     ) -> Result<Emoji> {
         let map = json!({
             "name": name,
         });
 
-        http.as_ref().edit_emoji(self, emoji_id.into(), &map, None).await
+        http.as_ref().edit_emoji(self, emoji_id, &map, None).await
     }
 
     /// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
@@ -634,10 +613,10 @@ impl GuildId {
     pub async fn edit_member(
         self,
         cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
         builder: EditMember<'_>,
     ) -> Result<Member> {
-        builder.execute(cache_http, (self, user_id.into())).await
+        builder.execute(cache_http, (self, user_id)).await
     }
 
     /// Edits the guild's MFA level. Returns the new level on success.
@@ -713,10 +692,10 @@ impl GuildId {
     pub async fn edit_role(
         self,
         cache_http: impl CacheHttp,
-        role_id: impl Into<RoleId>,
+        role_id: RoleId,
         builder: EditRole<'_>,
     ) -> Result<Role> {
-        builder.execute(cache_http, (self, Some(role_id.into()))).await
+        builder.execute(cache_http, (self, Some(role_id))).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -734,10 +713,10 @@ impl GuildId {
     pub async fn edit_scheduled_event(
         self,
         cache_http: impl CacheHttp,
-        event_id: impl Into<ScheduledEventId>,
+        event_id: ScheduledEventId,
         builder: EditScheduledEvent<'_>,
     ) -> Result<ScheduledEvent> {
-        builder.execute(cache_http, (self, event_id.into())).await
+        builder.execute(cache_http, (self, event_id)).await
     }
 
     /// Edits a sticker.
@@ -772,10 +751,10 @@ impl GuildId {
     pub async fn edit_sticker(
         self,
         cache_http: impl CacheHttp,
-        sticker_id: impl Into<StickerId>,
+        sticker_id: StickerId,
         builder: EditSticker<'_>,
     ) -> Result<Sticker> {
-        builder.execute(cache_http, (self, sticker_id.into())).await
+        builder.execute(cache_http, (self, sticker_id)).await
     }
 
     /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
@@ -797,10 +776,10 @@ impl GuildId {
     pub async fn edit_role_position(
         self,
         http: impl AsRef<Http>,
-        role_id: impl Into<RoleId>,
+        role_id: RoleId,
         position: u16,
     ) -> Result<Vec<Role>> {
-        http.as_ref().edit_role_position(self, role_id.into(), position, None).await
+        http.as_ref().edit_role_position(self, role_id, position, None).await
     }
 
     /// Edits the guild's welcome screen.
@@ -970,8 +949,8 @@ impl GuildId {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().kick_member(self, user_id.into(), None).await
+    pub async fn kick(self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
+        http.as_ref().kick_member(self, user_id, None).await
     }
 
     /// # Errors
@@ -981,10 +960,10 @@ impl GuildId {
     pub async fn kick_with_reason(
         self,
         http: impl AsRef<Http>,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
         reason: &str,
     ) -> Result<()> {
-        http.as_ref().kick_member(self, user_id.into(), Some(reason)).await
+        http.as_ref().kick_member(self, user_id, Some(reason)).await
     }
 
     /// Returns a guild [`Member`] object for the current user.
@@ -1018,13 +997,7 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if the user is not in the guild, or if the guild is otherwise
     /// unavailable
-    pub async fn member(
-        self,
-        cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
-    ) -> Result<Member> {
-        let user_id = user_id.into();
-
+    pub async fn member(self, cache_http: impl CacheHttp, user_id: UserId) -> Result<Member> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -1103,10 +1076,10 @@ impl GuildId {
     pub async fn move_member(
         self,
         cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
-        channel_id: impl Into<ChannelId>,
+        user_id: UserId,
+        channel_id: ChannelId,
     ) -> Result<Member> {
-        let builder = EditMember::new().voice_channel(channel_id.into());
+        let builder = EditMember::new().voice_channel(channel_id);
         self.edit_member(cache_http, user_id, builder).await
     }
 
@@ -1130,7 +1103,7 @@ impl GuildId {
     pub async fn disconnect_member(
         self,
         cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
     ) -> Result<Member> {
         self.edit_member(cache_http, user_id, EditMember::new().disconnect_member()).await
     }
@@ -1214,10 +1187,10 @@ impl GuildId {
     pub async fn scheduled_event(
         self,
         http: impl AsRef<Http>,
-        event_id: impl Into<ScheduledEventId>,
+        event_id: ScheduledEventId,
         with_user_count: bool,
     ) -> Result<ScheduledEvent> {
-        http.as_ref().get_scheduled_event(self, event_id.into(), with_user_count).await
+        http.as_ref().get_scheduled_event(self, event_id, with_user_count).await
     }
 
     /// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
@@ -1253,10 +1226,10 @@ impl GuildId {
     pub async fn scheduled_event_users(
         self,
         http: impl AsRef<Http>,
-        event_id: impl Into<ScheduledEventId>,
+        event_id: ScheduledEventId,
         limit: Option<u64>,
     ) -> Result<Vec<ScheduledEventUser>> {
-        http.as_ref().get_scheduled_event_users(self, event_id.into(), limit, None, None).await
+        http.as_ref().get_scheduled_event_users(self, event_id, limit, None, None).await
     }
 
     /// Fetches a list of interested users for the specified event, with additional options and
@@ -1273,14 +1246,12 @@ impl GuildId {
     pub async fn scheduled_event_users_optioned(
         self,
         http: impl AsRef<Http>,
-        event_id: impl Into<ScheduledEventId>,
+        event_id: ScheduledEventId,
         limit: Option<u64>,
         target: Option<UserPagination>,
         with_member: Option<bool>,
     ) -> Result<Vec<ScheduledEventUser>> {
-        http.as_ref()
-            .get_scheduled_event_users(self, event_id.into(), limit, target, with_member)
-            .await
+        http.as_ref().get_scheduled_event_users(self, event_id, limit, target, with_member).await
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -1335,9 +1306,9 @@ impl GuildId {
     pub async fn start_integration_sync(
         self,
         http: impl AsRef<Http>,
-        integration_id: impl Into<IntegrationId>,
+        integration_id: IntegrationId,
     ) -> Result<()> {
-        http.as_ref().start_integration_sync(self, integration_id.into()).await
+        http.as_ref().start_integration_sync(self, integration_id).await
     }
 
     /// Starts a prune of [`Member`]s.
@@ -1364,8 +1335,8 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn unban(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().remove_ban(self, user_id.into(), None).await
+    pub async fn unban(self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
+        http.as_ref().remove_ban(self, user_id, None).await
     }
 
     /// Retrieve's the guild's vanity URL.

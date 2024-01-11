@@ -411,7 +411,7 @@ impl GuildChannel {
     pub async fn delete_reaction(
         &self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
@@ -432,7 +432,7 @@ impl GuildChannel {
     pub async fn delete_reactions(
         &self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
     ) -> Result<()> {
         self.id.delete_reactions(http, message_id).await
     }
@@ -494,7 +494,7 @@ impl GuildChannel {
     pub async fn edit_message(
         &self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
         self.id.edit_message(cache_http, message_id, builder).await
@@ -556,14 +556,14 @@ impl GuildChannel {
     pub async fn edit_voice_state(
         &self,
         cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
         builder: EditVoiceState,
     ) -> Result<()> {
         if self.kind != ChannelType::Stage {
             return Err(Error::from(ModelError::InvalidChannelType));
         }
 
-        builder.execute(cache_http, (self.guild_id, self.id, Some(user_id.into()))).await
+        builder.execute(cache_http, (self.guild_id, self.id, Some(user_id))).await
     }
 
     /// Edits the current user's voice state in a stage channel.
@@ -631,7 +631,7 @@ impl GuildChannel {
     pub async fn follow(
         &self,
         http: impl AsRef<Http>,
-        target_channel_id: impl Into<ChannelId>,
+        target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
         self.id.follow(http, target_channel_id).await
     }
@@ -675,7 +675,7 @@ impl GuildChannel {
     pub async fn message(
         &self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
     ) -> Result<Message> {
         self.id.message(cache_http, message_id).await
     }
@@ -725,7 +725,7 @@ impl GuildChannel {
     ///             None => return,
     ///         };
     ///
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author) {
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, msg.author.id) {
     ///             println!("The user's permissions: {:?}", permissions);
     ///         }
     ///     }
@@ -743,11 +743,10 @@ impl GuildChannel {
     pub fn permissions_for_user(
         &self,
         cache: impl AsRef<Cache>,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
     ) -> Result<Permissions> {
         let guild = self.guild(&cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
-        let member =
-            guild.members.get(&user_id.into()).ok_or(Error::Model(ModelError::MemberNotFound))?;
+        let member = guild.members.get(&user_id).ok_or(Error::Model(ModelError::MemberNotFound))?;
         Ok(guild.user_permissions_in(self, member))
     }
 
@@ -761,11 +760,7 @@ impl GuildChannel {
     /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-    ) -> Result<()> {
+    pub async fn pin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
         self.id.pin(http, message_id).await
     }
 
@@ -806,7 +801,7 @@ impl GuildChannel {
     pub async fn reaction_users(
         &self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
         after: Option<UserId>,
@@ -914,11 +909,7 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-    ) -> Result<()> {
+    pub async fn unpin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
         self.id.unpin(http, message_id).await
     }
 
@@ -968,8 +959,8 @@ impl GuildChannel {
             ChannelType::News | ChannelType::Text => Ok(guild
                 .members
                 .iter()
-                .filter(|e| {
-                    self.permissions_for_user(cache, e.0)
+                .filter(|(id, _)| {
+                    self.permissions_for_user(cache, **id)
                         .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                         .unwrap_or(false)
                 })
@@ -1108,7 +1099,7 @@ impl GuildChannel {
     pub async fn create_thread_from_message(
         &self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
         self.id.create_thread_from_message(cache_http, message_id, builder).await
