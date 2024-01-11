@@ -120,10 +120,10 @@ impl ChannelId {
     pub async fn create_reaction(
         self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.as_ref().create_reaction(self, message_id.into(), &reaction_type.into()).await
+        http.as_ref().create_reaction(self, message_id, &reaction_type.into()).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -151,12 +151,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_message(
-        self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-    ) -> Result<()> {
-        http.as_ref().delete_message(self, message_id.into(), None).await
+    pub async fn delete_message(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+        http.as_ref().delete_message(self, message_id, None).await
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -236,12 +232,11 @@ impl ChannelId {
     pub async fn delete_reaction(
         self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
         let http = http.as_ref();
-        let message_id = message_id.into();
         let reaction_type = reaction_type.into();
         match user_id {
             Some(user_id) => http.delete_reaction(self, message_id, user_id, &reaction_type).await,
@@ -262,9 +257,9 @@ impl ChannelId {
     pub async fn delete_reactions(
         self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
     ) -> Result<()> {
-        http.as_ref().delete_message_reactions(self, message_id.into()).await
+        http.as_ref().delete_message_reactions(self, message_id).await
     }
 
     /// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
@@ -279,12 +274,10 @@ impl ChannelId {
     pub async fn delete_reaction_emoji(
         self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.as_ref()
-            .delete_message_reaction_emoji(self, message_id.into(), &reaction_type.into())
-            .await
+        http.as_ref().delete_message_reaction_emoji(self, message_id, &reaction_type.into()).await
     }
 
     /// Edits a channel's settings.
@@ -342,7 +335,7 @@ impl ChannelId {
     pub async fn edit_message(
         self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
         builder.execute(cache_http, (self, message_id.into(), None)).await
@@ -361,9 +354,9 @@ impl ChannelId {
     pub async fn follow(
         self,
         http: impl AsRef<Http>,
-        target_channel_id: impl Into<ChannelId>,
+        target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
-        http.as_ref().follow_news_channel(self, target_channel_id.into()).await
+        http.as_ref().follow_news_channel(self, target_channel_id).await
     }
 
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
@@ -438,10 +431,8 @@ impl ChannelId {
     pub async fn message(
         self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
     ) -> Result<Message> {
-        let message_id = message_id.into();
-
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
             if let Some(message) = cache.message(self, message_id) {
@@ -539,8 +530,8 @@ impl ChannelId {
     /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
-        http.as_ref().pin_message(self, message_id.into(), None).await
+    pub async fn pin(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+        http.as_ref().pin_message(self, message_id, None).await
     }
 
     /// Crossposts a [`Message`].
@@ -556,12 +547,8 @@ impl ChannelId {
     /// author of the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn crosspost(
-        self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-    ) -> Result<Message> {
-        http.as_ref().crosspost_message(self, message_id.into()).await
+    pub async fn crosspost(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<Message> {
+        http.as_ref().crosspost_message(self, message_id).await
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -602,7 +589,7 @@ impl ChannelId {
     pub async fn reaction_users(
         self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
         after: Option<UserId>,
@@ -610,7 +597,7 @@ impl ChannelId {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
         http.as_ref()
-            .get_reaction_users(self, message_id.into(), &reaction_type.into(), limit, after)
+            .get_reaction_users(self, message_id, &reaction_type.into(), limit, after)
             .await
     }
 
@@ -774,12 +761,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(
-        self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-    ) -> Result<()> {
-        http.as_ref().unpin_message(self, message_id.into(), None).await
+    pub async fn unpin(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+        http.as_ref().unpin_message(self, message_id, None).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -908,10 +891,10 @@ impl ChannelId {
     pub async fn create_thread_from_message(
         self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        builder.execute(cache_http, (self, Some(message_id.into()))).await
+        builder.execute(cache_http, (self, Some(message_id))).await
     }
 
     /// Creates a thread that is not connected to a message.
