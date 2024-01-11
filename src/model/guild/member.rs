@@ -107,8 +107,8 @@ impl Member {
     /// Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_role(&self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
-        http.as_ref().add_member_role(self.guild_id, self.user.id, role_id.into(), None).await
+    pub async fn add_role(&self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+        http.as_ref().add_member_role(self.guild_id, self.user.id, role_id, None).await
     }
 
     /// Adds one or multiple [`Role`]s to the member.
@@ -122,7 +122,7 @@ impl Member {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_roles(&self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
-        for role_id in role_ids {
+        for &role_id in role_ids {
             self.add_role(http.as_ref(), role_id).await?;
         }
 
@@ -155,7 +155,7 @@ impl Member {
         &self,
         http: impl AsRef<Http>,
         dmd: u8,
-        reason: impl AsRef<str>,
+        reason: &str,
     ) -> Result<()> {
         self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
     }
@@ -393,7 +393,7 @@ impl Member {
     pub async fn move_to_voice_channel(
         &self,
         cache_http: impl CacheHttp,
-        channel: impl Into<ChannelId>,
+        channel: ChannelId,
     ) -> Result<Member> {
         self.guild_id.move_member(cache_http, self.user.id, channel).await
     }
@@ -448,12 +448,8 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_role(
-        &self,
-        http: impl AsRef<Http>,
-        role_id: impl Into<RoleId>,
-    ) -> Result<()> {
-        http.as_ref().remove_member_role(self.guild_id, self.user.id, role_id.into(), None).await
+    pub async fn remove_role(&self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+        http.as_ref().remove_member_role(self.guild_id, self.user.id, role_id, None).await
     }
 
     /// Removes one or multiple [`Role`]s from the member.
@@ -467,7 +463,7 @@ impl Member {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_roles(&self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
-        for role_id in role_ids {
+        for &role_id in role_ids {
             self.remove_role(http.as_ref(), role_id).await?;
         }
 

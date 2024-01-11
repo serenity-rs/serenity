@@ -736,8 +736,8 @@ impl Message {
     }
 
     /// Checks whether the message mentions passed [`UserId`].
-    pub fn mentions_user_id(&self, id: impl Into<UserId>) -> bool {
-        let id = id.into();
+    #[must_use]
+    pub fn mentions_user_id(&self, id: UserId) -> bool {
         self.mentions.iter().any(|mentioned_user| mentioned_user.id == id)
     }
 
