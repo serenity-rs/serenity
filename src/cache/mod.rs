@@ -349,11 +349,7 @@ impl Cache {
 
     /// Retrieves a [`GuildChannel`] from the cache based on the given Id.
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
-    pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannelRef<'_>> {
-        self._channel(id.into())
-    }
-
-    fn _channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
+    pub fn channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
         let guild_id = *self.channels.get(&id)?;
         let guild_ref = self.guilds.get(&guild_id)?;
         let channel = guild_ref.try_map(|g| g.channels.get(&id)).ok();
@@ -378,17 +374,16 @@ impl Cache {
     /// Find all messages by user ID 8 in channel ID 7:
     ///
     /// ```rust,no_run
+    /// # use serenity::model::id::ChannelId;
+    /// #
     /// # let cache: serenity::cache::Cache = todo!();
-    /// let messages_in_channel = cache.channel_messages(7);
+    /// let messages_in_channel = cache.channel_messages(ChannelId::new(7));
     /// let messages_by_user = messages_in_channel
     ///     .as_ref()
     ///     .map(|msgs| msgs.values().filter(|m| m.author.id == 8).collect::<Vec<_>>());
     /// ```
-    pub fn channel_messages(
-        &self,
-        channel_id: impl Into<ChannelId>,
-    ) -> Option<ChannelMessagesRef<'_>> {
-        self.messages.get(&channel_id.into()).map(CacheRef::from_ref)
+    pub fn channel_messages(&self, channel_id: ChannelId) -> Option<ChannelMessagesRef<'_>> {
+        self.messages.get(&channel_id).map(CacheRef::from_ref)
     }
 
     /// Gets a reference to a guild from the cache based on the given `id`.
@@ -399,18 +394,15 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
+    /// # use serenity::model::id::GuildId;
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(guild) = cache.guild(7) {
+    /// if let Some(guild) = cache.guild(GuildId::new(7)) {
     ///     println!("Guild name: {}", guild.name);
     /// };
     /// ```
-    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<GuildRef<'_>> {
-        self._guild(id.into())
-    }
-
-    fn _guild(&self, id: GuildId) -> Option<GuildRef<'_>> {
+    pub fn guild(&self, id: GuildId) -> Option<GuildRef<'_>> {
         self.guilds.get(&id).map(CacheRef::from_ref)
     }
 
@@ -463,12 +455,8 @@ impl Cache {
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
     #[deprecated = "Use Cache::guild and Guild::members instead"]
-    pub fn member(
-        &self,
-        guild_id: impl Into<GuildId>,
-        user_id: impl Into<UserId>,
-    ) -> Option<MemberRef<'_>> {
-        self._member(guild_id.into(), user_id.into())
+    pub fn member(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
+        self._member(guild_id, user_id)
     }
 
     fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
@@ -477,8 +465,8 @@ impl Cache {
     }
 
     #[deprecated = "Use Cache::guild and Guild::roles instead"]
-    pub fn guild_roles(&self, guild_id: impl Into<GuildId>) -> Option<GuildRolesRef<'_>> {
-        self._guild_roles(guild_id.into())
+    pub fn guild_roles(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
+        self._guild_roles(guild_id)
     }
 
     fn _guild_roles(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
@@ -493,8 +481,8 @@ impl Cache {
 
     /// This method returns all channels from a guild of with the given `guild_id`.
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
-    pub fn guild_channels(&self, guild_id: impl Into<GuildId>) -> Option<GuildChannelsRef<'_>> {
-        self._guild_channels(guild_id.into())
+    pub fn guild_channels(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
+        self._guild_channels(guild_id)
     }
 
     fn _guild_channels(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
@@ -535,15 +523,7 @@ impl Cache {
     /// ```
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
-    pub fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<MessageRef<'_>>
-    where
-        C: Into<ChannelId>,
-        M: Into<MessageId>,
-    {
-        self._message(channel_id.into(), message_id.into())
-    }
-
-    fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
+    pub fn message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
         #[cfg(feature = "temp_cache")]
         if let Some(message) = self.temp_messages.get(&message_id) {
             return Some(CacheRef::from_arc(message));
@@ -564,11 +544,12 @@ impl Cache {
     /// Retrieve a role from the cache and print its name:
     ///
     /// ```rust,no_run
+    /// # use serenity::model::id::{GuildId, RoleId};
     /// # use serenity::cache::Cache;
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(role) = cache.role(7, 77) {
+    /// if let Some(role) = cache.role(GuildId::new(7), RoleId::new(77)) {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// };
     /// ```
@@ -576,15 +557,7 @@ impl Cache {
     /// [`Guild`]: crate::model::guild::Guild
     /// [`roles`]: crate::model::guild::Guild::roles
     #[deprecated = "Use Cache::guild and Guild::roles instead"]
-    pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<GuildRoleRef<'_>>
-    where
-        G: Into<GuildId>,
-        R: Into<RoleId>,
-    {
-        self._role(guild_id.into(), role_id.into())
-    }
-
-    fn _role(&self, guild_id: GuildId, role_id: RoleId) -> Option<GuildRoleRef<'_>> {
+    pub fn role(&self, guild_id: GuildId, role_id: RoleId) -> Option<GuildRoleRef<'_>> {
         let role = self.guilds.get(&guild_id)?.try_map(|g| g.roles.get(&role_id)).ok()?;
         Some(CacheRef::from_mapped_ref(role))
     }
