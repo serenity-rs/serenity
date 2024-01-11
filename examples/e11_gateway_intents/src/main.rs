@@ -34,7 +34,7 @@ async fn main() {
     let intents =
         GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
     // Build our client.
-    let mut client = Client::builder(token, intents)
+    let mut client = Client::builder(&token, intents)
         .event_handler(Handler)
         .await
         .expect("Error creating client");

@@ -50,8 +50,8 @@ impl<'a> EditScheduledEvent<'a> {
     /// [`kind`]: EditScheduledEvent::kind
     /// [`Voice`]: ScheduledEventType::Voice
     /// [`External`]: ScheduledEventType::External
-    pub fn channel_id(mut self, channel_id: impl Into<ChannelId>) -> Self {
-        self.channel_id = Some(Some(channel_id.into()));
+    pub fn channel_id(mut self, channel_id: ChannelId) -> Self {
+        self.channel_id = Some(Some(channel_id));
         self
     }
 
