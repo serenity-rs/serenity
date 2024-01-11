@@ -218,8 +218,8 @@ impl Webhook {
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
-    pub async fn from_id(http: impl AsRef<Http>, webhook_id: impl Into<WebhookId>) -> Result<Self> {
-        http.as_ref().get_webhook(webhook_id.into()).await
+    pub async fn from_id(http: impl AsRef<Http>, webhook_id: WebhookId) -> Result<Self> {
+        http.as_ref().get_webhook(webhook_id).await
     }
 
     /// Retrieves a webhook given its Id and unique token.
@@ -252,10 +252,10 @@ impl Webhook {
     /// response.
     pub async fn from_id_with_token(
         http: impl AsRef<Http>,
-        webhook_id: impl Into<WebhookId>,
+        webhook_id: WebhookId,
         token: &str,
     ) -> Result<Self> {
-        http.as_ref().get_webhook_with_token(webhook_id.into(), token).await
+        http.as_ref().get_webhook_with_token(webhook_id, token).await
     }
 
     /// Retrieves a webhook given its url.

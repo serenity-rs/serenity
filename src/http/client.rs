@@ -64,7 +64,7 @@ pub struct HttpBuilder {
 impl HttpBuilder {
     /// Construct a new builder to call methods on for the HTTP construction. The `token` will
     /// automatically be prefixed "Bot " if not already.
-    pub fn new(token: impl AsRef<str>) -> Self {
+    pub fn new(token: &str) -> Self {
         Self {
             client: None,
             ratelimiter: None,
@@ -84,7 +84,7 @@ impl HttpBuilder {
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
     /// automatically do so.
-    pub fn token(mut self, token: impl AsRef<str>) -> Self {
+    pub fn token(mut self, token: &str) -> Self {
         self.token = SecretString::new(parse_token(token));
         self
     }
@@ -170,8 +170,8 @@ impl HttpBuilder {
     }
 }
 
-fn parse_token(token: impl AsRef<str>) -> String {
-    let token = token.as_ref().trim();
+fn parse_token(token: &str) -> String {
+    let token = token.trim();
 
     if token.starts_with("Bot ") || token.starts_with("Bearer ") {
         token.to_string()
