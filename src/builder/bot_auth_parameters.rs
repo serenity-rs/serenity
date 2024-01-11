@@ -70,8 +70,8 @@ impl<'a> CreateBotAuthParameters<'a> {
     }
 
     /// Specify the client Id of your application.
-    pub fn client_id(mut self, client_id: impl Into<ApplicationId>) -> Self {
-        self.client_id = Some(client_id.into());
+    pub fn client_id(mut self, client_id: ApplicationId) -> Self {
+        self.client_id = Some(client_id);
         self
     }
 
@@ -106,8 +106,8 @@ impl<'a> CreateBotAuthParameters<'a> {
     }
 
     /// Specify the Id of the guild to prefill the dropdown picker for the user.
-    pub fn guild_id(mut self, guild_id: impl Into<GuildId>) -> Self {
-        self.guild_id = Some(guild_id.into());
+    pub fn guild_id(mut self, guild_id: GuildId) -> Self {
+        self.guild_id = Some(guild_id);
         self
     }
 

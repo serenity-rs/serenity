@@ -27,9 +27,9 @@ use std::{fmt, str};
 ///
 /// Returns a [`InvalidToken`] when one of the above checks fail. The type of failure is not
 /// specified.
-pub fn validate(token: impl AsRef<str>) -> Result<(), InvalidToken> {
+pub fn validate(token: &str) -> Result<(), InvalidToken> {
     // Tokens can be preceded by "Bot " (that's how the Discord API expects them)
-    let mut parts = token.as_ref().trim_start_matches("Bot ").split('.');
+    let mut parts = token.trim_start_matches("Bot ").split('.');
 
     let is_valid = parts.next().is_some_and(|p| !p.is_empty())
         && parts.next().is_some_and(|p| !p.is_empty())
