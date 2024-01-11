@@ -352,7 +352,7 @@ async fn say(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
                     // We do not want to clean channel mentions as they do not ping users.
                     .clean_channel(false);
 
-                x = content_safe(&guild, x, settings, &msg.mentions);
+                x = content_safe(&guild, &x, settings, &msg.mentions);
             }
 
             msg.channel_id.say(&ctx.http, x).await?;
