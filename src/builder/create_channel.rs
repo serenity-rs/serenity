@@ -97,8 +97,8 @@ impl<'a> CreateChannel<'a> {
     /// Only for [`ChannelType::Text`], [`ChannelType::Voice`], [`ChannelType::News`],
     /// [`ChannelType::Stage`], [`ChannelType::Forum`]
     #[doc(alias = "parent_id")]
-    pub fn category(mut self, id: impl Into<ChannelId>) -> Self {
-        self.parent_id = Some(id.into());
+    pub fn category(mut self, id: ChannelId) -> Self {
+        self.parent_id = Some(id);
         self
     }
 
