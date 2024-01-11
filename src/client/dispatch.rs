@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use tracing::debug;
-
 #[cfg(feature = "gateway")]
 use super::event_handler::{EventHandler, RawEventHandler};
 use super::{Context, FullEvent};
@@ -368,10 +366,6 @@ fn update_cache_with_event(
         },
         Event::TypingStart(event) => FullEvent::TypingStart {
             event,
-        },
-        Event::Unknown(event) => {
-            debug!("An unknown event was received: {event:?}");
-            return None;
         },
         Event::UserUpdate(mut event) => {
             let before = if_cache!(event.update(cache));
