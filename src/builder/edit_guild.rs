@@ -145,8 +145,8 @@ impl<'a> EditGuild<'a> {
     /// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
-    pub fn owner(mut self, user_id: impl Into<UserId>) -> Self {
-        self.owner_id = Some(user_id.into());
+    pub fn owner(mut self, user_id: UserId) -> Self {
+        self.owner_id = Some(user_id);
         self
     }
 

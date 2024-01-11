@@ -59,7 +59,7 @@ impl PrivateChannel {
     pub async fn create_reaction(
         &self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
         self.id.create_reaction(http, message_id, reaction_type).await
@@ -118,7 +118,7 @@ impl PrivateChannel {
     pub async fn delete_reaction(
         &self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
@@ -144,7 +144,7 @@ impl PrivateChannel {
     pub async fn edit_message(
         &self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
         self.id.edit_message(cache_http, message_id, builder).await
@@ -166,7 +166,7 @@ impl PrivateChannel {
     pub async fn message(
         &self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
     ) -> Result<Message> {
         self.id.message(cache_http, message_id).await
     }
@@ -210,7 +210,7 @@ impl PrivateChannel {
     pub async fn reaction_users(
         &self,
         http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
         after: Option<UserId>,
@@ -223,11 +223,7 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
-    pub async fn pin(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-    ) -> Result<()> {
+    pub async fn pin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
         self.id.pin(http, message_id).await
     }
 
@@ -343,11 +339,7 @@ impl PrivateChannel {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
     /// or if the channel already has the limit of 50 pinned messages.
-    pub async fn unpin(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-    ) -> Result<()> {
+    pub async fn unpin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
         self.id.unpin(http, message_id).await
     }
 }

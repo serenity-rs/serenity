@@ -34,8 +34,8 @@ impl<'a> EditGuildWidget<'a> {
     }
 
     /// The server description shown in the welcome screen.
-    pub fn channel_id(mut self, id: impl Into<ChannelId>) -> Self {
-        self.channel_id = Some(id.into());
+    pub fn channel_id(mut self, id: ChannelId) -> Self {
+        self.channel_id = Some(id);
         self
     }
 
