@@ -60,21 +60,21 @@ impl GetMessages {
     }
 
     /// Indicates to retrieve the messages after a specific message, given its Id.
-    pub fn after(mut self, message_id: impl Into<MessageId>) -> Self {
-        self.search_filter = Some(SearchFilter::After(message_id.into()));
+    pub fn after(mut self, message_id: MessageId) -> Self {
+        self.search_filter = Some(SearchFilter::After(message_id));
         self
     }
 
     /// Indicates to retrieve the messages _around_ a specific message, in other words in either
     /// direction from the message in time.
-    pub fn around(mut self, message_id: impl Into<MessageId>) -> Self {
-        self.search_filter = Some(SearchFilter::Around(message_id.into()));
+    pub fn around(mut self, message_id: MessageId) -> Self {
+        self.search_filter = Some(SearchFilter::Around(message_id));
         self
     }
 
     /// Indicates to retrieve the messages before a specific message, given its Id.
-    pub fn before(mut self, message_id: impl Into<MessageId>) -> Self {
-        self.search_filter = Some(SearchFilter::Before(message_id.into()));
+    pub fn before(mut self, message_id: MessageId) -> Self {
+        self.search_filter = Some(SearchFilter::Before(message_id));
         self
     }
 

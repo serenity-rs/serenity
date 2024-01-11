@@ -57,8 +57,8 @@ impl<'a> EditWebhookMessage<'a> {
 
     /// Edits a message within a given thread. If the provided thread Id doesn't belong to the
     /// current webhook, the API will return an error.
-    pub fn in_thread(mut self, thread_id: impl Into<ChannelId>) -> Self {
-        self.thread_id = Some(thread_id.into());
+    pub fn in_thread(mut self, thread_id: ChannelId) -> Self {
+        self.thread_id = Some(thread_id);
         self
     }
 

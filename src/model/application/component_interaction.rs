@@ -155,10 +155,10 @@ impl ComponentInteraction {
     pub async fn edit_followup(
         &self,
         cache_http: impl CacheHttp,
-        message_id: impl Into<MessageId>,
+        message_id: MessageId,
         builder: CreateInteractionResponseFollowup<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, (Some(message_id.into()), &self.token)).await
+        builder.execute(cache_http, (Some(message_id), &self.token)).await
     }
 
     /// Deletes a followup message.
@@ -167,12 +167,12 @@ impl ComponentInteraction {
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
     /// deleted.
-    pub async fn delete_followup<M: Into<MessageId>>(
+    pub async fn delete_followup(
         &self,
         http: impl AsRef<Http>,
-        message_id: M,
+        message_id: MessageId,
     ) -> Result<()> {
-        http.as_ref().delete_followup_message(&self.token, message_id.into()).await
+        http.as_ref().delete_followup_message(&self.token, message_id).await
     }
 
     /// Gets a followup message.
@@ -181,12 +181,12 @@ impl ComponentInteraction {
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was
     /// deleted.
-    pub async fn get_followup<M: Into<MessageId>>(
+    pub async fn get_followup(
         &self,
         http: impl AsRef<Http>,
-        message_id: M,
+        message_id: MessageId,
     ) -> Result<Message> {
-        http.as_ref().get_followup_message(&self.token, message_id.into()).await
+        http.as_ref().get_followup_message(&self.token, message_id).await
     }
 
     /// Helper function to defer an interaction.

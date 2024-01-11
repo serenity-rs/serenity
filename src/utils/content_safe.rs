@@ -90,12 +90,8 @@ impl Default for ContentSafeOptions {
 ///     }
 /// }
 /// ```
-pub fn content_safe(
-    guild: &Guild,
-    s: impl AsRef<str>,
-    options: ContentSafeOptions,
-    users: &[User],
-) -> String {
+#[must_use]
+pub fn content_safe(guild: &Guild, s: &str, options: ContentSafeOptions, users: &[User]) -> String {
     let mut content = clean_mentions(guild, s, options, users);
 
     if options.get_clean_here() {
@@ -109,13 +105,7 @@ pub fn content_safe(
     content
 }
 
-fn clean_mentions(
-    guild: &Guild,
-    s: impl AsRef<str>,
-    options: ContentSafeOptions,
-    users: &[User],
-) -> String {
-    let s = s.as_ref();
+fn clean_mentions(guild: &Guild, s: &str, options: ContentSafeOptions, users: &[User]) -> String {
     let mut content = String::with_capacity(s.len());
     let mut brackets = s.match_indices(['<', '>']).peekable();
     let mut progress = 0;
