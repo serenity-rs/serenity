@@ -210,18 +210,14 @@ impl Reaction {
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: crate::model::permissions
-    pub async fn users<R, U>(
+    pub async fn users(
         &self,
         http: impl AsRef<Http>,
-        reaction_type: R,
+        reaction_type: impl Into<ReactionType>,
         limit: Option<NonMaxU8>,
-        after: Option<U>,
-    ) -> Result<Vec<User>>
-    where
-        R: Into<ReactionType>,
-        U: Into<UserId>,
-    {
-        self._users(http, &reaction_type.into(), limit, after.map(Into::into)).await
+        after: Option<UserId>,
+    ) -> Result<Vec<User>> {
+        self._users(http, &reaction_type.into(), limit, after).await
     }
 
     async fn _users(
