@@ -207,11 +207,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rule(
-        &self,
-        http: impl AsRef<Http>,
-        rule_id: impl Into<RuleId>,
-    ) -> Result<Rule> {
+    pub async fn automod_rule(&self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<Rule> {
         self.id.automod_rule(http, rule_id).await
     }
 
@@ -248,7 +244,7 @@ impl PartialGuild {
     pub async fn edit_automod_rule(
         &self,
         cache_http: impl CacheHttp,
-        rule_id: impl Into<RuleId>,
+        rule_id: RuleId,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
         self.id.edit_automod_rule(cache_http, rule_id, builder).await
@@ -264,11 +260,7 @@ impl PartialGuild {
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn delete_automod_rule(
-        &self,
-        http: impl AsRef<Http>,
-        rule_id: impl Into<RuleId>,
-    ) -> Result<()> {
+    pub async fn delete_automod_rule(&self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<()> {
         self.id.delete_automod_rule(http, rule_id).await
     }
 
@@ -294,12 +286,7 @@ impl PartialGuild {
     /// Also may return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(
-        &self,
-        http: impl AsRef<Http>,
-        user: impl Into<UserId>,
-        dmd: u8,
-    ) -> Result<()> {
+    pub async fn ban(&self, http: impl AsRef<Http>, user: UserId, dmd: u8) -> Result<()> {
         self.ban_with_reason(http, user, dmd, "").await
     }
 
@@ -313,9 +300,9 @@ impl PartialGuild {
     pub async fn ban_with_reason(
         &self,
         http: impl AsRef<Http>,
-        user: impl Into<UserId>,
+        user: UserId,
         dmd: u8,
-        reason: impl AsRef<str>,
+        reason: &str,
     ) -> Result<()> {
         self.id.ban_with_reason(http, user, dmd, reason).await
     }
@@ -374,12 +361,7 @@ impl PartialGuild {
     }
 
     #[cfg(feature = "cache")]
-    pub fn channel_id_from_name(
-        &self,
-        cache: impl AsRef<Cache>,
-        name: impl AsRef<str>,
-    ) -> Option<ChannelId> {
-        let name = name.as_ref();
+    pub fn channel_id_from_name(&self, cache: impl AsRef<Cache>, name: &str) -> Option<ChannelId> {
         let guild_channels = cache.as_ref().guild_channels(self.id)?;
 
         for (id, channel) in guild_channels.iter() {
@@ -474,7 +456,7 @@ impl PartialGuild {
     pub async fn create_integration(
         &self,
         http: impl AsRef<Http>,
-        integration_id: impl Into<IntegrationId>,
+        integration_id: IntegrationId,
         kind: &str,
     ) -> Result<()> {
         self.id.create_integration(http, integration_id, kind).await
@@ -680,11 +662,7 @@ impl PartialGuild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_emoji(
-        &self,
-        http: impl AsRef<Http>,
-        emoji_id: impl Into<EmojiId>,
-    ) -> Result<()> {
+    pub async fn delete_emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<()> {
         self.id.delete_emoji(http, emoji_id).await
     }
 
@@ -701,7 +679,7 @@ impl PartialGuild {
     pub async fn delete_integration(
         &self,
         http: impl AsRef<Http>,
-        integration_id: impl Into<IntegrationId>,
+        integration_id: IntegrationId,
     ) -> Result<()> {
         self.id.delete_integration(http, integration_id).await
     }
@@ -718,11 +696,7 @@ impl PartialGuild {
     /// does not exist in the Guild.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete_role(
-        &self,
-        http: impl AsRef<Http>,
-        role_id: impl Into<RoleId>,
-    ) -> Result<()> {
+    pub async fn delete_role(&self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
         self.id.delete_role(http, role_id).await
     }
 
@@ -742,7 +716,7 @@ impl PartialGuild {
     pub async fn delete_sticker(
         &self,
         http: impl AsRef<Http>,
-        sticker_id: impl Into<StickerId>,
+        sticker_id: StickerId,
     ) -> Result<()> {
         self.id.delete_sticker(http, sticker_id).await
     }
@@ -791,7 +765,7 @@ impl PartialGuild {
     pub async fn edit_emoji(
         &self,
         http: impl AsRef<Http>,
-        emoji_id: impl Into<EmojiId>,
+        emoji_id: EmojiId,
         name: &str,
     ) -> Result<Emoji> {
         self.id.edit_emoji(http, emoji_id, name).await
@@ -813,7 +787,7 @@ impl PartialGuild {
     pub async fn edit_member(
         &self,
         cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
         builder: EditMember<'_>,
     ) -> Result<Member> {
         self.id.edit_member(cache_http, user_id, builder).await
@@ -871,7 +845,7 @@ impl PartialGuild {
     pub async fn edit_role(
         &self,
         cache_http: impl CacheHttp,
-        role_id: impl Into<RoleId>,
+        role_id: RoleId,
         builder: EditRole<'_>,
     ) -> Result<Role> {
         self.id.edit_role(cache_http, role_id, builder).await
@@ -896,7 +870,7 @@ impl PartialGuild {
     pub async fn edit_role_position(
         &self,
         http: impl AsRef<Http>,
-        role_id: impl Into<RoleId>,
+        role_id: RoleId,
         position: u16,
     ) -> Result<Vec<Role>> {
         self.id.edit_role_position(http, role_id, position).await
@@ -937,7 +911,7 @@ impl PartialGuild {
     pub async fn edit_sticker(
         &self,
         cache_http: impl CacheHttp,
-        sticker_id: impl Into<StickerId>,
+        sticker_id: StickerId,
         builder: EditSticker<'_>,
     ) -> Result<Sticker> {
         self.id.edit_sticker(cache_http, sticker_id, builder).await
@@ -983,11 +957,8 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user is not
     /// in the guild.
-    pub async fn get(
-        cache_http: impl CacheHttp,
-        guild_id: impl Into<GuildId>,
-    ) -> Result<PartialGuild> {
-        guild_id.into().to_partial_guild(cache_http).await
+    pub async fn get(cache_http: impl CacheHttp, guild_id: GuildId) -> Result<PartialGuild> {
+        guild_id.to_partial_guild(cache_http).await
     }
 
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
@@ -1006,10 +977,10 @@ impl PartialGuild {
     pub fn greater_member_hierarchy(
         &self,
         cache: impl AsRef<Cache>,
-        lhs_id: impl Into<UserId>,
-        rhs_id: impl Into<UserId>,
+        lhs_id: UserId,
+        rhs_id: UserId,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
+        self._greater_member_hierarchy(&cache, lhs_id, rhs_id)
     }
 
     #[cfg(feature = "cache")]
@@ -1160,7 +1131,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
+    pub async fn kick(&self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
         self.id.kick(http, user_id).await
     }
 
@@ -1171,7 +1142,7 @@ impl PartialGuild {
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,
-        user_id: impl Into<UserId>,
+        user_id: UserId,
         reason: &str,
     ) -> Result<()> {
         self.id.kick_with_reason(http, user_id, reason).await
@@ -1261,11 +1232,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the member is not in the Guild, or if the Guild is otherwise
     /// unavailable.
-    pub async fn member(
-        &self,
-        cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
-    ) -> Result<Member> {
+    pub async fn member(&self, cache_http: impl CacheHttp, user_id: UserId) -> Result<Member> {
         self.id.member(cache_http, user_id).await
     }
 
@@ -1304,8 +1271,8 @@ impl PartialGuild {
     pub async fn move_member(
         &self,
         cache_http: impl CacheHttp,
-        user_id: impl Into<UserId>,
-        channel_id: impl Into<ChannelId>,
+        user_id: UserId,
+        channel_id: ChannelId,
     ) -> Result<Member> {
         self.id.move_member(cache_http, user_id, channel_id).await
     }
@@ -1393,7 +1360,7 @@ impl PartialGuild {
     pub async fn start_integration_sync(
         &self,
         http: impl AsRef<Http>,
-        integration_id: impl Into<IntegrationId>,
+        integration_id: IntegrationId,
     ) -> Result<()> {
         self.id.start_integration_sync(http, integration_id).await
     }
@@ -1408,7 +1375,7 @@ impl PartialGuild {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     /// [`Guild::unban`]: crate::model::guild::Guild::unban
-    pub async fn unban(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
+    pub async fn unban(&self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
         self.id.unban(http, user_id).await
     }
 
