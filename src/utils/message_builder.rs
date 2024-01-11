@@ -113,11 +113,7 @@ impl MessageBuilder {
     /// [`Channel`]: crate::model::channel::Channel
     /// [`GuildChannel`]: crate::model::channel::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
-    pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
-        self.channel_(channel.into())
-    }
-
-    fn channel_(&mut self, channel: ChannelId) -> &mut Self {
+    pub fn channel(&mut self, channel: ChannelId) -> &mut Self {
         self.push_(&channel.mention());
         self
     }
@@ -816,31 +812,25 @@ impl MessageBuilder {
 
     /// Mentions the [`Role`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`RoleId`]. Refer to [`RoleId`]'s
-    /// documentation for more information.
-    ///
     /// Refer to [`RoleId`]'s [Display implementation] for more information on how this is
     /// formatted.
     ///
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
-    pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
-        self.push_(&role.into().mention());
+    pub fn role(&mut self, role: RoleId) -> &mut Self {
+        self.push_(&role.mention());
         self
     }
 
     /// Mentions the [`User`] in the built message.
-    ///
-    /// This accepts anything that converts _into_ a [`UserId`]. Refer to [`UserId`]'s
-    /// documentation for more information.
     ///
     /// Refer to [`UserId`]'s [Display implementation] for more information on how this is
     /// formatted.
     ///
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
-    pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
-        self.push_(&user.into().mention());
+    pub fn user(&mut self, user: UserId) -> &mut Self {
+        self.push_(&user.mention());
         self
     }
 }
