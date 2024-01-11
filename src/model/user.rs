@@ -504,10 +504,10 @@ impl User {
     pub async fn has_role(
         &self,
         cache_http: impl CacheHttp,
-        guild_id: impl Into<GuildId>,
-        role: impl Into<RoleId>,
+        guild_id: GuildId,
+        role: RoleId,
     ) -> Result<bool> {
-        guild_id.into().member(cache_http, self).await.map(|m| m.roles.contains(&role.into()))
+        guild_id.member(cache_http, self.id).await.map(|m| m.roles.contains(&role))
     }
 
     /// Refreshes the information about the user.
@@ -563,13 +563,7 @@ impl User {
     /// Returns the user's nickname in the given `guild_id`.
     ///
     /// If none is used, it returns [`None`].
-    pub async fn nick_in(
-        &self,
-        cache_http: impl CacheHttp,
-        guild_id: impl Into<GuildId>,
-    ) -> Option<String> {
-        let guild_id = guild_id.into();
-
+    pub async fn nick_in(&self, cache_http: impl CacheHttp, guild_id: GuildId) -> Option<String> {
         // This can't be removed because `GuildId::member` clones the entire `Member` struct if
         // it's present in the cache, which is expensive.
         #[cfg(feature = "cache")]
@@ -585,7 +579,7 @@ impl User {
 
         // At this point we're guaranteed to do an API call.
         guild_id
-            .member(cache_http, &self.id)
+            .member(cache_http, self.id)
             .await
             .ok()
             .and_then(|member| member.nick)

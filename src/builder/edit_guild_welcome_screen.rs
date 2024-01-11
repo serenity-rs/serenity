@@ -111,8 +111,8 @@ impl<'a> CreateGuildWelcomeChannel<'a> {
     }
 
     /// The Id of the channel to show.
-    pub fn id(mut self, id: impl Into<ChannelId>) -> Self {
-        self.channel_id = id.into();
+    pub fn id(mut self, id: ChannelId) -> Self {
+        self.channel_id = id;
         self
     }
 

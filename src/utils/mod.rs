@@ -258,11 +258,9 @@ pub fn parse_channel_mention(mention: &str) -> Option<ChannelId> {
 /// ```
 ///
 /// [`Emoji`]: crate::model::guild::Emoji
-pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
-    let mention = mention.as_ref();
-
+#[must_use]
+pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
     let len = mention.len();
-
     if !(6..=56).contains(&len) {
         return None;
     }
@@ -325,8 +323,8 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
 ///
 /// assert_eq!(parse_quotes(command), expected);
 /// ```
-pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
-    let s = s.as_ref();
+#[must_use]
+pub fn parse_quotes(s: &str) -> Vec<String> {
     let mut args = vec![];
     let mut in_string = false;
     let mut escaping = false;
