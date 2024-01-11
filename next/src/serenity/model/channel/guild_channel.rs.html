@@ -1145,15 +1145,6 @@
 <a href="#1143" id="1143">1143</a>
 <a href="#1144" id="1144">1144</a>
 <a href="#1145" id="1145">1145</a>
-<a href="#1146" id="1146">1146</a>
-<a href="#1147" id="1147">1147</a>
-<a href="#1148" id="1148">1148</a>
-<a href="#1149" id="1149">1149</a>
-<a href="#1150" id="1150">1150</a>
-<a href="#1151" id="1151">1151</a>
-<a href="#1152" id="1152">1152</a>
-<a href="#1153" id="1153">1153</a>
-<a href="#1154" id="1154">1154</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1568,7 +1559,7 @@
     </span><span class="kw">pub async fn </span>delete_reaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -1589,7 +1580,7 @@
     </span><span class="kw">pub async fn </span>delete_reactions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_reactions(http, message_id).<span class="kw">await
     </span>}
@@ -1651,7 +1642,7 @@
     </span><span class="kw">pub async fn </span>edit_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         builder: EditMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.id.edit_message(cache_http, message_id, builder).<span class="kw">await
@@ -1714,10 +1705,10 @@
     </span><span class="kw">pub async fn </span>edit_voice_state(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id.into()))).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id))).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the current user's voice state in a stage channel.
@@ -1785,7 +1776,7 @@
     </span><span class="kw">pub async fn </span>follow(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        target_channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
+        target_channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;FollowedChannel&gt; {
         <span class="self">self</span>.id.follow(http, target_channel_id).<span class="kw">await
     </span>}
@@ -1831,7 +1822,7 @@
     </span><span class="kw">pub async fn </span>message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.id.message(cache_http, message_id).<span class="kw">await
     </span>}
@@ -1881,7 +1872,7 @@
     ///             None =&gt; return,
     ///         };
     ///
-    ///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, &amp;msg.author) {
+    ///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, msg.author.id) {
     ///             println!("The user's permissions: {:?}", permissions);
     ///         }
     ///     }
@@ -1899,11 +1890,10 @@
     </span><span class="kw">pub fn </span>permissions_for_user(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
         <span class="kw">let </span>guild = <span class="self">self</span>.guild(<span class="kw-2">&amp;</span>cache).ok_or(Error::Model(ModelError::GuildNotFound))<span class="question-mark">?</span>;
-        <span class="kw">let </span>member =
-            guild.members.get(<span class="kw-2">&amp;</span>user_id.into()).ok_or(Error::Model(ModelError::MemberNotFound))<span class="question-mark">?</span>;
+        <span class="kw">let </span>member = guild.members.get(<span class="kw-2">&amp;</span>user_id).ok_or(Error::Model(ModelError::MemberNotFound))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(guild.user_permissions_in(<span class="self">self</span>, member))
     }
 
@@ -1917,11 +1907,7 @@
     /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>pin(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.pin(http, message_id).<span class="kw">await
     </span>}
 
@@ -1962,7 +1948,7 @@
     </span><span class="kw">pub async fn </span>reaction_users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
@@ -2074,11 +2060,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>unpin(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.unpin(http, message_id).<span class="kw">await
     </span>}
 
@@ -2128,8 +2110,8 @@
             ChannelType::News | ChannelType::Text =&gt; <span class="prelude-val">Ok</span>(guild
                 .members
                 .iter()
-                .filter(|e| {
-                    <span class="self">self</span>.permissions_for_user(cache, e.<span class="number">0</span>)
+                .filter(|(id, <span class="kw">_</span>)| {
+                    <span class="self">self</span>.permissions_for_user(cache, <span class="kw-2">**</span>id)
                         .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                         .unwrap_or(<span class="bool-val">false</span>)
                 })
@@ -2250,7 +2232,7 @@
     </span><span class="kw">pub async fn </span>create_thread_from_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         builder: CreateThread&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="self">self</span>.id.create_thread_from_message(cache_http, message_id, builder).<span class="kw">await

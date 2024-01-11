@@ -239,8 +239,8 @@
 
     <span class="doccomment">/// Edits a message within a given thread. If the provided thread Id doesn't belong to the
     /// current webhook, the API will return an error.
-    </span><span class="kw">pub fn </span>in_thread(<span class="kw-2">mut </span><span class="self">self</span>, thread_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.thread_id = <span class="prelude-val">Some</span>(thread_id.into());
+    </span><span class="kw">pub fn </span>in_thread(<span class="kw-2">mut </span><span class="self">self</span>, thread_id: ChannelId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thread_id = <span class="prelude-val">Some</span>(thread_id);
         <span class="self">self
     </span>}
 

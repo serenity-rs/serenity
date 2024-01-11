@@ -193,8 +193,8 @@
     }
 
     <span class="doccomment">/// Specify the client Id of your application.
-    </span><span class="kw">pub fn </span>client_id(<span class="kw-2">mut </span><span class="self">self</span>, client_id: <span class="kw">impl </span>Into&lt;ApplicationId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.client_id = <span class="prelude-val">Some</span>(client_id.into());
+    </span><span class="kw">pub fn </span>client_id(<span class="kw-2">mut </span><span class="self">self</span>, client_id: ApplicationId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.client_id = <span class="prelude-val">Some</span>(client_id);
         <span class="self">self
     </span>}
 
@@ -229,8 +229,8 @@
     </span>}
 
     <span class="doccomment">/// Specify the Id of the guild to prefill the dropdown picker for the user.
-    </span><span class="kw">pub fn </span>guild_id(<span class="kw-2">mut </span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.guild_id = <span class="prelude-val">Some</span>(guild_id.into());
+    </span><span class="kw">pub fn </span>guild_id(<span class="kw-2">mut </span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.guild_id = <span class="prelude-val">Some</span>(guild_id);
         <span class="self">self
     </span>}
 

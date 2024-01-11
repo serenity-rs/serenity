@@ -1436,16 +1436,6 @@
 <a href="#1434" id="1434">1434</a>
 <a href="#1435" id="1435">1435</a>
 <a href="#1436" id="1436">1436</a>
-<a href="#1437" id="1437">1437</a>
-<a href="#1438" id="1438">1438</a>
-<a href="#1439" id="1439">1439</a>
-<a href="#1440" id="1440">1440</a>
-<a href="#1441" id="1441">1441</a>
-<a href="#1442" id="1442">1442</a>
-<a href="#1443" id="1443">1443</a>
-<a href="#1444" id="1444">1444</a>
-<a href="#1445" id="1445">1445</a>
-<a href="#1446" id="1446">1446</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self </span><span class="kw">as </span>fmt, Write};
 <span class="kw">use </span>std::ops::Add;
 
@@ -1561,11 +1551,7 @@
     /// [`Channel`]: crate::model::channel::Channel
     /// [`GuildChannel`]: crate::model::channel::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
-    </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._channel(channel.into())
-    }
-
-    <span class="kw">fn </span>_channel(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: ChannelId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>channel(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: ChannelId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>channel.mention());
         <span class="self">self
     </span>}
@@ -2264,31 +2250,25 @@
 
     <span class="doccomment">/// Mentions the [`Role`] in the built message.
     ///
-    /// This accepts anything that converts _into_ a [`RoleId`]. Refer to [`RoleId`]'s
-    /// documentation for more information.
-    ///
     /// Refer to [`RoleId`]'s [Display implementation] for more information on how this is
     /// formatted.
     ///
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
-    </span><span class="kw">pub fn </span>role&lt;R: Into&lt;RoleId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, role: R) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>role.into().mention());
+    </span><span class="kw">pub fn </span>role(<span class="kw-2">&amp;mut </span><span class="self">self</span>, role: RoleId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>role.mention());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Mentions the [`User`] in the built message.
-    ///
-    /// This accepts anything that converts _into_ a [`UserId`]. Refer to [`UserId`]'s
-    /// documentation for more information.
     ///
     /// Refer to [`UserId`]'s [Display implementation] for more information on how this is
     /// formatted.
     ///
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
-    </span><span class="kw">pub fn </span>user&lt;U: Into&lt;UserId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: U) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>user.into().mention());
+    </span><span class="kw">pub fn </span>user(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: UserId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>user.mention());
         <span class="self">self
     </span>}
 }

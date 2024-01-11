@@ -341,16 +341,6 @@
 <a href="#339" id="339">339</a>
 <a href="#340" id="340">340</a>
 <a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::Guild;
@@ -443,12 +433,8 @@
 ///     }
 /// }
 /// ```
-</span><span class="kw">pub fn </span>content_safe(
-    guild: <span class="kw-2">&amp;</span>Guild,
-    s: <span class="kw">impl </span>AsRef&lt;str&gt;,
-    options: ContentSafeOptions,
-    users: <span class="kw-2">&amp;</span>[User],
-) -&gt; String {
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub fn </span>content_safe(guild: <span class="kw-2">&amp;</span>Guild, s: <span class="kw-2">&amp;</span>str, options: ContentSafeOptions, users: <span class="kw-2">&amp;</span>[User]) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>content = clean_mentions(guild, s, options, users);
 
     <span class="kw">if </span>options.get_clean_here() {
@@ -462,13 +448,7 @@
     content
 }
 
-<span class="kw">fn </span>clean_mentions(
-    guild: <span class="kw-2">&amp;</span>Guild,
-    s: <span class="kw">impl </span>AsRef&lt;str&gt;,
-    options: ContentSafeOptions,
-    users: <span class="kw-2">&amp;</span>[User],
-) -&gt; String {
-    <span class="kw">let </span>s = s.as_ref();
+<span class="kw">fn </span>clean_mentions(guild: <span class="kw-2">&amp;</span>Guild, s: <span class="kw-2">&amp;</span>str, options: ContentSafeOptions, users: <span class="kw-2">&amp;</span>[User]) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>content = String::with_capacity(s.len());
     <span class="kw">let </span><span class="kw-2">mut </span>brackets = s.match_indices(|c| c == <span class="string">'&lt;' </span>|| c == <span class="string">'&gt;'</span>).peekable();
     <span class="kw">let </span><span class="kw-2">mut </span>progress = <span class="number">0</span>;

@@ -4753,7 +4753,7 @@
 <span class="kw">impl </span>HttpBuilder {
     <span class="doccomment">/// Construct a new builder to call methods on for the HTTP construction. The `token` will
     /// automatically be prefixed "Bot " if not already.
-    </span><span class="kw">pub fn </span>new(token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(token: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             client: <span class="prelude-val">None</span>,
             ratelimiter: <span class="prelude-val">None</span>,
@@ -4772,7 +4772,7 @@
 
     <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
     /// automatically do so.
-    </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.token = SecretString::new(parse_token(token));
         <span class="self">self
     </span>}
@@ -4845,8 +4845,8 @@
     }
 }
 
-<span class="kw">fn </span>parse_token(token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; String {
-    <span class="kw">let </span>token = token.as_ref().trim();
+<span class="kw">fn </span>parse_token(token: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span>token = token.trim();
 
     <span class="kw">if </span>token.starts_with(<span class="string">"Bot "</span>) || token.starts_with(<span class="string">"Bearer "</span>) {
         token.to_string()

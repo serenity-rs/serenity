@@ -1830,8 +1830,8 @@
     </span>}
 
     <span class="doccomment">/// Checks whether the message mentions passed [`UserId`].
-    </span><span class="kw">pub fn </span>mentions_user_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; bool {
-        <span class="kw">let </span>id = id.into();
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>mentions_user_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: UserId) -&gt; bool {
         <span class="self">self</span>.mentions.iter().any(|mentioned_user| mentioned_user.id == id)
     }
 

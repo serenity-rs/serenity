@@ -384,8 +384,8 @@
     /// Only for [`ChannelType::Text`], [`ChannelType::Voice`], [`ChannelType::News`],
     /// [`ChannelType::Stage`], [`ChannelType::Forum`]
     </span><span class="attr">#[doc(alias = <span class="string">"parent_id"</span>)]
-    </span><span class="kw">pub fn </span>category(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.parent_id = <span class="prelude-val">Some</span>(id.into());
+    </span><span class="kw">pub fn </span>category(<span class="kw-2">mut </span><span class="self">self</span>, id: ChannelId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.parent_id = <span class="prelude-val">Some</span>(id);
         <span class="self">self
     </span>}
 

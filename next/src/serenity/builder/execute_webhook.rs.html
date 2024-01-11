@@ -519,20 +519,20 @@
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::{id::ChannelId, webhook::Webhook};
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Http = unimplemented!();
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&amp;http, url).await?;
     ///
-    /// let builder = ExecuteWebhook::new().in_thread(12345678).content("test");
+    /// let builder = ExecuteWebhook::new().in_thread(ChannelId::new(12345678)).content("test");
     /// webhook.execute(&amp;http, false, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    </span><span class="kw">pub fn </span>in_thread(<span class="kw-2">mut </span><span class="self">self</span>, thread_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.thread_id = <span class="prelude-val">Some</span>(thread_id.into());
+    </span><span class="kw">pub fn </span>in_thread(<span class="kw-2">mut </span><span class="self">self</span>, thread_id: ChannelId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.thread_id = <span class="prelude-val">Some</span>(thread_id);
         <span class="self">self
     </span>}
 

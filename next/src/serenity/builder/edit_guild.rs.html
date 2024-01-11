@@ -487,8 +487,8 @@
     <span class="doccomment">/// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
-    </span><span class="kw">pub fn </span>owner(<span class="kw-2">mut </span><span class="self">self</span>, user_id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.owner_id = <span class="prelude-val">Some</span>(user_id.into());
+    </span><span class="kw">pub fn </span>owner(<span class="kw-2">mut </span><span class="self">self</span>, user_id: UserId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.owner_id = <span class="prelude-val">Some</span>(user_id);
         <span class="self">self
     </span>}
 

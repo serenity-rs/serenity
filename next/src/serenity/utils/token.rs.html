@@ -85,9 +85,9 @@
 ///
 /// Returns a [`InvalidToken`] when one of the above checks fail. The type of failure is not
 /// specified.
-</span><span class="kw">pub fn </span>validate(token: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidToken&gt; {
+</span><span class="kw">pub fn </span>validate(token: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidToken&gt; {
     <span class="comment">// Tokens can be preceded by "Bot " (that's how the Discord API expects them)
-    </span><span class="kw">let </span><span class="kw-2">mut </span>parts = token.as_ref().trim_start_matches(<span class="string">"Bot "</span>).split(<span class="string">'.'</span>);
+    </span><span class="kw">let </span><span class="kw-2">mut </span>parts = token.trim_start_matches(<span class="string">"Bot "</span>).split(<span class="string">'.'</span>);
 
     <span class="kw">let </span>is_valid = parts.next().is_some_and(|p| !p.is_empty())
         &amp;&amp; parts.next().is_some_and(|p| !p.is_empty())

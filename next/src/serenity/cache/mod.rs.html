@@ -737,33 +737,6 @@
 <a href="#735" id="735">735</a>
 <a href="#736" id="736">736</a>
 <a href="#737" id="737">737</a>
-<a href="#738" id="738">738</a>
-<a href="#739" id="739">739</a>
-<a href="#740" id="740">740</a>
-<a href="#741" id="741">741</a>
-<a href="#742" id="742">742</a>
-<a href="#743" id="743">743</a>
-<a href="#744" id="744">744</a>
-<a href="#745" id="745">745</a>
-<a href="#746" id="746">746</a>
-<a href="#747" id="747">747</a>
-<a href="#748" id="748">748</a>
-<a href="#749" id="749">749</a>
-<a href="#750" id="750">750</a>
-<a href="#751" id="751">751</a>
-<a href="#752" id="752">752</a>
-<a href="#753" id="753">753</a>
-<a href="#754" id="754">754</a>
-<a href="#755" id="755">755</a>
-<a href="#756" id="756">756</a>
-<a href="#757" id="757">757</a>
-<a href="#758" id="758">758</a>
-<a href="#759" id="759">759</a>
-<a href="#760" id="760">760</a>
-<a href="#761" id="761">761</a>
-<a href="#762" id="762">762</a>
-<a href="#763" id="763">763</a>
-<a href="#764" id="764">764</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -1114,11 +1087,7 @@
     }
 
     <span class="doccomment">/// Retrieves a [`GuildChannel`] from the cache based on the given Id.
-    </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: C) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._channel(id.into())
-    }
-
-    <span class="kw">fn </span>_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
         <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
         <span class="kw">let </span>channel = guild_ref.try_map(|g| g.channels.get(<span class="kw-2">&amp;</span>id)).ok();
@@ -1152,17 +1121,16 @@
     /// Find all messages by user ID 8 in channel ID 7:
     ///
     /// ```rust,no_run
+    /// # use serenity::model::id::ChannelId;
+    /// #
     /// # let cache: serenity::cache::Cache = todo!();
-    /// let messages_in_channel = cache.channel_messages(7);
+    /// let messages_in_channel = cache.channel_messages(ChannelId::new(7));
     /// let messages_by_user = messages_in_channel
     ///     .as_ref()
     ///     .map(|msgs| msgs.values().filter(|m| m.author.id == 8).collect::&lt;Vec&lt;_&gt;&gt;());
     /// ```
-    </span><span class="kw">pub fn </span>channel_messages(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelMessagesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>.messages.get(<span class="kw-2">&amp;</span>channel_id.into()).map(CacheRef::from_ref)
+    </span><span class="kw">pub fn </span>channel_messages(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelMessagesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+        <span class="self">self</span>.messages.get(<span class="kw-2">&amp;</span>channel_id).map(CacheRef::from_ref)
     }
 
     <span class="doccomment">/// Gets a reference to a guild from the cache based on the given `id`.
@@ -1173,18 +1141,15 @@
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
+    /// # use serenity::model::id::GuildId;
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(guild) = cache.guild(7) {
+    /// if let Some(guild) = cache.guild(GuildId::new(7)) {
     ///     println!("Guild name: {}", guild.name);
     /// };
     /// ```
-    </span><span class="kw">pub fn </span>guild&lt;G: Into&lt;GuildId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: G) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._guild(id.into())
-    }
-
-    <span class="kw">fn </span>_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>guild(<span class="kw-2">&amp;</span><span class="self">self</span>, id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>id).map(CacheRef::from_ref)
     }
 
@@ -1236,12 +1201,8 @@
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
-    </span><span class="kw">pub fn </span>member(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;MemberRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._member(guild_id.into(), user_id.into())
+    </span><span class="kw">pub fn </span>member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;MemberRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+        <span class="self">self</span>._member(guild_id, user_id)
     }
 
     <span class="kw">fn </span>_member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;MemberRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
@@ -1249,8 +1210,8 @@
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(member))
     }
 
-    <span class="kw">pub fn </span>guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._guild_roles(guild_id.into())
+    <span class="kw">pub fn </span>guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+        <span class="self">self</span>._guild_roles(guild_id)
     }
 
     <span class="kw">fn </span>_guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
@@ -1264,8 +1225,8 @@
     }
 
     <span class="doccomment">/// This method returns all channels from a guild of with the given `guild_id`.
-    </span><span class="kw">pub fn </span>guild_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._guild_channels(guild_id.into())
+    </span><span class="kw">pub fn </span>guild_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+        <span class="self">self</span>._guild_channels(guild_id)
     }
 
     <span class="kw">fn </span>_guild_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
@@ -1306,15 +1267,7 @@
     /// ```
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
-    </span><span class="kw">pub fn </span>message&lt;C, M&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: C, message_id: M) -&gt; <span class="prelude-ty">Option</span>&lt;MessageRef&lt;<span class="lifetime">'_</span>&gt;&gt;
-    <span class="kw">where
-        </span>C: Into&lt;ChannelId&gt;,
-        M: Into&lt;MessageId&gt;,
-    {
-        <span class="self">self</span>._message(channel_id.into(), message_id.into())
-    }
-
-    <span class="kw">fn </span>_message(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId, message_id: MessageId) -&gt; <span class="prelude-ty">Option</span>&lt;MessageRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId, message_id: MessageId) -&gt; <span class="prelude-ty">Option</span>&lt;MessageRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.temp_messages.get(<span class="kw-2">&amp;</span>message_id) {
             <span class="kw">return </span><span class="prelude-val">Some</span>(CacheRef::from_arc(message));
@@ -1335,26 +1288,19 @@
     /// Retrieve a role from the cache and print its name:
     ///
     /// ```rust,no_run
+    /// # use serenity::model::id::{GuildId, RoleId};
     /// # use serenity::cache::Cache;
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(role) = cache.role(7, 77) {
+    /// if let Some(role) = cache.role(GuildId::new(7), RoleId::new(77)) {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// };
     /// ```
     ///
     /// [`Guild`]: crate::model::guild::Guild
     /// [`roles`]: crate::model::guild::Guild::roles
-    </span><span class="kw">pub fn </span>role&lt;G, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: G, role_id: R) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRoleRef&lt;<span class="lifetime">'_</span>&gt;&gt;
-    <span class="kw">where
-        </span>G: Into&lt;GuildId&gt;,
-        R: Into&lt;RoleId&gt;,
-    {
-        <span class="self">self</span>._role(guild_id.into(), role_id.into())
-    }
-
-    <span class="kw">fn </span>_role(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, role_id: RoleId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRoleRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    </span><span class="kw">pub fn </span>role(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, role_id: RoleId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRoleRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>role = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.try_map(|g| g.roles.get(<span class="kw-2">&amp;</span>role_id)).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(role))
     }

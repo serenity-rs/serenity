@@ -196,21 +196,21 @@
     }
 
     <span class="doccomment">/// Indicates to retrieve the messages after a specific message, given its Id.
-    </span><span class="kw">pub fn </span>after(<span class="kw-2">mut </span><span class="self">self</span>, message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.search_filter = <span class="prelude-val">Some</span>(SearchFilter::After(message_id.into()));
+    </span><span class="kw">pub fn </span>after(<span class="kw-2">mut </span><span class="self">self</span>, message_id: MessageId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.search_filter = <span class="prelude-val">Some</span>(SearchFilter::After(message_id));
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Indicates to retrieve the messages _around_ a specific message, in other words in either
     /// direction from the message in time.
-    </span><span class="kw">pub fn </span>around(<span class="kw-2">mut </span><span class="self">self</span>, message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.search_filter = <span class="prelude-val">Some</span>(SearchFilter::Around(message_id.into()));
+    </span><span class="kw">pub fn </span>around(<span class="kw-2">mut </span><span class="self">self</span>, message_id: MessageId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.search_filter = <span class="prelude-val">Some</span>(SearchFilter::Around(message_id));
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Indicates to retrieve the messages before a specific message, given its Id.
-    </span><span class="kw">pub fn </span>before(<span class="kw-2">mut </span><span class="self">self</span>, message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.search_filter = <span class="prelude-val">Some</span>(SearchFilter::Before(message_id.into()));
+    </span><span class="kw">pub fn </span>before(<span class="kw-2">mut </span><span class="self">self</span>, message_id: MessageId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.search_filter = <span class="prelude-val">Some</span>(SearchFilter::Before(message_id));
         <span class="self">self
     </span>}
 

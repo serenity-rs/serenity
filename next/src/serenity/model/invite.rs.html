@@ -493,10 +493,10 @@
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     </span><span class="kw">pub async fn </span>create(
         cache_http: <span class="kw">impl </span>CacheHttp,
-        channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
+        channel_id: ChannelId,
         builder: CreateInvite&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
-        channel_id.into().create_invite(cache_http, builder).<span class="kw">await
+        channel_id.create_invite(cache_http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the invite.

@@ -558,10 +558,6 @@
 <a href="#556" id="556">556</a>
 <a href="#557" id="557">557</a>
 <a href="#558" id="558">558</a>
-<a href="#559" id="559">559</a>
-<a href="#560" id="560">560</a>
-<a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="attr">#[cfg(doc)]
@@ -775,18 +771,14 @@
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: crate::model::permissions
-    </span><span class="kw">pub async fn </span>users&lt;R, U&gt;(
+    </span><span class="kw">pub async fn </span>users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        reaction_type: R,
+        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
-        after: <span class="prelude-ty">Option</span>&lt;U&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt;
-    <span class="kw">where
-        </span>R: Into&lt;ReactionType&gt;,
-        U: Into&lt;UserId&gt;,
-    {
-        <span class="self">self</span>._users(http, <span class="kw-2">&amp;</span>reaction_type.into(), limit, after.map(Into::into)).<span class="kw">await
+        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
+        <span class="self">self</span>._users(http, <span class="kw-2">&amp;</span>reaction_type.into(), limit, after).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>_users(

@@ -256,8 +256,8 @@
     }
 
     <span class="doccomment">/// The Id of the channel to show.
-    </span><span class="kw">pub fn </span>id(<span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.channel_id = id.into();
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">mut </span><span class="self">self</span>, id: ChannelId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.channel_id = id;
         <span class="self">self
     </span>}
 

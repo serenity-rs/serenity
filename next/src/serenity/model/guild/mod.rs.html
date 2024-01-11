@@ -2643,51 +2643,6 @@
 <a href="#2641" id="2641">2641</a>
 <a href="#2642" id="2642">2642</a>
 <a href="#2643" id="2643">2643</a>
-<a href="#2644" id="2644">2644</a>
-<a href="#2645" id="2645">2645</a>
-<a href="#2646" id="2646">2646</a>
-<a href="#2647" id="2647">2647</a>
-<a href="#2648" id="2648">2648</a>
-<a href="#2649" id="2649">2649</a>
-<a href="#2650" id="2650">2650</a>
-<a href="#2651" id="2651">2651</a>
-<a href="#2652" id="2652">2652</a>
-<a href="#2653" id="2653">2653</a>
-<a href="#2654" id="2654">2654</a>
-<a href="#2655" id="2655">2655</a>
-<a href="#2656" id="2656">2656</a>
-<a href="#2657" id="2657">2657</a>
-<a href="#2658" id="2658">2658</a>
-<a href="#2659" id="2659">2659</a>
-<a href="#2660" id="2660">2660</a>
-<a href="#2661" id="2661">2661</a>
-<a href="#2662" id="2662">2662</a>
-<a href="#2663" id="2663">2663</a>
-<a href="#2664" id="2664">2664</a>
-<a href="#2665" id="2665">2665</a>
-<a href="#2666" id="2666">2666</a>
-<a href="#2667" id="2667">2667</a>
-<a href="#2668" id="2668">2668</a>
-<a href="#2669" id="2669">2669</a>
-<a href="#2670" id="2670">2670</a>
-<a href="#2671" id="2671">2671</a>
-<a href="#2672" id="2672">2672</a>
-<a href="#2673" id="2673">2673</a>
-<a href="#2674" id="2674">2674</a>
-<a href="#2675" id="2675">2675</a>
-<a href="#2676" id="2676">2676</a>
-<a href="#2677" id="2677">2677</a>
-<a href="#2678" id="2678">2678</a>
-<a href="#2679" id="2679">2679</a>
-<a href="#2680" id="2680">2680</a>
-<a href="#2681" id="2681">2681</a>
-<a href="#2682" id="2682">2682</a>
-<a href="#2683" id="2683">2683</a>
-<a href="#2684" id="2684">2684</a>
-<a href="#2685" id="2685">2685</a>
-<a href="#2686" id="2686">2686</a>
-<a href="#2687" id="2687">2687</a>
-<a href="#2688" id="2688">2688</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2995,11 +2950,7 @@
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>automod_rule(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        rule_id: <span class="kw">impl </span>Into&lt;RuleId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
+    </span><span class="kw">pub async fn </span>automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         <span class="self">self</span>.id.automod_rule(http, rule_id).<span class="kw">await
     </span>}
 
@@ -3036,7 +2987,7 @@
     </span><span class="kw">pub async fn </span>edit_automod_rule(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        rule_id: <span class="kw">impl </span>Into&lt;RuleId&gt;,
+        rule_id: RuleId,
         builder: EditAutoModRule&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         <span class="self">self</span>.id.edit_automod_rule(cache_http, rule_id, builder).<span class="kw">await
@@ -3052,11 +3003,7 @@
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>delete_automod_rule(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        rule_id: <span class="kw">impl </span>Into&lt;RuleId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_automod_rule(http, rule_id).<span class="kw">await
     </span>}
 
@@ -3120,12 +3067,7 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    </span><span class="kw">pub fn </span>channel_id_from_name(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
-        name: <span class="kw">impl </span>AsRef&lt;str&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
-        <span class="kw">let </span>name = name.as_ref();
+    </span><span class="kw">pub fn </span>channel_id_from_name(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
         <span class="kw">let </span>guild_channels = cache.as_ref().guild_channels(<span class="self">self</span>.id)<span class="question-mark">?</span>;
 
         <span class="kw">for </span>(id, channel) <span class="kw">in </span>guild_channels.iter() {
@@ -3165,13 +3107,8 @@
     /// Otherwise returns [`Error::Http`] if the member cannot be banned.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    </span><span class="kw">pub async fn </span>ban(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        user: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        dmd: u8,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>._ban_with_reason(cache_http, user.into(), dmd, <span class="string">""</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>ban(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, user: UserId, dmd: u8) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.ban_with_reason(cache_http, user, dmd, <span class="string">""</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
@@ -3182,16 +3119,6 @@
     /// In addition to the possible reasons [`Self::ban`] may return an error, an
     /// [`ModelError::TooLarge`] may also be returned if the reason is too long.
     </span><span class="kw">pub async fn </span>ban_with_reason(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        user: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        dmd: u8,
-        reason: <span class="kw">impl </span>AsRef&lt;str&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>._ban_with_reason(cache_http, user.into(), dmd, reason.as_ref()).<span class="kw">await
-    </span>}
-
-    <span class="kw">async fn </span>_ban_with_reason(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         user: UserId,
@@ -3254,7 +3181,7 @@
     </span><span class="kw">pub async fn </span>add_member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
         builder: AddMember&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Member&gt;&gt; {
         <span class="self">self</span>.id.add_member(cache_http, user_id, builder).<span class="kw">await
@@ -3412,7 +3339,7 @@
     </span><span class="kw">pub async fn </span>create_integration(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        integration_id: <span class="kw">impl </span>Into&lt;IntegrationId&gt;,
+        integration_id: IntegrationId,
         kind: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.create_integration(http, integration_id, kind).<span class="kw">await
@@ -3649,11 +3576,7 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>delete_emoji(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        emoji_id: <span class="kw">impl </span>Into&lt;EmojiId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_emoji(http, emoji_id).<span class="kw">await
     </span>}
 
@@ -3670,7 +3593,7 @@
     </span><span class="kw">pub async fn </span>delete_integration(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        integration_id: <span class="kw">impl </span>Into&lt;IntegrationId&gt;,
+        integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_integration(http, integration_id).<span class="kw">await
     </span>}
@@ -3686,11 +3609,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete the role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>delete_role(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_role(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, role_id: RoleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_role(http, role_id).<span class="kw">await
     </span>}
 
@@ -3708,7 +3627,7 @@
     </span><span class="kw">pub async fn </span>delete_scheduled_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_scheduled_event(http, event_id).<span class="kw">await
     </span>}
@@ -3729,7 +3648,7 @@
     </span><span class="kw">pub async fn </span>delete_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        sticker_id: <span class="kw">impl </span>Into&lt;StickerId&gt;,
+        sticker_id: StickerId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_sticker(http, sticker_id).<span class="kw">await
     </span>}
@@ -3798,7 +3717,7 @@
     </span><span class="kw">pub async fn </span>edit_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        emoji_id: <span class="kw">impl </span>Into&lt;EmojiId&gt;,
+        emoji_id: EmojiId,
         name: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="self">self</span>.id.edit_emoji(http, emoji_id, name).<span class="kw">await
@@ -3820,7 +3739,7 @@
     </span><span class="kw">pub async fn </span>edit_member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
         builder: EditMember&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="self">self</span>.id.edit_member(cache_http, user_id, builder).<span class="kw">await
@@ -3888,7 +3807,7 @@
     </span><span class="kw">pub async fn </span>edit_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
+        role_id: RoleId,
         builder: EditRole&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         <span class="self">self</span>.id.edit_role(cache_http, role_id, builder).<span class="kw">await
@@ -3913,7 +3832,7 @@
     </span><span class="kw">pub async fn </span>edit_role_position(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
+        role_id: RoleId,
         position: u16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
         <span class="self">self</span>.id.edit_role_position(http, role_id, position).<span class="kw">await
@@ -3934,7 +3853,7 @@
     </span><span class="kw">pub async fn </span>edit_scheduled_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         builder: EditScheduledEvent&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         <span class="self">self</span>.id.edit_scheduled_event(cache_http, event_id, builder).<span class="kw">await
@@ -3975,7 +3894,7 @@
     </span><span class="kw">pub async fn </span>edit_sticker(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        sticker_id: <span class="kw">impl </span>Into&lt;StickerId&gt;,
+        sticker_id: StickerId,
         builder: EditSticker&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
         <span class="self">self</span>.id.edit_sticker(cache_http, sticker_id, builder).<span class="kw">await
@@ -4023,11 +3942,8 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    </span><span class="kw">pub async fn </span>get(
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        guild_id.into().to_partial_guild(cache_http).<span class="kw">await
+    </span><span class="kw">pub async fn </span>get(cache_http: <span class="kw">impl </span>CacheHttp, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
+        guild_id.to_partial_guild(cache_http).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
@@ -4046,10 +3962,10 @@
     </span><span class="kw">pub fn </span>greater_member_hierarchy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
-        lhs_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        rhs_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        lhs_id: UserId,
+        rhs_id: UserId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
-        <span class="self">self</span>._greater_member_hierarchy(<span class="kw-2">&amp;</span>cache, lhs_id.into(), rhs_id.into())
+        <span class="self">self</span>._greater_member_hierarchy(<span class="kw-2">&amp;</span>cache, lhs_id, rhs_id)
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
@@ -4185,7 +4101,7 @@
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    </span><span class="kw">pub async fn </span>kick(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>kick(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.kick(http, user_id).<span class="kw">await
     </span>}
 
@@ -4196,7 +4112,7 @@
     </span><span class="kw">pub async fn </span>kick_with_reason(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
         reason: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.kick_with_reason(http, user_id, reason).<span class="kw">await
@@ -4236,10 +4152,8 @@
     </span><span class="kw">pub async fn </span>member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;<span class="lifetime">'_</span>, Member&gt;&gt; {
-        <span class="kw">let </span>user_id = user_id.into();
-
         <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>user_id) {
             <span class="prelude-val">Ok</span>(Cow::Borrowed(member))
         } <span class="kw">else </span>{
@@ -4556,8 +4470,8 @@
     </span><span class="kw">pub async fn </span>move_member(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
+        user_id: UserId,
+        channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="self">self</span>.id.move_member(cache_http, user_id, channel_id).<span class="kw">await
     </span>}
@@ -4726,7 +4640,7 @@
     </span><span class="kw">pub async fn </span>scheduled_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         with_user_count: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
         <span class="self">self</span>.id.scheduled_event(http, event_id, with_user_count).<span class="kw">await
@@ -4765,7 +4679,7 @@
     </span><span class="kw">pub async fn </span>scheduled_event_users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEventUser&gt;&gt; {
         <span class="self">self</span>.id.scheduled_event_users(http, event_id, limit).<span class="kw">await
@@ -4785,7 +4699,7 @@
     </span><span class="kw">pub async fn </span>scheduled_event_users_optioned(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
         with_member: <span class="prelude-ty">Option</span>&lt;bool&gt;,
@@ -4849,7 +4763,7 @@
     </span><span class="kw">pub async fn </span>start_integration_sync(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        integration_id: <span class="kw">impl </span>Into&lt;IntegrationId&gt;,
+        integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.start_integration_sync(http, integration_id).<span class="kw">await
     </span>}
@@ -4895,11 +4809,7 @@
     /// Otherwise will return an [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    </span><span class="kw">pub async fn </span>unban(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>unban(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {

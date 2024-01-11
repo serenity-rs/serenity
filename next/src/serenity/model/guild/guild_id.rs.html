@@ -1749,35 +1749,6 @@
 <a href="#1747" id="1747">1747</a>
 <a href="#1748" id="1748">1748</a>
 <a href="#1749" id="1749">1749</a>
-<a href="#1750" id="1750">1750</a>
-<a href="#1751" id="1751">1751</a>
-<a href="#1752" id="1752">1752</a>
-<a href="#1753" id="1753">1753</a>
-<a href="#1754" id="1754">1754</a>
-<a href="#1755" id="1755">1755</a>
-<a href="#1756" id="1756">1756</a>
-<a href="#1757" id="1757">1757</a>
-<a href="#1758" id="1758">1758</a>
-<a href="#1759" id="1759">1759</a>
-<a href="#1760" id="1760">1760</a>
-<a href="#1761" id="1761">1761</a>
-<a href="#1762" id="1762">1762</a>
-<a href="#1763" id="1763">1763</a>
-<a href="#1764" id="1764">1764</a>
-<a href="#1765" id="1765">1765</a>
-<a href="#1766" id="1766">1766</a>
-<a href="#1767" id="1767">1767</a>
-<a href="#1768" id="1768">1768</a>
-<a href="#1769" id="1769">1769</a>
-<a href="#1770" id="1770">1770</a>
-<a href="#1771" id="1771">1771</a>
-<a href="#1772" id="1772">1772</a>
-<a href="#1773" id="1773">1773</a>
-<a href="#1774" id="1774">1774</a>
-<a href="#1775" id="1775">1775</a>
-<a href="#1776" id="1776">1776</a>
-<a href="#1777" id="1777">1777</a>
-<a href="#1778" id="1778">1778</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1845,12 +1816,8 @@
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>automod_rule(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        rule_id: <span class="kw">impl </span>Into&lt;RuleId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
-        http.as_ref().get_automod_rule(<span class="self">self</span>, rule_id.into()).<span class="kw">await
+    </span><span class="kw">pub async fn </span>automod_rule(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
+        http.as_ref().get_automod_rule(<span class="self">self</span>, rule_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates an auto moderation [`Rule`] in the guild.
@@ -1913,10 +1880,10 @@
     </span><span class="kw">pub async fn </span>edit_automod_rule(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        rule_id: <span class="kw">impl </span>Into&lt;RuleId&gt;,
+        rule_id: RuleId,
         builder: EditAutoModRule&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">Some</span>(rule_id.into()))).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">Some</span>(rule_id))).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes an auto moderation [`Rule`] from the guild.
@@ -1929,12 +1896,8 @@
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>delete_automod_rule(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        rule_id: <span class="kw">impl </span>Into&lt;RuleId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_automod_rule(<span class="self">self</span>, rule_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_automod_rule(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_automod_rule(<span class="self">self</span>, rule_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Adds a [`User`] to this guild with a valid OAuth2 access token.
@@ -1948,10 +1911,10 @@
     </span><span class="kw">pub async fn </span>add_member(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
         builder: AddMember&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Member&gt;&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>, user_id.into())).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, user_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -1986,8 +1949,8 @@
     /// Also can return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    </span><span class="kw">pub async fn </span>ban(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user: <span class="kw">impl </span>Into&lt;UserId&gt;, dmd: u8) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>._ban(http, user.into(), dmd, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>ban(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user: UserId, dmd: u8) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>._ban(http, user, dmd, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
@@ -2000,11 +1963,11 @@
     </span><span class="kw">pub async fn </span>ban_with_reason(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        user: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user: UserId,
         dmd: u8,
-        reason: <span class="kw">impl </span>AsRef&lt;str&gt;,
+        reason: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>._ban(http, user.into(), dmd, <span class="prelude-val">Some</span>(reason.as_ref())).<span class="kw">await
+        <span class="self">self</span>._ban(http, user, dmd, <span class="prelude-val">Some</span>(reason)).<span class="kw">await
     </span>}
 
     <span class="kw">async fn </span>_ban(
@@ -2161,10 +2124,9 @@
     </span><span class="kw">pub async fn </span>create_integration(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        integration_id: <span class="kw">impl </span>Into&lt;IntegrationId&gt;,
+        integration_id: IntegrationId,
         kind: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>integration_id = integration_id.into();
         <span class="kw">let </span>map = <span class="macro">json!</span>({
             <span class="string">"id"</span>: integration_id,
             <span class="string">"type"</span>: kind,
@@ -2256,12 +2218,8 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>delete_emoji(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        emoji_id: <span class="kw">impl </span>Into&lt;EmojiId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_emoji(<span class="self">self</span>, emoji_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_emoji(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_emoji(<span class="self">self</span>, emoji_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes an integration by Id from the guild.
@@ -2277,9 +2235,9 @@
     </span><span class="kw">pub async fn </span>delete_integration(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        integration_id: <span class="kw">impl </span>Into&lt;IntegrationId&gt;,
+        integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_guild_integration(<span class="self">self</span>, integration_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
+        http.as_ref().delete_guild_integration(<span class="self">self</span>, integration_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a [`Role`] by Id from the guild.
@@ -2294,12 +2252,8 @@
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>delete_role(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_role(<span class="self">self</span>, role_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_role(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, role_id: RoleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_role(<span class="self">self</span>, role_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a specified scheduled event in the guild.
@@ -2316,9 +2270,9 @@
     </span><span class="kw">pub async fn </span>delete_scheduled_event(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_scheduled_event(<span class="self">self</span>, event_id.into()).<span class="kw">await
+        http.as_ref().delete_scheduled_event(<span class="self">self</span>, event_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a [`Sticker`] by id from the guild.
@@ -2334,12 +2288,8 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>delete_sticker(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        sticker_id: <span class="kw">impl </span>Into&lt;StickerId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_sticker(<span class="self">self</span>, sticker_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_sticker(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, sticker_id: StickerId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().delete_sticker(<span class="self">self</span>, sticker_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the current guild with new data where specified.
@@ -2376,14 +2326,14 @@
     </span><span class="kw">pub async fn </span>edit_emoji(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        emoji_id: <span class="kw">impl </span>Into&lt;EmojiId&gt;,
+        emoji_id: EmojiId,
         name: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="kw">let </span>map = <span class="macro">json!</span>({
             <span class="string">"name"</span>: name,
         });
 
-        http.as_ref().edit_emoji(<span class="self">self</span>, emoji_id.into(), <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
+        http.as_ref().edit_emoji(<span class="self">self</span>, emoji_id, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
@@ -2417,10 +2367,10 @@
     </span><span class="kw">pub async fn </span>edit_member(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
         builder: EditMember&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>, user_id.into())).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, user_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the guild's MFA level. Returns the new level on success.
@@ -2496,10 +2446,10 @@
     </span><span class="kw">pub async fn </span>edit_role(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
+        role_id: RoleId,
         builder: EditRole&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">Some</span>(role_id.into()))).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, <span class="prelude-val">Some</span>(role_id))).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Modifies a scheduled event in the guild with the data set, if any.
@@ -2517,10 +2467,10 @@
     </span><span class="kw">pub async fn </span>edit_scheduled_event(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         builder: EditScheduledEvent&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>, event_id.into())).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, event_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a sticker.
@@ -2555,10 +2505,10 @@
     </span><span class="kw">pub async fn </span>edit_sticker(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        sticker_id: <span class="kw">impl </span>Into&lt;StickerId&gt;,
+        sticker_id: StickerId,
         builder: EditSticker&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>, sticker_id.into())).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, sticker_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edit the position of a [`Role`] relative to all others in the [`Guild`].
@@ -2580,10 +2530,10 @@
     </span><span class="kw">pub async fn </span>edit_role_position(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        role_id: <span class="kw">impl </span>Into&lt;RoleId&gt;,
+        role_id: RoleId,
         position: u16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
-        http.as_ref().edit_role_position(<span class="self">self</span>, role_id.into(), position, <span class="prelude-val">None</span>).<span class="kw">await
+        http.as_ref().edit_role_position(<span class="self">self</span>, role_id, position, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the guild's welcome screen.
@@ -2753,8 +2703,8 @@
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    </span><span class="kw">pub async fn </span>kick(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().kick_member(<span class="self">self</span>, user_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>kick(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().kick_member(<span class="self">self</span>, user_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// # Errors
@@ -2764,10 +2714,10 @@
     </span><span class="kw">pub async fn </span>kick_with_reason(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
         reason: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().kick_member(<span class="self">self</span>, user_id.into(), <span class="prelude-val">Some</span>(reason)).<span class="kw">await
+        http.as_ref().kick_member(<span class="self">self</span>, user_id, <span class="prelude-val">Some</span>(reason)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns a guild [`Member`] object for the current user.
@@ -2801,13 +2751,7 @@
     ///
     /// Returns an [`Error::Http`] if the user is not in the guild, or if the guild is otherwise
     /// unavailable
-    </span><span class="kw">pub async fn </span>member(
-        <span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
-        <span class="kw">let </span>user_id = user_id.into();
-
+    </span><span class="kw">pub async fn </span>member(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
@@ -2884,10 +2828,10 @@
     </span><span class="kw">pub async fn </span>move_member(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
-        channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;,
+        user_id: UserId,
+        channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
-        <span class="kw">let </span>builder = EditMember::new().voice_channel(channel_id.into());
+        <span class="kw">let </span>builder = EditMember::new().voice_channel(channel_id);
         <span class="self">self</span>.edit_member(cache_http, user_id, builder).<span class="kw">await
     </span>}
 
@@ -2911,7 +2855,7 @@
     </span><span class="kw">pub async fn </span>disconnect_member(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
+        user_id: UserId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="self">self</span>.edit_member(cache_http, user_id, EditMember::new().disconnect_member()).<span class="kw">await
     </span>}
@@ -2995,10 +2939,10 @@
     </span><span class="kw">pub async fn </span>scheduled_event(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         with_user_count: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
-        http.as_ref().get_scheduled_event(<span class="self">self</span>, event_id.into(), with_user_count).<span class="kw">await
+        http.as_ref().get_scheduled_event(<span class="self">self</span>, event_id, with_user_count).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
@@ -3034,10 +2978,10 @@
     </span><span class="kw">pub async fn </span>scheduled_event_users(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEventUser&gt;&gt; {
-        http.as_ref().get_scheduled_event_users(<span class="self">self</span>, event_id.into(), limit, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await
+        http.as_ref().get_scheduled_event_users(<span class="self">self</span>, event_id, limit, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Fetches a list of interested users for the specified event, with additional options and
@@ -3054,14 +2998,12 @@
     </span><span class="kw">pub async fn </span>scheduled_event_users_optioned(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        event_id: <span class="kw">impl </span>Into&lt;ScheduledEventId&gt;,
+        event_id: ScheduledEventId,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
         with_member: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEventUser&gt;&gt; {
-        http.as_ref()
-            .get_scheduled_event_users(<span class="self">self</span>, event_id.into(), limit, target, with_member)
-            .<span class="kw">await
+        http.as_ref().get_scheduled_event_users(<span class="self">self</span>, event_id, limit, target, with_member).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
@@ -3116,9 +3058,9 @@
     </span><span class="kw">pub async fn </span>start_integration_sync(
         <span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        integration_id: <span class="kw">impl </span>Into&lt;IntegrationId&gt;,
+        integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().start_integration_sync(<span class="self">self</span>, integration_id.into()).<span class="kw">await
+        http.as_ref().start_integration_sync(<span class="self">self</span>, integration_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Starts a prune of [`Member`]s.
@@ -3145,8 +3087,8 @@
     /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    </span><span class="kw">pub async fn </span>unban(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: <span class="kw">impl </span>Into&lt;UserId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().remove_ban(<span class="self">self</span>, user_id.into(), <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>unban(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.as_ref().remove_ban(<span class="self">self</span>, user_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieve's the guild's vanity URL.

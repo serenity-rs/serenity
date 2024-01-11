@@ -246,8 +246,8 @@
     /// [`kind`]: EditScheduledEvent::kind
     /// [`Voice`]: ScheduledEventType::Voice
     /// [`External`]: ScheduledEventType::External
-    </span><span class="kw">pub fn </span>channel_id(<span class="kw-2">mut </span><span class="self">self</span>, channel_id: <span class="kw">impl </span>Into&lt;ChannelId&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.channel_id = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(channel_id.into()));
+    </span><span class="kw">pub fn </span>channel_id(<span class="kw-2">mut </span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.channel_id = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(channel_id));
         <span class="self">self
     </span>}
 

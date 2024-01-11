@@ -855,12 +855,6 @@
 <a href="#853" id="853">853</a>
 <a href="#854" id="854">854</a>
 <a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
-<a href="#861" id="861">861</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1382,10 +1376,10 @@
     </span><span class="kw">pub async fn </span>has_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
-        role: <span class="kw">impl </span>Into&lt;RoleId&gt;,
+        guild_id: GuildId,
+        role: RoleId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
-        guild_id.into().member(cache_http, <span class="self">self</span>).<span class="kw">await</span>.map(|m| m.roles.contains(<span class="kw-2">&amp;</span>role.into()))
+        guild_id.member(cache_http, <span class="self">self</span>.id).<span class="kw">await</span>.map(|m| m.roles.contains(<span class="kw-2">&amp;</span>role))
     }
 
     <span class="doccomment">/// Refreshes the information about the user.
@@ -1441,13 +1435,7 @@
     <span class="doccomment">/// Returns the user's nickname in the given `guild_id`.
     ///
     /// If none is used, it returns [`None`].
-    </span><span class="kw">pub async fn </span>nick_in(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-        <span class="kw">let </span>guild_id = guild_id.into();
-
+    </span><span class="kw">pub async fn </span>nick_in(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
         <span class="comment">// This can't be removed because `GuildId::member` clones the entire `Member` struct if
         // it's present in the cache, which is expensive.
         </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
@@ -1463,7 +1451,7 @@
 
         <span class="comment">// At this point we're guaranteed to do an API call.
         </span>guild_id
-            .member(cache_http, <span class="kw-2">&amp;</span><span class="self">self</span>.id)
+            .member(cache_http, <span class="self">self</span>.id)
             .<span class="kw">await
             </span>.ok()
             .and_then(|member| member.nick)

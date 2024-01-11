@@ -355,14 +355,6 @@
 <a href="#353" id="353">353</a>
 <a href="#354" id="354">354</a>
 <a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -425,7 +417,7 @@
     </span><span class="kw">pub async fn </span>create_reaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.create_reaction(http, message_id, reaction_type).<span class="kw">await
@@ -484,7 +476,7 @@
     </span><span class="kw">pub async fn </span>delete_reaction(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -510,7 +502,7 @@
     </span><span class="kw">pub async fn </span>edit_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         builder: EditMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.id.edit_message(cache_http, message_id, builder).<span class="kw">await
@@ -534,7 +526,7 @@
     </span><span class="kw">pub async fn </span>message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.id.message(cache_http, message_id).<span class="kw">await
     </span>}
@@ -578,7 +570,7 @@
     </span><span class="kw">pub async fn </span>reaction_users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
@@ -591,11 +583,7 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
-    </span><span class="kw">pub async fn </span>pin(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.pin(http, message_id).<span class="kw">await
     </span>}
 
@@ -711,11 +699,7 @@
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
     /// or if the channel already has the limit of 50 pinned messages.
-    </span><span class="kw">pub async fn </span>unpin(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.unpin(http, message_id).<span class="kw">await
     </span>}
 }

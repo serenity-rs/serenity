@@ -377,10 +377,10 @@
     </span><span class="kw">pub async fn </span>edit_followup(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+        message_id: MessageId,
         builder: CreateInteractionResponseFollowup&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        builder.execute(cache_http, (<span class="prelude-val">Some</span>(message_id.into()), <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
+        builder.execute(cache_http, (<span class="prelude-val">Some</span>(message_id), <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a followup message.
@@ -389,12 +389,12 @@
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
     /// deleted.
-    </span><span class="kw">pub async fn </span>delete_followup&lt;M: Into&lt;MessageId&gt;&gt;(
+    </span><span class="kw">pub async fn </span>delete_followup(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: M,
+        message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id.into()).<span class="kw">await
+        http.as_ref().delete_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Helper function to defer an interaction.
