@@ -84,7 +84,23 @@ pub struct ClientBuilder {
 
 #[cfg(feature = "gateway")]
 impl ClientBuilder {
-    fn new_(http: Http, intents: GatewayIntents) -> Self {
+    /// Construct a new builder to call methods on for the client construction. The `token` will
+    /// automatically be prefixed "Bot " if not already.
+    ///
+    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
+    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
+    /// panic.
+    pub fn new(token: &str, intents: GatewayIntents) -> Self {
+        Self::new_with_http(Http::new(token), intents)
+    }
+
+    /// Construct a new builder with a [`Http`] instance to calls methods on for the client
+    /// construction.
+    ///
+    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
+    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
+    /// panic.
+    pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
         Self {
             data: TypeMap::new(),
             http,
@@ -101,31 +117,10 @@ impl ClientBuilder {
         }
     }
 
-    /// Construct a new builder to call methods on for the client construction. The `token` will
-    /// automatically be prefixed "Bot " if not already.
-    ///
-    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
-    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
-    /// panic.
-    pub fn new(token: impl AsRef<str>, intents: GatewayIntents) -> Self {
-        Self::new_(Http::new(token.as_ref()), intents)
-    }
-
-    /// Construct a new builder with a [`Http`] instance to calls methods on for the client
-    /// construction.
-    ///
-    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
-    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
-    /// panic.
-    pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
-        Self::new_(http, intents)
-    }
-
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
     /// automatically do so.
-    pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.http = Http::new(token.as_ref());
-
+    pub fn token(mut self, token: &str) -> Self {
+        self.http = Http::new(token);
         self
     }
 
@@ -601,7 +596,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn builder(token: impl AsRef<str>, intents: GatewayIntents) -> ClientBuilder {
+    pub fn builder(token: &str, intents: GatewayIntents) -> ClientBuilder {
         ClientBuilder::new(token, intents)
     }
 

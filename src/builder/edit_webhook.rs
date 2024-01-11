@@ -37,8 +37,8 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Set the channel to move the webhook to.
-    pub fn channel_id(mut self, channel_id: impl Into<ChannelId>) -> Self {
-        self.channel_id = Some(channel_id.into());
+    pub fn channel_id(mut self, channel_id: ChannelId) -> Self {
+        self.channel_id = Some(channel_id);
         self
     }
 

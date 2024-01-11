@@ -62,8 +62,8 @@ impl<'a> CreateScheduledEvent<'a> {
 
     /// Sets the channel id of the scheduled event. Required if [`Self::kind`] is
     /// [`ScheduledEventType::StageInstance`] or [`ScheduledEventType::Voice`].
-    pub fn channel_id<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
-        self.channel_id = Some(channel_id.into());
+    pub fn channel_id(mut self, channel_id: ChannelId) -> Self {
+        self.channel_id = Some(channel_id);
         self
     }
 

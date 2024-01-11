@@ -117,7 +117,7 @@ impl fmt::Display for Minimum {
 /// #[cfg(feature = "client")]
 /// impl EventHandler for Handler {
 ///     async fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
-///         match guild_id.ban(&context, user, 8).await {
+///         match guild_id.ban(&context, user.id, 8).await {
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },

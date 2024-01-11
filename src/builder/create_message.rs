@@ -212,8 +212,8 @@ impl<'a> CreateMessage<'a> {
     ///
     /// **Note**: This will replace all existing stickers. Use [`Self::add_sticker_id()`] to keep
     /// existing stickers.
-    pub fn sticker_id(self, sticker_id: impl Into<StickerId>) -> Self {
-        self.sticker_ids(vec![sticker_id.into()])
+    pub fn sticker_id(self, sticker_id: StickerId) -> Self {
+        self.sticker_ids(vec![sticker_id])
     }
 
     /// Sets a list of sticker IDs to include in the message.
@@ -233,8 +233,8 @@ impl<'a> CreateMessage<'a> {
     ///
     /// **Note**: This will keep all existing stickers. Use [`Self::sticker_id()`] to replace
     /// existing sticker.
-    pub fn add_sticker_id(mut self, sticker_id: impl Into<StickerId>) -> Self {
-        self.sticker_ids.to_mut().push(sticker_id.into());
+    pub fn add_sticker_id(mut self, sticker_id: StickerId) -> Self {
+        self.sticker_ids.to_mut().push(sticker_id);
         self
     }
 
@@ -244,11 +244,8 @@ impl<'a> CreateMessage<'a> {
     ///
     /// **Note**: This will keep all existing stickers. Use [`Self::sticker_ids()`] to replace
     /// existing stickers.
-    pub fn add_sticker_ids<T: Into<StickerId>>(
-        mut self,
-        sticker_ids: impl IntoIterator<Item = T>,
-    ) -> Self {
-        self.sticker_ids.to_mut().extend(sticker_ids.into_iter().map(Into::into));
+    pub fn add_sticker_ids(mut self, sticker_ids: impl IntoIterator<Item = StickerId>) -> Self {
+        self.sticker_ids.to_mut().extend(sticker_ids);
         self
     }
 
