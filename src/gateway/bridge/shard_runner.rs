@@ -386,8 +386,11 @@ impl ShardRunner {
     /// successful.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
-        let gw_event = match self.shard.client.recv_json().await {
-            Ok(inner) => Ok(inner),
+        let gateway_event = match self.shard.client.recv_json().await {
+            Ok(Some(inner)) => Ok(inner),
+            Ok(None) => {
+                return Ok((None, None, true));
+            },
             Err(Error::Tungstenite(tung_err)) if matches!(*tung_err, TungsteniteError::Io(_)) => {
                 debug!("Attempting to auto-reconnect");
 
@@ -410,13 +413,7 @@ impl ShardRunner {
             Err(why) => Err(why),
         };
 
-        let event = match gw_event {
-            Ok(Some(event)) => Ok(event),
-            Ok(None) => return Ok((None, None, true)),
-            Err(why) => Err(why),
-        };
-
-        let action = match self.shard.handle_event(&event) {
+        let action = match self.shard.handle_event(&gateway_event) {
             Ok(Some(action)) => Some(action),
             Ok(None) => None,
             Err(why) => {
@@ -437,18 +434,18 @@ impl ShardRunner {
             },
         };
 
-        if let Ok(GatewayEvent::HeartbeatAck) = event {
+        if let Ok(GatewayEvent::HeartbeatAck) = gateway_event {
             self.update_manager().await;
         }
 
         #[cfg(feature = "voice")]
         {
-            if let Ok(GatewayEvent::Dispatch(_, ref event)) = event {
+            if let Ok(GatewayEvent::Dispatch(_, ref event)) = gateway_event {
                 self.handle_voice_event(event).await;
             }
         }
 
-        let event = match event {
+        let event = match gateway_event {
             Ok(GatewayEvent::Dispatch(_, event)) => Some(event),
             _ => None,
         };
