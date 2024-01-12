@@ -1348,21 +1348,13 @@ pub enum Event {
     MessagePollVoteAdd(MessagePollVoteAddEvent),
     /// A user has removed a previous vote on a Message Poll.
     MessagePollVoteRemove(MessagePollVoteRemoveEvent),
-    /// An event type not covered by the above
-    #[serde(untagged)]
-    Unknown(UnknownEvent),
 }
 
 impl Event {
-    /// Return the event name of this event. Returns [`None`] if the event is
-    /// [`Unknown`](Event::Unknown).
+    /// Returns the event name of this event.
     #[must_use]
     pub fn name(&self) -> Option<String> {
-        if let Self::Unknown(_) = self {
-            None
-        } else {
-            let map = serde_json::to_value(self).ok()?;
-            Some(map.get("t")?.as_str()?.to_string())
-        }
+        let map = serde_json::to_value(self).ok()?;
+        Some(map.get("t")?.as_str()?.to_string())
     }
 }
