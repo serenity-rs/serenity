@@ -453,7 +453,11 @@ impl Shard {
                 Ok(Some(ShardAction::Reconnect(self.reconnection_type())))
             },
             Err(why) => {
-                warn!("[{:?}] Unhandled error: {:?}", self.info, why);
+                if let Error::Json(_) = why {
+                    // Deserialization errors already get logged when the event is first received
+                } else {
+                    warn!("[{:?}] Unhandled error: {:?}", self.info, why);
+                }
 
                 Ok(None)
             },
