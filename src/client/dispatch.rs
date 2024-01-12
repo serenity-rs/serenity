@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use tracing::debug;
-
 #[cfg(feature = "gateway")]
 use super::event_handler::{EventHandler, RawEventHandler};
 use super::{Context, FullEvent};
@@ -55,33 +53,31 @@ pub(crate) fn dispatch_model(
         tokio::spawn(async move { raw_handler.raw_event(context, event).await });
     }
 
-    let full_events = update_cache_with_event(
+    let (full_event, extra_event) = update_cache_with_event(
         #[cfg(feature = "cache")]
         &context.cache,
         event,
     );
 
-    if let Some(events) = full_events {
-        let iter = std::iter::once(events.0).chain(events.1);
-        for handler in event_handlers {
-            for event in iter.clone() {
-                let context = context.clone();
-                let handler = Arc::clone(&handler);
-                spawn_named(event.snake_case_name(), async move {
-                    event.dispatch(context, &*handler).await;
-                });
-            }
+    let iter = std::iter::once(full_event).chain(extra_event);
+    for handler in event_handlers {
+        for event in iter.clone() {
+            let context = context.clone();
+            let handler = Arc::clone(&handler);
+            spawn_named(event.snake_case_name(), async move {
+                event.dispatch(context, &*handler).await;
+            });
         }
+    }
 
-        #[cfg(feature = "framework")]
-        if let Some(framework) = framework {
-            for event in iter {
-                let context = context.clone();
-                let framework = Arc::clone(&framework);
-                spawn_named("dispatch::framework::dispatch", async move {
-                    framework.dispatch(context, event).await;
-                });
-            }
+    #[cfg(feature = "framework")]
+    if let Some(framework) = framework {
+        for event in iter {
+            let context = context.clone();
+            let framework = Arc::clone(&framework);
+            spawn_named("dispatch::framework::dispatch", async move {
+                framework.dispatch(context, event).await;
+            });
         }
     }
 }
@@ -96,7 +92,7 @@ pub(crate) fn dispatch_model(
 fn update_cache_with_event(
     #[cfg(feature = "cache")] cache: &Cache,
     event: Event,
-) -> Option<(FullEvent, Option<FullEvent>)> {
+) -> (FullEvent, Option<FullEvent>) {
     let mut extra_event = None;
     let event = match event {
         Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
@@ -368,10 +364,6 @@ fn update_cache_with_event(
         Event::TypingStart(event) => FullEvent::TypingStart {
             event,
         },
-        Event::Unknown(event) => {
-            debug!("An unknown event was received: {event:?}");
-            return None;
-        },
         Event::UserUpdate(mut event) => {
             let before = if_cache!(event.update(cache));
 
@@ -493,5 +485,5 @@ fn update_cache_with_event(
         },
     };
 
-    Some((event, extra_event))
+    (event, extra_event)
 }
