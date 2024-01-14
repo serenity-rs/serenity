@@ -286,7 +286,7 @@ pub mod comma_separated_string {
         vec: &FixedArray<FixedString>,
         serializer: S,
     ) -> Result<S::Ok, S::Error> {
-        let vec: Vec<String> = vec.iter().map(FixedString::clone).map(String::from).collect();
+        let vec: Vec<String> = vec.iter().cloned().map(String::from).collect();
         serializer.serialize_str(&vec.join(", "))
     }
 }
