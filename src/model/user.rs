@@ -856,6 +856,8 @@ mod test {
         use std::num::NonZeroU16;
         use std::str::FromStr;
 
+        use small_fixed_array::FixedString;
+
         use crate::model::id::UserId;
         use crate::model::misc::ImageHash;
         use crate::model::user::User;
@@ -866,7 +868,7 @@ mod test {
                 id: UserId::new(210),
                 avatar: Some(ImageHash::from_str("fb211703bcc04ee612c88d494df0272f").unwrap()),
                 discriminator: NonZeroU16::new(1432),
-                name: "test".to_string().into(),
+                name: FixedString::from_str_trunc("test"),
                 ..Default::default()
             };
 

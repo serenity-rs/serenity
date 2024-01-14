@@ -199,6 +199,8 @@ fn clean_mention(
 #[allow(clippy::non_ascii_literal)]
 #[cfg(test)]
 mod tests {
+    use small_fixed_array::FixedString;
+
     use super::*;
     use crate::model::channel::*;
     use crate::model::guild::*;
@@ -209,7 +211,7 @@ mod tests {
     fn test_content_safe() {
         let user = User {
             id: UserId::new(100000000000000000),
-            name: "Crab".to_string().into(),
+            name: FixedString::from_str_trunc("Crab"),
             ..Default::default()
         };
 
@@ -221,19 +223,19 @@ mod tests {
         let mut guild = no_member_guild.clone();
 
         let member = Member {
-            nick: Some("Ferris".to_string().into()),
+            nick: Some(FixedString::from_str_trunc("Ferris")),
             ..Default::default()
         };
 
         let role = Role {
             id: RoleId::new(333333333333333333),
-            name: "ferris-club-member".to_string().into(),
+            name: FixedString::from_str_trunc("ferris-club-member"),
             ..Default::default()
         };
 
         let channel = GuildChannel {
             id: ChannelId::new(111880193700067777),
-            name: "general".to_string().into(),
+            name: FixedString::from_str_trunc("general"),
             ..Default::default()
         };
 
