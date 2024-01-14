@@ -33,7 +33,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     pub fn attachments(&mut self, attachments: Vec<Attachment>) -> &mut Self {
-        self.msg.attachments = attachments.into();
+        self.msg.attachments = attachments.trunc_into();
 
         self
     }
@@ -60,7 +60,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty string (`String::default()`).
     pub fn content(&mut self, s: impl Into<String>) -> &mut Self {
-        self.msg.content = s.into().into();
+        self.msg.content = s.into().trunc_into();
 
         self
     }
@@ -78,7 +78,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     pub fn embeds(&mut self, embeds: Vec<Embed>) -> &mut Self {
-        self.msg.embeds = embeds.into();
+        self.msg.embeds = embeds.trunc_into();
 
         self
     }
@@ -125,7 +125,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     pub fn mention_roles(&mut self, roles: Vec<RoleId>) -> &mut Self {
-        self.msg.mention_roles = roles.into();
+        self.msg.mention_roles = roles.trunc_into();
 
         self
     }
@@ -134,7 +134,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     pub fn mentions(&mut self, mentions: Vec<User>) -> &mut Self {
-        self.msg.mentions = mentions.into();
+        self.msg.mentions = mentions.trunc_into();
 
         self
     }
@@ -152,7 +152,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     pub fn reactions(&mut self, reactions: Vec<MessageReaction>) -> &mut Self {
-        self.msg.reactions = reactions.into();
+        self.msg.reactions = reactions.trunc_into();
 
         self
     }
