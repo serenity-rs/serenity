@@ -1,7 +1,6 @@
 #![allow(clippy::missing_errors_doc)]
 
 use std::borrow::Cow;
-use std::convert::TryFrom;
 use std::num::NonZeroU64;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;

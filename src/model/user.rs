@@ -53,7 +53,6 @@ use crate::model::utils::avatar_url;
 /// }
 /// ```
 pub(crate) mod discriminator {
-    use std::convert::TryFrom;
     use std::fmt;
 
     use serde::de::{Error, Visitor};
