@@ -558,7 +558,7 @@
         vec: <span class="kw-2">&amp;</span>FixedArray&lt;FixedString&gt;,
         serializer: S,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-        <span class="kw">let </span>vec: Vec&lt;String&gt; = vec.iter().map(FixedString::clone).map(String::from).collect();
+        <span class="kw">let </span>vec: Vec&lt;String&gt; = vec.iter().cloned().map(String::from).collect();
         serializer.serialize_str(<span class="kw-2">&amp;</span>vec.join(<span class="string">", "</span>))
     }
 }

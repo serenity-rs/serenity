@@ -443,7 +443,7 @@
             event_handlers: <span class="self">self</span>.event_handlers.clone(),
             raw_event_handlers: <span class="self">self</span>.raw_event_handlers.clone(),
             <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
-            </span>framework: <span class="self">self</span>.framework.get().map(Arc::clone),
+            </span>framework: <span class="self">self</span>.framework.get().cloned(),
             manager: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.manager),
             <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
             </span>voice_manager: <span class="self">self</span>.voice_manager.clone(),

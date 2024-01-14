@@ -879,6 +879,7 @@
 <a href="#877" id="877">877</a>
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -1197,8 +1198,9 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;mut </span>http.ratelimiter {
             <span class="kw">let </span>event_handlers_clone = event_handlers.clone();
             ratelimiter.set_ratelimit_callback(Box::new(<span class="kw">move </span>|info| {
-                <span class="kw">for </span>event_handler <span class="kw">in </span>event_handlers_clone.iter().map(Arc::clone) {
+                <span class="kw">for </span>event_handler <span class="kw">in </span><span class="kw-2">&amp;</span>event_handlers_clone {
                     <span class="kw">let </span>info = info.clone();
+                    <span class="kw">let </span>event_handler = Arc::clone(event_handler);
                     tokio::spawn(<span class="kw">async move </span>{ event_handler.ratelimit(info).<span class="kw">await </span>});
                 }
             }));
@@ -1230,7 +1232,7 @@
                 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
                 </span>framework: Arc::clone(<span class="kw-2">&amp;</span>framework_cell),
                 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
-                </span>voice_manager: voice_manager.as_ref().map(Arc::clone),
+                </span>voice_manager: voice_manager.clone(),
                 ws_url: Arc::clone(<span class="kw-2">&amp;</span>ws_url),
                 shard_total,
                 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
