@@ -319,7 +319,6 @@ impl fmt::Display for ShardId {
 /// }
 /// ```
 pub(crate) mod snowflake {
-    use std::convert::TryFrom;
     use std::fmt;
     use std::num::NonZeroU64;
 

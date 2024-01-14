@@ -1,5 +1,4 @@
 use std::cmp::Ordering;
-use std::convert::TryFrom;
 #[cfg(doc)]
 use std::fmt::Display as _;
 use std::fmt::{self, Write as _};
@@ -482,8 +481,6 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// Creating a [`ReactionType`] from a custom emoji argument in the following format:
     ///
     /// ```rust
-    /// use std::convert::TryFrom;
-    ///
     /// use serenity::model::channel::ReactionType;
     /// use serenity::model::id::EmojiId;
     ///
