@@ -186,7 +186,7 @@ impl ShardQueuer {
             event_handlers: self.event_handlers.clone(),
             raw_event_handlers: self.raw_event_handlers.clone(),
             #[cfg(feature = "framework")]
-            framework: self.framework.get().map(Arc::clone),
+            framework: self.framework.get().cloned(),
             manager: Arc::clone(&self.manager),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
