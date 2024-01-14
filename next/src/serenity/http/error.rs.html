@@ -278,8 +278,11 @@
 <a href="#276" id="276">276</a>
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<a href="#279" id="279">279</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>reqwest::header::InvalidHeaderValue;
 <span class="kw">use </span>reqwest::{Error <span class="kw">as </span>ReqwestError, Method, Response, StatusCode};
@@ -301,14 +304,21 @@
     </span><span class="kw">pub </span>errors: FixedArray&lt;DiscordJsonSingleError&gt;,
 }
 
-<span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+<span class="attr">#[derive(serde::Deserialize)]
+</span><span class="kw">struct </span>RawDiscordJsonSingleError {
+    code: FixedString&lt;u8&gt;,
+    message: FixedString,
+}
+
+<span class="attr">#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 </span><span class="kw">pub struct </span>DiscordJsonSingleError {
     <span class="doccomment">/// The error code.
     </span><span class="kw">pub </span>code: FixedString&lt;u8&gt;,
     <span class="doccomment">/// The error message.
     </span><span class="kw">pub </span>message: FixedString,
     <span class="doccomment">/// The path to the error in the request body itself, dot separated.
-    </span><span class="kw">pub </span>path: FixedString,
+    </span><span class="attr">#[serde(skip)]
+    </span><span class="kw">pub </span>path: Arc&lt;str&gt;,
 }
 
 <span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
@@ -460,64 +470,56 @@
 </span><span class="kw">pub fn </span>deserialize_errors&lt;<span class="lifetime">'de</span>, D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(
     deserializer: D,
 ) -&gt; StdResult&lt;FixedArray&lt;DiscordJsonSingleError&gt;, D::Error&gt; {
-    <span class="kw">let </span>map: Value = Value::deserialize(deserializer)<span class="question-mark">?</span>;
-
-    <span class="kw">if </span>!map.is_object() {
-        <span class="kw">return </span><span class="prelude-val">Ok</span>(FixedArray::empty());
-    }
+    <span class="kw">let </span>ErrorValue::Recurse(map) = ErrorValue::deserialize(deserializer)<span class="question-mark">? </span><span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(FixedArray::new());
+    };
 
     <span class="kw">let </span><span class="kw-2">mut </span>errors = Vec::new();
     <span class="kw">let </span><span class="kw-2">mut </span>path = Vec::new();
-    loop_errors(<span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span>errors, <span class="kw-2">&amp;mut </span>path).map_err(D::Error::custom)<span class="question-mark">?</span>;
+    loop_errors(map, <span class="kw-2">&amp;mut </span>errors, <span class="kw-2">&amp;mut </span>path).map_err(D::Error::custom)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(errors.into())
 }
 
 <span class="kw">fn </span>make_error(
-    errors_value: <span class="kw-2">&amp;</span>Value,
+    errors_to_process: Vec&lt;RawDiscordJsonSingleError&gt;,
     errors: <span class="kw-2">&amp;mut </span>Vec&lt;DiscordJsonSingleError&gt;,
     path: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
-) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
-    <span class="kw">let </span>found_errors = errors_value.as_array().ok_or(<span class="string">"expected array"</span>)<span class="question-mark">?</span>;
+) {
+    <span class="kw">let </span>joined_path = Arc::from(path.join(<span class="string">"."</span>));
+    errors.extend(errors_to_process.into_iter().map(|raw| DiscordJsonSingleError {
+        code: raw.code,
+        message: raw.message,
+        path: Arc::clone(<span class="kw-2">&amp;</span>joined_path),
+    }));
+}
 
-    <span class="kw">for </span>error <span class="kw">in </span>found_errors {
-        <span class="kw">let </span>error_object = error.as_object().ok_or(<span class="string">"expected object"</span>)<span class="question-mark">?</span>;
-
-        errors.push(DiscordJsonSingleError {
-            code: error_object
-                .get(<span class="string">"code"</span>)
-                .ok_or(<span class="string">"expected code"</span>)<span class="question-mark">?
-                </span>.as_str()
-                .ok_or(<span class="string">"expected string"</span>)<span class="question-mark">?
-                </span>.to_owned()
-                .into(),
-            message: error_object
-                .get(<span class="string">"message"</span>)
-                .ok_or(<span class="string">"expected message"</span>)<span class="question-mark">?
-                </span>.as_str()
-                .ok_or(<span class="string">"expected string"</span>)<span class="question-mark">?
-                </span>.to_owned()
-                .into(),
-            path: path.join(<span class="string">"."</span>).into(),
-        });
-    }
-    <span class="prelude-val">Ok</span>(())
+<span class="attr">#[derive(serde::Deserialize)]
+#[serde(untagged)]
+</span><span class="kw">enum </span>ErrorValue&lt;<span class="lifetime">'a</span>&gt; {
+    Base(Vec&lt;RawDiscordJsonSingleError&gt;),
+    <span class="attr">#[serde(borrow)]
+    </span>Recurse(HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, ErrorValue&lt;<span class="lifetime">'a</span>&gt;&gt;),
 }
 
 <span class="kw">fn </span>loop_errors&lt;<span class="lifetime">'a</span>&gt;(
-    value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Value,
+    value: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, ErrorValue&lt;<span class="lifetime">'a</span>&gt;&gt;,
     errors: <span class="kw-2">&amp;mut </span>Vec&lt;DiscordJsonSingleError&gt;,
     path: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
-) -&gt; StdResult&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
-    <span class="kw">for </span>(key, value) <span class="kw">in </span>value.as_object().ok_or(<span class="string">"expected object"</span>)<span class="question-mark">? </span>{
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt; {
+    <span class="kw">for </span>(key, value) <span class="kw">in </span>value {
         <span class="kw">if </span>key == <span class="string">"_errors" </span>{
-            make_error(value, errors, path)<span class="question-mark">?</span>;
+            <span class="kw">let </span>ErrorValue::Base(value) = value <span class="kw">else </span>{ <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"expected array, found map"</span>) };
+            make_error(value, errors, path);
         } <span class="kw">else </span>{
+            <span class="kw">let </span>ErrorValue::Recurse(value) = value <span class="kw">else </span>{ <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">"expected map, found array"</span>) };
+
             path.push(key);
             loop_errors(value, errors, path)<span class="question-mark">?</span>;
             path.pop();
         }
     }
+
     <span class="prelude-val">Ok</span>(())
 }
 
