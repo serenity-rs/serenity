@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use nonmax::NonMaxU16;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -23,7 +25,7 @@ pub struct EditThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     invitable: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rate_limit_per_user: Option<u16>,
+    rate_limit_per_user: Option<NonMaxU16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<ChannelFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,7 +81,7 @@ impl<'a> EditThread<'a> {
     /// Amount of seconds a user has to wait before sending another message (0-21600); bots, as well
     /// as users with the permission manage_messages, manage_thread, or manage_channel, are
     /// unaffected
-    pub fn rate_limit_per_user(mut self, rate_limit_per_user: u16) -> Self {
+    pub fn rate_limit_per_user(mut self, rate_limit_per_user: NonMaxU16) -> Self {
         self.rate_limit_per_user = Some(rate_limit_per_user);
         self
     }

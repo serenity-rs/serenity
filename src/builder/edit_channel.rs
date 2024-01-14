@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use nonmax::NonMaxU16;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateForumTag;
@@ -47,7 +49,7 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     nsfw: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rate_limit_per_user: Option<u16>,
+    rate_limit_per_user: Option<NonMaxU16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     bitrate: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,7 +71,7 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     default_reaction_emoji: Option<Option<ForumEmoji>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    default_thread_rate_limit_per_user: Option<u16>,
+    default_thread_rate_limit_per_user: Option<NonMaxU16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_sort_order: Option<SortOrder>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -196,7 +198,7 @@ impl<'a> EditChannel<'a> {
     /// [`MANAGE_MESSAGES`]: Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
-    pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
+    pub fn rate_limit_per_user(mut self, seconds: NonMaxU16) -> Self {
         self.rate_limit_per_user = Some(seconds);
         self
     }
@@ -283,7 +285,7 @@ impl<'a> EditChannel<'a> {
     /// copied to the thread at creation time and does not live update.
     pub fn default_thread_rate_limit_per_user(
         mut self,
-        default_thread_rate_limit_per_user: u16,
+        default_thread_rate_limit_per_user: NonMaxU16,
     ) -> Self {
         self.default_thread_rate_limit_per_user = Some(default_thread_rate_limit_per_user);
         self
