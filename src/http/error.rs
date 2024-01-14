@@ -1,5 +1,7 @@
+use std::collections::HashMap;
 use std::error::Error as StdError;
 use std::fmt;
+use std::sync::Arc;
 
 use reqwest::header::InvalidHeaderValue;
 use reqwest::{Error as ReqwestError, Method, Response, StatusCode};
@@ -21,14 +23,21 @@ pub struct DiscordJsonError {
     pub errors: FixedArray<DiscordJsonSingleError>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(serde::Deserialize)]
+struct RawDiscordJsonSingleError {
+    code: FixedString<u8>,
+    message: FixedString,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct DiscordJsonSingleError {
     /// The error code.
     pub code: FixedString<u8>,
     /// The error message.
     pub message: FixedString,
     /// The path to the error in the request body itself, dot separated.
-    pub path: FixedString,
+    #[serde(skip)]
+    pub path: Arc<str>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -180,64 +189,56 @@ impl StdError for HttpError {
 pub fn deserialize_errors<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<FixedArray<DiscordJsonSingleError>, D::Error> {
-    let map: Value = Value::deserialize(deserializer)?;
-
-    if !map.is_object() {
-        return Ok(FixedArray::empty());
-    }
+    let ErrorValue::Recurse(map) = ErrorValue::deserialize(deserializer)? else {
+        return Ok(FixedArray::new());
+    };
 
     let mut errors = Vec::new();
     let mut path = Vec::new();
-    loop_errors(&map, &mut errors, &mut path).map_err(D::Error::custom)?;
+    loop_errors(map, &mut errors, &mut path).map_err(D::Error::custom)?;
 
     Ok(errors.into())
 }
 
 fn make_error(
-    errors_value: &Value,
+    errors_to_process: Vec<RawDiscordJsonSingleError>,
     errors: &mut Vec<DiscordJsonSingleError>,
     path: &[&str],
-) -> StdResult<(), &'static str> {
-    let found_errors = errors_value.as_array().ok_or("expected array")?;
+) {
+    let joined_path = Arc::from(path.join("."));
+    errors.extend(errors_to_process.into_iter().map(|raw| DiscordJsonSingleError {
+        code: raw.code,
+        message: raw.message,
+        path: Arc::clone(&joined_path),
+    }));
+}
 
-    for error in found_errors {
-        let error_object = error.as_object().ok_or("expected object")?;
-
-        errors.push(DiscordJsonSingleError {
-            code: error_object
-                .get("code")
-                .ok_or("expected code")?
-                .as_str()
-                .ok_or("expected string")?
-                .to_owned()
-                .into(),
-            message: error_object
-                .get("message")
-                .ok_or("expected message")?
-                .as_str()
-                .ok_or("expected string")?
-                .to_owned()
-                .into(),
-            path: path.join(".").into(),
-        });
-    }
-    Ok(())
+#[derive(serde::Deserialize)]
+#[serde(untagged)]
+enum ErrorValue<'a> {
+    Base(Vec<RawDiscordJsonSingleError>),
+    #[serde(borrow)]
+    Recurse(HashMap<&'a str, ErrorValue<'a>>),
 }
 
 fn loop_errors<'a>(
-    value: &'a Value,
+    value: HashMap<&'a str, ErrorValue<'a>>,
     errors: &mut Vec<DiscordJsonSingleError>,
     path: &mut Vec<&'a str>,
-) -> StdResult<(), &'static str> {
-    for (key, value) in value.as_object().ok_or("expected object")? {
+) -> Result<(), &'static str> {
+    for (key, value) in value {
         if key == "_errors" {
-            make_error(value, errors, path)?;
+            let ErrorValue::Base(value) = value else { return Err("expected array, found map") };
+            make_error(value, errors, path);
         } else {
+            let ErrorValue::Recurse(value) = value else { return Err("expected map, found array") };
+
             path.push(key);
             loop_errors(value, errors, path)?;
             path.pop();
         }
     }
+
     Ok(())
 }
 
