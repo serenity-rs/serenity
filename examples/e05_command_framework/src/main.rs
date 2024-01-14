@@ -8,6 +8,7 @@
 //! features = ["framework", "standard_framework"]
 //! ```
 #![allow(deprecated)] // We recommend migrating to poise, instead of using the standard command framework.
+use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fmt::Write;
@@ -546,22 +547,30 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
 #[command]
 async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u16>() {
-        let builder = EditChannel::new().rate_limit_per_user(slow_mode_rate_seconds);
-        if let Err(why) = msg.channel_id.edit(&ctx.http, builder).await {
-            println!("Error setting channel's slow mode rate: {why:?}");
+        if slow_mode_rate_seconds <= 21600 {
+            let slow_mode_rate_seconds = serenity::nonmax::NonMaxU16::new(slow_mode_rate_seconds)
+                .expect("Just checked less than less than max");
 
-            format!("Failed to set slow mode to `{slow_mode_rate_seconds}` seconds.")
+            let builder = EditChannel::new().rate_limit_per_user(slow_mode_rate_seconds);
+            if let Err(why) = msg.channel_id.edit(&ctx.http, builder).await {
+                println!("Error setting channel's slow mode rate: {why:?}");
+
+                format!("Failed to set slow mode to `{slow_mode_rate_seconds}` seconds.").into()
+            } else {
+                format!("Successfully set slow mode rate to `{slow_mode_rate_seconds}` seconds.")
+                    .into()
+            }
         } else {
-            format!("Successfully set slow mode rate to `{slow_mode_rate_seconds}` seconds.")
+            Cow::Borrowed("That is too many seconds to add slow-mode for!")
         }
     } else if let Some(channel) = msg.channel_id.to_channel_cached(&ctx.cache) {
         if let Some(slow_mode_rate) = channel.rate_limit_per_user {
-            format!("Current slow mode rate is `{slow_mode_rate}` seconds.")
+            format!("Current slow mode rate is `{slow_mode_rate}` seconds.").into()
         } else {
-            "There is no current slow mode rate for this channel.".to_string()
+            Cow::Borrowed("There is no current slow mode rate for this channel.")
         }
     } else {
-        "Failed to find channel in cache.".to_string()
+        Cow::Borrowed("Failed to find channel in cache.")
     };
 
     msg.channel_id.say(&ctx.http, say_content).await?;

@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::CreateAttachment;
@@ -12,7 +14,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     avatar: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,7 +33,7 @@ impl<'a> EditWebhook<'a> {
     /// Set the webhook's name.
     ///
     /// This must be between 1-80 characters.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = Some(name.into());
         self
     }
