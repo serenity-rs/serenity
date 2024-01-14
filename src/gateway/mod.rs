@@ -87,7 +87,7 @@ impl ActivityData {
     #[must_use]
     pub fn playing(name: impl Into<String>) -> Self {
         Self {
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Playing,
             state: None,
             url: None,
@@ -102,7 +102,7 @@ impl ActivityData {
     #[cfg(feature = "http")]
     pub fn streaming(name: impl Into<String>, url: impl IntoUrl) -> Result<Self> {
         Ok(Self {
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Streaming,
             state: None,
             url: Some(url.into_url()?),
@@ -113,7 +113,7 @@ impl ActivityData {
     #[must_use]
     pub fn listening(name: impl Into<String>) -> Self {
         Self {
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Listening,
             state: None,
             url: None,
@@ -124,7 +124,7 @@ impl ActivityData {
     #[must_use]
     pub fn watching(name: impl Into<String>) -> Self {
         Self {
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Watching,
             state: None,
             url: None,
@@ -135,7 +135,7 @@ impl ActivityData {
     #[must_use]
     pub fn competing(name: impl Into<String>) -> Self {
         Self {
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Competing,
             state: None,
             url: None,
@@ -148,9 +148,9 @@ impl ActivityData {
         Self {
             // discord seems to require a name for custom activities
             // even though it's not displayed
-            name: "~".to_string().into(),
+            name: FixedString::from_str_trunc("~"),
             kind: ActivityType::Custom,
-            state: Some(state.into().into()),
+            state: Some(state.into().trunc_into()),
             url: None,
         }
     }
