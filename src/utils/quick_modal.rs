@@ -107,8 +107,8 @@ impl<'a> CreateQuickModal<'a> {
         );
         builder.execute(ctx, (interaction_id, token)).await?;
 
-        let collector =
-            ModalInteractionCollector::new(&ctx.shard).custom_ids(vec![modal_custom_id.into()]);
+        let collector = ModalInteractionCollector::new(&ctx.shard)
+            .custom_ids(vec![modal_custom_id.trunc_into()]);
 
         let collector = match self.timeout {
             Some(timeout) => collector.timeout(timeout),
@@ -144,7 +144,7 @@ impl<'a> CreateQuickModal<'a> {
             .collect();
 
         Ok(Some(QuickModalResponse {
-            inputs,
+            inputs: FixedArray::from_vec_trunc(inputs),
             interaction: modal_interaction,
         }))
     }
