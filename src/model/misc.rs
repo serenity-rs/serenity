@@ -205,7 +205,7 @@ impl fmt::Display for EmojiIdentifier {
 #[derive(Debug)]
 #[cfg(all(feature = "model", feature = "utils"))]
 pub struct EmojiIdentifierParseError {
-    parsed_string: FixedString,
+    parsed_string: String,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -224,7 +224,7 @@ impl FromStr for EmojiIdentifier {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
-            parsed_string: s.to_owned().into(),
+            parsed_string: s.to_owned(),
         })
     }
 }

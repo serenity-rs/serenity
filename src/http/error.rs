@@ -43,9 +43,9 @@ pub struct DiscordJsonSingleError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub struct ErrorResponse {
+    pub method: Method,
     pub status_code: StatusCode,
     pub url: FixedString<u16>,
-    pub method: Method,
     pub error: DiscordJsonError,
 }
 
@@ -53,13 +53,13 @@ impl ErrorResponse {
     // We need a freestanding from-function since we cannot implement an async From-trait.
     pub async fn from_response(r: Response, method: Method) -> Self {
         ErrorResponse {
-            status_code: r.status(),
-            url: r.url().to_string().into(),
             method,
+            status_code: r.status(),
+            url: FixedString::from_str_trunc(r.url().as_str()),
             error: decode_resp(r).await.unwrap_or_else(|e| DiscordJsonError {
                 code: -1,
                 errors: FixedArray::empty(),
-                message: format!("[Serenity] Could not decode json when receiving error response from discord:, {e}").into(),
+                message: format!("[Serenity] Could not decode json when receiving error response from discord:, {e}").trunc_into(),
             }),
         }
     }
@@ -197,7 +197,7 @@ pub fn deserialize_errors<'de, D: Deserializer<'de>>(
     let mut path = Vec::new();
     loop_errors(map, &mut errors, &mut path).map_err(D::Error::custom)?;
 
-    Ok(errors.into())
+    Ok(errors.trunc_into())
 }
 
 fn make_error(
@@ -253,8 +253,8 @@ mod test {
     async fn test_error_response_into() {
         let error = DiscordJsonError {
             code: 43121215,
-            message: String::from("This is a Ferris error").into(),
             errors: FixedArray::empty(),
+            message: FixedString::from_str_trunc("This is a Ferris error"),
         };
 
         let mut builder = Builder::new();
@@ -268,7 +268,7 @@ mod test {
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),
-            url: String::from("https://ferris.crab/").into(),
+            url: FixedString::from_str_trunc("https://ferris.crab/"),
             method: Method::POST,
             error,
         };
