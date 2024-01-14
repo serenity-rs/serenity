@@ -412,7 +412,7 @@ impl From<char> for ReactionType {
     /// # fn main() {}
     /// ```
     fn from(ch: char) -> ReactionType {
-        ReactionType::Unicode(ch.to_string().into())
+        ReactionType::Unicode(ch.to_string().trunc_into())
     }
 }
 
@@ -431,7 +431,7 @@ impl From<EmojiId> for ReactionType {
         ReactionType::Custom {
             animated: false,
             id: emoji_id,
-            name: Some("emoji".to_string().into()),
+            name: Some(FixedString::from_str_trunc("emoji")),
         }
     }
 }
@@ -466,7 +466,7 @@ impl TryFrom<String> for ReactionType {
         }
 
         if !emoji_string.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_string.into()));
+            return Ok(ReactionType::Unicode(emoji_string.trunc_into()));
         }
         ReactionType::try_from(&emoji_string[..])
     }
@@ -500,13 +500,14 @@ impl TryFrom<&str> for ReactionType {
     /// ```rust
     /// use serenity::model::channel::ReactionType;
     /// use serenity::model::id::EmojiId;
+    /// use serenity::small_fixed_array::FixedString;
     ///
     /// let emoji_string = "<:customemoji:600404340292059257>";
     /// let reaction = ReactionType::try_from(emoji_string).unwrap();
     /// let reaction2 = ReactionType::Custom {
     ///     animated: false,
     ///     id: EmojiId::new(600404340292059257),
-    ///     name: Some("customemoji".to_string().into()),
+    ///     name: Some(FixedString::from_str_trunc("customemoji")),
     /// };
     ///
     /// assert_eq!(reaction, reaction2);
@@ -519,7 +520,7 @@ impl TryFrom<&str> for ReactionType {
         }
 
         if !emoji_str.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_str.to_string().into()));
+            return Ok(ReactionType::Unicode(emoji_str.to_string().trunc_into()));
         }
 
         if !emoji_str.ends_with('>') {
@@ -531,7 +532,7 @@ impl TryFrom<&str> for ReactionType {
         let mut split_iter = emoji_str.split(':');
 
         let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
-        let name = Some(split_iter.next().ok_or(ReactionConversionError)?.to_string().into());
+        let name = Some(split_iter.next().ok_or(ReactionConversionError)?.to_string().trunc_into());
         let id = split_iter.next().and_then(|s| s.parse().ok()).ok_or(ReactionConversionError)?;
 
         Ok(ReactionType::Custom {

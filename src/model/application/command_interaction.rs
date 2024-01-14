@@ -346,10 +346,10 @@ impl CommandData {
             for opt in opts {
                 let value = match &opt.value {
                     CommandDataOptionValue::SubCommand(opts) => {
-                        ResolvedValue::SubCommand(resolve_options(opts, resolved).into())
+                        ResolvedValue::SubCommand(resolve_options(opts, resolved).trunc_into())
                     },
                     CommandDataOptionValue::SubCommandGroup(opts) => {
-                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved).into())
+                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved).trunc_into())
                     },
                     CommandDataOptionValue::Autocomplete {
                         kind,
@@ -573,13 +573,13 @@ fn option_from_raw(raw: RawCommandDataOption) -> Result<CommandDataOption> {
             let options =
                 raw.options.ok_or_else::<JsonError, _>(|| DeError::missing_field("options"))?;
             let options = options.into_iter().map(option_from_raw).collect::<Result<_>>()?;
-            CommandDataOptionValue::SubCommand(options)
+            CommandDataOptionValue::SubCommand(FixedArray::from_vec_trunc(options))
         },
         CommandOptionType::SubCommandGroup => {
             let options =
                 raw.options.ok_or_else::<JsonError, _>(|| DeError::missing_field("options"))?;
             let options = options.into_iter().map(option_from_raw).collect::<Result<_>>()?;
-            CommandDataOptionValue::SubCommandGroup(options)
+            CommandDataOptionValue::SubCommandGroup(FixedArray::from_vec_trunc(options))
         },
         CommandOptionType::Attachment => CommandDataOptionValue::Attachment(value!()),
         CommandOptionType::Channel => CommandDataOptionValue::Channel(value!()),
@@ -818,19 +818,19 @@ mod tests {
     #[test]
     fn nested_options() {
         let value = CommandDataOption {
-            name: "subcommand_group".to_string().into(),
+            name: FixedString::from_str_trunc("subcommand_group"),
             value: CommandDataOptionValue::SubCommandGroup(
                 vec![CommandDataOption {
-                    name: "subcommand".to_string().into(),
+                    name: FixedString::from_str_trunc("subcommand"),
                     value: CommandDataOptionValue::SubCommand(
                         vec![CommandDataOption {
-                            name: "channel".to_string().into(),
+                            name: FixedString::from_str_trunc("channel"),
                             value: CommandDataOptionValue::Channel(ChannelId::new(3)),
                         }]
-                        .into(),
+                        .trunc_into(),
                     ),
                 }]
-                .into(),
+                .trunc_into(),
             ),
         };
 
@@ -852,30 +852,30 @@ mod tests {
     fn mixed_options() {
         let value = vec![
             CommandDataOption {
-                name: "boolean".to_string().into(),
+                name: FixedString::from_str_trunc("boolean"),
                 value: CommandDataOptionValue::Boolean(true),
             },
             CommandDataOption {
-                name: "integer".to_string().into(),
+                name: FixedString::from_str_trunc("integer"),
                 value: CommandDataOptionValue::Integer(1),
             },
             CommandDataOption {
-                name: "number".to_string().into(),
+                name: FixedString::from_str_trunc("number"),
                 value: CommandDataOptionValue::Number(2.0),
             },
             CommandDataOption {
-                name: "string".to_string().into(),
-                value: CommandDataOptionValue::String("foobar".to_string().into()),
+                name: FixedString::from_str_trunc("string"),
+                value: CommandDataOptionValue::String(FixedString::from_str_trunc("foobar")),
             },
             CommandDataOption {
-                name: "empty_subcommand".to_string().into(),
+                name: FixedString::from_str_trunc("empty_subcommand"),
                 value: CommandDataOptionValue::SubCommand(FixedArray::default()),
             },
             CommandDataOption {
-                name: "autocomplete".to_string().into(),
+                name: FixedString::from_str_trunc("autocomplete"),
                 value: CommandDataOptionValue::Autocomplete {
                     kind: CommandOptionType::Integer,
-                    value: "not an integer".to_string().into(),
+                    value: FixedString::from_str_trunc("not an integer"),
                 },
             },
         ];

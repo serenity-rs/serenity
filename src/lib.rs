@@ -187,4 +187,4 @@ pub mod all {
 }
 
 // Re-exports of crates used internally which are already publically exposed.
-pub use nonmax;
+pub use {nonmax, small_fixed_array};

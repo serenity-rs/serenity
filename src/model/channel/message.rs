@@ -1503,11 +1503,11 @@ mod tests {
 
         // Channel with the message, with SEND_MESSAGES on.
         let channel = GuildChannel {
-            permission_overwrites: vec![PermissionOverwrite {
+            permission_overwrites: FixedArray::from_vec_trunc(vec![PermissionOverwrite {
                 allow: Permissions::SEND_MESSAGES,
                 deny: Permissions::default(),
                 kind: PermissionOverwriteType::Member(author.id),
-            }].into(),
+            }]),
             ..Default::default()
         };
         let channel_id = channel.id;

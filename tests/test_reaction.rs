@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use serenity::model::channel::ReactionType;
 use serenity::model::id::EmojiId;
+use small_fixed_array::FixedString;
 
 #[test]
 fn str_to_reaction_type() {
@@ -10,7 +11,7 @@ fn str_to_reaction_type() {
     let reaction2 = ReactionType::Custom {
         animated: false,
         id: EmojiId::new(600404340292059257),
-        name: Some("customemoji".to_string().into()),
+        name: Some(FixedString::from_str_trunc("customemoji")),
     };
     assert_eq!(reaction, reaction2);
 }
@@ -22,7 +23,7 @@ fn str_to_reaction_type_animated() {
     let reaction2 = ReactionType::Custom {
         animated: true,
         id: EmojiId::new(600409340292059257),
-        name: Some("customemoji2".to_string().into()),
+        name: Some(FixedString::from_str_trunc("customemoji2")),
     };
     assert_eq!(reaction, reaction2);
 }
@@ -34,7 +35,7 @@ fn string_to_reaction_type() {
     let reaction2 = ReactionType::Custom {
         animated: false,
         id: EmojiId::new(600404340292059257),
-        name: Some("customemoji".to_string().into()),
+        name: Some(FixedString::from_str_trunc("customemoji")),
     };
     assert_eq!(reaction, reaction2);
 }

@@ -105,8 +105,8 @@ impl StrOrInt<'_> {
     pub fn into_enum<T>(self, string: fn(FixedString) -> T, int: fn(u64) -> T) -> T {
         match self {
             Self::Int(val) => int(val),
-            Self::String(val) => string(val.into()),
-            Self::Str(val) => string(val.to_owned().into()),
+            Self::String(val) => string(FixedString::from_string_trunc(val)),
+            Self::Str(val) => string(FixedString::from_str_trunc(val)),
         }
     }
 }
@@ -235,13 +235,15 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<FixedArray<ActivityButton>, D::Error> {
     ArrayVec::<_, 2>::deserialize(deserializer).map(|labels| {
-        labels
-            .into_iter()
-            .map(|l| ActivityButton {
-                label: l,
-                url: FixedString::default(),
-            })
-            .collect()
+        FixedArray::from_vec_trunc(
+            labels
+                .into_iter()
+                .map(|l| ActivityButton {
+                    label: l,
+                    url: FixedString::default(),
+                })
+                .collect(),
+        )
     })
 }
 
@@ -294,9 +296,9 @@ pub mod comma_separated_string {
         deserializer: D,
     ) -> Result<FixedArray<FixedString>, D::Error> {
         let str_sequence = CowStr::deserialize(deserializer)?.0;
-        let vec = str_sequence.split(", ").map(str::to_owned).map(FixedString::from).collect();
+        let vec = str_sequence.split(", ").map(FixedString::from_str_trunc).collect();
 
-        Ok(vec)
+        Ok(FixedArray::from_vec_trunc(vec))
     }
 
     pub fn serialize<S: Serializer>(
@@ -511,7 +513,7 @@ where
                 }
             }
 
-            Ok(components.into())
+            Ok(FixedArray::from_vec_trunc(components))
         }
     }
 
