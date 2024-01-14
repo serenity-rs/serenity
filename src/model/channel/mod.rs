@@ -488,16 +488,16 @@ mod test {
             assert!(!channel.is_nsfw());
 
             channel.kind = ChannelType::Text;
-            channel.name = "nsfw-".to_string().into();
+            channel.name = FixedString::from_str_trunc("nsfw-");
             assert!(!channel.is_nsfw());
 
-            channel.name = "nsfw".to_string().into();
+            channel.name = FixedString::from_str_trunc("nsfw");
             assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
             assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Text;
 
-            channel.name = "nsf".to_string().into();
+            channel.name = FixedString::from_str_trunc("nsf");
             channel.nsfw = true;
             assert!(channel.is_nsfw());
             channel.nsfw = false;
