@@ -302,7 +302,7 @@ mod tests {
     fn entity_type_variant() {
         let value = Change::Type {
             old: Some(EntityType::Int(123)),
-            new: Some(EntityType::Str("discord".to_string().into())),
+            new: Some(EntityType::Str(FixedString::from_str_trunc("discord"))),
         };
         assert_json(&value, json!({"key": "type", "old_value": 123, "new_value": "discord"}));
     }

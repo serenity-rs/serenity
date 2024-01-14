@@ -495,7 +495,9 @@ impl CacheUpdate for ThreadCreateEvent {
                 // This is a rare enough occurence to realloc.
                 let mut threads = std::mem::take(&mut g.threads).into_vec();
                 threads.push(self.thread.clone());
-                g.threads = threads.into();
+
+                g.threads = FixedArray::try_from(threads.into_boxed_slice())
+                    .expect("A guild should not have 4 billion threads");
 
                 None
             }
@@ -516,7 +518,9 @@ impl CacheUpdate for ThreadUpdateEvent {
                 // This is a rare enough occurence to realloc.
                 let mut threads = std::mem::take(&mut g.threads).into_vec();
                 threads.push(self.thread.clone());
-                g.threads = threads.into();
+
+                g.threads = FixedArray::try_from(threads.into_boxed_slice())
+                    .expect("A guild should not have 4 billion threads");
 
                 None
             }
@@ -534,7 +538,9 @@ impl CacheUpdate for ThreadDeleteEvent {
             g.threads.iter().position(|e| e.id == thread_id).map(|i| {
                 let mut threads = std::mem::take(&mut g.threads).into_vec();
                 let thread = threads.remove(i);
-                g.threads = threads.into();
+
+                g.threads = FixedArray::try_from(threads.into_boxed_slice())
+                    .expect("A guild should not have 4 billion threads");
 
                 thread
             })
