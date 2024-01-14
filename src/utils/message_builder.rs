@@ -1185,8 +1185,8 @@ mod test {
     fn mentions() {
         let mut emoji = Emoji {
             id: EmojiId::new(32),
-            name: "Rohrkatze".to_string().into(),
-            roles: vec![].into(),
+            name: FixedString::from_str_trunc("Rohrkatze"),
+            roles: FixedArray::empty(),
             user: None,
             __generated_flags: EmojiGeneratedFlags::empty(),
         };
