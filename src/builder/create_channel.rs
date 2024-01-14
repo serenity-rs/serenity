@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use nonmax::NonMaxU16;
+
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
@@ -27,7 +29,7 @@ pub struct CreateChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     user_limit: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    rate_limit_per_user: Option<u16>,
+    rate_limit_per_user: Option<NonMaxU16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     position: Option<u16>,
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
@@ -150,7 +152,7 @@ impl<'a> CreateChannel<'a> {
     /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
-    pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
+    pub fn rate_limit_per_user(mut self, seconds: NonMaxU16) -> Self {
         self.rate_limit_per_user = Some(seconds);
         self
     }
