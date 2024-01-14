@@ -108,7 +108,7 @@ impl<'a> CreateQuickModal<'a> {
         builder.execute(ctx, (interaction_id, token)).await?;
 
         let modal_interaction = ModalInteractionCollector::new(&ctx.shard)
-            .custom_ids(vec![modal_custom_id.into()])
+            .custom_ids(vec![modal_custom_id.trunc_into()])
             .next()
             .await;
 
@@ -139,7 +139,7 @@ impl<'a> CreateQuickModal<'a> {
             .collect();
 
         Ok(Some(QuickModalResponse {
-            inputs,
+            inputs: FixedArray::from_vec_trunc(inputs),
             interaction: modal_interaction,
         }))
     }
