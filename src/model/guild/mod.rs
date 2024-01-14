@@ -2698,9 +2698,9 @@ mod test {
 
         fn gen_member() -> Member {
             Member {
-                nick: Some("aaaa".to_string().into()),
+                nick: Some(FixedString::from_str_trunc("aaaa")),
                 user: User {
-                    name: "test".to_string().into(),
+                    name: FixedString::from_str_trunc("test"),
                     discriminator: NonZeroU16::new(1432),
                     ..User::default()
                 },
