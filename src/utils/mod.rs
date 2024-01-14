@@ -289,7 +289,7 @@ pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
         }
 
         id.parse().ok().map(|id| EmojiIdentifier {
-            name: name.into(),
+            name: name.trunc_into(),
             animated,
             id,
         })
