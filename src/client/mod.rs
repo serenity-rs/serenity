@@ -316,8 +316,9 @@ impl IntoFuture for ClientBuilder {
         if let Some(ratelimiter) = &mut http.ratelimiter {
             let event_handlers_clone = event_handlers.clone();
             ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-                for event_handler in event_handlers_clone.iter().map(Arc::clone) {
+                for event_handler in &event_handlers_clone {
                     let info = info.clone();
+                    let event_handler = Arc::clone(event_handler);
                     tokio::spawn(async move { event_handler.ratelimit(info).await });
                 }
             }));
@@ -349,7 +350,7 @@ impl IntoFuture for ClientBuilder {
                 #[cfg(feature = "framework")]
                 framework: Arc::clone(&framework_cell),
                 #[cfg(feature = "voice")]
-                voice_manager: voice_manager.as_ref().map(Arc::clone),
+                voice_manager: voice_manager.clone(),
                 ws_url: Arc::clone(&ws_url),
                 shard_total,
                 #[cfg(feature = "cache")]
