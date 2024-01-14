@@ -1108,16 +1108,16 @@
             <span class="macro">assert!</span>(!channel.is_nsfw());
 
             channel.kind = ChannelType::Text;
-            channel.name = <span class="string">"nsfw-"</span>.to_string().into();
+            channel.name = FixedString::from_str_trunc(<span class="string">"nsfw-"</span>);
             <span class="macro">assert!</span>(!channel.is_nsfw());
 
-            channel.name = <span class="string">"nsfw"</span>.to_string().into();
+            channel.name = FixedString::from_str_trunc(<span class="string">"nsfw"</span>);
             <span class="macro">assert!</span>(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
             <span class="macro">assert!</span>(!channel.is_nsfw());
             channel.kind = ChannelType::Text;
 
-            channel.name = <span class="string">"nsf"</span>.to_string().into();
+            channel.name = FixedString::from_str_trunc(<span class="string">"nsf"</span>);
             channel.nsfw = <span class="bool-val">true</span>;
             <span class="macro">assert!</span>(channel.is_nsfw());
             channel.nsfw = <span class="bool-val">false</span>;

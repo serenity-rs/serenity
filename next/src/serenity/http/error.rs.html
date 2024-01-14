@@ -324,9 +324,9 @@
 <span class="attr">#[derive(Clone, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>ErrorResponse {
+    <span class="kw">pub </span>method: Method,
     <span class="kw">pub </span>status_code: StatusCode,
     <span class="kw">pub </span>url: FixedString&lt;u16&gt;,
-    <span class="kw">pub </span>method: Method,
     <span class="kw">pub </span>error: DiscordJsonError,
 }
 
@@ -334,13 +334,13 @@
     <span class="comment">// We need a freestanding from-function since we cannot implement an async From-trait.
     </span><span class="kw">pub async fn </span>from_response(r: Response, method: Method) -&gt; <span class="self">Self </span>{
         ErrorResponse {
-            status_code: r.status(),
-            url: r.url().to_string().into(),
             method,
+            status_code: r.status(),
+            url: FixedString::from_str_trunc(r.url().as_str()),
             error: decode_resp(r).<span class="kw">await</span>.unwrap_or_else(|e| DiscordJsonError {
                 code: -<span class="number">1</span>,
                 errors: FixedArray::empty(),
-                message: <span class="macro">format!</span>(<span class="string">"[Serenity] Could not decode json when receiving error response from discord:, {e}"</span>).into(),
+                message: <span class="macro">format!</span>(<span class="string">"[Serenity] Could not decode json when receiving error response from discord:, {e}"</span>).trunc_into(),
             }),
         }
     }
@@ -478,7 +478,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>path = Vec::new();
     loop_errors(map, <span class="kw-2">&amp;mut </span>errors, <span class="kw-2">&amp;mut </span>path).map_err(D::Error::custom)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(errors.into())
+    <span class="prelude-val">Ok</span>(errors.trunc_into())
 }
 
 <span class="kw">fn </span>make_error(
@@ -535,8 +535,8 @@
     </span><span class="kw">async fn </span>test_error_response_into() {
         <span class="kw">let </span>error = DiscordJsonError {
             code: <span class="number">43121215</span>,
-            message: String::from(<span class="string">"This is a Ferris error"</span>).into(),
             errors: FixedArray::empty(),
+            message: FixedString::from_str_trunc(<span class="string">"This is a Ferris error"</span>),
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Builder::new();
@@ -550,7 +550,7 @@
 
         <span class="kw">let </span>known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(<span class="number">403</span>).unwrap(),
-            url: String::from(<span class="string">"https://ferris.crab/"</span>).into(),
+            url: FixedString::from_str_trunc(<span class="string">"https://ferris.crab/"</span>),
             method: Method::POST,
             error,
         };

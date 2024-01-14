@@ -1229,10 +1229,10 @@
             <span class="kw">for </span>opt <span class="kw">in </span>opts {
                 <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>opt.value {
                     CommandDataOptionValue::SubCommand(opts) =&gt; {
-                        ResolvedValue::SubCommand(resolve_options(opts, resolved).into())
+                        ResolvedValue::SubCommand(resolve_options(opts, resolved).trunc_into())
                     },
                     CommandDataOptionValue::SubCommandGroup(opts) =&gt; {
-                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved).into())
+                        ResolvedValue::SubCommandGroup(resolve_options(opts, resolved).trunc_into())
                     },
                     CommandDataOptionValue::Autocomplete {
                         kind,
@@ -1456,13 +1456,13 @@
             <span class="kw">let </span>options =
                 raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
             <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
-            CommandDataOptionValue::SubCommand(options)
+            CommandDataOptionValue::SubCommand(FixedArray::from_vec_trunc(options))
         },
         CommandOptionType::SubCommandGroup =&gt; {
             <span class="kw">let </span>options =
                 raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
             <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
-            CommandDataOptionValue::SubCommandGroup(options)
+            CommandDataOptionValue::SubCommandGroup(FixedArray::from_vec_trunc(options))
         },
         CommandOptionType::Attachment =&gt; CommandDataOptionValue::Attachment(<span class="macro">value!</span>()),
         CommandOptionType::Channel =&gt; CommandDataOptionValue::Channel(<span class="macro">value!</span>()),
@@ -1701,19 +1701,19 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>nested_options() {
         <span class="kw">let </span>value = CommandDataOption {
-            name: <span class="string">"subcommand_group"</span>.to_string().into(),
+            name: FixedString::from_str_trunc(<span class="string">"subcommand_group"</span>),
             value: CommandDataOptionValue::SubCommandGroup(
                 <span class="macro">vec!</span>[CommandDataOption {
-                    name: <span class="string">"subcommand"</span>.to_string().into(),
+                    name: FixedString::from_str_trunc(<span class="string">"subcommand"</span>),
                     value: CommandDataOptionValue::SubCommand(
                         <span class="macro">vec!</span>[CommandDataOption {
-                            name: <span class="string">"channel"</span>.to_string().into(),
+                            name: FixedString::from_str_trunc(<span class="string">"channel"</span>),
                             value: CommandDataOptionValue::Channel(ChannelId::new(<span class="number">3</span>)),
                         }]
-                        .into(),
+                        .trunc_into(),
                     ),
                 }]
-                .into(),
+                .trunc_into(),
             ),
         };
 
@@ -1735,30 +1735,30 @@
     </span><span class="kw">fn </span>mixed_options() {
         <span class="kw">let </span>value = <span class="macro">vec!</span>[
             CommandDataOption {
-                name: <span class="string">"boolean"</span>.to_string().into(),
+                name: FixedString::from_str_trunc(<span class="string">"boolean"</span>),
                 value: CommandDataOptionValue::Boolean(<span class="bool-val">true</span>),
             },
             CommandDataOption {
-                name: <span class="string">"integer"</span>.to_string().into(),
+                name: FixedString::from_str_trunc(<span class="string">"integer"</span>),
                 value: CommandDataOptionValue::Integer(<span class="number">1</span>),
             },
             CommandDataOption {
-                name: <span class="string">"number"</span>.to_string().into(),
+                name: FixedString::from_str_trunc(<span class="string">"number"</span>),
                 value: CommandDataOptionValue::Number(<span class="number">2.0</span>),
             },
             CommandDataOption {
-                name: <span class="string">"string"</span>.to_string().into(),
-                value: CommandDataOptionValue::String(<span class="string">"foobar"</span>.to_string().into()),
+                name: FixedString::from_str_trunc(<span class="string">"string"</span>),
+                value: CommandDataOptionValue::String(FixedString::from_str_trunc(<span class="string">"foobar"</span>)),
             },
             CommandDataOption {
-                name: <span class="string">"empty_subcommand"</span>.to_string().into(),
+                name: FixedString::from_str_trunc(<span class="string">"empty_subcommand"</span>),
                 value: CommandDataOptionValue::SubCommand(FixedArray::default()),
             },
             CommandDataOption {
-                name: <span class="string">"autocomplete"</span>.to_string().into(),
+                name: FixedString::from_str_trunc(<span class="string">"autocomplete"</span>),
                 value: CommandDataOptionValue::Autocomplete {
                     kind: CommandOptionType::Integer,
-                    value: <span class="string">"not an integer"</span>.to_string().into(),
+                    value: FixedString::from_str_trunc(<span class="string">"not an integer"</span>),
                 },
             },
         ];

@@ -558,6 +558,7 @@
 <a href="#556" id="556">556</a>
 <a href="#557" id="557">557</a>
 <a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::convert::TryFrom;
 <span class="attr">#[cfg(doc)]
@@ -943,7 +944,7 @@
     /// # fn main() {}
     /// ```
     </span><span class="kw">fn </span>from(ch: char) -&gt; ReactionType {
-        ReactionType::Unicode(ch.to_string().into())
+        ReactionType::Unicode(ch.to_string().trunc_into())
     }
 }
 
@@ -997,7 +998,7 @@
         }
 
         <span class="kw">if </span>!emoji_string.starts_with(<span class="string">'&lt;'</span>) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(ReactionType::Unicode(emoji_string.into()));
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(ReactionType::Unicode(emoji_string.trunc_into()));
         }
         ReactionType::try_from(<span class="kw-2">&amp;</span>emoji_string[..])
     }
@@ -1033,13 +1034,14 @@
     ///
     /// use serenity::model::channel::ReactionType;
     /// use serenity::model::id::EmojiId;
+    /// use serenity::small_fixed_array::FixedString;
     ///
     /// let emoji_string = "&lt;:customemoji:600404340292059257&gt;";
     /// let reaction = ReactionType::try_from(emoji_string).unwrap();
     /// let reaction2 = ReactionType::Custom {
     ///     animated: false,
     ///     id: EmojiId::new(600404340292059257),
-    ///     name: Some("customemoji".to_string().into()),
+    ///     name: Some(FixedString::from_str_trunc("customemoji")),
     /// };
     ///
     /// assert_eq!(reaction, reaction2);
@@ -1053,7 +1055,7 @@
         }
 
         <span class="kw">if </span>!emoji_str.starts_with(<span class="string">'&lt;'</span>) {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(ReactionType::Unicode(emoji_str.to_string().into()));
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(ReactionType::Unicode(emoji_str.to_string().trunc_into()));
         }
 
         <span class="kw">if </span>!emoji_str.ends_with(<span class="string">'&gt;'</span>) {
@@ -1065,7 +1067,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>split_iter = emoji_str.split(<span class="string">':'</span>);
 
         <span class="kw">let </span>animated = split_iter.next().ok_or(ReactionConversionError)<span class="question-mark">? </span>== <span class="string">"a"</span>;
-        <span class="kw">let </span>name = <span class="prelude-val">Some</span>(split_iter.next().ok_or(ReactionConversionError)<span class="question-mark">?</span>.to_string().into());
+        <span class="kw">let </span>name = <span class="prelude-val">Some</span>(split_iter.next().ok_or(ReactionConversionError)<span class="question-mark">?</span>.to_string().trunc_into());
         <span class="kw">let </span>id = split_iter.next().and_then(|s| s.parse().ok()).ok_or(ReactionConversionError)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(ReactionType::Custom {

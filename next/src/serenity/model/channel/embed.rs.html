@@ -354,7 +354,7 @@
         </span>T: Into&lt;String&gt;,
         U: Into&lt;String&gt;,
     {
-        <span class="self">Self</span>::_new(name.into().into(), value.into().into(), inline)
+        <span class="self">Self</span>::_new(name.into().trunc_into(), value.into().trunc_into(), inline)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>_new(

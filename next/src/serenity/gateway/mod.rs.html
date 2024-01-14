@@ -360,7 +360,7 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>playing(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Playing,
             state: <span class="prelude-val">None</span>,
             url: <span class="prelude-val">None</span>,
@@ -375,7 +375,7 @@
     </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     </span><span class="kw">pub fn </span>streaming(name: <span class="kw">impl </span>Into&lt;String&gt;, url: <span class="kw">impl </span>IntoUrl) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Streaming,
             state: <span class="prelude-val">None</span>,
             url: <span class="prelude-val">Some</span>(url.into_url()<span class="question-mark">?</span>),
@@ -386,7 +386,7 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>listening(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Listening,
             state: <span class="prelude-val">None</span>,
             url: <span class="prelude-val">None</span>,
@@ -397,7 +397,7 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>watching(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Watching,
             state: <span class="prelude-val">None</span>,
             url: <span class="prelude-val">None</span>,
@@ -408,7 +408,7 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>competing(name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            name: name.into().into(),
+            name: name.into().trunc_into(),
             kind: ActivityType::Competing,
             state: <span class="prelude-val">None</span>,
             url: <span class="prelude-val">None</span>,
@@ -421,9 +421,9 @@
         <span class="self">Self </span>{
             <span class="comment">// discord seems to require a name for custom activities
             // even though it's not displayed
-            </span>name: <span class="string">"~"</span>.to_string().into(),
+            </span>name: FixedString::from_str_trunc(<span class="string">"~"</span>),
             kind: ActivityType::Custom,
-            state: <span class="prelude-val">Some</span>(state.into().into()),
+            state: <span class="prelude-val">Some</span>(state.into().trunc_into()),
             url: <span class="prelude-val">None</span>,
         }
     }

@@ -256,7 +256,7 @@
         builder.execute(ctx, (interaction_id, token)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>modal_interaction = ModalInteractionCollector::new(<span class="kw-2">&amp;</span>ctx.shard)
-            .custom_ids(<span class="macro">vec!</span>[modal_custom_id.into()])
+            .custom_ids(<span class="macro">vec!</span>[modal_custom_id.trunc_into()])
             .next()
             .<span class="kw">await</span>;
 
@@ -287,7 +287,7 @@
             .collect();
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(QuickModalResponse {
-            inputs,
+            inputs: FixedArray::from_vec_trunc(inputs),
             interaction: modal_interaction,
         }))
     }

@@ -633,10 +633,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>button = Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
-                custom_id: <span class="string">"hello"</span>.to_string().into(),
+                custom_id: FixedString::from_str_trunc(<span class="string">"hello"</span>),
                 style: ButtonStyle::Danger,
             },
-            label: <span class="prelude-val">Some</span>(<span class="string">"a"</span>.to_string().into()),
+            label: <span class="prelude-val">Some</span>(FixedString::from_str_trunc(<span class="string">"a"</span>)),
             emoji: <span class="prelude-val">None</span>,
             disabled: <span class="bool-val">false</span>,
         };
@@ -646,7 +646,7 @@
         );
 
         button.data = ButtonKind::Link {
-            url: <span class="string">"https://google.com"</span>.to_string().into(),
+            url: FixedString::from_str_trunc(<span class="string">"https://google.com"</span>),
         };
         assert_json(
             <span class="kw-2">&amp;</span>button,

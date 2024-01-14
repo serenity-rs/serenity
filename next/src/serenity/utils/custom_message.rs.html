@@ -227,7 +227,7 @@
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     </span><span class="kw">pub fn </span>attachments(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attachments: Vec&lt;Attachment&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.msg.attachments = attachments.into();
+        <span class="self">self</span>.msg.attachments = attachments.trunc_into();
 
         <span class="self">self
     </span>}
@@ -254,7 +254,7 @@
     ///
     /// If not used, the default value is an empty string (`String::default()`).
     </span><span class="kw">pub fn </span>content(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.msg.content = s.into().into();
+        <span class="self">self</span>.msg.content = s.into().trunc_into();
 
         <span class="self">self
     </span>}
@@ -272,7 +272,7 @@
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     </span><span class="kw">pub fn </span>embeds(<span class="kw-2">&amp;mut </span><span class="self">self</span>, embeds: Vec&lt;Embed&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.msg.embeds = embeds.into();
+        <span class="self">self</span>.msg.embeds = embeds.trunc_into();
 
         <span class="self">self
     </span>}
@@ -319,7 +319,7 @@
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     </span><span class="kw">pub fn </span>mention_roles(<span class="kw-2">&amp;mut </span><span class="self">self</span>, roles: Vec&lt;RoleId&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.msg.mention_roles = roles.into();
+        <span class="self">self</span>.msg.mention_roles = roles.trunc_into();
 
         <span class="self">self
     </span>}
@@ -328,7 +328,7 @@
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     </span><span class="kw">pub fn </span>mentions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mentions: Vec&lt;User&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.msg.mentions = mentions.into();
+        <span class="self">self</span>.msg.mentions = mentions.trunc_into();
 
         <span class="self">self
     </span>}
@@ -346,7 +346,7 @@
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     </span><span class="kw">pub fn </span>reactions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, reactions: Vec&lt;MessageReaction&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.msg.reactions = reactions.into();
+        <span class="self">self</span>.msg.reactions = reactions.trunc_into();
 
         <span class="self">self
     </span>}

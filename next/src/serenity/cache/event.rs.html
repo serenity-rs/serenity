@@ -571,6 +571,12 @@
 <a href="#569" id="569">569</a>
 <a href="#570" id="570">570</a>
 <a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 <span class="kw">use </span>std::num::NonZeroU16;
 
@@ -1045,7 +1051,9 @@
                 <span class="comment">// This is a rare enough occurence to realloc.
                 </span><span class="kw">let </span><span class="kw-2">mut </span>threads = std::mem::take(<span class="kw-2">&amp;mut </span>g.threads).into_vec();
                 threads.push(<span class="self">self</span>.thread.clone());
-                g.threads = threads.into();
+
+                g.threads = FixedArray::try_from(threads.into_boxed_slice())
+                    .expect(<span class="string">"A guild should not have 4 billion threads"</span>);
 
                 <span class="prelude-val">None
             </span>}
@@ -1066,7 +1074,9 @@
                 <span class="comment">// This is a rare enough occurence to realloc.
                 </span><span class="kw">let </span><span class="kw-2">mut </span>threads = std::mem::take(<span class="kw-2">&amp;mut </span>g.threads).into_vec();
                 threads.push(<span class="self">self</span>.thread.clone());
-                g.threads = threads.into();
+
+                g.threads = FixedArray::try_from(threads.into_boxed_slice())
+                    .expect(<span class="string">"A guild should not have 4 billion threads"</span>);
 
                 <span class="prelude-val">None
             </span>}
@@ -1084,7 +1094,9 @@
             g.threads.iter().position(|e| e.id == thread_id).map(|i| {
                 <span class="kw">let </span><span class="kw-2">mut </span>threads = std::mem::take(<span class="kw-2">&amp;mut </span>g.threads).into_vec();
                 <span class="kw">let </span>thread = threads.remove(i);
-                g.threads = threads.into();
+
+                g.threads = FixedArray::try_from(threads.into_boxed_slice())
+                    .expect(<span class="string">"A guild should not have 4 billion threads"</span>);
 
                 thread
             })

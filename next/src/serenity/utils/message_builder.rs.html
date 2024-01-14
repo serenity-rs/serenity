@@ -2623,8 +2623,8 @@
     </span><span class="kw">fn </span>mentions() {
         <span class="kw">let </span><span class="kw-2">mut </span>emoji = Emoji {
             id: EmojiId::new(<span class="number">32</span>),
-            name: <span class="string">"Rohrkatze"</span>.to_string().into(),
-            roles: <span class="macro">vec!</span>[].into(),
+            name: FixedString::from_str_trunc(<span class="string">"Rohrkatze"</span>),
+            roles: FixedArray::empty(),
             user: <span class="prelude-val">None</span>,
             __generated_flags: EmojiGeneratedFlags::empty(),
         };

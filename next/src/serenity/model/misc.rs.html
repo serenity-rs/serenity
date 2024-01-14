@@ -497,7 +497,7 @@
 <span class="attr">#[derive(Debug)]
 #[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">pub struct </span>EmojiIdentifierParseError {
-    parsed_string: FixedString,
+    parsed_string: String,
 }
 
 <span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
@@ -516,7 +516,7 @@
 
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
-            parsed_string: s.to_owned().into(),
+            parsed_string: s.to_owned(),
         })
     }
 }

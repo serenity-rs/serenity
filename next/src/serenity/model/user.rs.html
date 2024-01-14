@@ -855,6 +855,8 @@
 <a href="#853" id="853">853</a>
 <a href="#854" id="854">854</a>
 <a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1657,6 +1659,8 @@
         <span class="kw">use </span>std::num::NonZeroU16;
         <span class="kw">use </span>std::str::FromStr;
 
+        <span class="kw">use </span>small_fixed_array::FixedString;
+
         <span class="kw">use </span><span class="kw">crate</span>::model::id::UserId;
         <span class="kw">use </span><span class="kw">crate</span>::model::misc::ImageHash;
         <span class="kw">use </span><span class="kw">crate</span>::model::user::User;
@@ -1667,7 +1671,7 @@
                 id: UserId::new(<span class="number">210</span>),
                 avatar: <span class="prelude-val">Some</span>(ImageHash::from_str(<span class="string">"fb211703bcc04ee612c88d494df0272f"</span>).unwrap()),
                 discriminator: NonZeroU16::new(<span class="number">1432</span>),
-                name: <span class="string">"test"</span>.to_string().into(),
+                name: FixedString::from_str_trunc(<span class="string">"test"</span>),
                 ..Default::default()
             };
 
