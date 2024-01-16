@@ -335,11 +335,15 @@ impl IntoFuture for ClientBuilder {
         let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
-            let (ws_url, shard_total) = match http.get_bot_gateway().await {
-                Ok(response) => (Arc::from(response.url), response.shards),
+            let (ws_url, shard_total, max_concurrency) = match http.get_bot_gateway().await {
+                Ok(response) => (
+                    Arc::from(response.url),
+                    response.shards,
+                    response.session_start_limit.max_concurrency,
+                ),
                 Err(err) => {
                     tracing::warn!("HTTP request to get gateway URL failed: {err}");
-                    (Arc::from("wss://gateway.discord.gg"), NonZeroU16::MIN)
+                    (Arc::from("wss://gateway.discord.gg"), NonZeroU16::MIN, NonZeroU16::MIN)
                 },
             };
 
@@ -360,6 +364,7 @@ impl IntoFuture for ClientBuilder {
                 http: Arc::clone(&http),
                 intents,
                 presence: Some(presence),
+                max_concurrency,
             });
 
             let client = Client {
