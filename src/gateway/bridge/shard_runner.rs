@@ -2,12 +2,10 @@ use std::borrow::Cow;
 use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use tokio::sync::RwLock;
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
-use typemap_rev::TypeMap;
 
 use super::event::ShardStageUpdateEvent;
 #[cfg(feature = "collector")]
@@ -29,7 +27,7 @@ use crate::model::event::{Event, GatewayEvent};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
-    data: Arc<RwLock<TypeMap>>,
+    data: Arc<dyn std::any::Any + Send + Sync>,
     event_handlers: Vec<Arc<dyn EventHandler>>,
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
@@ -482,7 +480,7 @@ impl ShardRunner {
 
 /// Options to be passed to [`ShardRunner::new`].
 pub struct ShardRunnerOptions {
-    pub data: Arc<RwLock<TypeMap>>,
+    pub data: Arc<dyn std::any::Any + Send + Sync>,
     pub event_handlers: Vec<Arc<dyn EventHandler>>,
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
