@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 use std::num::NonZeroU16;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
@@ -14,7 +14,7 @@ use typemap_rev::TypeMap;
 
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
-use super::{ShardId, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
+use super::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::{EventHandler, RawEventHandler};
@@ -71,6 +71,7 @@ use crate::model::gateway::GatewayIntents;
 /// let ws_url = Arc::from(gateway_info.url);
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
+/// let max_concurrency = std::num::NonZeroU16::MIN;
 /// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
@@ -87,6 +88,7 @@ use crate::model::gateway::GatewayIntents;
 ///     # http,
 ///     intents: GatewayIntents::non_privileged(),
 ///     presence: None,
+///     max_concurrency,
 /// });
 /// # Ok(())
 /// # }
@@ -137,7 +139,7 @@ impl ShardManager {
             framework: opt.framework,
             last_start: None,
             manager: Arc::clone(&manager),
-            queue: VecDeque::new(),
+            queue: ShardQueue::new(opt.max_concurrency),
             runners,
             rx: shard_queue_rx,
             #[cfg(feature = "voice")]
@@ -176,7 +178,7 @@ impl ShardManager {
 
         self.set_shard_total(shard_total);
         for shard_id in shard_index..shard_to {
-            self.boot(ShardId(shard_id));
+            self.boot(ShardId(shard_id), true);
         }
     }
 
@@ -204,7 +206,7 @@ impl ShardManager {
     pub async fn restart(&self, shard_id: ShardId) {
         info!("Restarting shard {shard_id}");
         self.shutdown(shard_id, 4000).await;
-        self.boot(shard_id);
+        self.boot(shard_id, false);
     }
 
     /// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
@@ -233,9 +235,10 @@ impl ShardManager {
         {
             let mut shard_shutdown = self.shard_shutdown.lock().await;
 
-            drop(
-                self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)),
-            );
+            drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard {
+                shard_id,
+                code,
+            }));
             match timeout(TIMEOUT, shard_shutdown.next()).await {
                 Ok(Some(shutdown_shard_id)) => {
                     if shutdown_shard_id != shard_id {
@@ -299,11 +302,13 @@ impl ShardManager {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn boot(&self, shard_id: ShardId) {
+    fn boot(&self, shard_id: ShardId, concurrent: bool) {
         info!("Telling shard queuer to start shard {shard_id}");
 
-        let msg = ShardQueuerMessage::Start(shard_id);
-        drop(self.shard_queuer.unbounded_send(msg));
+        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Start {
+            shard_id,
+            concurrent,
+        }));
     }
 
     /// Returns the gateway intents used for this gateway connection.
@@ -371,4 +376,5 @@ pub struct ShardManagerOptions {
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
+    pub max_concurrency: NonZeroU16,
 }
