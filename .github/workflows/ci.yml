@@ -261,12 +261,10 @@ jobs:
       - name: 'Check example 14'
         run: cargo check -p e14_slash_commands
       - name: 'Check example 15'
-        run: cargo check -p e15_simple_dashboard
+        run: cargo check -p e15_sqlite_database
       - name: 'Check example 16'
-        run: cargo check -p e16_sqlite_database
+        run: cargo check -p e16_message_components
       - name: 'Check example 17'
-        run: cargo check -p e17_message_components
+        run: cargo check -p e17_webhook
       - name: 'Check example 18'
-        run: cargo check -p e18_webhook
-      - name: 'Check example 19'
-        run: cargo check -p e19_interactions_endpoint
+        run: cargo check -p e18_interactions_endpoint
