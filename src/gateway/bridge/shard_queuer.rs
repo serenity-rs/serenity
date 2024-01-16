@@ -185,7 +185,7 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn checked_start_batch(&mut self, shard_ids: Vec<ShardId>) {
         if shard_ids.is_empty() {
             return;
@@ -200,7 +200,7 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
-    #[instrument(skip(self))]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn try_start(&mut self, shard_id: ShardId) {
         if let Err(why) = self.start(shard_id).await {
             warn!("[Shard Queuer] Err starting shard {shard_id}: {why:?}");
