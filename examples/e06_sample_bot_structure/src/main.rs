@@ -12,7 +12,7 @@ mod commands;
 
 use std::collections::HashSet;
 use std::env;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use serenity::async_trait;
 use serenity::framework::standard::macros::group;
@@ -29,10 +29,8 @@ use crate::commands::math::*;
 use crate::commands::meta::*;
 use crate::commands::owner::*;
 
-pub struct ShardManagerContainer;
-
-impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<ShardManager>;
+struct UserData {
+    shard_manager: OnceLock<Arc<ShardManager>>,
 }
 
 struct Handler;
@@ -84,18 +82,23 @@ async fn main() {
     let framework = StandardFramework::new().group(&GENERAL_GROUP);
     framework.configure(Configuration::new().owners(owners).prefix("~"));
 
+    let user_data = UserData {
+        shard_manager: OnceLock::new(),
+    };
+
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(&token, intents)
         .framework(framework)
         .event_handler(Handler)
+        .data(Arc::new(user_data) as _)
         .await
         .expect("Err creating client");
 
     {
-        let mut data = client.data.write().await;
-        data.insert::<ShardManagerContainer>(client.shard_manager.clone());
+        let data = client.data::<UserData>();
+        let _ = data.shard_manager.set(client.shard_manager.clone());
     }
 
     let shard_manager = client.shard_manager.clone();
