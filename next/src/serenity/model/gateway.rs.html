@@ -751,6 +751,8 @@
 <a href="#749" id="749">749</a>
 <a href="#750" id="750">750</a>
 <a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>std::num::{NonZeroU16, NonZeroU64};
@@ -790,6 +792,8 @@
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>Activity {
     <span class="doccomment">/// The ID of the application for the activity.
+    </span><span class="attr">#[serde(deserialize_with = <span class="string">"deserialize_buggy_id"</span>)]
+    #[serde(default)]
     </span><span class="kw">pub </span>application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
     <span class="doccomment">/// Images for the presence and their texts.
     </span><span class="kw">pub </span>assets: <span class="prelude-ty">Option</span>&lt;ActivityAssets&gt;,

@@ -842,6 +842,18 @@
 <a href="#840" id="840">840</a>
 <a href="#841" id="841">841</a>
 <a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
 //! channel's permission overrides.
 //!
@@ -1635,11 +1647,23 @@
     }
 }
 
-<span class="comment">// Manual impl needed because Permissions are sent as a stringified integer
+<span class="comment">// Manual impl needed because Permissions are usually sent as a stringified integer,
+// but audit log changes are sent as an int, which is probably a problem.
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Permissions {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
-        <span class="kw">let </span>permissions_str = String::deserialize(deserializer)<span class="question-mark">?</span>;
-        <span class="kw">let </span>permissions_num = permissions_str.parse().map_err(DeError::custom)<span class="question-mark">?</span>;
+        <span class="attr">#[derive(serde::Deserialize)]
+        #[serde(untagged)]
+        </span><span class="kw">enum </span>StrOrInt&lt;<span class="lifetime">'a</span>&gt; {
+            Str(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str),
+            String(String),
+            Integer(u64),
+        }
+
+        <span class="kw">let </span>permissions_num = <span class="kw">match </span>StrOrInt::deserialize(deserializer)<span class="question-mark">? </span>{
+            StrOrInt::String(permissions) =&gt; permissions.parse().map_err(DeError::custom)<span class="question-mark">?</span>,
+            StrOrInt::Str(permissions) =&gt; permissions.parse().map_err(DeError::custom)<span class="question-mark">?</span>,
+            StrOrInt::Integer(permissions) =&gt; permissions,
+        };
 
         <span class="prelude-val">Ok</span>(Permissions::from_bits_truncate(permissions_num))
     }

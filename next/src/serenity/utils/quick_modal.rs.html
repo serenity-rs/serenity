@@ -146,6 +146,11 @@
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">crate</span>::builder::{
@@ -255,10 +260,15 @@
         );
         builder.execute(ctx, (interaction_id, token)).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let </span>modal_interaction = ModalInteractionCollector::new(<span class="kw-2">&amp;</span>ctx.shard)
-            .custom_ids(<span class="macro">vec!</span>[modal_custom_id.trunc_into()])
-            .next()
-            .<span class="kw">await</span>;
+        <span class="kw">let </span>collector = ModalInteractionCollector::new(<span class="kw-2">&amp;</span>ctx.shard)
+            .custom_ids(<span class="macro">vec!</span>[modal_custom_id.trunc_into()]);
+
+        <span class="kw">let </span>collector = <span class="kw">match </span><span class="self">self</span>.timeout {
+            <span class="prelude-val">Some</span>(timeout) =&gt; collector.timeout(timeout),
+            <span class="prelude-val">None </span>=&gt; collector,
+        };
+
+        <span class="kw">let </span>modal_interaction = collector.next().<span class="kw">await</span>;
 
         <span class="kw">let </span><span class="prelude-val">Some</span>(modal_interaction) = modal_interaction <span class="kw">else </span>{ <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) };
 
