@@ -34,6 +34,7 @@ use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
+use crate::model::guild::SerializeIter;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
