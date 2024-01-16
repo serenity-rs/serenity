@@ -9,10 +9,10 @@
 //! ```
 #![allow(deprecated)] // We recommend migrating to poise, instead of using the standard command framework.
 use std::borrow::Cow;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::env;
 use std::fmt::Write;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use serenity::async_trait;
 use serenity::builder::EditChannel;
@@ -43,16 +43,9 @@ use serenity::utils::{content_safe, ContentSafeOptions};
 // A container type is created for inserting into the Client's `data`, which allows for data to be
 // accessible across all events and framework commands, or anywhere else that has a copy of the
 // `data` Arc.
-struct ShardManagerContainer;
-
-impl TypeMapKey for ShardManagerContainer {
-    type Value = Arc<ShardManager>;
-}
-
-struct CommandCounter;
-
-impl TypeMapKey for CommandCounter {
-    type Value = HashMap<String, u64>;
+struct UserData {
+    command_counter: dashmap::DashMap<String, u64>,
+    shard_manager: OnceLock<Arc<ShardManager>>,
 }
 
 struct Handler;
@@ -144,9 +137,8 @@ async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
 
     // Increment the number of times this command has been run once. If the command's name does not
     // exist in the counter, add a default value of 0.
-    let mut data = ctx.data.write().await;
-    let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
-    let entry = counter.entry(command_name.to_string()).or_insert(0);
+    let data = ctx.data::<UserData>();
+    let mut entry = data.command_counter.entry(command_name.to_string()).or_insert(0);
     *entry += 1;
 
     true // if `before` returns false, command processing doesn't happen.
@@ -295,6 +287,11 @@ async fn main() {
             .owners(owners),
     );
 
+    let data = UserData {
+        command_counter: dashmap::DashMap::new(),
+        shard_manager: OnceLock::new(),
+    };
+
     // For this example to run properly, the "Presence Intent" and "Server Members Intent" options
     // need to be enabled.
     // These are needed so the `required_permissions` macro works on the commands that need to use
@@ -305,13 +302,13 @@ async fn main() {
     let mut client = Client::builder(&token, intents)
         .event_handler(Handler)
         .framework(framework)
-        .type_map_insert::<CommandCounter>(HashMap::default())
+        .data(Arc::new(data) as _)
         .await
         .expect("Err creating client");
 
     {
-        let mut data = client.data.write().await;
-        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
+        let data = client.data::<UserData>();
+        let _ = data.shard_manager.set(Arc::clone(&client.shard_manager));
     }
 
     if let Err(why) = client.start().await {
@@ -327,10 +324,9 @@ async fn main() {
 async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
     let mut contents = "Commands used:\n".to_string();
 
-    let data = ctx.data.read().await;
-    let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
-
-    for (name, amount) in counter {
+    let counter = &ctx.data::<UserData>().command_counter;
+    for entry in counter {
+        let (name, amount) = entry.pair();
         writeln!(contents, "- {name}: {amount}")?;
     }
 
@@ -448,17 +444,8 @@ async fn about(ctx: &Context, msg: &Message) -> CommandResult {
 async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     // The shard manager is an interface for mutating, stopping, restarting, and retrieving
     // information about shards.
-    let data = ctx.data.read().await;
-
-    let shard_manager = match data.get::<ShardManagerContainer>() {
-        Some(v) => v,
-        None => {
-            msg.reply(ctx, "There was a problem getting the shard manager").await?;
-
-            return Ok(());
-        },
-    };
-
+    let data = ctx.data::<UserData>();
+    let shard_manager = data.shard_manager.get().expect("should be init before startup");
     let runners = shard_manager.runners.lock().await;
 
     // Shards are backed by a "shard runner" responsible for processing events over the shard, so
