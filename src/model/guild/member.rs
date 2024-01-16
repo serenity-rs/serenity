@@ -291,7 +291,7 @@ impl Member {
     /// more roles have the same highest position, then the role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
     #[deprecated = "Use Guild::member_highest_role"]
-    pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, u16)> {
+    pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, i16)> {
         cache
             .as_ref()
             .guild(self.guild_id)
