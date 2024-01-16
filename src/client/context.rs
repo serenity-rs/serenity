@@ -1,9 +1,6 @@
 use std::fmt;
 use std::sync::Arc;
 
-use tokio::sync::RwLock;
-use typemap_rev::TypeMap;
-
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 use crate::gateway::ActivityData;
@@ -32,7 +29,7 @@ pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more information.
     ///
     /// [`Client::data`]: super::Client::data
-    pub data: Arc<RwLock<TypeMap>>,
+    data: Arc<dyn std::any::Any + Send + Sync>,
     /// The messenger to communicate with the shard runner.
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
@@ -57,7 +54,7 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     #[cfg(feature = "gateway")]
     pub(crate) fn new(
-        data: Arc<RwLock<TypeMap>>,
+        data: Arc<dyn std::any::Any + Send + Sync>,
         runner: &ShardRunner,
         shard_id: ShardId,
         http: Arc<Http>,
@@ -74,12 +71,34 @@ impl Context {
     }
 
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
-    pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u32, http: Arc<Http>) -> Context {
+    pub fn easy(
+        data: Arc<dyn std::any::Any + Send + Sync>,
+        shard_id: ShardId,
+        http: Arc<Http>,
+    ) -> Context {
         Context {
             shard_id,
             data,
             http,
         }
+    }
+
+    /// A container for a data type that can be used across contexts.
+    ///
+    /// The purpose of the data field is to be accessible and persistent across contexts; that is,
+    /// data can be modified by one context, and will persist through the future and be accessible
+    /// through other contexts. This is useful for anything that should "live" through the program:
+    /// counters, database connections, custom user caches, etc.
+    ///
+    /// # Panics
+    /// Panics if the generic provided is not equal to the type provided in [`ClientBuilder::data`].
+    ///
+    /// [`ClientBuilder::data`]: super::ClientBuilder::data
+    #[must_use]
+    pub fn data<Data: Send + Sync + 'static>(&self) -> &Data {
+        self.data
+            .downcast_ref()
+            .expect("Type provided to Context should be the same as ClientBuilder::data.")
     }
 
     /// Sets the current user as being [`Online`]. This maintains the current activity.
