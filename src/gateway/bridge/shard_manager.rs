@@ -7,10 +7,9 @@ use std::time::Duration;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::{SinkExt, StreamExt};
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tracing::{info, warn};
-use typemap_rev::TypeMap;
 
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
@@ -67,9 +66,9 @@ use crate::model::gateway::GatewayIntents;
 /// # let http: Arc<Http> = unimplemented!();
 /// let gateway_info = http.get_bot_gateway().await?;
 ///
+/// let data = Arc::new(());
 /// let shard_total = gateway_info.shards;
 /// let ws_url = Arc::from(gateway_info.url);
-/// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let max_concurrency = std::num::NonZeroU16::MIN;
 /// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + 'static>;
@@ -362,7 +361,7 @@ impl Drop for ShardManager {
 }
 
 pub struct ShardManagerOptions {
-    pub data: Arc<RwLock<TypeMap>>,
+    pub data: Arc<dyn std::any::Any + Send + Sync>,
     pub event_handlers: Vec<Arc<dyn EventHandler>>,
     pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
