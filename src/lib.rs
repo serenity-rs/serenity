@@ -127,13 +127,6 @@ pub use static_assertions;
 pub use crate::client::Client;
 pub use crate::error::{Error, Result};
 
-#[cfg(feature = "absolute_ratelimits")]
-compile_error!(
-    "The absolute_ratelimits feature has been removed.\n\
-    Configure absolute ratelimits via Ratelimiter::set_absolute_ratelimits.\n\
-    You can set the Ratelimiter of Http via HttpBuilder::ratelimiter."
-);
-
 /// Special module that re-exports most public items from this crate.
 ///
 /// Useful, because you don't have to remember the full paths of serenity items.
