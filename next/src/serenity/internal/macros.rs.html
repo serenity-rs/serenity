@@ -201,6 +201,7 @@
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of macros for easily working with internals.
 
 </span><span class="attr">#[cfg(any(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
@@ -348,7 +349,8 @@
         }
     ) =&gt; {
         $(<span class="attr">#[<span class="macro-nonterminal">$outer</span>]</span>)*
-        <span class="macro-nonterminal">$vis </span><span class="kw">struct </span><span class="macro-nonterminal">$BitFlags</span>(<span class="macro-nonterminal">$T</span>);
+        <span class="attr">#[repr(packed)]
+        </span><span class="macro-nonterminal">$vis </span><span class="kw">struct </span><span class="macro-nonterminal">$BitFlags</span>(<span class="macro-nonterminal">$T</span>);
 
         <span class="macro">bitflags::bitflags! </span>{
             <span class="kw">impl </span><span class="macro-nonterminal">$BitFlags</span>: <span class="macro-nonterminal">$T </span>{

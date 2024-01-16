@@ -854,6 +854,7 @@
 <a href="#852" id="852">852</a>
 <a href="#853" id="853">853</a>
 <a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
 //! channel's permission overrides.
 //!
@@ -1076,6 +1077,7 @@
 /// [`User`]: super::user::User
 </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+#[repr(packed)]
 </span><span class="kw">pub struct </span>Permissions(u64);
 
 <span class="macro">bitflags::bitflags! </span>{
