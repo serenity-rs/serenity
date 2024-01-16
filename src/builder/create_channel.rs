@@ -27,7 +27,7 @@ pub struct CreateChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     bitrate: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    user_limit: Option<u32>,
+    user_limit: Option<NonMaxU16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<NonMaxU16>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -137,7 +137,7 @@ impl<'a> CreateChannel<'a> {
     /// Set how many users may occupy this voice channel
     ///
     /// Only for [`ChannelType::Voice`] and [`ChannelType::Stage`]
-    pub fn user_limit(mut self, limit: u32) -> Self {
+    pub fn user_limit(mut self, limit: NonMaxU16) -> Self {
         self.user_limit = Some(limit);
         self
     }
