@@ -1,5 +1,5 @@
 [package]
-name = "e19_interactions_endpoint"
+name = "e18_interactions_endpoint"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
