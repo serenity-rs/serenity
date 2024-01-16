@@ -18,7 +18,7 @@ members = ["examples/*"]
 
 [dependencies]
 # Required dependencies
-bitflags = "2.4.1"
+bitflags = "2.4.2"
 serde_json = "1.0.108"
 async-trait = "0.1.74"
 tracing = { version = "0.1.40", features = ["log"] }
