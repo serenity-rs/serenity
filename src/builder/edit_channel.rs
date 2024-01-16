@@ -53,7 +53,7 @@ pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     bitrate: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    user_limit: Option<u32>,
+    user_limit: Option<NonMaxU16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     permission_overwrites: Option<Cow<'a, [PermissionOverwrite]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -169,10 +169,11 @@ impl<'a> EditChannel<'a> {
 
     /// The number of users that may be in the channel simultaneously.
     ///
-    /// This is for [voice] channels only.
+    /// This is for [voice] and [stage] channels only.
     ///
     /// [voice]: ChannelType::Voice
-    pub fn user_limit(mut self, user_limit: u32) -> Self {
+    /// [stage]: ChannelType::Stage
+    pub fn user_limit(mut self, user_limit: NonMaxU16) -> Self {
         self.user_limit = Some(user_limit);
         self
     }

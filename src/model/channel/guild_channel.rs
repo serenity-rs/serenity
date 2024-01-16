@@ -92,8 +92,8 @@ pub struct GuildChannel {
     pub topic: Option<FixedString<u16>>,
     /// The maximum number of members allowed in the channel.
     ///
-    /// **Note**: This is only available for voice channels.
-    pub user_limit: Option<NonMaxU8>,
+    /// This is max 99 for voice channels and 10,000 for stage channels (0 refers to no limit).
+    pub user_limit: Option<NonMaxU16>,
     /// Used to tell if the channel is not safe for work.
     // This field can or can not be present sometimes, but if it isn't default to `false`.
     #[serde(default)]
