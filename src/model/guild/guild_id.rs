@@ -806,7 +806,7 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         role_id: RoleId,
-        position: u16,
+        position: i16,
     ) -> Result<Vec<Role>> {
         http.as_ref().edit_role_position(self, role_id, position, None).await
     }
