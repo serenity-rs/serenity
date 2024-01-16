@@ -1,7 +1,6 @@
 use std::fmt;
 use std::hash::Hash;
 use std::marker::PhantomData;
-use std::num::NonZeroU64;
 
 use arrayvec::ArrayVec;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
@@ -74,7 +73,7 @@ where
 pub fn deserialize_buggy_id<'de, D, Id>(deserializer: D) -> StdResult<Option<Id>, D::Error>
 where
     D: Deserializer<'de>,
-    Id: From<NonZeroU64>,
+    Id: From<u64>,
 {
     if let Some(val) = Option::<StrOrInt<'de>>::deserialize(deserializer)? {
         let val = val.parse().map_err(serde::de::Error::custom)?;
