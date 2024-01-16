@@ -169,7 +169,7 @@
 <span class="kw">pub use </span><span class="self">self</span>::event::ShardStageUpdateEvent;
 <span class="kw">pub use </span><span class="self">self</span>::shard_manager::{ShardManager, ShardManagerOptions};
 <span class="kw">pub use </span><span class="self">self</span>::shard_messenger::ShardMessenger;
-<span class="kw">pub use </span><span class="self">self</span>::shard_queuer::ShardQueuer;
+<span class="kw">pub use </span><span class="self">self</span>::shard_queuer::{ShardQueue, ShardQueuer};
 <span class="kw">pub use </span><span class="self">self</span>::shard_runner::{ShardRunner, ShardRunnerOptions};
 <span class="kw">pub use </span><span class="self">self</span>::shard_runner_message::ShardRunnerMessage;
 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
@@ -185,11 +185,11 @@
     <span class="doccomment">/// Message to set the shard total.
     </span>SetShardTotal(NonZeroU16),
     <span class="doccomment">/// Message to start a shard.
-    </span>Start(ShardId),
+    </span>Start { shard_id: ShardId, concurrent: bool },
     <span class="doccomment">/// Message to shutdown the shard queuer.
     </span>Shutdown,
     <span class="doccomment">/// Message to dequeue/shutdown a shard.
-    </span>ShutdownShard(ShardId, u16),
+    </span>ShutdownShard { shard_id: ShardId, code: u16 },
 }
 
 <span class="doccomment">/// Information about a [`ShardRunner`].

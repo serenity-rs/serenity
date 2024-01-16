@@ -255,6 +255,98 @@
 <a href="#253" id="253">253</a>
 <a href="#254" id="254">254</a>
 <a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::sync::Arc;
@@ -319,9 +411,7 @@
     <span class="doccomment">/// A copy of the [`ShardManager`] to communicate with it.
     </span><span class="kw">pub </span>manager: Arc&lt;ShardManager&gt;,
     <span class="doccomment">/// The shards that are queued for booting.
-    ///
-    /// This will typically be filled with previously failed boots.
-    </span><span class="kw">pub </span>queue: VecDeque&lt;ShardId&gt;,
+    </span><span class="kw">pub </span>queue: ShardQueue,
     <span class="doccomment">/// A copy of the map of shard runners.
     </span><span class="kw">pub </span>runners: Arc&lt;Mutex&lt;HashMap&lt;ShardId, ShardRunnerInfo&gt;&gt;&gt;,
     <span class="doccomment">/// A receiver channel for the shard queuer to be told to start shards.
@@ -359,35 +449,60 @@
     /// **Note**: This should be run in its own thread due to the blocking nature of the loop.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="comment">// The duration to timeout from reads over the Rx channel. This can be done in a loop, and
-        // if the read times out then a shard can be started if one is presently waiting in the
-        // queue.
+        <span class="comment">// We read from the Rx channel in a loop, and use a timeout of 5 seconds so that we don't
+        // hang forever. When we receive a command to start a shard, we append it to our queue. The
+        // queue is popped in batches of shards, which are started in parallel. A batch is fired
+        // every 5 seconds at minimum in order to avoid being ratelimited.
         </span><span class="kw">const </span>TIMEOUT: Duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
 
         <span class="kw">loop </span>{
-            <span class="kw">match </span>timeout(TIMEOUT, <span class="self">self</span>.rx.next()).<span class="kw">await </span>{
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::Shutdown)) =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">"[Shard Queuer] Received to shutdown."</span>);
-                    <span class="self">self</span>.shutdown_runners().<span class="kw">await</span>;
-
-                    <span class="kw">break</span>;
-                },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::ShutdownShard(shard, code))) =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">"[Shard Queuer] Received to shutdown shard {} with {}."</span>, shard.<span class="number">0</span>, code);
-                    <span class="self">self</span>.shutdown(shard, code).<span class="kw">await</span>;
-                },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::Start(shard_id))) =&gt; {
-                    <span class="self">self</span>.checked_start(shard_id).<span class="kw">await</span>;
-                },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardQueuerMessage::SetShardTotal(shard_total))) =&gt; {
-                    <span class="self">self</span>.shard_total = shard_total;
-                },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(shard) = <span class="self">self</span>.queue.pop_front() {
-                        <span class="self">self</span>.checked_start(shard).<span class="kw">await</span>;
-                    }
-                },
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(msg) = timeout(TIMEOUT, <span class="self">self</span>.rx.next()).<span class="kw">await </span>{
+                <span class="kw">match </span>msg {
+                    <span class="prelude-val">Some</span>(ShardQueuerMessage::SetShardTotal(shard_total)) =&gt; {
+                        <span class="self">self</span>.shard_total = shard_total;
+                    },
+                    <span class="prelude-val">Some</span>(ShardQueuerMessage::Start {
+                        shard_id,
+                        concurrent,
+                    }) =&gt; {
+                        <span class="kw">if </span>concurrent {
+                            <span class="comment">// If we're starting multiple shards, we can start them concurrently
+                            // according to `max_concurrency`, and want our batches to be of
+                            // maximal size.
+                            </span><span class="self">self</span>.queue.push_back(shard_id);
+                            <span class="kw">if </span><span class="self">self</span>.queue.buckets_filled() {
+                                <span class="kw">let </span>batch = <span class="self">self</span>.queue.pop_batch();
+                                <span class="self">self</span>.checked_start_batch(batch).<span class="kw">await</span>;
+                            }
+                        } <span class="kw">else </span>{
+                            <span class="comment">// In cases where we're only starting a single shard (e.g. if we're
+                            // restarting a shard), we assume the queue will never fill up and skip
+                            // using it so that we don't incur a 5 second timeout.
+                            </span><span class="self">self</span>.checked_start(shard_id).<span class="kw">await</span>;
+                        }
+                    },
+                    <span class="prelude-val">Some</span>(ShardQueuerMessage::ShutdownShard {
+                        shard_id,
+                        code,
+                    }) =&gt; {
+                        <span class="macro">debug!</span>(
+                            <span class="string">"[Shard Queuer] Received to shutdown shard {} with code {}"</span>,
+                            shard_id.<span class="number">0</span>, code
+                        );
+                        <span class="self">self</span>.shutdown(shard_id, code).<span class="kw">await</span>;
+                    },
+                    <span class="prelude-val">Some</span>(ShardQueuerMessage::Shutdown) =&gt; {
+                        <span class="macro">debug!</span>(<span class="string">"[Shard Queuer] Received to shutdown all shards"</span>);
+                        <span class="self">self</span>.shutdown_runners().<span class="kw">await</span>;
+                        <span class="kw">break</span>;
+                    },
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
+                }
+            } <span class="kw">else </span>{
+                <span class="comment">// Once we've stopped receiving `Start` commands, we no longer care about the size
+                // of our batches being maximal.
+                </span><span class="kw">let </span>batch = <span class="self">self</span>.queue.pop_batch();
+                <span class="self">self</span>.checked_start_batch(batch).<span class="kw">await</span>;
             }
         }
     }
@@ -414,14 +529,35 @@
         <span class="macro">debug!</span>(<span class="string">"[Shard Queuer] Checked start for shard {shard_id}"</span>);
 
         <span class="self">self</span>.check_last_start().<span class="kw">await</span>;
+        <span class="self">self</span>.try_start(shard_id).<span class="kw">await</span>;
+
+        <span class="self">self</span>.last_start = <span class="prelude-val">Some</span>(Instant::now());
+    }
+
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
+    </span><span class="kw">async fn </span>checked_start_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_ids: Vec&lt;ShardId&gt;) {
+        <span class="kw">if </span>shard_ids.is_empty() {
+            <span class="kw">return</span>;
+        }
+
+        <span class="macro">debug!</span>(<span class="string">"[Shard Queuer] Starting batch of {} shards"</span>, shard_ids.len());
+        <span class="self">self</span>.check_last_start().<span class="kw">await</span>;
+        <span class="kw">for </span>shard_id <span class="kw">in </span>shard_ids {
+            <span class="macro">debug!</span>(<span class="string">"[Shard Queuer] Starting shard {shard_id}"</span>);
+            <span class="self">self</span>.try_start(shard_id).<span class="kw">await</span>;
+        }
+        <span class="self">self</span>.last_start = <span class="prelude-val">Some</span>(Instant::now());
+    }
+
+    <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
+    </span><span class="kw">async fn </span>try_start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId) {
         <span class="kw">if let </span><span class="prelude-val">Err</span>(why) = <span class="self">self</span>.start(shard_id).<span class="kw">await </span>{
             <span class="macro">warn!</span>(<span class="string">"[Shard Queuer] Err starting shard {shard_id}: {why:?}"</span>);
             <span class="macro">info!</span>(<span class="string">"[Shard Queuer] Re-queueing start of shard {shard_id}"</span>);
 
-            <span class="self">self</span>.queue.push_back(shard_id);
+            <span class="comment">// Try again in the next batch.
+            </span><span class="self">self</span>.queue.push_front(shard_id);
         }
-
-        <span class="self">self</span>.last_start = <span class="prelude-val">Some</span>(Instant::now());
     }
 
     <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
@@ -509,5 +645,53 @@
             }
         }
     }
+}
+
+<span class="doccomment">/// A queue of [`ShardId`]s that is split up into multiple buckets according to the value of
+/// [`max_concurrency`](crate::model::gateway::SessionStartLimit::max_concurrency).
+</span><span class="attr">#[must_use]
+</span><span class="kw">pub struct </span>ShardQueue {
+    buckets: HashMap&lt;u16, VecDeque&lt;ShardId&gt;&gt;,
+    max_concurrency: NonZeroU16,
+}
+
+<span class="kw">impl </span>ShardQueue {
+    <span class="kw">pub fn </span>new(max_concurrency: NonZeroU16) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            buckets: HashMap::with_capacity(max_concurrency.get() <span class="kw">as </span>usize),
+            max_concurrency,
+        }
+    }
+
+    <span class="doccomment">/// Calculates the corresponding bucket for the given `ShardId` and **appends** to it.
+    </span><span class="kw">pub fn </span>push_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId) {
+        <span class="kw">let </span>bucket = shard_id.<span class="number">0 </span>% <span class="self">self</span>.max_concurrency.get();
+        <span class="self">self</span>.buckets.entry(bucket).or_default().push_back(shard_id);
+    }
+
+    <span class="doccomment">/// Calculates the corresponding bucket for the given `ShardId` and **prepends** to it.
+    </span><span class="kw">pub fn </span>push_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId) {
+        <span class="kw">let </span>bucket = shard_id.<span class="number">0 </span>% <span class="self">self</span>.max_concurrency.get();
+        <span class="self">self</span>.buckets.entry(bucket).or_default().push_front(shard_id);
+    }
+
+    <span class="doccomment">/// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
+    </span><span class="kw">pub fn </span>pop_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;ShardId&gt; {
+        (<span class="number">0</span>..<span class="self">self</span>.max_concurrency.get())
+            .filter_map(|i| <span class="self">self</span>.buckets.get_mut(<span class="kw-2">&amp;</span>i).and_then(|bucket| bucket.pop_front()))
+            .collect()
+    }
+
+    <span class="doccomment">/// Returns `true` if every bucket contains at least one `ShardId`.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>buckets_filled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.max_concurrency.get() {
+            <span class="kw">let </span><span class="prelude-val">Some</span>(bucket) = <span class="self">self</span>.buckets.get(<span class="kw-2">&amp;</span>i) <span class="kw">else </span>{ <span class="kw">return </span><span class="bool-val">false </span>};
+            <span class="kw">if </span>bucket.is_empty() {
+                <span class="kw">return </span><span class="bool-val">false</span>;
+            }
+        }
+        <span class="bool-val">true
+    </span>}
 }
 </code></pre></div></section></main></body></html>

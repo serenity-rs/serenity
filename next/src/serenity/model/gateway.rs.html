@@ -753,6 +753,9 @@
 <a href="#751" id="751">751</a>
 <a href="#752" id="752">752</a>
 <a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.
 
 </span><span class="kw">use </span>std::num::{NonZeroU16, NonZeroU64};
@@ -1112,7 +1115,10 @@
     <span class="doccomment">/// The total number of session starts within the ratelimit period allowed.
     </span><span class="kw">pub </span>total: u64,
     <span class="doccomment">/// The number of identify requests allowed per 5 seconds.
-    </span><span class="kw">pub </span>max_concurrency: u64,
+    ///
+    /// This is almost always 1, but for large bots (in more than 150,000 servers) it can be
+    /// larger.
+    </span><span class="kw">pub </span>max_concurrency: NonZeroU16,
 }
 
 <span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]

@@ -374,7 +374,13 @@
 <a href="#372" id="372">372</a>
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::sync::Arc;
 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
@@ -390,7 +396,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::VoiceGatewayManager;
-<span class="kw">use super</span>::{ShardId, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
+<span class="kw">use super</span>::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="kw">use </span><span class="kw">crate</span>::client::{EventHandler, RawEventHandler};
@@ -447,6 +453,7 @@
 /// let ws_url = Arc::from(gateway_info.url);
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;
+/// let max_concurrency = std::num::NonZeroU16::MIN;
 /// let framework = Arc::new(StandardFramework::new()) as Arc&lt;dyn Framework + 'static&gt;;
 ///
 /// ShardManager::new(ShardManagerOptions {
@@ -463,6 +470,7 @@
 ///     # http,
 ///     intents: GatewayIntents::non_privileged(),
 ///     presence: None,
+///     max_concurrency,
 /// });
 /// # Ok(())
 /// # }
@@ -513,7 +521,7 @@
             </span>framework: opt.framework,
             last_start: <span class="prelude-val">None</span>,
             manager: Arc::clone(<span class="kw-2">&amp;</span>manager),
-            queue: VecDeque::new(),
+            queue: ShardQueue::new(opt.max_concurrency),
             runners,
             rx: shard_queue_rx,
             <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
@@ -552,7 +560,7 @@
 
         <span class="self">self</span>.set_shard_total(shard_total);
         <span class="kw">for </span>shard_id <span class="kw">in </span>shard_index..shard_to {
-            <span class="self">self</span>.boot(ShardId(shard_id));
+            <span class="self">self</span>.boot(ShardId(shard_id), <span class="bool-val">true</span>);
         }
     }
 
@@ -580,7 +588,7 @@
     </span><span class="kw">pub async fn </span>restart(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId) {
         <span class="macro">info!</span>(<span class="string">"Restarting shard {shard_id}"</span>);
         <span class="self">self</span>.shutdown(shard_id, <span class="number">4000</span>).<span class="kw">await</span>;
-        <span class="self">self</span>.boot(shard_id);
+        <span class="self">self</span>.boot(shard_id, <span class="bool-val">false</span>);
     }
 
     <span class="doccomment">/// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
@@ -609,9 +617,10 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>shard_shutdown = <span class="self">self</span>.shard_shutdown.lock().<span class="kw">await</span>;
 
-            drop(
-                <span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)),
-            );
+            drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard {
+                shard_id,
+                code,
+            }));
             <span class="kw">match </span>timeout(TIMEOUT, shard_shutdown.next()).<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(shutdown_shard_id)) =&gt; {
                     <span class="kw">if </span>shutdown_shard_id != shard_id {
@@ -675,11 +684,13 @@
     }
 
     <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
-    </span><span class="kw">fn </span>boot(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId) {
+    </span><span class="kw">fn </span>boot(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId, concurrent: bool) {
         <span class="macro">info!</span>(<span class="string">"Telling shard queuer to start shard {shard_id}"</span>);
 
-        <span class="kw">let </span>msg = ShardQueuerMessage::Start(shard_id);
-        drop(<span class="self">self</span>.shard_queuer.unbounded_send(msg));
+        drop(<span class="self">self</span>.shard_queuer.unbounded_send(ShardQueuerMessage::Start {
+            shard_id,
+            concurrent,
+        }));
     }
 
     <span class="doccomment">/// Returns the gateway intents used for this gateway connection.
@@ -747,5 +758,6 @@
     <span class="kw">pub </span>http: Arc&lt;Http&gt;,
     <span class="kw">pub </span>intents: GatewayIntents,
     <span class="kw">pub </span>presence: <span class="prelude-ty">Option</span>&lt;PresenceData&gt;,
+    <span class="kw">pub </span>max_concurrency: NonZeroU16,
 }
 </code></pre></div></section></main></body></html>

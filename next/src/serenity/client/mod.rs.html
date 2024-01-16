@@ -880,6 +880,11 @@
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -1215,11 +1220,15 @@
         </span><span class="kw">let </span>cache = Arc::new(Cache::new_with_settings(<span class="self">self</span>.cache_settings));
 
         Box::pin(<span class="kw">async move </span>{
-            <span class="kw">let </span>(ws_url, shard_total) = <span class="kw">match </span>http.get_bot_gateway().<span class="kw">await </span>{
-                <span class="prelude-val">Ok</span>(response) =&gt; (Arc::from(response.url), response.shards),
+            <span class="kw">let </span>(ws_url, shard_total, max_concurrency) = <span class="kw">match </span>http.get_bot_gateway().<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(response) =&gt; (
+                    Arc::from(response.url),
+                    response.shards,
+                    response.session_start_limit.max_concurrency,
+                ),
                 <span class="prelude-val">Err</span>(err) =&gt; {
                     <span class="macro">tracing::warn!</span>(<span class="string">"HTTP request to get gateway URL failed: {err}"</span>);
-                    (Arc::from(<span class="string">"wss://gateway.discord.gg"</span>), NonZeroU16::MIN)
+                    (Arc::from(<span class="string">"wss://gateway.discord.gg"</span>), NonZeroU16::MIN, NonZeroU16::MIN)
                 },
             };
 
@@ -1240,6 +1249,7 @@
                 http: Arc::clone(<span class="kw-2">&amp;</span>http),
                 intents,
                 presence: <span class="prelude-val">Some</span>(presence),
+                max_concurrency,
             });
 
             <span class="kw">let </span>client = Client {
