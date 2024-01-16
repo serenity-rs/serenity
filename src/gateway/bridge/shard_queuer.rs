@@ -62,9 +62,7 @@ pub struct ShardQueuer {
     /// A copy of the [`ShardManager`] to communicate with it.
     pub manager: Arc<ShardManager>,
     /// The shards that are queued for booting.
-    ///
-    /// This will typically be filled with previously failed boots.
-    pub queue: VecDeque<ShardId>,
+    pub queue: ShardQueue,
     /// A copy of the map of shard runners.
     pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// A receiver channel for the shard queuer to be told to start shards.
@@ -102,35 +100,60 @@ impl ShardQueuer {
     /// **Note**: This should be run in its own thread due to the blocking nature of the loop.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn run(&mut self) {
-        // The duration to timeout from reads over the Rx channel. This can be done in a loop, and
-        // if the read times out then a shard can be started if one is presently waiting in the
-        // queue.
+        // We read from the Rx channel in a loop, and use a timeout of 5 seconds so that we don't
+        // hang forever. When we receive a command to start a shard, we append it to our queue. The
+        // queue is popped in batches of shards, which are started in parallel. A batch is fired
+        // every 5 seconds at minimum in order to avoid being ratelimited.
         const TIMEOUT: Duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
 
         loop {
-            match timeout(TIMEOUT, self.rx.next()).await {
-                Ok(Some(ShardQueuerMessage::Shutdown)) => {
-                    debug!("[Shard Queuer] Received to shutdown.");
-                    self.shutdown_runners().await;
-
-                    break;
-                },
-                Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
-                    debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
-                    self.shutdown(shard, code).await;
-                },
-                Ok(Some(ShardQueuerMessage::Start(shard_id))) => {
-                    self.checked_start(shard_id).await;
-                },
-                Ok(Some(ShardQueuerMessage::SetShardTotal(shard_total))) => {
-                    self.shard_total = shard_total;
-                },
-                Ok(None) => break,
-                Err(_) => {
-                    if let Some(shard) = self.queue.pop_front() {
-                        self.checked_start(shard).await;
-                    }
-                },
+            if let Ok(msg) = timeout(TIMEOUT, self.rx.next()).await {
+                match msg {
+                    Some(ShardQueuerMessage::SetShardTotal(shard_total)) => {
+                        self.shard_total = shard_total;
+                    },
+                    Some(ShardQueuerMessage::Start {
+                        shard_id,
+                        concurrent,
+                    }) => {
+                        if concurrent {
+                            // If we're starting multiple shards, we can start them concurrently
+                            // according to `max_concurrency`, and want our batches to be of
+                            // maximal size.
+                            self.queue.push_back(shard_id);
+                            if self.queue.buckets_filled() {
+                                let batch = self.queue.pop_batch();
+                                self.checked_start_batch(batch).await;
+                            }
+                        } else {
+                            // In cases where we're only starting a single shard (e.g. if we're
+                            // restarting a shard), we assume the queue will never fill up and skip
+                            // using it so that we don't incur a 5 second timeout.
+                            self.checked_start(shard_id).await;
+                        }
+                    },
+                    Some(ShardQueuerMessage::ShutdownShard {
+                        shard_id,
+                        code,
+                    }) => {
+                        debug!(
+                            "[Shard Queuer] Received to shutdown shard {} with code {}",
+                            shard_id.0, code
+                        );
+                        self.shutdown(shard_id, code).await;
+                    },
+                    Some(ShardQueuerMessage::Shutdown) => {
+                        debug!("[Shard Queuer] Received to shutdown all shards");
+                        self.shutdown_runners().await;
+                        break;
+                    },
+                    None => break,
+                }
+            } else {
+                // Once we've stopped receiving `Start` commands, we no longer care about the size
+                // of our batches being maximal.
+                let batch = self.queue.pop_batch();
+                self.checked_start_batch(batch).await;
             }
         }
     }
@@ -157,14 +180,35 @@ impl ShardQueuer {
         debug!("[Shard Queuer] Checked start for shard {shard_id}");
 
         self.check_last_start().await;
+        self.try_start(shard_id).await;
+
+        self.last_start = Some(Instant::now());
+    }
+
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    async fn checked_start_batch(&mut self, shard_ids: Vec<ShardId>) {
+        if shard_ids.is_empty() {
+            return;
+        }
+
+        debug!("[Shard Queuer] Starting batch of {} shards", shard_ids.len());
+        self.check_last_start().await;
+        for shard_id in shard_ids {
+            debug!("[Shard Queuer] Starting shard {shard_id}");
+            self.try_start(shard_id).await;
+        }
+        self.last_start = Some(Instant::now());
+    }
+
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    async fn try_start(&mut self, shard_id: ShardId) {
         if let Err(why) = self.start(shard_id).await {
             warn!("[Shard Queuer] Err starting shard {shard_id}: {why:?}");
             info!("[Shard Queuer] Re-queueing start of shard {shard_id}");
 
-            self.queue.push_back(shard_id);
+            // Try again in the next batch.
+            self.queue.push_front(shard_id);
         }
-
-        self.last_start = Some(Instant::now());
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -251,5 +295,53 @@ impl ShardQueuer {
                 );
             }
         }
+    }
+}
+
+/// A queue of [`ShardId`]s that is split up into multiple buckets according to the value of
+/// [`max_concurrency`](crate::model::gateway::SessionStartLimit::max_concurrency).
+#[must_use]
+pub struct ShardQueue {
+    buckets: HashMap<u16, VecDeque<ShardId>>,
+    max_concurrency: NonZeroU16,
+}
+
+impl ShardQueue {
+    pub fn new(max_concurrency: NonZeroU16) -> Self {
+        Self {
+            buckets: HashMap::with_capacity(max_concurrency.get() as usize),
+            max_concurrency,
+        }
+    }
+
+    /// Calculates the corresponding bucket for the given `ShardId` and **appends** to it.
+    pub fn push_back(&mut self, shard_id: ShardId) {
+        let bucket = shard_id.0 % self.max_concurrency.get();
+        self.buckets.entry(bucket).or_default().push_back(shard_id);
+    }
+
+    /// Calculates the corresponding bucket for the given `ShardId` and **prepends** to it.
+    pub fn push_front(&mut self, shard_id: ShardId) {
+        let bucket = shard_id.0 % self.max_concurrency.get();
+        self.buckets.entry(bucket).or_default().push_front(shard_id);
+    }
+
+    /// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
+    pub fn pop_batch(&mut self) -> Vec<ShardId> {
+        (0..self.max_concurrency.get())
+            .filter_map(|i| self.buckets.get_mut(&i).and_then(|bucket| bucket.pop_front()))
+            .collect()
+    }
+
+    /// Returns `true` if every bucket contains at least one `ShardId`.
+    #[must_use]
+    pub fn buckets_filled(&self) -> bool {
+        for i in 0..self.max_concurrency.get() {
+            let Some(bucket) = self.buckets.get(&i) else { return false };
+            if bucket.is_empty() {
+                return false;
+            }
+        }
+        true
     }
 }
