@@ -9,7 +9,7 @@ use crate::model::{Colour, Timestamp};
 /// You can include an attachment in your own message by a user or a bot, or in a webhook.
 ///
 /// **Note**: Maximum amount of characters you can put is 256 in a field name,
-/// 1024 in a field value, and 2048 in a description.
+/// 1024 in a field value, and 4096 in a description.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object).
 ///
