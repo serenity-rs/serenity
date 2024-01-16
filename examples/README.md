@@ -43,10 +43,9 @@ To run an example, you have various options:
     13 => Parallel Loops: How to run tasks in a loop with context access.
     Additionally, show how to send a message to a specific channel.
     14 => Slash Commands: How to use the low level slash command API.
-    15 => Simple Dashboard: A simple dashboard to control and monitor the bot with `rillrate`.
-    16 => SQLite Database: How to run an embedded SQLite database alongside the bot using SQLx
-    17 => Message Components: How to structure and use buttons and select menus
-    18 => Webhook: How to construct and call a webhook
+    15 => SQLite Database: How to run an embedded SQLite database alongside the bot using SQLx
+    16 => Message Components: How to structure and use buttons and select menus
+    17 => Webhook: How to construct and call a webhook
     ```
 
 2. Manually running:
