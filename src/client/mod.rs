@@ -33,9 +33,7 @@ use std::sync::OnceLock;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
-use tokio::sync::RwLock;
 use tracing::debug;
-use typemap_rev::{TypeMap, TypeMapKey};
 
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
@@ -68,7 +66,7 @@ use crate::utils::check_shard_total;
 #[cfg(feature = "gateway")]
 #[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
-    data: TypeMap,
+    data: Option<Arc<dyn std::any::Any + Send + Sync>>,
     http: Http,
     intents: GatewayIntents,
     #[cfg(feature = "cache")]
@@ -102,9 +100,9 @@ impl ClientBuilder {
     /// panic.
     pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
         Self {
-            data: TypeMap::new(),
             http,
             intents,
+            data: None,
             #[cfg(feature = "cache")]
             cache_settings: CacheSettings::default(),
             #[cfg(feature = "framework")]
@@ -142,26 +140,9 @@ impl ClientBuilder {
         self.http.application_id()
     }
 
-    /// Sets the entire [`TypeMap`] that will be available in [`Context`]s. A [`TypeMap`] must not
-    /// be constructed manually: [`Self::type_map_insert`] can be used to insert one type at a
-    /// time.
-    pub fn type_map(mut self, type_map: TypeMap) -> Self {
-        self.data = type_map;
-
-        self
-    }
-
-    /// Gets the type map. See [`Self::type_map`] for more info.
-    pub fn get_type_map(&self) -> &TypeMap {
-        &self.data
-    }
-
-    /// Insert a single `value` into the internal [`TypeMap`] that will be available in
-    /// [`Context::data`]. This method can be called multiple times in order to populate the
-    /// [`TypeMap`] with `value`s.
-    pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
-        self.data.insert::<T>(value);
-
+    /// Sets the global data type that can be accessed from [`Context::data`].
+    pub fn data(mut self, data: Arc<dyn std::any::Any + Send + Sync>) -> Self {
+        self.data = Some(data);
         self
     }
 
@@ -305,7 +286,7 @@ impl IntoFuture for ClientBuilder {
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn into_future(self) -> Self::IntoFuture {
-        let data = Arc::new(RwLock::new(self.data));
+        let data = self.data.unwrap_or(Arc::new(()));
         #[cfg(feature = "framework")]
         let framework = self.framework;
         let event_handlers = self.event_handlers;
@@ -439,97 +420,7 @@ impl IntoFuture for ClientBuilder {
 /// [sharding docs]: crate::gateway#sharding
 #[cfg(feature = "gateway")]
 pub struct Client {
-    /// A TypeMap which requires types to be Send + Sync. This is a map that can be safely shared
-    /// across contexts.
-    ///
-    /// The purpose of the data field is to be accessible and persistent across contexts; that is,
-    /// data can be modified by one context, and will persist through the future and be accessible
-    /// through other contexts. This is useful for anything that should "live" through the program:
-    /// counters, database connections, custom user caches, etc.
-    ///
-    /// In the meaning of a context, this data can be accessed through [`Context::data`].
-    ///
-    /// # Examples
-    ///
-    /// Create a `MessageEventCounter` to track the following events:
-    ///
-    /// - [`Event::MessageCreate`]
-    /// - [`Event::MessageDelete`]
-    /// - [`Event::MessageDeleteBulk`]
-    /// - [`Event::MessageUpdate`]
-    ///
-    /// ```rust,ignore
-    /// use std::collections::HashMap;
-    /// use std::env;
-    ///
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
-    ///
-    /// struct MessageEventCounter;
-    ///
-    /// impl TypeMapKey for MessageEventCounter {
-    ///     type Value = HashMap<String, u64>;
-    /// }
-    ///
-    /// async fn reg<S: Into<String>>(ctx: Context, name: S) {
-    ///     let mut data = ctx.data.write().await;
-    ///     let counter = data.get_mut::<MessageEventCounter>().unwrap();
-    ///     let entry = counter.entry(name.into()).or_insert(0);
-    ///     *entry += 1;
-    /// }
-    ///
-    /// struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, _: Message) {
-    ///         reg(ctx, "MessageCreate").await
-    ///     }
-    ///     async fn message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
-    ///         reg(ctx, "MessageDelete").await
-    ///     }
-    ///     async fn message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
-    ///         reg(ctx, "MessageDeleteBulk").await
-    ///     }
-    ///
-    ///     #[cfg(feature = "cache")]
-    ///     async fn message_update(
-    ///         &self,
-    ///         ctx: Context,
-    ///         _old: Option<Message>,
-    ///         _new: Option<Message>,
-    ///         _: MessageUpdateEvent,
-    ///     ) {
-    ///         reg(ctx, "MessageUpdate").await
-    ///     }
-    ///
-    ///     #[cfg(not(feature = "cache"))]
-    ///     async fn message_update(&self, ctx: Context, _new_data: MessageUpdateEvent) {
-    ///         reg(ctx, "MessageUpdate").await
-    ///     }
-    /// }
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
-    /// {
-    ///     let mut data = client.data.write().await;
-    ///     data.insert::<MessageEventCounter>(HashMap::default());
-    /// }
-    ///
-    /// client.start().await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// Refer to [example 05] for an example on using the [`Self::data`] field.
-    ///
-    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
-    /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
-    /// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk
-    /// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate
-    /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework
-    pub data: Arc<RwLock<TypeMap>>,
+    data: Arc<dyn std::any::Any + Send + Sync>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -604,6 +495,16 @@ pub struct Client {
 impl Client {
     pub fn builder(token: &str, intents: GatewayIntents) -> ClientBuilder {
         ClientBuilder::new(token, intents)
+    }
+
+    /// Fetches the data type provided to [`ClientBuilder::data`].
+    ///
+    /// See the documentation for [`Context::data`] for more information.
+    #[must_use]
+    pub fn data<Data: Send + Sync + 'static>(&self) -> &Data {
+        self.data
+            .downcast_ref()
+            .expect("Client::data generic does not match ClientBuilder::data type")
     }
 
     /// Establish the connection and start listening for events.

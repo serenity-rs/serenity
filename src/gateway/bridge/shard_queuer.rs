@@ -6,10 +6,9 @@ use std::sync::OnceLock;
 
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::StreamExt;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::Mutex;
 use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, warn};
-use typemap_rev::TypeMap;
 
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
@@ -43,7 +42,7 @@ pub struct ShardQueuer {
     /// A copy of [`Client::data`] to be given to runners for contextual dispatching.
     ///
     /// [`Client::data`]: crate::Client::data
-    pub data: Arc<RwLock<TypeMap>>,
+    pub data: Arc<dyn std::any::Any + Send + Sync>,
     /// A reference to an [`EventHandler`], such as the one given to the [`Client`].
     ///
     /// [`Client`]: crate::Client

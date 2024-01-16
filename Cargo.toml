@@ -54,7 +54,6 @@ flate2 = { version = "1.0.28", optional = true }
 reqwest = { version = "0.11.22", default-features = false, features = ["multipart", "stream"], optional = true }
 static_assertions = { version = "1.1.0", optional = true }
 tokio-tungstenite = { version = "0.21.0", optional = true }
-typemap_rev = { version = "0.3.0", optional = true }
 bytes = { version = "1.5.0", optional = true }
 percent-encoding = { version = "2.3.0", optional = true }
 mini-moka = { version = "0.10.2", optional = true }
@@ -102,7 +101,7 @@ cache = ["fxhash", "dashmap", "parking_lot"]
 collector = ["gateway", "model"]
 # Wraps the gateway and http functionality into a single interface
 # TODO: should this require "gateway"?
-client = ["http", "typemap_rev"]
+client = ["http"]
 # Enables the Framework trait which is an abstraction for old-style text commands.
 framework = ["client", "model", "utils"]
 # Enables gateway support, which allows bots to listen for Discord events.
