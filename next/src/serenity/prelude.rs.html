@@ -31,8 +31,6 @@
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of exports which can be helpful to use.
 //!
 //! Note that the `SerenityError` re-export is equivalent to [`serenity::Error`], although is
@@ -49,8 +47,6 @@
 //! [`serenity::Error`]: crate::Error
 
 </span><span class="kw">pub use </span>tokio::sync::{Mutex, RwLock};
-<span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
-</span><span class="kw">pub use </span>typemap_rev::{TypeMap, TypeMapKey};
 
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::client::Context;

@@ -505,18 +505,14 @@
 <a href="#503" id="503">503</a>
 <a href="#504" id="504">504</a>
 <a href="#505" id="505">505</a>
-<a href="#506" id="506">506</a>
-<a href="#507" id="507">507</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>futures::channel::mpsc::{<span class="self">self</span>, UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
-<span class="kw">use </span>tokio::sync::RwLock;
 <span class="kw">use </span>tokio_tungstenite::tungstenite;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 <span class="kw">use </span>tracing::{debug, error, info, trace, warn};
-<span class="kw">use </span>typemap_rev::TypeMap;
 
 <span class="kw">use </span><span class="kw">super</span>::event::ShardStageUpdateEvent;
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
@@ -538,7 +534,7 @@
 
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.
 </span><span class="kw">pub struct </span>ShardRunner {
-    data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;,
     event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
@@ -1001,7 +997,7 @@
 
 <span class="doccomment">/// Options to be passed to [`ShardRunner::new`].
 </span><span class="kw">pub struct </span>ShardRunnerOptions {
-    <span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    <span class="kw">pub </span>data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;,
     <span class="kw">pub </span>event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     <span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]

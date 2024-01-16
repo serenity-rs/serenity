@@ -379,7 +379,6 @@
 <a href="#377" id="377">377</a>
 <a href="#378" id="378">378</a>
 <a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::sync::Arc;
@@ -389,10 +388,9 @@
 
 <span class="kw">use </span>futures::channel::mpsc::{<span class="self">self</span>, UnboundedReceiver <span class="kw">as </span>Receiver, UnboundedSender <span class="kw">as </span>Sender};
 <span class="kw">use </span>futures::{SinkExt, StreamExt};
-<span class="kw">use </span>tokio::sync::{Mutex, RwLock};
+<span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tokio::time::timeout;
 <span class="kw">use </span>tracing::{info, warn};
-<span class="kw">use </span>typemap_rev::TypeMap;
 
 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::VoiceGatewayManager;
@@ -449,9 +447,9 @@
 /// # let http: Arc&lt;Http&gt; = unimplemented!();
 /// let gateway_info = http.get_bot_gateway().await?;
 ///
+/// let data = Arc::new(());
 /// let shard_total = gateway_info.shards;
 /// let ws_url = Arc::from(gateway_info.url);
-/// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;
 /// let max_concurrency = std::num::NonZeroU16::MIN;
 /// let framework = Arc::new(StandardFramework::new()) as Arc&lt;dyn Framework + 'static&gt;;
@@ -744,7 +742,7 @@
 }
 
 <span class="kw">pub struct </span>ShardManagerOptions {
-    <span class="kw">pub </span>data: Arc&lt;RwLock&lt;TypeMap&gt;&gt;,
+    <span class="kw">pub </span>data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;,
     <span class="kw">pub </span>event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
     <span class="kw">pub </span>raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
