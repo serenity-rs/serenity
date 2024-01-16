@@ -1,3 +1,5 @@
+use nonmax::NonMaxU16;
+
 use crate::internal::prelude::*;
 use crate::json::Value;
 use crate::model::channel::PermissionOverwrite;
@@ -257,7 +259,7 @@ generate_change! {
     /// Unicode emoji of a role icon was changed.
     "unicode_emoji" => UnicodeEmoji(FixedString),
     /// Maximum number of users in a voice channel was changed.
-    "user_limit" => UserLimit(u64),
+    "user_limit" => UserLimit(NonMaxU16),
     /// Number of uses of an invite was changed.
     "uses" => Uses(u64),
     /// Guild invite vanity url was changed.
