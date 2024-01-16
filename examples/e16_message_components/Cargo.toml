@@ -1,5 +1,5 @@
 [package]
-name = "e17_message_components"
+name = "e16_message_components"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
