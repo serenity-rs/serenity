@@ -1,5 +1,5 @@
 [package]
-name = "e18_webhook"
+name = "e17_webhook"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
