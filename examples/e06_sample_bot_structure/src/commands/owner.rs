@@ -3,21 +3,16 @@ use serenity::framework::standard::CommandResult;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
-use crate::ShardManagerContainer;
+use crate::UserData;
 
 #[command]
 #[owners_only]
 async fn quit(ctx: &Context, msg: &Message) -> CommandResult {
-    let data = ctx.data.read().await;
+    let data = ctx.data::<UserData>();
+    let shard_manager = data.shard_manager.get().expect("should be init before startup");
 
-    if let Some(manager) = data.get::<ShardManagerContainer>() {
-        msg.reply(ctx, "Shutting down!").await?;
-        manager.shutdown_all().await;
-    } else {
-        msg.reply(ctx, "There was a problem getting the shard manager").await?;
-
-        return Ok(());
-    }
+    msg.reply(ctx, "Shutting down!").await?;
+    shard_manager.shutdown_all().await;
 
     Ok(())
 }
