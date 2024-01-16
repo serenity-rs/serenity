@@ -319,6 +319,7 @@
 <a href="#317" id="317">317</a>
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env::consts;
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span>std::io::Read;
@@ -455,13 +456,14 @@
 
                 from_str(<span class="kw-2">&amp;</span>decompressed).map_err(|why| {
                     <span class="macro">warn!</span>(<span class="string">"Err deserializing bytes: {why:?}"</span>);
-                    <span class="macro">debug!</span>(<span class="string">"Failing bytes: {bytes:?}"</span>);
+                    <span class="macro">debug!</span>(<span class="string">"Failing text: {decompressed}"</span>);
 
                     why
                 })<span class="question-mark">?
             </span>},
             Message::Text(payload) =&gt; from_str(<span class="kw-2">&amp;</span>payload).map_err(|why| {
-                <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {why:?}; text: {payload}"</span>);
+                <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {why:?}"</span>);
+                <span class="macro">debug!</span>(<span class="string">"Failing text: {payload}"</span>);
 
                 why
             })<span class="question-mark">?</span>,

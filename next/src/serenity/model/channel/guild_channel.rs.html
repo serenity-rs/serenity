@@ -1238,8 +1238,8 @@
     </span><span class="kw">pub </span>topic: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u16&gt;&gt;,
     <span class="doccomment">/// The maximum number of members allowed in the channel.
     ///
-    /// **Note**: This is only available for voice channels.
-    </span><span class="kw">pub </span>user_limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
+    /// This is max 99 for voice channels and 10,000 for stage channels (0 refers to no limit).
+    </span><span class="kw">pub </span>user_limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
     <span class="doccomment">/// Used to tell if the channel is not safe for work. Note however, it's recommended to use
     /// [`Self::is_nsfw`] as it's gonna be more accurate.
     </span><span class="comment">// This field can or can not be present sometimes, but if it isn't default to `false`.

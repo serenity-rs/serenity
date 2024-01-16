@@ -308,7 +308,11 @@
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
 <a href="#308" id="308">308</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>nonmax::NonMaxU16;
+
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::json::Value;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::PermissionOverwrite;
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
@@ -557,7 +561,7 @@
     <span class="doccomment">/// Unicode emoji of a role icon was changed.
     </span><span class="string">"unicode_emoji" </span>=&gt; UnicodeEmoji(FixedString),
     <span class="doccomment">/// Maximum number of users in a voice channel was changed.
-    </span><span class="string">"user_limit" </span>=&gt; UserLimit(u64),
+    </span><span class="string">"user_limit" </span>=&gt; UserLimit(NonMaxU16),
     <span class="doccomment">/// Number of uses of an invite was changed.
     </span><span class="string">"uses" </span>=&gt; Uses(u64),
     <span class="doccomment">/// Guild invite vanity url was changed.
