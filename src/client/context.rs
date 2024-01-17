@@ -95,9 +95,9 @@ impl Context {
     ///
     /// [`ClientBuilder::data`]: super::ClientBuilder::data
     #[must_use]
-    pub fn data<Data: Send + Sync + 'static>(&self) -> &Data {
-        self.data
-            .downcast_ref()
+    pub fn data<Data: Send + Sync + 'static>(&self) -> Arc<Data> {
+        Arc::clone(&self.data)
+            .downcast()
             .expect("Type provided to Context should be the same as ClientBuilder::data.")
     }
 
