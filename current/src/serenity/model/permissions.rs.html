@@ -855,15 +855,6 @@
 <a href="#853" id="853">853</a>
 <a href="#854" id="854">854</a>
 <a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
-<a href="#857" id="857">857</a>
-<a href="#858" id="858">858</a>
-<a href="#859" id="859">859</a>
-<a href="#860" id="860">860</a>
-<a href="#861" id="861">861</a>
-<a href="#862" id="862">862</a>
-<a href="#863" id="863">863</a>
-<a href="#864" id="864">864</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
 //! channel's permission overrides.
 //!
@@ -904,8 +895,10 @@
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::fmt;
 
-<span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
+<span class="kw">use </span>serde::de::{Deserialize, Deserializer};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
+
+<span class="kw">use </span><span class="kw">super</span>::utils::StrOrInt;
 
 <span class="doccomment">/// This macro generates the [`Permissions::get_permission_names`] method.
 ///
@@ -1671,21 +1664,10 @@
 // but audit log changes are sent as an int, which is probably a problem.
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Permissions {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
-        <span class="attr">#[derive(serde::Deserialize)]
-        #[serde(untagged)]
-        </span><span class="kw">enum </span>StrOrInt&lt;<span class="lifetime">'a</span>&gt; {
-            Str(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str),
-            String(String),
-            Integer(u64),
-        }
+        <span class="kw">let </span>val = StrOrInt::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">let </span>val = val.parse().map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>permissions_num = <span class="kw">match </span>StrOrInt::deserialize(deserializer)<span class="question-mark">? </span>{
-            StrOrInt::String(permissions) =&gt; permissions.parse().map_err(DeError::custom)<span class="question-mark">?</span>,
-            StrOrInt::Str(permissions) =&gt; permissions.parse().map_err(DeError::custom)<span class="question-mark">?</span>,
-            StrOrInt::Integer(permissions) =&gt; permissions,
-        };
-
-        <span class="prelude-val">Ok</span>(Permissions::from_bits_truncate(permissions_num))
+        <span class="prelude-val">Ok</span>(Permissions::from_bits_truncate(val))
     }
 }
 

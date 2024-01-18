@@ -1139,6 +1139,13 @@
 <a href="#1137" id="1137">1137</a>
 <a href="#1138" id="1138">1138</a>
 <a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1164,6 +1171,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{ActionRow, MessageInteraction};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::StrOrInt;
 <span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"cache"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
@@ -2258,11 +2266,17 @@
 }
 
 <span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>Nonce {
     String(String),
     Number(u64),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Nonce {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="prelude-val">Ok</span>(StrOrInt::deserialize(deserializer)<span class="question-mark">?</span>.into_enum(<span class="self">Self</span>::String, <span class="self">Self</span>::Number))
+    }
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#role-subscription-data-object)
