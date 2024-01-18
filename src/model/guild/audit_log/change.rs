@@ -11,6 +11,7 @@ use crate::model::guild::{
 use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, UserId};
 use crate::model::misc::ImageHash;
 use crate::model::sticker::StickerFormatType;
+use crate::model::utils::StrOrInt;
 use crate::model::{Permissions, Timestamp};
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -22,12 +23,18 @@ pub struct AffectedRole {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
+#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
 #[serde(untagged)]
 #[non_exhaustive]
 pub enum EntityType {
     Int(u64),
     Str(String),
+}
+
+impl<'de> serde::Deserialize<'de> for EntityType {
+    fn deserialize<D: serde::de::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Ok(StrOrInt::deserialize(deserializer)?.into_enum(Self::Str, Self::Int))
+    }
 }
 
 macro_rules! generate_change {

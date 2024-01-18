@@ -23,6 +23,7 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http};
 use crate::model::application::{ActionRow, MessageInteraction};
 use crate::model::prelude::*;
+use crate::model::utils::StrOrInt;
 #[cfg(all(feature = "model", feature = "cache"))]
 use crate::utils;
 
@@ -1117,11 +1118,17 @@ impl MessageId {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 pub enum Nonce {
     String(String),
     Number(u64),
+}
+
+impl<'de> serde::Deserialize<'de> for Nonce {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(StrOrInt::deserialize(deserializer)?.into_enum(Self::String, Self::Number))
+    }
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#role-subscription-data-object)

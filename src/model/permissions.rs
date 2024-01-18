@@ -38,8 +38,10 @@
 #[cfg(feature = "model")]
 use std::fmt;
 
-use serde::de::{Deserialize, Deserializer, Error as DeError};
+use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
+
+use super::utils::StrOrInt;
 
 /// This macro generates the [`Permissions::get_permission_names`] method.
 ///
@@ -805,21 +807,10 @@ impl Permissions {
 // but audit log changes are sent as an int, which is probably a problem.
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        #[derive(serde::Deserialize)]
-        #[serde(untagged)]
-        enum StrOrInt<'a> {
-            Str(&'a str),
-            String(String),
-            Integer(u64),
-        }
+        let val = StrOrInt::deserialize(deserializer)?;
+        let val = val.parse().map_err(serde::de::Error::custom)?;
 
-        let permissions_num = match StrOrInt::deserialize(deserializer)? {
-            StrOrInt::String(permissions) => permissions.parse().map_err(DeError::custom)?,
-            StrOrInt::Str(permissions) => permissions.parse().map_err(DeError::custom)?,
-            StrOrInt::Integer(permissions) => permissions,
-        };
-
-        Ok(Permissions::from_bits_truncate(permissions_num))
+        Ok(Permissions::from_bits_truncate(val))
     }
 }
 
