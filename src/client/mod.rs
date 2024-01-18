@@ -501,10 +501,17 @@ impl Client {
     ///
     /// See the documentation for [`Context::data`] for more information.
     #[must_use]
-    pub fn data<Data: Send + Sync + 'static>(&self) -> &Data {
-        self.data
-            .downcast_ref()
-            .expect("Client::data generic does not match ClientBuilder::data type")
+    pub fn data<Data: Send + Sync + 'static>(&self) -> Arc<Data> {
+        self.try_data().expect("Client::data generic does not match ClientBuilder::data type")
+    }
+
+    /// Tries to fetch the data type provided to [`ClientBuilder::data`].
+    ///
+    /// This returns None if no data was provided or Data is the wrong type and
+    /// is mostly for Framework usage, normal bots should just use [`Self::data`].
+    #[must_use]
+    pub fn try_data<Data: Send + Sync + 'static>(&self) -> Option<Arc<Data>> {
+        Arc::clone(&self.data).downcast().ok()
     }
 
     /// Establish the connection and start listening for events.
