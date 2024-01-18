@@ -145,6 +145,7 @@ macro_rules! bitflags {
         }
     ) => {
         $(#[$outer])*
+        #[repr(packed)]
         $vis struct $BitFlags($T);
 
         bitflags::bitflags! {
