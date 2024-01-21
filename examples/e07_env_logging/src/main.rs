@@ -3,9 +3,6 @@
 use std::env;
 
 use serenity::async_trait;
-use serenity::framework::standard::macros::{command, group, hook};
-use serenity::framework::standard::{CommandResult, Configuration, StandardFramework};
-use serenity::model::channel::Message;
 use serenity::model::event::ResumedEvent;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
@@ -34,23 +31,6 @@ impl EventHandler for Handler {
     }
 }
 
-#[hook]
-// instrument will show additional information on all the logs that happen inside the function.
-//
-// This additional information includes the function name, along with all it's arguments formatted
-// with the Debug impl. This additional information will also only be shown if the LOG level is set
-// to `debug`
-#[instrument]
-async fn before(_: &Context, msg: &Message, command_name: &str) -> bool {
-    info!("Got command '{}' by user '{}'", command_name, msg.author.name);
-
-    true
-}
-
-#[group]
-#[commands(ping)]
-struct General;
-
 #[tokio::main]
 #[instrument]
 async fn main() {
@@ -66,30 +46,14 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let framework = StandardFramework::new().before(before).group(&GENERAL_GROUP);
-    framework.configure(Configuration::new().prefix("~"));
-
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(&token, intents)
-        .event_handler(Handler)
-        .framework(framework)
-        .await
-        .expect("Err creating client");
+
+    let mut client =
+        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
 
     if let Err(why) = client.start().await {
         error!("Client error: {:?}", why);
     }
-}
-
-// Currently, the instrument macro doesn't work with commands.
-// If you wish to instrument commands, use it on the before function.
-#[command]
-async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )").await {
-        error!("Error sending message: {:?}", why);
-    }
-
-    Ok(())
 }
