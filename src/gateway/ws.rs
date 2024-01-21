@@ -29,7 +29,7 @@ use crate::constants::{self, Opcode};
 use crate::gateway::GatewayError;
 #[cfg(feature = "client")]
 use crate::json::from_str;
-use crate::json::to_string;
+use crate::json::{to_string, JsonError};
 #[cfg(feature = "client")]
 use crate::model::event::GatewayEvent;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
@@ -120,7 +120,8 @@ impl WsClient {
             Ok(None) | Err(_) => return Ok(None),
         };
 
-        let value = match message {
+        let json_str = match message {
+            Message::Text(payload) => payload,
             Message::Binary(bytes) => {
                 let mut decompressed =
                     String::with_capacity(bytes.len() * DECOMPRESSION_MULTIPLIER);
@@ -132,26 +133,15 @@ impl WsClient {
                     why
                 })?;
 
-                from_str(&decompressed).map_err(|why| {
-                    warn!("Err deserializing bytes: {why:?}");
-                    debug!("Failing text: {decompressed}");
-
-                    why
-                })?
+                decompressed
             },
-            Message::Text(payload) => from_str(&payload).map_err(|why| {
-                warn!("Err deserializing text: {why:?}");
-                debug!("Failing text: {payload}");
-
-                why
-            })?,
             Message::Close(Some(frame)) => {
                 return Err(Error::Gateway(GatewayError::Closed(Some(frame))));
             },
             _ => return Ok(None),
         };
 
-        Ok(Some(value))
+        from_str(&json_str).map(Some).map_err(|err| log_deserialisation_err(&json_str, err))
     }
 
     pub(crate) async fn send_json(&mut self, value: &impl serde::Serialize) -> Result<()> {
@@ -317,4 +307,31 @@ impl WsClient {
         })
         .await
     }
+}
+
+#[cfg(feature = "simd_json")]
+fn filter_unknown_variant(_: &str) -> bool {
+    false
+}
+
+#[cfg(not(feature = "simd_json"))]
+fn filter_unknown_variant(json_err_dbg: &str) -> bool {
+    if let Some(msg) = json_err_dbg.strip_prefix("Error(\"unknown variant `") {
+        if let Some((variant_name, _)) = msg.split_once('`') {
+            tracing::debug!("Unknown event: {variant_name}");
+            return true;
+        }
+    }
+
+    false
+}
+
+fn log_deserialisation_err(json_str: &str, err: JsonError) -> Error {
+    let json_err_dbg = format!("{err:?}");
+    if !filter_unknown_variant(&json_err_dbg) {
+        warn!("Err deserializing text: {json_err_dbg}");
+    }
+
+    debug!("Failing text: {json_str}");
+    Error::Json(err)
 }

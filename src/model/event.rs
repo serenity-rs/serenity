@@ -736,16 +736,6 @@ pub struct TypingStartEvent {
     pub member: Option<Member>,
 }
 
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct UnknownEvent {
-    #[serde(rename = "t")]
-    pub kind: FixedString,
-    #[serde(rename = "d")]
-    pub value: Value,
-}
-
 /// Sent when properties about the current bot's user change.
 ///
 /// Requires no gateway intents.
