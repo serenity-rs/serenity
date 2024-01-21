@@ -766,9 +766,9 @@ impl Client {
             let cache_user_id = {
                 let cache_user = self.cache.current_user();
                 if cache_user.id == UserId::default() {
-                    Some(cache_user.id)
-                } else {
                     None
+                } else {
+                    Some(cache_user.id)
                 }
             };
 
