@@ -63,7 +63,7 @@ where
 /// If the `simd_json` feature is enabled, this function turns its argument into `Cow::Owned`
 /// before deserializing from it. In other words, passing in a `&str` will result in a clone.
 #[allow(clippy::missing_errors_doc)]
-pub fn from_str<'a, T>(s: impl Into<Cow<'a, str>>) -> Result<T>
+pub fn from_str<'a, T>(s: impl Into<Cow<'a, str>>) -> Result<T, JsonError>
 where
     T: DeserializeOwned,
 {
