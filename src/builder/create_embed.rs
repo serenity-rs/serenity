@@ -21,7 +21,7 @@ use crate::model::prelude::*;
 /// A builder to create an embed in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateEmbed(Embed);
 
