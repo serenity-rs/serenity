@@ -39,7 +39,7 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
     }
 
     pub fn len(&self) -> usize {
-        self.0.as_ref().map_or(0, |map| map.len())
+        self.0.as_ref().map_or(0, DashMap::len)
     }
 
     pub fn shrink_to_fit(&self) {

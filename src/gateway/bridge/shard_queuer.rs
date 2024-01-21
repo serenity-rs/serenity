@@ -328,7 +328,7 @@ impl ShardQueue {
     /// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
     pub fn pop_batch(&mut self) -> Vec<ShardId> {
         (0..self.max_concurrency.get())
-            .filter_map(|i| self.buckets.get_mut(&i).and_then(|bucket| bucket.pop_front()))
+            .filter_map(|i| self.buckets.get_mut(&i).and_then(VecDeque::pop_front))
             .collect()
     }
 
