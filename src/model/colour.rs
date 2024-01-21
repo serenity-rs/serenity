@@ -203,25 +203,6 @@ impl Colour {
     }
 }
 
-impl From<i32> for Colour {
-    /// Constructs a Colour from a i32.
-    ///
-    /// This is used for functions that accept `Into<Colour>`.
-    ///
-    /// This is useful when providing hex values.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::model::Colour;
-    ///
-    /// assert_eq!(Colour::from(0xDEA584).tuple(), (222, 165, 132));
-    /// ```
-    fn from(value: i32) -> Colour {
-        Colour(value as u32)
-    }
-}
-
 impl From<u32> for Colour {
     /// Constructs a Colour from a u32.
     ///
@@ -235,24 +216,7 @@ impl From<u32> for Colour {
     /// assert_eq!(Colour::from(6573123u32).r(), 100);
     /// ```
     fn from(value: u32) -> Colour {
-        Colour(value)
-    }
-}
-
-impl From<u64> for Colour {
-    /// Constructs a Colour from a u32.
-    ///
-    /// This is used for functions that accept `Into<Colour>`.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use serenity::model::Colour;
-    ///
-    /// assert_eq!(Colour::from(6573123u64).r(), 100);
-    /// ```
-    fn from(value: u64) -> Colour {
-        Colour(value as u32)
+        Colour(value & 0xffffff)
     }
 }
 
@@ -445,8 +409,6 @@ mod test {
 
     #[test]
     fn from() {
-        assert_eq!(Colour::from(7i32).0, 7);
         assert_eq!(Colour::from(7u32).0, 7);
-        assert_eq!(Colour::from(7u64).0, 7);
     }
 }
