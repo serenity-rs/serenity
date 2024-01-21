@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/misc.rs`."><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-4e54bb2b497cc83f.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (6ae4cfbbb 2024-01-17)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/misc.rs`."><title>misc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-4e54bb2b497cc83f.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (88189a71e 2024-01-19)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -296,16 +296,24 @@
 <a href="#294" id="294">294</a>
 <a href="#295" id="295">295</a>
 <a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.
 
 </span><span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
-<span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
-</span><span class="kw">use </span>std::fmt::Write;
+<span class="kw">use </span>std::fmt::Write;
 <span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
 </span><span class="kw">use </span>std::result::Result <span class="kw">as </span>StdResult;
 <span class="kw">use </span>std::str::FromStr;
+
+<span class="kw">use </span>arrayvec::ArrayString;
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, any(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>)))]
@@ -355,6 +363,28 @@
             ImageHashInner::Clyde =&gt; <span class="bool-val">true</span>,
         }
     }
+
+    <span class="attr">#[must_use]
+    </span><span class="kw">fn </span>into_arraystring(<span class="self">self</span>) -&gt; ArrayString&lt;<span class="number">34</span>&gt; {
+        <span class="kw">let </span>ImageHashInner::Normal {
+            hash,
+            is_animated,
+        } = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+        </span><span class="kw">else </span>{
+            <span class="kw">return </span>ArrayString::from_str(<span class="string">"clyde"</span>).expect(<span class="string">"the string clyde is less than 34 chars"</span>);
+        };
+
+        <span class="kw">let </span><span class="kw-2">mut </span>out = ArrayString::new();
+        <span class="kw">if </span><span class="kw-2">*</span>is_animated {
+            out.push_str(<span class="string">"a_"</span>);
+        }
+
+        <span class="kw">for </span>byte <span class="kw">in </span>hash {
+            <span class="macro">write!</span>(out, <span class="string">"{byte:02x}"</span>).expect(<span class="string">"ImageHash should fit into 34 char ArrayString"</span>);
+        }
+
+        out
+    }
 }
 
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>ImageHash {
@@ -367,36 +397,20 @@
 
 <span class="kw">impl </span>serde::Serialize <span class="kw">for </span>ImageHash {
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-        <span class="self">self</span>.to_string().serialize(serializer)
+        <span class="self">self</span>.into_arraystring().serialize(serializer)
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>ImageHash {
     <span class="kw">fn </span>deserialize&lt;D: serde::Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
-        <span class="kw">let </span>helper = arrayvec::ArrayString::&lt;<span class="number">34</span>&gt;::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">let </span>helper = ArrayString::&lt;<span class="number">34</span>&gt;::deserialize(deserializer)<span class="question-mark">?</span>;
         <span class="self">Self</span>::from_str(<span class="kw-2">&amp;</span>helper).map_err(serde::de::Error::custom)
     }
 }
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ImageHash {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
-        <span class="kw">let </span>ImageHashInner::Normal {
-            hash,
-            is_animated,
-        } = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
-        </span><span class="kw">else </span>{
-            <span class="kw">return </span>f.write_str(<span class="string">"clyde"</span>);
-        };
-
-        <span class="kw">if </span><span class="kw-2">*</span>is_animated {
-            f.write_str(<span class="string">"a_"</span>)<span class="question-mark">?</span>;
-        }
-
-        <span class="kw">for </span>byte <span class="kw">in </span>hash {
-            <span class="macro">write!</span>(f, <span class="string">"{byte:02x}"</span>)<span class="question-mark">?</span>;
-        }
-
-        <span class="prelude-val">Ok</span>(())
+        <span class="self">self</span>.into_arraystring().fmt(f)
     }
 }
 
