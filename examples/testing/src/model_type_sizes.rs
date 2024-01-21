@@ -194,7 +194,6 @@ pub fn print_ranking() {
         ("TriggerMetadata", std::mem::size_of::<TriggerMetadata>()),
         ("TypingStartEvent", std::mem::size_of::<TypingStartEvent>()),
         ("UnavailableGuild", std::mem::size_of::<UnavailableGuild>()),
-        ("UnknownEvent", std::mem::size_of::<UnknownEvent>()),
         ("User", std::mem::size_of::<User>()),
         ("UserId", std::mem::size_of::<UserId>()),
         ("UserPublicFlags", std::mem::size_of::<UserPublicFlags>()),
