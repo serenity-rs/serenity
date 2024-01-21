@@ -331,7 +331,7 @@
 /// If the `simd_json` feature is enabled, this function turns its argument into `Cow::Owned`
 /// before deserializing from it. In other words, passing in a `&amp;str` will result in a clone.
 </span><span class="attr">#[allow(clippy::missing_errors_doc)]
-</span><span class="kw">pub fn </span>from_str&lt;<span class="lifetime">'a</span>, T&gt;(s: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+</span><span class="kw">pub fn </span>from_str&lt;<span class="lifetime">'a</span>, T&gt;(s: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, JsonError&gt;
 <span class="kw">where
     </span>T: DeserializeOwned,
 {

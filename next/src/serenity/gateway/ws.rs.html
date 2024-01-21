@@ -320,6 +320,23 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env::consts;
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span>std::io::Read;
@@ -351,7 +368,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::GatewayError;
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::from_str;
-<span class="kw">use </span><span class="kw">crate</span>::json::to_string;
+<span class="kw">use </span><span class="kw">crate</span>::json::{to_string, JsonError};
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::event::GatewayEvent;
 <span class="kw">use </span><span class="kw">crate</span>::model::gateway::{GatewayIntents, ShardInfo};
@@ -442,7 +459,8 @@
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) | <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="kw">let </span>value = <span class="kw">match </span>message {
+        <span class="kw">let </span>json_str = <span class="kw">match </span>message {
+            Message::Text(payload) =&gt; payload,
             Message::Binary(bytes) =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>decompressed =
                     String::with_capacity(bytes.len() * DECOMPRESSION_MULTIPLIER);
@@ -454,26 +472,15 @@
                     why
                 })<span class="question-mark">?</span>;
 
-                from_str(<span class="kw-2">&amp;</span>decompressed).map_err(|why| {
-                    <span class="macro">warn!</span>(<span class="string">"Err deserializing bytes: {why:?}"</span>);
-                    <span class="macro">debug!</span>(<span class="string">"Failing text: {decompressed}"</span>);
-
-                    why
-                })<span class="question-mark">?
-            </span>},
-            Message::Text(payload) =&gt; from_str(<span class="kw-2">&amp;</span>payload).map_err(|why| {
-                <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {why:?}"</span>);
-                <span class="macro">debug!</span>(<span class="string">"Failing text: {payload}"</span>);
-
-                why
-            })<span class="question-mark">?</span>,
+                decompressed
+            },
             Message::Close(<span class="prelude-val">Some</span>(frame)) =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Gateway(GatewayError::Closed(<span class="prelude-val">Some</span>(frame))));
             },
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(value))
+        from_str(<span class="kw-2">&amp;</span>json_str).map(<span class="prelude-val">Some</span>).map_err(|err| log_deserialisation_err(<span class="kw-2">&amp;</span>json_str, err))
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>send_json(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -639,5 +646,32 @@
         })
         .<span class="kw">await
     </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">"simd_json"</span>)]
+</span><span class="kw">fn </span>filter_unknown_variant(<span class="kw">_</span>: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="bool-val">false
+</span>}
+
+<span class="attr">#[cfg(not(feature = <span class="string">"simd_json"</span>))]
+</span><span class="kw">fn </span>filter_unknown_variant(json_err_dbg: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(msg) = json_err_dbg.strip_prefix(<span class="string">"Error(\"unknown variant `"</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((variant_name, <span class="kw">_</span>)) = msg.split_once(<span class="string">'`'</span>) {
+            <span class="macro">tracing::debug!</span>(<span class="string">"Unknown event: {variant_name}"</span>);
+            <span class="kw">return </span><span class="bool-val">true</span>;
+        }
+    }
+
+    <span class="bool-val">false
+</span>}
+
+<span class="kw">fn </span>log_deserialisation_err(json_str: <span class="kw-2">&amp;</span>str, err: JsonError) -&gt; Error {
+    <span class="kw">let </span>json_err_dbg = <span class="macro">format!</span>(<span class="string">"{err:?}"</span>);
+    <span class="kw">if </span>!filter_unknown_variant(<span class="kw-2">&amp;</span>json_err_dbg) {
+        <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {json_err_dbg}"</span>);
+    }
+
+    <span class="macro">debug!</span>(<span class="string">"Failing text: {json_str}"</span>);
+    Error::Json(err)
 }
 </code></pre></div></section></main></body></html>

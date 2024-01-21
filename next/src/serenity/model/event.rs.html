@@ -1313,16 +1313,6 @@
 <a href="#1311" id="1311">1311</a>
 <a href="#1312" id="1312">1312</a>
 <a href="#1313" id="1313">1313</a>
-<a href="#1314" id="1314">1314</a>
-<a href="#1315" id="1315">1315</a>
-<a href="#1316" id="1316">1316</a>
-<a href="#1317" id="1317">1317</a>
-<a href="#1318" id="1318">1318</a>
-<a href="#1319" id="1319">1319</a>
-<a href="#1320" id="1320">1320</a>
-<a href="#1321" id="1321">1321</a>
-<a href="#1322" id="1322">1322</a>
-<a href="#1323" id="1323">1323</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -2060,16 +2050,6 @@
     </span><span class="kw">pub </span>timestamp: u64,
     <span class="doccomment">/// Member who started typing if this happened in a guild.
     </span><span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Member&gt;,
-}
-
-<span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-</span><span class="kw">pub struct </span>UnknownEvent {
-    <span class="attr">#[serde(rename = <span class="string">"t"</span>)]
-    </span><span class="kw">pub </span>kind: FixedString,
-    <span class="attr">#[serde(rename = <span class="string">"d"</span>)]
-    </span><span class="kw">pub </span>value: Value,
 }
 
 <span class="doccomment">/// Sent when properties about the current bot's user change.
