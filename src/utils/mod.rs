@@ -484,7 +484,7 @@ pub(crate) fn user_perms(cache: impl AsRef<Cache>, channel_id: ChannelId) -> Res
 #[must_use]
 pub fn shard_id(guild_id: GuildId, shard_count: u16) -> u16 {
     let shard_count = check_shard_total(shard_count);
-    ((guild_id.get() >> 22) % (shard_count.get() as u64)) as u16
+    ((guild_id.get() >> 22) % u64::from(shard_count.get())) as u16
 }
 
 pub(crate) fn check_shard_total(total_shards: u16) -> NonZeroU16 {
