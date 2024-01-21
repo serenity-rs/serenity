@@ -2,17 +2,8 @@
 name = "e06_sample_bot_structure"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-dotenv = "0.15"
-tracing = "0.1.23"
-tracing-subscriber = "0.3"
-
-[dependencies.tokio]
-version = "1.0"
-features = ["macros", "signal", "rt-multi-thread"]
-
-[dependencies.serenity]
-features = ["cache", "framework", "standard_framework", "rustls_backend"]
-path = "../../"
+serenity = { path = "../../", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "collector"] }
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }

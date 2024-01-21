@@ -1,3 +1,7 @@
-pub mod math;
-pub mod meta;
-pub mod owner;
+pub mod attachmentinput;
+pub mod id;
+pub mod modal;
+pub mod numberinput;
+pub mod ping;
+pub mod welcome;
+pub mod wonderful_command;
