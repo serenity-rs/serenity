@@ -240,7 +240,7 @@ impl Builder for EditMessage<'_> {
     ) -> Result<Self::Built> {
         self.check_length()?;
 
-        let files = self.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
+        let files = self.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
         cache_http.http().edit_message(ctx.0, ctx.1, &self, files).await
     }
