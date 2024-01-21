@@ -251,7 +251,7 @@ impl Builder for EditMessage<'_> {
             }
         }
 
-        let files = self.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
+        let files = self.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
         let http = cache_http.http();
         if self.allowed_mentions.is_none() {
