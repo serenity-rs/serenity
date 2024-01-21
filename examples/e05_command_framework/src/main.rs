@@ -184,7 +184,7 @@ async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError, _com
 // You can construct a hook without the use of a macro, too.
 // This requires some boilerplate though and the following additional import.
 use serenity::futures::future::BoxFuture;
-use serenity::FutureExt;
+use serenity::futures::FutureExt;
 fn _dispatch_error_no_macro<'fut>(
     ctx: &'fut mut Context,
     msg: &'fut Message,
