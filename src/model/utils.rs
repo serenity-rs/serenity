@@ -341,7 +341,7 @@ pub mod secret {
         secret: &Option<Secret<S>>,
         serializer: Sr,
     ) -> Result<Sr::Ok, Sr::Error> {
-        secret.as_ref().map(|s| s.expose_secret()).serialize(serializer)
+        secret.as_ref().map(ExposeSecret::expose_secret).serialize(serializer)
     }
 }
 

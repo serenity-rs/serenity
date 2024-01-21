@@ -59,29 +59,22 @@
     clippy::non_ascii_literal,
     clippy::fallible_impl_from,
     clippy::let_underscore_must_use,
-    clippy::format_collect,
     clippy::format_push_string,
     clippy::pedantic
 )]
 #![allow(
-    // Allowed to avoid breaking changes.
-    clippy::module_name_repetitions,
-    clippy::unused_self,
     // Allowed as they are too pedantic
     clippy::cast_possible_truncation,
+    clippy::module_name_repetitions,
     clippy::unreadable_literal,
     clippy::cast_possible_wrap,
     clippy::wildcard_imports,
     clippy::cast_sign_loss,
     clippy::too_many_lines,
     clippy::doc_markdown,
-    clippy::cast_lossless,
-    clippy::redundant_closure_for_method_calls,
-    // Covered by other lints
-    clippy::missing_panics_doc, // clippy::unwrap_used
+    clippy::missing_panics_doc,
 )]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
-#![type_length_limit = "3294819"] // needed so ShardRunner::run compiles with instrument.
 
 #[macro_use]
 extern crate serde;
