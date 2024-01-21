@@ -410,7 +410,7 @@
 <span class="doccomment">/// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 #[must_use]
 </span><span class="kw">pub enum </span>CreateActionRow {
     Buttons(Vec&lt;CreateButton&gt;),
@@ -436,7 +436,7 @@
 }
 
 <span class="doccomment">/// A builder for creating a button component in a message
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateButton(Button);
 
@@ -532,7 +532,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 </span><span class="kw">pub enum </span>CreateSelectMenuKind {
     String { options: Vec&lt;CreateSelectMenuOption&gt; },
     User { default_users: <span class="prelude-ty">Option</span>&lt;Vec&lt;UserId&gt;&gt; },
@@ -602,7 +602,7 @@
 <span class="doccomment">/// A builder for creating a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenu {
     custom_id: String,
@@ -668,7 +668,7 @@
 <span class="doccomment">/// A builder for creating an option of a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenuOption {
     label: String,
@@ -728,7 +728,7 @@
 <span class="doccomment">/// A builder for creating an input text component in a modal
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateInputText(InputText);
 

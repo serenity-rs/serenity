@@ -328,7 +328,7 @@
 <span class="doccomment">/// A builder to create an embed in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateEmbed(Embed);
 

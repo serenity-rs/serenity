@@ -1575,7 +1575,7 @@
         message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
         builder: EditMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>, message_id.into())).<span class="kw">await
+        builder.execute(cache_http, (<span class="self">self</span>, message_id.into(), <span class="prelude-val">None</span>)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Follows the News Channel
