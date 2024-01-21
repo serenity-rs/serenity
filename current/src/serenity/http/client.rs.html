@@ -4674,6 +4674,19 @@
 <a href="#4672" id="4672">4672</a>
 <a href="#4673" id="4673">4673</a>
 <a href="#4674" id="4674">4674</a>
+<a href="#4675" id="4675">4675</a>
+<a href="#4676" id="4676">4676</a>
+<a href="#4677" id="4677">4677</a>
+<a href="#4678" id="4678">4678</a>
+<a href="#4679" id="4679">4679</a>
+<a href="#4680" id="4680">4680</a>
+<a href="#4681" id="4681">4681</a>
+<a href="#4682" id="4682">4682</a>
+<a href="#4683" id="4683">4683</a>
+<a href="#4684" id="4684">4684</a>
+<a href="#4685" id="4685">4685</a>
+<a href="#4686" id="4686">4686</a>
+<a href="#4687" id="4687">4687</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -5091,18 +5104,31 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Creates a forum post channel in the [`GuildChannel`] given its Id.
+    <span class="doccomment">/// Shortcut for [`Self::create_forum_post_with_attachments`]
     </span><span class="kw">pub async fn </span>create_forum_post(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
+        <span class="self">self</span>.create_forum_post_with_attachments(channel_id, map, <span class="macro">vec!</span>[], audit_log_reason).<span class="kw">await
+    </span>}
 
+    <span class="doccomment">/// Creates a forum post channel in the [`GuildChannel`] given its Id.
+    </span><span class="kw">pub async fn </span>create_forum_post_with_attachments(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        channel_id: ChannelId,
+        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+        files: Vec&lt;CreateAttachment&gt;,
+        audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="self">self</span>.fire(Request {
-            body: <span class="prelude-val">Some</span>(body),
-            multipart: <span class="prelude-val">None</span>,
+            body: <span class="prelude-val">None</span>,
+            multipart: <span class="prelude-val">Some</span>(Multipart {
+                upload: MultipartUpload::Attachments(files.into_iter().collect()),
+                payload_json: <span class="prelude-val">Some</span>(to_string(map)<span class="question-mark">?</span>),
+                fields: <span class="macro">vec!</span>[],
+            }),
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
             route: Route::ChannelForumPosts {

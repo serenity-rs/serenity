@@ -421,7 +421,7 @@
     sticker_ids: Vec&lt;StickerId&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
-    attachments: EditAttachments,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) attachments: EditAttachments,
 
     <span class="comment">// The following fields are handled separately.
     </span><span class="attr">#[serde(skip)]
