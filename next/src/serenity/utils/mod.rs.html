@@ -1039,7 +1039,7 @@
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>shard_id(guild_id: GuildId, shard_count: u16) -&gt; u16 {
     <span class="kw">let </span>shard_count = check_shard_total(shard_count);
-    ((guild_id.get() &gt;&gt; <span class="number">22</span>) % (shard_count.get() <span class="kw">as </span>u64)) <span class="kw">as </span>u16
+    ((guild_id.get() &gt;&gt; <span class="number">22</span>) % u64::from(shard_count.get())) <span class="kw">as </span>u16
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_shard_total(total_shards: u16) -&gt; NonZeroU16 {

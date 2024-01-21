@@ -489,7 +489,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
 
-        <span class="kw">let </span>files = <span class="self">self</span>.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
+        <span class="kw">let </span>files = <span class="self">self</span>.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
         cache_http.http().edit_message(ctx.<span class="number">0</span>, ctx.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
     </span>}

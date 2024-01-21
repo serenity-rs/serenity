@@ -676,7 +676,7 @@
     <span class="doccomment">/// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
     </span><span class="kw">pub fn </span>pop_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;ShardId&gt; {
         (<span class="number">0</span>..<span class="self">self</span>.max_concurrency.get())
-            .filter_map(|i| <span class="self">self</span>.buckets.get_mut(<span class="kw-2">&amp;</span>i).and_then(|bucket| bucket.pop_front()))
+            .filter_map(|i| <span class="self">self</span>.buckets.get_mut(<span class="kw-2">&amp;</span>i).and_then(VecDeque::pop_front))
             .collect()
     }
 

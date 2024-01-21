@@ -620,7 +620,7 @@
         secret: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Secret&lt;S&gt;&gt;,
         serializer: Sr,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sr::Ok, Sr::Error&gt; {
-        secret.as_ref().map(|s| s.expose_secret()).serialize(serializer)
+        secret.as_ref().map(ExposeSecret::expose_secret).serialize(serializer)
     }
 }
 

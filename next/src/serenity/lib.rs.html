@@ -176,13 +176,6 @@
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
 <a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.
 //!
 //! View the [examples] on how to make and structure a bot.
@@ -244,31 +237,24 @@
     clippy::non_ascii_literal,
     clippy::fallible_impl_from,
     clippy::let_underscore_must_use,
-    clippy::format_collect,
     clippy::format_push_string,
     clippy::pedantic
 )]
 #![allow(
-    <span class="comment">// Allowed to avoid breaking changes.
-    </span>clippy::module_name_repetitions,
-    clippy::unused_self,
     <span class="comment">// Allowed as they are too pedantic
     </span>clippy::cast_possible_truncation,
+    clippy::module_name_repetitions,
     clippy::unreadable_literal,
     clippy::cast_possible_wrap,
     clippy::wildcard_imports,
     clippy::cast_sign_loss,
     clippy::too_many_lines,
     clippy::doc_markdown,
-    clippy::cast_lossless,
-    clippy::redundant_closure_for_method_calls,
-    <span class="comment">// Covered by other lints
-    </span>clippy::missing_panics_doc, <span class="comment">// clippy::unwrap_used
-</span>)]
+    clippy::missing_panics_doc,
+)]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
-#![type_length_limit = <span class="string">"3294819"</span>] </span><span class="comment">// needed so ShardRunner::run compiles with instrument.
 
-</span><span class="attr">#[macro_use]
+#[macro_use]
 </span><span class="kw">extern crate </span>serde;
 
 <span class="attr">#[macro_use]
