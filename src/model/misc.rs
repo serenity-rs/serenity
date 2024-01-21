@@ -3,11 +3,12 @@
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
 use std::fmt;
-#[cfg(all(feature = "model", feature = "utils"))]
 use std::fmt::Write;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
 use std::str::FromStr;
+
+use arrayvec::ArrayString;
 
 use super::prelude::*;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
@@ -57,6 +58,28 @@ impl ImageHash {
             ImageHashInner::Clyde => true,
         }
     }
+
+    #[must_use]
+    fn into_arraystring(self) -> ArrayString<34> {
+        let ImageHashInner::Normal {
+            hash,
+            is_animated,
+        } = &self.0
+        else {
+            return ArrayString::from_str("clyde").expect("the string clyde is less than 34 chars");
+        };
+
+        let mut out = ArrayString::new();
+        if *is_animated {
+            out.push_str("a_");
+        }
+
+        for byte in hash {
+            write!(out, "{byte:02x}").expect("ImageHash should fit into 34 char ArrayString");
+        }
+
+        out
+    }
 }
 
 impl std::fmt::Debug for ImageHash {
@@ -69,36 +92,20 @@ impl std::fmt::Debug for ImageHash {
 
 impl serde::Serialize for ImageHash {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        self.to_string().serialize(serializer)
+        self.into_arraystring().serialize(serializer)
     }
 }
 
 impl<'de> serde::Deserialize<'de> for ImageHash {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let helper = arrayvec::ArrayString::<34>::deserialize(deserializer)?;
+        let helper = ArrayString::<34>::deserialize(deserializer)?;
         Self::from_str(&helper).map_err(serde::de::Error::custom)
     }
 }
 
 impl std::fmt::Display for ImageHash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let ImageHashInner::Normal {
-            hash,
-            is_animated,
-        } = &self.0
-        else {
-            return f.write_str("clyde");
-        };
-
-        if *is_animated {
-            f.write_str("a_")?;
-        }
-
-        for byte in hash {
-            write!(f, "{byte:02x}")?;
-        }
-
-        Ok(())
+        self.into_arraystring().fmt(f)
     }
 }
 
