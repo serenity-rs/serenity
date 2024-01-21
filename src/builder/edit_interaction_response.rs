@@ -126,7 +126,7 @@ impl Builder for EditInteractionResponse<'_> {
     ) -> Result<Self::Built> {
         self.0.check_length()?;
 
-        let files = self.0.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
+        let files = self.0.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
         cache_http.http().edit_original_interaction_response(ctx, &self, files).await
     }
