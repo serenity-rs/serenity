@@ -67,7 +67,7 @@ pub struct CreateMessage {
     sticker_ids: Vec<StickerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
-    attachments: EditAttachments,
+    pub(crate) attachments: EditAttachments,
 
     // The following fields are handled separately.
     #[serde(skip)]

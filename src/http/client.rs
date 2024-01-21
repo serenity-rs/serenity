@@ -415,18 +415,31 @@ impl Http {
         .await
     }
 
-    /// Creates a forum post channel in the [`GuildChannel`] given its Id.
+    /// Shortcut for [`Self::create_forum_post_with_attachments`]
     pub async fn create_forum_post(
         &self,
         channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
-        let body = to_vec(map)?;
+        self.create_forum_post_with_attachments(channel_id, map, vec![], audit_log_reason).await
+    }
 
+    /// Creates a forum post channel in the [`GuildChannel`] given its Id.
+    pub async fn create_forum_post_with_attachments(
+        &self,
+        channel_id: ChannelId,
+        map: &impl serde::Serialize,
+        files: Vec<CreateAttachment>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<GuildChannel> {
         self.fire(Request {
-            body: Some(body),
-            multipart: None,
+            body: None,
+            multipart: Some(Multipart {
+                upload: MultipartUpload::Attachments(files.into_iter().collect()),
+                payload_json: Some(to_string(map)?),
+                fields: vec![],
+            }),
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
             route: Route::ChannelForumPosts {

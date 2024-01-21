@@ -209,6 +209,31 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             &*guild.member(ctx, msg.author.id).await?,
         );
         channel_id.say(ctx, format!("{:?}", perms)).await?;
+    } else if let Some(forum_channel_id) = msg.content.strip_prefix("createforumpostin ") {
+        forum_channel_id
+            .parse::<ChannelId>()
+            .unwrap()
+            .create_forum_post(
+                ctx,
+                CreateForumPost::new(
+                    "a",
+                    CreateMessage::new()
+                        .add_file(CreateAttachment::bytes(b"Hallo welt!", "lul.txt")),
+                ),
+                // CreateForumPost::new(
+                //     "a",
+                //     CreateMessage::new()
+                //         .content("test, i hope that forum posts without attachments still
+                // work?")         .embed(CreateEmbed::new().title("hmmm").
+                // description("do they?")), ),
+            )
+            .await?;
+    } else if let Some(forum_post_url) = msg.content.strip_prefix("deleteforumpost ") {
+        let (_guild_id, channel_id, _message_id) =
+            serenity::utils::parse_message_url(forum_post_url).unwrap();
+        msg.channel_id.say(ctx, format!("Deleting <#{}> in 10 seconds...", channel_id)).await?;
+        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+        channel_id.delete(ctx).await?;
     } else {
         return Ok(());
     }
