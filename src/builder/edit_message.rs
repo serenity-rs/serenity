@@ -35,7 +35,7 @@ use crate::model::prelude::*;
 /// ```
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
-#[derive(Clone, Debug, Default, Serialize, PartialEq)]
+#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -204,6 +204,17 @@ impl<'a> EditMessage<'a> {
     }
 }
 
+impl EditMessage<'_> {
+    fn is_only_suppress_embeds(&self) -> bool {
+        self.flags == Some(MessageFlags::SUPPRESS_EMBEDS)
+            && self.content.is_none()
+            && self.embeds.is_none()
+            && self.allowed_mentions.is_none()
+            && self.components.is_none()
+            && self.attachments.is_none()
+    }
+}
+
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 impl Builder for EditMessage<'_> {
@@ -243,9 +254,7 @@ impl Builder for EditMessage<'_> {
         #[cfg(feature = "cache")]
         if let Some(user_id) = ctx.2 {
             if let Some(cache) = cache_http.cache() {
-                let reference_builder = EditMessage::new().suppress_embeds(true);
-
-                if user_id != cache.current_user().id && self != reference_builder {
+                if user_id != cache.current_user().id && !self.is_only_suppress_embeds() {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }

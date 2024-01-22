@@ -7,7 +7,7 @@ use crate::model::prelude::*;
 /// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 #[must_use]
 pub enum CreateActionRow<'a> {
     Buttons(Vec<CreateButton<'a>>),
@@ -34,7 +34,7 @@ impl serde::Serialize for CreateActionRow<'_> {
 }
 
 /// A builder for creating a button component in a message
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateButton<'a> {
     style: ButtonStyle,
@@ -193,7 +193,7 @@ impl Serialize for CreateSelectMenuDefault {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub enum CreateSelectMenuKind<'a> {
     String {
         options: Cow<'a, [CreateSelectMenuOption<'a>]>,
@@ -281,7 +281,7 @@ impl Serialize for CreateSelectMenuKind<'_> {
 /// A builder for creating a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu<'a> {
     custom_id: Cow<'a, str>,
@@ -347,7 +347,7 @@ impl<'a> CreateSelectMenu<'a> {
 /// A builder for creating an option of a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption<'a> {
     label: Cow<'a, str>,
@@ -407,7 +407,7 @@ impl<'a> CreateSelectMenuOption<'a> {
 /// A builder for creating an input text component in a modal
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText<'a> {
     #[serde(rename = "type")]
