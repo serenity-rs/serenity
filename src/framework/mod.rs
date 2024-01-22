@@ -85,6 +85,7 @@ pub mod standard;
 use async_trait::async_trait;
 
 #[cfg(feature = "standard_framework")]
+#[allow(deprecated)]
 pub use self::standard::StandardFramework;
 use crate::client::{Client, Context, FullEvent};
 
