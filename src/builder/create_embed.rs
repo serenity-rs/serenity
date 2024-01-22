@@ -23,7 +23,7 @@ use crate::model::prelude::*;
 /// A builder to create an embed in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateEmbed<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -263,7 +263,7 @@ impl From<Embed> for CreateEmbed<'_> {
 }
 
 /// A builder to create the author data of an embed. See [`CreateEmbed::author`]
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateEmbedAuthor<'a> {
     name: Cow<'a, str>,
@@ -327,7 +327,7 @@ impl From<&User> for CreateEmbedAuthor<'_> {
 }
 
 /// A builder to create the footer data for an embed. See [`CreateEmbed::footer`]
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateEmbedFooter<'a> {
     text: Cow<'a, str>,
@@ -367,7 +367,7 @@ impl From<EmbedFooter> for CreateEmbedFooter<'_> {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 struct CreateEmbedField<'a> {
     name: Cow<'a, str>,
     value: Cow<'a, str>,
@@ -394,7 +394,7 @@ impl From<EmbedField> for CreateEmbedField<'_> {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 struct CreateEmbedImage<'a> {
     url: Cow<'a, str>,
 }
