@@ -69,30 +69,6 @@ where
     remove_from_map_opt(map, key)?.ok_or_else(|| serde::de::Error::missing_field(key))
 }
 
-/// Workaround for Discord sending 0 value Ids as default values.
-/// This has been fixed properly on next by swapping to a NonMax based impl.
-pub fn deserialize_buggy_id<'de, D, Id>(deserializer: D) -> StdResult<Option<Id>, D::Error>
-where
-    D: Deserializer<'de>,
-    Id: From<u64>,
-{
-    #[derive(serde::Deserialize)]
-    #[serde(untagged)]
-    enum StringOrInt {
-        String(String),
-        Int(u64),
-    }
-
-    let raw = Option::<StringOrInt>::deserialize(deserializer)?;
-    let raw_int = match raw {
-        Some(StringOrInt::String(str)) => str.parse().map_err(serde::de::Error::custom)?,
-        Some(StringOrInt::Int(val)) => val,
-        None => return Ok(None),
-    };
-
-    Ok(Some(Id::from(raw_int)))
-}
-
 /// Used with `#[serde(with = "emojis")]`
 pub mod emojis {
     use std::collections::HashMap;
