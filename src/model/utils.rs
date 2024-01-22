@@ -7,6 +7,7 @@ use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use serde_cow::CowStr;
+use small_fixed_array::FixedString;
 
 use super::prelude::*;
 use crate::internal::prelude::*;
@@ -108,11 +109,11 @@ impl StrOrInt<'_> {
         }
     }
 
-    pub fn into_enum<T>(self, string: fn(String) -> T, int: fn(u64) -> T) -> T {
+    pub fn into_enum<T>(self, string: fn(FixedString) -> T, int: fn(u64) -> T) -> T {
         match self {
             Self::Int(val) => int(val),
-            Self::String(val) => string(val),
-            Self::Str(val) => string(val.into()),
+            Self::String(val) => string(FixedString::from_string_trunc(val)),
+            Self::Str(val) => string(FixedString::from_str_trunc(val)),
         }
     }
 }
