@@ -876,7 +876,17 @@
 <a href="#874" id="874">874</a>
 <a href="#875" id="875">875</a>
 <a href="#876" id="876">876</a>
-</pre></div><pre class="rust"><code><span class="kw">pub mod </span>help_commands;
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+</pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(
+    not(ignore_serenity_deprecated),
+    deprecated = <span class="string">"The standard framework is deprecated, and will be removed in 0.13. Please migrate to `poise` for command handling"
+</span>)]
+
+</span><span class="kw">pub mod </span>help_commands;
 <span class="kw">pub mod </span>macros {
     <span class="kw">pub use </span>command_attr::{check, command, group, help, hook};
 }

@@ -247,6 +247,17 @@
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -284,7 +295,7 @@
 /// ```
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
-</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditMessage&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -456,7 +467,7 @@
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
 </span><span class="kw">impl </span>Builder <span class="kw">for </span>EditMessage&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (ChannelId, MessageId);
+    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (ChannelId, MessageId, <span class="prelude-ty">Option</span>&lt;UserId&gt;);
     <span class="kw">type </span>Built = Message;
 
     <span class="doccomment">/// Edits a message in the channel.
@@ -488,6 +499,17 @@
         ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
+
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = ctx.<span class="number">2 </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="kw">let </span>reference_builder = EditMessage::new().suppress_embeds(<span class="bool-val">true</span>);
+
+                <span class="kw">if </span>user_id != cache.current_user().id &amp;&amp; <span class="self">self </span>!= reference_builder {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidUser));
+                }
+            }
+        }
 
         <span class="kw">let </span>files = <span class="self">self</span>.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 

@@ -1169,6 +1169,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{ActionRow, MessageInteraction};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::StrOrInt;
 <span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"cache"</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::utils;
 
@@ -1495,21 +1496,14 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidUser));
-                }
-            }
-        }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(flags) = <span class="self">self</span>.flags {
             <span class="kw">if </span>flags.contains(MessageFlags::IS_VOICE_MESSAGE) {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::CannotEditVoiceMessage));
             }
         }
 
-        <span class="kw-2">*</span><span class="self">self </span>= builder.execute(cache_http, (<span class="self">self</span>.channel_id, <span class="self">self</span>.id)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self </span>=
+            builder.execute(cache_http, (<span class="self">self</span>.channel_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.author.id))).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -2260,11 +2254,17 @@
 }
 
 <span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>Nonce {
     String(FixedString),
     Number(u64),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Nonce {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="prelude-val">Ok</span>(StrOrInt::deserialize(deserializer)<span class="question-mark">?</span>.into_enum(<span class="self">Self</span>::String, <span class="self">Self</span>::Number))
+    }
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#role-subscription-data-object)

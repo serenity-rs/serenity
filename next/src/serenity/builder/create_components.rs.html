@@ -453,7 +453,7 @@
 <span class="doccomment">/// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 #[must_use]
 </span><span class="kw">pub enum </span>CreateActionRow&lt;<span class="lifetime">'a</span>&gt; {
     Buttons(Vec&lt;CreateButton&lt;<span class="lifetime">'a</span>&gt;&gt;),
@@ -479,7 +479,7 @@
 }
 
 <span class="doccomment">/// A builder for creating a button component in a message
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateButton&lt;<span class="lifetime">'a</span>&gt; {
     style: ButtonStyle,
@@ -584,7 +584,7 @@
 }
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-</span><span class="attr">#[derive(Clone, Debug)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 </span><span class="kw">pub enum </span>CreateSelectMenuKind&lt;<span class="lifetime">'a</span>&gt; {
     String {
         options: Cow&lt;<span class="lifetime">'a</span>, [CreateSelectMenuOption&lt;<span class="lifetime">'a</span>&gt;]&gt;,
@@ -671,7 +671,7 @@
 <span class="doccomment">/// A builder for creating a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenu&lt;<span class="lifetime">'a</span>&gt; {
     custom_id: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
@@ -737,7 +737,7 @@
 <span class="doccomment">/// A builder for creating an option of a select menu component in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateSelectMenuOption&lt;<span class="lifetime">'a</span>&gt; {
     label: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
@@ -797,7 +797,7 @@
 <span class="doccomment">/// A builder for creating an input text component in a modal
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
-</span><span class="attr">#[derive(Clone, Debug, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateInputText&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(rename = <span class="string">"type"</span>)]

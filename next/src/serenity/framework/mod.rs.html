@@ -131,6 +131,7 @@
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The framework is a customizable method of separating commands.
 //!
 //! This is used in combination with [`ClientBuilder::framework`].
@@ -218,6 +219,7 @@
 <span class="kw">use </span>async_trait::async_trait;
 
 <span class="attr">#[cfg(feature = <span class="string">"standard_framework"</span>)]
+#[allow(deprecated)]
 </span><span class="kw">pub use </span><span class="self">self</span>::standard::StandardFramework;
 <span class="kw">use </span><span class="kw">crate</span>::client::{Client, Context, FullEvent};
 

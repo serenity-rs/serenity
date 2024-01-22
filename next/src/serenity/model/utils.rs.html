@@ -317,12 +317,76 @@
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
 <a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::hash::Hash;
 <span class="kw">use </span>std::marker::PhantomData;
 
 <span class="kw">use </span>arrayvec::ArrayVec;
+<span class="kw">use </span>small_fixed_array::FixedString;
 <span class="kw">use </span>serde::ser::{Serialize, SerializeSeq, Serializer};
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
@@ -386,6 +450,68 @@
     E: serde::de::Error,
 {
     remove_from_map_opt(map, key)<span class="question-mark">?</span>.ok_or_else(|| serde::de::Error::missing_field(key))
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>StrOrInt&lt;<span class="lifetime">'de</span>&gt; {
+    String(String),
+    Str(<span class="kw-2">&amp;</span><span class="lifetime">'de </span>str),
+    Int(u64),
+}
+
+<span class="kw">impl </span>StrOrInt&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">pub fn </span>parse(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u64, std::num::ParseIntError&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            StrOrInt::String(val) =&gt; val.parse(),
+            StrOrInt::Str(val) =&gt; val.parse(),
+            StrOrInt::Int(val) =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">*</span>val),
+        }
+    }
+
+    <span class="kw">pub fn </span>into_enum&lt;T&gt;(<span class="self">self</span>, string: <span class="kw">fn</span>(FixedString) -&gt; T, int: <span class="kw">fn</span>(u64) -&gt; T) -&gt; T {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Int(val) =&gt; int(val),
+            <span class="self">Self</span>::String(val) =&gt; string(FixedString::from_string_trunc(val)),
+            <span class="self">Self</span>::Str(val) =&gt; string(FixedString::from_str_trunc(val)),
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>StrOrInt&lt;<span class="lifetime">'de</span>&gt; {
+    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">struct </span>Visitor;
+        <span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; serde::de::Visitor&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Visitor {
+            <span class="kw">type </span>Value = StrOrInt&lt;<span class="lifetime">'de</span>&gt;;
+
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+                formatter.write_str(<span class="string">"a string or integer"</span>)
+            }
+
+            <span class="kw">fn </span>visit_borrowed_str&lt;E&gt;(<span class="self">self</span>, val: <span class="kw-2">&amp;</span><span class="lifetime">'de </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: serde::de::Error,
+            {
+                <span class="prelude-val">Ok</span>(StrOrInt::Str(val))
+            }
+
+            <span class="kw">fn </span>visit_str&lt;E: serde::de::Error&gt;(<span class="self">self</span>, val: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;<span class="self">Self</span>::Value, E&gt; {
+                <span class="self">self</span>.visit_string(val.into())
+            }
+
+            <span class="kw">fn </span>visit_string&lt;E: serde::de::Error&gt;(<span class="self">self</span>, val: String) -&gt; StdResult&lt;<span class="self">Self</span>::Value, E&gt; {
+                <span class="prelude-val">Ok</span>(StrOrInt::String(val))
+            }
+
+            <span class="kw">fn </span>visit_i64&lt;E: serde::de::Error&gt;(<span class="self">self</span>, val: i64) -&gt; StdResult&lt;<span class="self">Self</span>::Value, E&gt; {
+                <span class="self">self</span>.visit_u64(val <span class="kw">as _</span>)
+            }
+
+            <span class="kw">fn </span>visit_u64&lt;E: serde::de::Error&gt;(<span class="self">self</span>, val: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt; {
+                <span class="prelude-val">Ok</span>(StrOrInt::Int(val))
+            }
+        }
+
+        deserializer.deserialize_any(Visitor)
+    }
 }
 
 <span class="doccomment">/// Used with `#[serde(with = "emojis")]`
