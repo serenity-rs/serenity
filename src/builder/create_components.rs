@@ -7,7 +7,8 @@ use crate::model::prelude::*;
 /// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#action-row).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
+>>>>>>> 4d9c1b5f0d (Remove `PartialEq` implementations from all builders (#2734))
 #[must_use]
 pub enum CreateActionRow<'a> {
     Buttons(Vec<CreateButton<'a>>),
@@ -34,7 +35,7 @@ impl serde::Serialize for CreateActionRow<'_> {
 }
 
 /// A builder for creating a button component in a message
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateButton<'a> {
     style: ButtonStyle,
@@ -193,7 +194,7 @@ impl Serialize for CreateSelectMenuDefault {
 }
 
 /// Discord docs: [String Select](https://docs.discord.com/developers/components/reference#string-select), [User Select](https://docs.discord.com/developers/components/reference#user-select), [Role Select](https://docs.discord.com/developers/components/reference#role-select), [Mentionable Select](https://docs.discord.com/developers/components/reference#mentionable-select), [Channel Select](https://docs.discord.com/developers/components/reference#channel-select).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug)]
 pub enum CreateSelectMenuKind<'a> {
     String {
         options: Cow<'a, [CreateSelectMenuOption<'a>]>,
@@ -281,7 +282,7 @@ impl Serialize for CreateSelectMenuKind<'_> {
 /// A builder for creating a select menu component in a message
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#component-object).
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu<'a> {
     custom_id: Cow<'a, str>,
@@ -347,7 +348,7 @@ impl<'a> CreateSelectMenu<'a> {
 /// A builder for creating an option of a select menu component in a message
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#string-select-select-option-structure)
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption<'a> {
     label: Cow<'a, str>,
@@ -407,7 +408,7 @@ impl<'a> CreateSelectMenuOption<'a> {
 /// A builder for creating an input text component in a modal
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#text-input-text-input-structure).
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText<'a> {
     #[serde(rename = "type")]

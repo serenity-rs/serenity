@@ -76,7 +76,7 @@ impl ParseAction {
 /// ```
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#allowed-mentions-object).
-#[derive(Clone, Debug, Default, Serialize, PartialEq)]
+#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAllowedMentions<'a> {
     parse: ArrayVec<ParseValue, 3>,
