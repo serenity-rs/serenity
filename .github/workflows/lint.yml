@@ -24,7 +24,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run clippy
-        run: cargo clippy --workspace --tests -- -D warnings
+        run: cargo clippy --workspace --tests -- -D warnings --cfg ignore_serenity_deprecated
 
   rustfmt:
     name: Format

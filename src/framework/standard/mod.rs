@@ -1,3 +1,8 @@
+#![cfg_attr(
+    not(ignore_serenity_deprecated),
+    deprecated = "The standard framework is deprecated, and will be removed in 0.13. Please migrate to `poise` for command handling"
+)]
+
 pub mod help_commands;
 pub mod macros {
     pub use command_attr::{check, command, group, help, hook};

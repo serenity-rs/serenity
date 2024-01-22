@@ -5,6 +5,7 @@
 //! Example 7 is needed because tracing is being used.
 //! Example 12 is needed because global data and atomic are used.
 //! Example 13 is needed for the parallel loops that are running to update data from the dashboard.
+#![allow(deprecated)] // We recommend migrating to poise, instead of using the standard command framework.
 
 // be lazy, import all macros globally!
 #[macro_use]

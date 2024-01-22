@@ -1,3 +1,5 @@
+#![allow(deprecated)] // We recommend migrating to poise, instead of using the standard command framework.
+
 use std::env;
 
 use serenity::async_trait;

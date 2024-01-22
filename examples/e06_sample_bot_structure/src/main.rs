@@ -7,6 +7,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
+#![allow(deprecated)] // We recommend migrating to poise, instead of using the standard command framework.
 mod commands;
 
 use std::collections::HashSet;
