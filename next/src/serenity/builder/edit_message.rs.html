@@ -258,6 +258,15 @@
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -295,7 +304,7 @@
 /// ```
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
-</span><span class="attr">#[derive(Clone, Debug, Default, Serialize, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>EditMessage&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -464,6 +473,17 @@
     </span>}
 }
 
+<span class="kw">impl </span>EditMessage&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>is_only_suppress_embeds(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.flags == <span class="prelude-val">Some</span>(MessageFlags::SUPPRESS_EMBEDS)
+            &amp;&amp; <span class="self">self</span>.content.is_none()
+            &amp;&amp; <span class="self">self</span>.embeds.is_none()
+            &amp;&amp; <span class="self">self</span>.allowed_mentions.is_none()
+            &amp;&amp; <span class="self">self</span>.components.is_none()
+            &amp;&amp; <span class="self">self</span>.attachments.is_none()
+    }
+}
+
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 #[async_trait::async_trait]
 </span><span class="kw">impl </span>Builder <span class="kw">for </span>EditMessage&lt;<span class="lifetime">'_</span>&gt; {
@@ -503,9 +523,7 @@
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = ctx.<span class="number">2 </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">let </span>reference_builder = EditMessage::new().suppress_embeds(<span class="bool-val">true</span>);
-
-                <span class="kw">if </span>user_id != cache.current_user().id &amp;&amp; <span class="self">self </span>!= reference_builder {
+                <span class="kw">if </span>user_id != cache.current_user().id &amp;&amp; !<span class="self">self</span>.is_only_suppress_embeds() {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidUser));
                 }
             }

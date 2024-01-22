@@ -418,7 +418,7 @@
 <span class="doccomment">/// A builder to create an embed in a message
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
-</span><span class="attr">#[derive(Clone, Debug, PartialEq, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateEmbed&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -653,7 +653,7 @@
 }
 
 <span class="doccomment">/// A builder to create the author data of an emebd. See [`CreateEmbed::author`]
-</span><span class="attr">#[derive(Clone, Debug, PartialEq, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateEmbedAuthor&lt;<span class="lifetime">'a</span>&gt; {
     name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
@@ -701,7 +701,7 @@
 }
 
 <span class="doccomment">/// A builder to create the footer data for an embed. See [`CreateEmbed::footer`]
-</span><span class="attr">#[derive(Clone, Debug, PartialEq, Serialize)]
+</span><span class="attr">#[derive(Clone, Debug, Serialize)]
 #[must_use]
 </span><span class="kw">pub struct </span>CreateEmbedFooter&lt;<span class="lifetime">'a</span>&gt; {
     text: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
@@ -739,7 +739,7 @@
     }
 }
 
-<span class="attr">#[derive(Clone, Debug, PartialEq, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Serialize)]
 </span><span class="kw">struct </span>CreateEmbedField&lt;<span class="lifetime">'a</span>&gt; {
     name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     value: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
@@ -766,7 +766,7 @@
     }
 }
 
-<span class="attr">#[derive(Clone, Debug, PartialEq, Serialize)]
+<span class="attr">#[derive(Clone, Debug, Serialize)]
 </span><span class="kw">struct </span>CreateEmbedImage&lt;<span class="lifetime">'a</span>&gt; {
     url: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
 }
