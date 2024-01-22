@@ -212,14 +212,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 CreateForumPost::new(
                     "a",
                     CreateMessage::new()
-                        .add_file(CreateAttachment::bytes(b"Hallo welt!", "lul.txt")),
+                        .add_file(CreateAttachment::bytes(b"Hallo welt!".as_slice(), "lul.txt")),
                 ),
-                // CreateForumPost::new(
-                //     "a",
-                //     CreateMessage::new()
-                //         .content("test, i hope that forum posts without attachments still
-                // work?")         .embed(CreateEmbed::new().title("hmmm").
-                // description("do they?")), ),
             )
             .await?;
     } else if let Some(forum_post_url) = msg.content.strip_prefix("deleteforumpost ") {
