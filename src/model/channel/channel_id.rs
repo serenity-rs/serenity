@@ -339,7 +339,7 @@ impl ChannelId {
         message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, (self, message_id.into(), None)).await
+        builder.execute(cache_http, (self, message_id, None)).await
     }
 
     /// Follows the News Channel

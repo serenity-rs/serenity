@@ -6,6 +6,7 @@ use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use serde_cow::CowStr;
+use small_fixed_array::FixedString;
 
 use super::prelude::*;
 use crate::internal::prelude::*;
