@@ -14,7 +14,7 @@ use crate::model::id::AttachmentId;
 /// A builder for creating a new attachment from a file path, file data, or URL.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
-#[derive(Clone, Debug, Serialize, PartialEq)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 #[must_use]
 pub struct CreateAttachment<'a> {
@@ -110,12 +110,12 @@ impl<'a> CreateAttachment<'a> {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, PartialEq)]
+#[derive(Debug, Clone, serde::Serialize)]
 struct ExistingAttachment {
     id: AttachmentId,
 }
 
-#[derive(Debug, Clone, serde::Serialize, PartialEq)]
+#[derive(Debug, Clone, serde::Serialize)]
 #[serde(untagged)]
 enum NewOrExisting<'a> {
     New(CreateAttachment<'a>),
@@ -177,7 +177,7 @@ enum NewOrExisting<'a> {
 ///
 /// Internally, this type is used not just for message editing endpoints, but also for message
 /// creation endpoints.
-#[derive(Default, Debug, Clone, serde::Serialize, PartialEq)]
+#[derive(Default, Debug, Clone, serde::Serialize)]
 #[serde(transparent)]
 #[must_use]
 pub struct EditAttachments<'a> {
