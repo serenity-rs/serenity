@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use serde_json::json;
+
 #[cfg(feature = "http")]
 use super::Builder;
 use super::{
@@ -12,7 +14,6 @@ use super::{
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
-use crate::json::{self, json};
 use crate::model::prelude::*;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
@@ -83,14 +84,14 @@ impl serde::Serialize for CreateInteractionResponse<'_> {
                 Self::PremiumRequired => 10,
             },
             "data": match self {
-                Self::Pong => json::NULL,
-                Self::Message(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Defer(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Acknowledge => json::NULL,
-                Self::UpdateMessage(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Autocomplete(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Modal(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::PremiumRequired => json::NULL,
+                Self::Pong => Value::Null,
+                Self::Message(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Defer(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Acknowledge => Value::Null,
+                Self::UpdateMessage(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Autocomplete(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::Modal(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::PremiumRequired => Value::Null,
             }
         })
         .serialize(serializer)
