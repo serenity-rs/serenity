@@ -223,7 +223,7 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user does not have the required permissions.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn broadcast_typing(&self, http: &Http) -> Result<()> {
         self.id.broadcast_typing(http).await
     }
 
@@ -335,11 +335,7 @@ impl GuildChannel {
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
-    pub async fn create_permission(
-        &self,
-        http: impl AsRef<Http>,
-        target: PermissionOverwrite,
-    ) -> Result<()> {
+    pub async fn create_permission(&self, http: &Http, target: PermissionOverwrite) -> Result<()> {
         self.id.create_permission(http, target).await
     }
 
@@ -381,11 +377,7 @@ impl GuildChannel {
     /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages(
-        &self,
-        http: impl AsRef<Http>,
-        message_ids: &[MessageId],
-    ) -> Result<()> {
+    pub async fn delete_messages(&self, http: &Http, message_ids: &[MessageId]) -> Result<()> {
         self.id.delete_messages(http, message_ids).await
     }
 
@@ -400,7 +392,7 @@ impl GuildChannel {
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     pub async fn delete_permission(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
         self.id.delete_permission(http, permission_type).await
@@ -417,7 +409,7 @@ impl GuildChannel {
     /// Permissions::MANAGE_MESSAGES
     pub async fn delete_reaction(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
@@ -436,11 +428,7 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_reactions(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: MessageId,
-    ) -> Result<()> {
+    pub async fn delete_reactions(&self, http: &Http, message_id: MessageId) -> Result<()> {
         self.id.delete_reactions(http, message_id).await
     }
 
@@ -637,7 +625,7 @@ impl GuildChannel {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn follow(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
         self.id.follow(http, target_channel_id).await
@@ -645,8 +633,8 @@ impl GuildChannel {
 
     /// Attempts to find this channel's guild in the Cache.
     #[cfg(feature = "cache")]
-    pub fn guild<'a>(&self, cache: &'a impl AsRef<Cache>) -> Option<cache::GuildRef<'a>> {
-        cache.as_ref().guild(self.guild_id)
+    pub fn guild<'a>(&self, cache: &'a Cache) -> Option<cache::GuildRef<'a>> {
+        cache.guild(self.guild_id)
     }
 
     /// Gets all of the channel's invites.
@@ -658,7 +646,7 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
+    pub async fn invites(&self, http: &Http) -> Result<Vec<RichInvite>> {
         self.id.invites(http).await
     }
 
@@ -748,12 +736,8 @@ impl GuildChannel {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "cache")]
     #[deprecated = "Use `Guild::user_permissions_in`"]
-    pub fn permissions_for_user(
-        &self,
-        cache: impl AsRef<Cache>,
-        user_id: UserId,
-    ) -> Result<Permissions> {
-        let guild = self.guild(&cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
+    pub fn permissions_for_user(&self, cache: &Cache, user_id: UserId) -> Result<Permissions> {
+        let guild = self.guild(cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
         let member = guild.members.get(&user_id).ok_or(Error::Model(ModelError::MemberNotFound))?;
         Ok(guild.user_permissions_in(self, member))
     }
@@ -768,7 +752,7 @@ impl GuildChannel {
     /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+    pub async fn pin(&self, http: &Http, message_id: MessageId) -> Result<()> {
         self.id.pin(http, message_id).await
     }
 
@@ -782,7 +766,7 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
+    pub async fn pins(&self, http: &Http) -> Result<Vec<Message>> {
         self.id.pins(http).await
     }
 
@@ -808,7 +792,7 @@ impl GuildChannel {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn reaction_users(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
@@ -917,7 +901,7 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+    pub async fn unpin(&self, http: &Http, message_id: MessageId) -> Result<()> {
         self.id.unpin(http, message_id).await
     }
 
@@ -930,7 +914,7 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
+    pub async fn webhooks(&self, http: &Http) -> Result<Vec<Webhook>> {
         self.id.webhooks(http).await
     }
 
@@ -946,8 +930,7 @@ impl GuildChannel {
     /// Other [`ChannelType`]s lack the concept of [`Member`]s and will return:
     /// [`ModelError::InvalidChannelType`].
     #[cfg(feature = "cache")]
-    pub fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
-        let cache = cache.as_ref();
+    pub fn members(&self, cache: &Cache) -> Result<Vec<Member>> {
         let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
 
         match self.kind {
@@ -979,29 +962,26 @@ impl GuildChannel {
     /// Returns a builder which can be awaited to obtain a message or stream of messages sent in
     /// this guild channel.
     #[cfg(feature = "collector")]
-    pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_reply(&self, shard_messenger: ShardMessenger) -> MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(self.id)
     }
 
     /// Same as [`Self::await_reply`].
     #[cfg(feature = "collector")]
-    pub fn await_replies(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_replies(&self, shard_messenger: ShardMessenger) -> MessageCollector {
         self.await_reply(shard_messenger)
     }
 
     /// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions
     /// sent by this guild channel.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
+    pub fn await_reaction(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(self.id)
     }
 
     /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn await_reactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollector {
+    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         self.await_reaction(shard_messenger)
     }
 
@@ -1035,7 +1015,7 @@ impl GuildChannel {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
-    pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
+    pub async fn get_stage_instance(&self, http: &Http) -> Result<StageInstance> {
         if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
@@ -1089,7 +1069,7 @@ impl GuildChannel {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
-    pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn delete_stage_instance(&self, http: &Http) -> Result<()> {
         if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }

@@ -44,7 +44,7 @@ impl PrivateChannel {
     ///
     /// See [ChannelId::broadcast_typing] for more details.
     #[allow(clippy::missing_errors_doc)]
-    pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn broadcast_typing(&self, http: &Http) -> Result<()> {
         self.id.broadcast_typing(http).await
     }
 
@@ -58,7 +58,7 @@ impl PrivateChannel {
     /// not exist.
     pub async fn create_reaction(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
@@ -68,7 +68,7 @@ impl PrivateChannel {
     /// Deletes the channel. This does not delete the contents of the channel, and is equivalent to
     /// closing a private channel on the client, which can be re-opened.
     #[allow(clippy::missing_errors_doc)]
-    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
+    pub async fn delete(&self, http: &Http) -> Result<PrivateChannel> {
         self.id.delete(http).await?.private().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
@@ -86,11 +86,7 @@ impl PrivateChannel {
     /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages(
-        &self,
-        http: impl AsRef<Http>,
-        message_ids: &[MessageId],
-    ) -> Result<()> {
+    pub async fn delete_messages(&self, http: &Http, message_ids: &[MessageId]) -> Result<()> {
         self.id.delete_messages(http, message_ids).await
     }
 
@@ -102,7 +98,7 @@ impl PrivateChannel {
     #[allow(clippy::missing_errors_doc)]
     pub async fn delete_permission(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
         self.id.delete_permission(http, permission_type).await
@@ -117,7 +113,7 @@ impl PrivateChannel {
     /// Returns [`Error::Http`] if the reaction is not from the current user.
     pub async fn delete_reaction(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
@@ -209,7 +205,7 @@ impl PrivateChannel {
     /// Returns [`Error::Http`] if a message with the given Id does not exist in the channel.
     pub async fn reaction_users(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
@@ -223,13 +219,13 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
-    pub async fn pin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+    pub async fn pin(&self, http: &Http, message_id: MessageId) -> Result<()> {
         self.id.pin(http, message_id).await
     }
 
     /// Retrieves the list of messages that have been pinned in the private channel.
     #[allow(clippy::missing_errors_doc)]
-    pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
+    pub async fn pins(&self, http: &Http) -> Result<Vec<Message>> {
         self.id.pins(http).await
     }
 
@@ -339,7 +335,7 @@ impl PrivateChannel {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
     /// or if the channel already has the limit of 50 pinned messages.
-    pub async fn unpin(&self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+    pub async fn unpin(&self, http: &Http, message_id: MessageId) -> Result<()> {
         self.id.unpin(http, message_id).await
     }
 }
