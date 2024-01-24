@@ -7,7 +7,6 @@ use crate::builder::{Builder, CreateCommand};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::json::Value;
 use crate::model::channel::ChannelType;
 use crate::model::id::{
     ApplicationId,

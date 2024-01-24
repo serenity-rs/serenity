@@ -61,8 +61,6 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json::json;
-#[cfg(feature = "model")]
 use crate::model::application::{Command, CommandPermissions};
 #[cfg(feature = "model")]
 use crate::model::guild::automod::Rule;
@@ -598,7 +596,7 @@ impl Guild {
     /// [`Shard`]: crate::gateway::Shard
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub async fn create(http: &Http, name: &str, icon: Option<ImageHash>) -> Result<PartialGuild> {
-        let map = json!({
+        let map = serde_json::json!({
             "icon": icon,
             "name": name,
         });
