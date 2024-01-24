@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (ef71f1047 2024-01-21)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (5d3d3479d 2024-01-23)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -555,10 +555,6 @@
 <a href="#553" id="553">553</a>
 <a href="#554" id="554">554</a>
 <a href="#555" id="555">555</a>
-<a href="#556" id="556">556</a>
-<a href="#557" id="557">557</a>
-<a href="#558" id="558">558</a>
-<a href="#559" id="559">559</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -679,8 +675,8 @@
 </span><span class="kw">impl </span>WebhookGuild {
     <span class="doccomment">/// Tries to find the [`Guild`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    </span><span class="kw">pub fn </span>to_guild_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        cache.as_ref().guild(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>to_guild_cached&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'a</span>&gt;&gt; {
+        cache.guild(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Requests [`PartialGuild`] over REST API.
@@ -712,11 +708,8 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    </span><span class="kw">pub async fn </span>to_partial_guild_with_counts(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        http.as_ref().get_guild_with_counts(<span class="self">self</span>.id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>to_partial_guild_with_counts(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
+        http.get_guild_with_counts(<span class="self">self</span>.id).<span class="kw">await
     </span>}
 }
 
@@ -735,7 +728,7 @@
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        cache.as_ref().channel(<span class="self">self</span>.id)
+        cache.channel(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
@@ -806,8 +799,8 @@
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
-    </span><span class="kw">pub async fn </span>from_id(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, webhook_id: WebhookId) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        http.as_ref().get_webhook(webhook_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>from_id(http: <span class="kw-2">&amp;</span>Http, webhook_id: WebhookId) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        http.get_webhook(webhook_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves a webhook given its Id and unique token.
@@ -839,11 +832,11 @@
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
     </span><span class="kw">pub async fn </span>from_id_with_token(
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         webhook_id: WebhookId,
         token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        http.as_ref().get_webhook_with_token(webhook_id, token).<span class="kw">await
+        http.get_webhook_with_token(webhook_id, token).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves a webhook given its url.
@@ -873,8 +866,8 @@
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
-    </span><span class="kw">pub async fn </span>from_url(http: <span class="kw">impl </span>AsRef&lt;Http&gt;, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        http.as_ref().get_webhook_from_url(url).<span class="kw">await
+    </span><span class="kw">pub async fn </span>from_url(http: <span class="kw-2">&amp;</span>Http, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        http.get_webhook_from_url(url).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the webhook.
@@ -886,8 +879,7 @@
     ///
     /// Returns [`Error::Http`] if the webhook does not exist, the token is invalid, or if the
     /// webhook could not otherwise be deleted.
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>http = http.as_ref();
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.token {
             <span class="prelude-val">Some</span>(token) =&gt; {
                 http.delete_webhook_with_token(<span class="self">self</span>.id, token.expose_secret(), <span class="prelude-val">None</span>).<span class="kw">await
@@ -1016,12 +1008,12 @@
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     </span><span class="kw">pub async fn </span>get_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
-        http.as_ref().get_webhook_message(<span class="self">self</span>.id, thread_id, token, message_id).<span class="kw">await
+        http.get_webhook_message(<span class="self">self</span>.id, thread_id, token, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a webhook message with the fields set via the given builder.
@@ -1057,12 +1049,12 @@
     /// Id does not belong to the current webhook.
     </span><span class="kw">pub async fn </span>delete_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         thread_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
-        http.as_ref().delete_webhook_message(<span class="self">self</span>.id, thread_id, token, message_id).<span class="kw">await
+        http.delete_webhook_message(<span class="self">self</span>.id, thread_id, token, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the latest information about the webhook, editing the webhook in-place.
@@ -1078,9 +1070,9 @@
     /// error. Such as if the [`Webhook`] was deleted.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    </span><span class="kw">pub async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>token = <span class="self">self</span>.token.as_ref().ok_or(ModelError::NoTokenSet)<span class="question-mark">?</span>.expose_secret();
-        http.as_ref().get_webhook_with_token(<span class="self">self</span>.id, token).<span class="kw">await</span>.map(|replacement| {
+        http.get_webhook_with_token(<span class="self">self</span>.id, token).<span class="kw">await</span>.map(|replacement| {
             <span class="kw-2">*</span><span class="self">self </span>= replacement;
         })
     }
@@ -1114,8 +1106,8 @@
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
-    </span><span class="kw">pub async fn </span>to_webhook(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        http.as_ref().get_webhook(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>to_webhook(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
+        http.get_webhook(<span class="self">self</span>).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

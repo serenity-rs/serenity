@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command_interaction.rs`."><title>command_interaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (ef71f1047 2024-01-21)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/application/command_interaction.rs`."><title>command_interaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (5d3d3479d 2024-01-23)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -880,14 +880,6 @@
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
-<a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
-<a href="#888" id="888">888</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
@@ -980,8 +972,8 @@
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if there is no interaction response.
-    </span><span class="kw">pub async fn </span>get_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        http.as_ref().get_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span><span class="kw">pub async fn </span>get_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        http.get_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a response to the interaction received.
@@ -1026,8 +1018,8 @@
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
     /// deleted.
-    </span><span class="kw">pub async fn </span>delete_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_response(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_original_interaction_response(<span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a followup response to the response sent.
@@ -1071,12 +1063,8 @@
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
     /// deleted.
-    </span><span class="kw">pub async fn </span>delete_followup(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: MessageId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_followup(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a followup message.
@@ -1085,12 +1073,8 @@
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was
     /// deleted.
-    </span><span class="kw">pub async fn </span>get_followup(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: MessageId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        http.as_ref().get_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>get_followup(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        http.get_followup_message(<span class="kw-2">&amp;</span><span class="self">self</span>.token, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Helper function to defer an interaction.

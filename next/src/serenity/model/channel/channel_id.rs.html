@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/channel_id.rs`."><title>channel_id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (ef71f1047 2024-01-21)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/channel_id.rs`."><title>channel_id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (5d3d3479d 2024-01-23)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1166,24 +1166,6 @@
 <a href="#1164" id="1164">1164</a>
 <a href="#1165" id="1165">1165</a>
 <a href="#1166" id="1166">1166</a>
-<a href="#1167" id="1167">1167</a>
-<a href="#1168" id="1168">1168</a>
-<a href="#1169" id="1169">1169</a>
-<a href="#1170" id="1170">1170</a>
-<a href="#1171" id="1171">1171</a>
-<a href="#1172" id="1172">1172</a>
-<a href="#1173" id="1173">1173</a>
-<a href="#1174" id="1174">1174</a>
-<a href="#1175" id="1175">1175</a>
-<a href="#1176" id="1176">1176</a>
-<a href="#1177" id="1177">1177</a>
-<a href="#1178" id="1178">1178</a>
-<a href="#1179" id="1179">1179</a>
-<a href="#1180" id="1180">1180</a>
-<a href="#1181" id="1181">1181</a>
-<a href="#1182" id="1182">1182</a>
-<a href="#1183" id="1183">1183</a>
-<a href="#1184" id="1184">1184</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1247,8 +1229,8 @@
     /// channel.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="kw">pub async fn </span>broadcast_typing(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().broadcast_typing(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>broadcast_typing(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.broadcast_typing(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates an invite for the given channel.
@@ -1282,13 +1264,9 @@
     /// set.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">pub async fn </span>create_permission(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        target: PermissionOverwrite,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>create_permission(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, target: PermissionOverwrite) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>data: PermissionOverwriteData = target.into();
-        http.as_ref().create_permission(<span class="self">self</span>, data.id, <span class="kw-2">&amp;</span>data, <span class="prelude-val">None</span>).<span class="kw">await
+        http.create_permission(<span class="self">self</span>, data.id, <span class="kw-2">&amp;</span>data, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -1305,11 +1283,11 @@
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     </span><span class="kw">pub async fn </span>create_reaction(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         message_id: MessageId,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().create_reaction(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
+        http.create_reaction(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes this channel, returning the channel on a successful deletion.
@@ -1321,8 +1299,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">pub async fn </span>delete(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        http.as_ref().delete_channel(<span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
+        http.delete_channel(<span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a [`Message`] given its Id.
@@ -1337,8 +1315,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete_message(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_message(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes all messages by Ids from the given vector in the given channel.
@@ -1357,11 +1335,7 @@
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete_messages(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_ids: <span class="kw-2">&amp;</span>[MessageId],
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_messages(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_ids: <span class="kw-2">&amp;</span>[MessageId]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">use </span><span class="kw">crate</span>::model::error::{Maximum, Minimum};
 
         <span class="attr">#[derive(serde::Serialize)]
@@ -1379,7 +1353,7 @@
                 messages: message_ids,
             };
 
-            http.as_ref().delete_messages(<span class="self">self</span>, <span class="kw-2">&amp;</span>req, <span class="prelude-val">None</span>).<span class="kw">await
+            http.delete_messages(<span class="self">self</span>, <span class="kw-2">&amp;</span>req, <span class="prelude-val">None</span>).<span class="kw">await
         </span>}
     }
 
@@ -1394,14 +1368,14 @@
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     </span><span class="kw">pub async fn </span>delete_permission(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         permission_type: PermissionOverwriteType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>id = <span class="kw">match </span>permission_type {
             PermissionOverwriteType::Member(id) =&gt; id.into(),
             PermissionOverwriteType::Role(id) =&gt; id.get().into(),
         };
-        http.as_ref().delete_permission(<span class="self">self</span>, id, <span class="prelude-val">None</span>).<span class="kw">await
+        http.delete_permission(<span class="self">self</span>, id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the given [`Reaction`] from the channel.
@@ -1417,12 +1391,11 @@
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete_reaction(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         message_id: MessageId,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>http = http.as_ref();
         <span class="kw">let </span>reaction_type = reaction_type.into();
         <span class="kw">match </span>user_id {
             <span class="prelude-val">Some</span>(user_id) =&gt; http.delete_reaction(<span class="self">self</span>, message_id, user_id, <span class="kw-2">&amp;</span>reaction_type).<span class="kw">await</span>,
@@ -1440,12 +1413,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete_reactions(
-        <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        message_id: MessageId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_message_reactions(<span class="self">self</span>, message_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_reactions(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_message_reactions(<span class="self">self</span>, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
@@ -1459,11 +1428,11 @@
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete_reaction_emoji(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         message_id: MessageId,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_message_reaction_emoji(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
+        http.delete_message_reaction_emoji(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a channel's settings.
@@ -1539,16 +1508,16 @@
     /// Permissions::MANAGE_WEBHOOKS
     </span><span class="kw">pub async fn </span>follow(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         target_channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;FollowedChannel&gt; {
-        http.as_ref().follow_news_channel(<span class="self">self</span>, target_channel_id).<span class="kw">await
+        http.follow_news_channel(<span class="self">self</span>, target_channel_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        cache.as_ref().channel(<span class="self">self</span>)
+        cache.channel(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
@@ -1598,8 +1567,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">pub async fn </span>invites(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
-        http.as_ref().get_channel_invites(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>invites(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
+        http.get_channel_invites(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a message from the channel.
@@ -1685,8 +1654,8 @@
     /// }
     /// # }
     /// ```
-    </span><span class="kw">pub fn </span>messages_iter&lt;H: AsRef&lt;Http&gt;&gt;(<span class="self">self</span>, http: H) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; {
-        MessagesIter::&lt;H&gt;::stream(http, <span class="self">self</span>)
+    </span><span class="kw">pub fn </span>messages_iter(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; + <span class="lifetime">'_ </span>{
+        MessagesIter::stream(http, <span class="self">self</span>)
     }
 
     <span class="doccomment">/// Returns the name of whatever channel this id holds.
@@ -1716,8 +1685,8 @@
     /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>pin(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().pin_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>pin(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.pin_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Crossposts a [`Message`].
@@ -1733,8 +1702,8 @@
     /// author of the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>crosspost(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        http.as_ref().crosspost_message(<span class="self">self</span>, message_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>crosspost(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        http.crosspost_message(<span class="self">self</span>, message_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets the list of [`Message`]s which are pinned to the channel.
@@ -1747,8 +1716,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="kw">pub async fn </span>pins(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-        http.as_ref().get_pins(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>pins(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
+        http.get_pins(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
@@ -1774,7 +1743,7 @@
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     </span><span class="kw">pub async fn </span>reaction_users(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         message_id: MessageId,
         reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
@@ -1782,9 +1751,7 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
         <span class="kw">let </span>limit = limit.map_or(<span class="number">50</span>, |x| <span class="kw">if </span>x &gt; <span class="number">100 </span>{ <span class="number">100 </span>} <span class="kw">else </span>{ x });
 
-        http.as_ref()
-            .get_reaction_users(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into(), limit, after)
-            .<span class="kw">await
+        http.get_reaction_users(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into(), limit, after).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Sends a message with just the given message content in the channel.
@@ -1951,8 +1918,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>unpin(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().unpin_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>unpin(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.unpin_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the channel's webhooks.
@@ -1964,8 +1931,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    </span><span class="kw">pub async fn </span>webhooks(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
-        http.as_ref().get_channel_webhooks(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>webhooks(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
+        http.get_channel_webhooks(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a webhook in the channel.
@@ -1984,29 +1951,26 @@
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this
     /// channel.
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_reply(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
+    </span><span class="kw">pub fn </span>await_reply(<span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reply`].
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_replies(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
+    </span><span class="kw">pub fn </span>await_replies(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; MessageCollector {
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in
     /// this channel.
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_reaction(<span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
+    </span><span class="kw">pub fn </span>await_reaction(<span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reaction`].
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_reactions(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;,
-    ) -&gt; ReactionCollector {
+    </span><span class="kw">pub fn </span>await_reactions(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; ReactionCollector {
         <span class="self">self</span>.await_reaction(shard_messenger)
     }
 
@@ -2016,8 +1980,8 @@
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
-    </span><span class="kw">pub async fn </span>get_stage_instance(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
-        http.as_ref().get_stage_instance(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>get_stage_instance(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
+        http.get_stage_instance(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a stage instance.
@@ -2070,8 +2034,8 @@
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
-    </span><span class="kw">pub async fn </span>delete_stage_instance(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().delete_stage_instance(<span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_stage_instance(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_stage_instance(<span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a public thread that is connected to a message.
@@ -2121,8 +2085,8 @@
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    </span><span class="kw">pub async fn </span>get_thread_members(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ThreadMember&gt;&gt; {
-        http.as_ref().get_channel_thread_members(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>get_thread_members(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ThreadMember&gt;&gt; {
+        http.get_channel_thread_members(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Joins the thread, if this channel is a thread.
@@ -2130,8 +2094,8 @@
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    </span><span class="kw">pub async fn </span>join_thread(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().join_thread_channel(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>join_thread(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.join_thread_channel(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Leaves the thread, if this channel is a thread.
@@ -2139,8 +2103,8 @@
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    </span><span class="kw">pub async fn </span>leave_thread(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().leave_thread_channel(<span class="self">self</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>leave_thread(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.leave_thread_channel(<span class="self">self</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Adds a thread member, if this channel is a thread.
@@ -2148,8 +2112,8 @@
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    </span><span class="kw">pub async fn </span>add_thread_member(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().add_thread_channel_member(<span class="self">self</span>, user_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>add_thread_member(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.add_thread_channel_member(<span class="self">self</span>, user_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Removes a thread member, if this channel is a thread.
@@ -2157,8 +2121,8 @@
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    </span><span class="kw">pub async fn </span>remove_thread_member(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.as_ref().remove_thread_channel_member(<span class="self">self</span>, user_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>remove_thread_member(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.remove_thread_channel_member(<span class="self">self</span>, user_id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets private archived threads of a channel.
@@ -2168,11 +2132,11 @@
     /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     </span><span class="kw">pub async fn </span>get_archived_private_threads(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         before: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        http.as_ref().get_channel_archived_private_threads(<span class="self">self</span>, before, limit).<span class="kw">await
+        http.get_channel_archived_private_threads(<span class="self">self</span>, before, limit).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets public archived threads of a channel.
@@ -2182,11 +2146,11 @@
     /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     </span><span class="kw">pub async fn </span>get_archived_public_threads(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         before: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        http.as_ref().get_channel_archived_public_threads(<span class="self">self</span>, before, limit).<span class="kw">await
+        http.get_channel_archived_public_threads(<span class="self">self</span>, before, limit).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets private archived threads joined by the current user of a channel.
@@ -2196,11 +2160,11 @@
     /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     </span><span class="kw">pub async fn </span>get_joined_archived_private_threads(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         before: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
-        http.as_ref().get_channel_joined_archived_private_threads(<span class="self">self</span>, before, limit).<span class="kw">await
+        http.get_channel_joined_archived_private_threads(<span class="self">self</span>, before, limit).<span class="kw">await
     </span>}
 }
 
@@ -2265,8 +2229,8 @@
 <span class="doccomment">/// A helper class returned by [`ChannelId::messages_iter`]
 </span><span class="attr">#[derive(Clone, Debug)]
 #[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">pub struct </span>MessagesIter&lt;H: AsRef&lt;Http&gt;&gt; {
-    http: H,
+</span><span class="kw">pub struct </span>MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
+    http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http,
     channel_id: ChannelId,
     buffer: Vec&lt;Message&gt;,
     before: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
@@ -2274,8 +2238,8 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">impl</span>&lt;H: AsRef&lt;Http&gt;&gt; MessagesIter&lt;H&gt; {
-    <span class="kw">fn </span>new(http: H, channel_id: ChannelId) -&gt; MessagesIter&lt;H&gt; {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>new(http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http, channel_id: ChannelId) -&gt; MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
         MessagesIter {
             http,
             channel_id,
@@ -2311,7 +2275,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="self">self</span>.before {
             builder = builder.before(before);
         }
-        <span class="self">self</span>.buffer = <span class="self">self</span>.channel_id.messages(<span class="self">self</span>.http.as_ref(), builder).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.buffer = <span class="self">self</span>.channel_id.messages(<span class="self">self</span>.http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.buffer.reverse();
 
@@ -2337,11 +2301,11 @@
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::new(1);
-    /// # let ctx: Http = unimplemented!();
+    /// # let http: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///
-    /// let mut messages = MessagesIter::&lt;Http&gt;::stream(&amp;ctx, channel_id).boxed();
+    /// let mut messages = MessagesIter::stream(&amp;http, channel_id).boxed();
     /// while let Some(message_result) = messages.next().await {
     ///     match message_result {
     ///         Ok(message) =&gt; println!("{} said \"{}\"", message.author.name, message.content,),
@@ -2351,9 +2315,9 @@
     /// # }
     /// ```
     </span><span class="kw">pub fn </span>stream(
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http,
         channel_id: ChannelId,
-    ) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; {
+    ) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; + <span class="lifetime">'a </span>{
         <span class="kw">let </span>init_state = MessagesIter::new(http, channel_id);
 
         futures::stream::unfold(init_state, |<span class="kw-2">mut </span>state| <span class="kw">async </span>{

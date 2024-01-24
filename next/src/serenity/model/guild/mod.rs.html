@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (ef71f1047 2024-01-21)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (5d3d3479d 2024-01-23)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2600,49 +2600,6 @@
 <a href="#2598" id="2598">2598</a>
 <a href="#2599" id="2599">2599</a>
 <a href="#2600" id="2600">2600</a>
-<a href="#2601" id="2601">2601</a>
-<a href="#2602" id="2602">2602</a>
-<a href="#2603" id="2603">2603</a>
-<a href="#2604" id="2604">2604</a>
-<a href="#2605" id="2605">2605</a>
-<a href="#2606" id="2606">2606</a>
-<a href="#2607" id="2607">2607</a>
-<a href="#2608" id="2608">2608</a>
-<a href="#2609" id="2609">2609</a>
-<a href="#2610" id="2610">2610</a>
-<a href="#2611" id="2611">2611</a>
-<a href="#2612" id="2612">2612</a>
-<a href="#2613" id="2613">2613</a>
-<a href="#2614" id="2614">2614</a>
-<a href="#2615" id="2615">2615</a>
-<a href="#2616" id="2616">2616</a>
-<a href="#2617" id="2617">2617</a>
-<a href="#2618" id="2618">2618</a>
-<a href="#2619" id="2619">2619</a>
-<a href="#2620" id="2620">2620</a>
-<a href="#2621" id="2621">2621</a>
-<a href="#2622" id="2622">2622</a>
-<a href="#2623" id="2623">2623</a>
-<a href="#2624" id="2624">2624</a>
-<a href="#2625" id="2625">2625</a>
-<a href="#2626" id="2626">2626</a>
-<a href="#2627" id="2627">2627</a>
-<a href="#2628" id="2628">2628</a>
-<a href="#2629" id="2629">2629</a>
-<a href="#2630" id="2630">2630</a>
-<a href="#2631" id="2631">2631</a>
-<a href="#2632" id="2632">2632</a>
-<a href="#2633" id="2633">2633</a>
-<a href="#2634" id="2634">2634</a>
-<a href="#2635" id="2635">2635</a>
-<a href="#2636" id="2636">2636</a>
-<a href="#2637" id="2637">2637</a>
-<a href="#2638" id="2638">2638</a>
-<a href="#2639" id="2639">2639</a>
-<a href="#2640" id="2640">2640</a>
-<a href="#2641" id="2641">2641</a>
-<a href="#2642" id="2642">2642</a>
-<a href="#2643" id="2643">2643</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2937,7 +2894,7 @@
     /// Returns an [`Error::Http`] if the guild is unavailable.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>automod_rules(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Rule&gt;&gt; {
+    </span><span class="kw">pub async fn </span>automod_rules(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Rule&gt;&gt; {
         <span class="self">self</span>.id.automod_rules(http).<span class="kw">await
     </span>}
 
@@ -2950,7 +2907,7 @@
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
+    </span><span class="kw">pub async fn </span>automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;Rule&gt; {
         <span class="self">self</span>.id.automod_rule(http, rule_id).<span class="kw">await
     </span>}
 
@@ -3003,13 +2960,13 @@
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>delete_automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_automod_rule(http, rule_id).<span class="kw">await
     </span>}
 
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">fn </span>check_hierarchy(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache, other_user: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>current_id = cache.as_ref().current_user().id;
+        <span class="kw">let </span>current_id = cache.current_user().id;
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(higher) = <span class="self">self</span>.greater_member_hierarchy(cache, other_user, current_id) {
             <span class="kw">if </span>higher != current_id {
@@ -3067,8 +3024,8 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    </span><span class="kw">pub fn </span>channel_id_from_name(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
-        <span class="kw">let </span>guild_channels = cache.as_ref().guild_channels(<span class="self">self</span>.id)<span class="question-mark">?</span>;
+    </span><span class="kw">pub fn </span>channel_id_from_name(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
+        <span class="kw">let </span>guild_channels = cache.guild_channels(<span class="self">self</span>.id)<span class="question-mark">?</span>;
 
         <span class="kw">for </span>(id, channel) <span class="kw">in </span>guild_channels.iter() {
             <span class="kw">if </span><span class="kw-2">&amp;*</span>channel.name == name {
@@ -3199,7 +3156,7 @@
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     </span><span class="kw">pub async fn </span>audit_logs(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         action_type: <span class="prelude-ty">Option</span>&lt;audit_log::Action&gt;,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
         before: <span class="prelude-ty">Option</span>&lt;AuditLogEntryId&gt;,
@@ -3213,10 +3170,7 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is currently unavailable.
-    </span><span class="kw">pub async fn </span>channels(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;ChannelId, GuildChannel&gt;&gt; {
+    </span><span class="kw">pub async fn </span>channels(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;ChannelId, GuildChannel&gt;&gt; {
         <span class="self">self</span>.id.channels(http).<span class="kw">await
     </span>}
 
@@ -3245,17 +3199,13 @@
     ///
     /// [`Shard`]: crate::gateway::Shard
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
-    </span><span class="kw">pub async fn </span>create(
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        name: <span class="kw-2">&amp;</span>str,
-        icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
+    </span><span class="kw">pub async fn </span>create(http: <span class="kw-2">&amp;</span>Http, name: <span class="kw-2">&amp;</span>str, icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
         <span class="kw">let </span>map = <span class="macro">json!</span>({
             <span class="string">"icon"</span>: icon,
             <span class="string">"name"</span>: name,
         });
 
-        http.as_ref().create_guild(<span class="kw-2">&amp;</span>map).<span class="kw">await
+        http.create_guild(<span class="kw-2">&amp;</span>map).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a new [`Channel`] in the guild.
@@ -3318,12 +3268,7 @@
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`CreateAttachment`]: crate::builder::CreateAttachment
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>create_emoji(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        name: <span class="kw-2">&amp;</span>str,
-        image: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+    </span><span class="kw">pub async fn </span>create_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, name: <span class="kw-2">&amp;</span>str, image: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="self">self</span>.id.create_emoji(http, name, image).<span class="kw">await
     </span>}
 
@@ -3338,7 +3283,7 @@
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="kw">pub async fn </span>create_integration(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         integration_id: IntegrationId,
         kind: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -3369,7 +3314,7 @@
     /// Returns the same errors as [`Self::create_command`].
     </span><span class="kw">pub async fn </span>set_commands(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         commands: <span class="kw-2">&amp;</span>[CreateCommand&lt;<span class="lifetime">'_</span>&gt;],
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         <span class="self">self</span>.id.set_commands(http, commands).<span class="kw">await
@@ -3398,7 +3343,7 @@
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    </span><span class="kw">pub async fn </span>get_commands(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
+    </span><span class="kw">pub async fn </span>get_commands(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         <span class="self">self</span>.id.get_commands(http).<span class="kw">await
     </span>}
 
@@ -3407,10 +3352,7 @@
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    </span><span class="kw">pub async fn </span>get_commands_with_localizations(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
+    </span><span class="kw">pub async fn </span>get_commands_with_localizations(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Command&gt;&gt; {
         <span class="self">self</span>.id.get_commands_with_localizations(http).<span class="kw">await
     </span>}
 
@@ -3419,11 +3361,7 @@
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    </span><span class="kw">pub async fn </span>get_command(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        command_id: CommandId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+    </span><span class="kw">pub async fn </span>get_command(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, command_id: CommandId) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
         <span class="self">self</span>.id.get_command(http, command_id).<span class="kw">await
     </span>}
 
@@ -3448,11 +3386,7 @@
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    </span><span class="kw">pub async fn </span>delete_command(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        command_id: CommandId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_command(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, command_id: CommandId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_command(http, command_id).<span class="kw">await
     </span>}
 
@@ -3461,10 +3395,7 @@
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    </span><span class="kw">pub async fn </span>get_commands_permissions(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermissions&gt;&gt; {
+    </span><span class="kw">pub async fn </span>get_commands_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CommandPermissions&gt;&gt; {
         <span class="self">self</span>.id.get_commands_permissions(http).<span class="kw">await
     </span>}
 
@@ -3475,7 +3406,7 @@
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     </span><span class="kw">pub async fn </span>get_command_permissions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         command_id: CommandId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;CommandPermissions&gt; {
         <span class="self">self</span>.id.get_command_permissions(http, command_id).<span class="kw">await
@@ -3576,7 +3507,7 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>delete_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_emoji(http, emoji_id).<span class="kw">await
     </span>}
 
@@ -3592,7 +3523,7 @@
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="kw">pub async fn </span>delete_integration(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_integration(http, integration_id).<span class="kw">await
@@ -3609,7 +3540,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete the role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>delete_role(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, role_id: RoleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_role(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, role_id: RoleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_role(http, role_id).<span class="kw">await
     </span>}
 
@@ -3626,7 +3557,7 @@
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     </span><span class="kw">pub async fn </span>delete_scheduled_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         event_id: ScheduledEventId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_scheduled_event(http, event_id).<span class="kw">await
@@ -3645,11 +3576,7 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>delete_sticker(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        sticker_id: StickerId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_sticker(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, sticker_id: StickerId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.delete_sticker(http, sticker_id).<span class="kw">await
     </span>}
 
@@ -3714,12 +3641,7 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>edit_emoji(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        emoji_id: EmojiId,
-        name: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+    </span><span class="kw">pub async fn </span>edit_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, emoji_id: EmojiId, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="self">self</span>.id.edit_emoji(http, emoji_id, name).<span class="kw">await
     </span>}
 
@@ -3754,7 +3676,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     </span><span class="kw">pub async fn </span>edit_mfa_level(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         mfa_level: MfaLevel,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;MfaLevel&gt; {
@@ -3831,7 +3753,7 @@
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="kw">pub async fn </span>edit_role_position(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         role_id: RoleId,
         position: i16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
@@ -3961,17 +3883,17 @@
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">pub fn </span>greater_member_hierarchy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+        cache: <span class="kw-2">&amp;</span>Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
-        <span class="self">self</span>._greater_member_hierarchy(<span class="kw-2">&amp;</span>cache, lhs_id, rhs_id)
+        <span class="self">self</span>._greater_member_hierarchy(cache, lhs_id, rhs_id)
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     </span><span class="kw">fn </span>_greater_member_hierarchy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+        cache: <span class="kw-2">&amp;</span>Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
@@ -3988,9 +3910,9 @@
         }
 
         <span class="kw">let </span>lhs =
-            <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>lhs_id)<span class="question-mark">?</span>.highest_role_info(<span class="kw-2">&amp;</span>cache).unwrap_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>));
+            <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>lhs_id)<span class="question-mark">?</span>.highest_role_info(cache).unwrap_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>));
         <span class="kw">let </span>rhs =
-            <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>rhs_id)<span class="question-mark">?</span>.highest_role_info(<span class="kw-2">&amp;</span>cache).unwrap_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>));
+            <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>rhs_id)<span class="question-mark">?</span>.highest_role_info(cache).unwrap_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>));
 
         <span class="comment">// If LHS and RHS both have no top position or have the same role ID, then no one wins.
         </span><span class="kw">if </span>(lhs.<span class="number">1 </span>== <span class="number">0 </span>&amp;&amp; rhs.<span class="number">1 </span>== <span class="number">0</span>) || (lhs.<span class="number">0 </span>== rhs.<span class="number">0</span>) {
@@ -4031,7 +3953,7 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is unavailable
-    </span><span class="kw">pub async fn </span>emojis(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Emoji&gt;&gt; {
+    </span><span class="kw">pub async fn </span>emojis(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Emoji&gt;&gt; {
         <span class="self">self</span>.id.emojis(http).<span class="kw">await
     </span>}
 
@@ -4043,7 +3965,7 @@
     /// guild is unavailable.
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
-    </span><span class="kw">pub async fn </span>emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+    </span><span class="kw">pub async fn </span>emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
         <span class="self">self</span>.id.emoji(http, emoji_id).<span class="kw">await
     </span>}
 
@@ -4058,7 +3980,7 @@
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>integrations(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Integration&gt;&gt; {
+    </span><span class="kw">pub async fn </span>integrations(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Integration&gt;&gt; {
         <span class="self">self</span>.id.integrations(http).<span class="kw">await
     </span>}
 
@@ -4101,7 +4023,7 @@
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    </span><span class="kw">pub async fn </span>kick(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>kick(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.kick(http, user_id).<span class="kw">await
     </span>}
 
@@ -4109,12 +4031,7 @@
     ///
     /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
     /// the reason is too long.
-    </span><span class="kw">pub async fn </span>kick_with_reason(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
-        user_id: UserId,
-        reason: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>kick_with_reason(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId, reason: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.kick_with_reason(http, user_id, reason).<span class="kw">await
     </span>}
 
@@ -4126,7 +4043,7 @@
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild or the access token
     /// lacks the necessary scope.
-    </span><span class="kw">pub async fn </span>current_user_member(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
+    </span><span class="kw">pub async fn </span>current_user_member(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
         <span class="self">self</span>.id.current_user_member(http).<span class="kw">await
     </span>}
 
@@ -4136,7 +4053,7 @@
     ///
     /// May return an [`Error::Http`] if the current user cannot leave the guild, or currently is
     /// not in the guild.
-    </span><span class="kw">pub async fn </span>leave(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>leave(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.leave(http).<span class="kw">await
     </span>}
 
@@ -4176,7 +4093,7 @@
     /// [`User`]: crate::model::user::User
     </span><span class="kw">pub async fn </span>members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
@@ -4599,7 +4516,7 @@
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     </span><span class="kw">pub async fn </span>reorder_channels(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         channels: <span class="kw">impl </span>IntoIterator&lt;Item = (ChannelId, u64)&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.reorder_channels(http, channels).<span class="kw">await
@@ -4618,7 +4535,7 @@
     /// Returns an [`Error::Http`] if the API returns an error.
     </span><span class="kw">pub async fn </span>search_members(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         query: <span class="kw-2">&amp;</span>str,
         limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
@@ -4639,7 +4556,7 @@
     /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         event_id: ScheduledEventId,
         with_user_count: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
@@ -4658,7 +4575,7 @@
     /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_events(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         with_user_count: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEvent&gt;&gt; {
         <span class="self">self</span>.id.scheduled_events(http, with_user_count).<span class="kw">await
@@ -4678,7 +4595,7 @@
     /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_event_users(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         event_id: ScheduledEventId,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEventUser&gt;&gt; {
@@ -4698,7 +4615,7 @@
     /// [View Channel]: Permissions::VIEW_CHANNEL
     </span><span class="kw">pub async fn </span>scheduled_event_users_optioned(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         event_id: ScheduledEventId,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
@@ -4716,8 +4633,8 @@
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>))]
-    </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;) -&gt; u16 {
-        <span class="self">self</span>.id.shard_id(<span class="kw-2">&amp;</span>cache)
+    </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; u16 {
+        <span class="self">self</span>.id.shard_id(cache)
     }
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
@@ -4762,7 +4679,7 @@
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="kw">pub async fn </span>start_integration_sync(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         integration_id: IntegrationId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.start_integration_sync(http, integration_id).<span class="kw">await
@@ -4830,7 +4747,7 @@
     ///
     /// Will return [`Error::Http`] if the current user is lacking permissions. Can also return an
     /// [`Error::Json`] if there is an error deserializing the API response.
-    </span><span class="kw">pub async fn </span>vanity_url(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+    </span><span class="kw">pub async fn </span>vanity_url(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
         <span class="self">self</span>.id.vanity_url(http).<span class="kw">await
     </span>}
 
@@ -4844,7 +4761,7 @@
     ///
     /// Will return an [`Error::Http`] if the current user is lacking permissions. Can also return
     /// an [`Error::Json`] if there is an error deserializing the API response.
-    </span><span class="kw">pub async fn </span>webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
+    </span><span class="kw">pub async fn </span>webhooks(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Webhook&gt;&gt; {
         <span class="self">self</span>.id.webhooks(http).<span class="kw">await
     </span>}
 
@@ -4866,7 +4783,7 @@
     /// impl EventHandler for Handler {
     ///     async fn message(&amp;self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&amp;ctx) {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&amp;ctx.cache) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("{:?}", role);
     ///                 }
@@ -4883,29 +4800,26 @@
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this
     /// guild.
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_reply(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
+    </span><span class="kw">pub fn </span>await_reply(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; MessageCollector {
         MessageCollector::new(shard_messenger).guild_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reply`].
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_replies(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; MessageCollector {
+    </span><span class="kw">pub fn </span>await_replies(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; MessageCollector {
         <span class="self">self</span>.await_reply(shard_messenger)
     }
 
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in
     /// this guild.
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_reaction(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;) -&gt; ReactionCollector {
+    </span><span class="kw">pub fn </span>await_reaction(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; ReactionCollector {
         ReactionCollector::new(shard_messenger).guild_id(<span class="self">self</span>.id)
     }
 
     <span class="doccomment">/// Same as [`Self::await_reaction`].
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-    </span><span class="kw">pub fn </span>await_reactions(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        shard_messenger: <span class="kw">impl </span>AsRef&lt;ShardMessenger&gt;,
-    ) -&gt; ReactionCollector {
+    </span><span class="kw">pub fn </span>await_reactions(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_messenger: ShardMessenger) -&gt; ReactionCollector {
         <span class="self">self</span>.await_reaction(shard_messenger)
     }
 
@@ -4915,7 +4829,7 @@
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    </span><span class="kw">pub async fn </span>get_active_threads(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
+    </span><span class="kw">pub async fn </span>get_active_threads(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
         <span class="self">self</span>.id.get_active_threads(http).<span class="kw">await
     </span>}
 }
