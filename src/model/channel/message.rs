@@ -761,16 +761,13 @@ impl Message {
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this
     /// message.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
+    pub fn await_reaction(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).message_id(self.id)
     }
 
     /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn await_reactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollector {
+    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         self.await_reaction(shard_messenger)
     }
 
@@ -779,7 +776,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_component_interaction(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ComponentInteractionCollector {
         ComponentInteractionCollector::new(shard_messenger).message_id(self.id)
     }
@@ -788,7 +785,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_component_interactions(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ComponentInteractionCollector {
         self.await_component_interaction(shard_messenger)
     }
@@ -798,7 +795,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_modal_interaction(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ModalInteractionCollector {
         ModalInteractionCollector::new(shard_messenger).message_id(self.id)
     }
@@ -807,7 +804,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_modal_interactions(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ModalInteractionCollector {
         self.await_modal_interaction(shard_messenger)
     }

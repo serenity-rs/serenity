@@ -322,10 +322,3 @@ impl Context {
         self.shard.set_presence(activity, status);
     }
 }
-
-#[cfg(feature = "gateway")]
-impl AsRef<ShardMessenger> for Context {
-    fn as_ref(&self) -> &ShardMessenger {
-        &self.shard
-    }
-}
