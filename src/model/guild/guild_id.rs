@@ -3,6 +3,7 @@ use std::fmt;
 #[cfg(feature = "model")]
 use futures::stream::Stream;
 use nonmax::NonMaxU16;
+use serde_json::json;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -34,8 +35,7 @@ use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
-#[cfg(feature = "model")]
-use crate::json::SerializeIter;
+use crate::model::guild::SerializeIter;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
