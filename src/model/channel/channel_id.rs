@@ -1133,11 +1133,11 @@ impl<'a> MessagesIter<'a> {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::new(1);
-    /// # let ctx: Http = unimplemented!();
+    /// # let http: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///
-    /// let mut messages = MessagesIter::<Http>::stream(&ctx, channel_id).boxed();
+    /// let mut messages = MessagesIter::stream(&http, channel_id).boxed();
     /// while let Some(message_result) = messages.next().await {
     ///     match message_result {
     ///         Ok(message) => println!("{} said \"{}\"", message.author.name, message.content,),

@@ -1654,11 +1654,11 @@ impl<'a> MembersIter<'a> {
     /// #
     /// # async fn run() {
     /// # let guild_id = GuildId::new(1);
-    /// # let ctx: Http = unimplemented!();
+    /// # let http: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::guild::MembersIter;
     ///
-    /// let mut members = MembersIter::<Http>::stream(&ctx, guild_id).boxed();
+    /// let mut members = MembersIter::stream(&http, guild_id).boxed();
     /// while let Some(member_result) = members.next().await {
     ///     match member_result {
     ///         Ok(member) => println!("{} is {}", member, member.display_name(),),
