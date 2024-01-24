@@ -28,9 +28,6 @@ use crate::constants::{self, Opcode};
 #[cfg(feature = "client")]
 use crate::gateway::GatewayError;
 #[cfg(feature = "client")]
-use crate::json::from_str;
-use crate::json::{to_string, JsonError};
-#[cfg(feature = "client")]
 use crate::model::event::GatewayEvent;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::{GuildId, UserId};
@@ -141,11 +138,13 @@ impl WsClient {
             _ => return Ok(None),
         };
 
-        from_str(&json_str).map(Some).map_err(|err| log_deserialisation_err(&json_str, err))
+        serde_json::from_str(&json_str)
+            .map(Some)
+            .map_err(|err| log_deserialisation_err(&json_str, err))
     }
 
     pub(crate) async fn send_json(&mut self, value: &impl serde::Serialize) -> Result<()> {
-        let message = to_string(value).map(Message::Text)?;
+        let message = serde_json::to_string(value).map(Message::Text)?;
 
         self.0.send(message).await?;
         Ok(())
@@ -309,12 +308,6 @@ impl WsClient {
     }
 }
 
-#[cfg(feature = "simd_json")]
-fn filter_unknown_variant(_: &str) -> bool {
-    false
-}
-
-#[cfg(not(feature = "simd_json"))]
 fn filter_unknown_variant(json_err_dbg: &str) -> bool {
     if let Some(msg) = json_err_dbg.strip_prefix("Error(\"unknown variant `") {
         if let Some((variant_name, _)) = msg.split_once('`') {
@@ -326,7 +319,7 @@ fn filter_unknown_variant(json_err_dbg: &str) -> bool {
     false
 }
 
-fn log_deserialisation_err(json_str: &str, err: JsonError) -> Error {
+fn log_deserialisation_err(json_str: &str, err: serde_json::Error) -> Error {
     let json_err_dbg = format!("{err:?}");
     if !filter_unknown_variant(&json_err_dbg) {
         warn!("Err deserializing text: {json_err_dbg}");

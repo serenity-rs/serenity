@@ -474,8 +474,10 @@ impl fmt::Display for Permissions {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn permissions_serde() {
