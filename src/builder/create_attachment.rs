@@ -81,11 +81,11 @@ impl<'a> CreateAttachment<'a> {
     /// Returns [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
     pub async fn url(
-        http: impl AsRef<Http>,
+        http: &Http,
         url: impl reqwest::IntoUrl,
         filename: impl Into<Cow<'static, str>>,
     ) -> Result<Self> {
-        let response = http.as_ref().client.get(url).send().await?;
+        let response = http.client.get(url).send().await?;
         let data = response.bytes().await?.to_vec();
 
         Ok(CreateAttachment::bytes(data, filename))

@@ -145,7 +145,6 @@ impl Reaction {
         }
         cache_http
             .http()
-            .as_ref()
             .delete_message_reaction_emoji(self.channel_id, self.message_id, &self.emoji)
             .await
     }
@@ -212,7 +211,7 @@ impl Reaction {
     /// [permissions]: crate::model::permissions
     pub async fn users(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         reaction_type: impl Into<ReactionType>,
         limit: Option<NonMaxU8>,
         after: Option<UserId>,
@@ -222,7 +221,7 @@ impl Reaction {
 
     async fn _users(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         reaction_type: &ReactionType,
         limit: Option<NonMaxU8>,
         after: Option<UserId>,
@@ -234,9 +233,7 @@ impl Reaction {
             warn!("Reaction users limit clamped to 100! (API Restriction)");
         }
 
-        http.as_ref()
-            .get_reaction_users(self.channel_id, self.message_id, reaction_type, limit, after)
-            .await
+        http.get_reaction_users(self.channel_id, self.message_id, reaction_type, limit, after).await
     }
 }
 

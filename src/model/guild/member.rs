@@ -98,8 +98,8 @@ impl Member {
     /// Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_role(&self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
-        http.as_ref().add_member_role(self.guild_id, self.user.id, role_id, None).await
+    pub async fn add_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
+        http.add_member_role(self.guild_id, self.user.id, role_id, None).await
     }
 
     /// Adds one or multiple [`Role`]s to the member.
@@ -112,9 +112,9 @@ impl Member {
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_roles(&self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn add_roles(&self, http: &Http, role_ids: &[RoleId]) -> Result<()> {
         for &role_id in role_ids {
-            self.add_role(http.as_ref(), role_id).await?;
+            self.add_role(http, role_id).await?;
         }
 
         Ok(())
@@ -131,7 +131,7 @@ impl Member {
     /// return [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
+    pub async fn ban(&self, http: &Http, dmd: u8) -> Result<()> {
         self.ban_with_reason(http, dmd, "").await
     }
 
@@ -142,12 +142,7 @@ impl Member {
     ///
     /// In addition to the errors [`Self::ban`] may return, can also return
     /// [`ModelError::TooLarge`] if the length of the reason is greater than 512.
-    pub async fn ban_with_reason(
-        &self,
-        http: impl AsRef<Http>,
-        dmd: u8,
-        reason: &str,
-    ) -> Result<()> {
+    pub async fn ban_with_reason(&self, http: &Http, dmd: u8, reason: &str) -> Result<()> {
         self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
     }
 
@@ -448,8 +443,8 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_role(&self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
-        http.as_ref().remove_member_role(self.guild_id, self.user.id, role_id, None).await
+    pub async fn remove_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
+        http.remove_member_role(self.guild_id, self.user.id, role_id, None).await
     }
 
     /// Removes one or multiple [`Role`]s from the member.
@@ -462,9 +457,9 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_roles(&self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn remove_roles(&self, http: &Http, role_ids: &[RoleId]) -> Result<()> {
         for &role_id in role_ids {
-            self.remove_role(http.as_ref(), role_id).await?;
+            self.remove_role(http, role_id).await?;
         }
 
         Ok(())
@@ -499,8 +494,8 @@ impl Member {
     /// does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id, self.user.id, None).await
+    pub async fn unban(&self, http: &Http) -> Result<()> {
+        http.remove_ban(self.guild_id, self.user.id, None).await
     }
 
     /// Returns the formatted URL of the member's per guild avatar, if one exists.

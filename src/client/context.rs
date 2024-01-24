@@ -323,18 +323,6 @@ impl Context {
     }
 }
 
-impl AsRef<Http> for Context {
-    fn as_ref(&self) -> &Http {
-        &self.http
-    }
-}
-
-impl AsRef<Http> for Arc<Context> {
-    fn as_ref(&self) -> &Http {
-        &self.http
-    }
-}
-
 impl AsRef<Arc<Http>> for Context {
     fn as_ref(&self) -> &Arc<Http> {
         &self.http

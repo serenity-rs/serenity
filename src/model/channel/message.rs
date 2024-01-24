@@ -274,7 +274,7 @@ impl Message {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reaction(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
@@ -305,7 +305,6 @@ impl Message {
 
         cache_http
             .http()
-            .as_ref()
             .delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into())
             .await
     }
@@ -434,7 +433,7 @@ impl Message {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn reaction_users(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
         after: Option<UserId>,
