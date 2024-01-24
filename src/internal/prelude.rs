@@ -4,7 +4,9 @@
 
 pub use std::result::Result as StdResult;
 
+pub use serde_json::Value;
 pub use small_fixed_array::{FixedArray, FixedString, TruncatingInto};
 
 pub use crate::error::{Error, Result};
-pub use crate::json::{JsonMap, Value};
+
+pub type JsonMap = serde_json::Map<String, Value>;

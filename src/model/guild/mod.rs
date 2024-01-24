@@ -63,8 +63,6 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json::json;
 use crate::model::prelude::*;
 use crate::model::utils::*;
 
@@ -630,7 +628,7 @@ impl Guild {
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
     pub async fn create(http: &Http, name: &str, icon: Option<ImageHash>) -> Result<PartialGuild> {
-        let map = json!({
+        let map = serde_json::json!({
             "icon": icon,
             "name": name,
         });
