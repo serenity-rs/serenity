@@ -14,14 +14,6 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     let guild_id = msg.guild_id.unwrap();
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
         println!("command message: {msg:#?}");
-    } else if msg.content == "globalcommand" {
-        // Tests https://github.com/serenity-rs/serenity/issues/2259
-        // Activate simd_json feature for this
-        Command::create_global_command(
-            &ctx,
-            CreateCommand::new("ping").description("test command"),
-        )
-        .await?;
     } else if msg.content == "register" {
         guild_id
             .create_command(&ctx, CreateCommand::new("editattachments").description("test command"))

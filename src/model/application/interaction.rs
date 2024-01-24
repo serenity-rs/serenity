@@ -1,5 +1,6 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
+use serde_json::from_value;
 
 use super::{
     CommandInteraction,
@@ -9,7 +10,6 @@ use super::{
     PingInteraction,
 };
 use crate::internal::prelude::*;
-use crate::json::from_value;
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, GuildId, InteractionId, MessageId, UserId};
 use crate::model::monetization::Entitlement;

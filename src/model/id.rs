@@ -255,8 +255,9 @@ mod tests {
     #[test]
     fn test_id_serde() {
         use serde::{Deserialize, Serialize};
+        use serde_json::json;
 
-        use crate::json::{assert_json, json};
+        use crate::model::utils::assert_json;
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct S {
