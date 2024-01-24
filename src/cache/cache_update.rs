@@ -13,7 +13,7 @@ use super::Cache;
 /// ```rust,ignore
 /// use std::collections::hash_map::Entry;
 ///
-/// use serenity::json::json;
+/// use serde_json::json;
 /// use serenity::cache::{Cache, CacheUpdate};
 /// use serenity::model::id::UserId;
 /// use serenity::model::user::User;
@@ -56,7 +56,7 @@ use super::Cache;
 ///                 Some(old_user)
 ///             },
 ///             Entry::Vacant(entry) => {
-///                 // We can convert a [`json::Value`] to a User for test
+///                 // We can convert a [`Value`] to a User for test
 ///                 // purposes.
 ///                 let user = from_value::<User>(json!({
 ///                     "id": self.user_id,
