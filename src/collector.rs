@@ -64,9 +64,9 @@ macro_rules! make_specific_collector {
 
         impl $collector_type {
             /// Creates a new collector without any filters configured.
-            pub fn new(shard: impl AsRef<ShardMessenger>) -> Self {
+            pub fn new(shard: ShardMessenger) -> Self {
                 Self {
-                    shard: shard.as_ref().clone(),
+                    shard,
                     duration: None,
                     filter: None,
                     $( $filter_name: None, )*

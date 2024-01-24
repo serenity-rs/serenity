@@ -80,8 +80,8 @@ impl Role {
     /// Returns [`Error::Http`] if the current user lacks permission to delete this role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_role(self.guild_id, self.id, None).await
+    pub async fn delete(&mut self, http: &Http) -> Result<()> {
+        http.delete_role(self.guild_id, self.id, None).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -97,8 +97,8 @@ impl Role {
     /// Returns [`Error::Http`] if the current user does not have permission to Manage Roles.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditRole<'_>) -> Result<()> {
-        *self = self.guild_id.edit_role(http.as_ref(), self.id, builder).await?;
+    pub async fn edit(&mut self, http: &Http, builder: EditRole<'_>) -> Result<()> {
+        *self = self.guild_id.edit_role(http, self.id, builder).await?;
         Ok(())
     }
 
