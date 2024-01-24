@@ -95,7 +95,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
 
     // There is a method implemented for some models to conveniently collect replies. They return a
     // builder that can be turned into a Stream, or here, where we can await a single reply
-    let collector = msg.author.await_reply(&ctx.shard).timeout(Duration::from_secs(10));
+    let collector = msg.author.await_reply(ctx.shard.clone()).timeout(Duration::from_secs(10));
     if let Some(answer) = collector.await {
         if answer.content.to_lowercase() == "ferris" {
             let _ = answer.reply(ctx, "That's correct!").await;
@@ -114,7 +114,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
 
     // The message model can also be turned into a Collector to collect reactions on it.
     let collector = react_msg
-        .await_reaction(&ctx.shard)
+        .await_reaction(ctx.shard.clone())
         .timeout(Duration::from_secs(10))
         .author_id(msg.author.id);
 
@@ -132,7 +132,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let _ = msg.reply(ctx, "Write 5 messages in 10 seconds").await;
 
     // We can create a collector from scratch too using this builder future.
-    let collector = MessageCollector::new(&ctx.shard)
+    let collector = MessageCollector::new(ctx.shard.clone())
     // Only collect messages by this user.
         .author_id(msg.author.id)
         .channel_id(msg.channel_id)

@@ -848,7 +848,7 @@ impl CommonOptions for &CommandOptions {
 
 #[cfg(feature = "cache")]
 pub(crate) fn has_correct_permissions(
-    cache: impl AsRef<Cache>,
+    cache: &Cache,
     options: &impl CommonOptions,
     message: &Message,
 ) -> bool {

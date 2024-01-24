@@ -38,11 +38,7 @@ impl SoundId {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    pub async fn to_soundboard(
-        self,
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-    ) -> Result<Soundboard> {
+    pub async fn to_soundboard(self, http: &Http, guild_id: GuildId) -> Result<Soundboard> {
         guild_id.get_soundboard(http, self).await
     }
 }
