@@ -108,7 +108,7 @@ impl Invite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code, None).await
+        cache_http.http().delete_invite(&self.code, None).await
     }
 
     /// Gets information about an invite.
@@ -128,7 +128,7 @@ impl Invite {
     /// May return an [`Error::Http`] if the invite is invalid. Can also return an [`Error::Json`]
     /// if there is an error deserializing the API response.
     pub async fn get(
-        http: impl AsRef<Http>,
+        http: &Http,
         code: &str,
         member_counts: bool,
         expiration: bool,
@@ -141,7 +141,7 @@ impl Invite {
             invite = crate::utils::parse_invite(invite);
         }
 
-        http.as_ref().get_invite(invite, member_counts, expiration, event_id).await
+        http.get_invite(invite, member_counts, expiration, event_id).await
     }
 
     /// Returns a URL to use for the invite.
@@ -235,8 +235,8 @@ impl InviteGuild {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[must_use]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
-        self.id.shard_id(&cache)
+    pub fn shard_id(&self, cache: &Cache) -> u16 {
+        self.id.shard_id(cache)
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -330,7 +330,7 @@ impl RichInvite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code, None).await
+        cache_http.http().delete_invite(&self.code, None).await
     }
 
     /// Returns a URL to use for the invite.

@@ -61,8 +61,8 @@ impl ChannelId {
     /// channel.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn broadcast_typing(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().broadcast_typing(self).await
+    pub async fn broadcast_typing(self, http: &Http) -> Result<()> {
+        http.broadcast_typing(self).await
     }
 
     /// Creates an invite for the given channel.
@@ -96,13 +96,9 @@ impl ChannelId {
     /// set.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn create_permission(
-        self,
-        http: impl AsRef<Http>,
-        target: PermissionOverwrite,
-    ) -> Result<()> {
+    pub async fn create_permission(self, http: &Http, target: PermissionOverwrite) -> Result<()> {
         let data: PermissionOverwriteData = target.into();
-        http.as_ref().create_permission(self, data.id, &data, None).await
+        http.create_permission(self, data.id, &data, None).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -119,11 +115,11 @@ impl ChannelId {
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     pub async fn create_reaction(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.as_ref().create_reaction(self, message_id, &reaction_type.into()).await
+        http.create_reaction(self, message_id, &reaction_type.into()).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -135,8 +131,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn delete(self, http: impl AsRef<Http>) -> Result<Channel> {
-        http.as_ref().delete_channel(self, None).await
+    pub async fn delete(self, http: &Http) -> Result<Channel> {
+        http.delete_channel(self, None).await
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -151,8 +147,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_message(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
-        http.as_ref().delete_message(self, message_id, None).await
+    pub async fn delete_message(self, http: &Http, message_id: MessageId) -> Result<()> {
+        http.delete_message(self, message_id, None).await
     }
 
     /// Deletes messages by Ids from the given vector in the given channel.
@@ -172,11 +168,7 @@ impl ChannelId {
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages(
-        self,
-        http: impl AsRef<Http>,
-        message_ids: &[MessageId],
-    ) -> Result<()> {
+    pub async fn delete_messages(self, http: &Http, message_ids: &[MessageId]) -> Result<()> {
         use crate::model::error::{Maximum, Minimum};
 
         #[derive(serde::Serialize)]
@@ -194,7 +186,7 @@ impl ChannelId {
                 messages: message_ids,
             };
 
-            http.as_ref().delete_messages(self, &req, None).await
+            http.delete_messages(self, &req, None).await
         }
     }
 
@@ -209,14 +201,14 @@ impl ChannelId {
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     pub async fn delete_permission(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
         let id = match permission_type {
             PermissionOverwriteType::Member(id) => id.into(),
             PermissionOverwriteType::Role(id) => id.get().into(),
         };
-        http.as_ref().delete_permission(self, id, None).await
+        http.delete_permission(self, id, None).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -232,12 +224,11 @@ impl ChannelId {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reaction(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        let http = http.as_ref();
         let reaction_type = reaction_type.into();
         match user_id {
             Some(user_id) => http.delete_reaction(self, message_id, user_id, &reaction_type).await,
@@ -255,12 +246,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_reactions(
-        self,
-        http: impl AsRef<Http>,
-        message_id: MessageId,
-    ) -> Result<()> {
-        http.as_ref().delete_message_reactions(self, message_id).await
+    pub async fn delete_reactions(self, http: &Http, message_id: MessageId) -> Result<()> {
+        http.delete_message_reactions(self, message_id).await
     }
 
     /// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
@@ -274,11 +261,11 @@ impl ChannelId {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reaction_emoji(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.as_ref().delete_message_reaction_emoji(self, message_id, &reaction_type.into()).await
+        http.delete_message_reaction_emoji(self, message_id, &reaction_type.into()).await
     }
 
     /// Edits a channel's settings.
@@ -354,10 +341,10 @@ impl ChannelId {
     /// Permissions::MANAGE_WEBHOOKS
     pub async fn follow(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
-        http.as_ref().follow_news_channel(self, target_channel_id).await
+        http.follow_news_channel(self, target_channel_id).await
     }
 
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
@@ -413,8 +400,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
-        http.as_ref().get_channel_invites(self).await
+    pub async fn invites(self, http: &Http) -> Result<Vec<RichInvite>> {
+        http.get_channel_invites(self).await
     }
 
     /// Gets a message from the channel.
@@ -500,8 +487,8 @@ impl ChannelId {
     /// }
     /// # }
     /// ```
-    pub fn messages_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Message>> {
-        MessagesIter::<H>::stream(http, self)
+    pub fn messages_iter(self, http: &Http) -> impl Stream<Item = Result<Message>> + '_ {
+        MessagesIter::stream(http, self)
     }
 
     /// Returns the name of whatever channel this id holds.
@@ -531,8 +518,8 @@ impl ChannelId {
     /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
-        http.as_ref().pin_message(self, message_id, None).await
+    pub async fn pin(self, http: &Http, message_id: MessageId) -> Result<()> {
+        http.pin_message(self, message_id, None).await
     }
 
     /// Crossposts a [`Message`].
@@ -548,8 +535,8 @@ impl ChannelId {
     /// author of the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn crosspost(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<Message> {
-        http.as_ref().crosspost_message(self, message_id).await
+    pub async fn crosspost(self, http: &Http, message_id: MessageId) -> Result<Message> {
+        http.crosspost_message(self, message_id).await
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -562,8 +549,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn pins(self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
-        http.as_ref().get_pins(self).await
+    pub async fn pins(self, http: &Http) -> Result<Vec<Message>> {
+        http.get_pins(self).await
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
@@ -589,7 +576,7 @@ impl ChannelId {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn reaction_users(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
@@ -597,9 +584,7 @@ impl ChannelId {
     ) -> Result<Vec<User>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        http.as_ref()
-            .get_reaction_users(self, message_id, &reaction_type.into(), limit, after)
-            .await
+        http.get_reaction_users(self, message_id, &reaction_type.into(), limit, after).await
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -762,8 +747,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
-        http.as_ref().unpin_message(self, message_id, None).await
+    pub async fn unpin(self, http: &Http, message_id: MessageId) -> Result<()> {
+        http.unpin_message(self, message_id, None).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -775,8 +760,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
-        http.as_ref().get_channel_webhooks(self).await
+    pub async fn webhooks(self, http: &Http) -> Result<Vec<Webhook>> {
+        http.get_channel_webhooks(self).await
     }
 
     /// Creates a webhook in the channel.
@@ -795,29 +780,26 @@ impl ChannelId {
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this
     /// channel.
     #[cfg(feature = "collector")]
-    pub fn await_reply(self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_reply(self, shard_messenger: ShardMessenger) -> MessageCollector {
         MessageCollector::new(shard_messenger).channel_id(self)
     }
 
     /// Same as [`Self::await_reply`].
     #[cfg(feature = "collector")]
-    pub fn await_replies(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_replies(&self, shard_messenger: ShardMessenger) -> MessageCollector {
         self.await_reply(shard_messenger)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in
     /// this channel.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
+    pub fn await_reaction(self, shard_messenger: ShardMessenger) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).channel_id(self)
     }
 
     /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn await_reactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollector {
+    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         self.await_reaction(shard_messenger)
     }
 
@@ -827,8 +809,8 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
-    pub async fn get_stage_instance(self, http: impl AsRef<Http>) -> Result<StageInstance> {
-        http.as_ref().get_stage_instance(self).await
+    pub async fn get_stage_instance(self, http: &Http) -> Result<StageInstance> {
+        http.get_stage_instance(self).await
     }
 
     /// Creates a stage instance.
@@ -879,8 +861,8 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
-    pub async fn delete_stage_instance(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_stage_instance(self, None).await
+    pub async fn delete_stage_instance(self, http: &Http) -> Result<()> {
+        http.delete_stage_instance(self, None).await
     }
 
     /// Creates a public thread that is connected to a message.
@@ -930,8 +912,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn get_thread_members(self, http: impl AsRef<Http>) -> Result<Vec<ThreadMember>> {
-        http.as_ref().get_channel_thread_members(self).await
+    pub async fn get_thread_members(self, http: &Http) -> Result<Vec<ThreadMember>> {
+        http.get_channel_thread_members(self).await
     }
 
     /// Joins the thread, if this channel is a thread.
@@ -939,8 +921,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn join_thread(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().join_thread_channel(self).await
+    pub async fn join_thread(self, http: &Http) -> Result<()> {
+        http.join_thread_channel(self).await
     }
 
     /// Leaves the thread, if this channel is a thread.
@@ -948,8 +930,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn leave_thread(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().leave_thread_channel(self).await
+    pub async fn leave_thread(self, http: &Http) -> Result<()> {
+        http.leave_thread_channel(self).await
     }
 
     /// Adds a thread member, if this channel is a thread.
@@ -957,8 +939,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn add_thread_member(self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
-        http.as_ref().add_thread_channel_member(self, user_id).await
+    pub async fn add_thread_member(self, http: &Http, user_id: UserId) -> Result<()> {
+        http.add_thread_channel_member(self, user_id).await
     }
 
     /// Removes a thread member, if this channel is a thread.
@@ -966,8 +948,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn remove_thread_member(self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
-        http.as_ref().remove_thread_channel_member(self, user_id).await
+    pub async fn remove_thread_member(self, http: &Http, user_id: UserId) -> Result<()> {
+        http.remove_thread_channel_member(self, user_id).await
     }
 
     /// Gets a thread member, if this channel is a thread.
@@ -979,11 +961,11 @@ impl ChannelId {
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn get_thread_member(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         user_id: UserId,
         with_member: bool,
     ) -> Result<ThreadMember> {
-        http.as_ref().get_thread_channel_member(self, user_id, with_member).await
+        http.get_thread_channel_member(self, user_id, with_member).await
     }
 
     /// Gets private archived threads of a channel.
@@ -993,11 +975,11 @@ impl ChannelId {
     /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     pub async fn get_archived_private_threads(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
-        http.as_ref().get_channel_archived_private_threads(self, before, limit).await
+        http.get_channel_archived_private_threads(self, before, limit).await
     }
 
     /// Gets public archived threads of a channel.
@@ -1007,11 +989,11 @@ impl ChannelId {
     /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     pub async fn get_archived_public_threads(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
-        http.as_ref().get_channel_archived_public_threads(self, before, limit).await
+        http.get_channel_archived_public_threads(self, before, limit).await
     }
 
     /// Gets private archived threads joined by the current user of a channel.
@@ -1021,11 +1003,11 @@ impl ChannelId {
     /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
     pub async fn get_joined_archived_private_threads(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         before: Option<ChannelId>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
-        http.as_ref().get_channel_joined_archived_private_threads(self, before, limit).await
+        http.get_channel_joined_archived_private_threads(self, before, limit).await
     }
 
     /// Get a list of users that voted for this specific answer.
@@ -1035,13 +1017,13 @@ impl ChannelId {
     /// If the message does not have a poll.
     pub async fn get_poll_answer_voters(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         message_id: MessageId,
         answer_id: AnswerId,
         after: Option<UserId>,
         limit: Option<u8>,
     ) -> Result<Vec<User>> {
-        http.as_ref().get_poll_answer_voters(self, message_id, answer_id, after, limit).await
+        http.get_poll_answer_voters(self, message_id, answer_id, after, limit).await
     }
 
     /// Ends the [`Poll`] on a given [`MessageId`], if there is one.
@@ -1049,8 +1031,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// If the message does not have a poll, or if the poll was not created by the current user.
-    pub async fn end_poll(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<Message> {
-        http.as_ref().expire_poll(self, message_id).await
+    pub async fn end_poll(self, http: &Http, message_id: MessageId) -> Result<Message> {
+        http.expire_poll(self, message_id).await
     }
 }
 
@@ -1115,8 +1097,8 @@ impl From<&WebhookChannel> for ChannelId {
 /// A helper class returned by [`ChannelId::messages_iter`]
 #[derive(Clone, Debug)]
 #[cfg(feature = "model")]
-pub struct MessagesIter<H: AsRef<Http>> {
-    http: H,
+pub struct MessagesIter<'a> {
+    http: &'a Http,
     channel_id: ChannelId,
     buffer: Vec<Message>,
     before: Option<MessageId>,
@@ -1124,8 +1106,8 @@ pub struct MessagesIter<H: AsRef<Http>> {
 }
 
 #[cfg(feature = "model")]
-impl<H: AsRef<Http>> MessagesIter<H> {
-    fn new(http: H, channel_id: ChannelId) -> MessagesIter<H> {
+impl<'a> MessagesIter<'a> {
+    fn new(http: &'a Http, channel_id: ChannelId) -> MessagesIter<'a> {
         MessagesIter {
             http,
             channel_id,
@@ -1161,7 +1143,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
         if let Some(before) = self.before {
             builder = builder.before(before);
         }
-        self.buffer = self.channel_id.messages(self.http.as_ref(), builder).await?;
+        self.buffer = self.channel_id.messages(self.http, builder).await?;
 
         self.buffer.reverse();
 
@@ -1187,11 +1169,11 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::new(1);
-    /// # let ctx: Http = unimplemented!();
+    /// # let http: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///
-    /// let mut messages = MessagesIter::<Http>::stream(&ctx, channel_id).boxed();
+    /// let mut messages = MessagesIter::stream(&http, channel_id).boxed();
     /// while let Some(message_result) = messages.next().await {
     ///     match message_result {
     ///         Ok(message) => println!("{} said \"{}\"", message.author.name, message.content,),
@@ -1201,9 +1183,9 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// # }
     /// ```
     pub fn stream(
-        http: impl AsRef<Http>,
+        http: &'a Http,
         channel_id: ChannelId,
-    ) -> impl Stream<Item = Result<Message>> {
+    ) -> impl Stream<Item = Result<Message>> + 'a {
         let init_state = MessagesIter::new(http, channel_id);
 
         futures::stream::unfold(init_state, |mut state| async {

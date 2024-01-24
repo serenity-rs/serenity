@@ -194,8 +194,8 @@ impl Builder for CreateInteractionResponseFollowup<'_> {
         }
 
         match ctx.0 {
-            Some(id) => http.as_ref().edit_followup_message(ctx.1, id, &self, files).await,
-            None => http.as_ref().create_followup_message(ctx.1, &self, files).await,
+            Some(id) => http.edit_followup_message(ctx.1, id, &self, files).await,
+            None => http.create_followup_message(ctx.1, &self, files).await,
         }
     }
 }

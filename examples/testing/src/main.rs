@@ -58,7 +58,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             .send_message(
                 &ctx,
                 CreateMessage::new()
-                    .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
+                    .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
             .await?;
         // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
@@ -71,14 +71,14 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             .send_message(
                 ctx,
                 CreateMessage::new()
-                    .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
+                    .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
             .await?;
         msg.edit(
             ctx,
             EditMessage::new().attachments(
                 EditAttachments::keep_all(&msg)
-                    .add(CreateAttachment::url(ctx, IMAGE_URL_2, "testing1.png").await?),
+                    .add(CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?),
             ),
         )
         .await?;
@@ -121,7 +121,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 )
                 .await?;
             let button_press = msg
-                .await_component_interaction(&ctx.shard)
+                .await_component_interaction(ctx.shard.clone())
                 .timeout(std::time::Duration::from_secs(10))
                 .await;
             match button_press {
@@ -146,11 +146,11 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 }),
             )
             .await?;
-        println!("new automod rules: {:?}", guild_id.automod_rules(ctx).await?);
+        println!("new automod rules: {:?}", guild_id.automod_rules(&ctx.http).await?);
     } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
         // Test if banning without a reason actually works
         let user_id: UserId = user_id.trim().parse().unwrap();
-        guild_id.ban(ctx, user_id, 0).await?;
+        guild_id.ban(&ctx.http, user_id, 0).await?;
     } else if msg.content == "createtags" {
         channel_id
             .edit(
@@ -192,7 +192,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         // As of 2023-04-20, bots are still not allowed to sending voice messages
         let builder = CreateMessage::new()
             .flags(MessageFlags::IS_VOICE_MESSAGE)
-            .add_file(CreateAttachment::url(ctx, audio_url, "testing.ogg").await?);
+            .add_file(CreateAttachment::url(&ctx.http, audio_url, "testing.ogg").await?);
 
         msg.author.dm(ctx, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
@@ -202,7 +202,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         channel.edit(ctx, EditChannel::new().category(None)).await?;
         channel.edit(ctx, EditChannel::new().category(Some(parent_id))).await?;
     } else if msg.content == "channelperms" {
-        channel_id.say(ctx, format!("{:?}", msg.author_permissions(ctx))).await?;
+        channel_id.say(ctx, format!("{:?}", msg.author_permissions(&ctx.cache))).await?;
     } else if let Some(forum_channel_id) = msg.content.strip_prefix("createforumpostin ") {
         forum_channel_id
             .parse::<ChannelId>()
@@ -221,7 +221,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             serenity::utils::parse_message_url(forum_post_url).unwrap();
         msg.channel_id.say(ctx, format!("Deleting <#{}> in 10 seconds...", channel_id)).await?;
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-        channel_id.delete(ctx).await?;
+        channel_id.delete(&ctx.http).await?;
     } else {
         return Ok(());
     }
@@ -240,14 +240,15 @@ async fn interaction(
             .create_response(
                 &ctx,
                 CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new()
-                        .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
+                    CreateInteractionResponseMessage::new().add_file(
+                        CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
+                    ),
                 ),
             )
             .await?;
 
         // We need to know the attachments' IDs in order to not lose them in the subsequent edit
-        let msg = interaction.get_response(ctx).await?;
+        let msg = interaction.get_response(&ctx.http).await?;
 
         // Add another image
         let msg = interaction
@@ -255,7 +256,7 @@ async fn interaction(
                 &ctx,
                 EditInteractionResponse::new().attachments(
                     EditAttachments::keep_all(&msg)
-                        .add(CreateAttachment::url(ctx, IMAGE_URL_2, "testing1.png").await?),
+                        .add(CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?),
                 ),
             )
             .await?;
@@ -295,8 +296,9 @@ async fn interaction(
             .create_response(
                 ctx,
                 CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new()
-                        .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
+                    CreateInteractionResponseMessage::new().add_file(
+                        CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
+                    ),
                 ),
             )
             .await?;
@@ -304,8 +306,9 @@ async fn interaction(
         interaction
             .edit_response(
                 ctx,
-                EditInteractionResponse::new()
-                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2, "testing1.png").await?),
+                EditInteractionResponse::new().new_attachment(
+                    CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?,
+                ),
             )
             .await?;
 
@@ -313,7 +316,7 @@ async fn interaction(
             .create_followup(
                 ctx,
                 CreateInteractionResponseFollowup::new()
-                    .add_file(CreateAttachment::url(ctx, IMAGE_URL, "testing.png").await?),
+                    .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
             .await?;
     } else if interaction.data.name == "editembeds" {

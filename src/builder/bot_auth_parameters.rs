@@ -84,8 +84,8 @@ impl<'a> CreateBotAuthParameters<'a> {
     ///
     /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
     #[cfg(feature = "http")]
-    pub async fn auto_client_id(mut self, http: impl AsRef<Http>) -> Result<Self> {
-        self.client_id = http.as_ref().get_current_application_info().await.map(|v| Some(v.id))?;
+    pub async fn auto_client_id(mut self, http: &Http) -> Result<Self> {
+        self.client_id = http.get_current_application_info().await.map(|v| Some(v.id))?;
         Ok(self)
     }
 
