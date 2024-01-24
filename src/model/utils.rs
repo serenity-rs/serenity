@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::cell::Cell;
 use std::fmt;
 use std::hash::Hash;
 use std::marker::PhantomData;
@@ -108,6 +109,35 @@ impl<'de> serde::Deserialize<'de> for CowStr<'de> {
     }
 }
 
+pub(super) struct SerializeIter<I>(Cell<Option<I>>);
+
+impl<I> SerializeIter<I> {
+    pub fn new(iter: I) -> Self {
+        Self(Cell::new(Some(iter)))
+    }
+}
+
+impl<Iter, Item> serde::Serialize for SerializeIter<Iter>
+where
+    Iter: Iterator<Item = Item>,
+    Item: serde::Serialize,
+{
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let Some(iter) = self.0.take() else {
+            return serializer.serialize_seq(Some(0))?.end();
+        };
+
+        let (lower, upper) = iter.size_hint();
+        let mut serializer = serializer.serialize_seq(Some(upper.unwrap_or(lower)))?;
+
+        for item in iter {
+            serializer.serialize_element(&item)?;
+        }
+
+        serializer.end()
+    }
+}
+
 pub(super) enum StrOrInt<'de> {
     String(String),
     Str(&'de str),
@@ -168,6 +198,27 @@ impl<'de> serde::Deserialize<'de> for StrOrInt<'de> {
 
         deserializer.deserialize_any(Visitor)
     }
+}
+
+#[cfg(test)]
+#[track_caller]
+pub(crate) fn assert_json<T>(data: &T, json: Value)
+where
+    T: Serialize + for<'de> Deserialize<'de> + PartialEq + std::fmt::Debug,
+{
+    // test serialization
+    let serialized = serde_json::to_value(data).unwrap();
+    assert!(
+        serialized == json,
+        "data->JSON serialization failed\nexpected: {json:?}\n     got: {serialized:?}"
+    );
+
+    // test deserialization
+    let deserialized = serde_json::from_value::<T>(json).unwrap();
+    assert!(
+        &deserialized == data,
+        "JSON->data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}"
+    );
 }
 
 /// Used with `#[serde(with = "emojis")]`
