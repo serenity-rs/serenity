@@ -1,5 +1,6 @@
 use serde::de::Error as DeError;
 use serde::ser::{Error as _, Serialize};
+use serde_json::{from_value, json};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -14,7 +15,6 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::json::{self, json};
 use crate::model::prelude::*;
 #[cfg(all(feature = "collector", feature = "utils"))]
 use crate::utils::{CreateQuickModal, QuickModalResponse};
@@ -260,13 +260,13 @@ impl<'de> Deserialize<'de> for ComponentInteractionDataKind {
         #[derive(Deserialize)]
         struct Json {
             component_type: ComponentType,
-            values: Option<json::Value>,
+            values: Option<Value>,
         }
         let json = Json::deserialize(deserializer)?;
 
         macro_rules! parse_values {
             () => {
-                json::from_value(json.values.ok_or_else(|| D::Error::missing_field("values"))?)
+                from_value(json.values.ok_or_else(|| D::Error::missing_field("values"))?)
                     .map_err(D::Error::custom)?
             };
         }
@@ -311,12 +311,12 @@ impl Serialize for ComponentInteractionDataKind {
                 Self::Unknown(x) => *x,
             },
             "values": match self {
-                Self::StringSelect { values } => json::to_value(values).map_err(S::Error::custom)?,
-                Self::UserSelect { values } => json::to_value(values).map_err(S::Error::custom)?,
-                Self::RoleSelect { values } => json::to_value(values).map_err(S::Error::custom)?,
-                Self::MentionableSelect { values } => json::to_value(values).map_err(S::Error::custom)?,
-                Self::ChannelSelect { values } => json::to_value(values).map_err(S::Error::custom)?,
-                Self::Button | Self::Unknown(_) => json::NULL,
+                Self::StringSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::UserSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::RoleSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::MentionableSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::ChannelSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
+                Self::Button | Self::Unknown(_) => Value::Null,
             },
         })
         .serialize(serializer)
