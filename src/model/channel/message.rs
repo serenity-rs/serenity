@@ -208,8 +208,8 @@ impl Message {
     /// A util function for determining whether this message was sent by someone else, or the bot.
     #[cfg(feature = "cache")]
     #[deprecated = "Check Message::author is equal to Cache::current_user"]
-    pub fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
-        self.author.id == cache.as_ref().current_user().id
+    pub fn is_own(&self, cache: &Cache) -> bool {
+        self.author.id == cache.current_user().id
     }
 
     /// Deletes the message.
@@ -274,7 +274,7 @@ impl Message {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reaction(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
@@ -305,7 +305,6 @@ impl Message {
 
         cache_http
             .http()
-            .as_ref()
             .delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into())
             .await
     }
@@ -368,7 +367,7 @@ impl Message {
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
-    pub fn content_safe(&self, cache: impl AsRef<Cache>) -> String {
+    pub fn content_safe(&self, cache: &Cache) -> String {
         let mut result = self.content.to_string();
 
         // First replace all user mentions.
@@ -397,7 +396,7 @@ impl Message {
             for id in &self.mention_roles {
                 let mention = id.mention().to_string();
 
-                if let Some(guild) = cache.as_ref().guild(guild_id) {
+                if let Some(guild) = cache.guild(guild_id) {
                     if let Some(role) = guild.roles.get(id) {
                         result = result.replace(&mention, &format!("@{}", role.name));
                         continue;
@@ -434,7 +433,7 @@ impl Message {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn reaction_users(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
         after: Option<UserId>,
@@ -763,16 +762,13 @@ impl Message {
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this
     /// message.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
+    pub fn await_reaction(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).message_id(self.id)
     }
 
     /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn await_reactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollector {
+    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         self.await_reaction(shard_messenger)
     }
 
@@ -781,7 +777,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_component_interaction(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ComponentInteractionCollector {
         ComponentInteractionCollector::new(shard_messenger).message_id(self.id)
     }
@@ -790,7 +786,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_component_interactions(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ComponentInteractionCollector {
         self.await_component_interaction(shard_messenger)
     }
@@ -800,7 +796,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_modal_interaction(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ModalInteractionCollector {
         ModalInteractionCollector::new(shard_messenger).message_id(self.id)
     }
@@ -809,7 +805,7 @@ impl Message {
     #[cfg(feature = "collector")]
     pub fn await_modal_interactions(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
+        shard_messenger: ShardMessenger,
     ) -> ModalInteractionCollector {
         self.await_modal_interaction(shard_messenger)
     }
@@ -836,12 +832,6 @@ impl Message {
         } else {
             channel.parent_id
         }
-    }
-}
-
-impl AsRef<MessageId> for Message {
-    fn as_ref(&self) -> &MessageId {
-        &self.id
     }
 }
 

@@ -153,10 +153,10 @@ impl Command {
     ///
     /// Returns the same errors as [`Self::create_global_command`].
     pub async fn set_global_commands(
-        http: impl AsRef<Http>,
+        http: &Http,
         commands: &[CreateCommand<'_>],
     ) -> Result<Vec<Command>> {
-        http.as_ref().create_global_commands(&commands).await
+        http.create_global_commands(&commands).await
     }
 
     /// Edit a global command, given its Id.
@@ -177,8 +177,8 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_global_commands(http: impl AsRef<Http>) -> Result<Vec<Command>> {
-        http.as_ref().get_global_commands().await
+    pub async fn get_global_commands(http: &Http) -> Result<Vec<Command>> {
+        http.get_global_commands().await
     }
 
     /// Gets all global commands with localizations.
@@ -186,10 +186,8 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_global_commands_with_localizations(
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<Command>> {
-        http.as_ref().get_global_commands_with_localizations().await
+    pub async fn get_global_commands_with_localizations(http: &Http) -> Result<Vec<Command>> {
+        http.get_global_commands_with_localizations().await
     }
 
     /// Gets a global command by its Id.
@@ -197,11 +195,8 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_global_command(
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<Command> {
-        http.as_ref().get_global_command(command_id).await
+    pub async fn get_global_command(http: &Http, command_id: CommandId) -> Result<Command> {
+        http.get_global_command(command_id).await
     }
 
     /// Deletes a global command by its Id.
@@ -209,11 +204,8 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn delete_global_command(
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<()> {
-        http.as_ref().delete_global_command(command_id).await
+    pub async fn delete_global_command(http: &Http, command_id: CommandId) -> Result<()> {
+        http.delete_global_command(command_id).await
     }
 }
 
