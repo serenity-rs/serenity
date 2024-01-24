@@ -358,8 +358,8 @@ impl PartialGuild {
     }
 
     #[cfg(feature = "cache")]
-    pub fn channel_id_from_name(&self, cache: impl AsRef<Cache>, name: &str) -> Option<ChannelId> {
-        let guild_channels = cache.as_ref().guild_channels(self.id)?;
+    pub fn channel_id_from_name(&self, cache: &Cache, name: &str) -> Option<ChannelId> {
+        let guild_channels = cache.guild_channels(self.id)?;
 
         for (id, channel) in guild_channels.iter() {
             if &*channel.name == name {
@@ -941,17 +941,7 @@ impl PartialGuild {
     #[cfg(feature = "cache")]
     pub fn greater_member_hierarchy(
         &self,
-        cache: impl AsRef<Cache>,
-        lhs_id: UserId,
-        rhs_id: UserId,
-    ) -> Option<UserId> {
-        self._greater_member_hierarchy(&cache, lhs_id, rhs_id)
-    }
-
-    #[cfg(feature = "cache")]
-    fn _greater_member_hierarchy(
-        &self,
-        cache: impl AsRef<Cache>,
+        cache: &Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -968,7 +958,6 @@ impl PartialGuild {
         }
 
         let (lhs, rhs) = {
-            let cache = cache.as_ref();
             let default = (RoleId::new(1), 0);
 
             // Clone is necessary, highest_role_info goes into cache.
@@ -1273,7 +1262,7 @@ impl PartialGuild {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[must_use]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
+    pub fn shard_id(&self, cache: &Cache) -> u16 {
         self.id.shard_id(cache)
     }
 

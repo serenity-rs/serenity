@@ -816,8 +816,8 @@ impl GuildId {
 
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
-    pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
-        cache.as_ref().guild(self)
+    pub fn to_guild_cached(self, cache: &Cache) -> Option<GuildRef<'_>> {
+        cache.guild(self)
     }
 
     /// Requests [`PartialGuild`] over REST API.
@@ -1056,8 +1056,8 @@ impl GuildId {
     /// Returns the name of whatever guild this id holds.
     #[cfg(feature = "cache")]
     #[must_use]
-    pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
-        self.to_guild_cached(cache.as_ref()).map(|g| g.name.to_string())
+    pub fn name(self, cache: &Cache) -> Option<String> {
+        self.to_guild_cached(cache).map(|g| g.name.to_string())
     }
 
     /// Disconnects a member from a voice channel in the guild.
@@ -1234,8 +1234,8 @@ impl GuildId {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[must_use]
-    pub fn shard_id(self, cache: impl AsRef<Cache>) -> u16 {
-        crate::utils::shard_id(self, cache.as_ref().shard_count().get())
+    pub fn shard_id(self, cache: &Cache) -> u16 {
+        crate::utils::shard_id(self, cache.shard_count().get())
     }
 
     /// Returns the Id of the shard associated with the guild.

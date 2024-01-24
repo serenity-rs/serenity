@@ -208,8 +208,8 @@ impl Message {
 
     /// A util function for determining whether this message was sent by someone else, or the bot.
     #[cfg(feature = "cache")]
-    pub fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
-        self.author.id == cache.as_ref().current_user().id
+    pub fn is_own(&self, cache: &Cache) -> bool {
+        self.author.id == cache.current_user().id
     }
 
     /// Deletes the message.
@@ -367,7 +367,7 @@ impl Message {
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
-    pub fn content_safe(&self, cache: impl AsRef<Cache>) -> String {
+    pub fn content_safe(&self, cache: &Cache) -> String {
         let mut result = self.content.to_string();
 
         // First replace all user mentions.
@@ -396,7 +396,7 @@ impl Message {
             for id in &self.mention_roles {
                 let mention = id.mention().to_string();
 
-                if let Some(guild) = cache.as_ref().guild(guild_id) {
+                if let Some(guild) = cache.guild(guild_id) {
                     if let Some(role) = guild.roles.get(id) {
                         result = result.replace(&mention, &format!("@{}", role.name));
                         continue;

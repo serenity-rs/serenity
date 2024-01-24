@@ -148,8 +148,8 @@ impl Member {
 
     /// Determines the member's colour.
     #[cfg(feature = "cache")]
-    pub fn colour(&self, cache: impl AsRef<Cache>) -> Option<Colour> {
-        let guild = cache.as_ref().guild(self.guild_id)?;
+    pub fn colour(&self, cache: &Cache) -> Option<Colour> {
+        let guild = cache.guild(self.guild_id)?;
 
         let mut roles = self
             .roles
@@ -167,8 +167,8 @@ impl Member {
     /// Returns the "default channel" of the guild for the member. (This returns the first channel
     /// that can be read by the member, if there isn't one returns [`None`])
     #[cfg(feature = "cache")]
-    pub fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
-        let guild = self.guild_id.to_guild_cached(&cache)?;
+    pub fn default_channel(&self, cache: &Cache) -> Option<GuildChannel> {
+        let guild = self.guild_id.to_guild_cached(cache)?;
 
         let member = guild.members.get(&self.user.id)?;
 
@@ -275,8 +275,8 @@ impl Member {
     /// The "highest role in hierarchy" is defined as the role with the highest position. If two or
     /// more roles have the same highest position, then the role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
-    pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, i16)> {
-        let guild = cache.as_ref().guild(self.guild_id)?;
+    pub fn highest_role_info(&self, cache: &Cache) -> Option<(RoleId, i16)> {
+        let guild = cache.guild(self.guild_id)?;
 
         let mut highest = None;
 
@@ -428,8 +428,8 @@ impl Member {
     /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
     /// found.
     #[cfg(feature = "cache")]
-    pub fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
-        let guild = cache.as_ref().guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
+    pub fn permissions(&self, cache: &Cache) -> Result<Permissions> {
+        let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
         Ok(guild.member_permissions(self))
     }
 
@@ -471,10 +471,9 @@ impl Member {
     ///
     /// If role data can not be found for the member, then [`None`] is returned.
     #[cfg(feature = "cache")]
-    pub fn roles(&self, cache: impl AsRef<Cache>) -> Option<Vec<Role>> {
+    pub fn roles(&self, cache: &Cache) -> Option<Vec<Role>> {
         Some(
             cache
-                .as_ref()
                 .guild(self.guild_id)?
                 .roles
                 .iter()

@@ -235,8 +235,8 @@ impl InviteGuild {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[must_use]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
-        self.id.shard_id(&cache)
+    pub fn shard_id(&self, cache: &Cache) -> u16 {
+        self.id.shard_id(cache)
     }
 
     /// Returns the Id of the shard associated with the guild.

@@ -364,7 +364,7 @@ impl Guild {
 
     #[cfg(feature = "cache")]
     fn check_hierarchy(&self, cache: &Cache, other_user: UserId) -> Result<()> {
-        let current_id = cache.as_ref().current_user().id;
+        let current_id = cache.current_user().id;
 
         if let Some(higher) = self.greater_member_hierarchy(cache, other_user, current_id) {
             if higher != current_id {
@@ -422,8 +422,8 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    pub fn channel_id_from_name(&self, cache: impl AsRef<Cache>, name: &str) -> Option<ChannelId> {
-        let guild_channels = cache.as_ref().guild_channels(self.id)?;
+    pub fn channel_id_from_name(&self, cache: &Cache, name: &str) -> Option<ChannelId> {
+        let guild_channels = cache.guild_channels(self.id)?;
 
         for (id, channel) in guild_channels.iter() {
             if &*channel.name == name {
@@ -1281,17 +1281,17 @@ impl Guild {
     #[cfg(feature = "cache")]
     pub fn greater_member_hierarchy(
         &self,
-        cache: impl AsRef<Cache>,
+        cache: &Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(&cache, lhs_id, rhs_id)
+        self._greater_member_hierarchy(cache, lhs_id, rhs_id)
     }
 
     #[cfg(feature = "cache")]
     fn _greater_member_hierarchy(
         &self,
-        cache: impl AsRef<Cache>,
+        cache: &Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -1308,9 +1308,9 @@ impl Guild {
         }
 
         let lhs =
-            self.members.get(&lhs_id)?.highest_role_info(&cache).unwrap_or((RoleId::new(1), 0));
+            self.members.get(&lhs_id)?.highest_role_info(cache).unwrap_or((RoleId::new(1), 0));
         let rhs =
-            self.members.get(&rhs_id)?.highest_role_info(&cache).unwrap_or((RoleId::new(1), 0));
+            self.members.get(&rhs_id)?.highest_role_info(cache).unwrap_or((RoleId::new(1), 0));
 
         // If LHS and RHS both have no top position or have the same role ID, then no one wins.
         if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
@@ -2031,8 +2031,8 @@ impl Guild {
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
-        self.id.shard_id(&cache)
+    pub fn shard_id(&self, cache: &Cache) -> u16 {
+        self.id.shard_id(cache)
     }
 
     /// Returns the Id of the shard associated with the guild.

@@ -349,7 +349,7 @@ impl ChannelId {
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        cache.as_ref().channel(self)
+        cache.channel(self)
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via

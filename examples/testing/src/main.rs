@@ -209,7 +209,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         channel.edit(ctx, EditChannel::new().category(None)).await?;
         channel.edit(ctx, EditChannel::new().category(Some(parent_id))).await?;
     } else if msg.content == "channelperms" {
-        let guild = guild_id.to_guild_cached(ctx).unwrap().clone();
+        let guild = guild_id.to_guild_cached(&ctx.cache).unwrap().clone();
         let perms = guild.user_permissions_in(
             &channel_id.to_channel(ctx).await?.guild().unwrap(),
             &*guild.member(ctx, msg.author.id).await?,

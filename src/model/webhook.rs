@@ -118,8 +118,8 @@ pub struct WebhookGuild {
 impl WebhookGuild {
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
-    pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
-        cache.as_ref().guild(self.id)
+    pub fn to_guild_cached<'a>(&self, cache: &'a Cache) -> Option<GuildRef<'a>> {
+        cache.guild(self.id)
     }
 
     /// Requests [`PartialGuild`] over REST API.
@@ -171,7 +171,7 @@ impl WebhookChannel {
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        cache.as_ref().channel(self.id)
+        cache.channel(self.id)
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via

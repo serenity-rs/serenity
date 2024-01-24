@@ -624,8 +624,8 @@ impl GuildChannel {
 
     /// Attempts to find this channel's guild in the Cache.
     #[cfg(feature = "cache")]
-    pub fn guild<'a>(&self, cache: &'a impl AsRef<Cache>) -> Option<cache::GuildRef<'a>> {
-        cache.as_ref().guild(self.guild_id)
+    pub fn guild<'a>(&self, cache: &'a Cache) -> Option<cache::GuildRef<'a>> {
+        cache.guild(self.guild_id)
     }
 
     /// Gets all of the channel's invites.
@@ -728,12 +728,8 @@ impl GuildChannel {
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "cache")]
-    pub fn permissions_for_user(
-        &self,
-        cache: impl AsRef<Cache>,
-        user_id: UserId,
-    ) -> Result<Permissions> {
-        let guild = self.guild(&cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
+    pub fn permissions_for_user(&self, cache: &Cache, user_id: UserId) -> Result<Permissions> {
+        let guild = self.guild(cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
         let member = guild.members.get(&user_id).ok_or(Error::Model(ModelError::MemberNotFound))?;
         Ok(guild.user_permissions_in(self, member))
     }
@@ -930,8 +926,7 @@ impl GuildChannel {
     /// Other [`ChannelType`]s lack the concept of [`Member`]s and will return:
     /// [`ModelError::InvalidChannelType`].
     #[cfg(feature = "cache")]
-    pub fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
-        let cache = cache.as_ref();
+    pub fn members(&self, cache: &Cache) -> Result<Vec<Member>> {
         let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
 
         match self.kind {

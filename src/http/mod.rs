@@ -121,13 +121,6 @@ impl CacheHttp for Http {
     }
 }
 
-#[cfg(feature = "cache")]
-impl AsRef<Cache> for (&Arc<Cache>, &Http) {
-    fn as_ref(&self) -> &Cache {
-        self.0
-    }
-}
-
 /// An method used for ratelimiting special routes.
 ///
 /// This is needed because [`reqwest`]'s [`Method`] enum does not derive Copy.
