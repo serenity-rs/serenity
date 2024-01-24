@@ -423,7 +423,10 @@
 <a href="#421" id="421">421</a>
 <a href="#422" id="422">422</a>
 <a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="kw">use </span>serde_json::json;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::Builder;
@@ -437,7 +440,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::json::{<span class="self">self</span>, json};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
@@ -508,14 +510,14 @@
                 <span class="self">Self</span>::PremiumRequired =&gt; <span class="number">10</span>,
             },
             <span class="string">"data"</span>: <span class="kw">match </span><span class="self">self </span>{
-                <span class="self">Self</span>::Pong =&gt; json::NULL,
-                <span class="self">Self</span>::Message(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
-                <span class="self">Self</span>::Defer(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
-                <span class="self">Self</span>::Acknowledge =&gt; json::NULL,
-                <span class="self">Self</span>::UpdateMessage(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
-                <span class="self">Self</span>::Autocomplete(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
-                <span class="self">Self</span>::Modal(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
-                <span class="self">Self</span>::PremiumRequired =&gt; json::NULL,
+                <span class="self">Self</span>::Pong =&gt; Value::Null,
+                <span class="self">Self</span>::Message(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Defer(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Acknowledge =&gt; Value::Null,
+                <span class="self">Self</span>::UpdateMessage(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Autocomplete(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Modal(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::PremiumRequired =&gt; Value::Null,
             }
         })
         .serialize(serializer)

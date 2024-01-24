@@ -202,6 +202,8 @@
 <a href="#200" id="200">200</a>
 <a href="#201" id="201">201</a>
 <a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of macros for easily working with internals.
 
 </span><span class="attr">#[cfg(any(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]
@@ -380,7 +382,9 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
+    <span class="kw">use </span>serde_json::json;
+
+    <span class="kw">use </span><span class="kw">crate</span>::model::assert_json;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>enum_number() {

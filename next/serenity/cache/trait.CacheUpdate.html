@@ -12,7 +12,7 @@
 
 <div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::collections::hash_map::Entry;
 
-<span class="kw">use </span>serenity::json::json;
+<span class="kw">use </span>serde_json::json;
 <span class="kw">use </span>serenity::cache::{Cache, CacheUpdate};
 <span class="kw">use </span>serenity::model::id::UserId;
 <span class="kw">use </span>serenity::model::user::User;
@@ -55,7 +55,7 @@
                 </span><span class="prelude-val">Some</span>(old_user)
             },
             Entry::Vacant(entry) =&gt; {
-                <span class="comment">// We can convert a [`json::Value`] to a User for test
+                <span class="comment">// We can convert a [`Value`] to a User for test
                 // purposes.
                 </span><span class="kw">let </span>user = from_value::&lt;User&gt;(<span class="macro">json!</span>({
                     <span class="string">"id"</span>: <span class="self">self</span>.user_id,

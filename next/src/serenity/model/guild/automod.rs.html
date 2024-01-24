@@ -595,6 +595,8 @@
 <a href="#593" id="593">593</a>
 <a href="#594" id="594">594</a>
 <a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Auto moderation types
 //!
 //! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
@@ -1108,8 +1110,10 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>std::time::Duration;
 
+    <span class="kw">use </span>serde_json::json;
+
     <span class="kw">use super</span>::{Action, <span class="kw-2">*</span>};
-    <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
+    <span class="kw">use </span><span class="kw">crate</span>::model::utils::assert_json;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>rule_trigger_serde() {

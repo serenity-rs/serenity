@@ -846,6 +846,8 @@
 <a href="#844" id="844">844</a>
 <a href="#845" id="845">845</a>
 <a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly to a role or as a
 //! channel's permission overrides.
 //!
@@ -1683,8 +1685,10 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>serde_json::json;
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
+    <span class="kw">use </span><span class="kw">crate</span>::model::utils::assert_json;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>permissions_serde() {

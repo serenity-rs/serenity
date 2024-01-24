@@ -327,11 +327,13 @@
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
 <a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
+<span class="kw">use </span>serde_json::from_value;
 
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::json::from_value;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::utils::{default_true, deserialize_val};
 
@@ -625,8 +627,10 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>serde_json::json;
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
+    <span class="kw">use </span><span class="kw">crate</span>::model::utils::assert_json;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_button_serde() {

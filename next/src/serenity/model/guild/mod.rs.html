@@ -2598,8 +2598,6 @@
 <a href="#2596" id="2596">2596</a>
 <a href="#2597" id="2597">2597</a>
 <a href="#2598" id="2598">2598</a>
-<a href="#2599" id="2599">2599</a>
-<a href="#2600" id="2600">2600</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2662,8 +2660,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, UserPagination};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -3200,7 +3196,7 @@
     /// [`Shard`]: crate::gateway::Shard
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     </span><span class="kw">pub async fn </span>create(http: <span class="kw-2">&amp;</span>Http, name: <span class="kw-2">&amp;</span>str, icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="kw">let </span>map = <span class="macro">json!</span>({
+        <span class="kw">let </span>map = <span class="macro">serde_json::json!</span>({
             <span class="string">"icon"</span>: icon,
             <span class="string">"name"</span>: name,
         });

@@ -853,6 +853,7 @@
 <a href="#851" id="851">851</a>
 <a href="#852" id="852">852</a>
 <a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -862,6 +863,8 @@
 <span class="kw">use </span>std::ops::{Deref, DerefMut};
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+</span><span class="kw">use </span>serde_json::json;
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -873,8 +876,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::json::json;
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mentionable;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::utils::avatar_url;
@@ -1625,9 +1626,10 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_discriminator_serde() {
         <span class="kw">use </span>serde::{Deserialize, Serialize};
+        <span class="kw">use </span>serde_json::json;
 
         <span class="kw">use </span><span class="kw">super</span>::discriminator;
-        <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
+        <span class="kw">use </span><span class="kw">crate</span>::model::utils::assert_json;
 
         <span class="attr">#[derive(Debug, PartialEq, Deserialize, Serialize)]
         </span><span class="kw">struct </span>User {

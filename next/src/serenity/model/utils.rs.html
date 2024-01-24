@@ -380,7 +380,59 @@
 <a href="#378" id="378">378</a>
 <a href="#379" id="379">379</a>
 <a href="#380" id="380">380</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::cell::Cell;
+<span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::hash::Hash;
 <span class="kw">use </span>std::marker::PhantomData;
@@ -452,6 +504,35 @@
     remove_from_map_opt(map, key)<span class="question-mark">?</span>.ok_or_else(|| serde::de::Error::missing_field(key))
 }
 
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>SerializeIter&lt;I&gt;(Cell&lt;<span class="prelude-ty">Option</span>&lt;I&gt;&gt;);
+
+<span class="kw">impl</span>&lt;I&gt; SerializeIter&lt;I&gt; {
+    <span class="kw">pub fn </span>new(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(Cell::new(<span class="prelude-val">Some</span>(iter)))
+    }
+}
+
+<span class="kw">impl</span>&lt;Iter, Item&gt; serde::Serialize <span class="kw">for </span>SerializeIter&lt;Iter&gt;
+<span class="kw">where
+    </span>Iter: Iterator&lt;Item = Item&gt;,
+    Item: serde::Serialize,
+{
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(iter) = <span class="self">self</span>.<span class="number">0</span>.take() <span class="kw">else </span>{
+            <span class="kw">return </span>serializer.serialize_seq(<span class="prelude-val">Some</span>(<span class="number">0</span>))<span class="question-mark">?</span>.end();
+        };
+
+        <span class="kw">let </span>(lower, upper) = iter.size_hint();
+        <span class="kw">let </span><span class="kw-2">mut </span>serializer = serializer.serialize_seq(<span class="prelude-val">Some</span>(upper.unwrap_or(lower)))<span class="question-mark">?</span>;
+
+        <span class="kw">for </span>item <span class="kw">in </span>iter {
+            serializer.serialize_element(<span class="kw-2">&amp;</span>item)<span class="question-mark">?</span>;
+        }
+
+        serializer.end()
+    }
+}
+
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>StrOrInt&lt;<span class="lifetime">'de</span>&gt; {
     String(String),
     Str(<span class="kw-2">&amp;</span><span class="lifetime">'de </span>str),
@@ -512,6 +593,27 @@
 
         deserializer.deserialize_any(Visitor)
     }
+}
+
+<span class="attr">#[cfg(test)]
+#[track_caller]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>assert_json&lt;T&gt;(data: <span class="kw-2">&amp;</span>T, json: Value)
+<span class="kw">where
+    </span>T: Serialize + <span class="kw">for</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; + PartialEq + std::fmt::Debug,
+{
+    <span class="comment">// test serialization
+    </span><span class="kw">let </span>serialized = serde_json::to_value(data).unwrap();
+    <span class="macro">assert!</span>(
+        serialized == json,
+        <span class="string">"data-&gt;JSON serialization failed\nexpected: {json:?}\n     got: {serialized:?}"
+    </span>);
+
+    <span class="comment">// test deserialization
+    </span><span class="kw">let </span>deserialized = serde_json::from_value::&lt;T&gt;(json).unwrap();
+    <span class="macro">assert!</span>(
+        <span class="kw-2">&amp;</span>deserialized == data,
+        <span class="string">"JSON-&gt;data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}"
+    </span>);
 }
 
 <span class="doccomment">/// Used with `#[serde(with = "emojis")]`

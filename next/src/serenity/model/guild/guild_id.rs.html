@@ -1704,12 +1704,12 @@
 <a href="#1702" id="1702">1702</a>
 <a href="#1703" id="1703">1703</a>
 <a href="#1704" id="1704">1704</a>
-<a href="#1705" id="1705">1705</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>futures::stream::Stream;
 <span class="kw">use </span>nonmax::NonMaxU16;
+<span class="kw">use </span>serde_json::json;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
@@ -1740,12 +1740,10 @@
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::json::json;
-<span class="kw">use </span><span class="kw">crate</span>::json::SerializeIter;
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::SerializeIter;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]

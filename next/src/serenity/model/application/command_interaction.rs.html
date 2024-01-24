@@ -879,7 +879,6 @@
 <a href="#877" id="877">877</a>
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
-<a href="#880" id="880">880</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
@@ -899,7 +898,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::json::{<span class="self">self</span>, JsonError};
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandOptionType, CommandType};
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::{Attachment, Message, PartialChannel};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::{Member, PartialMember, Role};
@@ -1411,7 +1409,7 @@
     <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
     </span>kind: CommandOptionType,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-    </span>value: <span class="prelude-ty">Option</span>&lt;json::Value&gt;,
+    </span>value: <span class="prelude-ty">Option</span>&lt;Value&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>options: <span class="prelude-ty">Option</span>&lt;Vec&lt;RawCommandDataOption&gt;&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -1421,8 +1419,8 @@
 <span class="kw">fn </span>option_from_raw(raw: RawCommandDataOption) -&gt; <span class="prelude-ty">Result</span>&lt;CommandDataOption&gt; {
     <span class="macro">macro_rules! </span>value {
         () =&gt; {{
-            json::from_value(
-                raw.value.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"value"</span>))<span class="question-mark">?</span>,
+            serde_json::from_value(
+                raw.value.ok_or_else(|| serde_json::Error::missing_field(<span class="string">"value"</span>))<span class="question-mark">?</span>,
             )<span class="question-mark">?
         </span>}};
     }
@@ -1437,14 +1435,12 @@
         CommandOptionType::Number =&gt; CommandDataOptionValue::Number(<span class="macro">value!</span>()),
         CommandOptionType::String =&gt; CommandDataOptionValue::String(<span class="macro">value!</span>()),
         CommandOptionType::SubCommand =&gt; {
-            <span class="kw">let </span>options =
-                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>options = raw.options.ok_or_else(|| serde_json::Error::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
             <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
             CommandDataOptionValue::SubCommand(FixedArray::from_vec_trunc(options))
         },
         CommandOptionType::SubCommandGroup =&gt; {
-            <span class="kw">let </span>options =
-                raw.options.ok_or_else::&lt;JsonError, <span class="kw">_</span>&gt;(|| DeError::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>options = raw.options.ok_or_else(|| serde_json::Error::missing_field(<span class="string">"options"</span>))<span class="question-mark">?</span>;
             <span class="kw">let </span>options = options.into_iter().map(option_from_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
             CommandDataOptionValue::SubCommandGroup(FixedArray::from_vec_trunc(options))
         },
@@ -1476,21 +1472,21 @@
             kind: <span class="kw">_</span>,
             value,
         } =&gt; {
-            raw.value = <span class="prelude-val">Some</span>(json::to_value(value)<span class="question-mark">?</span>);
+            raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(value)<span class="question-mark">?</span>);
             raw.focused = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
         },
-        CommandDataOptionValue::Boolean(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Integer(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Number(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::String(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Boolean(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Integer(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Number(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::String(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
         CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) =&gt; {
             raw.options = <span class="prelude-val">Some</span>(o.iter().map(option_to_raw).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>);
         },
-        CommandDataOptionValue::Attachment(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Channel(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Mentionable(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::Role(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
-        CommandDataOptionValue::User(v) =&gt; raw.value = <span class="prelude-val">Some</span>(json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Attachment(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Channel(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Mentionable(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::Role(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
+        CommandDataOptionValue::User(v) =&gt; raw.value = <span class="prelude-val">Some</span>(serde_json::to_value(v)<span class="question-mark">?</span>),
         CommandDataOptionValue::Unknown(<span class="kw">_</span>) =&gt; {},
     }
 
@@ -1679,8 +1675,10 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>serde_json::json;
+
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span><span class="kw">crate</span>::json::{assert_json, json};
+    <span class="kw">use </span><span class="kw">crate</span>::model::utils::assert_json;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>nested_options() {

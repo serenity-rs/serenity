@@ -1047,7 +1047,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>action_serde() {
-        <span class="kw">use </span><span class="kw">crate</span>::json::{<span class="self">self</span>, json};
+        <span class="kw">use </span>serde_json::{from_value, json};
 
         <span class="attr">#[derive(Debug, Deserialize, Serialize)]
         </span><span class="kw">struct </span>T {
@@ -1058,7 +1058,7 @@
             <span class="string">"action"</span>: <span class="number">234</span>,
         });
 
-        <span class="kw">let </span>value = json::from_value::&lt;T&gt;(value).unwrap();
+        <span class="kw">let </span>value = from_value::&lt;T&gt;(value).unwrap();
         <span class="macro">assert_eq!</span>(value.action.num(), <span class="number">234</span>);
 
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(value.action, Action::Unknown(<span class="number">234</span>)));

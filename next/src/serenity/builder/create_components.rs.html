@@ -446,8 +446,8 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>serde_json::json;
 
-<span class="kw">use </span><span class="kw">crate</span>::json::{<span class="self">self</span>, json};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating a components action row in a message.
@@ -469,9 +469,9 @@
         <span class="macro">json!</span>({
             <span class="string">"type"</span>: <span class="number">1</span>,
             <span class="string">"components"</span>: <span class="kw">match </span><span class="self">self </span>{
-                <span class="self">Self</span>::Buttons(x) =&gt; json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
-                <span class="self">Self</span>::SelectMenu(x) =&gt; json::to_value(<span class="macro">vec!</span>[x]).map_err(S::Error::custom)<span class="question-mark">?</span>,
-                <span class="self">Self</span>::InputText(x) =&gt; json::to_value(<span class="macro">vec!</span>[x]).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::Buttons(x) =&gt; serde_json::to_value(x).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::SelectMenu(x) =&gt; serde_json::to_value(<span class="macro">vec!</span>[x]).map_err(S::Error::custom)<span class="question-mark">?</span>,
+                <span class="self">Self</span>::InputText(x) =&gt; serde_json::to_value(<span class="macro">vec!</span>[x]).map_err(S::Error::custom)<span class="question-mark">?</span>,
             }
         })
         .serialize(serializer)

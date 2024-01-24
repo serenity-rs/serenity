@@ -174,8 +174,6 @@
 <a href="#172" id="172">172</a>
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.
 //!
 //! View the [examples] on how to make and structure a bot.
@@ -261,7 +259,6 @@
 </span><span class="kw">mod </span>internal;
 
 <span class="kw">pub mod </span>constants;
-<span class="kw">pub mod </span>json;
 <span class="kw">pub mod </span>model;
 <span class="kw">pub mod </span>prelude;
 
@@ -303,7 +300,6 @@
 /// Useful, because you don't have to remember the full paths of serenity items.
 ///
 /// Not exported:
-/// - [`crate::json`]: it's a general-purpose JSON wrapper, not intrinsic to serenity
 /// - [`crate::framework::standard`]: has many standard_framework-specific items that may collide
 /// with items from the rest of serenity
 </span><span class="kw">pub mod </span>all {
