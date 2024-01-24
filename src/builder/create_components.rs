@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 
 use serde::Serialize;
+use serde_json::json;
 
-use crate::json::{self, json};
 use crate::model::prelude::*;
 
 /// A builder for creating a components action row in a message.
@@ -24,9 +24,9 @@ impl<'a> serde::Serialize for CreateActionRow<'a> {
         json!({
             "type": 1,
             "components": match self {
-                Self::Buttons(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::SelectMenu(x) => json::to_value(vec![x]).map_err(S::Error::custom)?,
-                Self::InputText(x) => json::to_value(vec![x]).map_err(S::Error::custom)?,
+                Self::Buttons(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
+                Self::SelectMenu(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
+                Self::InputText(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
             }
         })
         .serialize(serializer)

@@ -156,6 +156,27 @@ impl<'de> serde::Deserialize<'de> for StrOrInt<'de> {
     }
 }
 
+#[cfg(test)]
+#[track_caller]
+pub(crate) fn assert_json<T>(data: &T, json: Value)
+where
+    T: Serialize + for<'de> Deserialize<'de> + PartialEq + std::fmt::Debug,
+{
+    // test serialization
+    let serialized = serde_json::to_value(data).unwrap();
+    assert!(
+        serialized == json,
+        "data->JSON serialization failed\nexpected: {json:?}\n     got: {serialized:?}"
+    );
+
+    // test deserialization
+    let deserialized = serde_json::from_value::<T>(json).unwrap();
+    assert!(
+        &deserialized == data,
+        "JSON->data deserialization failed\nexpected: {data:?}\n     got: {deserialized:?}"
+    );
+}
+
 /// Used with `#[serde(with = "emojis")]`
 pub mod emojis {
     use std::collections::HashMap;

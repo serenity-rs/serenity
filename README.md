@@ -159,7 +159,6 @@ the HTTP functions.
 instead of `rustls_backend`.
 - **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable"` is set.
 - **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
-- **simd_json**: Enables SIMD accelerated JSON parsing and rendering for API calls, if supported on the target CPU architecture.
 - **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
 - **chrono**: Uses the `chrono` crate to represent timestamps. If disabled, the `time` crate is used instead.
 - **interactions_endpoint**: Enables tools related to Discord's Interactions Endpoint URL feature

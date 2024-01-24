@@ -1,11 +1,11 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
+use serde_json::from_value;
 
 #[cfg(feature = "unstable_discord_api")]
 use super::InstallationContext;
 use super::{CommandInteraction, ComponentInteraction, ModalInteraction, PingInteraction};
 use crate::internal::prelude::*;
-use crate::json::from_value;
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, InteractionId};
 #[cfg(feature = "unstable_discord_api")]
