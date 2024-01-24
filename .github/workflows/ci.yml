@@ -26,7 +26,6 @@ jobs:
           - no cache
           - no gateway
           - unstable Discord API features
-          - simd-json
 
         include:
           - name: beta
@@ -39,8 +38,6 @@ jobs:
             features: " "
           - name: no cache
             features: builder client framework gateway model http standard_framework utils rustls_backend
-          - name: simd-json
-            features: default_no_backend rustls_backend simd_json
           - name: no gateway
             features: model http rustls_backend
           - name: chrono

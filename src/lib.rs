@@ -83,7 +83,6 @@ extern crate serde;
 mod internal;
 
 pub mod constants;
-pub mod json;
 pub mod model;
 pub mod prelude;
 
@@ -125,7 +124,6 @@ pub use crate::error::{Error, Result};
 /// Useful, because you don't have to remember the full paths of serenity items.
 ///
 /// Not exported:
-/// - [`crate::json`]: it's a general-purpose JSON wrapper, not intrinsic to serenity
 /// - [`crate::framework::standard`]: has many standard_framework-specific items that may collide
 ///   with items from the rest of serenity
 pub mod all {

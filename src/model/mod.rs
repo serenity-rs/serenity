@@ -19,6 +19,8 @@
 
 #[macro_use]
 mod utils;
+#[cfg(test)]
+pub(crate) use utils::assert_json;
 
 pub mod application;
 pub mod channel;
