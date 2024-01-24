@@ -1,7 +1,6 @@
 use nonmax::NonMaxU16;
 
 use crate::internal::prelude::*;
-use crate::json::Value;
 use crate::model::channel::PermissionOverwrite;
 use crate::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
 use crate::model::guild::{
@@ -46,11 +45,8 @@ macro_rules! generate_change {
         $( #[doc = $doc:literal] )?
         $key:literal => $name:ident ($type:ty),
     )* ) => {
-        #[cfg_attr(not(feature = "simd_json"), allow(clippy::derive_partial_eq_without_eq))]
         #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-        #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
-        // serde_json's Value impls Eq, simd-json's Value doesn't
-        #[cfg_attr(not(feature = "simd_json"), derive(Eq))]
+        #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
         #[non_exhaustive]
         #[serde(tag = "key")]
         #[serde(rename_all = "snake_case")]
@@ -274,8 +270,10 @@ generate_change! {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn afk_channel_id_variant() {
