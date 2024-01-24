@@ -121,11 +121,6 @@ pub mod optional_string {
             Ok(None)
         }
 
-        /// Called by the `simd_json` crate
-        fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
-            Ok(None)
-        }
-
         fn visit_u64<E: Error>(self, val: u64) -> Result<Self::Value, E> {
             T::try_from_u64(val).map(Some).map_err(Error::custom)
         }
@@ -138,8 +133,10 @@ pub mod optional_string {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::optional_string;
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn optional_string_module() {

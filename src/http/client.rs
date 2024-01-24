@@ -13,6 +13,7 @@ use reqwest::Url;
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
+use serde_json::{from_value, json, to_string, to_vec};
 use tracing::{debug, warn};
 
 use super::multipart::{Multipart, MultipartUpload};
@@ -31,7 +32,6 @@ use super::{
 use crate::builder::{CreateAllowedMentions, CreateAttachment};
 use crate::constants;
 use crate::internal::prelude::*;
-use crate::json::*;
 use crate::model::prelude::*;
 
 /// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API
@@ -262,7 +262,7 @@ impl Http {
         if response.status() == 204 {
             Ok(None)
         } else {
-            Ok(Some(decode_resp(response).await?))
+            Ok(Some(response.json().await?))
         }
     }
 
@@ -652,7 +652,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::json;
+    /// use serde_json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -1003,7 +1003,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::json;
+    /// use serde_json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2315,7 +2315,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::json;
+    /// use serde_json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2368,7 +2368,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::json;
+    /// use serde_json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2442,7 +2442,7 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::builder::CreateAttachment;
     /// use serenity::http::Http;
-    /// use serenity::json::json;
+    /// use serde_json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2488,7 +2488,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::json;
+    /// use serde_json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2558,7 +2558,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
-    /// use serenity::json::json;
+    /// use serde_json::json;
     /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -2650,11 +2650,7 @@ impl Http {
 
         let response = self.request(request).await?;
 
-        Ok(if response.status() == StatusCode::NO_CONTENT {
-            None
-        } else {
-            decode_resp(response).await?
-        })
+        Ok(if response.status() == StatusCode::NO_CONTENT { None } else { response.json().await? })
     }
 
     // Gets a webhook's message by Id
@@ -4963,7 +4959,8 @@ impl Http {
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
-        decode_resp(response).await
+        let response_de = response.json().await?;
+        Ok(response_de)
     }
 
     /// Performs a request, ratelimiting it if necessary.

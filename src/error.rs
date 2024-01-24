@@ -14,7 +14,6 @@ use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
 use crate::internal::prelude::*;
-use crate::json::JsonError;
 use crate::model::ModelError;
 
 /// The common result type between most library functions.
@@ -33,9 +32,8 @@ pub type Result<T, E = Error> = StdResult<T, E>;
 pub enum Error {
     /// An [`std::io`] error.
     Io(IoError),
-    #[cfg_attr(not(feature = "simd_json"), doc = "An error from the [`serde_json`] crate.")]
-    #[cfg_attr(feature = "simd_json", doc = "An error from the [`simd_json`] crate.")]
-    Json(JsonError),
+    /// An error from the [`serde_json`] crate.
+    Json(serde_json::Error),
     /// An error from the [`model`] module.
     ///
     /// [`model`]: crate::model
@@ -73,8 +71,8 @@ impl From<IoError> for Error {
     }
 }
 
-impl From<JsonError> for Error {
-    fn from(e: JsonError) -> Error {
+impl From<serde_json::Error> for Error {
+    fn from(e: serde_json::Error) -> Error {
         Error::Json(e)
     }
 }

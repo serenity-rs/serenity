@@ -7,6 +7,8 @@ use std::num::NonZeroU16;
 use std::ops::{Deref, DerefMut};
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "model")]
+use serde_json::json;
 
 use super::prelude::*;
 #[cfg(feature = "model")]
@@ -18,8 +20,7 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json::json;
+use crate::model::mention::Mentionable;
 #[cfg(feature = "model")]
 use crate::model::utils::avatar_url;
 
@@ -827,9 +828,10 @@ mod test {
     #[test]
     fn test_discriminator_serde() {
         use serde::{Deserialize, Serialize};
+        use serde_json::json;
 
         use super::discriminator;
-        use crate::json::{assert_json, json};
+        use crate::model::utils::assert_json;
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct User {
