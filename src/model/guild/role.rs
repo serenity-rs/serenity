@@ -232,18 +232,15 @@ mod bool_as_option_unit {
         fn visit_none<E: Error>(self) -> Result<Self::Value, E> {
             Ok(true)
         }
-
-        /// Called by the `simd_json` crate
-        fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
-            Ok(true)
-        }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::RoleTags;
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn premium_subscriber_role_serde() {
