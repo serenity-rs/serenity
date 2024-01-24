@@ -4708,9 +4708,3 @@ fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
     builder.use_native_tls()
 }
-
-impl AsRef<Http> for Http {
-    fn as_ref(&self) -> &Http {
-        self
-    }
-}
