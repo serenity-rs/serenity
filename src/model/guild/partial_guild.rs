@@ -197,7 +197,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the guild is unavailable.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rules(self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
+    pub async fn automod_rules(self, http: &Http) -> Result<Vec<Rule>> {
         self.id.automod_rules(http).await
     }
 
@@ -210,7 +210,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rule(&self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<Rule> {
+    pub async fn automod_rule(&self, http: &Http, rule_id: RuleId) -> Result<Rule> {
         self.id.automod_rule(http, rule_id).await
     }
 
@@ -263,7 +263,7 @@ impl PartialGuild {
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn delete_automod_rule(&self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<()> {
+    pub async fn delete_automod_rule(&self, http: &Http, rule_id: RuleId) -> Result<()> {
         self.id.delete_automod_rule(http, rule_id).await
     }
 
@@ -289,7 +289,7 @@ impl PartialGuild {
     /// Also may return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(&self, http: impl AsRef<Http>, user: UserId, dmd: u8) -> Result<()> {
+    pub async fn ban(&self, http: &Http, user: UserId, dmd: u8) -> Result<()> {
         self.ban_with_reason(http, user, dmd, "").await
     }
 
@@ -302,7 +302,7 @@ impl PartialGuild {
     /// the reason is too long.
     pub async fn ban_with_reason(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         user: UserId,
         dmd: u8,
         reason: &str,
@@ -322,7 +322,7 @@ impl PartialGuild {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn bans(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         target: Option<UserPagination>,
         limit: Option<u8>,
     ) -> Result<Vec<Ban>> {
@@ -340,7 +340,7 @@ impl PartialGuild {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
-    pub async fn get_ban(&self, http: impl AsRef<Http>, user_id: UserId) -> Result<Option<Ban>> {
+    pub async fn get_ban(&self, http: &Http, user_id: UserId) -> Result<Option<Ban>> {
         self.id.get_ban(http, user_id).await
     }
 
@@ -356,7 +356,7 @@ impl PartialGuild {
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     pub async fn audit_logs(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
@@ -371,17 +371,13 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user is not in the guild or if the guild is
     /// otherwise unavailable.
-    pub async fn channels(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<HashMap<ChannelId, GuildChannel>> {
+    pub async fn channels(&self, http: &Http) -> Result<HashMap<ChannelId, GuildChannel>> {
         self.id.channels(http).await
     }
 
     #[cfg(feature = "cache")]
     #[deprecated = "Use Cache::guild and Guild::channels"]
     pub fn channel_id_from_name(&self, cache: &Cache, name: &str) -> Option<ChannelId> {
-        let cache = cache.as_ref();
         let guild = cache.guild(self.id)?;
         #[allow(deprecated)]
         guild.channel_id_from_name(cache, name)
@@ -448,12 +444,7 @@ impl PartialGuild {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_emoji(
-        &self,
-        http: impl AsRef<Http>,
-        name: &str,
-        image: &str,
-    ) -> Result<Emoji> {
+    pub async fn create_emoji(&self, http: &Http, name: &str, image: &str) -> Result<Emoji> {
         self.id.create_emoji(http, name, image).await
     }
 
@@ -468,7 +459,7 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn create_integration(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         integration_id: IntegrationId,
         kind: &str,
     ) -> Result<()> {
@@ -499,7 +490,7 @@ impl PartialGuild {
     /// Returns the same errors as [`Self::create_command`].
     pub async fn set_commands(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         commands: &[CreateCommand<'_>],
     ) -> Result<Vec<Command>> {
         self.id.set_commands(http, commands).await
@@ -528,7 +519,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
+    pub async fn get_commands(&self, http: &Http) -> Result<Vec<Command>> {
         self.id.get_commands(http).await
     }
 
@@ -537,10 +528,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_commands_with_localizations(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<Command>> {
+    pub async fn get_commands_with_localizations(&self, http: &Http) -> Result<Vec<Command>> {
         self.id.get_commands_with_localizations(http).await
     }
 
@@ -549,11 +537,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_command(
-        &self,
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<Command> {
+    pub async fn get_command(&self, http: &Http, command_id: CommandId) -> Result<Command> {
         self.id.get_command(http, command_id).await
     }
 
@@ -578,11 +562,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn delete_command(
-        &self,
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<()> {
+    pub async fn delete_command(&self, http: &Http, command_id: CommandId) -> Result<()> {
         self.id.delete_command(http, command_id).await
     }
 
@@ -591,10 +571,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_commands_permissions(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<CommandPermissions>> {
+    pub async fn get_commands_permissions(&self, http: &Http) -> Result<Vec<CommandPermissions>> {
         self.id.get_commands_permissions(http).await
     }
 
@@ -605,7 +582,7 @@ impl PartialGuild {
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn get_command_permissions(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         command_id: CommandId,
     ) -> Result<CommandPermissions> {
         self.id.get_command_permissions(http, command_id).await
@@ -658,7 +635,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user is not the owner of
     /// the guild.
-    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn delete(&self, http: &Http) -> Result<()> {
         self.id.delete(http).await
     }
 
@@ -675,7 +652,7 @@ impl PartialGuild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<()> {
+    pub async fn delete_emoji(&self, http: &Http, emoji_id: EmojiId) -> Result<()> {
         self.id.delete_emoji(http, emoji_id).await
     }
 
@@ -691,7 +668,7 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn delete_integration(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         integration_id: IntegrationId,
     ) -> Result<()> {
         self.id.delete_integration(http, integration_id).await
@@ -709,7 +686,7 @@ impl PartialGuild {
     /// does not exist in the Guild.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete_role(&self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+    pub async fn delete_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
         self.id.delete_role(http, role_id).await
     }
 
@@ -726,11 +703,7 @@ impl PartialGuild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_sticker(
-        &self,
-        http: impl AsRef<Http>,
-        sticker_id: StickerId,
-    ) -> Result<()> {
+    pub async fn delete_sticker(&self, http: &Http, sticker_id: StickerId) -> Result<()> {
         self.id.delete_sticker(http, sticker_id).await
     }
 
@@ -775,12 +748,7 @@ impl PartialGuild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn edit_emoji(
-        &self,
-        http: impl AsRef<Http>,
-        emoji_id: EmojiId,
-        name: &str,
-    ) -> Result<Emoji> {
+    pub async fn edit_emoji(&self, http: &Http, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
         self.id.edit_emoji(http, emoji_id, name).await
     }
 
@@ -815,7 +783,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     pub async fn edit_mfa_level(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         mfa_level: MfaLevel,
         audit_log_reason: Option<&str>,
     ) -> Result<MfaLevel> {
@@ -833,11 +801,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission to change their nickname.
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-    pub async fn edit_nickname(
-        &self,
-        http: impl AsRef<Http>,
-        new_nickname: Option<&str>,
-    ) -> Result<()> {
+    pub async fn edit_nickname(&self, http: &Http, new_nickname: Option<&str>) -> Result<()> {
         self.id.edit_nickname(http, new_nickname).await
     }
 
@@ -882,7 +846,7 @@ impl PartialGuild {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn edit_role_position(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         role_id: RoleId,
         position: i16,
     ) -> Result<Vec<Role>> {
@@ -990,11 +954,10 @@ impl PartialGuild {
     #[deprecated = "Use Cache::guild and Guild::greater_member_hierarchy"]
     pub fn greater_member_hierarchy(
         &self,
-        cache: impl AsRef<Cache>,
+        cache: &Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
-        let cache = cache.as_ref();
         let guild = cache.guild(self.id)?;
         guild.greater_member_hierarchy(cache, lhs_id, rhs_id)
     }
@@ -1083,7 +1046,7 @@ impl PartialGuild {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn reorder_channels(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         channels: impl IntoIterator<Item = (ChannelId, u64)>,
     ) -> Result<()> {
         self.id.reorder_channels(http, channels).await
@@ -1102,7 +1065,7 @@ impl PartialGuild {
     /// Returns an [`Error::Http`] if the API returns an error.
     pub async fn search_members(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         query: &str,
         limit: Option<NonMaxU16>,
     ) -> Result<Vec<Member>> {
@@ -1141,7 +1104,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
+    pub async fn kick(&self, http: &Http, user_id: UserId) -> Result<()> {
         self.id.kick(http, user_id).await
     }
 
@@ -1149,12 +1112,7 @@ impl PartialGuild {
     ///
     /// In addition to the reasons [`Self::kick`] may return an error, can also return an error if
     /// the reason is too long.
-    pub async fn kick_with_reason(
-        &self,
-        http: impl AsRef<Http>,
-        user_id: UserId,
-        reason: &str,
-    ) -> Result<()> {
+    pub async fn kick_with_reason(&self, http: &Http, user_id: UserId, reason: &str) -> Result<()> {
         self.id.kick_with_reason(http, user_id, reason).await
     }
 
@@ -1175,7 +1133,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is unavailable.
-    pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
+    pub async fn emojis(&self, http: &Http) -> Result<Vec<Emoji>> {
         self.id.emojis(http).await
     }
 
@@ -1184,7 +1142,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if an [`Emoji`] with the given Id does not exist for the guild.
-    pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
+    pub async fn emoji(&self, http: &Http, emoji_id: EmojiId) -> Result<Emoji> {
         self.id.emoji(http, emoji_id).await
     }
 
@@ -1197,7 +1155,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
+    pub async fn integrations(&self, http: &Http) -> Result<Vec<Integration>> {
         self.id.integrations(http).await
     }
 
@@ -1210,7 +1168,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
+    pub async fn invites(&self, http: &Http) -> Result<Vec<RichInvite>> {
         self.id.invites(http).await
     }
 
@@ -1222,7 +1180,7 @@ impl PartialGuild {
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild or the access token
     /// lacks the necessary scope.
-    pub async fn current_user_member(&self, http: impl AsRef<Http>) -> Result<Member> {
+    pub async fn current_user_member(&self, http: &Http) -> Result<Member> {
         self.id.current_user_member(http).await
     }
 
@@ -1232,7 +1190,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user is unable to leave the Guild, or currently is
     /// not in the guild.
-    pub async fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn leave(&self, http: &Http) -> Result<()> {
         self.id.leave(http).await
     }
 
@@ -1261,7 +1219,7 @@ impl PartialGuild {
     /// [`User`]: crate::model::user::User
     pub async fn members(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         limit: Option<NonMaxU16>,
         after: Option<UserId>,
     ) -> Result<Vec<Member>> {
@@ -1312,7 +1270,7 @@ impl PartialGuild {
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Guild::prune_count`]: crate::model::guild::Guild::prune_count
-    pub async fn prune_count(&self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
+    pub async fn prune_count(&self, http: &Http, days: u8) -> Result<GuildPrune> {
         self.id.prune_count(http, days).await
     }
 
@@ -1326,7 +1284,7 @@ impl PartialGuild {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[must_use]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
+    pub fn shard_id(&self, cache: &Cache) -> u16 {
         self.id.shard_id(cache)
     }
 
@@ -1372,7 +1330,7 @@ impl PartialGuild {
     /// [`Guild::start_integration_sync`]: crate::model::guild::Guild::start_integration_sync
     pub async fn start_integration_sync(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         integration_id: IntegrationId,
     ) -> Result<()> {
         self.id.start_integration_sync(http, integration_id).await
@@ -1388,7 +1346,7 @@ impl PartialGuild {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     /// [`Guild::unban`]: crate::model::guild::Guild::unban
-    pub async fn unban(&self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
+    pub async fn unban(&self, http: &Http, user_id: UserId) -> Result<()> {
         self.id.unban(http, user_id).await
     }
 
@@ -1402,7 +1360,7 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [`Guild::vanity_url`]: crate::model::guild::Guild::vanity_url
-    pub async fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
+    pub async fn vanity_url(&self, http: &Http) -> Result<String> {
         self.id.vanity_url(http).await
     }
 
@@ -1416,7 +1374,7 @@ impl PartialGuild {
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     /// [`Guild::webhooks`]: crate::model::guild::Guild::webhooks
-    pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
+    pub async fn webhooks(&self, http: &Http) -> Result<Vec<Webhook>> {
         self.id.webhooks(http).await
     }
 
@@ -1436,9 +1394,9 @@ impl PartialGuild {
     /// #[serenity::async_trait]
     /// #[cfg(all(feature = "cache", feature = "client"))]
     /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: Context, msg: Message) {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&context) {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx.cache) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("Obtained role's reference: {:?}", role);
     ///                 }
@@ -1455,29 +1413,26 @@ impl PartialGuild {
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this
     /// guild.
     #[cfg(feature = "collector")]
-    pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_reply(&self, shard_messenger: ShardMessenger) -> MessageCollector {
         MessageCollector::new(shard_messenger).guild_id(self.id)
     }
 
     /// Same as [`Self::await_reply`].
     #[cfg(feature = "collector")]
-    pub fn await_replies(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_replies(&self, shard_messenger: ShardMessenger) -> MessageCollector {
         self.await_reply(shard_messenger)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in
     /// this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
+    pub fn await_reaction(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).guild_id(self.id)
     }
 
     /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn await_reactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollector {
+    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         self.await_reaction(shard_messenger)
     }
 
@@ -1487,7 +1442,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
+    pub async fn get_active_threads(&self, http: &Http) -> Result<ThreadsData> {
         self.id.get_active_threads(http).await
     }
 
@@ -1497,11 +1452,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    pub async fn get_soundboard(
-        self,
-        http: impl AsRef<Http>,
-        sound_id: SoundId,
-    ) -> Result<Soundboard> {
+    pub async fn get_soundboard(self, http: &Http, sound_id: SoundId) -> Result<Soundboard> {
         self.id.get_soundboard(http, sound_id).await
     }
 
@@ -1511,7 +1462,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    pub async fn get_soundboards(self, http: impl AsRef<Http>) -> Result<Vec<Soundboard>> {
+    pub async fn get_soundboards(self, http: &Http) -> Result<Vec<Soundboard>> {
         self.id.get_soundboards(http).await
     }
 
@@ -1554,7 +1505,7 @@ impl PartialGuild {
     /// soundboard sound with that Id does not exist.
     pub async fn delete_soundboard(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         sound_id: SoundId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {

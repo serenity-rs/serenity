@@ -284,7 +284,7 @@ impl Guild {
     /// Returns an [`Error::Http`] if the guild is unavailable.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rules(&self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
+    pub async fn automod_rules(&self, http: &Http) -> Result<Vec<Rule>> {
         self.id.automod_rules(http).await
     }
 
@@ -297,7 +297,7 @@ impl Guild {
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rule(&self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<Rule> {
+    pub async fn automod_rule(&self, http: &Http, rule_id: RuleId) -> Result<Rule> {
         self.id.automod_rule(http, rule_id).await
     }
 
@@ -350,13 +350,13 @@ impl Guild {
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn delete_automod_rule(&self, http: impl AsRef<Http>, rule_id: RuleId) -> Result<()> {
+    pub async fn delete_automod_rule(&self, http: &Http, rule_id: RuleId) -> Result<()> {
         self.id.delete_automod_rule(http, rule_id).await
     }
 
     #[cfg(feature = "cache")]
     fn check_hierarchy(&self, cache: &Cache, other_user: UserId) -> Result<()> {
-        let current_id = cache.as_ref().current_user().id;
+        let current_id = cache.current_user().id;
 
         if let Some(higher) = self.greater_member_hierarchy(cache, other_user, current_id) {
             if higher != current_id {
@@ -589,7 +589,7 @@ impl Guild {
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     pub async fn audit_logs(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
@@ -603,10 +603,7 @@ impl Guild {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is currently unavailable.
-    pub async fn channels(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<HashMap<ChannelId, GuildChannel>> {
+    pub async fn channels(&self, http: &Http) -> Result<HashMap<ChannelId, GuildChannel>> {
         self.id.channels(http).await
     }
 
@@ -636,18 +633,14 @@ impl Guild {
     /// [`Shard`]: crate::gateway::Shard
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://discord.com/developers/docs/change-log#deprecating-guild-creation-by-apps"]
-    pub async fn create(
-        http: impl AsRef<Http>,
-        name: &str,
-        icon: Option<ImageHash>,
-    ) -> Result<PartialGuild> {
+    pub async fn create(http: &Http, name: &str, icon: Option<ImageHash>) -> Result<PartialGuild> {
         let map = json!({
             "icon": icon,
             "name": name,
         });
 
         #[allow(deprecated)]
-        http.as_ref().create_guild(&map).await
+        http.create_guild(&map).await
     }
 
     /// Creates a new [`Channel`] in the guild.
@@ -710,12 +703,7 @@ impl Guild {
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`CreateAttachment`]: crate::builder::CreateAttachment
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_emoji(
-        &self,
-        http: impl AsRef<Http>,
-        name: &str,
-        image: &str,
-    ) -> Result<Emoji> {
+    pub async fn create_emoji(&self, http: &Http, name: &str, image: &str) -> Result<Emoji> {
         self.id.create_emoji(http, name, image).await
     }
 
@@ -730,7 +718,7 @@ impl Guild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn create_integration(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         integration_id: IntegrationId,
         kind: &str,
     ) -> Result<()> {
@@ -761,7 +749,7 @@ impl Guild {
     /// Returns the same errors as [`Self::create_command`].
     pub async fn set_commands(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         commands: &[CreateCommand<'_>],
     ) -> Result<Vec<Command>> {
         self.id.set_commands(http, commands).await
@@ -790,7 +778,7 @@ impl Guild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
+    pub async fn get_commands(&self, http: &Http) -> Result<Vec<Command>> {
         self.id.get_commands(http).await
     }
 
@@ -799,10 +787,7 @@ impl Guild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_commands_with_localizations(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<Command>> {
+    pub async fn get_commands_with_localizations(&self, http: &Http) -> Result<Vec<Command>> {
         self.id.get_commands_with_localizations(http).await
     }
 
@@ -811,11 +796,7 @@ impl Guild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_command(
-        &self,
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<Command> {
+    pub async fn get_command(&self, http: &Http, command_id: CommandId) -> Result<Command> {
         self.id.get_command(http, command_id).await
     }
 
@@ -840,11 +821,7 @@ impl Guild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn delete_command(
-        &self,
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<()> {
+    pub async fn delete_command(&self, http: &Http, command_id: CommandId) -> Result<()> {
         self.id.delete_command(http, command_id).await
     }
 
@@ -853,10 +830,7 @@ impl Guild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_commands_permissions(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<CommandPermissions>> {
+    pub async fn get_commands_permissions(&self, http: &Http) -> Result<Vec<CommandPermissions>> {
         self.id.get_commands_permissions(http).await
     }
 
@@ -867,7 +841,7 @@ impl Guild {
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn get_command_permissions(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         command_id: CommandId,
     ) -> Result<CommandPermissions> {
         self.id.get_command_permissions(http, command_id).await
@@ -968,7 +942,7 @@ impl Guild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<()> {
+    pub async fn delete_emoji(&self, http: &Http, emoji_id: EmojiId) -> Result<()> {
         self.id.delete_emoji(http, emoji_id).await
     }
 
@@ -984,7 +958,7 @@ impl Guild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn delete_integration(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         integration_id: IntegrationId,
     ) -> Result<()> {
         self.id.delete_integration(http, integration_id).await
@@ -1001,7 +975,7 @@ impl Guild {
     /// Returns [`Error::Http`] if the current user lacks permission to delete the role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete_role(&self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+    pub async fn delete_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
         self.id.delete_role(http, role_id).await
     }
 
@@ -1018,7 +992,7 @@ impl Guild {
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn delete_scheduled_event(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         event_id: ScheduledEventId,
     ) -> Result<()> {
         self.id.delete_scheduled_event(http, event_id).await
@@ -1037,11 +1011,7 @@ impl Guild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_sticker(
-        &self,
-        http: impl AsRef<Http>,
-        sticker_id: StickerId,
-    ) -> Result<()> {
+    pub async fn delete_sticker(&self, http: &Http, sticker_id: StickerId) -> Result<()> {
         self.id.delete_sticker(http, sticker_id).await
     }
 
@@ -1106,12 +1076,7 @@ impl Guild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn edit_emoji(
-        &self,
-        http: impl AsRef<Http>,
-        emoji_id: EmojiId,
-        name: &str,
-    ) -> Result<Emoji> {
+    pub async fn edit_emoji(&self, http: &Http, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
         self.id.edit_emoji(http, emoji_id, name).await
     }
 
@@ -1146,7 +1111,7 @@ impl Guild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     pub async fn edit_mfa_level(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         mfa_level: MfaLevel,
         audit_log_reason: Option<&str>,
     ) -> Result<MfaLevel> {
@@ -1223,7 +1188,7 @@ impl Guild {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn edit_role_position(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         role_id: RoleId,
         position: i16,
     ) -> Result<Vec<Role>> {
@@ -1380,15 +1345,10 @@ impl Guild {
     #[cfg(feature = "cache")]
     pub fn greater_member_hierarchy(
         &self,
-        #[allow(unused_variables)] _cache: impl AsRef<Cache>,
+        #[allow(unused_variables)] cache: &Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
-        self.greater_member_hierarchy_(lhs_id.into(), rhs_id.into())
-    }
-
-    #[cfg(feature = "cache")]
-    fn greater_member_hierarchy_(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
             return None;
@@ -1448,7 +1408,7 @@ impl Guild {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is unavailable
-    pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
+    pub async fn emojis(&self, http: &Http) -> Result<Vec<Emoji>> {
         self.id.emojis(http).await
     }
 
@@ -1460,7 +1420,7 @@ impl Guild {
     /// guild is unavailable.
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
-    pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
+    pub async fn emoji(&self, http: &Http, emoji_id: EmojiId) -> Result<Emoji> {
         self.id.emoji(http, emoji_id).await
     }
 
@@ -1475,7 +1435,7 @@ impl Guild {
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
+    pub async fn integrations(&self, http: &Http) -> Result<Vec<Integration>> {
         self.id.integrations(http).await
     }
 
@@ -1520,7 +1480,7 @@ impl Guild {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
+    pub async fn kick(&self, http: &Http, user_id: UserId) -> Result<()> {
         self.id.kick(http, user_id).await
     }
 
@@ -1528,12 +1488,7 @@ impl Guild {
     ///
     /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
     /// the reason is too long.
-    pub async fn kick_with_reason(
-        &self,
-        http: impl AsRef<Http>,
-        user_id: UserId,
-        reason: &str,
-    ) -> Result<()> {
+    pub async fn kick_with_reason(&self, http: &Http, user_id: UserId, reason: &str) -> Result<()> {
         self.id.kick_with_reason(http, user_id, reason).await
     }
 
@@ -1545,7 +1500,7 @@ impl Guild {
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild or the access token
     /// lacks the necessary scope.
-    pub async fn current_user_member(&self, http: impl AsRef<Http>) -> Result<Member> {
+    pub async fn current_user_member(&self, http: &Http) -> Result<Member> {
         self.id.current_user_member(http).await
     }
 
@@ -1555,7 +1510,7 @@ impl Guild {
     ///
     /// May return an [`Error::Http`] if the current user cannot leave the guild, or currently is
     /// not in the guild.
-    pub async fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn leave(&self, http: &Http) -> Result<()> {
         self.id.leave(http).await
     }
 
@@ -1595,7 +1550,7 @@ impl Guild {
     /// [`User`]: crate::model::user::User
     pub async fn members(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         limit: Option<NonMaxU16>,
         after: Option<UserId>,
     ) -> Result<Vec<Member>> {
@@ -2058,7 +2013,7 @@ impl Guild {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn reorder_channels(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         channels: impl IntoIterator<Item = (ChannelId, u64)>,
     ) -> Result<()> {
         self.id.reorder_channels(http, channels).await
@@ -2077,7 +2032,7 @@ impl Guild {
     /// Returns an [`Error::Http`] if the API returns an error.
     pub async fn search_members(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         query: &str,
         limit: Option<NonMaxU16>,
     ) -> Result<Vec<Member>> {
@@ -2098,7 +2053,7 @@ impl Guild {
     /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn scheduled_event(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         event_id: ScheduledEventId,
         with_user_count: bool,
     ) -> Result<ScheduledEvent> {
@@ -2117,7 +2072,7 @@ impl Guild {
     /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn scheduled_events(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         with_user_count: bool,
     ) -> Result<Vec<ScheduledEvent>> {
         self.id.scheduled_events(http, with_user_count).await
@@ -2137,7 +2092,7 @@ impl Guild {
     /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn scheduled_event_users(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         event_id: ScheduledEventId,
         limit: Option<u64>,
     ) -> Result<Vec<ScheduledEventUser>> {
@@ -2157,7 +2112,7 @@ impl Guild {
     /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn scheduled_event_users_optioned(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         event_id: ScheduledEventId,
         limit: Option<u64>,
         target: Option<UserPagination>,
@@ -2175,8 +2130,8 @@ impl Guild {
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u16 {
-        self.id.shard_id(&cache)
+    pub fn shard_id(&self, cache: &Cache) -> u16 {
+        self.id.shard_id(cache)
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -2221,7 +2176,7 @@ impl Guild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn start_integration_sync(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         integration_id: IntegrationId,
     ) -> Result<()> {
         self.id.start_integration_sync(http, integration_id).await
@@ -2290,7 +2245,7 @@ impl Guild {
     ///
     /// Will return [`Error::Http`] if the current user is lacking permissions. Can also return an
     /// [`Error::Json`] if there is an error deserializing the API response.
-    pub async fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
+    pub async fn vanity_url(&self, http: &Http) -> Result<String> {
         self.id.vanity_url(http).await
     }
 
@@ -2304,7 +2259,7 @@ impl Guild {
     ///
     /// Will return an [`Error::Http`] if the current user is lacking permissions. Can also return
     /// an [`Error::Json`] if there is an error deserializing the API response.
-    pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
+    pub async fn webhooks(&self, http: &Http) -> Result<Vec<Webhook>> {
         self.id.webhooks(http).await
     }
 
@@ -2326,7 +2281,7 @@ impl Guild {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx) {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx.cache) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("{:?}", role);
     ///                 }
@@ -2343,29 +2298,26 @@ impl Guild {
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this
     /// guild.
     #[cfg(feature = "collector")]
-    pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_reply(&self, shard_messenger: ShardMessenger) -> MessageCollector {
         MessageCollector::new(shard_messenger).guild_id(self.id)
     }
 
     /// Same as [`Self::await_reply`].
     #[cfg(feature = "collector")]
-    pub fn await_replies(&self, shard_messenger: impl AsRef<ShardMessenger>) -> MessageCollector {
+    pub fn await_replies(&self, shard_messenger: ShardMessenger) -> MessageCollector {
         self.await_reply(shard_messenger)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in
     /// this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> ReactionCollector {
+    pub fn await_reaction(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         ReactionCollector::new(shard_messenger).guild_id(self.id)
     }
 
     /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn await_reactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollector {
+    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
         self.await_reaction(shard_messenger)
     }
 
@@ -2375,7 +2327,7 @@ impl Guild {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
+    pub async fn get_active_threads(&self, http: &Http) -> Result<ThreadsData> {
         self.id.get_active_threads(http).await
     }
 
@@ -2385,11 +2337,7 @@ impl Guild {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    pub async fn get_soundboard(
-        self,
-        http: impl AsRef<Http>,
-        sound_id: SoundId,
-    ) -> Result<Soundboard> {
+    pub async fn get_soundboard(self, http: &Http, sound_id: SoundId) -> Result<Soundboard> {
         self.id.get_soundboard(http, sound_id).await
     }
 
@@ -2399,7 +2347,7 @@ impl Guild {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
     /// the request is not in the guild.
-    pub async fn get_soundboards(self, http: impl AsRef<Http>) -> Result<Vec<Soundboard>> {
+    pub async fn get_soundboards(self, http: &Http) -> Result<Vec<Soundboard>> {
         self.id.get_soundboards(http).await
     }
 
@@ -2442,7 +2390,7 @@ impl Guild {
     /// soundboard sound with that Id does not exist.
     pub async fn delete_soundboard(
         self,
-        http: impl AsRef<Http>,
+        http: &Http,
         sound_id: SoundId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {

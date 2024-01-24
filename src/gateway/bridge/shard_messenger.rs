@@ -214,9 +214,3 @@ impl ShardMessenger {
         self.collectors.lock().expect("poison").push(collector);
     }
 }
-
-impl AsRef<ShardMessenger> for ShardMessenger {
-    fn as_ref(&self) -> &ShardMessenger {
-        self
-    }
-}

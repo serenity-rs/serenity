@@ -94,12 +94,6 @@ pub struct ShardRunnerInfo {
     pub stage: ConnectionStage,
 }
 
-impl AsRef<ShardMessenger> for ShardRunnerInfo {
-    fn as_ref(&self) -> &ShardMessenger {
-        &self.runner_tx
-    }
-}
-
 /// Newtype around a callback that will be called on every incoming request. As long as this
 /// collector should still receive events, it should return `true`. Once it returns `false`, it is
 /// removed.
