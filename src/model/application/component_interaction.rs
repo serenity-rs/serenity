@@ -14,7 +14,6 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::json;
 use crate::model::prelude::*;
 #[cfg(all(feature = "collector", feature = "utils"))]
 use crate::utils::{CreateQuickModal, QuickModalResponse};
@@ -260,13 +259,13 @@ impl<'de> Deserialize<'de> for ComponentInteractionDataKind {
         #[derive(Deserialize)]
         struct Json {
             component_type: ComponentType,
-            values: Option<json::Value>,
+            values: Option<Value>,
         }
         let json = Json::deserialize(deserializer)?;
 
         macro_rules! parse_values {
             () => {
-                json::from_value(json.values.ok_or_else(|| D::Error::missing_field("values"))?)
+                from_value(json.values.ok_or_else(|| D::Error::missing_field("values"))?)
                     .map_err(D::Error::custom)?
             };
         }

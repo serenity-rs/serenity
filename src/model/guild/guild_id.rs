@@ -3,6 +3,7 @@ use std::fmt;
 #[cfg(feature = "model")]
 use futures::stream::Stream;
 use nonmax::NonMaxU16;
+use serde_json::json;
 
 #[cfg(feature = "model")]
 use crate::builder::{

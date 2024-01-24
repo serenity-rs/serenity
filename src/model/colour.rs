@@ -14,7 +14,7 @@
 /// Passing in a role's colour, and then retrieving its green component via [`Self::g`]:
 ///
 /// ```rust
-/// # use serenity::json::{json, from_value};
+/// # use serde_json::{json, from_value};
 /// # use serenity::model::guild::Role;
 /// # use serenity::model::id::RoleId;
 /// # use serenity::model::id::GuildId;

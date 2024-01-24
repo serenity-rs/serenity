@@ -1,8 +1,8 @@
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
+use serde_json::from_value;
 
 use crate::internal::prelude::*;
-use crate::json::from_value;
 use crate::model::prelude::*;
 use crate::model::utils::{default_true, deserialize_val};
 
@@ -309,8 +309,10 @@ enum_number! {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn test_button_serde() {

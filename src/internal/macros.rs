@@ -176,7 +176,9 @@ macro_rules! bitflags {
 
 #[cfg(test)]
 mod tests {
-    use crate::json::{assert_json, json};
+    use serde_json::json;
+
+    use crate::model::assert_json;
 
     #[test]
     fn enum_number() {

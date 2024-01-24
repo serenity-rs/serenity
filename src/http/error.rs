@@ -9,7 +9,6 @@ use serde::de::{Deserialize, Deserializer, Error as _};
 use url::ParseError as UrlError;
 
 use crate::internal::prelude::*;
-use crate::json::*;
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -56,7 +55,7 @@ impl ErrorResponse {
             method,
             status_code: r.status(),
             url: FixedString::from_str_trunc(r.url().as_str()),
-            error: decode_resp(r).await.unwrap_or_else(|e| DiscordJsonError {
+            error: r.json().await.unwrap_or_else(|e| DiscordJsonError {
                 code: -1,
                 errors: FixedArray::empty(),
                 message: format!("[Serenity] Could not decode json when receiving error response from discord:, {e}").trunc_into(),
@@ -246,6 +245,7 @@ fn loop_errors<'a>(
 mod test {
     use http_crate::response::Builder;
     use reqwest::ResponseBuilderExt;
+    use serde_json::to_string;
 
     use super::*;
 
