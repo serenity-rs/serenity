@@ -511,8 +511,10 @@ enum_number! {
 mod tests {
     use std::time::Duration;
 
+    use serde_json::json;
+
     use super::{Action, *};
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn rule_trigger_serde() {
