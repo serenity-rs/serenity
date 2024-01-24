@@ -17,7 +17,6 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::json::{self, JsonError};
 use crate::model::application::{CommandOptionType, CommandType};
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
@@ -529,7 +528,7 @@ struct RawCommandDataOption {
     #[serde(rename = "type")]
     kind: CommandOptionType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    value: Option<json::Value>,
+    value: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     options: Option<Vec<RawCommandDataOption>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -539,8 +538,8 @@ struct RawCommandDataOption {
 fn option_from_raw(raw: RawCommandDataOption) -> Result<CommandDataOption> {
     macro_rules! value {
         () => {{
-            json::from_value(
-                raw.value.ok_or_else::<JsonError, _>(|| DeError::missing_field("value"))?,
+            serde_json::from_value(
+                raw.value.ok_or_else(|| serde_json::Error::missing_field("value"))?,
             )?
         }};
     }
@@ -555,14 +554,12 @@ fn option_from_raw(raw: RawCommandDataOption) -> Result<CommandDataOption> {
         CommandOptionType::Number => CommandDataOptionValue::Number(value!()),
         CommandOptionType::String => CommandDataOptionValue::String(value!()),
         CommandOptionType::SubCommand => {
-            let options =
-                raw.options.ok_or_else::<JsonError, _>(|| DeError::missing_field("options"))?;
+            let options = raw.options.ok_or_else(|| serde_json::Error::missing_field("options"))?;
             let options = options.into_iter().map(option_from_raw).collect::<Result<_>>()?;
             CommandDataOptionValue::SubCommand(FixedArray::from_vec_trunc(options))
         },
         CommandOptionType::SubCommandGroup => {
-            let options =
-                raw.options.ok_or_else::<JsonError, _>(|| DeError::missing_field("options"))?;
+            let options = raw.options.ok_or_else(|| serde_json::Error::missing_field("options"))?;
             let options = options.into_iter().map(option_from_raw).collect::<Result<_>>()?;
             CommandDataOptionValue::SubCommandGroup(FixedArray::from_vec_trunc(options))
         },
@@ -594,21 +591,21 @@ fn option_to_raw(option: &CommandDataOption) -> Result<RawCommandDataOption> {
             kind: _,
             value,
         } => {
-            raw.value = Some(json::to_value(value)?);
+            raw.value = Some(serde_json::to_value(value)?);
             raw.focused = Some(true);
         },
-        CommandDataOptionValue::Boolean(v) => raw.value = Some(json::to_value(v)?),
-        CommandDataOptionValue::Integer(v) => raw.value = Some(json::to_value(v)?),
-        CommandDataOptionValue::Number(v) => raw.value = Some(json::to_value(v)?),
-        CommandDataOptionValue::String(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::Boolean(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Integer(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Number(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::String(v) => raw.value = Some(serde_json::to_value(v)?),
         CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
             raw.options = Some(o.iter().map(option_to_raw).collect::<Result<_>>()?);
         },
-        CommandDataOptionValue::Attachment(v) => raw.value = Some(json::to_value(v)?),
-        CommandDataOptionValue::Channel(v) => raw.value = Some(json::to_value(v)?),
-        CommandDataOptionValue::Mentionable(v) => raw.value = Some(json::to_value(v)?),
-        CommandDataOptionValue::Role(v) => raw.value = Some(json::to_value(v)?),
-        CommandDataOptionValue::User(v) => raw.value = Some(json::to_value(v)?),
+        CommandDataOptionValue::Attachment(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Channel(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Mentionable(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Role(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::User(v) => raw.value = Some(serde_json::to_value(v)?),
         CommandDataOptionValue::Unknown(_) => {},
     }
 
@@ -797,8 +794,10 @@ impl From<TargetId> for UserId {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn nested_options() {

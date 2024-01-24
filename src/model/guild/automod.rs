@@ -509,6 +509,7 @@ enum_number! {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
 
     use super::*;
     use crate::json::{assert_json, json};
