@@ -22,7 +22,7 @@ impl EventHandler for Handler {
                 .title("This is a title")
                 .description("This is a description")
                 .image("attachment://ferris_eyes.png")
-                .fields(vec![
+                .fields([
                     ("This is the first field", "This is a field body", true),
                     ("This is the second field", "Both fields are inline", true),
                 ])
