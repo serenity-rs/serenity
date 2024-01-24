@@ -4,7 +4,7 @@ use reqwest::Client as ReqwestClient;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use crate::model::utils::is_false;
+use crate::model::utils::{is_false, CowStr};
 
 fn base64_bytes<'de, D>(deserializer: D) -> Result<Option<Vec<u8>>, D::Error>
 where
@@ -13,10 +13,10 @@ where
     use base64::Engine as _;
     use serde::de::Error;
 
-    let base64 = <Option<String>>::deserialize(deserializer)?;
+    let base64 = <Option<CowStr<'de>>>::deserialize(deserializer)?;
     let bytes = match base64 {
-        Some(base64) => {
-            Some(base64::prelude::BASE64_STANDARD.decode(base64).map_err(D::Error::custom)?)
+        Some(CowStr(base64)) => {
+            Some(base64::prelude::BASE64_STANDARD.decode(&*base64).map_err(D::Error::custom)?)
         },
         None => None,
     };
