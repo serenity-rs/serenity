@@ -14,8 +14,8 @@ impl StickerId {
     ///
     /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does not exist, or is
     /// otherwise unavailable.
-    pub async fn to_sticker(self, http: impl AsRef<Http>) -> Result<Sticker> {
-        http.as_ref().get_sticker(self).await
+    pub async fn to_sticker(self, http: &Http) -> Result<Sticker> {
+        http.get_sticker(self).await
     }
 }
 
@@ -42,7 +42,7 @@ impl StickerItem {
     ///
     /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does
     /// not exist, or is otherwise unavailable.
-    pub async fn to_sticker(&self, http: impl AsRef<Http>) -> Result<Sticker> {
+    pub async fn to_sticker(&self, http: &Http) -> Result<Sticker> {
         self.id.to_sticker(http).await
     }
 
@@ -151,7 +151,7 @@ impl Sticker {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn delete(&self, http: &Http) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
             guild_id.delete_sticker(http, self.id).await
         } else {

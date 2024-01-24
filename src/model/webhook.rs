@@ -112,8 +112,8 @@ pub struct WebhookGuild {
 impl WebhookGuild {
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
-    pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
-        cache.as_ref().guild(self.id)
+    pub fn to_guild_cached<'a>(&self, cache: &'a Cache) -> Option<GuildRef<'a>> {
+        cache.guild(self.id)
     }
 
     /// Requests [`PartialGuild`] over REST API.
@@ -145,11 +145,8 @@ impl WebhookGuild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    pub async fn to_partial_guild_with_counts(
-        self,
-        http: impl AsRef<Http>,
-    ) -> Result<PartialGuild> {
-        http.as_ref().get_guild_with_counts(self.id).await
+    pub async fn to_partial_guild_with_counts(self, http: &Http) -> Result<PartialGuild> {
+        http.get_guild_with_counts(self.id).await
     }
 }
 
@@ -168,7 +165,7 @@ impl WebhookChannel {
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        cache.as_ref().channel(self.id)
+        cache.channel(self.id)
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
@@ -239,8 +236,8 @@ impl Webhook {
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
-    pub async fn from_id(http: impl AsRef<Http>, webhook_id: WebhookId) -> Result<Self> {
-        http.as_ref().get_webhook(webhook_id).await
+    pub async fn from_id(http: &Http, webhook_id: WebhookId) -> Result<Self> {
+        http.get_webhook(webhook_id).await
     }
 
     /// Retrieves a webhook given its Id and unique token.
@@ -272,11 +269,11 @@ impl Webhook {
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
     pub async fn from_id_with_token(
-        http: impl AsRef<Http>,
+        http: &Http,
         webhook_id: WebhookId,
         token: &str,
     ) -> Result<Self> {
-        http.as_ref().get_webhook_with_token(webhook_id, token).await
+        http.get_webhook_with_token(webhook_id, token).await
     }
 
     /// Retrieves a webhook given its url.
@@ -306,8 +303,8 @@ impl Webhook {
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's
     /// response.
-    pub async fn from_url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
-        http.as_ref().get_webhook_from_url(url).await
+    pub async fn from_url(http: &Http, url: &str) -> Result<Self> {
+        http.get_webhook_from_url(url).await
     }
 
     /// Deletes the webhook.
@@ -319,8 +316,7 @@ impl Webhook {
     ///
     /// Returns [`Error::Http`] if the webhook does not exist, the token is invalid, or if the
     /// webhook could not otherwise be deleted.
-    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
-        let http = http.as_ref();
+    pub async fn delete(&self, http: &Http) -> Result<()> {
         match &self.token {
             Some(token) => {
                 http.delete_webhook_with_token(self.id, token.expose_secret(), None).await
@@ -449,12 +445,12 @@ impl Webhook {
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn get_message(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         thread_id: Option<ChannelId>,
         message_id: MessageId,
     ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        http.as_ref().get_webhook_message(self.id, thread_id, token, message_id).await
+        http.get_webhook_message(self.id, thread_id, token, message_id).await
     }
 
     /// Edits a webhook message with the fields set via the given builder.
@@ -490,12 +486,12 @@ impl Webhook {
     /// Id does not belong to the current webhook.
     pub async fn delete_message(
         &self,
-        http: impl AsRef<Http>,
+        http: &Http,
         thread_id: Option<ChannelId>,
         message_id: MessageId,
     ) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        http.as_ref().delete_webhook_message(self.id, thread_id, token, message_id).await
+        http.delete_webhook_message(self.id, thread_id, token, message_id).await
     }
 
     /// Retrieves the latest information about the webhook, editing the webhook in-place.
@@ -511,9 +507,9 @@ impl Webhook {
     /// error. Such as if the [`Webhook`] was deleted.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn refresh(&mut self, http: &Http) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        http.as_ref().get_webhook_with_token(self.id, token).await.map(|replacement| {
+        http.get_webhook_with_token(self.id, token).await.map(|replacement| {
             *self = replacement;
         })
     }
@@ -547,7 +543,7 @@ impl WebhookId {
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
-    pub async fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> {
-        http.as_ref().get_webhook(self).await
+    pub async fn to_webhook(self, http: &Http) -> Result<Webhook> {
+        http.get_webhook(self).await
     }
 }
