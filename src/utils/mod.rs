@@ -425,7 +425,7 @@ pub(crate) fn user_has_guild_perms(
 /// will return `true` even when the permissions are not in the cache.
 #[cfg(all(feature = "cache", feature = "model"))]
 pub(crate) fn user_has_perms_cache(
-    cache: impl AsRef<Cache>,
+    cache: &Cache,
     channel_id: ChannelId,
     required_permissions: Permissions,
 ) -> Result<()> {
@@ -446,9 +446,7 @@ pub(crate) fn user_has_perms_cache(
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub(crate) fn user_perms(cache: impl AsRef<Cache>, channel_id: ChannelId) -> Result<Permissions> {
-    let cache = cache.as_ref();
-
+pub(crate) fn user_perms(cache: &Cache, channel_id: ChannelId) -> Result<Permissions> {
     let Some(guild_id) = cache.channels.get(&channel_id).map(|c| *c) else {
         return Err(Error::Model(ModelError::ChannelNotFound));
     };

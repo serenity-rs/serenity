@@ -848,14 +848,14 @@ impl CommonOptions for &CommandOptions {
 
 #[cfg(feature = "cache")]
 pub(crate) fn has_correct_permissions(
-    cache: impl AsRef<Cache>,
+    cache: &Cache,
     options: &impl CommonOptions,
     message: &Message,
 ) -> bool {
     if options.required_permissions().is_empty() {
         true
     } else {
-        message.guild(cache.as_ref()).is_some_and(|guild| {
+        message.guild(cache).is_some_and(|guild| {
             let Some(channel) = guild.channels.get(&message.channel_id) else { return false };
             let Some(member) = guild.members.get(&message.author.id) else { return false };
 

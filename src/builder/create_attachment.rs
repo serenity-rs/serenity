@@ -46,18 +46,22 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// [`Error::Io`] if reading the file fails.
     pub async fn path(path: impl AsRef<Path>) -> Result<Self> {
-        let mut file = File::open(path.as_ref()).await?;
-        let mut data = Vec::new();
-        file.read_to_end(&mut data).await?;
+        async fn inner(path: &Path) -> Result<CreateAttachment<'static>> {
+            let mut file = File::open(path).await?;
+            let mut data = Vec::new();
+            file.read_to_end(&mut data).await?;
 
-        let filename = path.as_ref().file_name().ok_or_else(|| {
-            std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "attachment path must not be a directory",
-            )
-        })?;
+            let filename = path.file_name().ok_or_else(|| {
+                std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "attachment path must not be a directory",
+                )
+            })?;
 
-        Ok(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned()))
+            Ok(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned()))
+        }
+
+        inner(path.as_ref()).await
     }
 
     /// Builds an [`CreateAttachment`] by reading from a file handler.
@@ -79,11 +83,11 @@ impl<'a> CreateAttachment<'a> {
     /// Returns [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
     pub async fn url(
-        http: impl AsRef<Http>,
+        http: &Http,
         url: impl reqwest::IntoUrl,
         filename: impl Into<Cow<'static, str>>,
     ) -> Result<Self> {
-        let response = http.as_ref().client.get(url).send().await?;
+        let response = http.client.get(url).send().await?;
         let data = response.bytes().await?.to_vec();
 
         Ok(CreateAttachment::bytes(data, filename))
