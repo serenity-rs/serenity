@@ -138,7 +138,6 @@ pub struct EmojiId(#[serde(with = "snowflake")] NonZeroU64);
 /// An identifier for an unspecific entity.
 #[repr(packed)]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-// TODO: replace occurences of `#[serde(with = "snowflake")] u64` in the codebase with GenericId
 pub struct GenericId(#[serde(with = "snowflake")] NonZeroU64);
 
 /// An identifier for a Guild
@@ -295,30 +294,7 @@ impl fmt::Display for ShardId {
     }
 }
 
-/// Used with `#[serde(with|deserialize_with|serialize_with)]`
-///
-/// # Examples
-///
-/// ```rust,ignore
-/// #[derive(Deserialize, Serialize)]
-/// struct A {
-///     #[serde(with = "snowflake")]
-///     id: u64,
-/// }
-///
-/// #[derive(Deserialize)]
-/// struct B {
-///     #[serde(deserialize_with = "snowflake::deserialize")]
-///     id: u64,
-/// }
-///
-/// #[derive(Serialize)]
-/// struct C {
-///     #[serde(serialize_with = "snowflake::serialize")]
-///     id: u64,
-/// }
-/// ```
-pub(crate) mod snowflake {
+mod snowflake {
     use std::fmt;
     use std::num::NonZeroU64;
 
