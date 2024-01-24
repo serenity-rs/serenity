@@ -69,8 +69,8 @@ impl ModalInteraction {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if there is no interaction response.
-    pub async fn get_response(&self, http: impl AsRef<Http>) -> Result<Message> {
-        http.as_ref().get_original_interaction_response(&self.token).await
+    pub async fn get_response(&self, http: &Http) -> Result<Message> {
+        http.get_original_interaction_response(&self.token).await
     }
 
     /// Creates a response to the interaction received.
@@ -115,8 +115,8 @@ impl ModalInteraction {
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
     /// deleted.
-    pub async fn delete_response(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_original_interaction_response(&self.token).await
+    pub async fn delete_response(&self, http: &Http) -> Result<()> {
+        http.delete_original_interaction_response(&self.token).await
     }
 
     /// Creates a followup response to the response sent.
@@ -160,12 +160,8 @@ impl ModalInteraction {
     ///
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
     /// deleted.
-    pub async fn delete_followup(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: MessageId,
-    ) -> Result<()> {
-        http.as_ref().delete_followup_message(&self.token, message_id).await
+    pub async fn delete_followup(&self, http: &Http, message_id: MessageId) -> Result<()> {
+        http.delete_followup_message(&self.token, message_id).await
     }
 
     /// Helper function to defer an interaction.
