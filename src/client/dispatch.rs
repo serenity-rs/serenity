@@ -59,26 +59,33 @@ pub(crate) fn dispatch_model(
         event,
     );
 
-    let iter = std::iter::once(full_event).chain(extra_event);
     for handler in event_handlers {
-        for event in iter.clone() {
-            let context = context.clone();
-            let handler = Arc::clone(&handler);
-            spawn_named(event.snake_case_name(), async move {
-                event.dispatch(context, &*handler).await;
-            });
-        }
+        let context = context.clone();
+        let handler = Arc::clone(&handler);
+        let (full_event, extra_event) = (full_event.clone(), extra_event.clone());
+
+        spawn_named(full_event.snake_case_name(), async move {
+            if let Some(extra_event) = extra_event {
+                extra_event.dispatch(context.clone(), &*handler).await;
+            }
+
+            full_event.dispatch(context, &*handler).await;
+        });
     }
 
     #[cfg(feature = "framework")]
     if let Some(framework) = framework {
-        for event in iter {
-            let context = context.clone();
-            let framework = Arc::clone(&framework);
-            spawn_named("dispatch::framework::dispatch", async move {
-                framework.dispatch(context, event).await;
-            });
-        }
+        let context = context.clone();
+        let framework = Arc::clone(&framework);
+        let (full_event, extra_event) = (full_event.clone(), extra_event.clone());
+
+        spawn_named("dispatch::framework::dispatch", async move {
+            if let Some(extra_event) = extra_event {
+                framework.dispatch(context.clone(), extra_event).await;
+            }
+
+            framework.dispatch(context, full_event).await;
+        });
     }
 }
 
