@@ -83,7 +83,7 @@ impl EventHandler for Handler {
         // Acknowledge the interaction and edit the message
         interaction
             .create_response(
-                &ctx,
+                &ctx.http,
                 CreateInteractionResponse::UpdateMessage(
                     CreateInteractionResponseMessage::default()
                         .content(format!("You chose: **{animal}**\nNow choose a sound!"))
@@ -117,7 +117,7 @@ impl EventHandler for Handler {
             // Acknowledge the interaction and send a reply
             interaction
                 .create_response(
-                    &ctx,
+                    &ctx.http,
                     // This time we dont edit the message but reply to it
                     CreateInteractionResponse::Message(
                         CreateInteractionResponseMessage::default()
