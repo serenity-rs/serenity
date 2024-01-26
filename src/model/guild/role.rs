@@ -232,6 +232,10 @@ mod bool_as_option_unit {
         fn visit_none<E: Error>(self) -> Result<Self::Value, E> {
             Ok(true)
         }
+
+        fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
+            Ok(true)
+        }
     }
 }
 
