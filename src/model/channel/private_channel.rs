@@ -177,12 +177,8 @@ impl PrivateChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn messages(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: GetMessages,
-    ) -> Result<Vec<Message>> {
-        self.id.messages(cache_http, builder).await
+    pub async fn messages(&self, http: &Http, builder: GetMessages) -> Result<Vec<Message>> {
+        self.id.messages(http, builder).await
     }
 
     /// Returns "DM with $username#discriminator".

@@ -1,5 +1,3 @@
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -80,13 +78,6 @@ impl<'a> CreateSoundboard<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateSoundboard<'_> {
-    type Context<'ctx> = GuildId;
-    type Built = Soundboard;
 
     /// Creates a new soundboard in the guild with the data set.
     ///
@@ -98,18 +89,18 @@ impl Builder for CreateSoundboard<'_> {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    async fn execute(
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        guild_id: GuildId,
+    ) -> Result<Soundboard> {
         #[cfg(feature = "cache")]
         crate::utils::user_has_guild_perms(
             &cache_http,
-            ctx,
+            guild_id,
             Permissions::CREATE_GUILD_EXPRESSIONS,
         )?;
 
-        cache_http.http().create_guild_soundboard(ctx, &self, self.audit_log_reason).await
+        cache_http.http().create_guild_soundboard(guild_id, &self, self.audit_log_reason).await
     }
 }

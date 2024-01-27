@@ -1,6 +1,4 @@
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
@@ -70,13 +68,6 @@ impl<'a> EditSoundboard<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditSoundboard<'_> {
-    type Context<'ctx> = (GuildId, SoundId);
-    type Built = Soundboard;
 
     /// Edits the soundboard sound.
     ///
@@ -90,11 +81,15 @@ impl Builder for EditSoundboard<'_> {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    async fn execute(
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().edit_guild_soundboard(ctx.0, ctx.1, &self, self.audit_log_reason).await
+        guild_id: GuildId,
+        sound_id: SoundId,
+    ) -> Result<Soundboard> {
+        cache_http
+            .http()
+            .edit_guild_soundboard(guild_id, sound_id, &self, self.audit_log_reason)
+            .await
     }
 }

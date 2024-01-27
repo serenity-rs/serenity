@@ -6,7 +6,7 @@ use secrecy::SecretString;
 
 use super::utils::secret;
 #[cfg(feature = "model")]
-use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
+use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, GuildChannelRef, GuildRef};
 #[cfg(feature = "model")]
@@ -334,13 +334,9 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    pub async fn edit(
-        &mut self,
-        cache_http: impl CacheHttp,
-        builder: EditWebhook<'_>,
-    ) -> Result<()> {
+    pub async fn edit(&mut self, http: &Http, builder: EditWebhook<'_>) -> Result<()> {
         let token = self.token.as_ref().map(ExposeSecret::expose_secret).map(String::as_str);
-        *self = builder.execute(cache_http, (self.id, token)).await?;
+        *self = builder.execute(http, self.id, token).await?;
         Ok(())
     }
 
@@ -404,12 +400,12 @@ impl Webhook {
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn execute(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         wait: bool,
         builder: ExecuteWebhook<'_>,
     ) -> Result<Option<Message>> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        builder.execute(cache_http, (self.id, token, wait)).await
+        builder.execute(http, self.id, token, wait).await
     }
 
     /// Gets a previously sent message from the webhook.
@@ -447,12 +443,12 @@ impl Webhook {
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn edit_message(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         message_id: MessageId,
         builder: EditWebhookMessage<'_>,
     ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        builder.execute(cache_http, (self.id, token, message_id)).await
+        builder.execute(http, self.id, token, message_id).await
     }
 
     /// Deletes a webhook message.
