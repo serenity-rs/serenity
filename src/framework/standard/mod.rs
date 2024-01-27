@@ -606,7 +606,7 @@ impl StandardFramework {
 #[async_trait]
 impl Framework for StandardFramework {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, event)))]
-    async fn dispatch(&self, mut ctx: Context, event: FullEvent) {
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
         let FullEvent::Message {
             new_message: msg,
         } = event
@@ -614,7 +614,7 @@ impl Framework for StandardFramework {
             return;
         };
 
-        if self.should_ignore(&msg) {
+        if self.should_ignore(msg) {
             return;
         }
 
@@ -624,11 +624,11 @@ impl Framework for StandardFramework {
 
         let config = self.config.read().clone();
 
-        let prefix = parse::prefix(&ctx, &msg, &mut stream, &config).await;
+        let prefix = parse::prefix(ctx, msg, &mut stream, &config).await;
 
         if prefix.is_some() && stream.rest().is_empty() {
             if let Some(prefix_only) = &self.prefix_only {
-                prefix_only(&mut ctx, &msg).await;
+                prefix_only(ctx, msg).await;
             }
 
             return;
@@ -636,15 +636,15 @@ impl Framework for StandardFramework {
 
         if prefix.is_none() && !(config.get_no_dm_prefix() && msg.is_private()) {
             if let Some(normal) = &self.normal_message {
-                normal(&mut ctx, &msg).await;
+                normal(ctx, msg).await;
             }
 
             return;
         }
 
         let invocation = parse::command(
-            &ctx,
-            &msg,
+            ctx,
+            msg,
             &mut stream,
             &self.groups,
             &config,
@@ -657,12 +657,12 @@ impl Framework for StandardFramework {
             Err(ParseError::UnrecognisedCommand(unreg)) => {
                 if let Some(unreg) = unreg {
                     if let Some(unrecognised_command) = &self.unrecognised_command {
-                        unrecognised_command(&mut ctx, &msg, &unreg).await;
+                        unrecognised_command(ctx, msg, &unreg).await;
                     }
                 }
 
                 if let Some(normal) = &self.normal_message {
-                    normal(&mut ctx, &msg).await;
+                    normal(ctx, msg).await;
                 }
 
                 return;
@@ -672,7 +672,7 @@ impl Framework for StandardFramework {
                 command_name,
             }) => {
                 if let Some(dispatch) = &self.dispatch {
-                    dispatch(&mut ctx, &msg, error, &command_name).await;
+                    dispatch(ctx, msg, error, &command_name).await;
                 }
 
                 return;
@@ -695,16 +695,15 @@ impl Framework for StandardFramework {
                 let help = self.help.unwrap();
 
                 if let Some(before) = &self.before {
-                    if !before(&mut ctx, &msg, name).await {
+                    if !before(ctx, msg, name).await {
                         return;
                     }
                 }
 
-                let res =
-                    (help.fun)(&mut ctx, &msg, args, help.options, &groups, config.owners).await;
+                let res = (help.fun)(ctx, msg, args, help.options, &groups, config.owners).await;
 
                 if let Some(after) = &self.after {
-                    after(&mut ctx, &msg, name, res).await;
+                    after(ctx, msg, name, res).await;
                 }
             },
             Invoke::Command {
@@ -739,11 +738,11 @@ impl Framework for StandardFramework {
                 };
 
                 if let Some(error) =
-                    self.should_fail(&ctx, &msg, &mut args, command.options, group.options).await
+                    self.should_fail(ctx, msg, &mut args, command.options, group.options).await
                 {
                     if let Some(dispatch) = &self.dispatch {
                         let command_name = command.options.names[0];
-                        dispatch(&mut ctx, &msg, error, command_name).await;
+                        dispatch(ctx, msg, error, command_name).await;
                     }
 
                     return;
@@ -752,24 +751,24 @@ impl Framework for StandardFramework {
                 let name = command.options.names[0];
 
                 if let Some(before) = &self.before {
-                    if !before(&mut ctx, &msg, name).await {
+                    if !before(ctx, msg, name).await {
                         return;
                     }
                 }
 
-                let res = (command.fun)(&mut ctx, &msg, args).await;
+                let res = (command.fun)(ctx, msg, args).await;
 
                 // Check if the command wants to revert the bucket by giving back a ticket.
                 if matches!(&res, Err(e) if e.is::<RevertBucket>()) {
                     let mut buckets = self.buckets.lock().await;
 
                     if let Some(bucket) = command.options.bucket.and_then(|b| buckets.get_mut(b)) {
-                        bucket.give(&ctx, &msg).await;
+                        bucket.give(ctx, msg).await;
                     }
                 }
 
                 if let Some(after) = &self.after {
-                    after(&mut ctx, &msg, name, res).await;
+                    after(ctx, msg, name, res).await;
                 }
             },
         }
