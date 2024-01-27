@@ -102,7 +102,7 @@ pub trait Framework: Send + Sync {
         let _: &Client = client;
     }
     /// Called on every incoming event.
-    async fn dispatch(&self, ctx: Context, event: FullEvent);
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent);
 }
 
 #[async_trait]
@@ -113,7 +113,7 @@ where
     async fn init(&mut self, client: &Client) {
         (**self).init(client).await;
     }
-    async fn dispatch(&self, ctx: Context, event: FullEvent) {
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
         (**self).dispatch(ctx, event).await;
     }
 }
@@ -126,7 +126,7 @@ where
     async fn init(&mut self, client: &Client) {
         (**self).init(client).await;
     }
-    async fn dispatch(&self, ctx: Context, event: FullEvent) {
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
         (**self).dispatch(ctx, event).await;
     }
 }

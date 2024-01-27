@@ -43,14 +43,21 @@ macro_rules! update_cache {
 
 pub(crate) fn dispatch_model(
     event: Event,
-    context: &Context,
+    context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
-    event_handlers: Vec<Arc<dyn EventHandler>>,
-    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    event_handlers: &[Arc<dyn EventHandler>],
+    raw_event_handlers: &[Arc<dyn RawEventHandler>],
 ) {
+    struct DispatchContext {
+        context: Context,
+        full_event: FullEvent,
+        task_name: &'static str,
+        extra_event: Option<FullEvent>,
+    }
+
     for raw_handler in raw_event_handlers {
-        let (context, event) = (context.clone(), event.clone());
-        tokio::spawn(async move { raw_handler.raw_event(context, event).await });
+        let (handler, context, event) = (Arc::clone(raw_handler), context.clone(), event.clone());
+        tokio::spawn(async move { handler.raw_event(context, event).await });
     }
 
     let (full_event, extra_event) = update_cache_with_event(
@@ -59,14 +66,27 @@ pub(crate) fn dispatch_model(
         event,
     );
 
-    for handler in event_handlers {
-        let context = context.clone();
-        let handler = Arc::clone(&handler);
-        let (full_event, extra_event) = (full_event.clone(), extra_event.clone());
+    let dispatch_ctx = Arc::new(DispatchContext {
+        task_name: full_event.snake_case_name(),
+        context,
+        full_event,
+        extra_event,
+    });
 
-        spawn_named(full_event.snake_case_name(), async move {
+    for handler in event_handlers {
+        let handler = Arc::clone(handler);
+        let dispatch_ctx = Arc::clone(&dispatch_ctx);
+
+        spawn_named(dispatch_ctx.task_name, async move {
+            let DispatchContext {
+                context,
+                full_event,
+                extra_event,
+                ..
+            } = &*dispatch_ctx;
+
             if let Some(extra_event) = extra_event {
-                extra_event.dispatch(context.clone(), &*handler).await;
+                extra_event.dispatch(context, &*handler).await;
             }
 
             full_event.dispatch(context, &*handler).await;
@@ -75,13 +95,16 @@ pub(crate) fn dispatch_model(
 
     #[cfg(feature = "framework")]
     if let Some(framework) = framework {
-        let context = context.clone();
-        let framework = Arc::clone(&framework);
-        let (full_event, extra_event) = (full_event.clone(), extra_event.clone());
-
         spawn_named("dispatch::framework::dispatch", async move {
+            let DispatchContext {
+                context,
+                full_event,
+                extra_event,
+                ..
+            } = &*dispatch_ctx;
+
             if let Some(extra_event) = extra_event {
-                framework.dispatch(context.clone(), extra_event).await;
+                framework.dispatch(context, extra_event).await;
             }
 
             framework.dispatch(context, full_event).await;
