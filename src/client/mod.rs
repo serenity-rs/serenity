@@ -302,7 +302,7 @@ impl IntoFuture for ClientBuilder {
                 for event_handler in &event_handlers_clone {
                     let info = info.clone();
                     let event_handler = Arc::clone(event_handler);
-                    tokio::spawn(async move { event_handler.ratelimit(info).await });
+                    tokio::spawn(async move { event_handler.ratelimit(&info).await });
                 }
             }));
         }
@@ -399,7 +399,7 @@ impl IntoFuture for ClientBuilder {
 ///
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     async fn message(&self, context: Context, msg: Message) {
+///     async fn message(&self, context: &Context, msg: &Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say(&context, "Pong!");
 ///         }
