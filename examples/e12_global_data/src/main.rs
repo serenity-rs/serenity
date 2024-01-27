@@ -50,7 +50,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
+    async fn message(&self, ctx: &Context, msg: &Message) {
         // We are verifying if the bot id is the same as the message author id.
         if msg.author.id != ctx.cache.current_user().id
             && msg.content.to_lowercase().contains("owo")
@@ -68,7 +68,7 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: &Context, ready: &Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
