@@ -1,8 +1,6 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
@@ -46,13 +44,6 @@ impl<'a> EditStageInstance<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl<'a> Builder for EditStageInstance<'a> {
-    type Context<'ctx> = ChannelId;
-    type Built = StageInstance;
 
     /// Edits the stage instance
     ///
@@ -62,15 +53,16 @@ impl<'a> Builder for EditStageInstance<'a> {
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
     /// instance currently.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        channel_id: ChannelId,
+    ) -> Result<StageInstance> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(ctx) {
+                if let Some(channel) = cache.channel(channel_id) {
                     if channel.kind != ChannelType::Stage {
                         return Err(Error::Model(ModelError::InvalidChannelType));
                     }
@@ -78,6 +70,6 @@ impl<'a> Builder for EditStageInstance<'a> {
             }
         }
 
-        cache_http.http().edit_stage_instance(ctx, &self, self.audit_log_reason).await
+        cache_http.http().edit_stage_instance(channel_id, &self, self.audit_log_reason).await
     }
 }
