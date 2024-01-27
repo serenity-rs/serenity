@@ -1,12 +1,6 @@
 use std::borrow::Cow;
 
-use crate::builder::{
-    Builder as _,
-    CreateActionRow,
-    CreateInputText,
-    CreateInteractionResponse,
-    CreateModal,
-};
+use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
 use crate::internal::prelude::*;
@@ -105,7 +99,7 @@ impl<'a> CreateQuickModal<'a> {
                     .collect::<Vec<_>>(),
             ),
         );
-        builder.execute(ctx, (interaction_id, token)).await?;
+        builder.execute(&ctx.http, interaction_id, token).await?;
 
         let collector = ModalInteractionCollector::new(ctx.shard.clone())
             .custom_ids(vec![modal_custom_id.trunc_into()]);
