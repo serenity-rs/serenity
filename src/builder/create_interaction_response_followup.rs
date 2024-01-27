@@ -1,8 +1,6 @@
 use std::borrow::Cow;
 
 use super::create_poll::Ready;
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -12,7 +10,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -160,13 +158,6 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateInteractionResponseFollowup<'_> {
-    type Context<'ctx> = (Option<MessageId>, &'ctx str);
-    type Built = Message;
 
     /// Creates or edits a followup response to the response sent. If a [`MessageId`] is provided,
     /// then the corresponding message will be edited. Otherwise, a new message will be created.
@@ -179,23 +170,24 @@ impl Builder for CreateInteractionResponseFollowup<'_> {
     /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         mut self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        http: &Http,
+        message_id: Option<MessageId>,
+        interaction_token: &str,
+    ) -> Result<Message> {
         self.check_length()?;
 
         let files = self.attachments.take_files();
 
-        let http = cache_http.http();
         if self.allowed_mentions.is_none() {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        match ctx.0 {
-            Some(id) => http.edit_followup_message(ctx.1, id, &self, files).await,
-            None => http.create_followup_message(ctx.1, &self, files).await,
+        match message_id {
+            Some(id) => http.edit_followup_message(interaction_token, id, &self, files).await,
+            None => http.create_followup_message(interaction_token, &self, files).await,
         }
     }
 }

@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -202,9 +200,7 @@ impl<'a> EditMessage<'a> {
         self.attachments = Some(EditAttachments::new());
         self
     }
-}
 
-impl EditMessage<'_> {
     fn is_only_suppress_embeds(&self) -> bool {
         self.flags == Some(MessageFlags::SUPPRESS_EMBEDS)
             && self.content.is_none()
@@ -213,13 +209,6 @@ impl EditMessage<'_> {
             && self.components.is_none()
             && self.attachments.is_none()
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditMessage<'_> {
-    type Context<'ctx> = (ChannelId, MessageId, Option<UserId>);
-    type Built = Message;
 
     /// Edits a message in the channel.
     ///
@@ -244,15 +233,18 @@ impl Builder for EditMessage<'_> {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [`From<Embed>`]: CreateEmbed#impl-From<Embed>
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         mut self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        channel_id: ChannelId,
+        message_id: MessageId,
+        user_id: Option<UserId>,
+    ) -> Result<Message> {
         self.check_length()?;
 
         #[cfg(feature = "cache")]
-        if let Some(user_id) = ctx.2 {
+        if let Some(user_id) = user_id {
             if let Some(cache) = cache_http.cache() {
                 if user_id != cache.current_user().id && !self.is_only_suppress_embeds() {
                     return Err(Error::Model(ModelError::InvalidUser));
@@ -267,6 +259,6 @@ impl Builder for EditMessage<'_> {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        http.edit_message(ctx.0, ctx.1, &self, files).await
+        http.edit_message(channel_id, message_id, &self, files).await
     }
 }

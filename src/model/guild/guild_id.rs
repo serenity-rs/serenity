@@ -8,7 +8,6 @@ use serde_json::json;
 #[cfg(feature = "model")]
 use crate::builder::{
     AddMember,
-    Builder,
     CreateChannel,
     CreateCommand,
     CreateScheduledEvent,
@@ -106,10 +105,10 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn create_automod_rule(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
-        builder.execute(cache_http, (self, None)).await
+        builder.execute(http, self, None).await
     }
 
     /// Edit an auto moderation [`Rule`], given its Id.
@@ -123,11 +122,11 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_automod_rule(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         rule_id: RuleId,
         builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
-        builder.execute(cache_http, (self, Some(rule_id))).await
+        builder.execute(http, self, Some(rule_id)).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.
@@ -154,11 +153,11 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn add_member(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         user_id: UserId,
         builder: AddMember<'_>,
     ) -> Result<Option<Member>> {
-        builder.execute(cache_http, (self, user_id)).await
+        builder.execute(http, self, user_id).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -408,12 +407,8 @@ impl GuildId {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn create_role(
-        self,
-        cache_http: impl CacheHttp,
-        builder: EditRole<'_>,
-    ) -> Result<Role> {
-        builder.execute(cache_http, (self, None)).await
+    pub async fn create_role(self, http: &Http, builder: EditRole<'_>) -> Result<Role> {
+        builder.execute(http, self, None).await
     }
 
     /// Creates a new scheduled event in the guild with the data set, if any.
@@ -622,11 +617,11 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn edit_member(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         user_id: UserId,
         builder: EditMember<'_>,
     ) -> Result<Member> {
-        builder.execute(cache_http, (self, user_id)).await
+        builder.execute(http, self, user_id).await
     }
 
     /// Edits the guild's MFA level. Returns the new level on success.
@@ -701,7 +696,7 @@ impl GuildId {
         role_id: RoleId,
         builder: EditRole<'_>,
     ) -> Result<Role> {
-        builder.execute(cache_http, (self, Some(role_id))).await
+        builder.execute(cache_http, self, Some(role_id)).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -718,11 +713,11 @@ impl GuildId {
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn edit_scheduled_event(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         event_id: ScheduledEventId,
         builder: EditScheduledEvent<'_>,
     ) -> Result<ScheduledEvent> {
-        builder.execute(cache_http, (self, event_id)).await
+        builder.execute(http, self, event_id).await
     }
 
     /// Edits a sticker.
@@ -756,11 +751,11 @@ impl GuildId {
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     pub async fn edit_sticker(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         sticker_id: StickerId,
         builder: EditSticker<'_>,
     ) -> Result<Sticker> {
-        builder.execute(cache_http, (self, sticker_id)).await
+        builder.execute(http, self, sticker_id).await
     }
 
     /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
@@ -799,10 +794,10 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_welcome_screen(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: EditGuildWelcomeScreen<'_>,
     ) -> Result<GuildWelcomeScreen> {
-        builder.execute(cache_http, self).await
+        builder.execute(http, self).await
     }
 
     /// Edits the guild's widget.
@@ -816,10 +811,10 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_widget(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: EditGuildWidget<'_>,
     ) -> Result<GuildWidget> {
-        builder.execute(cache_http, self).await
+        builder.execute(http, self).await
     }
 
     /// Gets a specific role in the guild, by Id.
@@ -1083,12 +1078,12 @@ impl GuildId {
     /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn move_member(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         user_id: UserId,
         channel_id: ChannelId,
     ) -> Result<Member> {
         let builder = EditMember::new().voice_channel(channel_id);
-        self.edit_member(cache_http, user_id, builder).await
+        self.edit_member(http, user_id, builder).await
     }
 
     /// Returns the name of whatever guild this id holds.
@@ -1108,12 +1103,8 @@ impl GuildId {
     /// currently in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    pub async fn disconnect_member(
-        self,
-        cache_http: impl CacheHttp,
-        user_id: UserId,
-    ) -> Result<Member> {
-        self.edit_member(cache_http, user_id, EditMember::new().disconnect_member()).await
+    pub async fn disconnect_member(self, http: &Http, user_id: UserId) -> Result<Member> {
+        self.edit_member(http, user_id, EditMember::new().disconnect_member()).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given number of days.
@@ -1408,12 +1399,8 @@ impl GuildId {
     /// # Errors
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
-    pub async fn create_command(
-        self,
-        cache_http: impl CacheHttp,
-        builder: CreateCommand<'_>,
-    ) -> Result<Command> {
-        builder.execute(cache_http, (Some(self), None)).await
+    pub async fn create_command(self, http: &Http, builder: CreateCommand<'_>) -> Result<Command> {
+        builder.execute(http, Some(self), None).await
     }
 
     /// Override all guild application commands.
@@ -1438,11 +1425,11 @@ impl GuildId {
     /// See [`EditCommandPermissions::execute`] for a list of possible errors.
     pub async fn edit_command_permissions(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         command_id: CommandId,
         builder: EditCommandPermissions<'_>,
     ) -> Result<CommandPermissions> {
-        builder.execute(cache_http, (self, command_id)).await
+        builder.execute(http, self, command_id).await
     }
 
     /// Get all guild application commands.
@@ -1479,11 +1466,11 @@ impl GuildId {
     /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn edit_command(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         command_id: CommandId,
         builder: CreateCommand<'_>,
     ) -> Result<Command> {
-        builder.execute(cache_http, (Some(self), Some(command_id))).await
+        builder.execute(http, Some(self), Some(command_id)).await
     }
 
     /// Delete guild application command by its Id.
