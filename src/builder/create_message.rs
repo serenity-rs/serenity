@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -250,16 +248,6 @@ impl<'a> CreateMessage<'a> {
         self.nonce = Some(nonce);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateMessage<'_> {
-    #[cfg(feature = "cache")]
-    type Context<'ctx> = (ChannelId, Option<GuildId>);
-    #[cfg(not(feature = "cache"))]
-    type Context<'ctx> = (ChannelId,);
-    type Built = Message;
 
     /// Send a message to the channel.
     ///
@@ -278,15 +266,13 @@ impl Builder for CreateMessage<'_> {
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Attach Files]: Permissions::ATTACH_FILES
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         mut self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        let channel_id = ctx.0;
-        #[cfg(feature = "cache")]
-        let guild_id = ctx.1;
-
+        channel_id: ChannelId,
+        #[cfg(feature = "cache")] guild_id: Option<GuildId>,
+    ) -> Result<Message> {
         #[cfg(feature = "cache")]
         {
             let mut req = Permissions::SEND_MESSAGES;

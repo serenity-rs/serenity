@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -51,13 +49,6 @@ impl<'a> CreateWebhook<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl<'a> Builder for CreateWebhook<'a> {
-    type Context<'ctx> = ChannelId;
-    type Built = Webhook;
 
     /// Creates the webhook.
     ///
@@ -74,15 +65,16 @@ impl<'a> Builder for CreateWebhook<'a> {
     ///
     /// [`Text`]: ChannelType::Text
     /// [`News`]: ChannelType::News
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        channel_id: ChannelId,
+    ) -> Result<Webhook> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(ctx) {
+                if let Some(channel) = cache.channel(channel_id) {
                     // forum channels are not text-based, but webhooks can be created in them
                     // and used to send messages in their posts
                     if !channel.is_text_based() && channel.kind != ChannelType::Forum {
@@ -95,6 +87,6 @@ impl<'a> Builder for CreateWebhook<'a> {
         crate::model::error::Minimum::WebhookName.check_underflow(self.name.chars().count())?;
         crate::model::error::Maximum::WebhookName.check_overflow(self.name.chars().count())?;
 
-        cache_http.http().create_webhook(ctx, &self, self.audit_log_reason).await
+        cache_http.http().create_webhook(channel_id, &self, self.audit_log_reason).await
     }
 }

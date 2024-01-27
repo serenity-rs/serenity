@@ -1,6 +1,4 @@
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
@@ -60,13 +58,6 @@ impl EditVoiceState {
         self.request_to_speak_timestamp = Some(Some(timestamp.into()));
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditVoiceState {
-    type Context<'ctx> = (GuildId, ChannelId, Option<UserId>);
-    type Built = ();
 
     /// Edits the given user's voice state in a stage channel. Providing a [`UserId`] will edit
     /// that user's voice state, otherwise the current user's voice state will be edited.
@@ -84,12 +75,14 @@ impl Builder for EditVoiceState {
     ///
     /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
     /// [Mute Members]: Permissions::MUTE_MEMBERS
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         mut self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        let (guild_id, channel_id, user_id) = ctx;
+        guild_id: GuildId,
+        channel_id: ChannelId,
+        user_id: Option<UserId>,
+    ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
