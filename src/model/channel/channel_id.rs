@@ -7,7 +7,6 @@ use futures::stream::Stream;
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    Builder,
     CreateAttachment,
     CreateForumPost,
     CreateInvite,
@@ -326,7 +325,7 @@ impl ChannelId {
         message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, (self, message_id, None)).await
+        builder.execute(cache_http, self, message_id, None).await
     }
 
     /// Follows the News Channel
@@ -451,12 +450,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn messages(
-        self,
-        cache_http: impl CacheHttp,
-        builder: GetMessages,
-    ) -> Result<Vec<Message>> {
-        builder.execute(cache_http, self).await
+    pub async fn messages(self, http: &Http, builder: GetMessages) -> Result<Vec<Message>> {
+        builder.execute(http, self).await
     }
 
     /// Streams over all the messages in a channel.
@@ -693,7 +688,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: CreateMessage<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, (self, None)).await
+        builder.execute(cache_http, self, None).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
@@ -847,12 +842,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread(
-        self,
-        cache_http: impl CacheHttp,
-        builder: EditThread<'_>,
-    ) -> Result<GuildChannel> {
-        builder.execute(cache_http, self).await
+    pub async fn edit_thread(self, http: &Http, builder: EditThread<'_>) -> Result<GuildChannel> {
+        builder.execute(http, self).await
     }
 
     /// Deletes a stage instance.
@@ -873,11 +864,11 @@ impl ChannelId {
     #[doc(alias = "create_public_thread")]
     pub async fn create_thread_from_message(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         message_id: MessageId,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        builder.execute(cache_http, (self, Some(message_id))).await
+        builder.execute(http, self, Some(message_id)).await
     }
 
     /// Creates a thread that is not connected to a message.
@@ -888,10 +879,10 @@ impl ChannelId {
     #[doc(alias = "create_public_thread", alias = "create_private_thread")]
     pub async fn create_thread(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        builder.execute(cache_http, (self, None)).await
+        builder.execute(http, self, None).await
     }
 
     /// Creates a post in a forum channel.
@@ -901,10 +892,10 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn create_forum_post(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateForumPost<'_>,
     ) -> Result<GuildChannel> {
-        builder.execute(cache_http, self).await
+        builder.execute(http, self).await
     }
 
     /// Gets the thread members, if this channel is a thread.

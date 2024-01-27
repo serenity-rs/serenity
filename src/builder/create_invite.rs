@@ -1,6 +1,4 @@
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
@@ -194,13 +192,6 @@ impl<'a> CreateInvite<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateInvite<'_> {
-    type Context<'ctx> = ChannelId;
-    type Built = RichInvite;
 
     /// Creates an invite for the given channel.
     ///
@@ -212,18 +203,23 @@ impl Builder for CreateInvite<'_> {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
+        channel_id: ChannelId,
     ) -> Result<RichInvite> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, ctx, Permissions::CREATE_INSTANT_INVITE)?;
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    Permissions::CREATE_INSTANT_INVITE,
+                )?;
             }
         }
 
-        cache_http.http().create_invite(ctx, &self, self.audit_log_reason).await
+        cache_http.http().create_invite(channel_id, &self, self.audit_log_reason).await
     }
 }

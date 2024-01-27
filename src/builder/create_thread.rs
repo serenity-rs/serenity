@@ -3,9 +3,7 @@ use std::borrow::Cow;
 use nonmax::NonMaxU16;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -96,13 +94,6 @@ impl<'a> CreateThread<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateThread<'_> {
-    type Context<'ctx> = (ChannelId, Option<MessageId>);
-    type Built = GuildChannel;
 
     /// Creates a thread, either private or public. Public threads require a message to connect the
     /// thread to.
@@ -110,17 +101,18 @@ impl Builder for CreateThread<'_> {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
+        http: &Http,
+        channel_id: ChannelId,
+        message_id: Option<MessageId>,
     ) -> Result<GuildChannel> {
-        let http = cache_http.http();
-        match ctx.1 {
+        match message_id {
             Some(id) => {
-                http.create_thread_from_message(ctx.0, id, &self, self.audit_log_reason).await
+                http.create_thread_from_message(channel_id, id, &self, self.audit_log_reason).await
             },
-            None => http.create_thread(ctx.0, &self, self.audit_log_reason).await,
+            None => http.create_thread(channel_id, &self, self.audit_log_reason).await,
         }
     }
 }

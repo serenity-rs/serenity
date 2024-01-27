@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -122,13 +120,6 @@ impl<'a> CreateScheduledEvent<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateScheduledEvent<'_> {
-    type Context<'ctx> = GuildId;
-    type Built = ScheduledEvent;
 
     /// Creates a new scheduled event in the guild with the data set, if any.
     ///
@@ -140,15 +131,16 @@ impl Builder for CreateScheduledEvent<'_> {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        channel_id: GuildId,
+    ) -> Result<ScheduledEvent> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::CREATE_EVENTS)?;
+        crate::utils::user_has_guild_perms(&cache_http, channel_id, Permissions::CREATE_EVENTS)?;
 
-        cache_http.http().create_scheduled_event(ctx, &self, self.audit_log_reason).await
+        cache_http.http().create_scheduled_event(channel_id, &self, self.audit_log_reason).await
     }
 }
 
