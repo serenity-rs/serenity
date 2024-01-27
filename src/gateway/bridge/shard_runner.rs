@@ -128,7 +128,7 @@ impl ShardRunner {
                         shard_id: self.shard.shard_info().id,
                     };
                     spawn_named("dispatch::event_handler::shard_stage_update", async move {
-                        event_handler.shard_stage_update(context, event).await;
+                        event_handler.shard_stage_update(&context, &event).await;
                     });
                 }
             }
@@ -175,11 +175,11 @@ impl ShardRunner {
 
                 dispatch_model(
                     event,
-                    &self.make_context(),
+                    self.make_context(),
                     #[cfg(feature = "framework")]
                     self.framework.clone(),
-                    self.event_handlers.clone(),
-                    self.raw_event_handlers.clone(),
+                    &self.event_handlers,
+                    &self.raw_event_handlers,
                 );
             }
 
