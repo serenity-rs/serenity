@@ -1095,7 +1095,7 @@
                 <span class="kw">for </span>event_handler <span class="kw">in </span><span class="kw-2">&amp;</span>event_handlers_clone {
                     <span class="kw">let </span>info = info.clone();
                     <span class="kw">let </span>event_handler = Arc::clone(event_handler);
-                    tokio::spawn(<span class="kw">async move </span>{ event_handler.ratelimit(info).<span class="kw">await </span>});
+                    tokio::spawn(<span class="kw">async move </span>{ event_handler.ratelimit(<span class="kw-2">&amp;</span>info).<span class="kw">await </span>});
                 }
             }));
         }
@@ -1190,7 +1190,7 @@
 ///
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     async fn message(&amp;self, context: Context, msg: Message) {
+///     async fn message(&amp;self, context: &amp;Context, msg: &amp;Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say(&amp;context, "Pong!");
 ///         }

@@ -635,7 +635,7 @@
                         shard_id: <span class="self">self</span>.shard.shard_info().id,
                     };
                     spawn_named(<span class="string">"dispatch::event_handler::shard_stage_update"</span>, <span class="kw">async move </span>{
-                        event_handler.shard_stage_update(context, event).<span class="kw">await</span>;
+                        event_handler.shard_stage_update(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event).<span class="kw">await</span>;
                     });
                 }
             }
@@ -682,11 +682,11 @@
 
                 dispatch_model(
                     event,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.make_context(),
+                    <span class="self">self</span>.make_context(),
                     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
                     </span><span class="self">self</span>.framework.clone(),
-                    <span class="self">self</span>.event_handlers.clone(),
-                    <span class="self">self</span>.raw_event_handlers.clone(),
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.event_handlers,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.raw_event_handlers,
                 );
             }
 

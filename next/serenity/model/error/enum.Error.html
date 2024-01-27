@@ -41,7 +41,7 @@
 <span class="attr">#[serenity::async_trait]
 #[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>guild_ban_removal(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, guild_id: GuildId, user: User) {
+    <span class="kw">async fn </span>guild_ban_removal(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, guild_id: <span class="kw-2">&amp;</span>GuildId, user: <span class="kw-2">&amp;</span>User) {
         <span class="kw">match </span>guild_id.ban(<span class="kw-2">&amp;</span>ctx.http, user.id, <span class="number">8</span>).<span class="kw">await </span>{
             <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="comment">// Ban successful.

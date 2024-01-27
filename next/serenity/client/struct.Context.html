@@ -30,7 +30,7 @@ counters, database connections, custom user caches, etc.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">if </span>msg.content == <span class="string">"!online" </span>{
             ctx.online();
         }
@@ -43,7 +43,7 @@ counters, database connections, custom user caches, etc.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">if </span>msg.content == <span class="string">"!idle" </span>{
             ctx.idle();
         }
@@ -56,7 +56,7 @@ counters, database connections, custom user caches, etc.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">if </span>msg.content == <span class="string">"!dnd" </span>{
             ctx.dnd();
         }
@@ -69,7 +69,7 @@ counters, database connections, custom user caches, etc.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">if </span>msg.content == <span class="string">"!invisible" </span>{
             ctx.invisible();
         }
@@ -84,7 +84,7 @@ status to <a href="../model/user/enum.OnlineStatus.html#variant.Online" title="v
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">if </span>msg.content == <span class="string">"!reset_presence" </span>{
             ctx.reset_presence();
         }
@@ -99,7 +99,7 @@ status to <a href="../model/user/enum.OnlineStatus.html#variant.Online" title="v
 
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, msg: Message) {
+    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">let </span><span class="kw-2">mut </span>args = msg.content.splitn(<span class="number">2</span>, <span class="string">' '</span>);
 
         <span class="kw">if let </span>(<span class="prelude-val">Some</span>(<span class="string">"~setgame"</span>), <span class="prelude-val">Some</span>(game)) = (args.next(), args.next()) {
@@ -114,7 +114,7 @@ status to <a href="../model/user/enum.OnlineStatus.html#variant.Online" title="v
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>ready(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, <span class="kw">_</span>: Ready) {
+    <span class="kw">async fn </span>ready(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Ready) {
         <span class="kw">use </span>serenity::model::user::OnlineStatus;
 
         ctx.set_presence(<span class="prelude-val">None</span>, OnlineStatus::Idle);
@@ -125,7 +125,7 @@ status to <a href="../model/user/enum.OnlineStatus.html#variant.Online" title="v
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code>
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>ready(<span class="kw-2">&amp;</span><span class="self">self</span>, context: Context, <span class="kw">_</span>: Ready) {
+    <span class="kw">async fn </span>ready(<span class="kw-2">&amp;</span><span class="self">self</span>, context: <span class="kw-2">&amp;</span>Context, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Ready) {
         <span class="kw">use </span>serenity::gateway::ActivityData;
         <span class="kw">use </span>serenity::model::user::OnlineStatus;
 

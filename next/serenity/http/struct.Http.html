@@ -9,7 +9,7 @@
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     user_id: <a class="struct" href="../model/id/struct.UserId.html" title="struct serenity::model::id::UserId">UserId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/guild/struct.Member.html" title="struct serenity::model::guild::Member">Member</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Adds a <a href="../model/user/struct.User.html" title="struct serenity::model::user::User"><code>User</code></a> to a <a href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild"><code>Guild</code></a> with a valid OAuth2 access token.</p>
 <p>Returns the created <a href="../model/guild/struct.Member.html" title="struct serenity::model::guild::Member"><code>Member</code></a> object, or nothing if the user is already a guild member.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.add_member_role" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#259-279">source</a><h4 class="code-header">pub async fn <a href="#method.add_member_role" class="fn">add_member_role</a>(
@@ -39,46 +39,46 @@ command is still being processed.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_channel" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#340-359">source</a><h4 class="code-header">pub async fn <a href="#method.create_channel" class="fn">create_channel</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a <a href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel"><code>GuildChannel</code></a> in the <a href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild"><code>Guild</code></a> given its Id.</p>
 <p>Refer to the Discord’s <a href="https://discord.com/developers/docs/resources/guild#create-guild-channel">docs</a> for information on what fields this requires.</p>
 <p><strong>Note</strong>: Requires the <a href="../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS" title="associated constant serenity::model::permissions::Permissions::MANAGE_CHANNELS">Manage Channels</a> permission.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_stage_instance" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#362-376">source</a><h4 class="code-header">pub async fn <a href="#method.create_stage_instance" class="fn">create_stage_instance</a>(
     &amp;self,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.StageInstance.html" title="struct serenity::model::channel::StageInstance">StageInstance</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a stage instance.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_thread_from_message" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#379-400">source</a><h4 class="code-header">pub async fn <a href="#method.create_thread_from_message" class="fn">create_thread_from_message</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
     message_id: <a class="struct" href="../model/id/struct.MessageId.html" title="struct serenity::model::id::MessageId">MessageId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a thread channel in the <a href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel"><code>GuildChannel</code></a> given its Id, with a base message Id.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_thread" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#403-422">source</a><h4 class="code-header">pub async fn <a href="#method.create_thread" class="fn">create_thread</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a thread channel not attached to a message in the <a href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel"><code>GuildChannel</code></a> given its Id.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_forum_post" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#425-432">source</a><h4 class="code-header">pub async fn <a href="#method.create_forum_post" class="fn">create_forum_post</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Shortcut for <a href="struct.Http.html#method.create_forum_post_with_attachments" title="method serenity::http::Http::create_forum_post_with_attachments"><code>Self::create_forum_post_with_attachments</code></a></p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_forum_post_with_attachments" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#435-457">source</a><h4 class="code-header">pub async fn <a href="#method.create_forum_post_with_attachments" class="fn">create_forum_post_with_attachments</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     files: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a forum post channel in the <a href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel"><code>GuildChannel</code></a> given its Id.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_emoji" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#466-483">source</a><h4 class="code-header">pub async fn <a href="#method.create_emoji" class="fn">create_emoji</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.111/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
+    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.112/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.Emoji.html" title="struct serenity::model::guild::Emoji">Emoji</a>&gt;</h4></section></summary><div class="docblock"><p>Creates an emoji in the given <a href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild"><code>Guild</code></a> with the given data.</p>
 <p>View the source code for <a href="../model/guild/struct.Guild.html#method.create_emoji" title="method serenity::model::guild::Guild::create_emoji"><code>Guild::create_emoji</code></a> method to see what fields this requires.</p>
@@ -86,13 +86,13 @@ command is still being processed.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_followup_message" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#488-517">source</a><h4 class="code-header">pub async fn <a href="#method.create_followup_message" class="fn">create_followup_message</a>(
     &amp;self,
     interaction_token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     files: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section></summary><div class="docblock"><p>Create a follow-up message for an Interaction.</p>
 <p>Functions the same as <a href="struct.Http.html#method.execute_webhook" title="method serenity::http::Http::execute_webhook"><code>Self::execute_webhook</code></a></p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_global_command" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#529-541">source</a><h4 class="code-header">pub async fn <a href="#method.create_global_command" class="fn">create_global_command</a>(
     &amp;self,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a new global command.</p>
 <p>New global commands will be available in all guilds after 1 hour.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command">docs</a> for field information.</p>
@@ -100,14 +100,14 @@ command is still being processed.</p>
 will overwrite the old command.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_global_commands" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#544-559">source</a><h4 class="code-header">pub async fn <a href="#method.create_global_commands" class="fn">create_global_commands</a>(
     &amp;self,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../model/application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Creates new global application commands.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_guild_commands" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#562-579">source</a><h4 class="code-header">pub async fn <a href="#method.create_guild_commands" class="fn">create_guild_commands</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../model/application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Creates new guild application commands.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.create_guild" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#614-624">source</a><h4 class="code-header">pub async fn <a href="#method.create_guild" class="fn">create_guild</a>(&amp;self, map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.111/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.PartialGuild.html" title="struct serenity::model::guild::PartialGuild">PartialGuild</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a guild with the data provided.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.create_guild" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#614-624">source</a><h4 class="code-header">pub async fn <a href="#method.create_guild" class="fn">create_guild</a>(&amp;self, map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.112/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.PartialGuild.html" title="struct serenity::model::guild::PartialGuild">PartialGuild</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a guild with the data provided.</p>
 <p>Only a <a href="../model/guild/struct.PartialGuild.html" title="struct serenity::model::guild::PartialGuild"><code>PartialGuild</code></a> will be immediately returned, and a full <a href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild"><code>Guild</code></a> will be received
 over a <a href="../gateway/struct.Shard.html" title="struct serenity::gateway::Shard"><code>Shard</code></a>, if at least one is running.</p>
 <p><strong>Note</strong>: This endpoint is currently limited to 10 active guilds. The limits are raised for
@@ -127,7 +127,7 @@ info.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_guild_command" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#633-650">source</a><h4 class="code-header">pub async fn <a href="#method.create_guild_command" class="fn">create_guild_command</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a new guild command.</p>
 <p>New guild commands will be available in the guild immediately.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command">docs</a> for field information.</p>
@@ -135,7 +135,7 @@ info.</p>
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     integration_id: <a class="struct" href="../model/id/struct.IntegrationId.html" title="struct serenity::model::id::IntegrationId">IntegrationId</a>,
-    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.111/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
+    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.112/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Creates an <a href="../model/guild/struct.Integration.html" title="struct serenity::model::guild::Integration"><code>Integration</code></a> for a <a href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild"><code>Guild</code></a>.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/resources/guild#create-guild-integration">docs</a> for field information.</p>
@@ -144,14 +144,14 @@ info.</p>
     &amp;self,
     interaction_id: <a class="struct" href="../model/id/struct.InteractionId.html" title="struct serenity::model::id::InteractionId">InteractionId</a>,
     interaction_token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     files: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a response to an <a href="../model/application/enum.Interaction.html" title="enum serenity::model::application::Interaction"><code>Interaction</code></a> from the gateway.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response">docs</a> for the object it takes.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_invite" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#729-748">source</a><h4 class="code-header">pub async fn <a href="#method.create_invite" class="fn">create_invite</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/invite/struct.RichInvite.html" title="struct serenity::model::invite::RichInvite">RichInvite</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a <a href="../model/invite/struct.RichInvite.html" title="struct serenity::model::invite::RichInvite"><code>RichInvite</code></a> for the given <a href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">channel</a>.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/resources/channel#create-channel-invite">docs</a> for field information.</p>
@@ -161,12 +161,12 @@ info.</p>
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
     target_id: <a class="struct" href="../model/id/struct.TargetId.html" title="struct serenity::model::id::TargetId">TargetId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a permission override for a member or a role in a channel.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_private_channel" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#775-787">source</a><h4 class="code-header">pub async fn <a href="#method.create_private_channel" class="fn">create_private_channel</a>(
     &amp;self,
-    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.111/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>
+    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.112/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.PrivateChannel.html" title="struct serenity::model::channel::PrivateChannel">PrivateChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a private channel with a user.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_reaction" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#790-809">source</a><h4 class="code-header">pub async fn <a href="#method.create_reaction" class="fn">create_reaction</a>(
     &amp;self,
@@ -177,13 +177,13 @@ info.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_role" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#812-836">source</a><h4 class="code-header">pub async fn <a href="#method.create_role" class="fn">create_role</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    body: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    body: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.Role.html" title="struct serenity::model::guild::Role">Role</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a role.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_scheduled_event" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#845-863">source</a><h4 class="code-header">pub async fn <a href="#method.create_scheduled_event" class="fn">create_scheduled_event</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.ScheduledEvent.html" title="struct serenity::model::guild::ScheduledEvent">ScheduledEvent</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a Guild Scheduled Event.</p>
 <p>Refer to Discord’s docs for field information.</p>
@@ -206,7 +206,7 @@ entitlement will have <code>starts_at</code> and <code>ends_at</code> both be <c
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_webhook" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#950-969">source</a><h4 class="code-header">pub async fn <a href="#method.create_webhook" class="fn">create_webhook</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;</h4></section></summary><div class="docblock"><p>Creates a webhook for the given <a href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">channel</a>’s Id, passing in the given data.</p>
 <p>This method requires authentication.</p>
@@ -275,7 +275,7 @@ entitlement will have <code>starts_at</code> and <code>ends_at</code> both be <c
 </div></details><details class="toggle method-toggle" open><summary><section id="method.delete_messages" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1167-1184">source</a><h4 class="code-header">pub async fn <a href="#method.delete_messages" class="fn">delete_messages</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Deletes a bunch of messages, only works for bots.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.delete_message_reactions" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1204-1221">source</a><h4 class="code-header">pub async fn <a href="#method.delete_message_reactions" class="fn">delete_message_reactions</a>(
@@ -375,20 +375,20 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_channel" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1496-1515">source</a><h4 class="code-header">pub async fn <a href="#method.edit_channel" class="fn">edit_channel</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Changes channel information.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_stage_instance" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1518-1535">source</a><h4 class="code-header">pub async fn <a href="#method.edit_stage_instance" class="fn">edit_stage_instance</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.StageInstance.html" title="struct serenity::model::channel::StageInstance">StageInstance</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a stage instance.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_emoji" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1540-1561">source</a><h4 class="code-header">pub async fn <a href="#method.edit_emoji" class="fn">edit_emoji</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     emoji_id: <a class="struct" href="../model/id/struct.EmojiId.html" title="struct serenity::model::id::EmojiId">EmojiId</a>,
-    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.111/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
+    map: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.112/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.Emoji.html" title="struct serenity::model::guild::Emoji">Emoji</a>&gt;</h4></section></summary><div class="docblock"><p>Changes emoji information.</p>
 <p>See <a href="../model/id/struct.GuildId.html#method.edit_emoji" title="method serenity::model::id::GuildId::edit_emoji"><code>GuildId::edit_emoji</code></a> for permissions requirements.</p>
@@ -396,7 +396,7 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
     &amp;self,
     interaction_token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
     message_id: <a class="struct" href="../model/id/struct.MessageId.html" title="struct serenity::model::id::MessageId">MessageId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     new_attachments: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a follow-up message for an interaction.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/resources/webhook#edit-webhook-message">docs</a> for Edit Webhook Message for field information.</p>
@@ -409,21 +409,21 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_global_command" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1633-1650">source</a><h4 class="code-header">pub async fn <a href="#method.edit_global_command" class="fn">edit_global_command</a>(
     &amp;self,
     command_id: <a class="struct" href="../model/id/struct.CommandId.html" title="struct serenity::model::id::CommandId">CommandId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a global command.</p>
 <p>Updates will be available in all guilds after 1 hour.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command">docs</a> for field information.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_guild" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1653-1672">source</a><h4 class="code-header">pub async fn <a href="#method.edit_guild" class="fn">edit_guild</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.PartialGuild.html" title="struct serenity::model::guild::PartialGuild">PartialGuild</a>&gt;</h4></section></summary><div class="docblock"><p>Changes guild information.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_guild_command" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1681-1700">source</a><h4 class="code-header">pub async fn <a href="#method.edit_guild_command" class="fn">edit_guild_command</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     command_id: <a class="struct" href="../model/id/struct.CommandId.html" title="struct serenity::model::id::CommandId">CommandId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/application/struct.Command.html" title="struct serenity::model::application::Command">Command</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a guild command.</p>
 <p>Updates for guild commands will be available immediately.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command">docs</a> for field information.</p>
@@ -431,45 +431,45 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     command_id: <a class="struct" href="../model/id/struct.CommandId.html" title="struct serenity::model::id::CommandId">CommandId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/application/struct.CommandPermissions.html" title="struct serenity::model::application::CommandPermissions">CommandPermissions</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a guild command permissions.</p>
 <p>Updates for guild commands will be available immediately.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions">documentation</a> for field information.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_guild_channel_positions" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1731-1749">source</a><h4 class="code-header">pub async fn <a href="#method.edit_guild_channel_positions" class="fn">edit_guild_channel_positions</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    value: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    value: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the positions of a guild’s channels.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_guild_mfa_level" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1752-1777">source</a><h4 class="code-header">pub async fn <a href="#method.edit_guild_mfa_level" class="fn">edit_guild_mfa_level</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    value: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.111/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
+    value: &amp;<a class="enum" href="https://docs.rs/serde_json/1.0.112/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="enum" href="../model/guild/enum.MfaLevel.html" title="enum serenity::model::guild::MfaLevel">MfaLevel</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the MFA level of a guild. Requires guild ownership.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_guild_widget" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1780-1799">source</a><h4 class="code-header">pub async fn <a href="#method.edit_guild_widget" class="fn">edit_guild_widget</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.GuildWidget.html" title="struct serenity::model::guild::GuildWidget">GuildWidget</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a <a href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild"><code>Guild</code></a>’s widget.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_guild_welcome_screen" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1802-1821">source</a><h4 class="code-header">pub async fn <a href="#method.edit_guild_welcome_screen" class="fn">edit_guild_welcome_screen</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.GuildWelcomeScreen.html" title="struct serenity::model::guild::GuildWelcomeScreen">GuildWelcomeScreen</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a guild welcome screen.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_member" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1824-1852">source</a><h4 class="code-header">pub async fn <a href="#method.edit_member" class="fn">edit_member</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     user_id: <a class="struct" href="../model/id/struct.UserId.html" title="struct serenity::model::id::UserId">UserId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.Member.html" title="struct serenity::model::guild::Member">Member</a>&gt;</h4></section></summary><div class="docblock"><p>Does specific actions to a member.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_message" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1857-1887">source</a><h4 class="code-header">pub async fn <a href="#method.edit_message" class="fn">edit_message</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
     message_id: <a class="struct" href="../model/id/struct.MessageId.html" title="struct serenity::model::id::MessageId">MessageId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     new_attachments: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a message by Id.</p>
 <p><strong>Note</strong>: Only the author of a message can modify it.</p>
@@ -482,7 +482,7 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_member_me" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1912-1931">source</a><h4 class="code-header">pub async fn <a href="#method.edit_member_me" class="fn">edit_member_me</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;<a class="struct" href="https://docs.rs/serde_json/1.0.111/serde_json/map/struct.Map.html" title="struct serde_json::map::Map">Map</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>, <a class="enum" href="https://docs.rs/serde_json/1.0.111/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>&gt;,
+    map: &amp;<a class="struct" href="https://docs.rs/serde_json/1.0.112/serde_json/map/struct.Map.html" title="struct serde_json::map::Map">Map</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>, <a class="enum" href="https://docs.rs/serde_json/1.0.112/serde_json/value/enum.Value.html" title="enum serde_json::value::Value">Value</a>&gt;,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.Member.html" title="struct serenity::model::guild::Member">Member</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the current member for the provided <a href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild"><code>Guild</code></a> via its Id.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_nickname" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#1936-1956">source</a><h4 class="code-header">pub async fn <a href="#method.edit_nickname" class="fn">edit_nickname</a>(
@@ -504,16 +504,16 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_original_interaction_response" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2004-2033">source</a><h4 class="code-header">pub async fn <a href="#method.edit_original_interaction_response" class="fn">edit_original_interaction_response</a>(
     &amp;self,
     interaction_token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     new_attachments: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the initial interaction response.</p>
 <p>Refer to Discord’s <a href="https://discord.com/developers/docs/resources/webhook#edit-webhook-message">docs</a> for Edit Webhook Message for field information.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.edit_profile" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2036-2048">source</a><h4 class="code-header">pub async fn <a href="#method.edit_profile" class="fn">edit_profile</a>(&amp;self, map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the current user’s profile settings.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.edit_profile" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2036-2048">source</a><h4 class="code-header">pub async fn <a href="#method.edit_profile" class="fn">edit_profile</a>(&amp;self, map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the current user’s profile settings.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_role" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2051-2077">source</a><h4 class="code-header">pub async fn <a href="#method.edit_role" class="fn">edit_role</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     role_id: <a class="struct" href="../model/id/struct.RoleId.html" title="struct serenity::model::id::RoleId">RoleId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.Role.html" title="struct serenity::model::guild::Role">Role</a>&gt;</h4></section></summary><div class="docblock"><p>Changes a role in a guild.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_role_position" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2080-2115">source</a><h4 class="code-header">pub async fn <a href="#method.edit_role_position" class="fn">edit_role_position</a>(
@@ -527,7 +527,7 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     event_id: <a class="struct" href="../model/id/struct.ScheduledEventId.html" title="struct serenity::model::id::ScheduledEventId">ScheduledEventId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/struct.ScheduledEvent.html" title="struct serenity::model::guild::ScheduledEvent">ScheduledEvent</a>&gt;</h4></section></summary><div class="docblock"><p>Modifies a scheduled event.</p>
 <p><strong>Note</strong>: Requires the <a href="../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_EVENTS" title="associated constant serenity::model::permissions::Permissions::MANAGE_EVENTS">Manage Events</a> permission.</p>
@@ -535,21 +535,21 @@ http.delete_webhook_with_token(id, token, <span class="prelude-val">None</span>)
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     sticker_id: <a class="struct" href="../model/id/struct.StickerId.html" title="struct serenity::model::id::StickerId">StickerId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/sticker/struct.Sticker.html" title="struct serenity::model::sticker::Sticker">Sticker</a>&gt;</h4></section></summary><div class="docblock"><p>Changes a sticker in a guild.</p>
 <p>See <a href="../model/id/struct.GuildId.html#method.edit_sticker" title="method serenity::model::id::GuildId::edit_sticker"><code>GuildId::edit_sticker</code></a> for permissions requirements.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_thread" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2178-2195">source</a><h4 class="code-header">pub async fn <a href="#method.edit_thread" class="fn">edit_thread</a>(
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a thread channel in the <a href="../model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel"><code>GuildChannel</code></a> given its Id.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_voice_state" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2227-2245">source</a><h4 class="code-header">pub async fn <a href="#method.edit_voice_state" class="fn">edit_voice_state</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     user_id: <a class="struct" href="../model/id/struct.UserId.html" title="struct serenity::model::id::UserId">UserId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Changes another user’s voice state in a stage channel.</p>
 <p>The Value is a map with values of:</p>
 <ul>
@@ -576,7 +576,7 @@ invite the user to speak.</li>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_voice_state_me" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2280-2296">source</a><h4 class="code-header">pub async fn <a href="#method.edit_voice_state_me" class="fn">edit_voice_state_me</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Changes the current user’s voice state in a stage channel.</p>
 <p>The Value is a map with values of:</p>
 <ul>
@@ -605,7 +605,7 @@ can be any present or future time.</li>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.edit_webhook" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2330-2347">source</a><h4 class="code-header">pub async fn <a href="#method.edit_webhook" class="fn">edit_webhook</a>(
     &amp;self,
     webhook_id: <a class="struct" href="../model/id/struct.WebhookId.html" title="struct serenity::model::id::WebhookId">WebhookId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a the webhook with the given data.</p>
 <p>The Value is a map with optional values of:</p>
@@ -634,7 +634,7 @@ can be any present or future time.</li>
     &amp;self,
     webhook_id: <a class="struct" href="../model/id/struct.WebhookId.html" title="struct serenity::model::id::WebhookId">WebhookId</a>,
     token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the webhook with the given data.</p>
 <p>Refer to the documentation for <a href="struct.Http.html#method.edit_webhook" title="method serenity::http::Http::edit_webhook"><code>Self::edit_webhook</code></a> for more information.</p>
@@ -658,7 +658,7 @@ can be any present or future time.</li>
     token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
     wait: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,
     files: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Executes a webhook, posting a <a href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message"><code>Message</code></a> in the webhook’s associated <a href="../model/channel/enum.Channel.html" title="enum serenity::model::channel::Channel"><code>Channel</code></a>.</p>
 <p>This method does <em>not</em> require authentication.</p>
 <p>If <code>thread_id</code> is not <code>None</code>, then the message will be sent to the thread in the webhook’s
@@ -710,7 +710,7 @@ will be determined by Discord.</p>
     thread_id: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>&gt;,
     token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>,
     message_id: <a class="struct" href="../model/id/struct.MessageId.html" title="struct serenity::model::id::MessageId">MessageId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     new_attachments: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section></summary><div class="docblock"><p>Edits a webhook’s message by Id.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.delete_webhook_message" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2555-2578">source</a><h4 class="code-header">pub async fn <a href="#method.delete_webhook_message" class="fn">delete_webhook_message</a>(
@@ -752,7 +752,7 @@ after the provided <a href="../model/id/struct.UserId.html" title="struct sereni
 </div></details><details class="toggle method-toggle" open><summary><section id="method.create_automod_rule" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#2720-2739">source</a><h4 class="code-header">pub async fn <a href="#method.create_automod_rule" class="fn">create_automod_rule</a>(
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/automod/struct.Rule.html" title="struct serenity::model::guild::automod::Rule">Rule</a>&gt;</h4></section></summary><div class="docblock"><p>Creates an auto moderation rule in a guild.</p>
 <p>This method requires <code>MANAGE_GUILD</code> permissions.</p>
@@ -760,7 +760,7 @@ after the provided <a href="../model/id/struct.UserId.html" title="struct sereni
     &amp;self,
     guild_id: <a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>,
     rule_id: <a class="struct" href="../model/id/struct.RuleId.html" title="struct serenity::model::id::RuleId">RuleId</a>,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/guild/automod/struct.Rule.html" title="struct serenity::model::guild::automod::Rule">Rule</a>&gt;</h4></section></summary><div class="docblock"><p>Retrieves an auto moderation rule in a guild.</p>
 <p>This method requires <code>MANAGE_GUILD</code> permissions.</p>
@@ -1093,7 +1093,7 @@ of members in the server that the invite belongs to.</li>
     &amp;self,
     channel_id: <a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>,
     files: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../builder/struct.CreateAttachment.html" title="struct serenity::builder::CreateAttachment">CreateAttachment</a>&lt;'_&gt;&gt;,
-    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.195/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
+    map: &amp;impl <a class="trait" href="https://docs.rs/serde/1.0.196/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">Serialize</a>
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;</h4></section></summary><div class="docblock"><p>Sends a message to a channel.</p>
 <h5 id="errors"><a class="doc-anchor" href="#errors">§</a>Errors</h5>
 <p>Returns an <a href="enum.HttpError.html#variant.UnsuccessfulRequest" title="variant serenity::http::HttpError::UnsuccessfulRequest"><code>HttpError::UnsuccessfulRequest</code></a> if the files are too large to send.</p>
@@ -1161,7 +1161,7 @@ command is still being processed.</p>
     message_id: <a class="struct" href="../model/id/struct.MessageId.html" title="struct serenity::model::id::MessageId">MessageId</a>,
     audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Unpins a message from a channel.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.fire" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#4603-4607">source</a><h4 class="code-header">pub async fn <a href="#method.fire" class="fn">fire</a>&lt;T: <a class="trait" href="https://docs.rs/serde/1.0.195/serde/de/trait.DeserializeOwned.html" title="trait serde::de::DeserializeOwned">DeserializeOwned</a>&gt;(&amp;self, req: <a class="struct" href="struct.Request.html" title="struct serenity::http::Request">Request</a>&lt;'_&gt;) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;T&gt;</h4></section></summary><div class="docblock"><p>Fires off a request, deserializing the response reader via the given type bound.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.fire" class="method"><a class="src rightside" href="../../src/serenity/http/client.rs.html#4603-4607">source</a><h4 class="code-header">pub async fn <a href="#method.fire" class="fn">fire</a>&lt;T: <a class="trait" href="https://docs.rs/serde/1.0.196/serde/de/trait.DeserializeOwned.html" title="trait serde::de::DeserializeOwned">DeserializeOwned</a>&gt;(&amp;self, req: <a class="struct" href="struct.Request.html" title="struct serenity::http::Request">Request</a>&lt;'_&gt;) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;T&gt;</h4></section></summary><div class="docblock"><p>Fires off a request, deserializing the response reader via the given type bound.</p>
 <p>If you don’t need to deserialize the response and want the response instance itself, use
 <a href="struct.Http.html#method.request" title="method serenity::http::Http::request"><code>Self::request</code></a>.</p>
 <h5 id="examples-16"><a class="doc-anchor" href="#examples-16">§</a>Examples</h5>

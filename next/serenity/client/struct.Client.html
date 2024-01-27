@@ -26,7 +26,7 @@ dispatched to your event handlers.</p>
 
 <span class="attr">#[serenity::async_trait]
 </span><span class="kw">impl </span>EventHandler <span class="kw">for </span>Handler {
-    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, context: Context, msg: Message) {
+    <span class="kw">async fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>, context: <span class="kw-2">&amp;</span>Context, msg: <span class="kw-2">&amp;</span>Message) {
         <span class="kw">if </span>msg.content == <span class="string">"!ping" </span>{
             <span class="kw">let _ </span>= msg.channel_id.say(<span class="kw-2">&amp;</span>context, <span class="string">"Pong!"</span>);
         }

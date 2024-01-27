@@ -440,7 +440,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
     ///         if msg.content == "!online" {
     ///             ctx.online();
     ///         }
@@ -468,7 +468,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
     ///         if msg.content == "!idle" {
     ///             ctx.idle();
     ///         }
@@ -496,7 +496,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
     ///         if msg.content == "!dnd" {
     ///             ctx.dnd();
     ///         }
@@ -524,7 +524,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
     ///         if msg.content == "!invisible" {
     ///             ctx.invisible();
     ///         }
@@ -555,7 +555,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
     ///         if msg.content == "!reset_presence" {
     ///             ctx.reset_presence();
     ///         }
@@ -585,7 +585,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, ctx: Context, msg: Message) {
+    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
     ///         let mut args = msg.content.splitn(2, ' ');
     ///
     ///         if let (Some("~setgame"), Some(game)) = (args.next(), args.next()) {
@@ -612,7 +612,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&amp;self, ctx: Context, _: Ready) {
+    ///     async fn ready(&amp;self, ctx: &amp;Context, _: &amp;Ready) {
     ///         use serenity::model::user::OnlineStatus;
     ///
     ///         ctx.set_presence(None, OnlineStatus::Idle);
@@ -629,7 +629,7 @@
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&amp;self, context: Context, _: Ready) {
+    ///     async fn ready(&amp;self, context: &amp;Context, _: &amp;Ready) {
     ///         use serenity::gateway::ActivityData;
     ///         use serenity::model::user::OnlineStatus;
     ///

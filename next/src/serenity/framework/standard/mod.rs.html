@@ -880,7 +880,6 @@
 <a href="#878" id="878">878</a>
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
-<a href="#881" id="881">881</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(
     not(ignore_serenity_deprecated),
     deprecated = <span class="string">"The standard framework is deprecated, and will be removed in 0.13. Please migrate to `poise` for command handling"
@@ -1488,7 +1487,7 @@
 <span class="attr">#[async_trait]
 </span><span class="kw">impl </span>Framework <span class="kw">for </span>StandardFramework {
     <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>, event)))]
-    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>ctx: Context, event: FullEvent) {
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, event: <span class="kw-2">&amp;</span>FullEvent) {
         <span class="kw">let </span>FullEvent::Message {
             new_message: msg,
         } = event
@@ -1496,7 +1495,7 @@
             <span class="kw">return</span>;
         };
 
-        <span class="kw">if </span><span class="self">self</span>.should_ignore(<span class="kw-2">&amp;</span>msg) {
+        <span class="kw">if </span><span class="self">self</span>.should_ignore(msg) {
             <span class="kw">return</span>;
         }
 
@@ -1506,11 +1505,11 @@
 
         <span class="kw">let </span>config = <span class="self">self</span>.config.read().clone();
 
-        <span class="kw">let </span>prefix = parse::prefix(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;mut </span>stream, <span class="kw-2">&amp;</span>config).<span class="kw">await</span>;
+        <span class="kw">let </span>prefix = parse::prefix(ctx, msg, <span class="kw-2">&amp;mut </span>stream, <span class="kw-2">&amp;</span>config).<span class="kw">await</span>;
 
         <span class="kw">if </span>prefix.is_some() &amp;&amp; stream.rest().is_empty() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(prefix_only) = <span class="kw-2">&amp;</span><span class="self">self</span>.prefix_only {
-                prefix_only(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
+                prefix_only(ctx, msg).<span class="kw">await</span>;
             }
 
             <span class="kw">return</span>;
@@ -1518,15 +1517,15 @@
 
         <span class="kw">if </span>prefix.is_none() &amp;&amp; !(config.get_no_dm_prefix() &amp;&amp; msg.is_private()) {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(normal) = <span class="kw-2">&amp;</span><span class="self">self</span>.normal_message {
-                normal(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
+                normal(ctx, msg).<span class="kw">await</span>;
             }
 
             <span class="kw">return</span>;
         }
 
         <span class="kw">let </span>invocation = parse::command(
-            <span class="kw-2">&amp;</span>ctx,
-            <span class="kw-2">&amp;</span>msg,
+            ctx,
+            msg,
             <span class="kw-2">&amp;mut </span>stream,
             <span class="kw-2">&amp;</span><span class="self">self</span>.groups,
             <span class="kw-2">&amp;</span>config,
@@ -1539,12 +1538,12 @@
             <span class="prelude-val">Err</span>(ParseError::UnrecognisedCommand(unreg)) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(unreg) = unreg {
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(unrecognised_command) = <span class="kw-2">&amp;</span><span class="self">self</span>.unrecognised_command {
-                        unrecognised_command(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;</span>unreg).<span class="kw">await</span>;
+                        unrecognised_command(ctx, msg, <span class="kw-2">&amp;</span>unreg).<span class="kw">await</span>;
                     }
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(normal) = <span class="kw-2">&amp;</span><span class="self">self</span>.normal_message {
-                    normal(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
+                    normal(ctx, msg).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
@@ -1554,7 +1553,7 @@
                 command_name,
             }) =&gt; {
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(dispatch) = <span class="kw-2">&amp;</span><span class="self">self</span>.dispatch {
-                    dispatch(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, error, <span class="kw-2">&amp;</span>command_name).<span class="kw">await</span>;
+                    dispatch(ctx, msg, error, <span class="kw-2">&amp;</span>command_name).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
@@ -1577,16 +1576,15 @@
                 </span><span class="kw">let </span>help = <span class="self">self</span>.help.unwrap();
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="kw-2">&amp;</span><span class="self">self</span>.before {
-                    <span class="kw">if </span>!before(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name).<span class="kw">await </span>{
+                    <span class="kw">if </span>!before(ctx, msg, name).<span class="kw">await </span>{
                         <span class="kw">return</span>;
                     }
                 }
 
-                <span class="kw">let </span>res =
-                    (help.fun)(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, args, help.options, <span class="kw-2">&amp;</span>groups, config.owners).<span class="kw">await</span>;
+                <span class="kw">let </span>res = (help.fun)(ctx, msg, args, help.options, <span class="kw-2">&amp;</span>groups, config.owners).<span class="kw">await</span>;
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = <span class="kw-2">&amp;</span><span class="self">self</span>.after {
-                    after(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name, res).<span class="kw">await</span>;
+                    after(ctx, msg, name, res).<span class="kw">await</span>;
                 }
             },
             Invoke::Command {
@@ -1621,11 +1619,11 @@
                 };
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(error) =
-                    <span class="self">self</span>.should_fail(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;mut </span>args, command.options, group.options).<span class="kw">await
+                    <span class="self">self</span>.should_fail(ctx, msg, <span class="kw-2">&amp;mut </span>args, command.options, group.options).<span class="kw">await
                 </span>{
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(dispatch) = <span class="kw-2">&amp;</span><span class="self">self</span>.dispatch {
                         <span class="kw">let </span>command_name = command.options.names[<span class="number">0</span>];
-                        dispatch(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, error, command_name).<span class="kw">await</span>;
+                        dispatch(ctx, msg, error, command_name).<span class="kw">await</span>;
                     }
 
                     <span class="kw">return</span>;
@@ -1634,24 +1632,24 @@
                 <span class="kw">let </span>name = command.options.names[<span class="number">0</span>];
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="kw-2">&amp;</span><span class="self">self</span>.before {
-                    <span class="kw">if </span>!before(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name).<span class="kw">await </span>{
+                    <span class="kw">if </span>!before(ctx, msg, name).<span class="kw">await </span>{
                         <span class="kw">return</span>;
                     }
                 }
 
-                <span class="kw">let </span>res = (command.fun)(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, args).<span class="kw">await</span>;
+                <span class="kw">let </span>res = (command.fun)(ctx, msg, args).<span class="kw">await</span>;
 
                 <span class="comment">// Check if the command wants to revert the bucket by giving back a ticket.
                 </span><span class="kw">if </span><span class="macro">matches!</span>(<span class="kw-2">&amp;</span>res, <span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.is::&lt;RevertBucket&gt;()) {
                     <span class="kw">let </span><span class="kw-2">mut </span>buckets = <span class="self">self</span>.buckets.lock().<span class="kw">await</span>;
 
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(bucket) = command.options.bucket.and_then(|b| buckets.get_mut(b)) {
-                        bucket.give(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>msg).<span class="kw">await</span>;
+                        bucket.give(ctx, msg).<span class="kw">await</span>;
                     }
                 }
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = <span class="kw-2">&amp;</span><span class="self">self</span>.after {
-                    after(<span class="kw-2">&amp;mut </span>ctx, <span class="kw-2">&amp;</span>msg, name, res).<span class="kw">await</span>;
+                    after(ctx, msg, name, res).<span class="kw">await</span>;
                 }
             },
         }

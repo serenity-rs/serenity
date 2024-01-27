@@ -388,7 +388,7 @@
 /// #[serenity::async_trait]
 /// #[cfg(feature = "client")]
 /// impl EventHandler for Handler {
-///     async fn guild_ban_removal(&amp;self, ctx: Context, guild_id: GuildId, user: User) {
+///     async fn guild_ban_removal(&amp;self, ctx: &amp;Context, guild_id: &amp;GuildId, user: &amp;User) {
 ///         match guild_id.ban(&amp;ctx.http, user.id, 8).await {
 ///             Ok(()) =&gt; {
 ///                 // Ban successful.

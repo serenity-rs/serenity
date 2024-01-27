@@ -236,7 +236,7 @@
         <span class="kw">let _</span>: <span class="kw-2">&amp;</span>Client = client;
     }
     <span class="doccomment">/// Called on every incoming event.
-    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, event: FullEvent);
+    </span><span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, event: <span class="kw-2">&amp;</span>FullEvent);
 }
 
 <span class="attr">#[async_trait]
@@ -247,7 +247,7 @@
     <span class="kw">async fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, client: <span class="kw-2">&amp;</span>Client) {
         (<span class="kw-2">**</span><span class="self">self</span>).init(client).<span class="kw">await</span>;
     }
-    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, event: FullEvent) {
+    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, event: <span class="kw-2">&amp;</span>FullEvent) {
         (<span class="kw-2">**</span><span class="self">self</span>).dispatch(ctx, event).<span class="kw">await</span>;
     }
 }
@@ -260,7 +260,7 @@
     <span class="kw">async fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>, client: <span class="kw-2">&amp;</span>Client) {
         (<span class="kw-2">**</span><span class="self">self</span>).init(client).<span class="kw">await</span>;
     }
-    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context, event: FullEvent) {
+    <span class="kw">async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, event: <span class="kw-2">&amp;</span>FullEvent) {
         (<span class="kw-2">**</span><span class="self">self</span>).dispatch(ctx, event).<span class="kw">await</span>;
     }
 }
