@@ -2,8 +2,6 @@ use std::borrow::Cow;
 
 use nonmax::NonMaxU16;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateForumTag;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -291,13 +289,6 @@ impl<'a> EditChannel<'a> {
         self.default_forum_layout = Some(default_forum_layout);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl<'a> Builder for EditChannel<'a> {
-    type Context<'ctx> = ChannelId;
-    type Built = GuildChannel;
 
     /// Edits the channel's settings.
     ///
@@ -311,21 +302,30 @@ impl<'a> Builder for EditChannel<'a> {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        channel_id: ChannelId,
+    ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, ctx, Permissions::MANAGE_CHANNELS)?;
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    Permissions::MANAGE_CHANNELS,
+                )?;
                 if self.permission_overwrites.is_some() {
-                    crate::utils::user_has_perms_cache(cache, ctx, Permissions::MANAGE_ROLES)?;
+                    crate::utils::user_has_perms_cache(
+                        cache,
+                        channel_id,
+                        Permissions::MANAGE_ROLES,
+                    )?;
                 }
             }
         }
 
-        cache_http.http().edit_channel(ctx, &self, self.audit_log_reason).await
+        cache_http.http().edit_channel(channel_id, &self, self.audit_log_reason).await
     }
 }
