@@ -306,18 +306,26 @@ impl<'a> EditChannel<'a> {
     pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        chan_id: ChannelId,
+        channel_id: ChannelId,
     ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, chan_id, Permissions::MANAGE_CHANNELS)?;
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    Permissions::MANAGE_CHANNELS,
+                )?;
                 if self.permission_overwrites.is_some() {
-                    crate::utils::user_has_perms_cache(cache, chan_id, Permissions::MANAGE_ROLES)?;
+                    crate::utils::user_has_perms_cache(
+                        cache,
+                        channel_id,
+                        Permissions::MANAGE_ROLES,
+                    )?;
                 }
             }
         }
 
-        cache_http.http().edit_channel(chan_id, &self, self.audit_log_reason).await
+        cache_http.http().edit_channel(channel_id, &self, self.audit_log_reason).await
     }
 }
