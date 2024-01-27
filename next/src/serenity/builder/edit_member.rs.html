@@ -148,24 +148,10 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -297,13 +283,6 @@
         <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Builder <span class="kw">for </span>EditMember&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (GuildId, UserId);
-    <span class="kw">type </span>Built = Member;
 
     <span class="doccomment">/// Edits the properties of the guild member.
     ///
@@ -312,12 +291,9 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    </span><span class="kw">async fn </span>execute(
-        <span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
-        cache_http.http().edit_member(ctx.<span class="number">0</span>, ctx.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
+        http.edit_member(guild_id, user_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

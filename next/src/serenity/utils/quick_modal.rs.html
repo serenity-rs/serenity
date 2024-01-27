@@ -145,21 +145,9 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use </span><span class="kw">crate</span>::builder::{
-    Builder <span class="kw">as _</span>,
-    CreateActionRow,
-    CreateInputText,
-    CreateInteractionResponse,
-    CreateModal,
-};
+<span class="kw">use </span><span class="kw">crate</span>::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 <span class="kw">use </span><span class="kw">crate</span>::client::Context;
 <span class="kw">use </span><span class="kw">crate</span>::collector::ModalInteractionCollector;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
@@ -258,7 +246,7 @@
                     .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
             ),
         );
-        builder.execute(ctx, (interaction_id, token)).<span class="kw">await</span><span class="question-mark">?</span>;
+        builder.execute(<span class="kw-2">&amp;</span>ctx.http, interaction_id, token).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>collector = ModalInteractionCollector::new(ctx.shard.clone())
             .custom_ids(<span class="macro">vec!</span>[modal_custom_id.trunc_into()]);

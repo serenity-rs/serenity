@@ -78,25 +78,11 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -158,13 +144,6 @@
         <span class="self">self</span>.username = <span class="prelude-val">Some</span>(username.into());
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditProfile&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = ();
-    <span class="kw">type </span>Built = CurrentUser;
 
     <span class="doccomment">/// Edit the current user's profile with the fields set.
     ///
@@ -172,12 +151,9 @@
     ///
     /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
     /// if there is an error in deserializing the API response.
-    </span><span class="kw">async fn </span>execute(
-        <span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        _ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
-        cache_http.http().edit_profile(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;CurrentUser&gt; {
+        http.edit_profile(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

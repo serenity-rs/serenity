@@ -184,19 +184,8 @@
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
 <a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -344,13 +333,6 @@
         <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Builder <span class="kw">for </span>EditRole&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (GuildId, <span class="prelude-ty">Option</span>&lt;RoleId&gt;);
-    <span class="kw">type </span>Built = Role;
 
     <span class="doccomment">/// Edits the role.
     ///
@@ -362,13 +344,13 @@
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
-        <span class="kw">let </span>(guild_id, role_id) = ctx;
-
+        guild_id: GuildId,
+        role_id: <span class="prelude-ty">Option</span>&lt;RoleId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, guild_id, Permissions::MANAGE_ROLES)<span class="question-mark">?</span>;
 

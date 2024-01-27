@@ -221,20 +221,18 @@
 <a href="#219" id="219">219</a>
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer};
 <span class="kw">use </span>serde::Serialize;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
-    Builder,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     CreateInteractionResponseMessage,
     EditInteractionResponse,
 };
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
@@ -309,10 +307,10 @@
     /// deserializing the API response.
     </span><span class="kw">pub async fn </span>create_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateInteractionResponse&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
+        builder.execute(http, <span class="self">self</span>.id, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the initial interaction response.
@@ -326,10 +324,10 @@
     /// deserializing the API response.
     </span><span class="kw">pub async fn </span>edit_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: EditInteractionResponse&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        builder.execute(cache_http, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+        builder.execute(http, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the initial interaction response.
@@ -355,10 +353,10 @@
     /// response.
     </span><span class="kw">pub async fn </span>create_followup(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateInteractionResponseFollowup&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        builder.execute(cache_http, (<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
+        builder.execute(http, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a followup response to the response sent.
@@ -372,11 +370,11 @@
     /// response.
     </span><span class="kw">pub async fn </span>edit_followup(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         message_id: MessageId,
         builder: CreateInteractionResponseFollowup&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        builder.execute(cache_http, (<span class="prelude-val">Some</span>(message_id), <span class="kw-2">&amp;</span><span class="self">self</span>.token)).<span class="kw">await
+        builder.execute(http, <span class="prelude-val">Some</span>(message_id), <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a followup message.
@@ -395,8 +393,8 @@
     ///
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
-    </span><span class="kw">pub async fn </span>defer(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.create_response(cache_http, CreateInteractionResponse::Acknowledge).<span class="kw">await
+    </span><span class="kw">pub async fn </span>defer(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.create_response(http, CreateInteractionResponse::Acknowledge).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Helper function to defer an interaction ephemerally
@@ -405,11 +403,11 @@
     ///
     /// May also return an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if
     /// there is an error in deserializing the API response.
-    </span><span class="kw">pub async fn </span>defer_ephemeral(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>defer_ephemeral(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>builder = CreateInteractionResponse::Defer(
             CreateInteractionResponseMessage::new().ephemeral(<span class="bool-val">true</span>),
         );
-        <span class="self">self</span>.create_response(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.create_response(http, builder).<span class="kw">await
     </span>}
 }
 

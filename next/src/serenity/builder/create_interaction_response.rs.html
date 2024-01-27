@@ -412,24 +412,10 @@
 <a href="#410" id="410">410</a>
 <a href="#411" id="411">411</a>
 <a href="#412" id="412">412</a>
-<a href="#413" id="413">413</a>
-<a href="#414" id="414">414</a>
-<a href="#415" id="415">415</a>
-<a href="#416" id="416">416</a>
-<a href="#417" id="417">417</a>
-<a href="#418" id="418">418</a>
-<a href="#419" id="419">419</a>
-<a href="#420" id="420">420</a>
-<a href="#421" id="421">421</a>
-<a href="#422" id="422">422</a>
-<a href="#423" id="423">423</a>
-<a href="#424" id="424">424</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>serde_json::json;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -438,7 +424,7 @@
     EditAttachments,
 };
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
@@ -536,13 +522,6 @@
             <span class="prelude-val">Ok</span>(())
         }
     }
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateInteractionResponse&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (InteractionId, <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str);
-    <span class="kw">type </span>Built = ();
 
     <span class="doccomment">/// Creates a response to the interaction received.
     ///
@@ -554,11 +533,13 @@
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        http: <span class="kw-2">&amp;</span>Http,
+        interaction_id: InteractionId,
+        interaction_token: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
         <span class="kw">let </span>files = <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self </span>{
             CreateInteractionResponse::Message(msg)
@@ -567,7 +548,7 @@
             <span class="kw">_ </span>=&gt; Vec::new(),
         };
 
-        cache_http.http().create_interaction_response(ctx.<span class="number">0</span>, ctx.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
+        http.create_interaction_response(interaction_id, interaction_token, <span class="kw-2">&amp;</span><span class="self">self</span>, files).<span class="kw">await
     </span>}
 }
 
@@ -799,25 +780,20 @@
         <span class="self">self</span>.choices.to_mut().push(value);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateAutocompleteResponse&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (InteractionId, <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str);
-    <span class="kw">type </span>Built = ();
 
     <span class="doccomment">/// Creates a response to an autocomplete interaction.
     ///
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
-        cache_http.http().create_interaction_response(ctx.<span class="number">0</span>, ctx.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, Vec::new()).<span class="kw">await
+        http: <span class="kw-2">&amp;</span>Http,
+        interaction_id: InteractionId,
+        interaction_token: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.create_interaction_response(interaction_id, interaction_token, <span class="kw-2">&amp;</span><span class="self">self</span>, Vec::new()).<span class="kw">await
     </span>}
 }
 

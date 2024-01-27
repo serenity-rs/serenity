@@ -676,14 +676,6 @@
 <a href="#674" id="674">674</a>
 <a href="#675" id="675">675</a>
 <a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::cmp::Reverse;
 <span class="kw">use </span>std::fmt;
@@ -884,11 +876,11 @@
     </span><span class="attr">#[doc(alias = <span class="string">"timeout"</span>)]
     </span><span class="kw">pub async fn </span>disable_communication_until(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         time: Timestamp,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>builder = EditMember::new().disable_communication_until(time);
-        <span class="kw">match </span><span class="self">self</span>.guild_id.edit_member(cache_http, <span class="self">self</span>.user.id, builder).<span class="kw">await </span>{
+        <span class="kw">match </span><span class="self">self</span>.guild_id.edit_member(http, <span class="self">self</span>.user.id, builder).<span class="kw">await </span>{
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.communication_disabled_until = <span class="prelude-val">Some</span>(time);
                 <span class="prelude-val">Ok</span>(())
@@ -927,12 +919,8 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    </span><span class="kw">pub async fn </span>edit(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditMember&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.guild_id.edit_member(cache_http, <span class="self">self</span>.user.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
+    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: EditMember&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.guild_id.edit_member(http, <span class="self">self</span>.user.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -946,9 +934,9 @@
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     </span><span class="attr">#[doc(alias = <span class="string">"timeout"</span>)]
-    </span><span class="kw">pub async fn </span>enable_communication(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>enable_communication(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>builder = EditMember::new().enable_communication();
-        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.guild_id.edit_member(cache_http, <span class="self">self</span>.user.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.guild_id.edit_member(http, <span class="self">self</span>.user.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -1074,12 +1062,8 @@
     /// current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    </span><span class="kw">pub async fn </span>move_to_voice_channel(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        channel: ChannelId,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
-        <span class="self">self</span>.guild_id.move_member(cache_http, <span class="self">self</span>.user.id, channel).<span class="kw">await
+    </span><span class="kw">pub async fn </span>move_to_voice_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
+        <span class="self">self</span>.guild_id.move_member(http, <span class="self">self</span>.user.id, channel).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Disconnects the member from their voice channel if any.
@@ -1092,8 +1076,8 @@
     /// current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    </span><span class="kw">pub async fn </span>disconnect_from_voice(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
-        <span class="self">self</span>.guild_id.disconnect_member(cache_http, <span class="self">self</span>.user.id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>disconnect_from_voice(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Member&gt; {
+        <span class="self">self</span>.guild_id.disconnect_member(http, <span class="self">self</span>.user.id).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the guild-level permissions for the member.

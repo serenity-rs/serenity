@@ -179,11 +179,8 @@
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -192,7 +189,7 @@
     EditAttachments,
 };
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -324,13 +321,6 @@
         <span class="self">self</span>.attachments = <span class="prelude-val">Some</span>(EditAttachments::new());
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditWebhookMessage&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (WebhookId, <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str, MessageId);
-    <span class="kw">type </span>Built = Message;
 
     <span class="doccomment">/// Edits the webhook's message.
     ///
@@ -345,19 +335,27 @@
     /// invalid, or the given message Id does not belong to the webhook.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        http: <span class="kw-2">&amp;</span>Http,
+        webhook_id: WebhookId,
+        webhook_token: <span class="kw-2">&amp;</span>str,
+        message_id: MessageId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>files = <span class="self">self</span>.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
-        cache_http
-            .http()
-            .edit_webhook_message(ctx.<span class="number">0</span>, <span class="self">self</span>.thread_id, ctx.<span class="number">1</span>, ctx.<span class="number">2</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, files)
-            .<span class="kw">await
+        http.edit_webhook_message(
+            webhook_id,
+            <span class="self">self</span>.thread_id,
+            webhook_token,
+            message_id,
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            files,
+        )
+        .<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

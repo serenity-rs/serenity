@@ -311,24 +311,8 @@
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -577,16 +561,6 @@
         <span class="self">self</span>.nonce = <span class="prelude-val">Some</span>(nonce);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>CreateMessage&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    </span><span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (ChannelId, <span class="prelude-ty">Option</span>&lt;GuildId&gt;);
-    <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
-    </span><span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (ChannelId,);
-    <span class="kw">type </span>Built = Message;
 
     <span class="doccomment">/// Send a message to the channel.
     ///
@@ -605,15 +579,13 @@
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Attach Files]: Permissions::ATTACH_FILES
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
-        <span class="kw">let </span>channel_id = ctx.<span class="number">0</span>;
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span><span class="kw">let </span>guild_id = ctx.<span class="number">1</span>;
-
+        channel_id: ChannelId,
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)] </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>req = Permissions::SEND_MESSAGES;

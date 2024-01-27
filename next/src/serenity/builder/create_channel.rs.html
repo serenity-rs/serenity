@@ -279,20 +279,10 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>nonmax::NonMaxU16;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -545,13 +535,6 @@
         <span class="self">self</span>.default_sort_order = <span class="prelude-val">Some</span>(default_sort_order);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Builder <span class="kw">for </span>CreateChannel&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = GuildId;
-    <span class="kw">type </span>Built = GuildChannel;
 
     <span class="doccomment">/// Creates a new [`Channel`] in the guild.
     ///
@@ -563,15 +546,16 @@
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        guild_id: GuildId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, ctx, Permissions::MANAGE_CHANNELS)<span class="question-mark">?</span>;
+        </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, guild_id, Permissions::MANAGE_CHANNELS)<span class="question-mark">?</span>;
 
-        cache_http.http().create_channel(ctx, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+        cache_http.http().create_channel(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

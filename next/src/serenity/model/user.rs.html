@@ -850,10 +850,6 @@
 <a href="#848" id="848">848</a>
 <a href="#849" id="849">849</a>
 <a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -868,13 +864,13 @@
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, CreateMessage, EditProfile};
+</span><span class="kw">use </span><span class="kw">crate</span>::builder::{CreateMessage, EditProfile};
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::mention::Mentionable;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1033,12 +1029,8 @@
     ///
     /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
     /// if there is an error in deserializing the API response.
-    </span><span class="kw">pub async fn </span>edit(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditProfile&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw-2">*</span><span class="self">self </span>= builder.execute(cache_http, ()).<span class="kw">await</span><span class="question-mark">?</span>;
+    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: EditProfile&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw-2">*</span><span class="self">self </span>= builder.execute(http).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }

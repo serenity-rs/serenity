@@ -1116,15 +1116,6 @@
 <a href="#1114" id="1114">1114</a>
 <a href="#1115" id="1115">1115</a>
 <a href="#1116" id="1116">1116</a>
-<a href="#1117" id="1117">1117</a>
-<a href="#1118" id="1118">1118</a>
-<a href="#1119" id="1119">1119</a>
-<a href="#1120" id="1120">1120</a>
-<a href="#1121" id="1121">1121</a>
-<a href="#1122" id="1122">1122</a>
-<a href="#1123" id="1123">1123</a>
-<a href="#1124" id="1124">1124</a>
-<a href="#1125" id="1125">1125</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1134,7 +1125,6 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
-    Builder,
     CreateAttachment,
     CreateForumPost,
     CreateInvite,
@@ -1621,12 +1611,8 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    </span><span class="kw">pub async fn </span>edit_thread(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditThread&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.id.edit_thread(cache_http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
+    </span><span class="kw">pub async fn </span>edit_thread(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: EditThread&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.id.edit_thread(http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -1676,7 +1662,7 @@
         user_id: UserId,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id))).<span class="kw">await
+        builder.execute(cache_http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the current user's voice state in a stage channel.
@@ -1728,7 +1714,7 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>)).<span class="kw">await
+        builder.execute(cache_http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Follows the News Channel
@@ -1805,12 +1791,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    </span><span class="kw">pub async fn </span>messages(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: GetMessages,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-        <span class="self">self</span>.id.messages(cache_http, builder).<span class="kw">await
+    </span><span class="kw">pub async fn </span>messages(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: GetMessages) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
+        <span class="self">self</span>.id.messages(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the name of the guild channel.
@@ -1968,9 +1950,9 @@
         builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span>;
+        </span><span class="kw">let </span>msg = builder.execute(cache_http, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id)).<span class="kw">await</span>;
         <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span>;
+        </span><span class="kw">let </span>msg = builder.execute(cache_http, <span class="self">self</span>.id).<span class="kw">await</span>;
         msg
     }
 
@@ -2191,11 +2173,11 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     </span><span class="kw">pub async fn </span>create_thread_from_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         message_id: MessageId,
         builder: CreateThread&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_thread_from_message(cache_http, message_id, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_thread_from_message(http, message_id, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a thread that is not connected to a message.
@@ -2205,10 +2187,10 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     </span><span class="kw">pub async fn </span>create_thread(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateThread&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_thread(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_thread(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a post in a forum channel.
@@ -2218,10 +2200,10 @@
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     </span><span class="kw">pub async fn </span>create_forum_post(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateForumPost&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_forum_post(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_forum_post(http, builder).<span class="kw">await
     </span>}
 }
 

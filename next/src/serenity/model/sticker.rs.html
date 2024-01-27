@@ -261,14 +261,10 @@
 <a href="#259" id="259">259</a>
 <a href="#260" id="260">260</a>
 <a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::EditSticker;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::utils::comma_separated_string;
@@ -459,13 +455,9 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>edit(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditSticker&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: EditSticker&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.guild_id {
-            <span class="kw-2">*</span><span class="self">self </span>= guild_id.edit_sticker(cache_http, <span class="self">self</span>.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw-2">*</span><span class="self">self </span>= guild_id.edit_sticker(http, <span class="self">self</span>.id, builder).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(Error::Model(ModelError::DeleteNitroSticker))

@@ -104,16 +104,7 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
@@ -173,13 +164,6 @@
         <span class="self">self</span>.request_to_speak_timestamp = <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(timestamp.into()));
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>EditVoiceState {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (GuildId, ChannelId, <span class="prelude-ty">Option</span>&lt;UserId&gt;);
-    <span class="kw">type </span>Built = ();
 
     <span class="doccomment">/// Edits the given user's voice state in a stage channel. Providing a [`UserId`] will edit
     /// that user's voice state, otherwise the current user's voice state will be edited.
@@ -197,12 +181,14 @@
     ///
     /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
     /// [Mute Members]: Permissions::MUTE_MEMBERS
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
-        <span class="kw">let </span>(guild_id, channel_id, user_id) = ctx;
+        guild_id: GuildId,
+        channel_id: ChannelId,
+        user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {

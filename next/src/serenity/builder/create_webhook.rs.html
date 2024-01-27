@@ -92,18 +92,8 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -153,13 +143,6 @@
         <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Builder <span class="kw">for </span>CreateWebhook&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = ChannelId;
-    <span class="kw">type </span>Built = Webhook;
 
     <span class="doccomment">/// Creates the webhook.
     ///
@@ -176,15 +159,16 @@
     ///
     /// [`Text`]: ChannelType::Text
     /// [`News`]: ChannelType::News
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        channel_id: ChannelId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(ctx) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(channel_id) {
                     <span class="comment">// forum channels are not text-based, but webhooks can be created in them
                     // and used to send messages in their posts
                     </span><span class="kw">if </span>!channel.is_text_based() &amp;&amp; channel.kind != ChannelType::Forum {
@@ -197,7 +181,7 @@
         <span class="kw">crate</span>::model::error::Minimum::WebhookName.check_underflow(<span class="self">self</span>.name.chars().count())<span class="question-mark">?</span>;
         <span class="kw">crate</span>::model::error::Maximum::WebhookName.check_overflow(<span class="self">self</span>.name.chars().count())<span class="question-mark">?</span>;
 
-        cache_http.http().create_webhook(ctx, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+        cache_http.http().create_webhook(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

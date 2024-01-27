@@ -332,18 +332,8 @@
 <a href="#330" id="330">330</a>
 <a href="#331" id="331">331</a>
 <a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
@@ -651,13 +641,6 @@
         <span class="self">self</span>.premium_progress_bar_enabled = <span class="prelude-val">Some</span>(premium_progress_bar_enabled);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Builder <span class="kw">for </span>EditGuild&lt;<span class="lifetime">'a</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = GuildId;
-    <span class="kw">type </span>Built = PartialGuild;
 
     <span class="doccomment">/// Edits the given guild.
     ///
@@ -669,15 +652,16 @@
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        guild_id: GuildId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, ctx, Permissions::MANAGE_GUILD)<span class="question-mark">?</span>;
+        </span><span class="kw">crate</span>::utils::user_has_guild_perms(<span class="kw-2">&amp;</span>cache_http, guild_id, Permissions::MANAGE_GUILD)<span class="question-mark">?</span>;
 
-        cache_http.http().edit_guild(ctx, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+        cache_http.http().edit_guild(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>

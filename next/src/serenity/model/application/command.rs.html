@@ -410,17 +410,14 @@
 <a href="#408" id="408">408</a>
 <a href="#409" id="409">409</a>
 <a href="#410" id="410">410</a>
-<a href="#411" id="411">411</a>
-<a href="#412" id="412">412</a>
-<a href="#413" id="413">413</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, CreateCommand};
+</span><span class="kw">use </span><span class="kw">crate</span>::builder::CreateCommand;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::channel::ChannelType;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::{
@@ -555,11 +552,8 @@
     /// See [`CreateCommand::execute`] for a list of possible errors.
     ///
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
-    </span><span class="kw">pub async fn </span>create_global_command(
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        builder.execute(cache_http, (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)).<span class="kw">await
+    </span><span class="kw">pub async fn </span>create_global_command(http: <span class="kw-2">&amp;</span>Http, builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+        builder.execute(http, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Override all global application commands.
@@ -580,11 +574,11 @@
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
     </span><span class="kw">pub async fn </span>edit_global_command(
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         command_id: CommandId,
         builder: CreateCommand&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-        builder.execute(cache_http, (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(command_id))).<span class="kw">await
+        builder.execute(http, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(command_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all global commands.

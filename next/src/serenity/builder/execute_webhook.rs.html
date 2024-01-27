@@ -349,17 +349,8 @@
 <a href="#347" id="347">347</a>
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::Builder;
 <span class="kw">use super</span>::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -368,7 +359,7 @@
     EditAttachments,
 };
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+</span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -684,14 +675,6 @@
         <span class="self">self</span>.thread_name = <span class="prelude-val">Some</span>(thread_name);
         <span class="self">self
     </span>}
-}
-
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-#[async_trait::async_trait]
-</span><span class="kw">impl </span>Builder <span class="kw">for </span>ExecuteWebhook&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">type </span>Context&lt;<span class="lifetime">'ctx</span>&gt; = (WebhookId, <span class="kw-2">&amp;</span><span class="lifetime">'ctx </span>str, bool);
-    <span class="kw">type </span>Built = <span class="prelude-ty">Option</span>&lt;Message&gt;;
-
     <span class="doccomment">/// Executes the webhook with the given content.
     ///
     /// # Errors
@@ -700,16 +683,19 @@
     /// execution is attempted in a thread not belonging to the webhook's [`Channel`].
     ///
     /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
-    </span><span class="kw">async fn </span>execute(
+    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+    </span><span class="kw">pub async fn </span>execute(
         <span class="kw-2">mut </span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        ctx: <span class="self">Self</span>::Context&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Built&gt; {
+        http: <span class="kw-2">&amp;</span>Http,
+        webhook_id: WebhookId,
+        webhook_token: <span class="kw-2">&amp;</span>str,
+        wait: bool,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Message&gt;&gt; {
         <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
 
         <span class="kw">let </span>files = <span class="self">self</span>.attachments.take_files();
 
-        cache_http.http().execute_webhook(ctx.<span class="number">0</span>, <span class="self">self</span>.thread_id, ctx.<span class="number">1</span>, ctx.<span class="number">2</span>, files, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
+        http.execute_webhook(webhook_id, <span class="self">self</span>.thread_id, webhook_token, wait, files, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>
