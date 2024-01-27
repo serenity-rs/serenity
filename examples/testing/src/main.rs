@@ -16,29 +16,35 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         println!("command message: {msg:#?}");
     } else if msg.content == "register" {
         guild_id
-            .create_command(&ctx, CreateCommand::new("editattachments").description("test command"))
+            .create_command(
+                &ctx.http,
+                CreateCommand::new("editattachments").description("test command"),
+            )
             .await?;
         guild_id
             .create_command(
-                &ctx,
+                &ctx.http,
                 CreateCommand::new("unifiedattachments1").description("test command"),
             )
             .await?;
         guild_id
             .create_command(
-                &ctx,
+                &ctx.http,
                 CreateCommand::new("unifiedattachments2").description("test command"),
             )
             .await?;
         guild_id
-            .create_command(&ctx, CreateCommand::new("editembeds").description("test command"))
-            .await?;
-        guild_id
-            .create_command(&ctx, CreateCommand::new("newselectmenu").description("test command"))
+            .create_command(&ctx.http, CreateCommand::new("editembeds").description("test command"))
             .await?;
         guild_id
             .create_command(
-                &ctx,
+                &ctx.http,
+                CreateCommand::new("newselectmenu").description("test command"),
+            )
+            .await?;
+        guild_id
+            .create_command(
+                &ctx.http,
                 CreateCommand::new("autocomplete").description("test command").add_option(
                     CreateCommandOption::new(CommandOptionType::String, "foo", "foo")
                         .set_autocomplete(true),
@@ -117,7 +123,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
                 .timeout(std::time::Duration::from_secs(10))
                 .await;
             match button_press {
-                Some(x) => x.defer(ctx).await?,
+                Some(x) => x.defer(&ctx.http).await?,
                 None => break,
             }
 
@@ -130,7 +136,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
     } else if msg.content == "testautomodregex" {
         guild_id
             .create_automod_rule(
-                ctx,
+                &ctx.http,
                 EditAutoModRule::new().trigger(Trigger::Keyword {
                     strings: vec!["badword".into()],
                     regex_patterns: vec!["b[o0]{2,}b(ie)?s?".into()],
@@ -158,7 +164,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         let forum = forum_id.to_channel(ctx).await?.guild().unwrap();
         channel_id
             .edit_thread(
-                &ctx,
+                &ctx.http,
                 EditThread::new()
                     .applied_tags(forum.available_tags.iter().map(|t| t.id).collect::<Vec<_>>()),
             )
@@ -200,7 +206,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .parse::<ChannelId>()
             .unwrap()
             .create_forum_post(
-                ctx,
+                &ctx.http,
                 CreateForumPost::new(
                     "a",
                     CreateMessage::new()
@@ -230,7 +236,7 @@ async fn interaction(
         // Respond with an image
         interaction
             .create_response(
-                &ctx,
+                &ctx.http,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().add_file(
                         CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
@@ -245,7 +251,7 @@ async fn interaction(
         // Add another image
         let msg = interaction
             .edit_response(
-                &ctx,
+                &ctx.http,
                 EditInteractionResponse::new().attachments(
                     EditAttachments::keep_all(&msg)
                         .add(CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?),
@@ -258,7 +264,7 @@ async fn interaction(
         // Only keep the new image, removing the first image
         let _msg = interaction
             .edit_response(
-                &ctx,
+                &ctx.http,
                 EditInteractionResponse::new()
                     .attachments(EditAttachments::new().keep(msg.attachments[1].id)),
             )
@@ -266,7 +272,7 @@ async fn interaction(
     } else if interaction.data.name == "unifiedattachments1" {
         interaction
             .create_response(
-                ctx,
+                &ctx.http,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().content("works"),
                 ),
@@ -274,19 +280,19 @@ async fn interaction(
             .await?;
 
         interaction
-            .edit_response(ctx, EditInteractionResponse::new().content("works still"))
+            .edit_response(&ctx.http, EditInteractionResponse::new().content("works still"))
             .await?;
 
         interaction
             .create_followup(
-                ctx,
+                &ctx.http,
                 CreateInteractionResponseFollowup::new().content("still works still"),
             )
             .await?;
     } else if interaction.data.name == "unifiedattachments2" {
         interaction
             .create_response(
-                ctx,
+                &ctx.http,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().add_file(
                         CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
@@ -297,7 +303,7 @@ async fn interaction(
 
         interaction
             .edit_response(
-                ctx,
+                &ctx.http,
                 EditInteractionResponse::new().new_attachment(
                     CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?,
                 ),
@@ -306,7 +312,7 @@ async fn interaction(
 
         interaction
             .create_followup(
-                ctx,
+                &ctx.http,
                 CreateInteractionResponseFollowup::new()
                     .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
@@ -314,7 +320,7 @@ async fn interaction(
     } else if interaction.data.name == "editembeds" {
         interaction
             .create_response(
-                &ctx,
+                &ctx.http,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
                         .content("hi")
@@ -324,11 +330,11 @@ async fn interaction(
             .await?;
 
         // Pre-PR, this falsely deleted the embed
-        interaction.edit_response(&ctx, EditInteractionResponse::new()).await?;
+        interaction.edit_response(&ctx.http, EditInteractionResponse::new()).await?;
     } else if interaction.data.name == "newselectmenu" {
         interaction
             .create_response(
-                &ctx,
+                &ctx.http,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
                         .select_menu(CreateSelectMenu::new("0", CreateSelectMenuKind::String {
@@ -375,7 +381,7 @@ impl EventHandler for Handler {
             Interaction::Component(i) => println!("{:#?}", i.data),
             Interaction::Autocomplete(i) => {
                 i.create_response(
-                    &ctx,
+                    &ctx.http,
                     CreateInteractionResponse::Autocomplete(
                         CreateAutocompleteResponse::new()
                             .add_string_choice("suggestion", "suggestion"),

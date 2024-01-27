@@ -1,10 +1,8 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -61,13 +59,6 @@ impl<'a> EditWebhook<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditWebhook<'_> {
-    type Context<'ctx> = (WebhookId, Option<&'ctx str>);
-    type Built = Webhook;
 
     /// Edits the webhook corresponding to the provided [`WebhookId`] and token, and returns the
     /// resulting new [`Webhook`].
@@ -77,19 +68,18 @@ impl Builder for EditWebhook<'_> {
     /// Returns [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
     /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        match ctx.1 {
+        http: &Http,
+        webhook_id: WebhookId,
+        webhook_token: Option<&str>,
+    ) -> Result<Webhook> {
+        match webhook_token {
             Some(token) => {
-                cache_http
-                    .http()
-                    .edit_webhook_with_token(ctx.0, token, &self, self.audit_log_reason)
-                    .await
+                http.edit_webhook_with_token(webhook_id, token, &self, self.audit_log_reason).await
             },
-            None => cache_http.http().edit_webhook(ctx.0, &self, self.audit_log_reason).await,
+            None => http.edit_webhook(webhook_id, &self, self.audit_log_reason).await,
         }
     }
 }

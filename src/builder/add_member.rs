@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -84,13 +82,6 @@ impl<'a> AddMember<'a> {
         self.deaf = Some(deafen);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for AddMember<'_> {
-    type Context<'ctx> = (GuildId, UserId);
-    type Built = Option<Member>;
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
     ///
@@ -100,11 +91,13 @@ impl Builder for AddMember<'_> {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().add_guild_member(ctx.0, ctx.1, &self).await
+        http: &Http,
+        guild_id: GuildId,
+        user_id: UserId,
+    ) -> Result<Option<Member>> {
+        http.add_guild_member(guild_id, user_id, &self).await
     }
 }
