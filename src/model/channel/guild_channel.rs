@@ -7,7 +7,6 @@ use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8};
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    Builder,
     CreateAttachment,
     CreateForumPost,
     CreateInvite,
@@ -493,12 +492,8 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread(
-        &mut self,
-        cache_http: impl CacheHttp,
-        builder: EditThread<'_>,
-    ) -> Result<()> {
-        *self = self.id.edit_thread(cache_http, builder).await?;
+    pub async fn edit_thread(&mut self, http: &Http, builder: EditThread<'_>) -> Result<()> {
+        *self = self.id.edit_thread(http, builder).await?;
         Ok(())
     }
 
@@ -548,7 +543,7 @@ impl GuildChannel {
         user_id: UserId,
         builder: EditVoiceState,
     ) -> Result<()> {
-        builder.execute(cache_http, (self.guild_id, self.id, Some(user_id))).await
+        builder.execute(cache_http, self.guild_id, self.id, Some(user_id)).await
     }
 
     /// Edits the current user's voice state in a stage channel.
@@ -600,7 +595,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: EditVoiceState,
     ) -> Result<()> {
-        builder.execute(cache_http, (self.guild_id, self.id, None)).await
+        builder.execute(cache_http, self.guild_id, self.id, None).await
     }
 
     /// Follows the News Channel
@@ -677,12 +672,8 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn messages(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: GetMessages,
-    ) -> Result<Vec<Message>> {
-        self.id.messages(cache_http, builder).await
+    pub async fn messages(&self, http: &Http, builder: GetMessages) -> Result<Vec<Message>> {
+        self.id.messages(http, builder).await
     }
 
     /// Returns the name of the guild channel.
@@ -840,9 +831,9 @@ impl GuildChannel {
         builder: CreateMessage<'_>,
     ) -> Result<Message> {
         #[cfg(feature = "cache")]
-        let msg = builder.execute(cache_http, (self.id, Some(self.guild_id))).await;
+        let msg = builder.execute(cache_http, self.id, Some(self.guild_id)).await;
         #[cfg(not(feature = "cache"))]
-        let msg = builder.execute(cache_http, (self.id,)).await;
+        let msg = builder.execute(cache_http, self.id).await;
         msg
     }
 
@@ -1063,11 +1054,11 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn create_thread_from_message(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         message_id: MessageId,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_thread_from_message(cache_http, message_id, builder).await
+        self.id.create_thread_from_message(http, message_id, builder).await
     }
 
     /// Creates a thread that is not connected to a message.
@@ -1077,10 +1068,10 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn create_thread(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_thread(cache_http, builder).await
+        self.id.create_thread(http, builder).await
     }
 
     /// Creates a post in a forum channel.
@@ -1090,10 +1081,10 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     pub async fn create_forum_post(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateForumPost<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_forum_post(cache_http, builder).await
+        self.id.create_forum_post(http, builder).await
     }
 }
 
