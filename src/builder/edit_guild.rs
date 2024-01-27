@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -309,13 +307,6 @@ impl<'a> EditGuild<'a> {
         self.premium_progress_bar_enabled = Some(premium_progress_bar_enabled);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditGuild<'_> {
-    type Context<'ctx> = GuildId;
-    type Built = PartialGuild;
 
     /// Edits the given guild.
     ///
@@ -327,14 +318,15 @@ impl Builder for EditGuild<'_> {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        guild_id: GuildId,
+    ) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_GUILD)?;
+        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_GUILD)?;
 
-        cache_http.http().edit_guild(ctx, &self, self.audit_log_reason).await
+        cache_http.http().edit_guild(guild_id, &self, self.audit_log_reason).await
     }
 }

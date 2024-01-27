@@ -8,26 +8,9 @@
 #![allow(clippy::option_option)]
 
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
-#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::ModelError;
-
-/// Common trait for all HTTP request builders in this module.
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-pub trait Builder {
-    /// Additional data that's only required when sending a request off to the API.
-    type Context<'ctx>;
-    type Built;
-    /// Serializes a builder's fields and sends the request off the API, returning the response.
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built>;
-}
 
 #[cfg(feature = "http")]
 pub(crate) fn check_lengths(

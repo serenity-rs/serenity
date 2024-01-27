@@ -3,9 +3,7 @@ use std::borrow::Cow;
 use nonmax::NonMaxU16;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -104,24 +102,14 @@ impl<'a> EditThread<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditThread<'_> {
-    type Context<'ctx> = ChannelId;
-    type Built = GuildChannel;
 
     /// Edits the thread.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().edit_thread(ctx, &self, self.audit_log_reason).await
+    #[cfg(feature = "http")]
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
+        http.edit_thread(channel_id, &self, self.audit_log_reason).await
     }
 }

@@ -1,10 +1,8 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -80,13 +78,6 @@ impl<'a> EditProfile<'a> {
         self.banner = Some(None);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditProfile<'_> {
-    type Context<'ctx> = ();
-    type Built = CurrentUser;
 
     /// Edit the current user's profile with the fields set.
     ///
@@ -94,11 +85,8 @@ impl Builder for EditProfile<'_> {
     ///
     /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
     /// if there is an error in deserializing the API response.
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        _ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().edit_profile(&self).await
+    #[cfg(feature = "http")]
+    pub async fn execute(self, http: &Http) -> Result<CurrentUser> {
+        http.edit_profile(&self).await
     }
 }

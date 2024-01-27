@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -62,13 +60,6 @@ impl<'a> EditGuildWelcomeScreen<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditGuildWelcomeScreen<'_> {
-    type Context<'ctx> = GuildId;
-    type Built = GuildWelcomeScreen;
 
     /// Edits the guild's welcome screen.
     ///
@@ -79,12 +70,9 @@ impl Builder for EditGuildWelcomeScreen<'_> {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().edit_guild_welcome_screen(ctx, &self, self.audit_log_reason).await
+    #[cfg(feature = "http")]
+    pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<GuildWelcomeScreen> {
+        http.edit_guild_welcome_screen(guild_id, &self, self.audit_log_reason).await
     }
 }
 

@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -159,6 +157,40 @@ impl<'a> EditRole<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
+
+    /// Edits the role.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        guild_id: GuildId,
+        role_id: Option<RoleId>,
+    ) -> Result<Role> {
+        #[cfg(feature = "cache")]
+        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_ROLES)?;
+
+        let http = cache_http.http();
+        let role = match role_id {
+            Some(role_id) => {
+                http.edit_role(guild_id, role_id, &self, self.audit_log_reason).await?
+            },
+            None => http.create_role(guild_id, &self, self.audit_log_reason).await?,
+        };
+
+        if let Some(position) = self.position {
+            http.edit_role_position(guild_id, role.id, position, self.audit_log_reason).await?;
+        }
+        Ok(role)
+    }
 }
 
 /// The colours of a Discord role, secondary_colour and tertiary_colour may only be set if
@@ -207,46 +239,5 @@ impl From<RoleColours> for CreateRoleColours {
             secondary_color: c.secondary_colour,
             tertiary_color: c.tertiary_colour,
         }
-    }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditRole<'_> {
-    type Context<'ctx> = (GuildId, Option<RoleId>);
-    type Built = Role;
-
-    /// Edits the role.
-    ///
-    /// **Note**: Requires the [Manage Roles] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
-    ///
-    /// [Manage Roles]: Permissions::MANAGE_ROLES
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        let (guild_id, role_id) = ctx;
-
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_ROLES)?;
-
-        let http = cache_http.http();
-        let role = match role_id {
-            Some(role_id) => {
-                http.edit_role(guild_id, role_id, &self, self.audit_log_reason).await?
-            },
-            None => http.create_role(guild_id, &self, self.audit_log_reason).await?,
-        };
-
-        if let Some(position) = self.position {
-            http.edit_role_position(guild_id, role.id, position, self.audit_log_reason).await?;
-        }
-        Ok(role)
     }
 }

@@ -9,7 +9,7 @@ use std::fmt::Write;
 use nonmax::NonMaxU64;
 
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
+use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
@@ -408,8 +408,7 @@ impl Message {
             }
         }
 
-        *self =
-            builder.execute(cache_http, (self.channel_id, self.id, Some(self.author.id))).await?;
+        *self = builder.execute(cache_http, self.channel_id, self.id, Some(self.author.id)).await?;
         Ok(())
     }
 

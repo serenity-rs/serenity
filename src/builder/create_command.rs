@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -502,13 +500,6 @@ impl<'a> CreateCommand<'a> {
         self.handler = Some(handler);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateCommand<'_> {
-    type Context<'ctx> = (Option<GuildId>, Option<CommandId>);
-    type Built = Command;
 
     /// Create a [`Command`], overriding an existing one with the same name if it exists.
     ///
@@ -524,13 +515,14 @@ impl Builder for CreateCommand<'_> {
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        let http = cache_http.http();
-        match ctx {
+        http: &Http,
+        guild_id: Option<GuildId>,
+        command_id: Option<CommandId>,
+    ) -> Result<Command> {
+        match (guild_id, command_id) {
             (Some(guild_id), Some(cmd_id)) => {
                 http.edit_guild_command(guild_id, cmd_id, &self).await
             },

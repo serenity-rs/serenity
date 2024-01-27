@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(any(feature = "http", doc))]
@@ -68,13 +66,6 @@ impl<'a> EditSticker<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditSticker<'_> {
-    type Context<'ctx> = (GuildId, StickerId);
-    type Built = Sticker;
 
     /// Edits the sticker.
     ///
@@ -88,11 +79,13 @@ impl Builder for EditSticker<'_> {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().edit_sticker(ctx.0, ctx.1, &self, self.audit_log_reason).await
+        http: &Http,
+        guild_id: GuildId,
+        sticker_id: StickerId,
+    ) -> Result<Sticker> {
+        http.edit_sticker(guild_id, sticker_id, &self, self.audit_log_reason).await
     }
 }

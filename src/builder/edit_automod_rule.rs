@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::guild::automod::EventType;
@@ -96,6 +94,31 @@ impl<'a> EditAutoModRule<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
+
+    /// Creates or edits an AutoMod [`Rule`] in a guild. Providing a [`RuleId`] will edit that
+    /// corresponding rule, otherwise a new rule will be created.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        http: &Http,
+        guild_id: GuildId,
+        rule_id: Option<RuleId>,
+    ) -> Result<Rule> {
+        match rule_id {
+            Some(id) => http.edit_automod_rule(guild_id, id, &self, self.audit_log_reason).await,
+            // Automod Rule creation has required fields, whereas modifying a rule does not.
+            // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
+            None => http.create_automod_rule(guild_id, &self, self.audit_log_reason).await,
+        }
+    }
 }
 
 impl Default for EditAutoModRule<'_> {
@@ -109,37 +132,6 @@ impl Default for EditAutoModRule<'_> {
             exempt_channels: None,
             event_type: EventType::MessageSend,
             audit_log_reason: None,
-        }
-    }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditAutoModRule<'_> {
-    type Context<'ctx> = (GuildId, Option<RuleId>);
-    type Built = Rule;
-
-    /// Creates or edits an AutoMod [`Rule`] in a guild. Providing a [`RuleId`] will edit that
-    /// corresponding rule, otherwise a new rule will be created.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    ///
-    /// [Manage Guild]: Permissions::MANAGE_GUILD
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        let http = cache_http.http();
-        match ctx.1 {
-            Some(id) => http.edit_automod_rule(ctx.0, id, &self, self.audit_log_reason).await,
-            // Automod Rule creation has required fields, whereas modifying a rule does not.
-            // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
-            None => http.create_automod_rule(ctx.0, &self, self.audit_log_reason).await,
         }
     }
 }

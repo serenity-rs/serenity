@@ -12,13 +12,13 @@ use serde_json::json;
 
 use super::prelude::*;
 #[cfg(feature = "model")]
-use crate::builder::{Builder, CreateMessage, EditProfile};
+use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
-use crate::http::CacheHttp;
+use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::mention::Mentionable;
 #[cfg(feature = "model")]
@@ -177,12 +177,8 @@ impl CurrentUser {
     ///
     /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
     /// if there is an error in deserializing the API response.
-    pub async fn edit(
-        &mut self,
-        cache_http: impl CacheHttp,
-        builder: EditProfile<'_>,
-    ) -> Result<()> {
-        *self = builder.execute(cache_http, ()).await?;
+    pub async fn edit(&mut self, http: &Http, builder: EditProfile<'_>) -> Result<()> {
+        *self = builder.execute(http).await?;
         Ok(())
     }
 }

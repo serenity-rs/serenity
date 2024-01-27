@@ -1,7 +1,7 @@
 #[cfg(feature = "model")]
 use crate::builder::EditSticker;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::comma_separated_string;
@@ -203,13 +203,9 @@ impl Sticker {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn edit(
-        &mut self,
-        cache_http: impl CacheHttp,
-        builder: EditSticker<'_>,
-    ) -> Result<()> {
+    pub async fn edit(&mut self, http: &Http, builder: EditSticker<'_>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            *self = guild_id.edit_sticker(cache_http, self.id, builder).await?;
+            *self = guild_id.edit_sticker(http, self.id, builder).await?;
             Ok(())
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
