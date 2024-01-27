@@ -5,9 +5,9 @@ use serde::Serialize;
 #[cfg(feature = "unstable_discord_api")]
 use super::{InstallationContext, InteractionContext};
 #[cfg(feature = "model")]
-use crate::builder::{Builder, CreateCommand};
+use crate::builder::CreateCommand;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::channel::ChannelType;
 use crate::model::id::{
@@ -157,11 +157,8 @@ impl Command {
     /// See [`CreateCommand::execute`] for a list of possible errors.
     ///
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
-    pub async fn create_global_command(
-        cache_http: impl CacheHttp,
-        builder: CreateCommand<'_>,
-    ) -> Result<Command> {
-        builder.execute(cache_http, (None, None)).await
+    pub async fn create_global_command(http: &Http, builder: CreateCommand<'_>) -> Result<Command> {
+        builder.execute(http, None, None).await
     }
 
     /// Override all global application commands.
@@ -182,11 +179,11 @@ impl Command {
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn edit_global_command(
-        cache_http: impl CacheHttp,
+        http: &Http,
         command_id: CommandId,
         builder: CreateCommand<'_>,
     ) -> Result<Command> {
-        builder.execute(cache_http, (None, Some(command_id))).await
+        builder.execute(http, None, Some(command_id)).await
     }
 
     /// Gets all global commands.
