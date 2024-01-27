@@ -1,6 +1,5 @@
 use std::env;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
 use std::time::Duration;
 
 use chrono::offset::Utc;
@@ -18,7 +17,7 @@ struct Handler {
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
+    async fn message(&self, ctx: &Context, msg: &Message) {
         if msg.content.starts_with("!ping") {
             if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
                 eprintln!("Error sending message: {why:?}");
@@ -26,18 +25,14 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _ctx: Context, ready: Ready) {
+    async fn ready(&self, _ctx: &Context, ready: &Ready) {
         println!("{} is connected!", ready.user.name);
     }
 
     // We use the cache_ready event just in case some cache operation is required in whatever use
     // case you have for this.
-    async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
+    async fn cache_ready(&self, ctx: &Context, _guilds: &Vec<GuildId>) {
         println!("Cache built successfully!");
-
-        // It's safe to clone Context, but Arc is cheaper for this use case.
-        // Untested claim, just theoretically. :P
-        let ctx = Arc::new(ctx);
 
         // We need to check that the loop is not already running when this event triggers, as this
         // event triggers every time the bot enters or leaves a guild, along every time the ready
@@ -46,8 +41,8 @@ impl EventHandler for Handler {
         // An AtomicBool is used because it doesn't require a mutable reference to be changed, as
         // we don't have one due to self being an immutable reference.
         if !self.is_loop_running.load(Ordering::Relaxed) {
-            // We have to clone the Arc, as it gets moved into the new thread.
-            let ctx1 = Arc::clone(&ctx);
+            // We have to clone the ctx, as it gets moved into the new thread.
+            let ctx1 = ctx.clone();
             // tokio::spawn creates a new green thread that can run in parallel with the rest of
             // the application.
             tokio::spawn(async move {
@@ -58,7 +53,7 @@ impl EventHandler for Handler {
             });
 
             // And of course, we can run more than one thread at different timings.
-            let ctx2 = Arc::clone(&ctx);
+            let ctx2 = ctx.clone();
             tokio::spawn(async move {
                 loop {
                     set_activity_to_current_time(&ctx2);
