@@ -1,5 +1,4 @@
-use std::collections::HashSet;
-
+use arrayvec::ArrayVec;
 use serde::{Deserialize, Serialize};
 
 use crate::model::prelude::*;
@@ -10,6 +9,21 @@ enum ParseValue {
     Everyone,
     Users,
     Roles,
+}
+
+enum ParseAction {
+    Remove,
+    Insert,
+}
+
+impl ParseAction {
+    fn from_allow(allow: bool) -> Self {
+        if allow {
+            Self::Insert
+        } else {
+            Self::Remove
+        }
+    }
 }
 
 /// A builder to manage the allowed mentions on a message, used by the [`ChannelId::send_message`]
@@ -58,7 +72,7 @@ enum ParseValue {
 #[derive(Clone, Debug, Default, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateAllowedMentions {
-    parse: HashSet<ParseValue>,
+    parse: ArrayVec<ParseValue, 3>,
     users: Vec<UserId>,
     roles: Vec<RoleId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,34 +85,30 @@ impl CreateAllowedMentions {
         Self::default()
     }
 
-    /// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.
-    pub fn all_users(mut self, allow: bool) -> Self {
-        if allow {
-            self.parse.insert(ParseValue::Users);
-        } else {
-            self.parse.remove(&ParseValue::Users);
-        }
+    fn handle_parse_unique(mut self, value: ParseValue, action: ParseAction) -> Self {
+        let existing_pos = self.parse.iter().position(|p| *p == value);
+        match (existing_pos, action) {
+            (Some(pos), ParseAction::Remove) => drop(self.parse.swap_remove(pos)),
+            (None, ParseAction::Insert) => self.parse.push(value),
+            _ => {},
+        };
+
         self
+    }
+
+    /// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.
+    pub fn all_users(self, allow: bool) -> Self {
+        self.handle_parse_unique(ParseValue::Users, ParseAction::from_allow(allow))
     }
 
     /// Toggles mentions for all roles. Overrides [`Self::roles`] if it was previously set.
-    pub fn all_roles(mut self, allow: bool) -> Self {
-        if allow {
-            self.parse.insert(ParseValue::Roles);
-        } else {
-            self.parse.remove(&ParseValue::Roles);
-        }
-        self
+    pub fn all_roles(self, allow: bool) -> Self {
+        self.handle_parse_unique(ParseValue::Roles, ParseAction::from_allow(allow))
     }
 
     /// Toggles @everyone and @here mentions.
-    pub fn everyone(mut self, allow: bool) -> Self {
-        if allow {
-            self.parse.insert(ParseValue::Everyone);
-        } else {
-            self.parse.remove(&ParseValue::Everyone);
-        }
-        self
+    pub fn everyone(self, allow: bool) -> Self {
+        self.handle_parse_unique(ParseValue::Everyone, ParseAction::from_allow(allow))
     }
 
     /// Sets the *specific* users that will be allowed mentionable.
