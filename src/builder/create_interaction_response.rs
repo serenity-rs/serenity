@@ -2,8 +2,6 @@ use std::borrow::Cow;
 
 use serde_json::json;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -12,7 +10,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -110,13 +108,6 @@ impl CreateInteractionResponse<'_> {
             Ok(())
         }
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateInteractionResponse<'_> {
-    type Context<'ctx> = (InteractionId, &'ctx str);
-    type Built = ();
 
     /// Creates a response to the interaction received.
     ///
@@ -128,11 +119,13 @@ impl Builder for CreateInteractionResponse<'_> {
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         mut self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        http: &Http,
+        interaction_id: InteractionId,
+        interaction_token: &str,
+    ) -> Result<()> {
         self.check_length()?;
         let files = match &mut self {
             CreateInteractionResponse::Message(msg)
@@ -141,7 +134,7 @@ impl Builder for CreateInteractionResponse<'_> {
             _ => Vec::new(),
         };
 
-        cache_http.http().create_interaction_response(ctx.0, ctx.1, &self, files).await
+        http.create_interaction_response(interaction_id, interaction_token, &self, files).await
     }
 }
 
@@ -373,25 +366,20 @@ impl<'a> CreateAutocompleteResponse<'a> {
         self.choices.to_mut().push(value);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateAutocompleteResponse<'_> {
-    type Context<'ctx> = (InteractionId, &'ctx str);
-    type Built = ();
 
     /// Creates a response to an autocomplete interaction.
     ///
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().create_interaction_response(ctx.0, ctx.1, &self, Vec::new()).await
+        http: &Http,
+        interaction_id: InteractionId,
+        interaction_token: &str,
+    ) -> Result<()> {
+        http.create_interaction_response(interaction_id, interaction_token, &self, Vec::new()).await
     }
 }
 
