@@ -8,7 +8,6 @@ use serde::{Deserialize, Serialize};
 use super::{AuthorizingIntegrationOwners, InteractionContext};
 #[cfg(feature = "model")]
 use crate::builder::{
-    Builder,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     CreateInteractionResponseMessage,
@@ -17,7 +16,7 @@ use crate::builder::{
 #[cfg(feature = "collector")]
 use crate::client::Context;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::{CommandOptionType, CommandType};
 use crate::model::channel::{Attachment, Message, PartialChannel};
@@ -114,10 +113,10 @@ impl CommandInteraction {
     /// deserializing the API response.
     pub async fn create_response(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateInteractionResponse<'_>,
     ) -> Result<()> {
-        builder.execute(cache_http, (self.id, &self.token)).await
+        builder.execute(http, self.id, &self.token).await
     }
 
     /// Edits the initial interaction response.
@@ -131,10 +130,10 @@ impl CommandInteraction {
     /// deserializing the API response.
     pub async fn edit_response(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: EditInteractionResponse<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, &self.token).await
+        builder.execute(http, &self.token).await
     }
 
     /// Deletes the initial interaction response.
@@ -160,10 +159,10 @@ impl CommandInteraction {
     /// response.
     pub async fn create_followup(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateInteractionResponseFollowup<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, (None, &self.token)).await
+        builder.execute(http, None, &self.token).await
     }
 
     /// Edits a followup response to the response sent.
@@ -177,11 +176,11 @@ impl CommandInteraction {
     /// response.
     pub async fn edit_followup(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         message_id: MessageId,
         builder: CreateInteractionResponseFollowup<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, (Some(message_id), &self.token)).await
+        builder.execute(http, Some(message_id), &self.token).await
     }
 
     /// Deletes a followup message.
@@ -210,9 +209,9 @@ impl CommandInteraction {
     ///
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
-    pub async fn defer(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn defer(&self, http: &Http) -> Result<()> {
         let builder = CreateInteractionResponse::Defer(CreateInteractionResponseMessage::default());
-        self.create_response(cache_http, builder).await
+        self.create_response(http, builder).await
     }
 
     /// Helper function to defer an interaction ephemerally
@@ -221,11 +220,11 @@ impl CommandInteraction {
     ///
     /// May also return an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if
     /// there is an error in deserializing the API response.
-    pub async fn defer_ephemeral(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn defer_ephemeral(&self, http: &Http) -> Result<()> {
         let builder = CreateInteractionResponse::Defer(
             CreateInteractionResponseMessage::new().ephemeral(true),
         );
-        self.create_response(cache_http, builder).await
+        self.create_response(http, builder).await
     }
 
     /// See [`CreateQuickModal`].
