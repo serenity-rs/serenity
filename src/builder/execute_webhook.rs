@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -10,7 +8,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -326,14 +324,6 @@ impl<'a> ExecuteWebhook<'a> {
         self.thread_name = Some(thread_name);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for ExecuteWebhook<'_> {
-    type Context<'ctx> = (WebhookId, &'ctx str, bool);
-    type Built = Option<Message>;
-
     /// Executes the webhook with the given content.
     ///
     /// # Errors
@@ -342,20 +332,22 @@ impl Builder for ExecuteWebhook<'_> {
     /// execution is attempted in a thread not belonging to the webhook's [`Channel`].
     ///
     /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         mut self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        http: &Http,
+        webhook_id: WebhookId,
+        webhook_token: &str,
+        wait: bool,
+    ) -> Result<Option<Message>> {
         self.check_length()?;
 
         let files = self.attachments.take_files();
 
-        let http = cache_http.http();
         if self.allowed_mentions.is_none() {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        http.execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
+        http.execute_webhook(webhook_id, self.thread_id, webhook_token, wait, files, &self).await
     }
 }

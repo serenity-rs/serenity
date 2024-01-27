@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -10,7 +8,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -142,13 +140,6 @@ impl<'a> EditWebhookMessage<'a> {
         self.attachments = Some(EditAttachments::new());
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditWebhookMessage<'_> {
-    type Context<'ctx> = (WebhookId, &'ctx str, MessageId);
-    type Built = Message;
 
     /// Edits the webhook's message.
     ///
@@ -163,20 +154,30 @@ impl Builder for EditWebhookMessage<'_> {
     /// invalid, or the given message Id does not belong to the webhook.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         mut self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        http: &Http,
+        webhook_id: WebhookId,
+        webhook_token: &str,
+        message_id: MessageId,
+    ) -> Result<Message> {
         self.check_length()?;
 
         let files = self.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
-        let http = cache_http.http();
         if self.allowed_mentions.is_none() {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        http.edit_webhook_message(ctx.0, self.thread_id, ctx.1, ctx.2, &self, files).await
+        http.edit_webhook_message(
+            webhook_id,
+            self.thread_id,
+            webhook_token,
+            message_id,
+            &self,
+            files,
+        )
+        .await
     }
 }

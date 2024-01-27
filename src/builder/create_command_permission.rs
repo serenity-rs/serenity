@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -26,13 +24,6 @@ impl<'a> EditCommandPermissions<'a> {
             permissions: permissions.into(),
         }
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditCommandPermissions<'_> {
-    type Context<'ctx> = (GuildId, CommandId);
-    type Built = CommandPermissions;
 
     /// Create permissions for a guild application command. These will overwrite any existing
     /// permissions for that command.
@@ -47,12 +38,13 @@ impl Builder for EditCommandPermissions<'_> {
     ///
     /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
     #[cfg(feature = "http")]
-    async fn execute(
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().edit_guild_command_permissions(ctx.0, ctx.1, &self).await
+        http: &Http,
+        guild_id: GuildId,
+        command_id: CommandId,
+    ) -> Result<CommandPermissions> {
+        http.edit_guild_command_permissions(guild_id, command_id, &self).await
     }
 }
 
