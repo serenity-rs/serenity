@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -11,7 +9,7 @@ use super::{
     EditWebhookMessage,
 };
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -98,13 +96,6 @@ impl<'a> EditInteractionResponse<'a> {
     pub fn clear_attachments(self) -> Self {
         Self(self.0.clear_attachments())
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditInteractionResponse<'_> {
-    type Context<'ctx> = &'ctx str;
-    type Built = Message;
 
     /// Edits the initial interaction response. Does not work for ephemeral messages.
     ///
@@ -119,15 +110,12 @@ impl Builder for EditInteractionResponse<'_> {
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    async fn execute(
-        mut self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+    #[cfg(feature = "http")]
+    pub async fn execute(mut self, http: &Http, interaction_token: &str) -> Result<Message> {
         self.0.check_length()?;
 
         let files = self.0.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
-        cache_http.http().edit_original_interaction_response(ctx, &self, files).await
+        http.edit_original_interaction_response(interaction_token, &self, files).await
     }
 }

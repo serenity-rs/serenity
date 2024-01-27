@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -51,13 +49,6 @@ impl<'a> CreateWebhook<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateWebhook<'_> {
-    type Context<'ctx> = ChannelId;
-    type Built = Webhook;
 
     /// Creates the webhook.
     ///
@@ -71,14 +62,15 @@ impl Builder for CreateWebhook<'_> {
     ///
     /// [`Text`]: ChannelType::Text
     /// [`News`]: ChannelType::News
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        channel_id: ChannelId,
+    ) -> Result<Webhook> {
         crate::model::error::Minimum::WebhookName.check_underflow(self.name.chars().count())?;
         crate::model::error::Maximum::WebhookName.check_overflow(self.name.chars().count())?;
 
-        cache_http.http().create_webhook(ctx, &self, self.audit_log_reason).await
+        cache_http.http().create_webhook(channel_id, &self, self.audit_log_reason).await
     }
 }

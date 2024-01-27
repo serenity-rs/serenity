@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 use crate::internal::prelude::Result;
 use crate::model::id::{EntitlementId, GuildId, SkuId, UserId};
 use crate::model::monetization::Entitlement;
@@ -67,20 +67,14 @@ impl<'a> GetEntitlements<'a> {
         self.exclude_ended = Some(exclude_ended);
         self
     }
-}
 
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl super::Builder for GetEntitlements<'_> {
-    type Context<'ctx> = ();
-    type Built = Vec<Entitlement>;
-
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        _: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        let http = cache_http.http();
+    /// Returns all entitlements for the current application, active and expired.
+    ///
+    /// # Errors
+    ///
+    /// May error due to an invalid response from discord, or network error.
+    #[cfg(feature = "http")]
+    pub async fn execute(self, http: &Http) -> Result<Vec<Entitlement>> {
         http.get_entitlements(
             self.user_id,
             self.sku_ids.as_deref(),
