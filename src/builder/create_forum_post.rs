@@ -2,11 +2,9 @@ use std::borrow::Cow;
 
 use nonmax::NonMaxU16;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateMessage;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -93,28 +91,16 @@ impl<'a> CreateForumPost<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateForumPost<'_> {
-    type Context<'ctx> = ChannelId;
-    type Built = GuildChannel;
 
     /// Creates a forum post in the given channel.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    async fn execute(
-        mut self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+    #[cfg(feature = "http")]
+    pub async fn execute(mut self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
         let files = self.message.attachments.take_files();
-        cache_http
-            .http()
-            .create_forum_post_with_attachments(ctx, &self, files, self.audit_log_reason)
+        http.create_forum_post_with_attachments(channel_id, &self, files, self.audit_log_reason)
             .await
     }
 }

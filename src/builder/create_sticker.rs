@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -72,13 +70,6 @@ impl<'a> CreateSticker<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateSticker<'_> {
-    type Context<'ctx> = GuildId;
-    type Built = Sticker;
 
     /// Creates a new sticker in the guild with the data set, if any.
     ///
@@ -90,15 +81,12 @@ impl Builder for CreateSticker<'_> {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+    #[cfg(feature = "http")]
+    pub async fn execute(self, cache_http: impl CacheHttp, guild_id: GuildId) -> Result<Sticker> {
         #[cfg(feature = "cache")]
         crate::utils::user_has_guild_perms(
             &cache_http,
-            ctx,
+            guild_id,
             Permissions::CREATE_GUILD_EXPRESSIONS,
         )?;
 
@@ -108,6 +96,6 @@ impl Builder for CreateSticker<'_> {
             ("description".into(), self.description),
         ];
 
-        cache_http.http().create_sticker(ctx, map, self.file, self.audit_log_reason).await
+        cache_http.http().create_sticker(guild_id, map, self.file, self.audit_log_reason).await
     }
 }

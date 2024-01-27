@@ -3,8 +3,6 @@ use std::borrow::Cow;
 use nonmax::NonMaxU16;
 
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
@@ -256,13 +254,6 @@ impl<'a> CreateChannel<'a> {
         self.default_sort_order = Some(default_sort_order);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for CreateChannel<'_> {
-    type Context<'ctx> = GuildId;
-    type Built = GuildChannel;
 
     /// Creates a new [`Channel`] in the guild.
     ///
@@ -274,14 +265,15 @@ impl Builder for CreateChannel<'_> {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
+        guild_id: GuildId,
+    ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_CHANNELS)?;
+        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_CHANNELS)?;
 
-        cache_http.http().create_channel(ctx, &self, self.audit_log_reason).await
+        cache_http.http().create_channel(guild_id, &self, self.audit_log_reason).await
     }
 }

@@ -1,7 +1,7 @@
 #[cfg(feature = "model")]
-use crate::builder::{Builder as _, GetEntitlements};
+use crate::builder::GetEntitlements;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 /// A premium offering that can be made available to an application's users and guilds.
@@ -138,11 +138,8 @@ impl Entitlement {
     ///
     /// May error due to an invalid response from discord, or network error.
     #[cfg(feature = "model")]
-    pub async fn list(
-        cache_http: impl CacheHttp,
-        builder: GetEntitlements<'_>,
-    ) -> Result<Vec<Entitlement>> {
-        builder.execute(cache_http, ()).await
+    pub async fn list(http: &Http, builder: GetEntitlements<'_>) -> Result<Vec<Entitlement>> {
+        builder.execute(http).await
     }
 }
 
