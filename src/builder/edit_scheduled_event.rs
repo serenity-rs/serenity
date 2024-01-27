@@ -1,10 +1,8 @@
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use super::Builder;
 use super::{CreateAttachment, CreateScheduledEventMetadata};
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -164,13 +162,6 @@ impl<'a> EditScheduledEvent<'a> {
         self.audit_log_reason = Some(reason);
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for EditScheduledEvent<'_> {
-    type Context<'ctx> = (GuildId, ScheduledEventId);
-    type Built = ScheduledEvent;
 
     /// Modifies a scheduled event in the guild with the data set, if any.
     ///
@@ -184,11 +175,13 @@ impl Builder for EditScheduledEvent<'_> {
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    async fn execute(
+    #[cfg(feature = "http")]
+    pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().edit_scheduled_event(ctx.0, ctx.1, &self, self.audit_log_reason).await
+        http: &Http,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
+    ) -> Result<ScheduledEvent> {
+        http.edit_scheduled_event(guild_id, event_id, &self, self.audit_log_reason).await
     }
 }

@@ -207,11 +207,11 @@ impl Member {
     #[doc(alias = "timeout")]
     pub async fn disable_communication_until(
         &mut self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         time: Timestamp,
     ) -> Result<()> {
         let builder = EditMember::new().disable_communication_until(time);
-        match self.guild_id.edit_member(cache_http, self.user.id, builder).await {
+        match self.guild_id.edit_member(http, self.user.id, builder).await {
             Ok(_) => {
                 self.communication_disabled_until = Some(time);
                 Ok(())
@@ -251,12 +251,8 @@ impl Member {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    pub async fn edit(
-        &mut self,
-        cache_http: impl CacheHttp,
-        builder: EditMember<'_>,
-    ) -> Result<()> {
-        *self = self.guild_id.edit_member(cache_http, self.user.id, builder).await?;
+    pub async fn edit(&mut self, http: &Http, builder: EditMember<'_>) -> Result<()> {
+        *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
         Ok(())
     }
 
@@ -270,9 +266,9 @@ impl Member {
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
-    pub async fn enable_communication(&mut self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn enable_communication(&mut self, http: &Http) -> Result<()> {
         let builder = EditMember::new().enable_communication();
-        *self = self.guild_id.edit_member(cache_http, self.user.id, builder).await?;
+        *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
         Ok(())
     }
 
@@ -384,12 +380,8 @@ impl Member {
     /// current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    pub async fn move_to_voice_channel(
-        &self,
-        cache_http: impl CacheHttp,
-        channel: ChannelId,
-    ) -> Result<Member> {
-        self.guild_id.move_member(cache_http, self.user.id, channel).await
+    pub async fn move_to_voice_channel(&self, http: &Http, channel: ChannelId) -> Result<Member> {
+        self.guild_id.move_member(http, self.user.id, channel).await
     }
 
     /// Disconnects the member from their voice channel if any.
@@ -402,8 +394,8 @@ impl Member {
     /// current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    pub async fn disconnect_from_voice(&self, cache_http: impl CacheHttp) -> Result<Member> {
-        self.guild_id.disconnect_member(cache_http, self.user.id).await
+    pub async fn disconnect_from_voice(&self, http: &Http) -> Result<Member> {
+        self.guild_id.disconnect_member(http, self.user.id).await
     }
 
     /// Returns the guild-level permissions for the member.
