@@ -1,7 +1,5 @@
 #[cfg(feature = "http")]
-use super::Builder;
-#[cfg(feature = "http")]
-use crate::http::{CacheHttp, MessagePagination};
+use crate::http::{Http, MessagePagination};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -88,13 +86,6 @@ impl GetMessages {
         self.limit = Some(limit.min(100));
         self
     }
-}
-
-#[cfg(feature = "http")]
-#[async_trait::async_trait]
-impl Builder for GetMessages {
-    type Context<'ctx> = ChannelId;
-    type Built = Vec<Message>;
 
     /// Gets messages from the channel.
     ///
@@ -106,12 +97,9 @@ impl Builder for GetMessages {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
-    ) -> Result<Self::Built> {
-        cache_http.http().get_messages(ctx, self.search_filter.map(Into::into), self.limit).await
+    #[cfg(feature = "http")]
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<Vec<Message>> {
+        http.get_messages(channel_id, self.search_filter.map(Into::into), self.limit).await
     }
 }
 

@@ -32,7 +32,6 @@ use super::{
 use crate::builder::{CreateAllowedMentions, CreateAttachment};
 use crate::constants;
 use crate::internal::prelude::*;
-use crate::json::*;
 use crate::model::prelude::*;
 
 /// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API. If
