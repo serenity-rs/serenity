@@ -20,8 +20,9 @@ macro_rules! event_handler {
             $(
                 $( #[doc = $doc] )*
                 $( #[cfg(feature = $feature)] )?
-                async fn $method_name(&self, $($context: Context,)? $( $arg_name: $arg_type ),*) {
+                async fn $method_name(&self, $($context: &Context,)? $( $arg_name: &$arg_type ),*) {
                     // Suppress unused argument warnings
+                    #[allow(dropping_references, dropping_copy_types)]
                     drop(( $($context,)? $($arg_name),* ))
                 }
             )*
@@ -62,7 +63,7 @@ macro_rules! event_handler {
             }
 
             /// Runs the given [`EventHandler`]'s code for this event.
-            pub async fn dispatch(self, ctx: Context, handler: &dyn EventHandler) {
+            pub async fn dispatch(&self, ctx: &Context, handler: &dyn EventHandler) {
                 match self {
                     $(
                         $( #[cfg(feature = $feature)] )?
