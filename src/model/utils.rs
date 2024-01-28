@@ -88,14 +88,7 @@ where
             return serializer.serialize_seq(Some(0))?.end();
         };
 
-        let (lower, upper) = iter.size_hint();
-        let mut serializer = serializer.serialize_seq(Some(upper.unwrap_or(lower)))?;
-
-        for item in iter {
-            serializer.serialize_element(&item)?;
-        }
-
-        serializer.end()
+        serializer.collect_seq(iter)
     }
 }
 
@@ -381,13 +374,7 @@ pub fn serialize_map_values<K, S: Serializer, V: Serialize>(
     map: &HashMap<K, V>,
     serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(map.len()))?;
-
-    for value in map.values() {
-        seq.serialize_element(&value)?;
-    }
-
-    seq.end()
+    serializer.collect_seq(map.values())
 }
 
 /// Deserializes a sequence and builds a `HashMap` with the key extraction function.
