@@ -875,11 +875,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MessageType {
         /// A regular message.
-        #[default]
         Regular = 0,
         /// An indicator that a recipient was added by the author.
         GroupRecipientAddition = 1,
@@ -942,7 +940,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MessageActivityKind {
         Join = 1,
