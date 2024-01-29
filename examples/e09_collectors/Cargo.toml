@@ -1,0 +1,12 @@
+[package]
+name = "e09_collectors"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+edition = "2018"
+
+[dependencies.serenity]
+features = ["framework", "rustls_backend", "collector"]
+path = "../../"
+
+[dependencies]
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
