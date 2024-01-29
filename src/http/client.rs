@@ -11,7 +11,6 @@ use reqwest::header::{HeaderMap as Headers, HeaderValue};
 #[cfg(feature = "utils")]
 use reqwest::Url;
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
-use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
 use serde_json::{from_value, json, to_string, to_vec};
 use tracing::{debug, warn};
@@ -55,8 +54,8 @@ pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: bool,
-    token: SecretString,
-    proxy: Option<String>,
+    token: Arc<str>,
+    proxy: Option<FixedString<u16>>,
     application_id: Option<ApplicationId>,
     default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
@@ -69,7 +68,7 @@ impl HttpBuilder {
             client: None,
             ratelimiter: None,
             ratelimiter_disabled: false,
-            token: SecretString::new(parse_token(token)),
+            token: parse_token(token),
             proxy: None,
             application_id: None,
             default_allowed_mentions: None,
@@ -85,7 +84,7 @@ impl HttpBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
     /// automatically do so.
     pub fn token(mut self, token: &str) -> Self {
-        self.token = SecretString::new(parse_token(token));
+        self.token = parse_token(token);
         self
     }
 
@@ -124,10 +123,24 @@ impl HttpBuilder {
     /// proxy's behavior where it will tunnel requests that use TLS via [`HTTP CONNECT`] method
     /// (e.g. using [`reqwest::Proxy`]).
     ///
+    /// # Panics
+    ///
+    /// Panics if the proxy URL is larger than u16::MAX characters... what are you doing?
+    ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
-    pub fn proxy(mut self, proxy: impl Into<String>) -> Self {
-        self.proxy = Some(proxy.into());
+    pub fn proxy<'a>(mut self, proxy: impl Into<Cow<'a, str>>) -> Self {
+        let proxy = proxy.into();
+        let len = proxy.len();
+
+        let proxy = match proxy {
+            Cow::Owned(proxy) => FixedString::from_string_trunc(proxy),
+            Cow::Borrowed(proxy) => FixedString::from_str_trunc(proxy),
+        };
+
+        assert_eq!(len as u32, proxy.len(), "Proxy URL should not be larger than u16::MAX chars");
+        self.proxy = Some(proxy);
+
         self
     }
 
@@ -156,7 +169,7 @@ impl HttpBuilder {
 
         let ratelimiter = (!self.ratelimiter_disabled).then(|| {
             self.ratelimiter
-                .unwrap_or_else(|| Ratelimiter::new(client.clone(), self.token.expose_secret()))
+                .unwrap_or_else(|| Ratelimiter::new(client.clone(), Arc::clone(&self.token)))
         });
 
         Http {
@@ -170,13 +183,13 @@ impl HttpBuilder {
     }
 }
 
-fn parse_token(token: &str) -> String {
+fn parse_token(token: &str) -> Arc<str> {
     let token = token.trim();
 
     if token.starts_with("Bot ") || token.starts_with("Bearer ") {
-        token.to_string()
+        Arc::from(token)
     } else {
-        format!("Bot {token}")
+        Arc::from(format!("Bot {token}"))
     }
 }
 
@@ -201,8 +214,8 @@ fn reason_into_header(reason: &str) -> Headers {
 pub struct Http {
     pub(crate) client: Client,
     pub ratelimiter: Option<Ratelimiter>,
-    pub proxy: Option<String>,
-    token: SecretString,
+    pub proxy: Option<FixedString<u16>>,
+    token: Arc<str>,
     application_id: AtomicU64,
     pub default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
@@ -230,8 +243,8 @@ impl Http {
         self.application_id.store(application_id.get(), Ordering::Relaxed);
     }
 
-    pub fn token(&self) -> &str {
-        self.token.expose_secret()
+    pub(crate) fn token(&self) -> &Arc<str> {
+        &self.token
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -4950,7 +4963,7 @@ impl Http {
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
         } else {
-            let request = req.build(&self.client, self.token(), self.proxy.as_deref())?.build()?;
+            let request = req.build(&self.client, &self.token, self.proxy.as_deref())?.build()?;
             self.client.execute(request).await?
         };
 
