@@ -438,7 +438,7 @@ impl<'de> Deserialize<'de> for Action {
                     .duration_seconds
                     .ok_or_else(|| Error::missing_field("duration_seconds"))?,
             )),
-            ActionType::Unknown(unknown) => Action::Unknown(unknown),
+            ActionType(unknown) => Action::Unknown(unknown),
         })
     }
 }
@@ -497,7 +497,6 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ActionType {
         BlockMessage = 1,
