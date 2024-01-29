@@ -37,7 +37,7 @@ jobs:
           - name: no default features
             features: " "
           - name: no cache
-            features: builder client framework gateway model http standard_framework utils rustls_backend
+            features: builder client framework gateway model http utils rustls_backend
           - name: no gateway
             features: model http rustls_backend
           - name: chrono
@@ -208,7 +208,6 @@ jobs:
       - name: Build docs
         run: |
           cargo doc --no-deps --features collector,voice,unstable_discord_api
-          cargo doc --no-deps -p command_attr
         env:
           RUSTDOCFLAGS: -D rustdoc::broken_intra_doc_links
 
@@ -238,30 +237,26 @@ jobs:
       - name: 'Check example 4'
         run: cargo check -p e04_message_builder
       - name: 'Check example 5'
-        run: cargo check -p e05_command_framework
+        run: cargo check -p e05_sample_bot_structure
       - name: 'Check example 6'
-        run: cargo check -p e06_sample_bot_structure
+        run: cargo check -p e06_env_logging
       - name: 'Check example 7'
-        run: cargo check -p e07_env_logging
+        run: cargo check -p e07_shard_manager
       - name: 'Check example 8'
-        run: cargo check -p e08_shard_manager
-      - name: 'Check example 9'
-        run: cargo check -p e09_create_message_builder
+        run: cargo check -p e08_create_message_builder
+      - name: 'Check example 09'
+        run: cargo check -p e09_collectors
       - name: 'Check example 10'
-        run: cargo check -p e10_collectors
+        run: cargo check -p e10_gateway_intents
       - name: 'Check example 11'
-        run: cargo check -p e11_gateway_intents
+        run: cargo check -p e11_global_data
       - name: 'Check example 12'
-        run: cargo check -p e12_global_data
+        run: cargo check -p e12_parallel_loops
       - name: 'Check example 13'
-        run: cargo check -p e13_parallel_loops
+        run: cargo check -p e13_sqlite_database
       - name: 'Check example 14'
-        run: cargo check -p e14_slash_commands
+        run: cargo check -p e14_message_components
       - name: 'Check example 15'
-        run: cargo check -p e15_sqlite_database
+        run: cargo check -p e15_webhook
       - name: 'Check example 16'
-        run: cargo check -p e16_message_components
-      - name: 'Check example 17'
-        run: cargo check -p e17_webhook
-      - name: 'Check example 18'
-        run: cargo check -p e18_interactions_endpoint
+        run: cargo check -p e16_interactions_endpoint
