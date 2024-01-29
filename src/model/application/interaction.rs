@@ -237,7 +237,7 @@ impl<'de> Deserialize<'de> for Interaction {
             InteractionType::Autocomplete => from_value(value).map(Interaction::Autocomplete),
             InteractionType::Modal => from_value(value).map(Interaction::Modal),
             InteractionType::Ping => from_value(value).map(Interaction::Ping),
-            InteractionType::Unknown(_) => return Err(DeError::custom("Unknown interaction type")),
+            InteractionType(_) => return Err(DeError::custom("Unknown interaction type")),
         }
         .map_err(DeError::custom)
     }
@@ -260,7 +260,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InteractionType {
         Ping = 1,
