@@ -43,7 +43,6 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/monetization/skus#sku-object-sku-types).
     #[derive(Clone, Debug, Serialize, Deserialize)]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum SkuKind {
         /// Represents a recurring subscription.
@@ -127,7 +126,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#entitlement-object-entitlement-types).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Clone, Debug, Serialize, Deserialize)]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum EntitlementKind {
         /// Entitlement was purchased as an app subscription.
