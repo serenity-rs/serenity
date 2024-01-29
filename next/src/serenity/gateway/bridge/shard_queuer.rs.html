@@ -562,7 +562,7 @@
     </span><span class="kw">async fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>shard = Shard::new(
             Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.ws_url),
-            <span class="self">self</span>.http.token(),
+            Arc::clone(<span class="self">self</span>.http.token()),
             ShardInfo::new(shard_id, <span class="self">self</span>.shard_total),
             <span class="self">self</span>.intents,
             <span class="self">self</span>.presence.clone(),

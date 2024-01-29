@@ -4689,6 +4689,19 @@
 <a href="#4687" id="4687">4687</a>
 <a href="#4688" id="4688">4688</a>
 <a href="#4689" id="4689">4689</a>
+<a href="#4690" id="4690">4690</a>
+<a href="#4691" id="4691">4691</a>
+<a href="#4692" id="4692">4692</a>
+<a href="#4693" id="4693">4693</a>
+<a href="#4694" id="4694">4694</a>
+<a href="#4695" id="4695">4695</a>
+<a href="#4696" id="4696">4696</a>
+<a href="#4697" id="4697">4697</a>
+<a href="#4698" id="4698">4698</a>
+<a href="#4699" id="4699">4699</a>
+<a href="#4700" id="4700">4700</a>
+<a href="#4701" id="4701">4701</a>
+<a href="#4702" id="4702">4702</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4702,7 +4715,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
 </span><span class="kw">use </span>reqwest::Url;
 <span class="kw">use </span>reqwest::{Client, ClientBuilder, Response <span class="kw">as </span>ReqwestResponse, StatusCode};
-<span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde_json::{from_value, json, to_string, to_vec};
 <span class="kw">use </span>tracing::{debug, trace};
@@ -4747,8 +4759,8 @@
     client: <span class="prelude-ty">Option</span>&lt;Client&gt;,
     ratelimiter: <span class="prelude-ty">Option</span>&lt;Ratelimiter&gt;,
     ratelimiter_disabled: bool,
-    token: SecretString,
-    proxy: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    token: Arc&lt;str&gt;,
+    proxy: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u16&gt;&gt;,
     application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
 }
 
@@ -4760,7 +4772,7 @@
             client: <span class="prelude-val">None</span>,
             ratelimiter: <span class="prelude-val">None</span>,
             ratelimiter_disabled: <span class="bool-val">false</span>,
-            token: SecretString::new(parse_token(token)),
+            token: parse_token(token),
             proxy: <span class="prelude-val">None</span>,
             application_id: <span class="prelude-val">None</span>,
         }
@@ -4775,7 +4787,7 @@
     <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
     /// automatically do so.
     </span><span class="kw">pub fn </span>token(<span class="kw-2">mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.token = SecretString::new(parse_token(token));
+        <span class="self">self</span>.token = parse_token(token);
         <span class="self">self
     </span>}
 
@@ -4814,10 +4826,24 @@
     /// proxy's behavior where it will tunnel requests that use TLS via [`HTTP CONNECT`] method
     /// (e.g. using [`reqwest::Proxy`]).
     ///
+    /// # Panics
+    ///
+    /// Panics if the proxy URL is larger than u16::MAX characters... what are you doing?
+    ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
-    </span><span class="kw">pub fn </span>proxy(<span class="kw-2">mut </span><span class="self">self</span>, proxy: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.proxy = <span class="prelude-val">Some</span>(proxy.into());
+    </span><span class="kw">pub fn </span>proxy&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, proxy: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>proxy = proxy.into();
+        <span class="kw">let </span>len = proxy.len();
+
+        <span class="kw">let </span>proxy = <span class="kw">match </span>proxy {
+            Cow::Owned(proxy) =&gt; FixedString::from_string_trunc(proxy),
+            Cow::Borrowed(proxy) =&gt; FixedString::from_str_trunc(proxy),
+        };
+
+        <span class="macro">assert_eq!</span>(len <span class="kw">as </span>u32, proxy.len(), <span class="string">"Proxy URL should not be larger than u16::MAX chars"</span>);
+        <span class="self">self</span>.proxy = <span class="prelude-val">Some</span>(proxy);
+
         <span class="self">self
     </span>}
 
@@ -4834,7 +4860,7 @@
 
         <span class="kw">let </span>ratelimiter = (!<span class="self">self</span>.ratelimiter_disabled).then(|| {
             <span class="self">self</span>.ratelimiter
-                .unwrap_or_else(|| Ratelimiter::new(client.clone(), <span class="self">self</span>.token.expose_secret()))
+                .unwrap_or_else(|| Ratelimiter::new(client.clone(), Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.token)))
         });
 
         Http {
@@ -4847,13 +4873,13 @@
     }
 }
 
-<span class="kw">fn </span>parse_token(token: <span class="kw-2">&amp;</span>str) -&gt; String {
+<span class="kw">fn </span>parse_token(token: <span class="kw-2">&amp;</span>str) -&gt; Arc&lt;str&gt; {
     <span class="kw">let </span>token = token.trim();
 
     <span class="kw">if </span>token.starts_with(<span class="string">"Bot "</span>) || token.starts_with(<span class="string">"Bearer "</span>) {
-        token.to_string()
+        Arc::from(token)
     } <span class="kw">else </span>{
-        <span class="macro">format!</span>(<span class="string">"Bot {token}"</span>)
+        Arc::from(<span class="macro">format!</span>(<span class="string">"Bot {token}"</span>))
     }
 }
 
@@ -4878,8 +4904,8 @@
 </span><span class="kw">pub struct </span>Http {
     <span class="kw">pub</span>(<span class="kw">crate</span>) client: Client,
     <span class="kw">pub </span>ratelimiter: <span class="prelude-ty">Option</span>&lt;Ratelimiter&gt;,
-    <span class="kw">pub </span>proxy: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    token: SecretString,
+    <span class="kw">pub </span>proxy: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u16&gt;&gt;,
+    token: Arc&lt;str&gt;,
     application_id: AtomicU64,
 }
 
@@ -4906,8 +4932,8 @@
         <span class="self">self</span>.application_id.store(application_id.get(), Ordering::Relaxed);
     }
 
-    <span class="kw">pub fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.token.expose_secret()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;str&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.token
     }
 
     <span class="doccomment">/// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -9334,7 +9360,7 @@
         <span class="kw">let </span>response = <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimiter {
             ratelimiter.perform(req).<span class="kw">await</span><span class="question-mark">?
         </span>} <span class="kw">else </span>{
-            <span class="kw">let </span>request = req.build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="self">self</span>.token(), <span class="self">self</span>.proxy.as_deref())<span class="question-mark">?</span>.build()<span class="question-mark">?</span>;
+            <span class="kw">let </span>request = req.build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="self">self</span>.proxy.as_deref())<span class="question-mark">?</span>.build()<span class="question-mark">?</span>;
             <span class="self">self</span>.client.execute(request).<span class="kw">await</span><span class="question-mark">?
         </span>};
 

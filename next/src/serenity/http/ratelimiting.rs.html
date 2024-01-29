@@ -501,10 +501,6 @@
 <a href="#499" id="499">499</a>
 <a href="#500" id="500">500</a>
 <a href="#501" id="501">501</a>
-<a href="#502" id="502">502</a>
-<a href="#503" id="503">503</a>
-<a href="#504" id="504">504</a>
-<a href="#505" id="505">505</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
 //! routes - such as getting the current user's channels - for the most part, with the exception
 //! being major parameters.
@@ -545,12 +541,12 @@
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::str::{<span class="self">self</span>, FromStr};
+<span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::SystemTime;
 
 <span class="kw">use </span>dashmap::DashMap;
 <span class="kw">use </span>reqwest::header::HeaderMap;
 <span class="kw">use </span>reqwest::{Client, Response, StatusCode};
-<span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
 <span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tokio::time::{sleep, Duration};
 <span class="kw">use </span>tracing::debug;
@@ -592,7 +588,7 @@
     client: Client,
     global: Mutex&lt;()&gt;,
     routes: DashMap&lt;RatelimitingBucket, Ratelimit&gt;,
-    token: SecretString,
+    token: Arc&lt;str&gt;,
     absolute_ratelimits: bool,
     ratelimit_callback: Box&lt;<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync&gt;,
 }
@@ -615,16 +611,12 @@
     ///
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not prefix it.
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>new(client: Client, token: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::_new(client, token.into())
-    }
-
-    <span class="kw">fn </span>_new(client: Client, token: String) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(client: Client, token: Arc&lt;str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
+            token,
             client,
             global: Mutex::default(),
             routes: DashMap::new(),
-            token: SecretString::new(token),
             ratelimit_callback: Box::new(|<span class="kw">_</span>| {}),
             absolute_ratelimits: <span class="bool-val">false</span>,
         }
@@ -704,7 +696,7 @@
                 sleep(delay_time).<span class="kw">await</span>;
             }
 
-            <span class="kw">let </span>request = req.clone().build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="self">self</span>.token.expose_secret(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>request = req.clone().build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
             <span class="kw">let </span>response = <span class="self">self</span>.client.execute(request.build()<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// Check if the request got ratelimited by checking for status 429, and if so, sleep
