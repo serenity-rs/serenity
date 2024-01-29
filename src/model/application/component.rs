@@ -10,7 +10,6 @@ enum_number! {
     /// The type of a component
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ComponentType {
         ActionRow = 1,
@@ -70,7 +69,7 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
             ComponentType::ActionRow => {
                 return Err(DeError::custom("Invalid component type ActionRow"))
             },
-            ComponentType::Unknown(i) => {
+            ComponentType(i) => {
                 return Err(DeError::custom(format_args!("Unknown component type {i}")))
             },
         }
@@ -146,7 +145,7 @@ impl Serialize for ButtonKind {
                 custom_id,
                 style,
             } => Helper {
-                style: (*style).into(),
+                style: style.0,
                 url: None,
                 custom_id: Some(custom_id),
                 sku_id: None,
@@ -184,7 +183,6 @@ enum_number! {
     /// The style of a button.
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ButtonStyle {
         Primary = 1,
@@ -298,7 +296,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InputTextStyle {
         Short = 1,

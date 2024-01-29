@@ -254,7 +254,7 @@ impl<'de> Deserialize<'de> for Interaction {
             InteractionType::Autocomplete => from_value(value).map(Interaction::Autocomplete),
             InteractionType::Modal => from_value(value).map(Interaction::Modal),
             InteractionType::Ping => from_value(value).map(Interaction::Ping),
-            InteractionType::Unknown(_) => return Err(DeError::custom("Unknown interaction type")),
+            InteractionType(_) => return Err(DeError::custom("Unknown interaction type")),
         }
         .map_err(DeError::custom)
     }
@@ -277,7 +277,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InteractionType {
         Ping = 1,
@@ -347,7 +346,7 @@ impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
                 let mut out = Vec::new();
                 while let Some(key_str) = map.next_key::<serde_cow::CowStr<'_>>()? {
                     let key_int = key_str.0.parse::<u8>().map_err(serde::de::Error::custom)?;
-                    let value = match InstallationContext::from(key_int) {
+                    let value = match InstallationContext(key_int) {
                         InstallationContext::Guild => {
                             // GuildId here can be `0`, which signals the command is guild installed
                             // but invoked in a DM, we have to do this fun deserialisation dance.
@@ -543,8 +542,8 @@ impl serde::Serialize for MessageInteractionMetadata {
             MessageInteractionMetadata::ModalSubmit(val) => {
                 serialize_with_type(serializer, val, InteractionType::Modal)
             },
-            &MessageInteractionMetadata::Unknown(kind) => {
-                tracing::warn!("Tried to serialize MessageInteractionMetadata::Unknown({}), serialising null instead", u8::from(kind));
+            &MessageInteractionMetadata::Unknown(InteractionType(kind)) => {
+                tracing::warn!("Tried to serialize MessageInteractionMetadata::Unknown({kind}), serialising null instead");
                 serializer.serialize_none()
             },
         }

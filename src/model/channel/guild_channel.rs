@@ -180,11 +180,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-forum-layout-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ForumLayoutType {
         /// No default has been set for forum channel.
-        #[default]
         NotSet = 0,
         /// Display posts as a list.
         ListView = 1,
