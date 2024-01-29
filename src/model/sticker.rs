@@ -214,7 +214,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum StickerType {
         /// An official sticker in a pack, part of Nitro or in a removed purchasable pack.
@@ -231,7 +230,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum StickerFormatType {
         /// A PNG format sticker.
@@ -252,7 +250,7 @@ fn sticker_url(sticker_id: StickerId, sticker_format_type: StickerFormatType) ->
         StickerFormatType::Png | StickerFormatType::Apng => "png",
         StickerFormatType::Lottie => "json",
         StickerFormatType::Gif => "gif",
-        StickerFormatType::Unknown(_) => return None,
+        StickerFormatType(_) => return None,
     };
 
     Some(cdn!("/stickers/{}.{}", sticker_id, ext))
