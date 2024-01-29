@@ -753,9 +753,19 @@
 <a href="#751" id="751">751</a>
 <a href="#752" id="752">752</a>
 <a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
+<span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 <span class="kw">use </span>tracing::{debug, error, info, trace, warn};
@@ -772,6 +782,7 @@
     WsClient,
 };
 <span class="kw">use </span><span class="kw">crate</span>::constants::{<span class="self">self</span>, close_codes};
+<span class="kw">use </span><span class="kw">crate</span>::http::Token;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::event::{Event, GatewayEvent};
 <span class="kw">use </span><span class="kw">crate</span>::model::gateway::{GatewayIntents, ShardInfo};
@@ -826,7 +837,7 @@
     </span><span class="comment">// This acts as a timeout to determine if the shard has - for some reason - not started within
     // a decent amount of time.
     </span><span class="kw">pub </span>started: Instant,
-    <span class="kw">pub </span>token: Arc&lt;str&gt;,
+    token: Secret&lt;Token&gt;,
     ws_url: Arc&lt;str&gt;,
     <span class="kw">pub </span>intents: GatewayIntents,
 }
@@ -902,7 +913,7 @@
             seq,
             stage,
             started: Instant::now(),
-            token,
+            token: Token::new(token),
             session_id,
             shard_info,
             ws_url,
@@ -1411,7 +1422,12 @@
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">pub async fn </span>identify(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.client
-            .send_identify(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="self">self</span>.intents, <span class="kw-2">&amp;</span><span class="self">self</span>.presence)
+            .send_identify(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.shard_info,
+                <span class="self">self</span>.token.expose_secret(),
+                <span class="self">self</span>.intents,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.presence,
+            )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.last_heartbeat_sent = <span class="prelude-val">Some</span>(Instant::now());
@@ -1468,7 +1484,9 @@
 
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.session_id {
             <span class="prelude-val">Some</span>(session_id) =&gt; {
-                <span class="self">self</span>.client.send_resume(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, session_id, <span class="self">self</span>.seq, <span class="kw-2">&amp;</span><span class="self">self</span>.token).<span class="kw">await
+                <span class="self">self</span>.client
+                    .send_resume(<span class="kw-2">&amp;</span><span class="self">self</span>.shard_info, session_id, <span class="self">self</span>.seq, <span class="self">self</span>.token.expose_secret())
+                    .<span class="kw">await
             </span>},
             <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::Gateway(GatewayError::NoSessionId)),
         }

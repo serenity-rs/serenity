@@ -501,6 +501,7 @@
 <a href="#499" id="499">499</a>
 <a href="#500" id="500">500</a>
 <a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
 //! routes - such as getting the current user's channels - for the most part, with the exception
 //! being major parameters.
@@ -547,12 +548,13 @@
 <span class="kw">use </span>dashmap::DashMap;
 <span class="kw">use </span>reqwest::header::HeaderMap;
 <span class="kw">use </span>reqwest::{Client, Response, StatusCode};
+<span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tokio::time::{sleep, Duration};
 <span class="kw">use </span>tracing::debug;
 
 <span class="kw">pub use </span><span class="kw">super</span>::routing::RatelimitingBucket;
-<span class="kw">use super</span>::{HttpError, LightMethod, Request};
+<span class="kw">use super</span>::{HttpError, LightMethod, Request, Token};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
@@ -588,7 +590,7 @@
     client: Client,
     global: Mutex&lt;()&gt;,
     routes: DashMap&lt;RatelimitingBucket, Ratelimit&gt;,
-    token: Arc&lt;str&gt;,
+    token: Secret&lt;Token&gt;,
     absolute_ratelimits: bool,
     ratelimit_callback: Box&lt;<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync&gt;,
 }
@@ -613,8 +615,8 @@
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new(client: Client, token: Arc&lt;str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            token,
             client,
+            token: Token::new(token),
             global: Mutex::default(),
             routes: DashMap::new(),
             ratelimit_callback: Box::new(|<span class="kw">_</span>| {}),
@@ -696,7 +698,7 @@
                 sleep(delay_time).<span class="kw">await</span>;
             }
 
-            <span class="kw">let </span>request = req.clone().build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>request = req.clone().build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="self">self</span>.token.expose_secret(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
             <span class="kw">let </span>response = <span class="self">self</span>.client.execute(request.build()<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// Check if the request got ratelimited by checking for status 429, and if so, sleep

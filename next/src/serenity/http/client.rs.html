@@ -4702,6 +4702,41 @@
 <a href="#4700" id="4700">4700</a>
 <a href="#4701" id="4701">4701</a>
 <a href="#4702" id="4702">4702</a>
+<a href="#4703" id="4703">4703</a>
+<a href="#4704" id="4704">4704</a>
+<a href="#4705" id="4705">4705</a>
+<a href="#4706" id="4706">4706</a>
+<a href="#4707" id="4707">4707</a>
+<a href="#4708" id="4708">4708</a>
+<a href="#4709" id="4709">4709</a>
+<a href="#4710" id="4710">4710</a>
+<a href="#4711" id="4711">4711</a>
+<a href="#4712" id="4712">4712</a>
+<a href="#4713" id="4713">4713</a>
+<a href="#4714" id="4714">4714</a>
+<a href="#4715" id="4715">4715</a>
+<a href="#4716" id="4716">4716</a>
+<a href="#4717" id="4717">4717</a>
+<a href="#4718" id="4718">4718</a>
+<a href="#4719" id="4719">4719</a>
+<a href="#4720" id="4720">4720</a>
+<a href="#4721" id="4721">4721</a>
+<a href="#4722" id="4722">4722</a>
+<a href="#4723" id="4723">4723</a>
+<a href="#4724" id="4724">4724</a>
+<a href="#4725" id="4725">4725</a>
+<a href="#4726" id="4726">4726</a>
+<a href="#4727" id="4727">4727</a>
+<a href="#4728" id="4728">4728</a>
+<a href="#4729" id="4729">4729</a>
+<a href="#4730" id="4730">4730</a>
+<a href="#4731" id="4731">4731</a>
+<a href="#4732" id="4732">4732</a>
+<a href="#4733" id="4733">4733</a>
+<a href="#4734" id="4734">4734</a>
+<a href="#4735" id="4735">4735</a>
+<a href="#4736" id="4736">4736</a>
+<a href="#4737" id="4737">4737</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4715,6 +4750,7 @@
 <span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
 </span><span class="kw">use </span>reqwest::Url;
 <span class="kw">use </span>reqwest::{Client, ClientBuilder, Response <span class="kw">as </span>ReqwestResponse, StatusCode};
+<span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde_json::{from_value, json, to_string, to_vec};
 <span class="kw">use </span>tracing::{debug, trace};
@@ -4738,6 +4774,38 @@
 <span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
 <span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Token(Arc&lt;str&gt;);
+
+<span class="kw">impl </span>Token {
+    <span class="kw">pub fn </span>new(inner: Arc&lt;str&gt;) -&gt; Secret&lt;<span class="self">Self</span>&gt; {
+        Secret::new(<span class="self">Self</span>(inner))
+    }
+
+    <span class="kw">pub fn </span>get_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;str&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>Token {
+    <span class="kw">type </span>Target = str;
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>secrecy::Zeroize <span class="kw">for </span>Token {
+    <span class="kw">fn </span>zeroize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(string) = Arc::get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>) {
+            string.zeroize();
+        }
+    }
+}
+
+<span class="kw">impl </span>secrecy::CloneableSecret <span class="kw">for </span>Token {}
+<span class="kw">impl </span>secrecy::DebugSecret <span class="kw">for </span>Token {}
 
 <span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API. If
 /// you do not need to use a proxy or do not need to disable the rate limiter, you can use
@@ -4867,7 +4935,7 @@
             client,
             ratelimiter,
             proxy: <span class="self">self</span>.proxy,
-            token: <span class="self">self</span>.token,
+            token: Token::new(<span class="self">self</span>.token),
             application_id,
         }
     }
@@ -4905,7 +4973,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) client: Client,
     <span class="kw">pub </span>ratelimiter: <span class="prelude-ty">Option</span>&lt;Ratelimiter&gt;,
     <span class="kw">pub </span>proxy: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u16&gt;&gt;,
-    token: Arc&lt;str&gt;,
+    token: Secret&lt;Token&gt;,
     application_id: AtomicU64,
 }
 
@@ -4933,7 +5001,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;str&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.token
+        <span class="self">self</span>.token.expose_secret().get_inner()
     }
 
     <span class="doccomment">/// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -9360,7 +9428,9 @@
         <span class="kw">let </span>response = <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;</span><span class="self">self</span>.ratelimiter {
             ratelimiter.perform(req).<span class="kw">await</span><span class="question-mark">?
         </span>} <span class="kw">else </span>{
-            <span class="kw">let </span>request = req.build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="kw-2">&amp;</span><span class="self">self</span>.token, <span class="self">self</span>.proxy.as_deref())<span class="question-mark">?</span>.build()<span class="question-mark">?</span>;
+            <span class="kw">let </span>request = req
+                .build(<span class="kw-2">&amp;</span><span class="self">self</span>.client, <span class="self">self</span>.token.expose_secret(), <span class="self">self</span>.proxy.as_deref())<span class="question-mark">?
+                </span>.build()<span class="question-mark">?</span>;
             <span class="self">self</span>.client.execute(request).<span class="kw">await</span><span class="question-mark">?
         </span>};
 
