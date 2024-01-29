@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Action","ActionType","EventType","KeywordPresetType","Trigger","TriggerType"],"struct":["ActionExecution","Rule","TriggerMetadata"]};
+window.SIDEBAR_ITEMS = {"enum":["Action","EventType","KeywordPresetType","Trigger","TriggerType"],"struct":["ActionExecution","ActionType","Rule","TriggerMetadata"]};
