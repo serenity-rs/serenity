@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
+use secrecy::{ExposeSecret as _, Secret};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
@@ -17,6 +18,7 @@ use super::{
     WsClient,
 };
 use crate::constants::{self, close_codes};
+use crate::http::Token;
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
@@ -72,7 +74,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason - not started within
     // a decent amount of time.
     pub started: Instant,
-    pub token: Arc<str>,
+    token: Secret<Token>,
     ws_url: Arc<str>,
     pub intents: GatewayIntents,
 }
@@ -148,7 +150,7 @@ impl Shard {
             seq,
             stage,
             started: Instant::now(),
-            token,
+            token: Token::new(token),
             session_id,
             shard_info,
             ws_url,
@@ -657,7 +659,12 @@ impl Shard {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client
-            .send_identify(&self.shard_info, &self.token, self.intents, &self.presence)
+            .send_identify(
+                &self.shard_info,
+                self.token.expose_secret(),
+                self.intents,
+                &self.presence,
+            )
             .await?;
 
         self.last_heartbeat_sent = Some(Instant::now());
@@ -714,7 +721,9 @@ impl Shard {
 
         match &self.session_id {
             Some(session_id) => {
-                self.client.send_resume(&self.shard_info, session_id, self.seq, &self.token).await
+                self.client
+                    .send_resume(&self.shard_info, session_id, self.seq, self.token.expose_secret())
+                    .await
             },
             None => Err(Error::Gateway(GatewayError::NoSessionId)),
         }
