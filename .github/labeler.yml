@@ -1,7 +1,5 @@
 ci:
   - .github/**/*
-command_attr:
-  - command_attr/**/*
 examples:
   - examples/**/*
 builder: 
