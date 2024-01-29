@@ -33,8 +33,7 @@ use crate::model::gateway::GatewayIntents;
 ///
 /// # Examples
 ///
-/// Initialize a shard manager with a framework responsible for shards 0 through 2, of 5 total
-/// shards:
+/// Initialize a shard manager for shards 0 through 2, of 5 total shards:
 ///
 /// ```rust,no_run
 /// # use std::error::Error;
@@ -51,7 +50,6 @@ use crate::model::gateway::GatewayIntents;
 /// use std::sync::{Arc, OnceLock};
 ///
 /// use serenity::client::{EventHandler, RawEventHandler};
-/// use serenity::framework::{Framework, StandardFramework};
 /// use serenity::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
@@ -71,13 +69,12 @@ use crate::model::gateway::GatewayIntents;
 /// let ws_url = Arc::from(gateway_info.url);
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let max_concurrency = std::num::NonZeroU16::MIN;
-/// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data,
 ///     event_handlers: vec![event_handler],
 ///     raw_event_handlers: vec![],
-///     framework: Arc::new(OnceLock::from(framework)),
+///     framework: Arc::new(OnceLock::new()),
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
 ///     ws_url,
