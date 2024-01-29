@@ -20,7 +20,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum WebhookType {
         /// An indicator that the webhook can post messages to channels with a token.
@@ -36,12 +35,12 @@ enum_number! {
 
 impl WebhookType {
     #[must_use]
-    pub fn name(&self) -> &str {
+    pub fn name(self) -> &'static str {
         match self {
             Self::Incoming => "incoming",
             Self::ChannelFollower => "channel follower",
             Self::Application => "application",
-            Self::Unknown(_) => "unknown",
+            _ => "unknown",
         }
     }
 }

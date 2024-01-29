@@ -60,7 +60,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ScheduledEventStatus {
         Scheduled = 1,
@@ -75,7 +74,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ScheduledEventType {
         StageInstance = 1,
@@ -111,7 +109,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ScheduledEventPrivacyLevel {
         GuildOnly = 2,
