@@ -2481,11 +2481,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum DefaultMessageNotificationLevel {
         /// Receive notifications for everything.
-        #[default]
         All = 0,
         /// Receive only mentions.
         Mentions = 1,
@@ -2499,11 +2497,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ExplicitContentFilter {
         /// Don't scan any messages.
-        #[default]
         None = 0,
         /// Scan messages from members without a role.
         WithoutRole = 1,
@@ -2519,11 +2515,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-mfa-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MfaLevel {
         /// MFA is disabled.
-        #[default]
         None = 0,
         /// MFA is enabled.
         Elevated = 1,
@@ -2538,11 +2532,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-verification-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum VerificationLevel {
         /// Does not require any verification.
-        #[default]
         None = 0,
         /// Must have a verified email on the user's Discord account.
         Low = 1,
@@ -2562,11 +2554,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum NsfwLevel {
         /// The nsfw level is not specified.
-        #[default]
         Default = 0,
         /// The guild is considered as explicit.
         Explicit = 1,
@@ -2584,7 +2574,6 @@ enum_number! {
     /// See [AfkMetadata::afk_timeout].
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u16", into = "u16")]
     #[non_exhaustive]
     pub enum AfkTimeout {
         OneMinute = 60,
