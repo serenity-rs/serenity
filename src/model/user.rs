@@ -297,10 +297,8 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum PremiumType {
-        #[default]
         None = 0,
         NitroClassic = 1,
         Nitro = 2,
