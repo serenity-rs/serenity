@@ -1,9 +1,0 @@
-[package]
-name = "e14_slash_commands"
-version = "0.1.0"
-authors = ["my name <my@email.address>"]
-edition = "2021"
-
-[dependencies]
-serenity = { path = "../../", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "collector"] }
-tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
