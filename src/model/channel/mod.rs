@@ -213,11 +213,9 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ChannelType {
         /// An indicator that the channel is a text [`GuildChannel`].
-        #[default]
         Text = 0,
         /// An indicator that the channel is a [`PrivateChannel`].
         Private = 1,
@@ -251,8 +249,8 @@ enum_number! {
 
 impl ChannelType {
     #[must_use]
-    pub const fn name(&self) -> &str {
-        match *self {
+    pub const fn name(self) -> &'static str {
+        match self {
             Self::Private => "private",
             Self::Text => "text",
             Self::Voice => "voice",
@@ -265,7 +263,7 @@ impl ChannelType {
             Self::Stage => "stage",
             Self::Directory => "directory",
             Self::Forum => "forum",
-            Self::Unknown(_) => "unknown",
+            Self(_) => "unknown",
         }
     }
 }
@@ -358,7 +356,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum VideoQualityMode {
         /// An indicator that the video quality is chosen by Discord for optimal
@@ -374,15 +371,14 @@ enum_number! {
     /// See [`StageInstance::privacy_level`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level).
-    #[derive(Clone, Copy, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
+    #[<default> = 2]
     pub enum StageInstancePrivacyLevel {
         /// The Stage instance is visible publicly. (deprecated)
         Public = 1,
         /// The Stage instance is visible to only guild members.
-        #[default]
         GuildOnly = 2,
         _ => Unknown(u8),
     }
@@ -394,7 +390,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object)
     #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u16", into = "u16")]
     #[non_exhaustive]
     pub enum AutoArchiveDuration {
         None = 0,
@@ -553,7 +548,6 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum SortOrder {
         /// Sort forum posts by activity.
