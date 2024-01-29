@@ -71,7 +71,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason - not started within
     // a decent amount of time.
     pub started: Instant,
-    pub token: String,
+    pub token: Arc<str>,
     ws_url: Arc<str>,
     pub intents: GatewayIntents,
 }
@@ -98,7 +98,7 @@ impl Shard {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
-    /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
+    /// let token = Arc::from(std::env::var("DISCORD_BOT_TOKEN")?);
     /// let shard_info = ShardInfo {
     ///     id: ShardId(0),
     ///     total: NonZeroU16::MIN,
@@ -106,7 +106,7 @@ impl Shard {
     ///
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::from(http.get_gateway().await?.url);
-    /// let shard = Shard::new(gateway, &token, shard_info, GatewayIntents::all(), None).await?;
+    /// let shard = Shard::new(gateway, token, shard_info, GatewayIntents::all(), None).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -120,7 +120,7 @@ impl Shard {
     /// TLS error.
     pub async fn new(
         ws_url: Arc<str>,
-        token: &str,
+        token: Arc<str>,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
@@ -147,7 +147,7 @@ impl Shard {
             seq,
             stage,
             started: Instant::now(),
-            token: token.to_string(),
+            token,
             session_id,
             shard_info,
             ws_url,
