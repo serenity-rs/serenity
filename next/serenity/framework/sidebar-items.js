@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["standard"],"trait":["Framework"]};
+window.SIDEBAR_ITEMS = {"trait":["Framework"]};
