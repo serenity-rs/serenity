@@ -1,6 +1,5 @@
 //! This example will showcase the beauty of collectors. They allow to await messages or reactions
 //! from a user in the middle of a control flow, one being a command.
-#![allow(deprecated)] // We recommend migrating to poise, instead of using the standard command framework.
 use std::collections::HashSet;
 use std::env;
 use std::time::Duration;
