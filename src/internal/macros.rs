@@ -86,43 +86,39 @@ macro_rules! status {
 macro_rules! enum_number {
     (
         $(#[$outer:meta])*
+        $(#[<default> = $default:literal])?
         $vis:vis enum $Enum:ident {
             $(
                 $(#[doc = $doc:literal])*
                 $(#[cfg $($cfg:tt)*])?
-                $(#[default $($dummy:tt)?])?
                 $Variant:ident = $value:literal,
             )*
             _ => Unknown($T:ty),
         }
     ) => {
         $(#[$outer])*
-        $vis enum $Enum {
+        $vis struct $Enum (pub $T);
+
+        $(
+            impl Default for $Enum {
+                fn default() -> Self {
+                    Self($default)
+                }
+            }
+        )?
+
+        #[allow(non_snake_case, non_upper_case_globals)]
+        impl $Enum {
             $(
                 $(#[doc = $doc])*
                 $(#[cfg $($cfg)*])?
-                $(#[default $($dummy:tt)?])?
-                $Variant,
+                $vis const $Variant: Self = Self($value);
             )*
+
             /// Variant value is unknown.
-            Unknown($T),
-        }
-
-        impl From<$T> for $Enum {
-            fn from(value: $T) -> Self {
-                match value {
-                    $($(#[cfg $($cfg)*])? $value => Self::$Variant,)*
-                    unknown => Self::Unknown(unknown),
-                }
-            }
-        }
-
-        impl From<$Enum> for $T {
-            fn from(value: $Enum) -> Self {
-                match value {
-                    $($(#[cfg $($cfg)*])? $Enum::$Variant => $value,)*
-                    $Enum::Unknown(unknown) => unknown,
-                }
+            #[must_use]
+            $vis const fn Unknown(val: $T) -> Self {
+                Self(val)
             }
         }
     };
@@ -184,7 +180,6 @@ mod tests {
     fn enum_number() {
         enum_number! {
             #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-            #[serde(from = "u8", into = "u8")]
             pub enum T {
                 /// AAA
                 A = 1,

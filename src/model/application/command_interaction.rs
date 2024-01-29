@@ -574,7 +574,7 @@ fn option_from_raw(raw: RawCommandDataOption) -> Result<CommandDataOption> {
         CommandOptionType::Mentionable => CommandDataOptionValue::Mentionable(value!()),
         CommandOptionType::Role => CommandDataOptionValue::Role(value!()),
         CommandOptionType::User => CommandDataOptionValue::User(value!()),
-        CommandOptionType::Unknown(unknown) => CommandDataOptionValue::Unknown(unknown),
+        CommandOptionType(unknown) => CommandDataOptionValue::Unknown(unknown),
     };
 
     Ok(CommandDataOption {

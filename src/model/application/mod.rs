@@ -106,7 +106,6 @@ enum_number! {
     /// [interaction contexts](https://discord.com/developers/docs/resources/application#application-object-application-integration-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InstallationContext {
         Guild = 0,
@@ -121,7 +120,6 @@ enum_number! {
     /// [interaction contexts](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum InteractionContext {
         /// Interaction can be used within servers
@@ -184,7 +182,6 @@ pub struct TeamMember {
 enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum MembershipState {
         Invited = 1,
