@@ -44,12 +44,13 @@ use std::time::SystemTime;
 use dashmap::DashMap;
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
+use secrecy::{ExposeSecret as _, Secret};
 use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
 use tracing::debug;
 
 pub use super::routing::RatelimitingBucket;
-use super::{HttpError, LightMethod, Request};
+use super::{HttpError, LightMethod, Request, Token};
 use crate::internal::prelude::*;
 
 /// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
@@ -85,7 +86,7 @@ pub struct Ratelimiter {
     client: Client,
     global: Mutex<()>,
     routes: DashMap<RatelimitingBucket, Ratelimit>,
-    token: Arc<str>,
+    token: Secret<Token>,
     absolute_ratelimits: bool,
     ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
 }
@@ -110,8 +111,8 @@ impl Ratelimiter {
     #[must_use]
     pub fn new(client: Client, token: Arc<str>) -> Self {
         Self {
-            token,
             client,
+            token: Token::new(token),
             global: Mutex::default(),
             routes: DashMap::new(),
             ratelimit_callback: Box::new(|_| {}),
@@ -193,7 +194,7 @@ impl Ratelimiter {
                 sleep(delay_time).await;
             }
 
-            let request = req.clone().build(&self.client, &self.token, None)?;
+            let request = req.clone().build(&self.client, self.token.expose_secret(), None)?;
             let response = self.client.execute(request.build()?).await?;
 
             // Check if the request got ratelimited by checking for status 429, and if so, sleep
