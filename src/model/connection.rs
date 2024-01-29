@@ -42,7 +42,6 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-visibility-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
     pub enum ConnectionVisibility {
         /// Invisible to everyone except the user themselves
