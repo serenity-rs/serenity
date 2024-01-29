@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT task FROM todo WHERE user_id = ? ORDER BY rowid",
+  "describe": {
+    "columns": [
+      {
+        "name": "task",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8a7bb6fe3b960d1d10bc8442bb1494f2c758dd890293c313811a8c4acb8edaeb"
+}
