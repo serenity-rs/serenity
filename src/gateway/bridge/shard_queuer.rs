@@ -214,7 +214,7 @@ impl ShardQueuer {
     async fn start(&mut self, shard_id: ShardId) -> Result<()> {
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
-            self.http.token(),
+            Arc::clone(self.http.token()),
             ShardInfo::new(shard_id, self.shard_total),
             self.intents,
             self.presence.clone(),

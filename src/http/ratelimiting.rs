@@ -38,12 +38,12 @@
 use std::borrow::Cow;
 use std::fmt;
 use std::str::{self, FromStr};
+use std::sync::Arc;
 use std::time::SystemTime;
 
 use dashmap::DashMap;
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
-use secrecy::{ExposeSecret, SecretString};
 use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
 use tracing::debug;
@@ -85,7 +85,7 @@ pub struct Ratelimiter {
     client: Client,
     global: Mutex<()>,
     routes: DashMap<RatelimitingBucket, Ratelimit>,
-    token: SecretString,
+    token: Arc<str>,
     absolute_ratelimits: bool,
     ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
 }
@@ -108,16 +108,12 @@ impl Ratelimiter {
     ///
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not prefix it.
     #[must_use]
-    pub fn new(client: Client, token: impl Into<String>) -> Self {
-        Self::new_(client, token.into())
-    }
-
-    fn new_(client: Client, token: String) -> Self {
+    pub fn new(client: Client, token: Arc<str>) -> Self {
         Self {
+            token,
             client,
             global: Mutex::default(),
             routes: DashMap::new(),
-            token: SecretString::new(token),
             ratelimit_callback: Box::new(|_| {}),
             absolute_ratelimits: false,
         }
@@ -197,7 +193,7 @@ impl Ratelimiter {
                 sleep(delay_time).await;
             }
 
-            let request = req.clone().build(&self.client, self.token.expose_secret(), None)?;
+            let request = req.clone().build(&self.client, &self.token, None)?;
             let response = self.client.execute(request.build()?).await?;
 
             // Check if the request got ratelimited by checking for status 429, and if so, sleep
