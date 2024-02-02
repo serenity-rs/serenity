@@ -168,7 +168,7 @@ impl ShardManager {
     ///
     /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
     /// queued.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub fn initialize(&self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         let shard_to = shard_index + shard_init;
 
@@ -198,7 +198,7 @@ impl ShardManager {
     /// ```
     ///
     /// [`ShardRunner`]: super::ShardRunner
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn restart(&self, shard_id: ShardId) {
         info!("Restarting shard {shard_id}");
         self.shutdown(shard_id, 4000).await;
@@ -209,7 +209,7 @@ impl ShardManager {
     /// valid [`ShardRunner`].
     ///
     /// [`ShardRunner`]: super::ShardRunner
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn shards_instantiated(&self) -> Vec<ShardId> {
         self.runners.lock().await.keys().copied().collect()
     }
@@ -222,7 +222,7 @@ impl ShardManager {
     /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
     /// - no longer exists, then the shard runner will not know it should shut down. This _should
     /// never happen_. It may already be stopped.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn shutdown(&self, shard_id: ShardId, code: u16) {
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
 
@@ -265,7 +265,7 @@ impl ShardManager {
     ///
     /// If you only need to shutdown a select number of shards, prefer looping over the
     /// [`Self::shutdown`] method.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn shutdown_all(&self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -297,7 +297,7 @@ impl ShardManager {
         drop(self.shard_queuer.unbounded_send(msg));
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     fn boot(&self, shard_id: ShardId, concurrent: bool) {
         info!("Telling shard queuer to start shard {shard_id}");
 

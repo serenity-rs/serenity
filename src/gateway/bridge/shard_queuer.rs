@@ -97,7 +97,7 @@ impl ShardQueuer {
     /// over.
     ///
     /// **Note**: This should be run in its own thread due to the blocking nature of the loop.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn run(&mut self) {
         // We read from the Rx channel in a loop, and use a timeout of 5 seconds so that we don't
         // hang forever. When we receive a command to start a shard, we append it to our queue. The
@@ -157,7 +157,7 @@ impl ShardQueuer {
         }
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn check_last_start(&mut self) {
         let Some(instant) = self.last_start else { return };
 
@@ -174,7 +174,7 @@ impl ShardQueuer {
         sleep(to_sleep).await;
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn checked_start(&mut self, shard_id: ShardId) {
         debug!("[Shard Queuer] Checked start for shard {shard_id}");
 
@@ -184,7 +184,7 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn checked_start_batch(&mut self, shard_ids: Vec<ShardId>) {
         if shard_ids.is_empty() {
             return;
@@ -199,7 +199,7 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn try_start(&mut self, shard_id: ShardId) {
         if let Err(why) = self.start(shard_id).await {
             warn!("[Shard Queuer] Err starting shard {shard_id}: {why:?}");
@@ -210,7 +210,7 @@ impl ShardQueuer {
         }
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn start(&mut self, shard_id: ShardId) -> Result<()> {
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
@@ -255,7 +255,7 @@ impl ShardQueuer {
         Ok(())
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn shutdown_runners(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -279,7 +279,7 @@ impl ShardQueuer {
     /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
     /// - no longer exists, then the shard runner will not know it should shut down. This _should
     /// never happen_. It may already be stopped.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 

@@ -66,7 +66,7 @@ impl<'a> Request<'a> {
     /// # Errors
     ///
     /// Errors if the given proxy URL is invalid, or the token cannot be parsed into a HTTP header.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(token)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(token)))]
     pub fn build(
         self,
         client: &Client,

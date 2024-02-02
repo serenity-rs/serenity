@@ -130,7 +130,7 @@ impl fmt::Display for Error {
 }
 
 impl StdError for Error {
-    #[cfg_attr(feature = "tracing_instrument", instrument)]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument)]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Self::Io(inner) => Some(inner),

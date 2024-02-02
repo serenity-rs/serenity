@@ -4683,7 +4683,7 @@ impl Http {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing_instrument", instrument)]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument)]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
         let response = if let Some(ratelimiter) = &self.ratelimiter {
