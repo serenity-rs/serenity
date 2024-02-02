@@ -4644,9 +4644,17 @@ impl Http {
     ///
     /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response into some
     /// type.
-    #[cfg_attr(feature = "tracing_instrument", instrument)]
+    #[cfg_attr(feature = "tracing_instrument", instrument(
+        skip_all,
+        fields(
+            url.path = %req.route.path(),
+            http.request.method = req.method.reqwest_method().as_str(),
+            http.response.status,
+        )
+    ))]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
+        debug!("Performing request: {method} {}", req.route.path());
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(&req).await?
         } else {
