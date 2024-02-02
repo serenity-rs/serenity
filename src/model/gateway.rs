@@ -376,6 +376,12 @@ impl ShardInfo {
     }
 }
 
+impl std::fmt::Display for ShardInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.id, self.total)
+    }
+}
+
 impl<'de> serde::Deserialize<'de> for ShardInfo {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         <(u16, NonZeroU16)>::deserialize(deserializer).map(|(id, total)| ShardInfo {

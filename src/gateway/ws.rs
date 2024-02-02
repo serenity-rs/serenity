@@ -180,7 +180,7 @@ impl WsClient {
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
     ) -> Result<()> {
-        debug!("[{:?}] Requesting member chunks", shard_info);
+        debug!("[{}] Requesting member chunks", shard_info);
 
         let (query, user_ids) = match filter {
             ChunkGuildFilter::None => (Some(String::new()), None),
@@ -207,7 +207,7 @@ impl WsClient {
     /// Errors if there is a problem with the WS connection.
     #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn send_heartbeat(&mut self, shard_info: &ShardInfo, seq: Option<u64>) -> Result<()> {
-        trace!("[{:?}] Sending heartbeat d: {:?}", shard_info, seq);
+        trace!("[{}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&WebSocketMessage {
             op: Opcode::Heartbeat,
@@ -230,7 +230,7 @@ impl WsClient {
         let now = SystemTime::now();
         let activities = presence.activity.as_ref().map(std::slice::from_ref).unwrap_or_default();
 
-        debug!("[{:?}] Identifying", shard);
+        debug!("[{}] Identifying", shard);
 
         let msg = WebSocketMessage {
             op: Opcode::Identify,
@@ -269,7 +269,7 @@ impl WsClient {
         let now = SystemTime::now();
         let activities = presence.activity.as_ref().map(std::slice::from_ref).unwrap_or_default();
 
-        debug!("[{shard_info:?}] Sending presence update");
+        debug!("[{shard_info}] Sending presence update");
 
         self.send_json(&WebSocketMessage {
             op: Opcode::PresenceUpdate,
@@ -294,7 +294,7 @@ impl WsClient {
         seq: u64,
         token: &str,
     ) -> Result<()> {
-        debug!("[{:?}] Sending resume; seq: {}", shard_info, seq);
+        debug!("[{}] Sending resume; seq: {}", shard_info, seq);
 
         self.send_json(&WebSocketMessage {
             op: Opcode::Resume,

@@ -97,17 +97,17 @@ impl ShardRunner {
     /// [`ShardManager`]: super::ShardManager
     #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn run(&mut self) -> Result<()> {
-        info!("[ShardRunner {:?}] Running", self.shard.shard_info());
+        info!("[ShardRunner {}] Running", self.shard.shard_info());
 
         loop {
-            trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
+            trace!("[ShardRunner {}] loop iteration started.", self.shard.shard_info());
             if !self.recv().await {
                 return Ok(());
             }
 
             // check heartbeat
             if !self.shard.do_heartbeat().await {
-                warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
+                warn!("[ShardRunner {}] Error heartbeating", self.shard.shard_info(),);
 
                 self.request_restart().await;
                 return Ok(());
@@ -141,7 +141,7 @@ impl ShardRunner {
                 Some(other) => {
                     if let Err(e) = self.action(&other).await {
                         debug!(
-                            "[ShardRunner {:?}] Reconnecting due to error performing {:?}: {:?}",
+                            "[ShardRunner {}] Reconnecting due to error performing {:?}: {:?}",
                             self.shard.shard_info(),
                             other,
                             e
@@ -154,7 +154,7 @@ impl ShardRunner {
                             ReconnectType::Resume => {
                                 if let Err(why) = self.shard.resume().await {
                                     warn!(
-                                        "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
+                                        "[ShardRunner {}] Resume failed, reidentifying: {:?}",
                                         self.shard.shard_info(),
                                         why
                                     );
@@ -175,7 +175,7 @@ impl ShardRunner {
 
                 debug!(
                     event.name = %event.name().unwrap_or_default(),
-                    "[ShardRunner {:?}] Dispatching event", self.shard.shard_info(),
+                    "[ShardRunner {}] Dispatching event", self.shard.shard_info(),
                 );
 
                 dispatch_model(
@@ -192,7 +192,7 @@ impl ShardRunner {
                 self.request_restart().await;
                 return Ok(());
             }
-            trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
+            trace!("[ShardRunner {}] loop iteration reached the end.", self.shard.shard_info());
         }
     }
 
@@ -254,7 +254,7 @@ impl ShardRunner {
                 Some(Ok(tungstenite::Message::Close(_))) => break,
                 Some(Err(_)) => {
                     warn!(
-                        "[ShardRunner {:?}] Received an error awaiting close frame",
+                        "[ShardRunner {}] Received an error awaiting close frame",
                         self.shard.shard_info(),
                     );
                     break;
@@ -379,10 +379,7 @@ impl ShardRunner {
                     }
                 },
                 Ok(None) => {
-                    warn!(
-                        "[ShardRunner {:?}] Sending half DC; restarting",
-                        self.shard.shard_info(),
-                    );
+                    warn!("[ShardRunner {}] Sending half DC; restarting", self.shard.shard_info(),);
 
                     self.request_restart().await;
                     return false;
@@ -468,7 +465,7 @@ impl ShardRunner {
 
     #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn request_restart(&mut self) {
-        debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
+        debug!("[ShardRunner {}] Requesting restart", self.shard.shard_info());
 
         self.update_manager().await;
 

@@ -247,7 +247,7 @@ impl ShardQueuer {
 
         spawn_named("shard_queuer::stop", async move {
             drop(runner.run().await);
-            debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
+            debug!("[ShardRunner {}] Stopping", runner.shard.shard_info());
         });
 
         self.runners.lock().await.insert(shard_id, runner_info);
