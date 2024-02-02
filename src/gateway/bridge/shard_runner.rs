@@ -173,6 +173,11 @@ impl ShardRunner {
                 #[cfg(feature = "collector")]
                 self.collectors.lock().expect("poison").retain_mut(|callback| (callback.0)(&event));
 
+                debug!(
+                    event.name = %event.name().unwrap_or_default(),
+                    "[ShardRunner {:?}] Dispatching event", self.shard.shard_info(),
+                );
+
                 dispatch_model(
                     event,
                     self.make_context(),

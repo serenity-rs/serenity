@@ -4683,9 +4683,18 @@ impl Http {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg_attr(feature = "tracing_instrument", tracing::instrument)]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(
+        skip_all,
+        fields(
+            req.route = ?req.route,
+            url.full = %req.route.path(),
+            http.request.method = req.method.reqwest_method().as_str(),
+            http.response.status,
+        )
+    ))]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
+        debug!(url.full = %req.route.path(), http.request.method = method.as_str(), "Sending request");
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
         } else {
@@ -4695,6 +4704,7 @@ impl Http {
             self.client.execute(request).await?
         };
 
+        tracing::Span::current().record("http.response.status", response.status().as_str());
         if response.status().is_success() {
             Ok(response)
         } else {

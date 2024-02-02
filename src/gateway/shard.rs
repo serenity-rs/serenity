@@ -265,7 +265,10 @@ impl Shard {
         self.stage
     }
 
-    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(
+        skip_all,
+        fields(%seq, event.data = ?event, event.name = event.name().unwrap_or_default())
+    ))]
     fn handle_gateway_dispatch(&mut self, seq: u64, event: &Event) -> Option<ShardAction> {
         if seq > self.seq + 1 {
             warn!("[{:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
