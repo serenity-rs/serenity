@@ -5205,15 +5205,25 @@ impl Http {
     /// # Ok(())
     /// # }
     /// ```
-    #[instrument]
+    #[instrument(
+        skip_all,
+        fields(
+            url.path = %req.route.path(),
+            http.request.method = req.method.reqwest_method().as_str(),
+            http.response.status,
+        )
+    )]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
+        debug!("Performing request: {method} {}", req.route.path());
         let response = if let Some(ratelimiter) = &self.ratelimiter {
             ratelimiter.perform(req).await?
         } else {
             let request = req.build(&self.client, self.token(), self.proxy.as_deref())?.build()?;
             self.client.execute(request).await?
         };
+
+        tracing::Span::current().record("http.response.status", response.status().as_u16());
 
         if response.status().is_success() {
             Ok(response)
