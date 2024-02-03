@@ -67,7 +67,7 @@ use crate::utils::check_shard_total;
 #[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
     data: Option<Arc<dyn std::any::Any + Send + Sync>>,
-    http: Http,
+    http: Arc<Http>,
     intents: GatewayIntents,
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
@@ -89,7 +89,7 @@ impl ClientBuilder {
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
     pub fn new(token: &str, intents: GatewayIntents) -> Self {
-        Self::new_with_http(Http::new(token), intents)
+        Self::new_with_http(Arc::new(Http::new(token)), intents)
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on for the client
@@ -98,7 +98,7 @@ impl ClientBuilder {
     /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
-    pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
+    pub fn new_with_http(http: Arc<Http>, intents: GatewayIntents) -> Self {
         Self {
             http,
             intents,
@@ -115,14 +115,8 @@ impl ClientBuilder {
         }
     }
 
-    /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
-    /// automatically do so.
-    pub fn token(mut self, token: &str) -> Self {
-        self.http = Http::new(token);
-        self
-    }
-
     /// Gets the current token used for the [`Http`] client.
+    #[must_use]
     pub fn get_token(&self) -> &str {
         self.http.token()
     }
@@ -136,6 +130,7 @@ impl ClientBuilder {
 
     /// Gets the application ID, if already initialized. See [`Self::application_id`] for more
     /// info.
+    #[must_use]
     pub fn get_application_id(&self) -> Option<ApplicationId> {
         self.http.application_id()
     }
@@ -157,6 +152,7 @@ impl ClientBuilder {
 
     /// Gets the cache settings. See [`Self::cache_settings`] for more info.
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn get_cache_settings(&self) -> &CacheSettings {
         &self.cache_settings
     }
@@ -178,6 +174,7 @@ impl ClientBuilder {
 
     /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     #[cfg(feature = "framework")]
+    #[must_use]
     pub fn get_framework(&self) -> Option<&dyn Framework> {
         self.framework.as_deref()
     }
@@ -195,6 +192,7 @@ impl ClientBuilder {
 
     /// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.
     #[cfg(feature = "voice")]
+    #[must_use]
     pub fn get_voice_manager(&self) -> Option<Arc<dyn VoiceGatewayManager>> {
         self.voice_manager.clone()
     }
@@ -226,6 +224,7 @@ impl ClientBuilder {
     }
 
     /// Gets the intents. See [`Self::intents`] for more info.
+    #[must_use]
     pub fn get_intents(&self) -> GatewayIntents {
         self.intents
     }
@@ -241,6 +240,7 @@ impl ClientBuilder {
     }
 
     /// Gets the added event handlers. See [`Self::event_handler`] for more info.
+    #[must_use]
     pub fn get_event_handlers(&self) -> &[Arc<dyn EventHandler>] {
         &self.event_handlers
     }
@@ -254,6 +254,7 @@ impl ClientBuilder {
     }
 
     /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
+    #[must_use]
     pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler>] {
         &self.raw_event_handlers
     }
@@ -273,6 +274,7 @@ impl ClientBuilder {
     }
 
     /// Gets the initial presence. See [`Self::activity`] and [`Self::status`] for more info.
+    #[must_use]
     pub fn get_presence(&self) -> &PresenceData {
         &self.presence
     }
@@ -293,10 +295,9 @@ impl IntoFuture for ClientBuilder {
         let raw_event_handlers = self.raw_event_handlers;
         let intents = self.intents;
         let presence = self.presence;
+        let http = self.http;
 
-        let mut http = self.http;
-
-        if let Some(ratelimiter) = &mut http.ratelimiter {
+        if let Some(ratelimiter) = &http.ratelimiter {
             let event_handlers_clone = event_handlers.clone();
             ratelimiter.set_ratelimit_callback(Box::new(move |info| {
                 for event_handler in &event_handlers_clone {
@@ -306,8 +307,6 @@ impl IntoFuture for ClientBuilder {
                 }
             }));
         }
-
-        let http = Arc::new(http);
 
         #[cfg(feature = "voice")]
         let voice_manager = self.voice_manager;
