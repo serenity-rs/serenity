@@ -95,19 +95,19 @@ impl ShardRunner {
     /// Returns errors if the internal WS connection drops in a non-recoverable way.
     ///
     /// [`ShardManager`]: super::ShardManager
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     pub async fn run(&mut self) -> Result<()> {
-        info!("[ShardRunner {:?}] Running", self.shard.shard_info());
+        info!("[ShardRunner {}] Running", self.shard.shard_info());
 
         loop {
-            trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
+            trace!("[ShardRunner {}] loop iteration started.", self.shard.shard_info());
             if !self.recv().await {
                 return Ok(());
             }
 
             // check heartbeat
             if !self.shard.do_heartbeat().await {
-                warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
+                warn!("[ShardRunner {}] Error heartbeating", self.shard.shard_info(),);
 
                 self.request_restart().await;
                 return Ok(());
@@ -141,7 +141,7 @@ impl ShardRunner {
                 Some(other) => {
                     if let Err(e) = self.action(&other).await {
                         debug!(
-                            "[ShardRunner {:?}] Reconnecting due to error performing {:?}: {:?}",
+                            "[ShardRunner {}] Reconnecting due to error performing {:?}: {:?}",
                             self.shard.shard_info(),
                             other,
                             e
@@ -154,7 +154,7 @@ impl ShardRunner {
                             ReconnectType::Resume => {
                                 if let Err(why) = self.shard.resume().await {
                                     warn!(
-                                        "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
+                                        "[ShardRunner {}] Resume failed, reidentifying: {:?}",
                                         self.shard.shard_info(),
                                         why
                                     );
@@ -173,6 +173,11 @@ impl ShardRunner {
                 #[cfg(feature = "collector")]
                 self.collectors.lock().expect("poison").retain_mut(|callback| (callback.0)(&event));
 
+                debug!(
+                    event.name = %event.name().unwrap_or_default(),
+                    "[ShardRunner {}] Dispatching event", self.shard.shard_info(),
+                );
+
                 dispatch_model(
                     event,
                     self.make_context(),
@@ -187,7 +192,7 @@ impl ShardRunner {
                 self.request_restart().await;
                 return Ok(());
             }
-            trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
+            trace!("[ShardRunner {}] loop iteration reached the end.", self.shard.shard_info());
         }
     }
 
@@ -204,7 +209,7 @@ impl ShardRunner {
     /// # Errors
     ///
     /// Returns
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, action)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self, action)))]
     async fn action(&mut self, action: &ShardAction) -> Result<()> {
         match *action {
             ShardAction::Reconnect(ReconnectType::Reidentify) => {
@@ -223,7 +228,7 @@ impl ShardRunner {
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
         // First verify the ID so we know for certain this runner is to shutdown.
         if id != self.shard.shard_info().id {
@@ -249,7 +254,7 @@ impl ShardRunner {
                 Some(Ok(tungstenite::Message::Close(_))) => break,
                 Some(Err(_)) => {
                     warn!(
-                        "[ShardRunner {:?}] Received an error awaiting close frame",
+                        "[ShardRunner {}] Received an error awaiting close frame",
                         self.shard.shard_info(),
                     );
                     break;
@@ -280,7 +285,7 @@ impl ShardRunner {
     //
     // This always returns true, except in the case that the shard manager asked the runner to
     // shutdown.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn handle_rx_value(&mut self, msg: ShardRunnerMessage) -> bool {
         match msg {
             ShardRunnerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
@@ -331,7 +336,7 @@ impl ShardRunner {
     }
 
     #[cfg(feature = "voice")]
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn handle_voice_event(&self, event: &Event) {
         if let Some(voice_manager) = &self.voice_manager {
             match event {
@@ -364,7 +369,7 @@ impl ShardRunner {
     // Requests a restart if the sending half of the channel disconnects. This should _never_
     // happen, as the sending half is kept on the runner.
     // Returns whether the shard runner is in a state that can continue.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn recv(&mut self) -> bool {
         loop {
             match self.runner_rx.try_next() {
@@ -374,10 +379,7 @@ impl ShardRunner {
                     }
                 },
                 Ok(None) => {
-                    warn!(
-                        "[ShardRunner {:?}] Sending half DC; restarting",
-                        self.shard.shard_info(),
-                    );
+                    warn!("[ShardRunner {}] Sending half DC; restarting", self.shard.shard_info(),);
 
                     self.request_restart().await;
                     return false;
@@ -392,7 +394,7 @@ impl ShardRunner {
 
     /// Returns a received event, as well as whether reading the potentially present event was
     /// successful.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gateway_event = match self.shard.client.recv_json().await {
             Ok(Some(inner)) => Ok(inner),
@@ -461,9 +463,9 @@ impl ShardRunner {
         Ok((event, action, true))
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn request_restart(&mut self) {
-        debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
+        debug!("[ShardRunner {}] Requesting restart", self.shard.shard_info());
 
         self.update_manager().await;
 
@@ -476,7 +478,7 @@ impl ShardRunner {
         }
     }
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self)))]
     async fn update_manager(&self) {
         self.manager
             .update_shard_latency_and_stage(

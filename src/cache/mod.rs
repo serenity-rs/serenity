@@ -232,7 +232,7 @@ impl Cache {
     ///
     /// let cache = Cache::new_with_settings(settings);
     /// ```
-    #[cfg_attr(feature = "tracing_instrument", instrument)]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument)]
     pub fn new_with_settings(settings: Settings) -> Self {
         #[cfg(feature = "temp_cache")]
         fn temp_cache<K, V>(ttl: Duration) -> MokaCache<K, V, BuildHasher>
@@ -634,7 +634,7 @@ impl Cache {
     /// Refer to the [`CacheUpdate` examples].
     ///
     /// [`CacheUpdate` examples]: CacheUpdate#examples
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self, e)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(self, e)))]
     pub fn update<E: CacheUpdate>(&self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }

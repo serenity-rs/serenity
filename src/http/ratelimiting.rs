@@ -172,7 +172,7 @@ impl Ratelimiter {
     /// # Errors
     ///
     /// Only error kind that may be returned is [`Error::Http`].
-    #[cfg_attr(feature = "tracing_instrument", instrument)]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument)]
     pub async fn perform(&self, req: Request<'_>) -> Result<Response> {
         loop {
             // This will block if another thread hit the global ratelimit.
@@ -288,7 +288,7 @@ pub struct Ratelimit {
 
 impl Ratelimit {
     #[must_use]
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(ratelimit_callback)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(ratelimit_callback)))]
     pub fn pre_hook(
         &mut self,
         req: &Request<'_>,
@@ -336,7 +336,7 @@ impl Ratelimit {
     /// # Errors
     ///
     /// Errors if unable to parse response headers.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(ratelimit_callback)))]
+    #[cfg_attr(feature = "tracing_instrument", tracing::instrument(skip(ratelimit_callback)))]
     pub fn post_hook(
         &mut self,
         response: &Response,
