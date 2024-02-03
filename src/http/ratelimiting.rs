@@ -88,7 +88,7 @@ pub struct Ratelimiter {
     routes: DashMap<RatelimitingBucket, Ratelimit>,
     token: Secret<Token>,
     absolute_ratelimits: bool,
-    ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
+    ratelimit_callback: parking_lot::RwLock<Box<dyn Fn(RatelimitInfo) + Send + Sync>>,
 }
 
 impl fmt::Debug for Ratelimiter {
@@ -115,17 +115,17 @@ impl Ratelimiter {
             token: Token::new(token),
             global: Mutex::default(),
             routes: DashMap::new(),
-            ratelimit_callback: Box::new(|_| {}),
             absolute_ratelimits: false,
+            ratelimit_callback: parking_lot::RwLock::new(Box::new(|_| {})),
         }
     }
 
     /// Sets a callback to be called when a route is rate limited.
     pub fn set_ratelimit_callback(
-        &mut self,
+        &self,
         ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
     ) {
-        self.ratelimit_callback = ratelimit_callback;
+        *self.ratelimit_callback.write() = ratelimit_callback;
     }
 
     // Sets whether absolute ratelimits should be used.
@@ -187,7 +187,7 @@ impl Ratelimiter {
             let ratelimiting_bucket = req.route.ratelimiting_bucket();
             let delay_time = {
                 let mut bucket = self.routes.entry(ratelimiting_bucket).or_default();
-                bucket.pre_hook(&req, &self.ratelimit_callback)
+                bucket.pre_hook(&req, &*self.ratelimit_callback.read())
             };
 
             if let Some(delay_time) = delay_time {
@@ -224,7 +224,7 @@ impl Ratelimiter {
                             "Ratelimited on route {:?} for {:?}s",
                             ratelimiting_bucket, retry_after
                         );
-                        (self.ratelimit_callback)(RatelimitInfo {
+                        (self.ratelimit_callback.read())(RatelimitInfo {
                             timeout: Duration::from_secs_f64(retry_after),
                             limit: 50,
                             method: req.method,
@@ -244,7 +244,7 @@ impl Ratelimiter {
                     bucket.post_hook(
                         &response,
                         &req,
-                        &self.ratelimit_callback,
+                        &*self.ratelimit_callback.read(),
                         self.absolute_ratelimits,
                     )
                 } else {
