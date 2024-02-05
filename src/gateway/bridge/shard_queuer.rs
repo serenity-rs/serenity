@@ -1,4 +1,4 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 use std::num::NonZeroU16;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
@@ -27,6 +27,7 @@ use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
+use crate::hasher::{BuildHasher, HashMap};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -308,7 +309,10 @@ pub struct ShardQueue {
 impl ShardQueue {
     pub fn new(max_concurrency: NonZeroU16) -> Self {
         Self {
-            buckets: HashMap::with_capacity(max_concurrency.get() as usize),
+            buckets: HashMap::with_capacity_and_hasher(
+                max_concurrency.get() as usize,
+                BuildHasher::default(),
+            ),
             max_concurrency,
         }
     }

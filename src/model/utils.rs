@@ -1,6 +1,5 @@
 use std::borrow::Cow;
 use std::cell::Cell;
-use std::collections::HashMap;
 use std::fmt;
 use std::hash::Hash;
 use std::marker::PhantomData;
@@ -10,6 +9,7 @@ use serde::ser::{Serialize, SerializeSeq, Serializer};
 use small_fixed_array::FixedString;
 
 use super::prelude::*;
+use crate::hasher::{BuildHasher, HashMap};
 use crate::internal::prelude::*;
 
 pub fn default_true() -> bool {
@@ -217,11 +217,10 @@ where
 
 /// Used with `#[serde(with = "emojis")]`
 pub mod emojis {
-    use std::collections::HashMap;
-
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
+    use crate::hasher::HashMap;
     use crate::model::guild::Emoji;
     use crate::model::id::EmojiId;
 
@@ -242,11 +241,10 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
 
 /// Used with `#[serde(with = "members")]
 pub mod members {
-    use std::collections::HashMap;
-
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
+    use crate::hasher::HashMap;
     use crate::model::guild::Member;
     use crate::model::id::UserId;
 
@@ -261,11 +259,10 @@ pub mod members {
 
 /// Used with `#[serde(with = "presences")]`
 pub mod presences {
-    use std::collections::HashMap;
-
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
+    use crate::hasher::HashMap;
     use crate::model::gateway::Presence;
     use crate::model::id::UserId;
 
@@ -296,11 +293,10 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
 
 /// Used with `#[serde(with = "roles")]`
 pub mod roles {
-    use std::collections::HashMap;
-
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
+    use crate::hasher::HashMap;
     use crate::model::guild::Role;
     use crate::model::id::RoleId;
 
@@ -315,11 +311,10 @@ pub mod roles {
 
 /// Used with `#[serde(with = "stickers")]`
 pub mod stickers {
-    use std::collections::HashMap;
-
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
+    use crate::hasher::HashMap;
     use crate::model::id::StickerId;
     use crate::model::sticker::Sticker;
 
@@ -448,7 +443,12 @@ where
     where
         A: serde::de::SeqAccess<'de>,
     {
-        let mut map = seq.size_hint().map_or_else(HashMap::new, HashMap::with_capacity);
+        let hasher = BuildHasher::default();
+        let mut map = match seq.size_hint() {
+            Some(cap) => HashMap::with_capacity_and_hasher(cap, hasher),
+            None => HashMap::with_hasher(hasher),
+        };
+
         while let Some(elem) = seq.next_element()? {
             map.insert((self.key)(&elem), elem);
         }

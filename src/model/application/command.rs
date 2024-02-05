@@ -1,9 +1,8 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "model")]
 use crate::builder::CreateCommand;
+use crate::hasher::HashMap;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;

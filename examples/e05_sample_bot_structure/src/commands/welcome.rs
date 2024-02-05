@@ -1,11 +1,11 @@
 use std::borrow::Cow;
-use std::collections::HashMap;
 
 use serenity::builder::{CreateCommand, CreateCommandOption};
+use serenity::hasher::{BuildHasher, HashMap};
 use serenity::model::application::CommandOptionType;
 
 fn new_map<'a>(key: &'a str, value: &'a str) -> HashMap<Cow<'a, str>, Cow<'a, str>> {
-    let mut map = HashMap::with_capacity(1);
+    let mut map = HashMap::with_capacity_and_hasher(1, BuildHasher::default());
     map.insert(Cow::Borrowed(key), Cow::Borrowed(value));
     map
 }

@@ -2534,9 +2534,9 @@ enum_number! {
 mod test {
     #[cfg(feature = "model")]
     mod model {
-        use std::collections::*;
         use std::num::NonZeroU16;
 
+        use crate::hasher::BuildHasher;
         use crate::model::prelude::*;
 
         fn gen_member() -> Member {
@@ -2553,9 +2553,11 @@ mod test {
 
         fn gen() -> Guild {
             let m = gen_member();
+            let mut members = HashMap::with_capacity_and_hasher(1, BuildHasher::default());
+            members.insert(m.user.id, m);
 
             Guild {
-                members: HashMap::from([(m.user.id, m)]),
+                members,
                 ..Default::default()
             }
         }

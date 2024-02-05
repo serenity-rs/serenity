@@ -6,8 +6,6 @@
 // Just for MessageUpdateEvent (for some reason the #[allow] doesn't work when placed directly)
 #![allow(clippy::option_option)]
 
-use std::collections::HashMap;
-
 use nonmax::NonMaxU64;
 use serde::de::Error as DeError;
 use serde::Serialize;
@@ -23,6 +21,7 @@ use super::utils::{
     stickers,
 };
 use crate::constants::Opcode;
+use crate::hasher::HashMap;
 use crate::internal::prelude::*;
 use crate::model::application::{CommandPermissions, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;

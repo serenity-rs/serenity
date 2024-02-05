@@ -34,8 +34,8 @@ arrayvec = { version = "0.7.4", features = ["serde"] }
 small-fixed-array = { version = "0.2", features = ["serde"] }
 bool_to_bitflags = { version = "0.1.0" }
 nonmax = { version = "0.5.5", features = ["serde"] }
+rustc-hash = { version = "1.1.0" }
 # Optional dependencies
-fxhash = { version = "0.2.1", optional = true }
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"], optional = true }
 flate2 = { version = "1.0.28", optional = true }
 reqwest = { version = "0.11.22", default-features = false, features = ["multipart", "stream", "json"], optional = true }
@@ -79,7 +79,7 @@ default_no_backend = [
 builder = []
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
-cache = ["fxhash", "dashmap", "parking_lot"]
+cache = ["dashmap", "parking_lot"]
 # Enables collectors, a utility feature that lets you await interaction events in code with
 # zero setup, without needing to setup an InteractionCreate event listener.
 collector = ["gateway", "model"]

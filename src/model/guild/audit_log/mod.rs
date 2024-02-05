@@ -1,10 +1,10 @@
 //! Audit log types for administrative actions within guilds.
 
-use std::collections::HashMap;
-
 use nonmax::{NonMaxU32, NonMaxU64};
 use serde::de::Deserializer;
 use serde::ser::{Serialize, Serializer};
+
+use crate::hasher::HashMap;
 
 mod change;
 mod utils;

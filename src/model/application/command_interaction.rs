@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde::de::{Deserializer, Error as DeError};
 use serde::ser::{Error as _, Serializer};
 use serde::{Deserialize, Serialize};
@@ -13,6 +11,7 @@ use crate::builder::{
 };
 #[cfg(feature = "collector")]
 use crate::client::Context;
+use crate::hasher::HashMap;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;

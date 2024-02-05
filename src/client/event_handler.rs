@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 #[cfg(feature = "cache")]
 use std::num::NonZeroU16;
 
@@ -6,6 +5,7 @@ use async_trait::async_trait;
 
 use super::context::Context;
 use crate::gateway::ShardStageUpdateEvent;
+use crate::hasher::HashMap;
 use crate::http::RatelimitInfo;
 use crate::model::application::{CommandPermissions, Interaction};
 use crate::model::guild::audit_log::AuditLogEntry;

@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::error::Error as StdError;
 use std::fmt;
 use std::sync::Arc;
@@ -8,6 +7,7 @@ use reqwest::{Error as ReqwestError, Method, Response, StatusCode};
 use serde::de::{Deserialize, Deserializer, Error as _};
 use url::ParseError as UrlError;
 
+use crate::hasher::HashMap;
 use crate::internal::prelude::*;
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]

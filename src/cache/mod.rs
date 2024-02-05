@@ -23,7 +23,7 @@
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashSet, VecDeque};
 use std::hash::Hash;
 use std::num::NonZeroU16;
 #[cfg(feature = "temp_cache")]
@@ -39,6 +39,7 @@ use parking_lot::RwLock;
 
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
+use crate::hasher::{BuildHasher, HashMap};
 use crate::model::prelude::*;
 
 mod cache_update;
@@ -48,7 +49,7 @@ mod wrappers;
 
 #[cfg(feature = "temp_cache")]
 pub(crate) use wrappers::MaybeOwnedArc;
-use wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
+use wrappers::{MaybeMap, ReadOnlyMapRef};
 
 type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, BuildHasher>;
 
@@ -648,9 +649,8 @@ impl Default for Cache {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-
     use crate::cache::{Cache, CacheUpdate, Settings};
+    use crate::hasher::{BuildHasher, HashMap};
     use crate::model::prelude::*;
 
     #[test]
@@ -714,10 +714,12 @@ mod test {
         let mut guild_create = GuildCreateEvent {
             guild: Guild {
                 id: GuildId::new(1),
-                channels: HashMap::from([(ChannelId::new(2), channel)]),
+                channels: HashMap::with_hasher(BuildHasher::default()),
                 ..Default::default()
             },
         };
+        guild_create.guild.channels.insert(ChannelId::new(2), channel);
+
         assert!(cache.update(&mut guild_create).is_none());
         assert!(cache.update(&mut event).is_none());
 

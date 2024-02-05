@@ -62,8 +62,6 @@ pub use self::timestamp::Timestamp;
 /// use serenity::model::prelude::*;
 /// ```
 pub mod prelude {
-    pub(crate) use std::collections::HashMap;
-
     pub(crate) use serde::de::Visitor;
     pub(crate) use serde::{Deserialize, Deserializer};
 
@@ -102,5 +100,6 @@ pub mod prelude {
         ModelError,
         Timestamp,
     };
+    pub(crate) use crate::hasher::HashMap;
     pub(crate) use crate::internal::prelude::*;
 }

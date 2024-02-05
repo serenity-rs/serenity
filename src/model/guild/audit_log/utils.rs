@@ -1,9 +1,8 @@
 /// Used with `#[serde(with = "users")]`
 pub mod users {
-    use std::collections::HashMap;
-
     use serde::Deserializer;
 
+    use crate::hasher::HashMap;
     use crate::model::id::UserId;
     use crate::model::user::User;
     use crate::model::utils::SequenceToMapVisitor;
@@ -19,10 +18,9 @@ pub mod users {
 
 /// Used with `#[serde(with = "webhooks")]`
 pub mod webhooks {
-    use std::collections::HashMap;
-
     use serde::Deserializer;
 
+    use crate::hasher::HashMap;
     use crate::model::id::WebhookId;
     use crate::model::utils::SequenceToMapVisitor;
     use crate::model::webhook::Webhook;

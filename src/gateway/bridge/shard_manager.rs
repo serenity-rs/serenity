@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::num::NonZeroU16;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
@@ -20,6 +19,7 @@ use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
+use crate::hasher::{BuildHasher, HashMap};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -115,7 +115,7 @@ impl ShardManager {
         let (return_value_tx, return_value_rx) = mpsc::unbounded();
         let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
-        let runners = Arc::new(Mutex::new(HashMap::new()));
+        let runners = Arc::new(Mutex::new(HashMap::with_hasher(BuildHasher::default())));
         let (shutdown_send, shutdown_recv) = mpsc::unbounded();
 
         let manager = Arc::new(Self {

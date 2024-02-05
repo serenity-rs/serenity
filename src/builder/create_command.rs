@@ -1,6 +1,6 @@
 use std::borrow::Cow;
-use std::collections::HashMap;
 
+use crate::hasher::{BuildHasher, HashMap};
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -353,9 +353,9 @@ impl<'a> CreateCommand<'a> {
             kind: None,
 
             name: name.into(),
-            name_localizations: HashMap::new(),
+            name_localizations: HashMap::with_hasher(BuildHasher::default()),
             description: None,
-            description_localizations: HashMap::new(),
+            description_localizations: HashMap::with_hasher(BuildHasher::default()),
             default_member_permissions: None,
             dm_permission: None,
 

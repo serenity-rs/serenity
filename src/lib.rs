@@ -83,6 +83,7 @@ extern crate serde;
 mod internal;
 
 pub mod constants;
+pub mod hasher;
 pub mod model;
 pub mod prelude;
 
