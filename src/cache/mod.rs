@@ -51,8 +51,6 @@ pub(crate) mod wrappers;
 pub(crate) use wrappers::MaybeOwnedArc;
 use wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
 
-type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, BuildHasher>;
-
 struct NotSend;
 
 enum CacheRefInner<'a, K, V, T> {
@@ -119,9 +117,9 @@ pub type SettingsRef<'a> = CacheRef<'a, Never, Settings, Never>;
 pub type GuildChannelRef<'a> = MappedGuildRef<'a, GuildChannel>;
 pub type CurrentUserRef<'a> = CacheRef<'a, Never, CurrentUser, Never>;
 pub type GuildRolesRef<'a> = MappedGuildRef<'a, HashMap<RoleId, Role>>;
+pub type MessageRef<'a> = CacheRef<'a, ChannelId, Message, VecDeque<Message>>;
+pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, VecDeque<Message>, Never>;
 pub type GuildChannelsRef<'a> = MappedGuildRef<'a, HashMap<ChannelId, GuildChannel>>;
-pub type MessageRef<'a> = CacheRef<'a, ChannelId, Message, HashMap<MessageId, Message>>;
-pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>, Never>;
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
@@ -193,13 +191,7 @@ pub struct Cache {
 
     // Messages cache:
     // ---
-    pub(crate) messages: MessageCache,
-    /// Queue of message IDs for each channel.
-    ///
-    /// This is simply a vecdeque so we can keep track of the order of messages inserted into the
-    /// cache. When a maximum number of messages are in a channel's cache, we can pop the front and
-    /// remove that ID from the cache.
-    pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, BuildHasher>,
+    pub(crate) messages: DashMap<ChannelId, VecDeque<Message>, BuildHasher>,
 
     // Miscellanous fixed-size data
     // ---
@@ -262,7 +254,6 @@ impl Cache {
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
 
             messages: DashMap::default(),
-            message_queue: DashMap::default(),
 
             shard_data: RwLock::new(CachedShardData {
                 total: NonZeroU16::MIN,
@@ -380,10 +371,10 @@ impl Cache {
     /// # use serenity::model::id::ChannelId;
     /// #
     /// # let cache: serenity::cache::Cache = todo!();
-    /// let messages_in_channel = cache.channel_messages(ChannelId::new(7));
-    /// let messages_by_user = messages_in_channel
-    ///     .as_ref()
-    ///     .map(|msgs| msgs.values().filter(|m| m.author.id == 8).collect::<Vec<_>>());
+    /// if let Some(messages_in_channel) = cache.channel_messages(ChannelId::new(7)) {
+    ///     let messages_by_user: Vec<_> =
+    ///         messages_in_channel.iter().filter(|m| m.author.id == 8).collect();
+    /// }
     /// ```
     pub fn channel_messages(&self, channel_id: ChannelId) -> Option<ChannelMessagesRef<'_>> {
         self.messages.get(&channel_id).map(CacheRef::from_ref)
@@ -532,8 +523,9 @@ impl Cache {
             return Some(CacheRef::from_arc(message));
         }
 
-        let channel_messages = self.messages.get(&channel_id)?;
-        let message = channel_messages.try_map(|messages| messages.get(&message_id)).ok()?;
+        let messages = self.messages.get(&channel_id)?;
+        let message =
+            messages.try_map(|messages| messages.iter().find(|m| m.id == message_id)).ok()?;
         Some(CacheRef::from_mapped_ref(message))
     }
 
@@ -695,7 +687,7 @@ mod test {
 
             assert_eq!(channel.len(), 2);
             // Check that the first message is now removed.
-            assert!(!channel.contains_key(&MessageId::new(3)));
+            assert!(!channel.iter().any(|m| m.id == MessageId::new(3)));
         }
 
         let channel = GuildChannel {
