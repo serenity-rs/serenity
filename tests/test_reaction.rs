@@ -11,7 +11,7 @@ fn str_to_reaction_type() {
     let reaction2 = ReactionType::Custom {
         animated: false,
         id: EmojiId::new(600404340292059257),
-        name: Some(FixedString::from_str_trunc("customemoji")),
+        name: Some(FixedString::from_static_trunc("customemoji")),
     };
     assert_eq!(reaction, reaction2);
 }
@@ -23,7 +23,7 @@ fn str_to_reaction_type_animated() {
     let reaction2 = ReactionType::Custom {
         animated: true,
         id: EmojiId::new(600409340292059257),
-        name: Some(FixedString::from_str_trunc("customemoji2")),
+        name: Some(FixedString::from_static_trunc("customemoji2")),
     };
     assert_eq!(reaction, reaction2);
 }
@@ -35,7 +35,7 @@ fn string_to_reaction_type() {
     let reaction2 = ReactionType::Custom {
         animated: false,
         id: EmojiId::new(600404340292059257),
-        name: Some(FixedString::from_str_trunc("customemoji")),
+        name: Some(FixedString::from_static_trunc("customemoji")),
     };
     assert_eq!(reaction, reaction2);
 }
