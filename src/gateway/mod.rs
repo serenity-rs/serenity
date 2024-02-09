@@ -148,7 +148,7 @@ impl ActivityData {
         Self {
             // discord seems to require a name for custom activities
             // even though it's not displayed
-            name: FixedString::from_str_trunc("~"),
+            name: FixedString::from_static_trunc("~"),
             kind: ActivityType::Custom,
             state: Some(state.into().trunc_into()),
             url: None,
