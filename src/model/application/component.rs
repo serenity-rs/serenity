@@ -316,10 +316,10 @@ mod tests {
         let mut button = Button {
             kind: ComponentType::Button,
             data: ButtonKind::NonLink {
-                custom_id: FixedString::from_str_trunc("hello"),
+                custom_id: FixedString::from_static_trunc("hello"),
                 style: ButtonStyle::Danger,
             },
-            label: Some(FixedString::from_str_trunc("a")),
+            label: Some(FixedString::from_static_trunc("a")),
             emoji: None,
             disabled: false,
         };
@@ -329,7 +329,7 @@ mod tests {
         );
 
         button.data = ButtonKind::Link {
-            url: FixedString::from_str_trunc("https://google.com"),
+            url: FixedString::from_static_trunc("https://google.com"),
         };
         assert_json(
             &button,
