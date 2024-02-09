@@ -489,7 +489,7 @@ impl CacheUpdate for ThreadCreateEvent {
 
         cache.guilds.get_mut(&guild_id).and_then(|mut g| {
             if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
-                Some(std::mem::replace(&mut g.threads[i], self.thread.clone()))
+                Some(std::mem::replace(&mut g.threads[i as u32], self.thread.clone()))
             } else {
                 // This is a rare enough occurence to realloc.
                 let mut threads = std::mem::take(&mut g.threads).into_vec();
@@ -512,7 +512,7 @@ impl CacheUpdate for ThreadUpdateEvent {
 
         cache.guilds.get_mut(&guild_id).and_then(|mut g| {
             if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
-                Some(std::mem::replace(&mut g.threads[i], self.thread.clone()))
+                Some(std::mem::replace(&mut g.threads[i as u32], self.thread.clone()))
             } else {
                 // This is a rare enough occurence to realloc.
                 let mut threads = std::mem::take(&mut g.threads).into_vec();

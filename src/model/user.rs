@@ -861,7 +861,7 @@ mod test {
                 id: UserId::new(210),
                 avatar: Some(ImageHash::from_str("fb211703bcc04ee612c88d494df0272f").unwrap()),
                 discriminator: NonZeroU16::new(1432),
-                name: FixedString::from_str_trunc("test"),
+                name: FixedString::from_static_trunc("test"),
                 ..Default::default()
             };
 
