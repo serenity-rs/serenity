@@ -336,6 +336,7 @@ pub mod stickers {
 pub mod comma_separated_string {
     use serde::{Deserialize, Deserializer, Serializer};
 
+    use super::CowStr;
     use crate::internal::prelude::*;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
