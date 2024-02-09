@@ -295,16 +295,6 @@ impl ShardRunner {
             },
             ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
             ShardRunnerMessage::SetActivity(activity) => {
-                // To avoid a clone of `activity`, we do a little bit of trickery here:
-                //
-                // First, we obtain a reference to the current presence of the shard, and
-                // create a new presence tuple of the new activity we received over the
-                // channel as well as the online status that the shard already had.
-                //
-                // We then (attempt to) send the websocket message with the status update,
-                // expressively returning:
-                // - whether the message successfully sent
-                // - the original activity we received over the channel
                 self.shard.set_activity(activity);
                 self.shard.update_presence().await.is_ok()
             },
