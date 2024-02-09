@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 use std::num::NonZeroU16;
 
 use super::{Cache, CacheUpdate};
@@ -53,16 +53,16 @@ impl CacheUpdate for ChannelCreateEvent {
 }
 
 impl CacheUpdate for ChannelDeleteEvent {
-    type Output = Vec<Message>;
+    type Output = VecDeque<Message>;
 
-    fn update(&mut self, cache: &Cache) -> Option<Vec<Message>> {
+    fn update(&mut self, cache: &Cache) -> Option<VecDeque<Message>> {
         let (channel_id, guild_id) = (self.channel.id, self.channel.guild_id);
 
         cache.channels.remove(&channel_id);
         cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
 
         // Remove the cached messages for the channel.
-        cache.messages.remove(&channel_id).map(|(_, messages)| messages.into_values().collect())
+        cache.messages.remove(&channel_id).map(|(_, messages)| messages)
     }
 }
 
@@ -357,18 +357,15 @@ impl CacheUpdate for MessageCreateEvent {
         }
 
         let mut messages = cache.messages.entry(self.message.channel_id).or_default();
-        let mut queue = cache.message_queue.entry(self.message.channel_id).or_default();
 
         let mut removed_msg = None;
-
         if messages.len() == max {
-            if let Some(id) = queue.pop_front() {
-                removed_msg = messages.remove(&id);
-            }
+            removed_msg = messages.pop_front();
         }
 
-        queue.push_back(self.message.id);
-        messages.insert(self.message.id, self.message.clone());
+        if !messages.iter().any(|m| m.id == self.message.id) {
+            messages.push_back(self.message.clone());
+        }
 
         removed_msg
     }
@@ -393,13 +390,15 @@ impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        let mut messages = cache.messages.get_mut(&self.channel_id)?;
-        let message = messages.get_mut(&self.id)?;
-        let old_message = message.clone();
+        for message in cache.messages.get_mut(&self.channel_id)?.iter_mut() {
+            if message.id == self.id {
+                let old_message = message.clone();
+                self.apply_to_message(message);
+                return Some(old_message);
+            }
+        }
 
-        self.apply_to_message(message);
-
-        Some(old_message)
+        None
     }
 }
 
