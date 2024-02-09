@@ -808,13 +808,13 @@ mod tests {
     #[test]
     fn nested_options() {
         let value = CommandDataOption {
-            name: FixedString::from_str_trunc("subcommand_group"),
+            name: FixedString::from_static_trunc("subcommand_group"),
             value: CommandDataOptionValue::SubCommandGroup(
                 vec![CommandDataOption {
-                    name: FixedString::from_str_trunc("subcommand"),
+                    name: FixedString::from_static_trunc("subcommand"),
                     value: CommandDataOptionValue::SubCommand(
                         vec![CommandDataOption {
-                            name: FixedString::from_str_trunc("channel"),
+                            name: FixedString::from_static_trunc("channel"),
                             value: CommandDataOptionValue::Channel(ChannelId::new(3)),
                         }]
                         .trunc_into(),
@@ -842,30 +842,30 @@ mod tests {
     fn mixed_options() {
         let value = vec![
             CommandDataOption {
-                name: FixedString::from_str_trunc("boolean"),
+                name: FixedString::from_static_trunc("boolean"),
                 value: CommandDataOptionValue::Boolean(true),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc("integer"),
+                name: FixedString::from_static_trunc("integer"),
                 value: CommandDataOptionValue::Integer(1),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc("number"),
+                name: FixedString::from_static_trunc("number"),
                 value: CommandDataOptionValue::Number(2.0),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc("string"),
-                value: CommandDataOptionValue::String(FixedString::from_str_trunc("foobar")),
+                name: FixedString::from_static_trunc("string"),
+                value: CommandDataOptionValue::String(FixedString::from_static_trunc("foobar")),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc("empty_subcommand"),
+                name: FixedString::from_static_trunc("empty_subcommand"),
                 value: CommandDataOptionValue::SubCommand(FixedArray::default()),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc("autocomplete"),
+                name: FixedString::from_static_trunc("autocomplete"),
                 value: CommandDataOptionValue::Autocomplete {
                     kind: CommandOptionType::Integer,
-                    value: FixedString::from_str_trunc("not an integer"),
+                    value: FixedString::from_static_trunc("not an integer"),
                 },
             },
         ];
