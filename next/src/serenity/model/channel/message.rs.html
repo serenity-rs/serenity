@@ -1091,48 +1091,11 @@
 <a href="#1089" id="1089">1089</a>
 <a href="#1090" id="1090">1090</a>
 <a href="#1091" id="1091">1091</a>
-<a href="#1092" id="1092">1092</a>
-<a href="#1093" id="1093">1093</a>
-<a href="#1094" id="1094">1094</a>
-<a href="#1095" id="1095">1095</a>
-<a href="#1096" id="1096">1096</a>
-<a href="#1097" id="1097">1097</a>
-<a href="#1098" id="1098">1098</a>
-<a href="#1099" id="1099">1099</a>
-<a href="#1100" id="1100">1100</a>
-<a href="#1101" id="1101">1101</a>
-<a href="#1102" id="1102">1102</a>
-<a href="#1103" id="1103">1103</a>
-<a href="#1104" id="1104">1104</a>
-<a href="#1105" id="1105">1105</a>
-<a href="#1106" id="1106">1106</a>
-<a href="#1107" id="1107">1107</a>
-<a href="#1108" id="1108">1108</a>
-<a href="#1109" id="1109">1109</a>
-<a href="#1110" id="1110">1110</a>
-<a href="#1111" id="1111">1111</a>
-<a href="#1112" id="1112">1112</a>
-<a href="#1113" id="1113">1113</a>
-<a href="#1114" id="1114">1114</a>
-<a href="#1115" id="1115">1115</a>
-<a href="#1116" id="1116">1116</a>
-<a href="#1117" id="1117">1117</a>
-<a href="#1118" id="1118">1118</a>
-<a href="#1119" id="1119">1119</a>
-<a href="#1120" id="1120">1120</a>
-<a href="#1121" id="1121">1121</a>
-<a href="#1122" id="1122">1122</a>
-<a href="#1123" id="1123">1123</a>
-<a href="#1124" id="1124">1124</a>
-<a href="#1125" id="1125">1125</a>
-<a href="#1126" id="1126">1126</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::fmt::Display;
-<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
-</span><span class="kw">use </span>std::fmt::Write;
 
 <span class="kw">use </span>nonmax::NonMaxU64;
 
@@ -1493,49 +1456,16 @@
 
     <span class="doccomment">/// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
-    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+    </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>))]
     </span><span class="kw">pub fn </span>content_safe(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; String {
-        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">self</span>.content.to_string();
+        <span class="kw">let </span><span class="prelude-val">Some</span>(guild) = <span class="self">self</span>.guild(cache) <span class="kw">else </span>{ <span class="kw">return </span><span class="self">self</span>.content.to_string() };
 
-        <span class="comment">// First replace all user mentions.
-        </span><span class="kw">for </span>u <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.mentions {
-            <span class="kw">let </span><span class="kw-2">mut </span>at_distinct = String::with_capacity(<span class="number">38</span>);
-            at_distinct.push(<span class="string">'@'</span>);
-            at_distinct.push_str(<span class="kw-2">&amp;</span>u.name);
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(discriminator) = u.discriminator {
-                at_distinct.push(<span class="string">'#'</span>);
-                <span class="macro">write!</span>(at_distinct, <span class="string">"{:04}"</span>, discriminator.get()).unwrap();
-            }
+        <span class="kw">let </span>options = <span class="kw">crate</span>::utils::ContentSafeOptions::new()
+            .clean_user(<span class="bool-val">true</span>)
+            .clean_role(<span class="bool-val">true</span>)
+            .clean_everyone(<span class="bool-val">true</span>);
 
-            <span class="kw">let </span><span class="kw-2">mut </span>m = u.mention().to_string();
-            <span class="comment">// Check whether we're replacing a nickname mention or a normal mention.
-            // `UserId::mention` returns a normal mention. If it isn't present in the message, it's
-            // a nickname mention.
-            </span><span class="kw">if </span>!result.contains(<span class="kw-2">&amp;</span>m) {
-                m.insert(<span class="number">2</span>, <span class="string">'!'</span>);
-            }
-
-            result = result.replace(<span class="kw-2">&amp;</span>m, <span class="kw-2">&amp;</span>at_distinct);
-        }
-
-        <span class="comment">// Then replace all role mentions.
-        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.guild_id {
-            <span class="kw">for </span>id <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.mention_roles {
-                <span class="kw">let </span>mention = id.mention().to_string();
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.guild(guild_id) {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild.roles.get(id) {
-                        result = result.replace(<span class="kw-2">&amp;</span>mention, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"@{}"</span>, role.name));
-                        <span class="kw">continue</span>;
-                    }
-                }
-
-                result = result.replace(<span class="kw-2">&amp;</span>mention, <span class="string">"@deleted-role"</span>);
-            }
-        }
-
-        <span class="comment">// And finally replace everyone and here mentions.
-        </span>result.replace(<span class="string">"@everyone"</span>, <span class="string">"@\u{200B}everyone"</span>).replace(<span class="string">"@here"</span>, <span class="string">"@\u{200B}here"</span>)
+        <span class="kw">crate</span>::utils::content_safe(<span class="kw-2">&amp;</span>guild, <span class="kw-2">&amp;</span><span class="self">self</span>.content, options, <span class="kw-2">&amp;</span><span class="self">self</span>.mentions)
     }
 
     <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
