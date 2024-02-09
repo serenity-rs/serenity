@@ -3,8 +3,6 @@
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Display;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::fmt::Write;
 
 use nonmax::NonMaxU64;
 
@@ -414,49 +412,16 @@ impl Message {
 
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn content_safe(&self, cache: &Cache) -> String {
-        let mut result = self.content.to_string();
+        let Some(guild) = self.guild(cache) else { return self.content.to_string() };
 
-        // First replace all user mentions.
-        for u in &self.mentions {
-            let mut at_distinct = String::with_capacity(38);
-            at_distinct.push('@');
-            at_distinct.push_str(&u.name);
-            if let Some(discriminator) = u.discriminator {
-                at_distinct.push('#');
-                write!(at_distinct, "{:04}", discriminator.get()).unwrap();
-            }
+        let options = crate::utils::ContentSafeOptions::new()
+            .clean_user(true)
+            .clean_role(true)
+            .clean_everyone(true);
 
-            let mut m = u.mention().to_string();
-            // Check whether we're replacing a nickname mention or a normal mention.
-            // `UserId::mention` returns a normal mention. If it isn't present in the message, it's
-            // a nickname mention.
-            if !result.contains(&m) {
-                m.insert(2, '!');
-            }
-
-            result = result.replace(&m, &at_distinct);
-        }
-
-        // Then replace all role mentions.
-        if let Some(guild_id) = self.guild_id {
-            for id in &self.mention_roles {
-                let mention = id.mention().to_string();
-
-                if let Some(guild) = cache.guild(guild_id) {
-                    if let Some(role) = guild.roles.get(id) {
-                        result = result.replace(&mention, &format!("@{}", role.name));
-                        continue;
-                    }
-                }
-
-                result = result.replace(&mention, "@deleted-role");
-            }
-        }
-
-        // And finally replace everyone and here mentions.
-        result.replace("@everyone", "@\u{200B}everyone").replace("@here", "@\u{200B}here")
+        crate::utils::content_safe(&guild, &self.content, options, &self.mentions)
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
