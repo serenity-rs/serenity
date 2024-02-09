@@ -211,7 +211,7 @@ mod tests {
     fn test_content_safe() {
         let user = User {
             id: UserId::new(100000000000000000),
-            name: FixedString::from_str_trunc("Crab"),
+            name: FixedString::from_static_trunc("Crab"),
             ..Default::default()
         };
 
@@ -223,19 +223,19 @@ mod tests {
         let mut guild = no_member_guild.clone();
 
         let member = Member {
-            nick: Some(FixedString::from_str_trunc("Ferris")),
+            nick: Some(FixedString::from_static_trunc("Ferris")),
             ..Default::default()
         };
 
         let role = Role {
             id: RoleId::new(333333333333333333),
-            name: FixedString::from_str_trunc("ferris-club-member"),
+            name: FixedString::from_static_trunc("ferris-club-member"),
             ..Default::default()
         };
 
         let channel = GuildChannel {
             id: ChannelId::new(111880193700067777),
-            name: FixedString::from_str_trunc("general"),
+            name: FixedString::from_static_trunc("general"),
             ..Default::default()
         };
 
