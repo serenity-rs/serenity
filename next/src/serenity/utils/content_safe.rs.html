@@ -553,7 +553,7 @@
     </span><span class="kw">fn </span>test_content_safe() {
         <span class="kw">let </span>user = User {
             id: UserId::new(<span class="number">100000000000000000</span>),
-            name: FixedString::from_str_trunc(<span class="string">"Crab"</span>),
+            name: FixedString::from_static_trunc(<span class="string">"Crab"</span>),
             ..Default::default()
         };
 
@@ -565,19 +565,19 @@
         <span class="kw">let </span><span class="kw-2">mut </span>guild = no_member_guild.clone();
 
         <span class="kw">let </span>member = Member {
-            nick: <span class="prelude-val">Some</span>(FixedString::from_str_trunc(<span class="string">"Ferris"</span>)),
+            nick: <span class="prelude-val">Some</span>(FixedString::from_static_trunc(<span class="string">"Ferris"</span>)),
             ..Default::default()
         };
 
         <span class="kw">let </span>role = Role {
             id: RoleId::new(<span class="number">333333333333333333</span>),
-            name: FixedString::from_str_trunc(<span class="string">"ferris-club-member"</span>),
+            name: FixedString::from_static_trunc(<span class="string">"ferris-club-member"</span>),
             ..Default::default()
         };
 
         <span class="kw">let </span>channel = GuildChannel {
             id: ChannelId::new(<span class="number">111880193700067777</span>),
-            name: FixedString::from_str_trunc(<span class="string">"general"</span>),
+            name: FixedString::from_static_trunc(<span class="string">"general"</span>),
             ..Default::default()
         };
 

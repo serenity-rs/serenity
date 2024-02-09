@@ -5122,9 +5122,9 @@
 
         <span class="kw">fn </span>gen_member() -&gt; Member {
             Member {
-                nick: <span class="prelude-val">Some</span>(FixedString::from_str_trunc(<span class="string">"aaaa"</span>)),
+                nick: <span class="prelude-val">Some</span>(FixedString::from_static_trunc(<span class="string">"aaaa"</span>)),
                 user: User {
-                    name: FixedString::from_str_trunc(<span class="string">"test"</span>),
+                    name: FixedString::from_static_trunc(<span class="string">"test"</span>),
                     discriminator: NonZeroU16::new(<span class="number">1432</span>),
                     ..User::default()
                 },

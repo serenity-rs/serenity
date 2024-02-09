@@ -1681,13 +1681,13 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>nested_options() {
         <span class="kw">let </span>value = CommandDataOption {
-            name: FixedString::from_str_trunc(<span class="string">"subcommand_group"</span>),
+            name: FixedString::from_static_trunc(<span class="string">"subcommand_group"</span>),
             value: CommandDataOptionValue::SubCommandGroup(
                 <span class="macro">vec!</span>[CommandDataOption {
-                    name: FixedString::from_str_trunc(<span class="string">"subcommand"</span>),
+                    name: FixedString::from_static_trunc(<span class="string">"subcommand"</span>),
                     value: CommandDataOptionValue::SubCommand(
                         <span class="macro">vec!</span>[CommandDataOption {
-                            name: FixedString::from_str_trunc(<span class="string">"channel"</span>),
+                            name: FixedString::from_static_trunc(<span class="string">"channel"</span>),
                             value: CommandDataOptionValue::Channel(ChannelId::new(<span class="number">3</span>)),
                         }]
                         .trunc_into(),
@@ -1715,30 +1715,30 @@
     </span><span class="kw">fn </span>mixed_options() {
         <span class="kw">let </span>value = <span class="macro">vec!</span>[
             CommandDataOption {
-                name: FixedString::from_str_trunc(<span class="string">"boolean"</span>),
+                name: FixedString::from_static_trunc(<span class="string">"boolean"</span>),
                 value: CommandDataOptionValue::Boolean(<span class="bool-val">true</span>),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc(<span class="string">"integer"</span>),
+                name: FixedString::from_static_trunc(<span class="string">"integer"</span>),
                 value: CommandDataOptionValue::Integer(<span class="number">1</span>),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc(<span class="string">"number"</span>),
+                name: FixedString::from_static_trunc(<span class="string">"number"</span>),
                 value: CommandDataOptionValue::Number(<span class="number">2.0</span>),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc(<span class="string">"string"</span>),
-                value: CommandDataOptionValue::String(FixedString::from_str_trunc(<span class="string">"foobar"</span>)),
+                name: FixedString::from_static_trunc(<span class="string">"string"</span>),
+                value: CommandDataOptionValue::String(FixedString::from_static_trunc(<span class="string">"foobar"</span>)),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc(<span class="string">"empty_subcommand"</span>),
+                name: FixedString::from_static_trunc(<span class="string">"empty_subcommand"</span>),
                 value: CommandDataOptionValue::SubCommand(FixedArray::default()),
             },
             CommandDataOption {
-                name: FixedString::from_str_trunc(<span class="string">"autocomplete"</span>),
+                name: FixedString::from_static_trunc(<span class="string">"autocomplete"</span>),
                 value: CommandDataOptionValue::Autocomplete {
                     kind: CommandOptionType::Integer,
-                    value: FixedString::from_str_trunc(<span class="string">"not an integer"</span>),
+                    value: FixedString::from_static_trunc(<span class="string">"not an integer"</span>),
                 },
             },
         ];

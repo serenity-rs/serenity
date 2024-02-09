@@ -534,7 +534,7 @@
         <span class="kw">let </span>error = DiscordJsonError {
             code: <span class="number">43121215</span>,
             errors: FixedArray::empty(),
-            message: FixedString::from_str_trunc(<span class="string">"This is a Ferris error"</span>),
+            message: FixedString::from_static_trunc(<span class="string">"This is a Ferris error"</span>),
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Builder::new();
@@ -548,7 +548,7 @@
 
         <span class="kw">let </span>known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(<span class="number">403</span>).unwrap(),
-            url: FixedString::from_str_trunc(<span class="string">"https://ferris.crab/"</span>),
+            url: FixedString::from_static_trunc(<span class="string">"https://ferris.crab/"</span>),
             method: Method::POST,
             error,
         };

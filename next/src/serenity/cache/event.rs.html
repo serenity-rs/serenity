@@ -1044,7 +1044,7 @@
 
         cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).and_then(|<span class="kw-2">mut </span>g| {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = g.threads.iter().position(|e| e.id == thread_id) {
-                <span class="prelude-val">Some</span>(std::mem::replace(<span class="kw-2">&amp;mut </span>g.threads[i], <span class="self">self</span>.thread.clone()))
+                <span class="prelude-val">Some</span>(std::mem::replace(<span class="kw-2">&amp;mut </span>g.threads[i <span class="kw">as </span>u32], <span class="self">self</span>.thread.clone()))
             } <span class="kw">else </span>{
                 <span class="comment">// This is a rare enough occurence to realloc.
                 </span><span class="kw">let </span><span class="kw-2">mut </span>threads = std::mem::take(<span class="kw-2">&amp;mut </span>g.threads).into_vec();
@@ -1067,7 +1067,7 @@
 
         cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).and_then(|<span class="kw-2">mut </span>g| {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = g.threads.iter().position(|e| e.id == thread_id) {
-                <span class="prelude-val">Some</span>(std::mem::replace(<span class="kw-2">&amp;mut </span>g.threads[i], <span class="self">self</span>.thread.clone()))
+                <span class="prelude-val">Some</span>(std::mem::replace(<span class="kw-2">&amp;mut </span>g.threads[i <span class="kw">as </span>u32], <span class="self">self</span>.thread.clone()))
             } <span class="kw">else </span>{
                 <span class="comment">// This is a rare enough occurence to realloc.
                 </span><span class="kw">let </span><span class="kw-2">mut </span>threads = std::mem::take(<span class="kw-2">&amp;mut </span>g.threads).into_vec();

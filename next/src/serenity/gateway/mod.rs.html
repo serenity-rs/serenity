@@ -421,7 +421,7 @@
         <span class="self">Self </span>{
             <span class="comment">// discord seems to require a name for custom activities
             // even though it's not displayed
-            </span>name: FixedString::from_str_trunc(<span class="string">"~"</span>),
+            </span>name: FixedString::from_static_trunc(<span class="string">"~"</span>),
             kind: ActivityType::Custom,
             state: <span class="prelude-val">Some</span>(state.into().trunc_into()),
             url: <span class="prelude-val">None</span>,

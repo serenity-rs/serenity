@@ -4735,8 +4735,6 @@
 <a href="#4733" id="4733">4733</a>
 <a href="#4734" id="4734">4734</a>
 <a href="#4735" id="4735">4735</a>
-<a href="#4736" id="4736">4736</a>
-<a href="#4737" id="4737">4737</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4902,16 +4900,14 @@
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
     </span><span class="kw">pub fn </span>proxy&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, proxy: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>proxy = proxy.into();
-        <span class="kw">let </span>len = proxy.len();
+        u16::try_from(proxy.len()).expect(<span class="string">"Proxy URL should be less than u16::MAX characters"</span>);
 
         <span class="kw">let </span>proxy = <span class="kw">match </span>proxy {
             Cow::Owned(proxy) =&gt; FixedString::from_string_trunc(proxy),
             Cow::Borrowed(proxy) =&gt; FixedString::from_str_trunc(proxy),
         };
 
-        <span class="macro">assert_eq!</span>(len <span class="kw">as </span>u32, proxy.len(), <span class="string">"Proxy URL should not be larger than u16::MAX chars"</span>);
         <span class="self">self</span>.proxy = <span class="prelude-val">Some</span>(proxy);
-
         <span class="self">self
     </span>}
 
