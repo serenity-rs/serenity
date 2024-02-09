@@ -474,7 +474,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// let reaction2 = ReactionType::Custom {
     ///     animated: false,
     ///     id: EmojiId::new(600404340292059257),
-    ///     name: Some(FixedString::from_str_trunc("customemoji")),
+    ///     name: Some(FixedString::from_static_trunc("customemoji")),
     /// };
     ///
     /// assert_eq!(reaction, reaction2);
