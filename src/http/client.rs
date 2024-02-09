@@ -164,16 +164,14 @@ impl HttpBuilder {
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
     pub fn proxy<'a>(mut self, proxy: impl Into<Cow<'a, str>>) -> Self {
         let proxy = proxy.into();
-        let len = proxy.len();
+        u16::try_from(proxy.len()).expect("Proxy URL should be less than u16::MAX characters");
 
         let proxy = match proxy {
             Cow::Owned(proxy) => FixedString::from_string_trunc(proxy),
             Cow::Borrowed(proxy) => FixedString::from_str_trunc(proxy),
         };
 
-        assert_eq!(len as u32, proxy.len(), "Proxy URL should not be larger than u16::MAX chars");
         self.proxy = Some(proxy);
-
         self
     }
 

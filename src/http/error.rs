@@ -254,7 +254,7 @@ mod test {
         let error = DiscordJsonError {
             code: 43121215,
             errors: FixedArray::empty(),
-            message: FixedString::from_str_trunc("This is a Ferris error"),
+            message: FixedString::from_static_trunc("This is a Ferris error"),
         };
 
         let mut builder = Builder::new();
@@ -268,7 +268,7 @@ mod test {
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),
-            url: FixedString::from_str_trunc("https://ferris.crab/"),
+            url: FixedString::from_static_trunc("https://ferris.crab/"),
             method: Method::POST,
             error,
         };
