@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 #[cfg(feature = "cache")]
 use std::num::NonZeroU16;
 
@@ -139,7 +139,7 @@ event_handler! {
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
-    ChannelDelete { channel: GuildChannel, messages: Option<Vec<Message>> } => async fn channel_delete(&self, ctx: Context);
+    ChannelDelete { channel: GuildChannel, messages: Option<VecDeque<Message>> } => async fn channel_delete(&self, ctx: Context);
 
     /// Dispatched when a pin is added, deleted.
     ///
