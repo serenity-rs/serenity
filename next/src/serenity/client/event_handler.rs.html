@@ -487,7 +487,7 @@
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
 <a href="#487" id="487">487</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::num::NonZeroU16;
 
@@ -628,7 +628,7 @@
     <span class="doccomment">/// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
-    </span>ChannelDelete { channel: GuildChannel, messages: <span class="prelude-ty">Option</span>&lt;Vec&lt;Message&gt;&gt; } =&gt; <span class="kw">async fn </span>channel_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
+    </span>ChannelDelete { channel: GuildChannel, messages: <span class="prelude-ty">Option</span>&lt;VecDeque&lt;Message&gt;&gt; } =&gt; <span class="kw">async fn </span>channel_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
 
     <span class="doccomment">/// Dispatched when a pin is added, deleted.
     ///

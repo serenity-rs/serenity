@@ -729,14 +729,6 @@
 <a href="#727" id="727">727</a>
 <a href="#728" id="728">728</a>
 <a href="#729" id="729">729</a>
-<a href="#730" id="730">730</a>
-<a href="#731" id="731">731</a>
-<a href="#732" id="732">732</a>
-<a href="#733" id="733">733</a>
-<a href="#734" id="734">734</a>
-<a href="#735" id="735">735</a>
-<a href="#736" id="736">736</a>
-<a href="#737" id="737">737</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -788,8 +780,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>wrappers::MaybeOwnedArc;
 <span class="kw">use </span>wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
-
-<span class="kw">type </span>MessageCache = DashMap&lt;ChannelId, HashMap&lt;MessageId, Message&gt;, BuildHasher&gt;;
 
 <span class="kw">struct </span>NotSend;
 
@@ -856,9 +846,9 @@
 <span class="kw">pub type </span>CurrentUserRef&lt;<span class="lifetime">'a</span>&gt; = CacheRef&lt;<span class="lifetime">'a</span>, (), CurrentUser&gt;;
 <span class="kw">pub type </span>GuildChannelRef&lt;<span class="lifetime">'a</span>&gt; = MappedGuildRef&lt;<span class="lifetime">'a</span>, GuildChannel&gt;;
 <span class="kw">pub type </span>GuildRolesRef&lt;<span class="lifetime">'a</span>&gt; = MappedGuildRef&lt;<span class="lifetime">'a</span>, HashMap&lt;RoleId, Role&gt;&gt;;
+<span class="kw">pub type </span>ChannelMessagesRef&lt;<span class="lifetime">'a</span>&gt; = CacheRef&lt;<span class="lifetime">'a</span>, ChannelId, VecDeque&lt;Message&gt;&gt;;
+<span class="kw">pub type </span>MessageRef&lt;<span class="lifetime">'a</span>&gt; = CacheRef&lt;<span class="lifetime">'a</span>, ChannelId, Message, VecDeque&lt;Message&gt;&gt;;
 <span class="kw">pub type </span>GuildChannelsRef&lt;<span class="lifetime">'a</span>&gt; = MappedGuildRef&lt;<span class="lifetime">'a</span>, HashMap&lt;ChannelId, GuildChannel&gt;&gt;;
-<span class="kw">pub type </span>ChannelMessagesRef&lt;<span class="lifetime">'a</span>&gt; = CacheRef&lt;<span class="lifetime">'a</span>, ChannelId, HashMap&lt;MessageId, Message&gt;&gt;;
-<span class="kw">pub type </span>MessageRef&lt;<span class="lifetime">'a</span>&gt; = CacheRef&lt;<span class="lifetime">'a</span>, ChannelId, Message, HashMap&lt;MessageId, Message&gt;&gt;;
 
 <span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
@@ -929,13 +919,7 @@
 
     <span class="comment">// Messages cache:
     // ---
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) messages: MessageCache,
-    <span class="doccomment">/// Queue of message IDs for each channel.
-    ///
-    /// This is simply a vecdeque so we can keep track of the order of messages inserted into the
-    /// cache. When a maximum number of messages are in a channel's cache, we can pop the front and
-    /// remove that ID from the cache.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) message_queue: DashMap&lt;ChannelId, VecDeque&lt;MessageId&gt;, BuildHasher&gt;,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) messages: DashMap&lt;ChannelId, VecDeque&lt;Message&gt;, BuildHasher&gt;,
 
     <span class="comment">// Miscellanous fixed-size data
     // ---
@@ -998,7 +982,6 @@
             presences: MaybeMap(settings.cache_users.then(DashMap::default)),
 
             messages: DashMap::default(),
-            message_queue: DashMap::default(),
 
             shard_data: RwLock::new(CachedShardData {
                 total: NonZeroU16::MIN,
@@ -1124,10 +1107,10 @@
     /// # use serenity::model::id::ChannelId;
     /// #
     /// # let cache: serenity::cache::Cache = todo!();
-    /// let messages_in_channel = cache.channel_messages(ChannelId::new(7));
-    /// let messages_by_user = messages_in_channel
-    ///     .as_ref()
-    ///     .map(|msgs| msgs.values().filter(|m| m.author.id == 8).collect::&lt;Vec&lt;_&gt;&gt;());
+    /// if let Some(messages_in_channel) = cache.channel_messages(ChannelId::new(7)) {
+    ///     let messages_by_user: Vec&lt;_&gt; =
+    ///         messages_in_channel.iter().filter(|m| m.author.id == 8).collect();
+    /// }
     /// ```
     </span><span class="kw">pub fn </span>channel_messages(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelMessagesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>.messages.get(<span class="kw-2">&amp;</span>channel_id).map(CacheRef::from_ref)
@@ -1273,8 +1256,9 @@
             <span class="kw">return </span><span class="prelude-val">Some</span>(CacheRef::from_arc(message));
         }
 
-        <span class="kw">let </span>channel_messages = <span class="self">self</span>.messages.get(<span class="kw-2">&amp;</span>channel_id)<span class="question-mark">?</span>;
-        <span class="kw">let </span>message = channel_messages.try_map(|messages| messages.get(<span class="kw-2">&amp;</span>message_id)).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>messages = <span class="self">self</span>.messages.get(<span class="kw-2">&amp;</span>channel_id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>message =
+            messages.try_map(|messages| messages.iter().find(|m| m.id == message_id)).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(message))
     }
 
@@ -1432,7 +1416,7 @@
 
             <span class="macro">assert_eq!</span>(channel.len(), <span class="number">2</span>);
             <span class="comment">// Check that the first message is now removed.
-            </span><span class="macro">assert!</span>(!channel.contains_key(<span class="kw-2">&amp;</span>MessageId::new(<span class="number">3</span>)));
+            </span><span class="macro">assert!</span>(!channel.iter().any(|m| m.id == MessageId::new(<span class="number">3</span>)));
         }
 
         <span class="kw">let </span>channel = GuildChannel {
