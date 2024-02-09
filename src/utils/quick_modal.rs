@@ -24,7 +24,7 @@ pub struct QuickModalResponse {
 ///     .paragraph_field("Hobbies and interests");
 /// let response = interaction.quick_modal(ctx, modal).await?;
 /// let inputs = response.unwrap().inputs;
-/// let (first_name, last_name, hobbies) = (&inputs[0_usize], &inputs[1_usize], &inputs[2_usize]);
+/// let (first_name, last_name, hobbies) = (&inputs[0], &inputs[1], &inputs[2]);
 /// # Ok(())
 /// # }
 /// ```
