@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/bridge/shard_queuer.rs`."><title>shard_queuer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (98aa3624b 2024-02-08)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/bridge/shard_queuer.rs`."><title>shard_queuer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (6cc484351 2024-02-10)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -343,9 +343,6 @@
 <a href="#341" id="341">341</a>
 <a href="#342" id="342">342</a>
 <a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::sync::Arc;
@@ -649,47 +646,44 @@
 /// [`max_concurrency`](crate::model::gateway::SessionStartLimit::max_concurrency).
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub struct </span>ShardQueue {
-    buckets: HashMap&lt;u16, VecDeque&lt;ShardId&gt;&gt;,
-    max_concurrency: NonZeroU16,
+    buckets: FixedArray&lt;VecDeque&lt;ShardId&gt;, u16&gt;,
 }
 
 <span class="kw">impl </span>ShardQueue {
     <span class="kw">pub fn </span>new(max_concurrency: NonZeroU16) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>buckets = <span class="macro">vec!</span>[VecDeque::new(); max_concurrency.get() <span class="kw">as </span>usize].into_boxed_slice();
+        <span class="kw">let </span>buckets = FixedArray::try_from(buckets).expect(<span class="string">"should fit without truncation"</span>);
+
         <span class="self">Self </span>{
-            buckets: HashMap::with_capacity(max_concurrency.get() <span class="kw">as </span>usize),
-            max_concurrency,
+            buckets,
         }
+    }
+
+    <span class="kw">fn </span>calculate_bucket(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId) -&gt; u16 {
+        shard_id.<span class="number">0 </span>% <span class="self">self</span>.buckets.len()
     }
 
     <span class="doccomment">/// Calculates the corresponding bucket for the given `ShardId` and **appends** to it.
     </span><span class="kw">pub fn </span>push_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId) {
-        <span class="kw">let </span>bucket = shard_id.<span class="number">0 </span>% <span class="self">self</span>.max_concurrency.get();
-        <span class="self">self</span>.buckets.entry(bucket).or_default().push_back(shard_id);
+        <span class="kw">let </span>bucket = <span class="self">self</span>.calculate_bucket(shard_id);
+        <span class="self">self</span>.buckets[bucket].push_back(shard_id);
     }
 
     <span class="doccomment">/// Calculates the corresponding bucket for the given `ShardId` and **prepends** to it.
     </span><span class="kw">pub fn </span>push_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>, shard_id: ShardId) {
-        <span class="kw">let </span>bucket = shard_id.<span class="number">0 </span>% <span class="self">self</span>.max_concurrency.get();
-        <span class="self">self</span>.buckets.entry(bucket).or_default().push_front(shard_id);
+        <span class="kw">let </span>bucket = <span class="self">self</span>.calculate_bucket(shard_id);
+        <span class="self">self</span>.buckets[bucket].push_front(shard_id);
     }
 
     <span class="doccomment">/// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
     </span><span class="kw">pub fn </span>pop_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;ShardId&gt; {
-        (<span class="number">0</span>..<span class="self">self</span>.max_concurrency.get())
-            .filter_map(|i| <span class="self">self</span>.buckets.get_mut(<span class="kw-2">&amp;</span>i).and_then(VecDeque::pop_front))
-            .collect()
+        <span class="self">self</span>.buckets.iter_mut().filter_map(VecDeque::pop_front).collect()
     }
 
     <span class="doccomment">/// Returns `true` if every bucket contains at least one `ShardId`.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>buckets_filled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.max_concurrency.get() {
-            <span class="kw">let </span><span class="prelude-val">Some</span>(bucket) = <span class="self">self</span>.buckets.get(<span class="kw-2">&amp;</span>i) <span class="kw">else </span>{ <span class="kw">return </span><span class="bool-val">false </span>};
-            <span class="kw">if </span>bucket.is_empty() {
-                <span class="kw">return </span><span class="bool-val">false</span>;
-            }
-        }
-        <span class="bool-val">true
-    </span>}
+        <span class="self">self</span>.buckets.iter().all(|b| !b.is_empty())
+    }
 }
 </code></pre></div></section></main></body></html>
