@@ -136,7 +136,7 @@ impl ClientBuilder {
     }
 
     /// Sets the global data type that can be accessed from [`Context::data`].
-    pub fn data(mut self, data: Arc<dyn std::any::Any + Send + Sync>) -> Self {
+    pub fn data<D: std::any::Any + Send + Sync>(mut self, data: Arc<D>) -> Self {
         self.data = Some(data);
         self
     }
