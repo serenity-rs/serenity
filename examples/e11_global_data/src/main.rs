@@ -73,8 +73,10 @@ async fn main() {
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(&token, intents)
-        // We have to use `as` to turn our UserData into `dyn Any`.
-        .data(Arc::new(data) as _)
+        // Specifying the data type as a type argument here is optional, but if done, you can
+        // guarantee that Context::data will not panic if the same type is given, as providing the
+        // incorrect type will lead to a compiler error, rather than a runtime panic.
+        .data::<UserData>(Arc::new(data))
         .event_handler(Handler)
         .await
         .expect("Err creating client");
