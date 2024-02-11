@@ -928,7 +928,7 @@
     }
 
     <span class="doccomment">/// Sets the global data type that can be accessed from [`Context::data`].
-    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>data&lt;D: std::any::Any + Send + Sync&gt;(<span class="kw-2">mut </span><span class="self">self</span>, data: Arc&lt;D&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.data = <span class="prelude-val">Some</span>(data);
         <span class="self">self
     </span>}
