@@ -301,46 +301,43 @@ impl ShardQueuer {
 /// [`max_concurrency`](crate::model::gateway::SessionStartLimit::max_concurrency).
 #[must_use]
 pub struct ShardQueue {
-    buckets: HashMap<u16, VecDeque<ShardId>>,
-    max_concurrency: NonZeroU16,
+    buckets: FixedArray<VecDeque<ShardId>, u16>,
 }
 
 impl ShardQueue {
     pub fn new(max_concurrency: NonZeroU16) -> Self {
+        let buckets = vec![VecDeque::new(); max_concurrency.get() as usize].into_boxed_slice();
+        let buckets = FixedArray::try_from(buckets).expect("should fit without truncation");
+
         Self {
-            buckets: HashMap::with_capacity(max_concurrency.get() as usize),
-            max_concurrency,
+            buckets,
         }
+    }
+
+    fn calculate_bucket(&self, shard_id: ShardId) -> u16 {
+        shard_id.0 % self.buckets.len()
     }
 
     /// Calculates the corresponding bucket for the given `ShardId` and **appends** to it.
     pub fn push_back(&mut self, shard_id: ShardId) {
-        let bucket = shard_id.0 % self.max_concurrency.get();
-        self.buckets.entry(bucket).or_default().push_back(shard_id);
+        let bucket = self.calculate_bucket(shard_id);
+        self.buckets[bucket].push_back(shard_id);
     }
 
     /// Calculates the corresponding bucket for the given `ShardId` and **prepends** to it.
     pub fn push_front(&mut self, shard_id: ShardId) {
-        let bucket = shard_id.0 % self.max_concurrency.get();
-        self.buckets.entry(bucket).or_default().push_front(shard_id);
+        let bucket = self.calculate_bucket(shard_id);
+        self.buckets[bucket].push_front(shard_id);
     }
 
     /// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
     pub fn pop_batch(&mut self) -> Vec<ShardId> {
-        (0..self.max_concurrency.get())
-            .filter_map(|i| self.buckets.get_mut(&i).and_then(VecDeque::pop_front))
-            .collect()
+        self.buckets.iter_mut().filter_map(VecDeque::pop_front).collect()
     }
 
     /// Returns `true` if every bucket contains at least one `ShardId`.
     #[must_use]
     pub fn buckets_filled(&self) -> bool {
-        for i in 0..self.max_concurrency.get() {
-            let Some(bucket) = self.buckets.get(&i) else { return false };
-            if bucket.is_empty() {
-                return false;
-            }
-        }
-        true
+        self.buckets.iter().all(|b| !b.is_empty())
     }
 }
