@@ -331,11 +331,9 @@ impl ShardRunner {
                         .await;
                 },
                 Event::VoiceServerUpdate(event) => {
-                    if let Some(guild_id) = event.guild_id {
-                        voice_manager
-                            .server_update(guild_id, event.endpoint.as_deref(), &event.token)
-                            .await;
-                    }
+                    voice_manager
+                        .server_update(event.guild_id, event.endpoint.as_deref(), &event.token)
+                        .await;
                 },
                 Event::VoiceStateUpdate(event) => {
                     if let Some(guild_id) = event.voice_state.guild_id {
