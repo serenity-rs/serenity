@@ -752,7 +752,7 @@ pub struct UserUpdateEvent {
 #[non_exhaustive]
 pub struct VoiceServerUpdateEvent {
     pub token: FixedString,
-    pub guild_id: Option<GuildId>,
+    pub guild_id: GuildId,
     pub endpoint: Option<FixedString>,
 }
 
