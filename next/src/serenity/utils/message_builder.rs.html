@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/message_builder.rs`."><title>message_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (b381d3ab2 2024-02-12)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/message_builder.rs`."><title>message_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (ee9c7c940 2024-02-14)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1385,57 +1385,6 @@
 <a href="#1383" id="1383">1383</a>
 <a href="#1384" id="1384">1384</a>
 <a href="#1385" id="1385">1385</a>
-<a href="#1386" id="1386">1386</a>
-<a href="#1387" id="1387">1387</a>
-<a href="#1388" id="1388">1388</a>
-<a href="#1389" id="1389">1389</a>
-<a href="#1390" id="1390">1390</a>
-<a href="#1391" id="1391">1391</a>
-<a href="#1392" id="1392">1392</a>
-<a href="#1393" id="1393">1393</a>
-<a href="#1394" id="1394">1394</a>
-<a href="#1395" id="1395">1395</a>
-<a href="#1396" id="1396">1396</a>
-<a href="#1397" id="1397">1397</a>
-<a href="#1398" id="1398">1398</a>
-<a href="#1399" id="1399">1399</a>
-<a href="#1400" id="1400">1400</a>
-<a href="#1401" id="1401">1401</a>
-<a href="#1402" id="1402">1402</a>
-<a href="#1403" id="1403">1403</a>
-<a href="#1404" id="1404">1404</a>
-<a href="#1405" id="1405">1405</a>
-<a href="#1406" id="1406">1406</a>
-<a href="#1407" id="1407">1407</a>
-<a href="#1408" id="1408">1408</a>
-<a href="#1409" id="1409">1409</a>
-<a href="#1410" id="1410">1410</a>
-<a href="#1411" id="1411">1411</a>
-<a href="#1412" id="1412">1412</a>
-<a href="#1413" id="1413">1413</a>
-<a href="#1414" id="1414">1414</a>
-<a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
-<a href="#1417" id="1417">1417</a>
-<a href="#1418" id="1418">1418</a>
-<a href="#1419" id="1419">1419</a>
-<a href="#1420" id="1420">1420</a>
-<a href="#1421" id="1421">1421</a>
-<a href="#1422" id="1422">1422</a>
-<a href="#1423" id="1423">1423</a>
-<a href="#1424" id="1424">1424</a>
-<a href="#1425" id="1425">1425</a>
-<a href="#1426" id="1426">1426</a>
-<a href="#1427" id="1427">1427</a>
-<a href="#1428" id="1428">1428</a>
-<a href="#1429" id="1429">1429</a>
-<a href="#1430" id="1430">1430</a>
-<a href="#1431" id="1431">1431</a>
-<a href="#1432" id="1432">1432</a>
-<a href="#1433" id="1433">1433</a>
-<a href="#1434" id="1434">1434</a>
-<a href="#1435" id="1435">1435</a>
-<a href="#1436" id="1436">1436</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self </span><span class="kw">as </span>fmt, Write};
 <span class="kw">use </span>std::ops::Add;
 
@@ -1471,6 +1420,7 @@
 /// # }
 /// ```
 </span><span class="attr">#[derive(Clone, Debug, Default)]
+#[must_use]
 </span><span class="kw">pub struct </span>MessageBuilder(<span class="kw">pub </span>String);
 
 <span class="kw">impl </span>MessageBuilder {
@@ -1488,7 +1438,6 @@
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
-    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>new() -&gt; MessageBuilder {
         MessageBuilder::default()
     }
@@ -1516,13 +1465,12 @@
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let mut content = MessageBuilder::new();
-    /// content.push("test");
-    ///
+    /// let mut content = MessageBuilder::new().push("test");
     /// assert_eq!(content.build(), "test");
     /// ```
-    </span><span class="kw">pub fn </span>build(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; String {
-        <span class="self">self</span>.clone().<span class="number">0
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.<span class="number">0
     </span>}
 
     <span class="doccomment">/// Mentions the [`GuildChannel`] in the built message.
@@ -1551,7 +1499,7 @@
     /// [`Channel`]: crate::model::channel::Channel
     /// [`GuildChannel`]: crate::model::channel::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
-    </span><span class="kw">pub fn </span>channel(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: ChannelId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>channel(<span class="kw-2">mut </span><span class="self">self</span>, channel: ChannelId) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>channel.mention());
         <span class="self">self
     </span>}
@@ -1581,13 +1529,13 @@
     /// ```
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
-    </span><span class="kw">pub fn </span>emoji(<span class="kw-2">&amp;mut </span><span class="self">self</span>, emoji: <span class="kw-2">&amp;</span>Emoji) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>emoji(<span class="kw-2">mut </span><span class="self">self</span>, emoji: <span class="kw-2">&amp;</span>Emoji) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>emoji);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Mentions something that implements the [`Mentionable`] trait.
-    </span><span class="kw">pub fn </span>mention&lt;M: Mentionable&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>M) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>mention&lt;M: Mentionable&gt;(<span class="kw-2">mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>M) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>item.mention());
         <span class="self">self
     </span>}
@@ -1602,26 +1550,19 @@
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let mut message = MessageBuilder::new();
-    /// message.push("test");
+    /// let message = MessageBuilder::new().push("test");
     ///
-    /// assert_eq!(
-    ///     {
-    ///         message.push("ing");
-    ///         message.build()
-    ///     },
-    ///     "testing"
-    /// );
+    /// assert_eq!(message.push("ing").build(), "testing");
     /// ```
-    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into())
-    }
-
-    <span class="kw">fn </span>_push&lt;C: std::fmt::Display + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw-2">&amp;</span>C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">"{content}"</span>).unwrap();
+    </span><span class="kw">pub fn </span>push&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
 
         <span class="self">self
     </span>}
+
+    <span class="kw">fn </span>_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw-2">&amp;</span><span class="kw">dyn </span>std::fmt::Display) {
+        <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">"{content}"</span>).unwrap();
+    }
 
     <span class="doccomment">/// Pushes a codeblock to the content, with optional syntax highlighting.
     ///
@@ -1661,11 +1602,11 @@
     ///
     /// assert_eq!(content, "```\nhello\n```");
     /// ```
-    </span><span class="kw">pub fn </span>push_codeblock(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        content: <span class="kw">impl </span>Into&lt;Content&gt;,
+    </span><span class="kw">pub fn </span>push_codeblock&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
         language: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"```"</span>);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(language) = language {
@@ -1703,7 +1644,7 @@
     ///
     /// assert_eq!(content, expected);
     /// ```
-    </span><span class="kw">pub fn </span>push_mono(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_mono&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'`'</span>);
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'`'</span>);
@@ -1732,7 +1673,7 @@
     ///
     /// assert_eq!(content, expected);
     /// ```
-    </span><span class="kw">pub fn </span>push_italic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_italic&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'_'</span>);
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'_'</span>);
@@ -1741,7 +1682,7 @@
     </span>}
 
     <span class="doccomment">/// Pushes an inline bold text to the content.
-    </span><span class="kw">pub fn </span>push_bold(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_bold&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"**"</span>);
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"**"</span>);
@@ -1750,7 +1691,7 @@
     </span>}
 
     <span class="doccomment">/// Pushes an underlined inline text to the content.
-    </span><span class="kw">pub fn </span>push_underline(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_underline&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"__"</span>);
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"__"</span>);
@@ -1759,7 +1700,7 @@
     </span>}
 
     <span class="doccomment">/// Pushes a strikethrough inline text to the content.
-    </span><span class="kw">pub fn </span>push_strike(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_strike&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"~~"</span>);
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"~~"</span>);
@@ -1768,7 +1709,7 @@
     </span>}
 
     <span class="doccomment">/// Pushes a spoiler'd inline text to the content.
-    </span><span class="kw">pub fn </span>push_spoiler(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_spoiler&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"||"</span>);
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"||"</span>);
@@ -1777,7 +1718,7 @@
     </span>}
 
     <span class="doccomment">/// Pushes a quoted inline text to the content
-    </span><span class="kw">pub fn </span>push_quote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_quote&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"&gt; "</span>);
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
 
@@ -1797,8 +1738,8 @@
     ///
     /// assert_eq!(content, "hello\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push(content);
+    </span><span class="kw">pub fn </span>push_line&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
         <span class="self">self
@@ -1817,12 +1758,12 @@
     ///
     /// assert_eq!(content, "`hello`\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_mono_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_mono(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_mono_line&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_mono(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes an inlined italicized text with an added newline to the content.
     ///
@@ -1837,12 +1778,12 @@
     ///
     /// assert_eq!(content, "_hello_\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_italic_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_italic(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_italic_line&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_italic(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes an inline bold text with an added newline to the content.
     ///
@@ -1857,12 +1798,12 @@
     ///
     /// assert_eq!(content, "**hello**\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_bold_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_bold(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_bold_line&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_bold(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes an underlined inline text with an added newline to the content.
     ///
@@ -1877,12 +1818,12 @@
     ///
     /// assert_eq!(content, "__hello__\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_underline_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_underline(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_underline_line&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_underline(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes a strikethrough inline text with a newline added to the content.
     ///
@@ -1897,12 +1838,12 @@
     ///
     /// assert_eq!(content, "~~hello~~\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_strike_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_strike(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_strike_line&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_strike(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes a spoiler'd inline text with a newline added to the content.
     ///
@@ -1917,12 +1858,12 @@
     ///
     /// assert_eq!(content, "||hello||\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_spoiler_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_spoiler(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_spoiler_line&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_spoiler(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes a quoted inline text to the content
     ///
@@ -1937,33 +1878,39 @@
     ///
     /// assert_eq!(content, "&gt; hello\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_quote_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_quote(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_quote_line&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_quote(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
+
+    <span class="kw">fn </span>_push_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: Content&lt;<span class="lifetime">'_</span>&gt;, norm: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>str) -&gt; String) {
+        <span class="kw">let </span>safe_content = norm(content.inner);
+        <span class="kw">let </span>safe_content = Content {
+            inner: <span class="kw-2">&amp;</span>safe_content,
+            ..content
+        };
+
+        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>safe_content);
+    }
 
     <span class="doccomment">/// Pushes text to your message, but normalizing content - that means ensuring that there's no
     /// unwanted formatting, mention spam etc.
-    </span><span class="kw">pub fn </span>push_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner =
-                normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">'*'</span>, <span class="string">"\\*"</span>).replace(<span class="string">'`'</span>, <span class="string">"\\`"</span>).replace(<span class="string">'_'</span>, <span class="string">"\\_"</span>);
-
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+    </span><span class="kw">pub fn </span>push_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>._push_safe(content.into(), |c| {
+            normalize(c).replace(<span class="string">'*'</span>, <span class="string">"\\*"</span>).replace(<span class="string">'`'</span>, <span class="string">"\\`"</span>).replace(<span class="string">'_'</span>, <span class="string">"\\_"</span>)
+        });
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes a code-block to your message normalizing content.
-    </span><span class="kw">pub fn </span>push_codeblock_safe(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        content: <span class="kw">impl </span>Into&lt;Content&gt;,
+    </span><span class="kw">pub fn </span>push_codeblock_safe&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
         language: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"```"</span>);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(language) = language {
@@ -1971,102 +1918,70 @@
         }
 
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"```"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">"```"</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"\n```"</span>);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes an inline monospaced text to the content normalizing content.
-    </span><span class="kw">pub fn </span>push_mono_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_mono_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'`'</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">'`'</span>, <span class="string">"'"</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">'`'</span>, <span class="string">"'"</span>));
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'`'</span>);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes an inline italicized text to the content normalizing content.
-    </span><span class="kw">pub fn </span>push_italic_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_italic_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'_'</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">'_'</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">'_'</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'_'</span>);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes an inline bold text to the content normalizing content.
-    </span><span class="kw">pub fn </span>push_bold_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_bold_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"**"</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"**"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">"**"</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"**"</span>);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes an underlined inline text to the content normalizing content.
-    </span><span class="kw">pub fn </span>push_underline_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_underline_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"__"</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"__"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">"__"</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"__"</span>);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes a strikethrough inline text to the content normalizing content.
-    </span><span class="kw">pub fn </span>push_strike_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_strike_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"~~"</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"~~"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">"~~"</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"~~"</span>);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes a spoiler'd inline text to the content normalizing content.
-    </span><span class="kw">pub fn </span>push_spoiler_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_spoiler_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"||"</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"||"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">"||"</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"||"</span>);
 
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Pushes a quoted inline text to the content normalizing content.
-    </span><span class="kw">pub fn </span>push_quote_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>push_quote_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"&gt; "</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"&gt; "</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(content.into(), |c| normalize(c).replace(<span class="string">"&gt; "</span>, <span class="string">" "</span>));
 
         <span class="self">self
     </span>}
@@ -2085,12 +2000,12 @@
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
-    </span><span class="kw">pub fn </span>push_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes an inline monospaced text with added newline to the content normalizing content.
     ///
@@ -2106,12 +2021,12 @@
     ///
     /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
     /// ```
-    </span><span class="kw">pub fn </span>push_mono_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_mono_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_mono_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_mono_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes an inline italicized text with added newline to the content normalizing content.
     ///
@@ -2127,12 +2042,12 @@
     ///
     /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
     /// ```
-    </span><span class="kw">pub fn </span>push_italic_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_italic_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_italic_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_italic_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes an inline bold text with added newline to the content normalizing content.
     ///
@@ -2148,12 +2063,12 @@
     ///
     /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
     /// ```
-    </span><span class="kw">pub fn </span>push_bold_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_bold_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_bold_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_bold_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes an underlined inline text with added newline to the content normalizing content.
     ///
@@ -2171,12 +2086,12 @@
     ///
     /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
     /// ```
-    </span><span class="kw">pub fn </span>push_underline_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_underline_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_underline_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_underline_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes a strikethrough inline text with added newline to the content normalizing content.
     ///
@@ -2192,12 +2107,12 @@
     ///
     /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
     /// ```
-    </span><span class="kw">pub fn </span>push_strike_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_strike_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_strike_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_strike_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes a spoiler'd inline text with added newline to the content normalizing content.
     ///
@@ -2213,12 +2128,12 @@
     ///
     /// assert_eq!(content, "||@\u{200B}everyone||\nIsn't a mention.");
     /// ```
-    </span><span class="kw">pub fn </span>push_spoiler_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_spoiler_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_spoiler_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_spoiler_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Pushes a quoted inline text with added newline to the content normalizing content.
     ///
@@ -2234,15 +2149,15 @@
     ///
     /// assert_eq!(content, "&gt; @\u{200B}everyone\nIsn't a mention.");
     /// ```
-    </span><span class="kw">pub fn </span>push_quote_line_safe(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>.push_quote_safe(content);
-        <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
+    </span><span class="kw">pub fn </span>push_quote_line_safe&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.push_quote_safe(content);
+        this.<span class="number">0</span>.push(<span class="string">'\n'</span>);
 
-        <span class="self">self
-    </span>}
+        this
+    }
 
     <span class="doccomment">/// Starts a multi-line quote, every push after this one will be quoted
-    </span><span class="kw">pub fn </span>quote_rest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>quote_rest(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"\n&gt;&gt;&gt; "</span>);
 
         <span class="self">self
@@ -2255,7 +2170,7 @@
     ///
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
-    </span><span class="kw">pub fn </span>role(<span class="kw-2">&amp;mut </span><span class="self">self</span>, role: RoleId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>role(<span class="kw-2">mut </span><span class="self">self</span>, role: RoleId) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>role.mention());
         <span class="self">self
     </span>}
@@ -2267,7 +2182,7 @@
     ///
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
-    </span><span class="kw">pub fn </span>user(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: UserId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>user(<span class="kw-2">mut </span><span class="self">self</span>, user: UserId) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>._push(<span class="kw-2">&amp;</span>user.mention());
         <span class="self">self
     </span>}
@@ -2321,14 +2236,16 @@
     /// ```rust
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    /// let mut msg = MessageBuilder::new();
-    /// msg.push("Rust's website: ");
-    /// msg.push_named_link("Homepage", "https://rust-lang.org");
-    /// let content = msg.build();
+    /// let content = MessageBuilder::new()
+    ///     .push("Rust's website: ")
+    ///     .push_named_link("Homepage", "https://rust-lang.org")
+    ///     .build();
     ///
     /// assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
     /// ```
-    </span><span class="kw">fn </span>push_named_link(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Content&gt;, url: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>;
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">fn </span>push_named_link&lt;<span class="lifetime">'a</span>&gt;(<span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;, url: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;)
+        -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// Pushes a named link intended for use in an embed, but with a normalized name to avoid
     /// escaping issues.
@@ -2340,44 +2257,41 @@
     /// ```rust
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    /// let mut msg = MessageBuilder::new();
-    /// msg.push("A weird website name: ");
-    /// msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
-    /// let content = msg.build();
+    /// let content = MessageBuilder::new()
+    ///     .push("A weird website name: ")
+    ///     .push_named_link_safe("Try to ] break links (](", "https://rust-lang.org")
+    ///     .build();
     ///
     /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
     /// ```
-    </span><span class="kw">fn </span>push_named_link_safe(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        name: <span class="kw">impl </span>Into&lt;Content&gt;,
-        url: <span class="kw">impl </span>Into&lt;Content&gt;,
-    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>;
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">fn </span>push_named_link_safe&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="self">self</span>,
+        name: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
+        url: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    ) -&gt; <span class="self">Self</span>;
 }
 
 <span class="kw">impl </span>EmbedMessageBuilding <span class="kw">for </span>MessageBuilder {
-    <span class="kw">fn </span>push_named_link(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Content&gt;, url: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    <span class="kw">fn </span>push_named_link&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        name: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
+        url: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
         <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">"[{}]({})"</span>, name.into(), url.into()).unwrap();
 
         <span class="self">self
     </span>}
 
-    <span class="kw">fn </span>push_named_link_safe(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        name: <span class="kw">impl </span>Into&lt;Content&gt;,
-        url: <span class="kw">impl </span>Into&lt;Content&gt;,
-    ) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    <span class="kw">fn </span>push_named_link_safe&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        name: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
+        url: <span class="kw">impl </span>Into&lt;Content&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'['</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = name.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">']'</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(name.into(), |c| normalize(c).replace(<span class="string">']'</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"]("</span>);
-        {
-            <span class="kw">let </span><span class="kw-2">mut </span>c = url.into();
-            c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">')'</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
-        }
+        <span class="self">self</span>._push_safe(url.into(), |c| normalize(c).replace(<span class="string">')'</span>, <span class="string">" "</span>));
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">')'</span>);
 
         <span class="self">self
@@ -2396,9 +2310,10 @@
 /// ```rust,no_run
 /// use serenity::utils::Content;
 /// use serenity::utils::ContentModifier::{Bold, Italic};
-/// let content: Content = Bold + Italic + "text";
+/// let content: Content = "text" + Bold + Italic;
 /// ```
 </span><span class="attr">#[non_exhaustive]
+#[derive(Clone, Copy)]
 </span><span class="kw">pub enum </span>ContentModifier {
     Italic,
     Bold,
@@ -2408,95 +2323,78 @@
     Spoiler,
 }
 
-<span class="attr">#[bool_to_bitflags::bool_to_bitflags]
+<span class="attr">#[bool_to_bitflags::bool_to_bitflags(owning_setters)]
 </span><span class="doccomment">/// Describes formatting on string content
 </span><span class="attr">#[derive(Clone, Debug, Default)]
-</span><span class="kw">pub struct </span>Content {
+</span><span class="kw">pub struct </span>Content&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">pub </span>italic: bool,
     <span class="kw">pub </span>bold: bool,
     <span class="kw">pub </span>strikethrough: bool,
-    <span class="kw">pub </span>inner: String,
+    <span class="kw">pub </span>inner: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
     <span class="kw">pub </span>code: bool,
     <span class="kw">pub </span>underline: bool,
     <span class="kw">pub </span>spoiler: bool,
 }
 
-<span class="kw">impl</span>&lt;T: AsRef&lt;str&gt;&gt; Add&lt;T&gt; <span class="kw">for </span>Content {
-    <span class="kw">type </span>Output = Content;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Add&lt;ContentModifier&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>str {
+    <span class="kw">type </span>Output = Content&lt;<span class="lifetime">'a</span>&gt;;
 
-    <span class="kw">fn </span>add(<span class="kw-2">mut </span><span class="self">self</span>, rhs: T) -&gt; Content {
-        <span class="self">self</span>.inner += rhs.as_ref();
+    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: ContentModifier) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">let </span>content = Content {
+            inner: <span class="self">self</span>,
+            ..Default::default()
+        };
 
-        <span class="self">self
-    </span>}
-}
-
-<span class="kw">impl</span>&lt;T: AsRef&lt;str&gt;&gt; Add&lt;T&gt; <span class="kw">for </span>ContentModifier {
-    <span class="kw">type </span>Output = Content;
-
-    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: T) -&gt; Content {
-        <span class="kw">let </span><span class="kw-2">mut </span>nc = <span class="self">self</span>.to_content();
-        nc.inner += rhs.as_ref();
-        nc
+        content.apply(rhs)
     }
 }
 
-<span class="kw">impl </span>Add&lt;ContentModifier&gt; <span class="kw">for </span>Content {
-    <span class="kw">type </span>Output = Content;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Add&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>ContentModifier {
+    <span class="kw">type </span>Output = Content&lt;<span class="lifetime">'a</span>&gt;;
 
-    <span class="kw">fn </span>add(<span class="kw-2">mut </span><span class="self">self</span>, rhs: ContentModifier) -&gt; Content {
-        <span class="self">self</span>.apply(<span class="kw-2">&amp;</span>rhs);
-
-        <span class="self">self
+    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self</span>::Output {
+        rhs + <span class="self">self
     </span>}
 }
 
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Add&lt;ContentModifier&gt; <span class="kw">for </span>Content&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Output = Content&lt;<span class="lifetime">'a</span>&gt;;
+
+    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: ContentModifier) -&gt; Content&lt;<span class="lifetime">'a</span>&gt; {
+        <span class="self">self</span>.apply(rhs)
+    }
+}
+
 <span class="kw">impl </span>Add&lt;ContentModifier&gt; <span class="kw">for </span>ContentModifier {
-    <span class="kw">type </span>Output = Content;
+    <span class="kw">type </span>Output = Content&lt;<span class="lifetime">'static</span>&gt;;
 
-    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: ContentModifier) -&gt; Content {
-        <span class="kw">let </span><span class="kw-2">mut </span>nc = <span class="self">self</span>.to_content();
-        nc.apply(<span class="kw-2">&amp;</span>rhs);
-
-        nc
+    <span class="kw">fn </span>add(<span class="self">self</span>, rhs: ContentModifier) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">let </span>content = <span class="self">self</span>.to_content();
+        content.apply(rhs)
     }
 }
 
 <span class="kw">impl </span>ContentModifier {
-    <span class="kw">fn </span>to_content(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Content {
-        <span class="kw">let </span><span class="kw-2">mut </span>nc = Content::default();
-        nc.apply(<span class="self">self</span>);
-
-        nc
+    <span class="kw">fn </span>to_content(<span class="self">self</span>) -&gt; Content&lt;<span class="lifetime">'static</span>&gt; {
+        Content::default().apply(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl </span>Content {
-    <span class="kw">pub fn </span>apply(<span class="kw-2">&amp;mut </span><span class="self">self</span>, modifier: <span class="kw-2">&amp;</span>ContentModifier) {
-        <span class="kw">match </span><span class="kw-2">*</span>modifier {
-            ContentModifier::Italic =&gt; {
-                <span class="self">self</span>.set_italic(<span class="bool-val">true</span>);
-            },
-            ContentModifier::Bold =&gt; {
-                <span class="self">self</span>.set_bold(<span class="bool-val">true</span>);
-            },
-            ContentModifier::Strikethrough =&gt; {
-                <span class="self">self</span>.set_strikethrough(<span class="bool-val">true</span>);
-            },
-            ContentModifier::Code =&gt; {
-                <span class="self">self</span>.set_code(<span class="bool-val">true</span>);
-            },
-            ContentModifier::Underline =&gt; {
-                <span class="self">self</span>.set_underline(<span class="bool-val">true</span>);
-            },
-            ContentModifier::Spoiler =&gt; {
-                <span class="self">self</span>.set_spoiler(<span class="bool-val">true</span>);
-            },
+<span class="kw">impl </span>Content&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>apply(<span class="self">self</span>, modifier: ContentModifier) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>modifier {
+            ContentModifier::Italic =&gt; <span class="self">self</span>.set_italic(<span class="bool-val">true</span>),
+            ContentModifier::Bold =&gt; <span class="self">self</span>.set_bold(<span class="bool-val">true</span>),
+            ContentModifier::Strikethrough =&gt; <span class="self">self</span>.set_strikethrough(<span class="bool-val">true</span>),
+            ContentModifier::Code =&gt; <span class="self">self</span>.set_code(<span class="bool-val">true</span>),
+            ContentModifier::Underline =&gt; <span class="self">self</span>.set_underline(<span class="bool-val">true</span>),
+            ContentModifier::Spoiler =&gt; <span class="self">self</span>.set_spoiler(<span class="bool-val">true</span>),
         }
     }
 }
 
-<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Content {
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Content&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">if </span><span class="self">self</span>.spoiler() {
             fmt.write_str(<span class="string">"||"</span>)<span class="question-mark">?</span>;
@@ -2522,7 +2420,7 @@
             fmt.write_char(<span class="string">'`'</span>)<span class="question-mark">?</span>;
         }
 
-        fmt.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.inner)<span class="question-mark">?</span>;
+        fmt.write_str(<span class="self">self</span>.inner)<span class="question-mark">?</span>;
 
         <span class="kw">if </span><span class="self">self</span>.code() {
             fmt.write_char(<span class="string">'`'</span>)<span class="question-mark">?</span>;
@@ -2552,10 +2450,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;T: Into&lt;String&gt;&gt; From&lt;T&gt; <span class="kw">for </span>Content {
-    <span class="kw">fn </span>from(t: T) -&gt; Content {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Content&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(inner: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; Content&lt;<span class="lifetime">'a</span>&gt; {
         Content {
-            inner: t.into(),
+            inner,
             ..Default::default()
         }
     }
@@ -2645,11 +2543,11 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>content() {
-        <span class="kw">let </span>content = Bold + Italic + Code + <span class="string">"Fun!"</span>;
+        <span class="kw">let </span>content = <span class="string">"Fun!" </span>+ Bold + Italic + Code;
 
         <span class="macro">assert_eq!</span>(content.to_string(), <span class="string">"***`Fun!`***"</span>);
 
-        <span class="kw">let </span>content = Spoiler + Bold + <span class="string">"Divert your eyes elsewhere"</span>;
+        <span class="kw">let </span>content = <span class="string">"Divert your eyes elsewhere" </span>+ Spoiler + Bold;
 
         <span class="macro">assert_eq!</span>(content.to_string(), <span class="string">"||**Divert your eyes elsewhere**||"</span>);
     }
@@ -2662,21 +2560,21 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>message_content() {
-        <span class="kw">let </span>message_content = MessageBuilder::new().push(Bold + Italic + Code + <span class="string">"Fun!"</span>).build();
+        <span class="kw">let </span>message_content = MessageBuilder::new().push(<span class="string">"Fun!" </span>+ Bold + Italic + Code).build();
 
         <span class="macro">assert_eq!</span>(message_content, <span class="string">"***`Fun!`***"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>message_content_safe() {
-        <span class="kw">let </span>message_content = MessageBuilder::new().push_safe(Bold + Italic + <span class="string">"test**test"</span>).build();
+        <span class="kw">let </span>message_content = MessageBuilder::new().push_safe(<span class="string">"test**test" </span>+ Bold + Italic).build();
 
         <span class="macro">assert_eq!</span>(message_content, <span class="string">"***test\\*\\*test***"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>push() {
-        <span class="macro">assert_eq!</span>(MessageBuilder::new().push(<span class="string">'a'</span>).<span class="number">0</span>, <span class="string">"a"</span>);
+        <span class="macro">assert_eq!</span>(MessageBuilder::new().push(<span class="string">"a"</span>).<span class="number">0</span>, <span class="string">"a"</span>);
         <span class="macro">assert!</span>(MessageBuilder::new().push(<span class="string">""</span>).<span class="number">0</span>.is_empty());
     }
 
@@ -2786,7 +2684,7 @@
             push_bold =&gt; [
                 <span class="string">"a" </span>=&gt; <span class="string">"**a**"</span>,
                 <span class="string">"" </span>=&gt; <span class="string">"****"</span>,
-                <span class="string">'*' </span>=&gt; <span class="string">"*****"</span>,
+                <span class="string">"*" </span>=&gt; <span class="string">"*****"</span>,
                 <span class="string">"**" </span>=&gt; <span class="string">"******"
             </span>],
             push_bold_line =&gt; [
