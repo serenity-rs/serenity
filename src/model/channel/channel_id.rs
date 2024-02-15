@@ -535,6 +535,9 @@ impl ChannelId {
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
     ///
+    /// If the cache is enabled, this method will fill up the message cache for the channel, if the
+    /// messages returned are newer than the existing cached messages or the cache is not full yet.
+    ///
     /// **Note**: Returns an empty [`Vec`] if the current user does not have the [Read Message
     /// History] permission.
     ///

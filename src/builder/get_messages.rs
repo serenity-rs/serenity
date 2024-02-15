@@ -89,6 +89,9 @@ impl GetMessages {
 
     /// Gets messages from the channel.
     ///
+    /// If the cache is enabled, this method will fill up the message cache for the channel, if the
+    /// messages returned are newer than the existing cached messages or the cache is not full yet.
+    ///
     /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
     /// [`Vec`].
     ///
