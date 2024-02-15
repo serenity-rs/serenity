@@ -543,8 +543,15 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn pins(self, http: &Http) -> Result<Vec<Message>> {
-        http.get_pins(self).await
+    pub async fn pins(self, cache_http: impl CacheHttp) -> Result<Vec<Message>> {
+        let messages = cache_http.http().get_pins(self).await?;
+
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            cache.fill_message_cache(self, messages.iter().cloned());
+        }
+
+        Ok(messages)
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].

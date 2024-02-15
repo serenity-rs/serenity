@@ -1,5 +1,5 @@
 #[cfg(feature = "http")]
-use crate::http::{Http, MessagePagination};
+use crate::http::{CacheHttp, MessagePagination};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -98,8 +98,21 @@ impl GetMessages {
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
-    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<Vec<Message>> {
-        http.get_messages(channel_id, self.search_filter.map(Into::into), self.limit).await
+    pub async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        channel_id: ChannelId,
+    ) -> Result<Vec<Message>> {
+        let http = cache_http.http();
+        let search_filter = self.search_filter.map(Into::into);
+        let messages = http.get_messages(channel_id, search_filter, self.limit).await?;
+
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            cache.fill_message_cache(channel_id, messages.iter().cloned());
+        }
+
+        Ok(messages)
     }
 }
 
