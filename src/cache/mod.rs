@@ -638,7 +638,8 @@ impl Cache {
         // Make sure the cache stays sorted to messages
         channel_messages.make_contiguous().sort_unstable_by_key(|m| m.id);
         // Get rid of the overflow at the front of the queue.
-        channel_messages.drain(..max_messages);
+        let truncate_end_index = channel_messages.len().saturating_sub(max_messages);
+        channel_messages.drain(..truncate_end_index);
     }
 
     /// Updates the cache with the update implementation for an event or other custom update
