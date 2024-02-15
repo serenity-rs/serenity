@@ -106,10 +106,11 @@ impl CacheHttp for Context {
 }
 
 #[cfg(feature = "cache")]
-impl CacheHttp for (&Arc<Cache>, &Http) {
+impl CacheHttp for (Option<&Arc<Cache>>, &Http) {
     fn cache(&self) -> Option<&Arc<Cache>> {
-        Some(self.0)
+        self.0
     }
+
     fn http(&self) -> &Http {
         self.1
     }
