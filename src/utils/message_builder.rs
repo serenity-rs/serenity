@@ -33,6 +33,7 @@ use crate::model::mention::Mentionable;
 /// # }
 /// ```
 #[derive(Clone, Debug, Default)]
+#[must_use]
 pub struct MessageBuilder(pub String);
 
 impl MessageBuilder {
@@ -50,7 +51,6 @@ impl MessageBuilder {
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
-    #[must_use]
     pub fn new() -> MessageBuilder {
         MessageBuilder::default()
     }
@@ -78,13 +78,12 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let mut content = MessageBuilder::new();
-    /// content.push("test");
-    ///
+    /// let mut content = MessageBuilder::new().push("test");
     /// assert_eq!(content.build(), "test");
     /// ```
-    pub fn build(&mut self) -> String {
-        self.clone().0
+    #[must_use]
+    pub fn build(self) -> String {
+        self.0
     }
 
     /// Mentions the [`GuildChannel`] in the built message.
@@ -113,7 +112,7 @@ impl MessageBuilder {
     /// [`Channel`]: crate::model::channel::Channel
     /// [`GuildChannel`]: crate::model::channel::GuildChannel
     /// [Display implementation]: ChannelId#impl-Display
-    pub fn channel(&mut self, channel: ChannelId) -> &mut Self {
+    pub fn channel(mut self, channel: ChannelId) -> Self {
         self.push_(&channel.mention());
         self
     }
@@ -143,13 +142,13 @@ impl MessageBuilder {
     /// ```
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
-    pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
+    pub fn emoji(mut self, emoji: &Emoji) -> Self {
         self.push_(&emoji);
         self
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
-    pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
+    pub fn mention<M: Mentionable>(mut self, item: &M) -> Self {
         self.push_(&item.mention());
         self
     }
@@ -164,25 +163,18 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let mut message = MessageBuilder::new();
-    /// message.push("test");
+    /// let message = MessageBuilder::new().push("test");
     ///
-    /// assert_eq!(
-    ///     {
-    ///         message.push("ing");
-    ///         message.build()
-    ///     },
-    ///     "testing"
-    /// );
+    /// assert_eq!(message.push("ing").build(), "testing");
     /// ```
-    pub fn push(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_(&content.into())
-    }
-
-    fn push_<C: std::fmt::Display + ?Sized>(&mut self, content: &C) -> &mut Self {
-        write!(self.0, "{content}").unwrap();
+    pub fn push<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
+        self.push_(&content.into());
 
         self
+    }
+
+    fn push_(&mut self, content: &dyn std::fmt::Display) {
+        write!(self.0, "{content}").unwrap();
     }
 
     /// Pushes a codeblock to the content, with optional syntax highlighting.
@@ -223,11 +215,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "```\nhello\n```");
     /// ```
-    pub fn push_codeblock(
-        &mut self,
-        content: impl Into<Content>,
+    pub fn push_codeblock<'a>(
+        mut self,
+        content: impl Into<Content<'a>>,
         language: Option<&str>,
-    ) -> &mut Self {
+    ) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
@@ -265,7 +257,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_mono(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_mono<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push('`');
         self.push_(&content.into());
         self.0.push('`');
@@ -294,7 +286,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    pub fn push_italic(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_italic<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push('_');
         self.push_(&content.into());
         self.0.push('_');
@@ -303,7 +295,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an inline bold text to the content.
-    pub fn push_bold(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_bold<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("**");
         self.push_(&content.into());
         self.0.push_str("**");
@@ -312,7 +304,7 @@ impl MessageBuilder {
     }
 
     /// Pushes an underlined inline text to the content.
-    pub fn push_underline(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_underline<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("__");
         self.push_(&content.into());
         self.0.push_str("__");
@@ -321,7 +313,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a strikethrough inline text to the content.
-    pub fn push_strike(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_strike<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("~~");
         self.push_(&content.into());
         self.0.push_str("~~");
@@ -330,7 +322,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a spoiler'd inline text to the content.
-    pub fn push_spoiler(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_spoiler<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("||");
         self.push_(&content.into());
         self.0.push_str("||");
@@ -339,7 +331,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a quoted inline text to the content
-    pub fn push_quote(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_quote<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("> ");
         self.push_(&content.into());
 
@@ -359,8 +351,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "hello\nworld");
     /// ```
-    pub fn push_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push(content);
+    pub fn push_line<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
+        self.push_(&content.into());
         self.0.push('\n');
 
         self
@@ -379,11 +371,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`hello`\nworld");
     /// ```
-    pub fn push_mono_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_mono(content);
-        self.0.push('\n');
+    pub fn push_mono_line<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_mono(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes an inlined italicized text with an added newline to the content.
@@ -399,11 +391,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_hello_\nworld");
     /// ```
-    pub fn push_italic_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_italic(content);
-        self.0.push('\n');
+    pub fn push_italic_line<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_italic(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes an inline bold text with an added newline to the content.
@@ -419,11 +411,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**hello**\nworld");
     /// ```
-    pub fn push_bold_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_bold(content);
-        self.0.push('\n');
+    pub fn push_bold_line<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_bold(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes an underlined inline text with an added newline to the content.
@@ -439,11 +431,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__hello__\nworld");
     /// ```
-    pub fn push_underline_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_underline(content);
-        self.0.push('\n');
+    pub fn push_underline_line<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_underline(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes a strikethrough inline text with a newline added to the content.
@@ -459,11 +451,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~hello~~\nworld");
     /// ```
-    pub fn push_strike_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_strike(content);
-        self.0.push('\n');
+    pub fn push_strike_line<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_strike(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes a spoiler'd inline text with a newline added to the content.
@@ -479,11 +471,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "||hello||\nworld");
     /// ```
-    pub fn push_spoiler_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_spoiler(content);
-        self.0.push('\n');
+    pub fn push_spoiler_line<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_spoiler(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes a quoted inline text to the content
@@ -499,33 +491,39 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "> hello\nworld");
     /// ```
-    pub fn push_quote_line(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_quote(content);
-        self.0.push('\n');
+    pub fn push_quote_line<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_quote(content);
+        this.0.push('\n');
 
-        self
+        this
+    }
+
+    fn push_safe_(&mut self, content: Content<'_>, norm: impl Fn(&str) -> String) {
+        let safe_content = norm(content.inner);
+        let safe_content = Content {
+            inner: &safe_content,
+            ..content
+        };
+
+        self.push_(&safe_content);
     }
 
     /// Pushes text to your message, but normalizing content - that means ensuring that there's no
     /// unwanted formatting, mention spam etc.
-    pub fn push_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        {
-            let mut c = content.into();
-            c.inner =
-                normalize(&c.inner).replace('*', "\\*").replace('`', "\\`").replace('_', "\\_");
-
-            self.push_(&c);
-        }
+    pub fn push_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
+        self.push_safe_(content.into(), |c| {
+            normalize(c).replace('*', "\\*").replace('`', "\\`").replace('_', "\\_")
+        });
 
         self
     }
 
     /// Pushes a code-block to your message normalizing content.
-    pub fn push_codeblock_safe(
-        &mut self,
-        content: impl Into<Content>,
+    pub fn push_codeblock_safe<'a>(
+        mut self,
+        content: impl Into<Content<'a>>,
         language: Option<&str>,
-    ) -> &mut Self {
+    ) -> Self {
         self.0.push_str("```");
 
         if let Some(language) = language {
@@ -533,102 +531,70 @@ impl MessageBuilder {
         }
 
         self.0.push('\n');
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("```", " ");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace("```", " "));
         self.0.push_str("\n```");
 
         self
     }
 
     /// Pushes an inline monospaced text to the content normalizing content.
-    pub fn push_mono_safe(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_mono_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push('`');
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace('`', "'");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace('`', "'"));
         self.0.push('`');
 
         self
     }
 
     /// Pushes an inline italicized text to the content normalizing content.
-    pub fn push_italic_safe(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_italic_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push('_');
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace('_', " ");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace('_', " "));
         self.0.push('_');
 
         self
     }
 
     /// Pushes an inline bold text to the content normalizing content.
-    pub fn push_bold_safe(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_bold_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("**");
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("**", " ");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace("**", " "));
         self.0.push_str("**");
 
         self
     }
 
     /// Pushes an underlined inline text to the content normalizing content.
-    pub fn push_underline_safe(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_underline_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("__");
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("__", " ");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace("__", " "));
         self.0.push_str("__");
 
         self
     }
 
     /// Pushes a strikethrough inline text to the content normalizing content.
-    pub fn push_strike_safe(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_strike_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("~~");
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("~~", " ");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace("~~", " "));
         self.0.push_str("~~");
 
         self
     }
 
     /// Pushes a spoiler'd inline text to the content normalizing content.
-    pub fn push_spoiler_safe(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_spoiler_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("||");
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("||", " ");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace("||", " "));
         self.0.push_str("||");
 
         self
     }
 
     /// Pushes a quoted inline text to the content normalizing content.
-    pub fn push_quote_safe(&mut self, content: impl Into<Content>) -> &mut Self {
+    pub fn push_quote_safe<'a>(mut self, content: impl Into<Content<'a>>) -> Self {
         self.0.push_str("> ");
-        {
-            let mut c = content.into();
-            c.inner = normalize(&c.inner).replace("> ", " ");
-            self.push_(&c);
-        }
+        self.push_safe_(content.into(), |c| normalize(c).replace("> ", " "));
 
         self
     }
@@ -647,11 +613,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
-    pub fn push_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_safe(content);
-        self.0.push('\n');
+    pub fn push_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes an inline monospaced text with added newline to the content normalizing content.
@@ -668,11 +634,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
     /// ```
-    pub fn push_mono_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_mono_safe(content);
-        self.0.push('\n');
+    pub fn push_mono_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_mono_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes an inline italicized text with added newline to the content normalizing content.
@@ -689,11 +655,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
     /// ```
-    pub fn push_italic_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_italic_safe(content);
-        self.0.push('\n');
+    pub fn push_italic_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_italic_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes an inline bold text with added newline to the content normalizing content.
@@ -710,11 +676,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
     /// ```
-    pub fn push_bold_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_bold_safe(content);
-        self.0.push('\n');
+    pub fn push_bold_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_bold_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes an underlined inline text with added newline to the content normalizing content.
@@ -733,11 +699,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
     /// ```
-    pub fn push_underline_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_underline_safe(content);
-        self.0.push('\n');
+    pub fn push_underline_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_underline_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes a strikethrough inline text with added newline to the content normalizing content.
@@ -754,11 +720,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
     /// ```
-    pub fn push_strike_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_strike_safe(content);
-        self.0.push('\n');
+    pub fn push_strike_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_strike_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes a spoiler'd inline text with added newline to the content normalizing content.
@@ -775,11 +741,11 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "||@\u{200B}everyone||\nIsn't a mention.");
     /// ```
-    pub fn push_spoiler_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_spoiler_safe(content);
-        self.0.push('\n');
+    pub fn push_spoiler_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_spoiler_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Pushes a quoted inline text with added newline to the content normalizing content.
@@ -796,15 +762,15 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "> @\u{200B}everyone\nIsn't a mention.");
     /// ```
-    pub fn push_quote_line_safe(&mut self, content: impl Into<Content>) -> &mut Self {
-        self.push_quote_safe(content);
-        self.0.push('\n');
+    pub fn push_quote_line_safe<'a>(self, content: impl Into<Content<'a>>) -> Self {
+        let mut this = self.push_quote_safe(content);
+        this.0.push('\n');
 
-        self
+        this
     }
 
     /// Starts a multi-line quote, every push after this one will be quoted
-    pub fn quote_rest(&mut self) -> &mut Self {
+    pub fn quote_rest(mut self) -> Self {
         self.0.push_str("\n>>> ");
 
         self
@@ -817,7 +783,7 @@ impl MessageBuilder {
     ///
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
-    pub fn role(&mut self, role: RoleId) -> &mut Self {
+    pub fn role(mut self, role: RoleId) -> Self {
         self.push_(&role.mention());
         self
     }
@@ -829,7 +795,7 @@ impl MessageBuilder {
     ///
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
-    pub fn user(&mut self, user: UserId) -> &mut Self {
+    pub fn user(mut self, user: UserId) -> Self {
         self.push_(&user.mention());
         self
     }
@@ -883,14 +849,16 @@ pub trait EmbedMessageBuilding {
     /// ```rust
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    /// let mut msg = MessageBuilder::new();
-    /// msg.push("Rust's website: ");
-    /// msg.push_named_link("Homepage", "https://rust-lang.org");
-    /// let content = msg.build();
+    /// let content = MessageBuilder::new()
+    ///     .push("Rust's website: ")
+    ///     .push_named_link("Homepage", "https://rust-lang.org")
+    ///     .build();
     ///
     /// assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
     /// ```
-    fn push_named_link(&mut self, name: impl Into<Content>, url: impl Into<Content>) -> &mut Self;
+    #[must_use]
+    fn push_named_link<'a>(self, name: impl Into<Content<'a>>, url: impl Into<Content<'a>>)
+        -> Self;
 
     /// Pushes a named link intended for use in an embed, but with a normalized name to avoid
     /// escaping issues.
@@ -902,44 +870,41 @@ pub trait EmbedMessageBuilding {
     /// ```rust
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    /// let mut msg = MessageBuilder::new();
-    /// msg.push("A weird website name: ");
-    /// msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
-    /// let content = msg.build();
+    /// let content = MessageBuilder::new()
+    ///     .push("A weird website name: ")
+    ///     .push_named_link_safe("Try to ] break links (](", "https://rust-lang.org")
+    ///     .build();
     ///
     /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
     /// ```
-    fn push_named_link_safe(
-        &mut self,
-        name: impl Into<Content>,
-        url: impl Into<Content>,
-    ) -> &mut Self;
+    #[must_use]
+    fn push_named_link_safe<'a>(
+        self,
+        name: impl Into<Content<'a>>,
+        url: impl Into<Content<'a>>,
+    ) -> Self;
 }
 
 impl EmbedMessageBuilding for MessageBuilder {
-    fn push_named_link(&mut self, name: impl Into<Content>, url: impl Into<Content>) -> &mut Self {
+    fn push_named_link<'a>(
+        mut self,
+        name: impl Into<Content<'a>>,
+        url: impl Into<Content<'a>>,
+    ) -> Self {
         write!(self.0, "[{}]({})", name.into(), url.into()).unwrap();
 
         self
     }
 
-    fn push_named_link_safe(
-        &mut self,
-        name: impl Into<Content>,
-        url: impl Into<Content>,
-    ) -> &mut Self {
+    fn push_named_link_safe<'a>(
+        mut self,
+        name: impl Into<Content<'a>>,
+        url: impl Into<Content<'a>>,
+    ) -> Self {
         self.0.push('[');
-        {
-            let mut c = name.into();
-            c.inner = normalize(&c.inner).replace(']', " ");
-            self.push_(&c);
-        }
+        self.push_safe_(name.into(), |c| normalize(c).replace(']', " "));
         self.0.push_str("](");
-        {
-            let mut c = url.into();
-            c.inner = normalize(&c.inner).replace(')', " ");
-            self.push_(&c);
-        }
+        self.push_safe_(url.into(), |c| normalize(c).replace(')', " "));
         self.0.push(')');
 
         self
@@ -958,9 +923,10 @@ impl EmbedMessageBuilding for MessageBuilder {
 /// ```rust,no_run
 /// use serenity::utils::Content;
 /// use serenity::utils::ContentModifier::{Bold, Italic};
-/// let content: Content = Bold + Italic + "text";
+/// let content: Content = "text" + Bold + Italic;
 /// ```
 #[non_exhaustive]
+#[derive(Clone, Copy)]
 pub enum ContentModifier {
     Italic,
     Bold,
@@ -970,95 +936,78 @@ pub enum ContentModifier {
     Spoiler,
 }
 
-#[bool_to_bitflags::bool_to_bitflags]
+#[bool_to_bitflags::bool_to_bitflags(owning_setters)]
 /// Describes formatting on string content
 #[derive(Clone, Debug, Default)]
-pub struct Content {
+pub struct Content<'a> {
     pub italic: bool,
     pub bold: bool,
     pub strikethrough: bool,
-    pub inner: String,
+    pub inner: &'a str,
     pub code: bool,
     pub underline: bool,
     pub spoiler: bool,
 }
 
-impl<T: AsRef<str>> Add<T> for Content {
-    type Output = Content;
+impl<'a> Add<ContentModifier> for &'a str {
+    type Output = Content<'a>;
 
-    fn add(mut self, rhs: T) -> Content {
-        self.inner += rhs.as_ref();
+    fn add(self, rhs: ContentModifier) -> Self::Output {
+        let content = Content {
+            inner: self,
+            ..Default::default()
+        };
 
-        self
+        content.apply(rhs)
     }
 }
 
-impl<T: AsRef<str>> Add<T> for ContentModifier {
-    type Output = Content;
+impl<'a> Add<&'a str> for ContentModifier {
+    type Output = Content<'a>;
 
-    fn add(self, rhs: T) -> Content {
-        let mut nc = self.to_content();
-        nc.inner += rhs.as_ref();
-        nc
+    fn add(self, rhs: &'a str) -> Self::Output {
+        rhs + self
     }
 }
 
-impl Add<ContentModifier> for Content {
-    type Output = Content;
+impl<'a> Add<ContentModifier> for Content<'a> {
+    type Output = Content<'a>;
 
-    fn add(mut self, rhs: ContentModifier) -> Content {
-        self.apply(&rhs);
-
-        self
+    fn add(self, rhs: ContentModifier) -> Content<'a> {
+        self.apply(rhs)
     }
 }
 
 impl Add<ContentModifier> for ContentModifier {
-    type Output = Content;
+    type Output = Content<'static>;
 
-    fn add(self, rhs: ContentModifier) -> Content {
-        let mut nc = self.to_content();
-        nc.apply(&rhs);
-
-        nc
+    fn add(self, rhs: ContentModifier) -> Self::Output {
+        let content = self.to_content();
+        content.apply(rhs)
     }
 }
 
 impl ContentModifier {
-    fn to_content(&self) -> Content {
-        let mut nc = Content::default();
-        nc.apply(self);
-
-        nc
+    fn to_content(self) -> Content<'static> {
+        Content::default().apply(self)
     }
 }
 
-impl Content {
-    pub fn apply(&mut self, modifier: &ContentModifier) {
-        match *modifier {
-            ContentModifier::Italic => {
-                self.set_italic(true);
-            },
-            ContentModifier::Bold => {
-                self.set_bold(true);
-            },
-            ContentModifier::Strikethrough => {
-                self.set_strikethrough(true);
-            },
-            ContentModifier::Code => {
-                self.set_code(true);
-            },
-            ContentModifier::Underline => {
-                self.set_underline(true);
-            },
-            ContentModifier::Spoiler => {
-                self.set_spoiler(true);
-            },
+impl Content<'_> {
+    #[must_use]
+    pub fn apply(self, modifier: ContentModifier) -> Self {
+        match modifier {
+            ContentModifier::Italic => self.set_italic(true),
+            ContentModifier::Bold => self.set_bold(true),
+            ContentModifier::Strikethrough => self.set_strikethrough(true),
+            ContentModifier::Code => self.set_code(true),
+            ContentModifier::Underline => self.set_underline(true),
+            ContentModifier::Spoiler => self.set_spoiler(true),
         }
     }
 }
 
-impl std::fmt::Display for Content {
+impl std::fmt::Display for Content<'_> {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.spoiler() {
             fmt.write_str("||")?;
@@ -1084,7 +1033,7 @@ impl std::fmt::Display for Content {
             fmt.write_char('`')?;
         }
 
-        fmt.write_str(&self.inner)?;
+        fmt.write_str(self.inner)?;
 
         if self.code() {
             fmt.write_char('`')?;
@@ -1114,10 +1063,10 @@ impl std::fmt::Display for Content {
     }
 }
 
-impl<T: Into<String>> From<T> for Content {
-    fn from(t: T) -> Content {
+impl<'a> From<&'a str> for Content<'a> {
+    fn from(inner: &'a str) -> Content<'a> {
         Content {
-            inner: t.into(),
+            inner,
             ..Default::default()
         }
     }
@@ -1207,11 +1156,11 @@ mod test {
 
     #[test]
     fn content() {
-        let content = Bold + Italic + Code + "Fun!";
+        let content = "Fun!" + Bold + Italic + Code;
 
         assert_eq!(content.to_string(), "***`Fun!`***");
 
-        let content = Spoiler + Bold + "Divert your eyes elsewhere";
+        let content = "Divert your eyes elsewhere" + Spoiler + Bold;
 
         assert_eq!(content.to_string(), "||**Divert your eyes elsewhere**||");
     }
@@ -1224,21 +1173,21 @@ mod test {
 
     #[test]
     fn message_content() {
-        let message_content = MessageBuilder::new().push(Bold + Italic + Code + "Fun!").build();
+        let message_content = MessageBuilder::new().push("Fun!" + Bold + Italic + Code).build();
 
         assert_eq!(message_content, "***`Fun!`***");
     }
 
     #[test]
     fn message_content_safe() {
-        let message_content = MessageBuilder::new().push_safe(Bold + Italic + "test**test").build();
+        let message_content = MessageBuilder::new().push_safe("test**test" + Bold + Italic).build();
 
         assert_eq!(message_content, "***test\\*\\*test***");
     }
 
     #[test]
     fn push() {
-        assert_eq!(MessageBuilder::new().push('a').0, "a");
+        assert_eq!(MessageBuilder::new().push("a").0, "a");
         assert!(MessageBuilder::new().push("").0.is_empty());
     }
 
@@ -1348,7 +1297,7 @@ mod test {
             push_bold => [
                 "a" => "**a**",
                 "" => "****",
-                '*' => "*****",
+                "*" => "*****",
                 "**" => "******"
             ],
             push_bold_line => [
