@@ -122,8 +122,24 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::http::{Http, MessagePagination};
+</span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, MessagePagination};
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -213,6 +229,9 @@
 
     <span class="doccomment">/// Gets messages from the channel.
     ///
+    /// If the cache is enabled, this method will fill up the message cache for the channel, if the
+    /// messages returned are newer than the existing cached messages or the cache is not full yet.
+    ///
     /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
     /// [`Vec`].
     ///
@@ -222,9 +241,22 @@
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-        http.get_messages(channel_id, <span class="self">self</span>.search_filter.map(Into::into), <span class="self">self</span>.limit).<span class="kw">await
-    </span>}
+    </span><span class="kw">pub async fn </span>execute(
+        <span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        channel_id: ChannelId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
+        <span class="kw">let </span>http = cache_http.http();
+        <span class="kw">let </span>search_filter = <span class="self">self</span>.search_filter.map(Into::into);
+        <span class="kw">let </span>messages = http.get_messages(channel_id, search_filter, <span class="self">self</span>.limit).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            cache.fill_message_cache(channel_id, messages.iter().cloned());
+        }
+
+        <span class="prelude-val">Ok</span>(messages)
+    }
 }
 
 <span class="attr">#[derive(Clone, Copy, Debug)]

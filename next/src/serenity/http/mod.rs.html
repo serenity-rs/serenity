@@ -179,6 +179,7 @@
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The HTTP module which provides functions for performing requests to endpoints in Discord's API.
 //!
 //! An important function of the REST API is ratelimiting. Requests to endpoints are ratelimited to
@@ -287,10 +288,11 @@
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-</span><span class="kw">impl </span>CacheHttp <span class="kw">for </span>(<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;, <span class="kw-2">&amp;</span>Http) {
+</span><span class="kw">impl </span>CacheHttp <span class="kw">for </span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt;, <span class="kw-2">&amp;</span>Http) {
     <span class="kw">fn </span>cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;Cache&gt;&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>)
-    }
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
     <span class="kw">fn </span>http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Http {
         <span class="self">self</span>.<span class="number">1
     </span>}

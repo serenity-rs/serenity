@@ -729,6 +729,32 @@
 <a href="#727" id="727">727</a>
 <a href="#728" id="728">728</a>
 <a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -1345,6 +1371,32 @@
                 .map(|(id, channel)| (<span class="kw-2">*</span>id, channel.clone()))
                 .collect(),
         )
+    }
+
+    <span class="doccomment">/// Inserts new messages into the message cache for a channel manually.
+    ///
+    /// This will keep the ordering of the message cache consistent, even if the message iterator
+    /// contains randomly ordered messages, and respects the [`Settings::max_messages`] setting.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fill_message_cache(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        channel_id: ChannelId,
+        new_messages: <span class="kw">impl </span>Iterator&lt;Item = Message&gt;,
+    ) {
+        <span class="kw">let </span>max_messages = <span class="self">self</span>.settings().max_messages;
+        <span class="kw">if </span>max_messages == <span class="number">0 </span>{
+            <span class="comment">// Early exit for common case of message cache being disabled.
+            </span><span class="kw">return</span>;
+        }
+
+        <span class="kw">let </span><span class="kw-2">mut </span>channel_messages = <span class="self">self</span>.messages.entry(channel_id).or_default();
+
+        <span class="comment">// Fill up the existing cache
+        </span>channel_messages.extend(new_messages.take(max_messages));
+        <span class="comment">// Make sure the cache stays sorted to messages
+        </span>channel_messages.make_contiguous().sort_unstable_by_key(|m| m.id);
+        <span class="comment">// Get rid of the overflow at the front of the queue.
+        </span><span class="kw">let </span>truncate_end_index = channel_messages.len().saturating_sub(max_messages);
+        channel_messages.drain(..truncate_end_index);
     }
 
     <span class="doccomment">/// Updates the cache with the update implementation for an event or other custom update
