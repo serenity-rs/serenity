@@ -450,8 +450,12 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn messages(self, http: &Http, builder: GetMessages) -> Result<Vec<Message>> {
-        builder.execute(http, self).await
+    pub async fn messages(
+        self,
+        cache_http: impl CacheHttp,
+        builder: GetMessages,
+    ) -> Result<Vec<Message>> {
+        builder.execute(cache_http, self).await
     }
 
     /// Streams over all the messages in a channel.
@@ -482,8 +486,11 @@ impl ChannelId {
     /// }
     /// # }
     /// ```
-    pub fn messages_iter(self, http: &Http) -> impl Stream<Item = Result<Message>> + '_ {
-        MessagesIter::stream(http, self)
+    pub fn messages_iter(
+        self,
+        cache_http: &impl CacheHttp,
+    ) -> impl Stream<Item = Result<Message>> + '_ {
+        MessagesIter::stream(cache_http, self)
     }
 
     /// Returns the name of whatever channel this id holds.
@@ -536,6 +543,9 @@ impl ChannelId {
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
     ///
+    /// If the cache is enabled, this method will fill up the message cache for the channel, if the
+    /// messages returned are newer than the existing cached messages or the cache is not full yet.
+    ///
     /// **Note**: Returns an empty [`Vec`] if the current user does not have the [Read Message
     /// History] permission.
     ///
@@ -544,8 +554,15 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn pins(self, http: &Http) -> Result<Vec<Message>> {
-        http.get_pins(self).await
+    pub async fn pins(self, cache_http: impl CacheHttp) -> Result<Vec<Message>> {
+        let messages = cache_http.http().get_pins(self).await?;
+
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            cache.fill_message_cache(self, messages.iter().cloned());
+        }
+
+        Ok(messages)
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
@@ -1090,6 +1107,8 @@ impl From<&WebhookChannel> for ChannelId {
 #[cfg(feature = "model")]
 pub struct MessagesIter<'a> {
     http: &'a Http,
+    #[cfg(feature = "cache")]
+    cache: Option<&'a Arc<Cache>>,
     channel_id: ChannelId,
     buffer: Vec<Message>,
     before: Option<MessageId>,
@@ -1098,14 +1117,26 @@ pub struct MessagesIter<'a> {
 
 #[cfg(feature = "model")]
 impl<'a> MessagesIter<'a> {
-    fn new(http: &'a Http, channel_id: ChannelId) -> MessagesIter<'a> {
+    fn new(cache_http: &'a impl CacheHttp, channel_id: ChannelId) -> MessagesIter<'a> {
         MessagesIter {
-            http,
+            http: cache_http.http(),
+            #[cfg(feature = "cache")]
+            cache: cache_http.cache(),
             channel_id,
             buffer: Vec::new(),
             before: None,
             tried_fetch: false,
         }
+    }
+
+    #[cfg(not(feature = "cache"))]
+    fn cache_http(&self) -> impl CacheHttp + '_ {
+        self.http
+    }
+
+    #[cfg(feature = "cache")]
+    fn cache_http(&self) -> impl CacheHttp + '_ {
+        (self.cache, self.http)
     }
 
     /// Fills the `self.buffer` cache with [`Message`]s.
@@ -1134,7 +1165,7 @@ impl<'a> MessagesIter<'a> {
         if let Some(before) = self.before {
             builder = builder.before(before);
         }
-        self.buffer = self.channel_id.messages(self.http, builder).await?;
+        self.buffer = self.channel_id.messages(self.cache_http(), builder).await?;
 
         self.buffer.reverse();
 
@@ -1174,10 +1205,10 @@ impl<'a> MessagesIter<'a> {
     /// # }
     /// ```
     pub fn stream(
-        http: &'a Http,
+        cache_http: &'a impl CacheHttp,
         channel_id: ChannelId,
     ) -> impl Stream<Item = Result<Message>> + 'a {
-        let init_state = MessagesIter::new(http, channel_id);
+        let init_state = MessagesIter::new(cache_http, channel_id);
 
         futures::stream::unfold(init_state, |mut state| async {
             if state.buffer.is_empty() && state.before.is_some() || !state.tried_fetch {
