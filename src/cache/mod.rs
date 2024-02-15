@@ -619,6 +619,32 @@ impl Cache {
         )
     }
 
+    /// Inserts new messages into the message cache for a channel manually.
+    ///
+    /// This will keep the ordering of the message cache consistent, even if the message iterator
+    /// contains randomly ordered messages, and respects the [`Settings::max_messages`] setting.
+    pub(crate) fn fill_message_cache(
+        &self,
+        channel_id: ChannelId,
+        new_messages: impl Iterator<Item = Message>,
+    ) {
+        let max_messages = self.settings().max_messages;
+        if max_messages == 0 {
+            // Early exit for common case of message cache being disabled.
+            return;
+        }
+
+        let mut channel_messages = self.messages.entry(channel_id).or_default();
+
+        // Fill up the existing cache
+        channel_messages.extend(new_messages.take(max_messages));
+        // Make sure the cache stays sorted to messages
+        channel_messages.make_contiguous().sort_unstable_by_key(|m| m.id);
+        // Get rid of the overflow at the front of the queue.
+        let truncate_end_index = channel_messages.len().saturating_sub(max_messages);
+        channel_messages.drain(..truncate_end_index);
+    }
+
     /// Updates the cache with the update implementation for an event or other custom update
     /// implementation.
     ///
