@@ -9,6 +9,7 @@
 use nonmax::NonMaxU64;
 use serde::de::Error as DeError;
 use serde::Serialize;
+use tracing::{debug, warn};
 
 use crate::constants::Opcode;
 use crate::internal::prelude::*;
@@ -1084,12 +1085,17 @@ pub struct MessagePollVoteRemoveEvent {
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
 #[serde(untagged)]
 pub enum GatewayEvent {
-    Dispatch(u64, Event),
+    Dispatch {
+        seq: u64,
+        // Avoid deserialising straight away to handle errors and get access to `seq`.
+        data: JsonMap,
+        // Used for debugging, if the data cannot be deserialised.
+        original_str: FixedString,
+    },
     Heartbeat(u64),
     Reconnect,
     /// Whether the session can be resumed.
@@ -1105,16 +1111,16 @@ impl<'de> Deserialize<'de> for GatewayEvent {
         let seq = remove_from_map_opt(&mut map, "s")?.flatten();
 
         Ok(match remove_from_map(&mut map, "op")? {
-            Opcode::Dispatch => Self::Dispatch(
-                seq.ok_or_else(|| DeError::missing_field("s"))?,
-                deserialize_val(Value::from(map))?,
-            ),
-            Opcode::Heartbeat => {
-                GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field("s"))?)
+            Opcode::Dispatch => {
+                Self::Dispatch {
+                    seq: seq.ok_or_else(|| DeError::missing_field("s"))?,
+                    // Filled in in recv_event
+                    original_str: FixedString::new(),
+                    data: map,
+                }
             },
-            Opcode::InvalidSession => {
-                GatewayEvent::InvalidateSession(remove_from_map(&mut map, "d")?)
-            },
+            Opcode::Heartbeat => Self::Heartbeat(seq.ok_or_else(|| DeError::missing_field("s"))?),
+            Opcode::InvalidSession => Self::InvalidateSession(remove_from_map(&mut map, "d")?),
             Opcode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
@@ -1122,10 +1128,10 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                 }
 
                 let inner: HelloPayload = remove_from_map(&mut map, "d")?;
-                GatewayEvent::Hello(inner.heartbeat_interval)
+                Self::Hello(inner.heartbeat_interval)
             },
-            Opcode::Reconnect => GatewayEvent::Reconnect,
-            Opcode::HeartbeatAck => GatewayEvent::HeartbeatAck,
+            Opcode::Reconnect => Self::Reconnect,
+            Opcode::HeartbeatAck => Self::HeartbeatAck,
             _ => return Err(DeError::custom("invalid opcode")),
         })
     }
@@ -1347,4 +1353,31 @@ impl Event {
         let map = serde_json::to_value(self).ok()?;
         Some(map.get("t")?.as_str()?.to_string())
     }
+
+    pub(crate) fn deserialize_and_log(map: JsonMap, original_str: &str) -> Result<Self> {
+        deserialize_val(Value::Object(map))
+            .map_err(|err| log_deserialisation_err(original_str, err))
+    }
+}
+
+fn filter_unknown_variant(json_err_dbg: &str) -> bool {
+    if let Some(msg) = json_err_dbg.strip_prefix("Error(\"unknown variant `") {
+        if let Some((variant_name, _)) = msg.split_once('`') {
+            debug!("Unknown event: {variant_name}");
+            return true;
+        }
+    }
+
+    false
+}
+
+#[cold]
+fn log_deserialisation_err(json_str: &str, err: serde_json::Error) -> Error {
+    let json_err_dbg = format!("{err:?}");
+    if !filter_unknown_variant(&json_err_dbg) {
+        warn!("Err deserializing text: {json_err_dbg}");
+    }
+
+    debug!("Failing text: {json_str}");
+    Error::Json(err)
 }
