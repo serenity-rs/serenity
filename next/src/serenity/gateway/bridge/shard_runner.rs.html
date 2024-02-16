@@ -497,12 +497,6 @@
 <a href="#495" id="495">495</a>
 <a href="#496" id="496">496</a>
 <a href="#497" id="497">497</a>
-<a href="#498" id="498">498</a>
-<a href="#499" id="499">499</a>
-<a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
-<a href="#502" id="502">502</a>
-<a href="#503" id="503">503</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -924,42 +918,36 @@
             <span class="prelude-val">Err</span>(why) =&gt; <span class="prelude-val">Err</span>(why),
         };
 
-        <span class="kw">let </span>action = <span class="kw">match </span><span class="self">self</span>.shard.handle_event(<span class="kw-2">&amp;</span>gateway_event) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(action)) =&gt; <span class="prelude-val">Some</span>(action),
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">let </span>is_ack = <span class="macro">matches!</span>(gateway_event, <span class="prelude-val">Ok</span>(GatewayEvent::HeartbeatAck));
+        <span class="kw">let </span>(action, event) = <span class="kw">match </span><span class="self">self</span>.shard.handle_event(gateway_event) {
+            <span class="prelude-val">Ok</span>((action, event)) =&gt; (action, event),
+            <span class="prelude-val">Err</span>(Error::Gateway(
+                why @ (GatewayError::InvalidAuthentication
+                | GatewayError::InvalidGatewayIntents
+                | GatewayError::DisallowedGatewayIntents),
+            )) =&gt; {
+                <span class="macro">error!</span>(<span class="string">"Shard handler received fatal err: {why:?}"</span>);
+
+                <span class="self">self</span>.manager.return_with_value(<span class="prelude-val">Err</span>(why.clone())).<span class="kw">await</span>;
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Gateway(why));
+            },
+            <span class="prelude-val">Err</span>(Error::Json(<span class="kw">_</span>)) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)),
             <span class="prelude-val">Err</span>(why) =&gt; {
-                <span class="macro">error!</span>(<span class="string">"Shard handler received err: {:?}"</span>, why);
-
-                <span class="kw">match </span><span class="kw-2">&amp;</span>why {
-                    Error::Gateway(
-                        error @ (GatewayError::InvalidAuthentication
-                        | GatewayError::InvalidGatewayIntents
-                        | GatewayError::DisallowedGatewayIntents),
-                    ) =&gt; {
-                        <span class="self">self</span>.manager.return_with_value(<span class="prelude-val">Err</span>(error.clone())).<span class="kw">await</span>;
-
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(why);
-                    },
-                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)),
-                }
+                <span class="macro">error!</span>(<span class="string">"Shard handler recieved err: {why:?}"</span>);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>));
             },
         };
 
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(GatewayEvent::HeartbeatAck) = gateway_event {
+        <span class="kw">if </span>is_ack {
             <span class="self">self</span>.update_manager().<span class="kw">await</span>;
         }
 
         <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(GatewayEvent::Dispatch(<span class="kw">_</span>, <span class="kw-2">ref </span>event)) = gateway_event {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = <span class="kw-2">&amp;</span>event {
                 <span class="self">self</span>.handle_voice_event(event).<span class="kw">await</span>;
             }
         }
-
-        <span class="kw">let </span>event = <span class="kw">match </span>gateway_event {
-            <span class="prelude-val">Ok</span>(GatewayEvent::Dispatch(<span class="kw">_</span>, event)) =&gt; <span class="prelude-val">Some</span>(event),
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
-        };
 
         <span class="prelude-val">Ok</span>((event, action, <span class="bool-val">true</span>))
     }

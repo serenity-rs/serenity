@@ -1313,6 +1313,39 @@
 <a href="#1311" id="1311">1311</a>
 <a href="#1312" id="1312">1312</a>
 <a href="#1313" id="1313">1313</a>
+<a href="#1314" id="1314">1314</a>
+<a href="#1315" id="1315">1315</a>
+<a href="#1316" id="1316">1316</a>
+<a href="#1317" id="1317">1317</a>
+<a href="#1318" id="1318">1318</a>
+<a href="#1319" id="1319">1319</a>
+<a href="#1320" id="1320">1320</a>
+<a href="#1321" id="1321">1321</a>
+<a href="#1322" id="1322">1322</a>
+<a href="#1323" id="1323">1323</a>
+<a href="#1324" id="1324">1324</a>
+<a href="#1325" id="1325">1325</a>
+<a href="#1326" id="1326">1326</a>
+<a href="#1327" id="1327">1327</a>
+<a href="#1328" id="1328">1328</a>
+<a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
+<a href="#1332" id="1332">1332</a>
+<a href="#1333" id="1333">1333</a>
+<a href="#1334" id="1334">1334</a>
+<a href="#1335" id="1335">1335</a>
+<a href="#1336" id="1336">1336</a>
+<a href="#1337" id="1337">1337</a>
+<a href="#1338" id="1338">1338</a>
+<a href="#1339" id="1339">1339</a>
+<a href="#1340" id="1340">1340</a>
+<a href="#1341" id="1341">1341</a>
+<a href="#1342" id="1342">1342</a>
+<a href="#1343" id="1343">1343</a>
+<a href="#1344" id="1344">1344</a>
+<a href="#1345" id="1345">1345</a>
+<a href="#1346" id="1346">1346</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1326,6 +1359,7 @@
 <span class="kw">use </span>nonmax::NonMaxU64;
 <span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
 <span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>tracing::{debug, warn};
 
 <span class="kw">use </span><span class="kw">super</span>::application::ActionRow;
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
@@ -2372,12 +2406,17 @@
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>GatewayEvent {
-    Dispatch(u64, Event),
+    Dispatch {
+        seq: u64,
+        <span class="comment">// Avoid deserialising straight away to handle errors and get access to `seq`.
+        </span>data: JsonMap,
+        <span class="comment">// Used for debugging, if the data cannot be deserialised.
+        </span>original_str: FixedString,
+    },
     Heartbeat(u64),
     Reconnect,
     <span class="doccomment">/// Whether the session can be resumed.
@@ -2393,16 +2432,16 @@
         <span class="kw">let </span>seq = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">"s"</span>)<span class="question-mark">?</span>.flatten();
 
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"op"</span>)<span class="question-mark">? </span>{
-            Opcode::Dispatch =&gt; <span class="self">Self</span>::Dispatch(
-                seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>,
-                deserialize_val(Value::from(map))<span class="question-mark">?</span>,
-            ),
-            Opcode::Heartbeat =&gt; {
-                GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>)
+            Opcode::Dispatch =&gt; {
+                <span class="self">Self</span>::Dispatch {
+                    seq: seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>,
+                    <span class="comment">// Filled in in recv_event
+                    </span>original_str: FixedString::new(),
+                    data: map,
+                }
             },
-            Opcode::InvalidSession =&gt; {
-                GatewayEvent::InvalidateSession(remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"d"</span>)<span class="question-mark">?</span>)
-            },
+            Opcode::Heartbeat =&gt; <span class="self">Self</span>::Heartbeat(seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>),
+            Opcode::InvalidSession =&gt; <span class="self">Self</span>::InvalidateSession(remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"d"</span>)<span class="question-mark">?</span>),
             Opcode::Hello =&gt; {
                 <span class="attr">#[derive(Deserialize)]
                 </span><span class="kw">struct </span>HelloPayload {
@@ -2410,10 +2449,10 @@
                 }
 
                 <span class="kw">let </span>inner: HelloPayload = remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"d"</span>)<span class="question-mark">?</span>;
-                GatewayEvent::Hello(inner.heartbeat_interval)
+                <span class="self">Self</span>::Hello(inner.heartbeat_interval)
             },
-            Opcode::Reconnect =&gt; GatewayEvent::Reconnect,
-            Opcode::HeartbeatAck =&gt; GatewayEvent::HeartbeatAck,
+            Opcode::Reconnect =&gt; <span class="self">Self</span>::Reconnect,
+            Opcode::HeartbeatAck =&gt; <span class="self">Self</span>::HeartbeatAck,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">"invalid opcode"</span>)),
         })
     }
@@ -2625,5 +2664,32 @@
         <span class="kw">let </span>map = serde_json::to_value(<span class="self">self</span>).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(map.get(<span class="string">"t"</span>)<span class="question-mark">?</span>.as_str()<span class="question-mark">?</span>.to_string())
     }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_and_log(map: JsonMap, original_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        deserialize_val(Value::Object(map))
+            .map_err(|err| log_deserialisation_err(original_str, err))
+    }
+}
+
+<span class="kw">fn </span>filter_unknown_variant(json_err_dbg: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(msg) = json_err_dbg.strip_prefix(<span class="string">"Error(\"unknown variant `"</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((variant_name, <span class="kw">_</span>)) = msg.split_once(<span class="string">'`'</span>) {
+            <span class="macro">debug!</span>(<span class="string">"Unknown event: {variant_name}"</span>);
+            <span class="kw">return </span><span class="bool-val">true</span>;
+        }
+    }
+
+    <span class="bool-val">false
+</span>}
+
+<span class="attr">#[cold]
+</span><span class="kw">fn </span>log_deserialisation_err(json_str: <span class="kw-2">&amp;</span>str, err: serde_json::Error) -&gt; Error {
+    <span class="kw">let </span>json_err_dbg = <span class="macro">format!</span>(<span class="string">"{err:?}"</span>);
+    <span class="kw">if </span>!filter_unknown_variant(<span class="kw-2">&amp;</span>json_err_dbg) {
+        <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {json_err_dbg}"</span>);
+    }
+
+    <span class="macro">debug!</span>(<span class="string">"Failing text: {json_str}"</span>);
+    Error::Json(err)
 }
 </code></pre></div></section></main></body></html>

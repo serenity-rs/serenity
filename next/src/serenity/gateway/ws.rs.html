@@ -324,12 +324,6 @@
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::env::consts;
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span>std::io::Read;
@@ -340,6 +334,8 @@
 <span class="kw">use </span>futures::SinkExt;
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span>futures::StreamExt;
+<span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
+</span><span class="kw">use </span>small_fixed_array::FixedString;
 <span class="kw">use </span>tokio::net::TcpStream;
 <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
 </span><span class="kw">use </span>tokio::time::{timeout, Duration};
@@ -470,9 +466,22 @@
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        serde_json::from_str(<span class="kw-2">&amp;</span>json_str)
-            .map(<span class="prelude-val">Some</span>)
-            .map_err(|err| log_deserialisation_err(<span class="kw-2">&amp;</span>json_str, err))
+        <span class="kw">match </span>serde_json::from_str(<span class="kw-2">&amp;</span>json_str) {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>event) =&gt; {
+                <span class="kw">if let </span>GatewayEvent::Dispatch {
+                    original_str, ..
+                } = <span class="kw-2">&amp;mut </span>event
+                {
+                    <span class="kw-2">*</span>original_str = FixedString::from_string_trunc(json_str);
+                }
+
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(event))
+            },
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">"Failing text: {json_str}"</span>);
+                <span class="prelude-val">Err</span>(Error::Json(err))
+            },
+        }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>send_json(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -638,26 +647,5 @@
         })
         .<span class="kw">await
     </span>}
-}
-
-<span class="kw">fn </span>filter_unknown_variant(json_err_dbg: <span class="kw-2">&amp;</span>str) -&gt; bool {
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(msg) = json_err_dbg.strip_prefix(<span class="string">"Error(\"unknown variant `"</span>) {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((variant_name, <span class="kw">_</span>)) = msg.split_once(<span class="string">'`'</span>) {
-            <span class="macro">tracing::debug!</span>(<span class="string">"Unknown event: {variant_name}"</span>);
-            <span class="kw">return </span><span class="bool-val">true</span>;
-        }
-    }
-
-    <span class="bool-val">false
-</span>}
-
-<span class="kw">fn </span>log_deserialisation_err(json_str: <span class="kw-2">&amp;</span>str, err: serde_json::Error) -&gt; Error {
-    <span class="kw">let </span>json_err_dbg = <span class="macro">format!</span>(<span class="string">"{err:?}"</span>);
-    <span class="kw">if </span>!filter_unknown_variant(<span class="kw-2">&amp;</span>json_err_dbg) {
-        <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {json_err_dbg}"</span>);
-    }
-
-    <span class="macro">debug!</span>(<span class="string">"Failing text: {json_str}"</span>);
-    Error::Json(err)
 }
 </code></pre></div></section></main></body></html>

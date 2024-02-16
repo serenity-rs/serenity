@@ -762,6 +762,18 @@
 <a href="#760" id="760">760</a>
 <a href="#761" id="761">761</a>
 <a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -1030,10 +1042,18 @@
     }
 
     <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
-    </span><span class="kw">fn </span>handle_gateway_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, seq: u64, event: <span class="kw-2">&amp;</span>Event) -&gt; <span class="prelude-ty">Option</span>&lt;ShardAction&gt; {
+    </span><span class="kw">fn </span>handle_gateway_dispatch(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        seq: u64,
+        event: JsonMap,
+        original_str: <span class="kw-2">&amp;</span>str,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;ShardAction&gt;, <span class="prelude-ty">Option</span>&lt;Event&gt;)&gt; {
         <span class="kw">if </span>seq &gt; <span class="self">self</span>.seq + <span class="number">1 </span>{
             <span class="macro">warn!</span>(<span class="string">"[{:?}] Sequence off; them: {}, us: {}"</span>, <span class="self">self</span>.shard_info, seq, <span class="self">self</span>.seq);
         }
+
+        <span class="self">self</span>.seq = seq;
+        <span class="kw">let </span>event = Event::deserialize_and_log(event, original_str)<span class="question-mark">?</span>;
 
         <span class="kw">match </span><span class="kw-2">&amp;</span>event {
             Event::Ready(ready) =&gt; {
@@ -1057,10 +1077,8 @@
             <span class="kw">_ </span>=&gt; {},
         }
 
-        <span class="self">self</span>.seq = seq;
-
-        <span class="prelude-val">None
-    </span>}
+        <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(event)))
+    }
 
     <span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
     </span><span class="kw">fn </span>handle_heartbeat_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: u64) -&gt; ShardAction {
@@ -1192,10 +1210,19 @@
     /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too many guilds
     /// assigned to it.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
-    </span><span class="kw">pub fn </span>handle_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span>&lt;GatewayEvent&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ShardAction&gt;&gt; {
-        <span class="kw">match </span>event {
-            <span class="prelude-val">Ok</span>(GatewayEvent::Dispatch(seq, event)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.handle_gateway_dispatch(<span class="kw-2">*</span>seq, event)),
-            <span class="prelude-val">Ok</span>(GatewayEvent::Heartbeat(s)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.handle_heartbeat_event(<span class="kw-2">*</span>s))),
+    </span><span class="kw">pub fn </span>handle_event(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        event: <span class="prelude-ty">Result</span>&lt;GatewayEvent&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="prelude-ty">Option</span>&lt;ShardAction&gt;, <span class="prelude-ty">Option</span>&lt;Event&gt;)&gt; {
+        <span class="kw">let </span>action = <span class="kw">match </span>event {
+            <span class="prelude-val">Ok</span>(GatewayEvent::Dispatch {
+                seq,
+                data,
+                original_str,
+            }) =&gt; {
+                <span class="kw">return </span><span class="self">self</span>.handle_gateway_dispatch(seq, data, <span class="kw-2">&amp;</span>original_str);
+            },
+            <span class="prelude-val">Ok</span>(GatewayEvent::Heartbeat(s)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.handle_heartbeat_event(s))),
             <span class="prelude-val">Ok</span>(GatewayEvent::HeartbeatAck) =&gt; {
                 <span class="self">self</span>.last_heartbeat_ack = <span class="prelude-val">Some</span>(Instant::now());
                 <span class="self">self</span>.last_heartbeat_acknowledged = <span class="bool-val">true</span>;
@@ -1204,11 +1231,11 @@
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
             },
-            <span class="kw-2">&amp;</span><span class="prelude-val">Ok</span>(GatewayEvent::Hello(interval)) =&gt; {
+            <span class="prelude-val">Ok</span>(GatewayEvent::Hello(interval)) =&gt; {
                 <span class="macro">debug!</span>(<span class="string">"[{:?}] Received a Hello; interval: {}"</span>, <span class="self">self</span>.shard_info, interval);
 
                 <span class="kw">if </span><span class="self">self</span>.stage == ConnectionStage::Resuming {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="prelude-val">None</span>));
                 }
 
                 <span class="self">self</span>.heartbeat_interval = <span class="prelude-val">Some</span>(std::time::Duration::from_millis(interval));
@@ -1221,7 +1248,7 @@
                     ShardAction::Reconnect(<span class="self">self</span>.reconnection_type())
                 }))
             },
-            <span class="kw-2">&amp;</span><span class="prelude-val">Ok</span>(GatewayEvent::InvalidateSession(resumable)) =&gt; {
+            <span class="prelude-val">Ok</span>(GatewayEvent::InvalidateSession(resumable)) =&gt; {
                 <span class="macro">info!</span>(<span class="string">"[{:?}] Received session invalidation"</span>, <span class="self">self</span>.shard_info);
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">if </span>resumable {
@@ -1241,15 +1268,12 @@
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ShardAction::Reconnect(<span class="self">self</span>.reconnection_type())))
             },
             <span class="prelude-val">Err</span>(why) =&gt; {
-                <span class="kw">if let </span>Error::Json(<span class="kw">_</span>) = why {
-                    <span class="comment">// Deserialization errors already get logged when the event is first received
-                </span>} <span class="kw">else </span>{
-                    <span class="macro">warn!</span>(<span class="string">"[{:?}] Unhandled error: {:?}"</span>, <span class="self">self</span>.shard_info, why);
-                }
-
+                <span class="macro">warn!</span>(<span class="string">"[{:?}] Unhandled error: {:?}"</span>, <span class="self">self</span>.shard_info, why);
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
             },
-        }
+        };
+
+        action.map(|a| (a, <span class="prelude-val">None</span>))
     }
 
     <span class="doccomment">/// Does a heartbeat if needed. Returns false if something went wrong and the shard should be
