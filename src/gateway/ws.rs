@@ -8,6 +8,8 @@ use flate2::read::ZlibDecoder;
 use futures::SinkExt;
 #[cfg(feature = "client")]
 use futures::StreamExt;
+#[cfg(feature = "client")]
+use small_fixed_array::FixedString;
 use tokio::net::TcpStream;
 #[cfg(feature = "client")]
 use tokio::time::{timeout, Duration};
@@ -138,9 +140,22 @@ impl WsClient {
             _ => return Ok(None),
         };
 
-        serde_json::from_str(&json_str)
-            .map(Some)
-            .map_err(|err| log_deserialisation_err(&json_str, err))
+        match serde_json::from_str(&json_str) {
+            Ok(mut event) => {
+                if let GatewayEvent::Dispatch {
+                    original_str, ..
+                } = &mut event
+                {
+                    *original_str = FixedString::from_string_trunc(json_str);
+                }
+
+                Ok(Some(event))
+            },
+            Err(err) => {
+                debug!("Failing text: {json_str}");
+                Err(Error::Json(err))
+            },
+        }
     }
 
     pub(crate) async fn send_json(&mut self, value: &impl serde::Serialize) -> Result<()> {
@@ -306,25 +321,4 @@ impl WsClient {
         })
         .await
     }
-}
-
-fn filter_unknown_variant(json_err_dbg: &str) -> bool {
-    if let Some(msg) = json_err_dbg.strip_prefix("Error(\"unknown variant `") {
-        if let Some((variant_name, _)) = msg.split_once('`') {
-            tracing::debug!("Unknown event: {variant_name}");
-            return true;
-        }
-    }
-
-    false
-}
-
-fn log_deserialisation_err(json_str: &str, err: serde_json::Error) -> Error {
-    let json_err_dbg = format!("{err:?}");
-    if !filter_unknown_variant(&json_err_dbg) {
-        warn!("Err deserializing text: {json_err_dbg}");
-    }
-
-    debug!("Failing text: {json_str}");
-    Error::Json(err)
 }
