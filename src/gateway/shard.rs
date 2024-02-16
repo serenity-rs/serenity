@@ -267,10 +267,18 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn handle_gateway_dispatch(&mut self, seq: u64, event: &Event) -> Option<ShardAction> {
+    fn handle_gateway_dispatch(
+        &mut self,
+        seq: u64,
+        event: JsonMap,
+        original_str: &str,
+    ) -> Result<(Option<ShardAction>, Option<Event>)> {
         if seq > self.seq + 1 {
             warn!("[{:?}] Sequence off; them: {}, us: {}", self.info, seq, self.seq);
         }
+
+        self.seq = seq;
+        let event = Event::deserialize_and_log(event, original_str)?;
 
         match &event {
             Event::Ready(ready) => {
@@ -294,9 +302,7 @@ impl Shard {
             _ => {},
         }
 
-        self.seq = seq;
-
-        None
+        Ok((None, Some(event)))
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -402,9 +408,18 @@ impl Shard {
     /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too many guilds
     /// assigned to it.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn handle_event(&mut self, event: &Result<GatewayEvent>) -> Result<Option<ShardAction>> {
-        match event {
-            Ok(GatewayEvent::Dispatch(seq, event)) => Ok(self.handle_gateway_dispatch(*seq, event)),
+    pub fn handle_event(
+        &mut self,
+        event: Result<GatewayEvent>,
+    ) -> Result<(Option<ShardAction>, Option<Event>)> {
+        let action = match event {
+            Ok(GatewayEvent::Dispatch {
+                seq,
+                data,
+                original_str,
+            }) => {
+                return self.handle_gateway_dispatch(seq, data, &original_str);
+            },
             Ok(GatewayEvent::Heartbeat(..)) => {
                 info!("[{:?}] Received shard heartbeat", self.info);
 
@@ -418,11 +433,11 @@ impl Shard {
 
                 Ok(None)
             },
-            &Ok(GatewayEvent::Hello(interval)) => {
+            Ok(GatewayEvent::Hello(interval)) => {
                 debug!("[{:?}] Received a Hello; interval: {}", self.info, interval);
 
                 if self.stage == ConnectionStage::Resuming {
-                    return Ok(None);
+                    return Ok((None, None));
                 }
 
                 self.heartbeat_interval = Some(std::time::Duration::from_millis(interval));
@@ -435,7 +450,7 @@ impl Shard {
                     ShardAction::Reconnect(self.reconnection_type())
                 }))
             },
-            &Ok(GatewayEvent::InvalidateSession(resumable)) => {
+            Ok(GatewayEvent::InvalidateSession(resumable)) => {
                 info!("[{:?}] Received session invalidation", self.info);
 
                 Ok(Some(if resumable {
@@ -455,15 +470,12 @@ impl Shard {
                 Ok(Some(ShardAction::Reconnect(self.reconnection_type())))
             },
             Err(why) => {
-                if let Error::Json(_) = why {
-                    // Deserialization errors already get logged when the event is first received
-                } else {
-                    warn!("[{:?}] Unhandled error: {:?}", self.info, why);
-                }
-
+                warn!("[{:?}] Unhandled error: {:?}", self.info, why);
                 Ok(None)
             },
-        }
+        };
+
+        action.map(|a| (a, None))
     }
 
     /// Does a heartbeat if needed. Returns false if something went wrong and the shard should be
