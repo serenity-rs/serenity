@@ -409,42 +409,36 @@ impl ShardRunner {
             Err(why) => Err(why),
         };
 
-        let action = match self.shard.handle_event(&gateway_event) {
-            Ok(Some(action)) => Some(action),
-            Ok(None) => None,
+        let is_ack = matches!(gateway_event, Ok(GatewayEvent::HeartbeatAck));
+        let (action, event) = match self.shard.handle_event(gateway_event) {
+            Ok((action, event)) => (action, event),
+            Err(Error::Gateway(
+                why @ (GatewayError::InvalidAuthentication
+                | GatewayError::InvalidGatewayIntents
+                | GatewayError::DisallowedGatewayIntents),
+            )) => {
+                error!("Shard handler received fatal err: {why:?}");
+
+                self.manager.return_with_value(Err(why.clone())).await;
+                return Err(Error::Gateway(why));
+            },
+            Err(Error::Json(_)) => return Ok((None, None, true)),
             Err(why) => {
-                error!("Shard handler received err: {:?}", why);
-
-                match &why {
-                    Error::Gateway(
-                        error @ (GatewayError::InvalidAuthentication
-                        | GatewayError::InvalidGatewayIntents
-                        | GatewayError::DisallowedGatewayIntents),
-                    ) => {
-                        self.manager.return_with_value(Err(error.clone())).await;
-
-                        return Err(why);
-                    },
-                    _ => return Ok((None, None, true)),
-                }
+                error!("Shard handler recieved err: {why:?}");
+                return Ok((None, None, true));
             },
         };
 
-        if let Ok(GatewayEvent::HeartbeatAck) = gateway_event {
+        if is_ack {
             self.update_manager().await;
         }
 
         #[cfg(feature = "voice")]
         {
-            if let Ok(GatewayEvent::Dispatch(_, ref event)) = gateway_event {
+            if let Some(event) = &event {
                 self.handle_voice_event(event).await;
             }
         }
-
-        let event = match gateway_event {
-            Ok(GatewayEvent::Dispatch(_, event)) => Some(event),
-            _ => None,
-        };
 
         Ok((event, action, true))
     }
