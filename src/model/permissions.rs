@@ -382,7 +382,6 @@ generate_get_permission_names! {
     create_public_threads: "Create Public Threads",
     deafen_members: "Deafen Members",
     embed_links: "Embed Links",
-    external_emojis: "Use External Emojis",
     kick_members: "Kick Members",
     manage_channels: "Manage Channels",
     manage_events: "Manage Events",
@@ -569,15 +568,6 @@ impl Permissions {
     #[must_use]
     pub const fn embed_links(self) -> bool {
         self.contains(Self::EMBED_LINKS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Use External Emojis]
-    /// permission.
-    ///
-    /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
-    #[must_use]
-    pub const fn external_emojis(self) -> bool {
-        self.contains(Self::USE_EXTERNAL_EMOJIS)
     }
 
     /// Shorthand for checking that the set of permissions contains the [Kick Members] permission.
