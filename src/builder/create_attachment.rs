@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::path::Path;
 
+use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
@@ -14,15 +15,12 @@ use crate::model::id::AttachmentId;
 /// A builder for creating a new attachment from a file path, file data, or URL.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 #[must_use]
 pub struct CreateAttachment<'a> {
-    pub(crate) id: u64, // Placeholder ID will be filled in when sending the request
     pub filename: Cow<'static, str>,
     pub description: Option<Cow<'a, str>>,
-
-    #[serde(skip)]
     pub data: Cow<'static, [u8]>,
 }
 
@@ -36,7 +34,6 @@ impl<'a> CreateAttachment<'a> {
             data: data.into(),
             filename: filename.into(),
             description: None,
-            id: 0,
         }
     }
 
@@ -114,13 +111,12 @@ impl<'a> CreateAttachment<'a> {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Clone, Debug, Serialize)]
 struct ExistingAttachment {
     id: AttachmentId,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(untagged)]
+#[derive(Clone, Debug)]
 enum NewOrExisting<'a> {
     New(CreateAttachment<'a>),
     Existing(ExistingAttachment),
@@ -181,8 +177,7 @@ enum NewOrExisting<'a> {
 ///
 /// Internally, this type is used not just for message editing endpoints, but also for message
 /// creation endpoints.
-#[derive(Default, Debug, Clone, serde::Serialize)]
-#[serde(transparent)]
+#[derive(Default, Debug, Clone)]
 #[must_use]
 pub struct EditAttachments<'a> {
     new_and_existing_attachments: Vec<NewOrExisting<'a>>,
@@ -256,22 +251,15 @@ impl<'a> EditAttachments<'a> {
     /// are needed for the multipart form data. The data is taken out of `self` in the process, so
     /// this method can only be called once.
     pub(crate) fn take_files(&mut self) -> Vec<CreateAttachment<'a>> {
-        let mut id_placeholder = 0;
-
         let mut files = Vec::new();
         for attachment in &mut self.new_and_existing_attachments {
             if let NewOrExisting::New(attachment) = attachment {
-                let mut cloned_attachment = CreateAttachment::bytes(
+                let cloned_attachment = CreateAttachment::bytes(
                     std::mem::take(&mut attachment.data),
                     attachment.filename.clone(),
                 );
 
-                // Assign placeholder IDs so Discord can match metadata to file contents
-                attachment.id = id_placeholder;
-                cloned_attachment.id = id_placeholder;
                 files.push(cloned_attachment);
-
-                id_placeholder += 1;
             }
         }
         files
@@ -280,5 +268,39 @@ impl<'a> EditAttachments<'a> {
     #[cfg(feature = "cache")]
     pub(crate) fn is_empty(&self) -> bool {
         self.new_and_existing_attachments.is_empty()
+    }
+}
+
+impl Serialize for EditAttachments<'_> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        #[derive(Serialize)]
+        struct NewAttachment<'a> {
+            id: u64,
+            filename: &'a Cow<'static, str>,
+            description: &'a Option<Cow<'a, str>>,
+        }
+
+        // Instead of an `AttachmentId`, the `id` field for new attachments corresponds to the
+        // index of the new attachment in the multipart payload. The attachment data will be
+        // labeled with `files[{id}]` in the multipart body. See `Multipart::build_form`.
+        let mut id = 0;
+        let mut seq = serializer.serialize_seq(Some(self.new_and_existing_attachments.len()))?;
+        for attachment in &self.new_and_existing_attachments {
+            match attachment {
+                NewOrExisting::New(new_attachment) => {
+                    let attachment = NewAttachment {
+                        id,
+                        filename: &new_attachment.filename,
+                        description: &new_attachment.description,
+                    };
+                    id += 1;
+                    seq.serialize_element(&attachment)?;
+                },
+                NewOrExisting::Existing(existing_attachment) => {
+                    seq.serialize_element(existing_attachment)?;
+                },
+            }
+        }
+        seq.end()
     }
 }
