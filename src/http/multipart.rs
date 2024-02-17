@@ -43,8 +43,8 @@ impl Multipart<'_> {
                 multipart = multipart.part("file", upload_file.into_part()?);
             },
             MultipartUpload::Attachments(attachment_files) => {
-                for file in attachment_files {
-                    multipart = multipart.part(format!("files[{}]", file.id), file.into_part()?);
+                for (idx, file) in attachment_files.into_iter().enumerate() {
+                    multipart = multipart.part(format!("files[{idx}]"), file.into_part()?);
                 }
             },
         }
