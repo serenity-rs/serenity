@@ -164,7 +164,10 @@ impl<'a> EditWebhookMessage<'a> {
     ) -> Result<Message> {
         self.check_length()?;
 
-        let files = self.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
+        let files = match self.attachments.as_mut() {
+            Some(attachments) => attachments.take_files().await?,
+            None => Vec::new(),
+        };
 
         http.edit_webhook_message(
             webhook_id,

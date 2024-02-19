@@ -114,7 +114,10 @@ impl<'a> EditInteractionResponse<'a> {
     pub async fn execute(mut self, http: &Http, interaction_token: &str) -> Result<Message> {
         self.0.check_length()?;
 
-        let files = self.0.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
+        let files = match self.0.attachments.as_mut() {
+            Some(attachments) => attachments.take_files().await?,
+            None => Vec::new(),
+        };
 
         http.edit_original_interaction_response(interaction_token, &self, files).await
     }

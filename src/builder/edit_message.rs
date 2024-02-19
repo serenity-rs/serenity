@@ -252,7 +252,10 @@ impl<'a> EditMessage<'a> {
             }
         }
 
-        let files = self.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
+        let files = match self.attachments.as_mut() {
+            Some(attachments) => attachments.take_files().await?,
+            None => Vec::new(),
+        };
 
         cache_http.http().edit_message(channel_id, message_id, &self, files).await
     }

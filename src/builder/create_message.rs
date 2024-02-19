@@ -288,7 +288,7 @@ impl<'a> CreateMessage<'a> {
 
         let http = cache_http.http();
 
-        let files = self.attachments.take_files();
+        let files = self.attachments.take_files().await?;
 
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut message = http.send_message(channel_id, files, &self).await?;

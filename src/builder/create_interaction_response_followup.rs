@@ -167,7 +167,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     ) -> Result<Message> {
         self.check_length()?;
 
-        let files = self.attachments.take_files();
+        let files = self.attachments.take_files().await?;
 
         match message_id {
             Some(id) => http.edit_followup_message(interaction_token, id, &self, files).await,
