@@ -343,6 +343,23 @@ impl CacheUpdate for MessageCreateEvent {
     type Output = Message;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        // Update the relevant channel object with the new latest message if this message is newer
+        let guild = self.message.guild_id.and_then(|g_id| cache.guilds.get_mut(&g_id));
+
+        if let Some(mut guild) = guild {
+            if let Some(channel) = guild.channels.get_mut(&self.message.channel_id) {
+                update_channel_last_message_id(&self.message, channel, cache);
+            } else {
+                // This may be a thread.
+                let thread =
+                    guild.threads.iter_mut().find(|thread| thread.id == self.message.channel_id);
+                if let Some(thread) = thread {
+                    update_channel_last_message_id(&self.message, thread, cache);
+                }
+            }
+        }
+
+        // Add the new message to the cache and remove the oldest cached message.
         let max = cache.settings().max_messages;
 
         if max == 0 {
@@ -364,6 +381,21 @@ impl CacheUpdate for MessageCreateEvent {
         messages.insert(self.message.id, self.message.clone());
 
         removed_msg
+    }
+}
+
+fn update_channel_last_message_id(message: &Message, channel: &mut GuildChannel, cache: &Cache) {
+    if let Some(last_message_id) = channel.last_message_id {
+        let most_recent_timestamp = cache.message(channel.id, last_message_id).map(|m| m.timestamp);
+        if let Some(most_recent_timestamp) = most_recent_timestamp {
+            if message.timestamp > most_recent_timestamp {
+                channel.last_message_id = Some(message.id);
+            }
+        } else {
+            channel.last_message_id = Some(message.id);
+        }
+    } else {
+        channel.last_message_id = Some(message.id);
     }
 }
 
