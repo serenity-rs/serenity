@@ -868,6 +868,9 @@
 <a href="#866" id="866">866</a>
 <a href="#867" id="867">867</a>
 <a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1218,6 +1221,9 @@
         </span><span class="kw">const </span>DISCORD_CERTIFIED_MODERATOR = <span class="number">1 </span>&lt;&lt; <span class="number">18</span>;
         <span class="doccomment">/// Bot's running with HTTP interactions
         </span><span class="kw">const </span>BOT_HTTP_INTERACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">19</span>;
+        <span class="doccomment">/// User's flag for suspected spam activity.
+        </span><span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
+        </span><span class="kw">const </span>SPAMMER = <span class="number">1 </span>&lt;&lt; <span class="number">20</span>;
         <span class="doccomment">/// User's flag as active developer
         </span><span class="kw">const </span>ACTIVE_DEVELOPER = <span class="number">1 </span>&lt;&lt; <span class="number">22</span>;
     }
