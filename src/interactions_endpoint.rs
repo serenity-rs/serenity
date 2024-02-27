@@ -53,6 +53,7 @@ impl std::error::Error for InvalidKey {
 ///     // Send HTTP 401 Unauthorized response
 /// }
 /// ```
+#[derive(Clone)]
 pub struct Verifier {
     public_key: ed25519_dalek::VerifyingKey,
 }
