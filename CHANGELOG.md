@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.12.1] - 2024-02-28
+
+Thanks to the following for their contributions:
+
+- [@arqunis]
+- [@GnomedDev]
+- [@jamesbt365]
+- [@kangalio]
+- [@logand22]
+- [@mkrasnitski]
+- [@SenseiHiraku]
+- [@vaporoxx]
+- [@vidhanio]
+- [@Xaeroxe]
+- [@yanorei32]
+
+### Notable changes
+
+In this release, **the standard framework has been deprecated**
+([#2733](https://github.com/serenity-rs/serenity/pull/2733)).
+
+As Discord continues to endorse and evolve application commands (`/...`
+commands, user commands, message commands, etc.), the standard framework
+becomes increasingly outdated. Bots are also steadily losing (and already have
+lost) access to contents of messages, making it difficult to build a
+prefix-only bot. Unless you plan on restricting your bot to only accept
+commands in DMs, allowing its presence in only fewer than 100 guilds, or
+presenting a reasonable justification to Discord for permission to continue
+using message contents, you should migrate to application commands. We
+recommend [poise](https://github.com/serenity-rs/poise), which supports writing
+both prefix and application commands with a `#[command]` macro like the
+standard framework.
+
+#### Why not just update the framework?
+
+Poise already exists and is better than the standard framework. Efforts should
+be directed at improving poise instead. To support application commands would
+require an overhaul of the standard framework, as they are special (for
+instance, Discord parses arguments on behalf of the bot and passes them as
+structured data, whereas for prefix commands, the bot must parse by itself).
+
+### Smaller, but still notable changes
+
+* ([#2621](https://github.com/serenity-rs/serenity/pull/2621)) Add a temporary cache for messages.
+* ([#2649](https://github.com/serenity-rs/serenity/pull/2649)) Deprecate `RoleId::to_role_cached` - Use `Guild::roles` instead.
+* ([#2726](https://github.com/serenity-rs/serenity/pull/2726)) Pack bitflags - Reduces alignments of `bitflags!` types, resulting in a smaller memory footprint.
+* ([#2696](https://github.com/serenity-rs/serenity/pull/2696)) Support attachments in forum posts.
+* ([#2560](https://github.com/serenity-rs/serenity/pull/2560)) Add support for monetization APIs.
+* ([#2648](https://github.com/serenity-rs/serenity/pull/2648)) Deprecate inefficient Emoji helpers - Use the emoji methods on `GuildId`/`Guild` instead.
+
 ## [0.12.0] - 2023-11-27
 
 This release turned out to be one of serenity's largest ever, with well over 300 PRs in total! It contains quite a few major breaking changes to the API. Therefore, the changelog for this release also serves as a migration guide for users upgrading from the 0.11 series.
@@ -5331,6 +5381,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.12.1]: https://github.com/serenity-rs/serenity/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/serenity-rs/serenity/compare/v0.11.7...v0.12.0
 [0.11.7]: https://github.com/serenity-rs/serenity/compare/v0.11.6...v0.11.7
 [0.11.6]: https://github.com/serenity-rs/serenity/compare/v0.11.5...v0.11.6
@@ -5567,6 +5618,7 @@ Initial commit.
 [@leumasme]: https://github.com/leumasme
 [@lhjt]: https://github.com/lhjt
 [@lo48576]: https://github.com/lo48576
+[@logand22]: https://github.com/logand22
 [@lolzballs]: https://github.com/lolzballs
 [@marcantoinem]: https://github.com/marcantoinem
 [@MarkusTheOrt]: https://github.com/MarkusTheOrt
@@ -5626,6 +5678,7 @@ Initial commit.
 [@SOF3]: https://github.com/SOF3
 [@Sei4or]: https://github.com/Sei4or
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
+[@SenseiHiraku]: https://github.com/SenseiHiraku
 [@sandlotie]: https://github.com/sandlotie
 [@Scetch]: https://github.com/Scetch
 [@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
@@ -5669,6 +5722,7 @@ Initial commit.
 [@Vaimer9]: https://github.com/Vaimer9
 [@vaporoxx]: https://github.com/vaporoxx
 [@vicky5124]: https://github.com/vicky5124
+[@vidhanio]: https://github.com/vidhanio
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
 [@Web-44]: https://github.com/Web-44
@@ -5680,6 +5734,7 @@ Initial commit.
 [@Xaeroxe]: https://github.com/Xaeroxe
 [@xentec]: https://github.com/xentec
 [@xfix]: https://github.com/xfix
+[@yanorei32]: https://github.com/yanorei32
 [@Zalaxx]: https://github.com/Zalaxx
 [@zacck]: https://github.com/zacck
 [@zack37]: https://github.com/zack37
