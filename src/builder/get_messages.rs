@@ -18,7 +18,7 @@ use crate::model::prelude::*;
 /// These are mutually exclusive, and override each other if called sequentially. If one is not
 /// specified, messages are simply sorted by most recent.
 ///
-/// The other parameter specifies the number of messages fo retrieve. This is _optional_, and
+/// The other parameter specifies the number of messages to retrieve. This is _optional_, and
 /// defaults to 50 if not specified.
 ///
 /// See [`GuildChannel::messages`] for more examples.
