@@ -154,9 +154,9 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
-<span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{Action, EventType, Trigger};
+
+<span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::EventType;
+
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating or editing guild AutoMod rules.

@@ -563,22 +563,12 @@
 <a href="#561" id="561">561</a>
 <a href="#562" id="562">562</a>
 <a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>secrecy::ExposeSecret;
 <span class="kw">use </span>secrecy::SecretString;
 
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">super</span>::channel::Message;
-<span class="kw">use </span><span class="kw">super</span>::id::{ChannelId, GuildId, WebhookId};
-<span class="kw">use </span><span class="kw">super</span>::user::User;
 <span class="kw">use </span><span class="kw">super</span>::utils::secret;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
@@ -589,8 +579,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::ModelError;
 
 <span class="macro">enum_number! </span>{
     <span class="doccomment">/// A representation of a type of webhook.

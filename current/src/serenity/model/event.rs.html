@@ -1324,12 +1324,6 @@
 <a href="#1322" id="1322">1322</a>
 <a href="#1323" id="1323">1323</a>
 <a href="#1324" id="1324">1324</a>
-<a href="#1325" id="1325">1325</a>
-<a href="#1326" id="1326">1326</a>
-<a href="#1327" id="1327">1327</a>
-<a href="#1328" id="1328">1328</a>
-<a href="#1329" id="1329">1329</a>
-<a href="#1330" id="1330">1330</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1338,14 +1332,10 @@
 </span><span class="comment">// Just for MessageUpdateEvent (for some reason the #[allow] doesn't work when placed directly)
 </span><span class="attr">#![allow(clippy::option_option)]
 
-</span><span class="kw">use </span>std::collections::HashMap;
-
-<span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
+</span><span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
 <span class="kw">use </span>serde::Serialize;
 
-<span class="kw">use </span><span class="kw">super</span>::application::ActionRow;
-<span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">super</span>::utils::{
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::{
     deserialize_val,
     emojis,
     members,
@@ -1354,9 +1344,7 @@
     stickers,
 };
 <span class="kw">use </span><span class="kw">crate</span>::constants::Opcode;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermissions, Interaction};
-<span class="kw">use </span><span class="kw">crate</span>::model::guild::audit_log::AuditLogEntry;
-<span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{ActionExecution, Rule};
+<span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Requires no gateway intents.
 ///

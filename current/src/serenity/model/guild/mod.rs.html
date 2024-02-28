@@ -2811,11 +2811,6 @@
 <a href="#2809" id="2809">2809</a>
 <a href="#2810" id="2810">2810</a>
 <a href="#2811" id="2811">2811</a>
-<a href="#2812" id="2812">2812</a>
-<a href="#2813" id="2813">2813</a>
-<a href="#2814" id="2814">2814</a>
-<a href="#2815" id="2815">2815</a>
-<a href="#2816" id="2816">2816</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2878,13 +2873,8 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, UserPagination};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::json::json;
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::application::{Command, CommandPermissions};
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::Rule;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::utils::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::Timestamp;
 
 <span class="doccomment">/// A representation of a banning of a user.
 ///

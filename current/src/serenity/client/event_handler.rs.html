@@ -480,21 +480,11 @@
 <a href="#478" id="478">478</a>
 <a href="#479" id="479">479</a>
 <a href="#480" id="480">480</a>
-<a href="#481" id="481">481</a>
-<a href="#482" id="482">482</a>
-<a href="#483" id="483">483</a>
-<a href="#484" id="484">484</a>
-<a href="#485" id="485">485</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
-
-<span class="kw">use </span>async_trait::async_trait;
+</pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
 
 <span class="kw">use </span><span class="kw">super</span>::context::Context;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::ShardStageUpdateEvent;
 <span class="kw">use </span><span class="kw">crate</span>::http::RatelimitInfo;
-<span class="kw">use </span><span class="kw">crate</span>::model::application::{CommandPermissions, Interaction};
-<span class="kw">use </span><span class="kw">crate</span>::model::guild::audit_log::AuditLogEntry;
-<span class="kw">use </span><span class="kw">crate</span>::model::guild::automod::{ActionExecution, Rule};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 
 <span class="macro">macro_rules! </span>event_handler {

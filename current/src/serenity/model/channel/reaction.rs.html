@@ -576,7 +576,7 @@
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span>percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-<span class="kw">use </span>serde::de::{Deserialize, Error <span class="kw">as </span>DeError};
+<span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
 <span class="kw">use </span>serde::ser::{Serialize, SerializeMap, Serializer};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>tracing::warn;
