@@ -142,8 +142,6 @@ fn banner_url(banner_asset_id: StickerPackBannerId) -> String {
 
 /// A sticker sent with a message.
 ///
-/// Bots cannot send stickers.
-///
 /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
