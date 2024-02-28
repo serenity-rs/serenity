@@ -23,7 +23,7 @@
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashSet, VecDeque};
 use std::hash::Hash;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;

@@ -60,13 +60,8 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::json::json;
-#[cfg(feature = "model")]
-use crate::model::application::{Command, CommandPermissions};
-#[cfg(feature = "model")]
-use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 use crate::model::utils::*;
-use crate::model::Timestamp;
 
 /// A representation of a banning of a user.
 ///

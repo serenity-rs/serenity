@@ -1,5 +1,4 @@
 use crate::model::prelude::*;
-use crate::model::Timestamp;
 
 /// A builder for constructing a personal [`Message`] instance. This can be useful for emitting a
 /// manual [`dispatch`] to the framework, but you don't have a message in hand, or just have a

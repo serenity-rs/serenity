@@ -23,7 +23,6 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
-use crate::model::mention::Mentionable;
 #[cfg(feature = "model")]
 use crate::model::utils::avatar_url;
 

@@ -1,9 +1,7 @@
 //! Audit log types for administrative actions within guilds.
 
-use std::collections::HashMap;
 use std::mem::transmute;
 
-use serde::de::Deserializer;
 use serde::ser::{Serialize, Serializer};
 
 mod change;

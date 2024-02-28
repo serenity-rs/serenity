@@ -26,7 +26,6 @@ use crate::http::CacheHttp;
 use crate::json::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
-use crate::model::Timestamp;
 
 #[deprecated = "use CreateAttachment instead"]
 #[cfg(feature = "model")]

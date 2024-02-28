@@ -1,4 +1,3 @@
-use serde::de::{Deserialize, Deserializer};
 use serde::Serialize;
 
 #[cfg(feature = "model")]

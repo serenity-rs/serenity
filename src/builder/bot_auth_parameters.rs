@@ -5,7 +5,6 @@ use url::Url;
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::model::application::Scope;
 use crate::model::prelude::*;
 
 /// A builder for constructing an invite link with custom OAuth2 scopes.

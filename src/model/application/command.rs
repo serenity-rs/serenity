@@ -1,14 +1,12 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 #[cfg(feature = "model")]
 use crate::builder::{Builder, CreateCommand};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::json::Value;
 use crate::model::channel::ChannelType;
 use crate::model::id::{
     ApplicationId,

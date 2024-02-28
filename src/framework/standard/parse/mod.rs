@@ -1,16 +1,12 @@
 use super::{Command, *};
-use crate::client::Context;
 use crate::model::prelude::*;
 
 pub mod map;
 
 use std::borrow::Cow;
-#[cfg(feature = "cache")]
-use std::collections::HashMap;
 
-use futures::future::{BoxFuture, FutureExt};
-use map::{CommandMap, GroupMap, ParseMap};
-use uwl::Stream;
+use futures::FutureExt;
+use map::ParseMap;
 
 // FIXME: Add the `http` parameter to `Guild::user_permissions_in`.
 //

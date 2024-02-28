@@ -4,9 +4,7 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
-use crate::model::guild::automod::Rule;
-use crate::model::guild::automod::{Action, EventType, Trigger};
+use crate::model::guild::automod::EventType;
 use crate::model::prelude::*;
 
 /// A builder for creating or editing guild AutoMod rules.

@@ -21,7 +21,6 @@ use crate::constants;
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::model::application::{ActionRow, MessageInteraction};
 use crate::model::prelude::*;
 use crate::model::utils::StrOrInt;
 #[cfg(all(feature = "model", feature = "cache"))]

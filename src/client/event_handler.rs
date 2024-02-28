@@ -1,13 +1,8 @@
-use std::collections::HashMap;
-
 use async_trait::async_trait;
 
 use super::context::Context;
 use crate::gateway::ShardStageUpdateEvent;
 use crate::http::RatelimitInfo;
-use crate::model::application::{CommandPermissions, Interaction};
-use crate::model::guild::audit_log::AuditLogEntry;
-use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
 
 macro_rules! event_handler {

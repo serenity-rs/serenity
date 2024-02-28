@@ -10,7 +10,6 @@ use crate::http::CacheHttp;
 use crate::http::{Http, Typing};
 use crate::model::prelude::*;
 use crate::model::utils::single_recipient;
-use crate::model::Timestamp;
 
 /// A Direct Message text channel with another user.
 ///

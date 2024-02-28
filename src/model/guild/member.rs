@@ -10,11 +10,9 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::avatar_url;
-use crate::model::Timestamp;
 
 /// Information about a member of a guild.
 ///

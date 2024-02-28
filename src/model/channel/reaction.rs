@@ -6,7 +6,7 @@ use std::str::FromStr;
 
 #[cfg(feature = "http")]
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use serde::de::{Deserialize, Error as DeError};
+use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeMap, Serializer};
 #[cfg(feature = "model")]
 use tracing::warn;

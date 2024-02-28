@@ -4,10 +4,6 @@
 use secrecy::ExposeSecret;
 use secrecy::SecretString;
 
-#[cfg(feature = "model")]
-use super::channel::Message;
-use super::id::{ChannelId, GuildId, WebhookId};
-use super::user::User;
 use super::utils::secret;
 #[cfg(feature = "model")]
 use crate::builder::{Builder, EditWebhook, EditWebhookMessage, ExecuteWebhook};
@@ -18,8 +14,6 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "model")]
-use crate::model::ModelError;
 
 enum_number! {
     /// A representation of a type of webhook.

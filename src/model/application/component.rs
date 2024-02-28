@@ -1,4 +1,4 @@
-use serde::de::{Deserialize, Deserializer, Error as DeError};
+use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
 
 use crate::internal::prelude::*;

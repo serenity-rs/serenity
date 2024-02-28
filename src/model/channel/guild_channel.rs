@@ -30,7 +30,6 @@ use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use crate::model::Timestamp;
 
 /// Represents a guild's text, news, or voice channel. Some methods are available only for voice
 /// channels and some are only available for text channels. News channels are a subset of text

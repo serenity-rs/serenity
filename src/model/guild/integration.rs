@@ -1,5 +1,4 @@
-use super::*;
-use crate::model::Timestamp;
+use crate::model::prelude::*;
 
 /// Various information about integrations.
 ///

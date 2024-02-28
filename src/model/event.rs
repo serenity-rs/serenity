@@ -6,14 +6,12 @@
 // Just for MessageUpdateEvent (for some reason the #[allow] doesn't work when placed directly)
 #![allow(clippy::option_option)]
 
-use std::collections::HashMap;
-
 use serde::de::Error as DeError;
 use serde::Serialize;
 
-use super::application::ActionRow;
-use super::prelude::*;
-use super::utils::{
+use crate::constants::Opcode;
+use crate::model::prelude::*;
+use crate::model::utils::{
     deserialize_val,
     emojis,
     members,
@@ -21,10 +19,6 @@ use super::utils::{
     remove_from_map_opt,
     stickers,
 };
-use crate::constants::Opcode;
-use crate::model::application::{CommandPermissions, Interaction};
-use crate::model::guild::audit_log::AuditLogEntry;
-use crate::model::guild::automod::{ActionExecution, Rule};
 
 /// Requires no gateway intents.
 ///

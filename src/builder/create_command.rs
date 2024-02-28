@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 #[cfg(feature = "http")]
 use super::Builder;
 #[cfg(feature = "http")]
