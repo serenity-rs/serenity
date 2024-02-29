@@ -9,11 +9,10 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    // Set a handler for the `message` event - so that whenever a new message is received - the
-    // closure (or function) passed will be called.
+    // Set a handler for the `message` event. This is called whenever a new message is received.
     //
-    // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched
-    // simultaneously.
+    // Event handlers are dispatched through a threadpool, and so multiple events can be
+    // dispatched simultaneously.
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!ping" {
             // Sending a message can fail, due to a network error, an authentication error, or lack
