@@ -45,45 +45,39 @@ A basic ping-pong bot looks like:
 use std::env;
 
 use serenity::async_trait;
-use serenity::prelude::*;
 use serenity::model::channel::Message;
-use serenity::framework::standard::macros::{command, group};
-use serenity::framework::standard::{StandardFramework, Configuration, CommandResult};
-
-#[group]
-#[commands(ping)]
-struct General;
+use serenity::prelude::*;
 
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {}
-
-#[tokio::main]
-async fn main() {
-    let framework = StandardFramework::new().group(&GENERAL_GROUP);
-    framework.configure(Configuration::new().prefix("~")); // set the bot's prefix to "~"
-
-    // Login with a bot token from the environment
-    let token = env::var("DISCORD_TOKEN").expect("token");
-    let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(token, intents)
-        .event_handler(Handler)
-        .framework(framework)
-        .await
-        .expect("Error creating client");
-
-    // start listening for events by starting a single shard
-    if let Err(why) = client.start().await {
-        println!("An error occurred while running the client: {:?}", why);
+impl EventHandler for Handler {
+    async fn message(&self, ctx: Context, msg: Message) {
+        if msg.content == "!ping" {
+            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
+                println!("Error sending message: {why:?}");
+            }
+        }
     }
 }
 
-#[command]
-async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    msg.reply(ctx, "Pong!").await?;
+#[tokio::main]
+async fn main() {
+    // Login with a bot token from the environment
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    // Set gateway intents, which decides what events the bot will be notified about
+    let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
 
-    Ok(())
+    // Create a new instance of the Client, logging in as a bot.
+    let mut client =
+        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+
+    // Start listening for events by starting a single shard
+    if let Err(why) = client.start().await {
+        println!("Client error: {why:?}");
+    }
 }
 ```
 
@@ -157,7 +151,7 @@ the Discord gateway over a WebSocket client.
 enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
-- **standard_framework**: A standard, default implementation of the Framework
+- **standard_framework**: A standard, default implementation of the Framework. **NOTE**: Deprecated as of v0.12.1. Using the [poise](https://github.com/serenity-rs/poise) framework is recommended instead.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
 [lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
