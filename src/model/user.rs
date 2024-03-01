@@ -20,7 +20,6 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::model::mention::Mentionable;
 #[cfg(feature = "model")]
 use crate::model::utils::avatar_url;
 
