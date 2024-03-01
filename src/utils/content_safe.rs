@@ -205,7 +205,6 @@ mod tests {
     use crate::model::channel::*;
     use crate::model::guild::*;
     use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
-    use crate::model::user::User;
 
     #[test]
     fn test_content_safe() {
