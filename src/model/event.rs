@@ -11,6 +11,8 @@ use serde::de::Error as DeError;
 use serde::Serialize;
 use tracing::{debug, warn};
 
+use crate::constants::Opcode;
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::{
     deserialize_val,
@@ -20,8 +22,6 @@ use crate::model::utils::{
     remove_from_map_opt,
     stickers,
 };
-use crate::constants::Opcode;
-use crate::internal::prelude::*;
 
 /// Requires no gateway intents.
 ///
