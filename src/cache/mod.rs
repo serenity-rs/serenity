@@ -666,8 +666,6 @@ impl Default for Cache {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-
     use crate::cache::{Cache, CacheUpdate, Settings};
     use crate::model::prelude::*;
 
