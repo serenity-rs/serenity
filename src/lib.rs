@@ -73,6 +73,7 @@
     clippy::too_many_lines,
     clippy::doc_markdown,
     clippy::missing_panics_doc,
+    clippy::doc_link_with_quotes
 )]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 
