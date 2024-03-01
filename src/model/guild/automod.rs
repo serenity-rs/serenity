@@ -511,7 +511,7 @@ mod tests {
     use serde_json::json;
 
     use super::*;
-    use crate::json::{assert_json, json};
+    use crate::model::utils::assert_json;
 
     #[test]
     fn rule_trigger_serde() {
