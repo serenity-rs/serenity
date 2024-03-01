@@ -5,7 +5,6 @@ use std::marker::PhantomData;
 
 use arrayvec::ArrayVec;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
-use small_fixed_array::FixedString;
 
 use super::prelude::*;
 use crate::internal::prelude::*;
