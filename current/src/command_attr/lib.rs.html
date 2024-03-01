@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (ef324565d 2024-02-27)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `command_attr/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="command_attr" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (878c8a2a6 2024-02-29)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../command_attr/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -980,7 +980,7 @@
 <span class="kw">use </span>structures::<span class="kw-2">*</span>;
 <span class="kw">use </span>util::<span class="kw-2">*</span>;
 
-<span class="macro">macro_rules! </span>match_options {
+<span class="macro">macro_rules!</span> match_options {
     (<span class="macro-nonterminal">$v</span>:expr, <span class="macro-nonterminal">$values</span>:ident, <span class="macro-nonterminal">$options</span>:ident, <span class="macro-nonterminal">$span</span>:expr =&gt; [$(<span class="macro-nonterminal">$name</span>:ident);<span class="kw-2">*</span>]) =&gt; {
         <span class="kw">match </span><span class="macro-nonterminal">$v </span>{
             $(
@@ -1151,7 +1151,7 @@
     populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
     <span class="kw">let </span>args = fun.args;
 
-    (<span class="macro">quote! </span>{
+    (<span class="macro">quote!</span> {
         #(#cooked)*
         <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#options: #options_path = #options_path {
@@ -1432,7 +1432,7 @@
     populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
     <span class="kw">let </span>args = fun.args;
 
-    (<span class="macro">quote! </span>{
+    (<span class="macro">quote!</span> {
         #(#cooked)*
         <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#options: #options_path = #options_path {
@@ -1662,7 +1662,7 @@
     <span class="kw">let </span>options_path = <span class="macro">quote!</span>(serenity::framework::standard::GroupOptions);
     <span class="kw">let </span>group_path = <span class="macro">quote!</span>(serenity::framework::standard::CommandGroup);
 
-    (<span class="macro">quote! </span>{
+    (<span class="macro">quote!</span> {
         #(#cooked)*
         <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#options: #options_path = #options_path {
@@ -1752,7 +1752,7 @@
     populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
     <span class="kw">let </span>args = fun.args;
 
-    (<span class="macro">quote! </span>{
+    (<span class="macro">quote!</span> {
         <span class="attr">#[allow(missing_docs)]
         </span><span class="kw">pub static </span>#name: #check = #check {
             name: #n2,
@@ -1887,7 +1887,7 @@
             populate_fut_lifetimes_on_refs(<span class="kw-2">&amp;mut </span>fun.args);
             <span class="kw">let </span>args = fun.args;
 
-            (<span class="macro">quote! </span>{
+            (<span class="macro">quote!</span> {
                 #(#attributes)*
                 <span class="attr">#[allow(missing_docs)]
                 </span>#visibility <span class="kw">fn </span>#fun_name&lt;<span class="lifetime">'fut</span>&gt;(#(#args),<span class="kw-2">*</span>) -&gt; std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = #ret&gt; + Send + <span class="lifetime">'fut</span>&gt;&gt; {
@@ -1906,7 +1906,7 @@
             <span class="kw">let </span>ret = closure.ret;
             <span class="kw">let </span>body = closure.body;
 
-            (<span class="macro">quote! </span>{
+            (<span class="macro">quote!</span> {
                 #(#attributes)*
                 |#args| #ret {
                     Box::pin(<span class="kw">async move </span>{ #body })
