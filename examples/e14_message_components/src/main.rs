@@ -13,7 +13,6 @@ use serenity::builder::{
     CreateSelectMenuKind,
     CreateSelectMenuOption,
 };
-use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
