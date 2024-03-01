@@ -668,7 +668,6 @@ impl Default for Cache {
 
 #[cfg(test)]
 mod test {
-
     use crate::cache::{Cache, CacheUpdate, Settings};
     use crate::model::prelude::*;
 
