@@ -11,7 +11,6 @@ use serde::de::Error as DeError;
 use serde::Serialize;
 use tracing::{debug, warn};
 
-use crate::constants::Opcode;
 use crate::model::prelude::*;
 use crate::model::utils::{
     deserialize_val,

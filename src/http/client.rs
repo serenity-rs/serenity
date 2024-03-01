@@ -32,7 +32,6 @@ use super::{
 use crate::builder::CreateAttachment;
 use crate::constants;
 use crate::internal::prelude::*;
-use crate::json::*;
 use crate::model::prelude::*;
 
 #[derive(Clone)]
