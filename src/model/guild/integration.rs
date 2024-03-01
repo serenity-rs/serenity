@@ -1,6 +1,5 @@
-use nonmax::NonMaxU32;
+use nonmax::{NonMaxU32, NonMaxU64};
 
-use super::*;
 use crate::model::prelude::*;
 
 /// Various information about integrations.
