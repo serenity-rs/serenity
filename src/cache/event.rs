@@ -597,9 +597,9 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut channel) = cache.channel_mut(self.id) {
             let old = channel.status.clone();
-            channel.status = self.status.clone();
+            channel.status.clone_from(&self.status);
             // Discord updates topic but doesn't fire ChannelUpdate.
-            channel.topic = self.status.clone();
+            channel.topic.clone_from(&self.status);
             old
         } else {
             None
