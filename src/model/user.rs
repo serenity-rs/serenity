@@ -344,7 +344,7 @@ bitflags! {
         /// Bot's running with HTTP interactions
         const BOT_HTTP_INTERACTIONS = 1 << 19;
         /// User's flag for suspected spam activity.
-        #[cfg(feature = "unstable_discord_api")]
+        #[cfg(feature = "unstable")]
         const SPAMMER = 1 << 20;
         /// User's flag as active developer
         const ACTIVE_DEVELOPER = 1 << 22;
