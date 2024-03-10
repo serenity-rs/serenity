@@ -3,6 +3,7 @@
 use std::fmt;
 
 use nonmax::NonMaxU64;
+use to_arraystring::ToArrayString;
 
 use super::Timestamp;
 
@@ -99,6 +100,13 @@ macro_rules! id_u64 {
 
                 fn from_str(s: &str) -> Result<Self, Self::Err> {
                     s.parse().map(Self).map_err(ParseIdError)
+                }
+            }
+
+            impl ToArrayString for $name {
+                type ArrayString = <u64 as ToArrayString>::ArrayString;
+                fn to_arraystring(self) -> Self::ArrayString {
+                    self.get().to_arraystring()
                 }
             }
 
