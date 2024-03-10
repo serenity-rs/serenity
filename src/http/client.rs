@@ -3471,10 +3471,7 @@ impl Http {
             params.push(("user_id", user_id.to_string()));
         }
         if let Some(sku_ids) = sku_ids {
-            params.push((
-                "sku_ids",
-                sku_ids.iter().map(ToString::to_string).collect::<Vec<_>>().join(","),
-            ));
+            params.push(("sku_ids", join_to_string(',', sku_ids)));
         }
         if let Some(before) = before {
             params.push(("before", before.to_string()));
