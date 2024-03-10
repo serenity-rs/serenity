@@ -9,6 +9,7 @@
 use nonmax::NonMaxU64;
 use serde::de::Error as DeError;
 use serde::Serialize;
+use strum::{EnumCount, IntoStaticStr, VariantNames};
 use tracing::{debug, warn};
 
 use crate::constants::Opcode;
@@ -1141,7 +1142,8 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#receive-events).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, EnumCount, VariantNames, IntoStaticStr)]
+#[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[serde(tag = "t", content = "d")]
 #[non_exhaustive]
@@ -1349,9 +1351,8 @@ pub enum Event {
 impl Event {
     /// Returns the event name of this event.
     #[must_use]
-    pub fn name(&self) -> Option<String> {
-        let map = serde_json::to_value(self).ok()?;
-        Some(map.get("t")?.as_str()?.to_string())
+    pub fn name(&self) -> &'static str {
+        self.into()
     }
 
     pub(crate) fn deserialize_and_log(map: JsonMap, original_str: &str) -> Result<Self> {
