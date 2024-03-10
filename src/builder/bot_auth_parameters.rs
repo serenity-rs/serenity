@@ -1,5 +1,4 @@
 use std::borrow::Cow;
-use std::fmt::Write;
 
 use arrayvec::ArrayVec;
 use url::Url;
@@ -9,16 +8,6 @@ use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-
-fn join_to_string(sep: char, iter: impl Iterator<Item = impl std::fmt::Display>) -> String {
-    let mut buf = String::new();
-    for item in iter {
-        write!(buf, "{item}{sep}").unwrap();
-    }
-
-    buf.truncate(buf.len() - 1);
-    buf
-}
 
 /// A builder for constructing an invite link with custom OAuth2 scopes.
 #[derive(Debug, Clone, Default)]
