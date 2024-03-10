@@ -817,11 +817,11 @@
     </span><span class="kw">pub </span>timestamps: <span class="prelude-ty">Option</span>&lt;ActivityTimestamps&gt;,
     <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity type which uses this
     /// parameter to store the track ID.
-    </span><span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"unstable"</span>)]
     </span><span class="kw">pub </span>sync_id: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The session ID of the activity. Reserved for specific activity types, such as the Activity
     /// that is transmitted when a user is listening to Spotify.
-    </span><span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"unstable"</span>)]
     </span><span class="kw">pub </span>session_id: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     </span><span class="kw">pub </span>url: <span class="prelude-ty">Option</span>&lt;Url&gt;,
