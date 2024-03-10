@@ -77,13 +77,13 @@ pub struct CurrentApplicationInfo {
     /// The application's role connection verification entry point, which when configured will
     /// render the app as a verification method in the guild role verification configuration.
     pub role_connections_verification_url: Option<FixedString>,
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     #[serde(default)]
     pub integration_types_config:
         std::collections::HashMap<InstallationContext, InstallationContextConfig>,
 }
 
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 enum_number! {
     /// An enum representing the [installation contexts].
     ///
@@ -98,7 +98,7 @@ enum_number! {
     }
 }
 
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 enum_number! {
     /// An enum representing the different [interaction contexts].
     ///
@@ -120,7 +120,7 @@ enum_number! {
 /// Information about how the [`CurrentApplicationInfo`] is installed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-integration-types).
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InstallationContextConfig {
     pub oauth2_install_params: InstallParams,
