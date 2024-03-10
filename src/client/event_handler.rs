@@ -3,6 +3,7 @@ use std::collections::VecDeque;
 use std::num::NonZeroU16;
 
 use async_trait::async_trait;
+use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 use super::context::Context;
 use crate::gateway::ShardStageUpdateEvent;
@@ -33,7 +34,7 @@ macro_rules! event_handler {
 
         /// This enum stores every possible event that an [`EventHandler`] can receive.
         #[non_exhaustive]
-        #[derive(Clone, Debug)]
+        #[derive(Clone, Debug, VariantNames, IntoStaticStr, EnumCount)]
         pub enum FullEvent {
             $(
                 $( #[doc = $doc] )*
