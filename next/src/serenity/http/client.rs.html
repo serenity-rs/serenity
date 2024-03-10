@@ -4730,6 +4730,92 @@
 <a href="#4728" id="4728">4728</a>
 <a href="#4729" id="4729">4729</a>
 <a href="#4730" id="4730">4730</a>
+<a href="#4731" id="4731">4731</a>
+<a href="#4732" id="4732">4732</a>
+<a href="#4733" id="4733">4733</a>
+<a href="#4734" id="4734">4734</a>
+<a href="#4735" id="4735">4735</a>
+<a href="#4736" id="4736">4736</a>
+<a href="#4737" id="4737">4737</a>
+<a href="#4738" id="4738">4738</a>
+<a href="#4739" id="4739">4739</a>
+<a href="#4740" id="4740">4740</a>
+<a href="#4741" id="4741">4741</a>
+<a href="#4742" id="4742">4742</a>
+<a href="#4743" id="4743">4743</a>
+<a href="#4744" id="4744">4744</a>
+<a href="#4745" id="4745">4745</a>
+<a href="#4746" id="4746">4746</a>
+<a href="#4747" id="4747">4747</a>
+<a href="#4748" id="4748">4748</a>
+<a href="#4749" id="4749">4749</a>
+<a href="#4750" id="4750">4750</a>
+<a href="#4751" id="4751">4751</a>
+<a href="#4752" id="4752">4752</a>
+<a href="#4753" id="4753">4753</a>
+<a href="#4754" id="4754">4754</a>
+<a href="#4755" id="4755">4755</a>
+<a href="#4756" id="4756">4756</a>
+<a href="#4757" id="4757">4757</a>
+<a href="#4758" id="4758">4758</a>
+<a href="#4759" id="4759">4759</a>
+<a href="#4760" id="4760">4760</a>
+<a href="#4761" id="4761">4761</a>
+<a href="#4762" id="4762">4762</a>
+<a href="#4763" id="4763">4763</a>
+<a href="#4764" id="4764">4764</a>
+<a href="#4765" id="4765">4765</a>
+<a href="#4766" id="4766">4766</a>
+<a href="#4767" id="4767">4767</a>
+<a href="#4768" id="4768">4768</a>
+<a href="#4769" id="4769">4769</a>
+<a href="#4770" id="4770">4770</a>
+<a href="#4771" id="4771">4771</a>
+<a href="#4772" id="4772">4772</a>
+<a href="#4773" id="4773">4773</a>
+<a href="#4774" id="4774">4774</a>
+<a href="#4775" id="4775">4775</a>
+<a href="#4776" id="4776">4776</a>
+<a href="#4777" id="4777">4777</a>
+<a href="#4778" id="4778">4778</a>
+<a href="#4779" id="4779">4779</a>
+<a href="#4780" id="4780">4780</a>
+<a href="#4781" id="4781">4781</a>
+<a href="#4782" id="4782">4782</a>
+<a href="#4783" id="4783">4783</a>
+<a href="#4784" id="4784">4784</a>
+<a href="#4785" id="4785">4785</a>
+<a href="#4786" id="4786">4786</a>
+<a href="#4787" id="4787">4787</a>
+<a href="#4788" id="4788">4788</a>
+<a href="#4789" id="4789">4789</a>
+<a href="#4790" id="4790">4790</a>
+<a href="#4791" id="4791">4791</a>
+<a href="#4792" id="4792">4792</a>
+<a href="#4793" id="4793">4793</a>
+<a href="#4794" id="4794">4794</a>
+<a href="#4795" id="4795">4795</a>
+<a href="#4796" id="4796">4796</a>
+<a href="#4797" id="4797">4797</a>
+<a href="#4798" id="4798">4798</a>
+<a href="#4799" id="4799">4799</a>
+<a href="#4800" id="4800">4800</a>
+<a href="#4801" id="4801">4801</a>
+<a href="#4802" id="4802">4802</a>
+<a href="#4803" id="4803">4803</a>
+<a href="#4804" id="4804">4804</a>
+<a href="#4805" id="4805">4805</a>
+<a href="#4806" id="4806">4806</a>
+<a href="#4807" id="4807">4807</a>
+<a href="#4808" id="4808">4808</a>
+<a href="#4809" id="4809">4809</a>
+<a href="#4810" id="4810">4810</a>
+<a href="#4811" id="4811">4811</a>
+<a href="#4812" id="4812">4812</a>
+<a href="#4813" id="4813">4813</a>
+<a href="#4814" id="4814">4814</a>
+<a href="#4815" id="4815">4815</a>
+<a href="#4816" id="4816">4816</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4746,6 +4832,7 @@
 <span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde_json::{from_value, json, to_string, to_vec};
+<span class="kw">use </span>to_arraystring::ToArrayString <span class="kw">as _</span>;
 <span class="kw">use </span>tracing::{debug, trace};
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::{Multipart, MultipartUpload};
@@ -5077,7 +5164,7 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"delete_message_days"</span>, delete_message_days.to_string())]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"delete_message_days"</span>, <span class="kw-2">&amp;</span>delete_message_days.to_arraystring())]),
         })
         .<span class="kw">await
     </span>}
@@ -7227,11 +7314,14 @@
         files: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Message&gt;&gt; {
+        <span class="kw">let </span>thread_id_str;
+        <span class="kw">let </span>wait_str = wait.to_arraystring();
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
 
-        params.push((<span class="string">"wait"</span>, wait.to_string()));
+        params.push((<span class="string">"wait"</span>, wait_str.as_str()));
         <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
-            params.push((<span class="string">"thread_id"</span>, thread_id.to_string()));
+            thread_id_str = thread_id.to_arraystring();
+            params.push((<span class="string">"thread_id"</span>, <span class="kw-2">&amp;</span>thread_id_str));
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
@@ -7269,6 +7359,14 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="kw">let </span>thread_id_str;
+        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="prelude-val">None</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
+            thread_id_str = thread_id.to_arraystring();
+            params = <span class="prelude-val">Some</span>([(<span class="string">"thread_id"</span>, thread_id_str.as_str())]);
+        }
+
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7279,10 +7377,7 @@
                 token,
                 message_id,
             },
-            params: thread_id
-                .map(|thread_id| [(<span class="string">"thread_id"</span>, thread_id.to_string())])
-                .as_ref()
-                .map(&lt;[<span class="kw">_</span>; <span class="number">1</span>]&gt;::as_slice),
+            params: params.as_ref().map(&lt;[<span class="kw">_</span>; <span class="number">1</span>]&gt;::as_slice),
         })
         .<span class="kw">await
     </span>}
@@ -7297,7 +7392,13 @@
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
         new_attachments: Vec&lt;CreateAttachment&lt;<span class="lifetime">'_</span>&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span>params = thread_id.map(|thread_id| [(<span class="string">"thread_id"</span>, thread_id.to_string())]);
+        <span class="kw">let </span>thread_id_str;
+        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="prelude-val">None</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
+            thread_id_str = thread_id.to_arraystring();
+            params = <span class="prelude-val">Some</span>([(<span class="string">"thread_id"</span>, thread_id_str.as_str())]);
+        }
 
         <span class="kw">let </span><span class="kw-2">mut </span>request = Request {
             body: <span class="prelude-val">None</span>,
@@ -7333,6 +7434,14 @@
         token: <span class="kw-2">&amp;</span>str,
         message_id: MessageId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>thread_id_str;
+        <span class="kw">let </span><span class="kw-2">mut </span>params = <span class="prelude-val">None</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(thread_id) = thread_id {
+            thread_id_str = thread_id.to_arraystring();
+            params = <span class="prelude-val">Some</span>([(<span class="string">"thread_id"</span>, thread_id_str.as_str())]);
+        }
+
         <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -7343,10 +7452,7 @@
                 token,
                 message_id,
             },
-            params: thread_id
-                .map(|thread_id| [(<span class="string">"thread_id"</span>, thread_id.to_string())])
-                .as_ref()
-                .map(&lt;[<span class="kw">_</span>; <span class="number">1</span>]&gt;::as_slice),
+            params: params.as_ref().map(&lt;[<span class="kw">_</span>; <span class="number">1</span>]&gt;::as_slice),
         })
         .<span class="kw">await
     </span>}
@@ -7391,17 +7497,23 @@
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
+        <span class="kw">let </span>id_str;
+        <span class="kw">let </span>limit_str;
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, limit_str.as_str()));
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = target {
-            <span class="kw">match </span>target {
-                UserPagination::After(id) =&gt; params.push((<span class="string">"after"</span>, id.to_string())),
-                UserPagination::Before(id) =&gt; params.push((<span class="string">"before"</span>, id.to_string())),
-            }
+            <span class="kw">let </span>(name, id) = <span class="kw">match </span>target {
+                UserPagination::After(id) =&gt; (<span class="string">"after"</span>, id),
+                UserPagination::Before(id) =&gt; (<span class="string">"before"</span>, id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, <span class="kw-2">&amp;</span>id_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -7426,18 +7538,23 @@
         before: <span class="prelude-ty">Option</span>&lt;AuditLogEntryId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;AuditLogs&gt; {
+        <span class="kw">let </span>(action_type_str, before_str, limit_str, user_id_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">4</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(action_type) = action_type {
-            params.push((<span class="string">"action_type"</span>, action_type.num().to_string()));
+            action_type_str = action_type.num().to_arraystring();
+            params.push((<span class="string">"action_type"</span>, action_type_str.as_str()));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
-            params.push((<span class="string">"before"</span>, before.to_string()));
+            before_str = before.to_arraystring();
+            params.push((<span class="string">"before"</span>, <span class="kw-2">&amp;</span>before_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, <span class="kw-2">&amp;</span>limit_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = user_id {
-            params.push((<span class="string">"user_id"</span>, user_id.to_string()));
+            user_id_str = user_id.to_arraystring();
+            params.push((<span class="string">"user_id"</span>, <span class="kw-2">&amp;</span>user_id_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -7629,12 +7746,15 @@
         before: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
+        <span class="kw">let </span>(before_str, limit_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
-            params.push((<span class="string">"before"</span>, before.to_string()));
+            before_str = before.to_string();
+            params.push((<span class="string">"before"</span>, before_str.as_str()));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, <span class="kw-2">&amp;</span>limit_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -7657,12 +7777,15 @@
         before: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
+        <span class="kw">let </span>(before_str, limit_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
-            params.push((<span class="string">"before"</span>, before.to_string()));
+            before_str = before.to_string();
+            params.push((<span class="string">"before"</span>, before_str.as_str()));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, <span class="kw-2">&amp;</span>limit_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -7685,12 +7808,15 @@
         before: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadsData&gt; {
+        <span class="kw">let </span>(before_str, limit_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
-            params.push((<span class="string">"before"</span>, before.to_string()));
+            before_str = before.to_arraystring();
+            params.push((<span class="string">"before"</span>, before_str.as_str()));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, <span class="kw-2">&amp;</span>limit_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -7926,28 +8052,36 @@
         guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
         exclude_ended: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Entitlement&gt;&gt; {
+        <span class="kw">let </span>(user_id_str, sku_ids_str, before_str, after_str, limit_str, guild_id_str, exclude_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">7</span>&gt;::new();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = user_id {
-            params.push((<span class="string">"user_id"</span>, user_id.to_string()));
+            user_id_str = user_id.to_arraystring();
+            params.push((<span class="string">"user_id"</span>, user_id_str.as_str()));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(sku_ids) = sku_ids {
-            params.push((<span class="string">"sku_ids"</span>, join_to_string(<span class="string">','</span>, sku_ids)));
+            sku_ids_str = join_to_string(<span class="string">','</span>, sku_ids);
+            params.push((<span class="string">"sku_ids"</span>, <span class="kw-2">&amp;</span>sku_ids_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = before {
-            params.push((<span class="string">"before"</span>, before.to_string()));
+            before_str = before.to_arraystring();
+            params.push((<span class="string">"before"</span>, <span class="kw-2">&amp;</span>before_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
-            params.push((<span class="string">"after"</span>, after.to_string()));
+            after_str = after.to_arraystring();
+            params.push((<span class="string">"after"</span>, <span class="kw-2">&amp;</span>after_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, <span class="kw-2">&amp;</span>limit_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = guild_id {
-            params.push((<span class="string">"guild_id"</span>, guild_id.to_string()));
+            guild_id_str = guild_id.to_arraystring();
+            params.push((<span class="string">"guild_id"</span>, <span class="kw-2">&amp;</span>guild_id_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(exclude_ended) = exclude_ended {
-            params.push((<span class="string">"exclude_ended"</span>, exclude_ended.to_string()));
+            exclude_str = exclude_ended.to_arraystring();
+            params.push((<span class="string">"exclude_ended"</span>, <span class="kw-2">&amp;</span>exclude_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -8001,7 +8135,7 @@
             route: Route::Commands {
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, String::from(<span class="string">"true"</span>))]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, <span class="string">"true"</span>)]),
         })
         .<span class="kw">await
     </span>}
@@ -8047,7 +8181,7 @@
             route: Route::Guild {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_counts"</span>, String::from(<span class="string">"true"</span>))]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_counts"</span>, <span class="string">"true"</span>)]),
         })
         .<span class="kw">await
     </span>}
@@ -8083,7 +8217,7 @@
                 application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, String::from(<span class="string">"true"</span>))]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_localizations"</span>, <span class="string">"true"</span>)]),
         })
         .<span class="kw">await
     </span>}
@@ -8255,10 +8389,15 @@
         limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
+        <span class="kw">let </span>(limit_str, after_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
-        params.push((<span class="string">"limit"</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()));
+
+        limit_str = limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).get().to_arraystring();
+        params.push((<span class="string">"limit"</span>, limit_str.as_str()));
+
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
-            params.push((<span class="string">"after"</span>, after.to_string()));
+            after_str = after.to_arraystring();
+            params.push((<span class="string">"after"</span>, <span class="kw-2">&amp;</span>after_str));
         }
 
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
@@ -8287,6 +8426,7 @@
 
     <span class="doccomment">/// Gets the amount of users that can be pruned.
     </span><span class="kw">pub async fn </span>get_guild_prune_count(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
+        <span class="kw">let </span>days_str = days.to_arraystring();
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -8295,7 +8435,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, days.to_string())]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, <span class="kw-2">&amp;</span>days_str)]),
         })
         .<span class="kw">await
     </span>}
@@ -8353,6 +8493,7 @@
         event_id: ScheduledEventId,
         with_user_count: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
+        <span class="kw">let </span>with_user_count_str = with_user_count.to_arraystring();
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -8362,7 +8503,7 @@
                 guild_id,
                 event_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, with_user_count.to_string())]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, <span class="kw-2">&amp;</span>with_user_count_str)]),
         })
         .<span class="kw">await
     </span>}
@@ -8377,6 +8518,7 @@
         guild_id: GuildId,
         with_user_count: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEvent&gt;&gt; {
+        <span class="kw">let </span>with_user_count_str = with_user_count.to_arraystring();
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -8385,7 +8527,7 @@
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, with_user_count.to_string())]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"with_user_count"</span>, <span class="kw-2">&amp;</span>with_user_count_str)]),
         })
         .<span class="kw">await
     </span>}
@@ -8414,18 +8556,24 @@
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
         with_member: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ScheduledEventUser&gt;&gt; {
+        <span class="kw">let </span>(limit_str, with_member_str, id_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">3</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, limit_str.as_str()));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(with_member) = with_member {
-            params.push((<span class="string">"with_member"</span>, with_member.to_string()));
+            with_member_str = with_member.to_arraystring();
+            params.push((<span class="string">"with_member"</span>, <span class="kw-2">&amp;</span>with_member_str));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = target {
-            <span class="kw">match </span>target {
-                UserPagination::After(id) =&gt; params.push((<span class="string">"after"</span>, id.to_string())),
-                UserPagination::Before(id) =&gt; params.push((<span class="string">"before"</span>, id.to_string())),
-            }
+            <span class="kw">let </span>(name, id) = <span class="kw">match </span>target {
+                UserPagination::After(id) =&gt; (<span class="string">"after"</span>, id),
+                UserPagination::Before(id) =&gt; (<span class="string">"before"</span>, id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, <span class="kw-2">&amp;</span>id_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -8560,15 +8708,20 @@
         target: <span class="prelude-ty">Option</span>&lt;GuildPagination&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;GuildInfo&gt;&gt; {
+        <span class="kw">let </span>(limit_str, id_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, limit_str.as_str()));
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = target {
-            <span class="kw">match </span>target {
-                GuildPagination::After(id) =&gt; params.push((<span class="string">"after"</span>, id.to_string())),
-                GuildPagination::Before(id) =&gt; params.push((<span class="string">"before"</span>, id.to_string())),
-            }
+            <span class="kw">let </span>(name, id) = <span class="kw">match </span>target {
+                GuildPagination::After(id) =&gt; (<span class="string">"after"</span>, id),
+                GuildPagination::Before(id) =&gt; (<span class="string">"before"</span>, id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, <span class="kw-2">&amp;</span>id_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -8650,14 +8803,21 @@
         expiration: bool,
         event_id: <span class="prelude-ty">Option</span>&lt;ScheduledEventId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
+        <span class="kw">let </span>(member_counts_str, expiration_str, event_id_str);
         <span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
         </span><span class="kw">let </span>code = <span class="kw">crate</span>::utils::parse_invite(code);
 
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">3</span>&gt;::new();
-        params.push((<span class="string">"member_counts"</span>, member_counts.to_string()));
-        params.push((<span class="string">"expiration"</span>, expiration.to_string()));
+
+        member_counts_str = member_counts.to_arraystring();
+        params.push((<span class="string">"member_counts"</span>, member_counts_str.as_str()));
+
+        expiration_str = expiration.to_arraystring();
+        params.push((<span class="string">"expiration"</span>, <span class="kw-2">&amp;</span>expiration_str));
+
         <span class="kw">if let </span><span class="prelude-val">Some</span>(event_id) = event_id {
-            params.push((<span class="string">"event_id"</span>, event_id.to_string()));
+            event_id_str = event_id.to_arraystring();
+            params.push((<span class="string">"event_id"</span>, <span class="kw-2">&amp;</span>event_id_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -8723,16 +8883,23 @@
         target: <span class="prelude-ty">Option</span>&lt;MessagePagination&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
+        <span class="kw">let </span>(limit_str, id_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
+
         <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = limit {
-            params.push((<span class="string">"limit"</span>, limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push((<span class="string">"limit"</span>, limit_str.as_str()));
         }
+
         <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = target {
-            <span class="kw">match </span>target {
-                MessagePagination::After(id) =&gt; params.push((<span class="string">"after"</span>, id.to_string())),
-                MessagePagination::Around(id) =&gt; params.push((<span class="string">"around"</span>, id.to_string())),
-                MessagePagination::Before(id) =&gt; params.push((<span class="string">"before"</span>, id.to_string())),
-            }
+            <span class="kw">let </span>(name, id) = <span class="kw">match </span>target {
+                MessagePagination::After(id) =&gt; (<span class="string">"after"</span>, id),
+                MessagePagination::Around(id) =&gt; (<span class="string">"around"</span>, id),
+                MessagePagination::Before(id) =&gt; (<span class="string">"before"</span>, id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, <span class="kw-2">&amp;</span>id_str));
         }
 
         <span class="self">self</span>.fire(Request {
@@ -8791,11 +8958,17 @@
         limit: u8,
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
+        <span class="kw">let </span>(limit_str, after_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
-        params.push((<span class="string">"limit"</span>, limit.to_string()));
+
+        limit_str = limit.to_arraystring();
+        params.push((<span class="string">"limit"</span>, limit_str.as_str()));
+
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
-            params.push((<span class="string">"after"</span>, after.to_string()));
+            after_str = after.to_arraystring();
+            params.push((<span class="string">"after"</span>, <span class="kw-2">&amp;</span>after_str));
         }
+
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -9206,6 +9379,7 @@
         query: <span class="kw-2">&amp;</span>str,
         limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Member&gt;&gt; {
+        <span class="kw">let </span>limit_str = limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).get().to_arraystring();
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
             </span>.fire(Request {
                 body: <span class="prelude-val">None</span>,
@@ -9215,10 +9389,7 @@
                 route: Route::GuildMembersSearch {
                     guild_id,
                 },
-                params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[
-                    (<span class="string">"query"</span>, query.to_string()),
-                    (<span class="string">"limit"</span>, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()),
-                ]),
+                params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"query"</span>, query), (<span class="string">"limit"</span>, <span class="kw-2">&amp;</span>limit_str)]),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -9240,6 +9411,7 @@
         days: u8,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
+        <span class="kw">let </span>days_str = days.to_arraystring();
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -9248,7 +9420,7 @@
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, days.to_string())]),
+            params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[(<span class="string">"days"</span>, <span class="kw-2">&amp;</span>days_str)]),
         })
         .<span class="kw">await
     </span>}

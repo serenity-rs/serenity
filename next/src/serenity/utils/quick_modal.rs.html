@@ -145,7 +145,11 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+
+<span class="kw">use </span>to_arraystring::ToArrayString;
 
 <span class="kw">use </span><span class="kw">crate</span>::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 <span class="kw">use </span><span class="kw">crate</span>::client::Context;
@@ -234,9 +238,9 @@
         interaction_id: InteractionId,
         token: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;QuickModalResponse&gt;, <span class="kw">crate</span>::Error&gt; {
-        <span class="kw">let </span>modal_custom_id = interaction_id.get().to_string();
+        <span class="kw">let </span>modal_custom_id = interaction_id.to_arraystring();
         <span class="kw">let </span>builder = CreateInteractionResponse::Modal(
-            CreateModal::new(<span class="kw-2">&amp;</span>modal_custom_id, <span class="self">self</span>.title).components(
+            CreateModal::new(modal_custom_id.as_str(), <span class="self">self</span>.title).components(
                 <span class="self">self</span>.input_texts
                     .into_iter()
                     .enumerate()
@@ -249,7 +253,7 @@
         builder.execute(<span class="kw-2">&amp;</span>ctx.http, interaction_id, token).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>collector = ModalInteractionCollector::new(ctx.shard.clone())
-            .custom_ids(<span class="macro">vec!</span>[modal_custom_id.trunc_into()]);
+            .custom_ids(<span class="macro">vec!</span>[FixedString::from_str_trunc(<span class="kw-2">&amp;</span>modal_custom_id)]);
 
         <span class="kw">let </span>collector = <span class="kw">match </span><span class="self">self</span>.timeout {
             <span class="prelude-val">Some</span>(timeout) =&gt; collector.timeout(timeout),

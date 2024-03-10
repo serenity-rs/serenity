@@ -108,9 +108,18 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>arrayvec::ArrayVec;
+<span class="kw">use </span>to_arraystring::ToArrayString;
 <span class="kw">use </span>url::Url;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -139,33 +148,40 @@
     <span class="doccomment">/// Builds the url with the provided data.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; String {
+        <span class="comment">// These bindings have to be defined before `valid_data`, due to Drop order.
+        </span><span class="kw">let </span>(client_id_str, guild_id_str, scope_str, bits_str);
+
         <span class="kw">let </span><span class="kw-2">mut </span>valid_data = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">5</span>&gt;::new();
         <span class="kw">let </span>bits = <span class="self">self</span>.permissions.bits();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(client_id) = <span class="self">self</span>.client_id {
-            valid_data.push((<span class="string">"client_id"</span>, client_id.to_string()));
+            client_id_str = client_id.to_arraystring();
+            valid_data.push((<span class="string">"client_id"</span>, client_id_str.as_str()));
         }
 
         <span class="kw">if </span>!<span class="self">self</span>.scopes.is_empty() {
-            valid_data.push((<span class="string">"scope"</span>, join_to_string(<span class="string">','</span>, <span class="self">self</span>.scopes.iter())));
+            scope_str = join_to_string(<span class="string">','</span>, <span class="self">self</span>.scopes.iter());
+            valid_data.push((<span class="string">"scope"</span>, <span class="kw-2">&amp;</span>scope_str));
         }
 
         <span class="kw">if </span>bits != <span class="number">0 </span>{
-            valid_data.push((<span class="string">"permissions"</span>, bits.to_string()));
+            bits_str = bits.to_arraystring();
+            valid_data.push((<span class="string">"permissions"</span>, <span class="kw-2">&amp;</span>bits_str));
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.guild_id {
-            valid_data.push((<span class="string">"guild"</span>, guild_id.to_string()));
+            guild_id_str = guild_id.to_arraystring();
+            valid_data.push((<span class="string">"guild"</span>, <span class="kw-2">&amp;</span>guild_id_str));
         }
 
         <span class="kw">if </span><span class="self">self</span>.disable_guild_select {
-            valid_data.push((<span class="string">"disable_guild_select"</span>, <span class="self">self</span>.disable_guild_select.to_string()));
+            valid_data.push((<span class="string">"disable_guild_select"</span>, <span class="string">"true"</span>));
         }
 
         <span class="kw">let </span>url = Url::parse_with_params(<span class="string">"https://discord.com/api/oauth2/authorize"</span>, <span class="kw-2">&amp;</span>valid_data)
             .expect(<span class="string">"failed to construct URL"</span>);
 
-        url.to_string()
+        url.into()
     }
 
     <span class="doccomment">/// Specify the client Id of your application.

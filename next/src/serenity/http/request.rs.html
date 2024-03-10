@@ -171,7 +171,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) headers: <span class="prelude-ty">Option</span>&lt;Headers&gt;,
     <span class="kw">pub</span>(<span class="kw">super</span>) method: LightMethod,
     <span class="kw">pub</span>(<span class="kw">super</span>) route: Route&lt;<span class="lifetime">'a</span>&gt;,
-    <span class="kw">pub</span>(<span class="kw">super</span>) params: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)]&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) params: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str)]&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Request&lt;<span class="lifetime">'a</span>&gt; {
@@ -201,7 +201,7 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>params(<span class="kw-2">mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)]) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>params(<span class="kw-2">mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str)]) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>params.is_empty() {
             <span class="self">self</span>.params = <span class="prelude-val">None</span>;
         } <span class="kw">else </span>{
@@ -220,7 +220,7 @@
         token: <span class="kw-2">&amp;</span>str,
         proxy: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ReqwestRequestBuilder&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>path = <span class="self">self</span>.route.path().to_string();
+        <span class="kw">let </span><span class="kw-2">mut </span>path = <span class="self">self</span>.route.path().into_owned();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(proxy) = proxy {
             <span class="comment">// trim_end_matches to prevent double slashes after the domain
@@ -286,7 +286,7 @@
     }
 
     <span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>params_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, String)]&gt; {
+    </span><span class="kw">pub fn </span>params_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str)]&gt; {
         <span class="self">self</span>.params
     }
 }
