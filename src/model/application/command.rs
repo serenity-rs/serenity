@@ -76,7 +76,7 @@ pub struct Command {
     /// commands. By default, commands are visible.
     #[serde(default)]
     #[cfg_attr(
-        all(not(ignore_serenity_deprecated), feature = "unstable_discord_api"),
+        all(not(ignore_serenity_deprecated), feature = "unstable"),
         deprecated = "Use Command::contexts"
     )]
     pub dm_permission: Option<bool>,

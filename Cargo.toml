@@ -113,7 +113,7 @@ model = ["builder", "http", "utils"]
 voice_model = ["serenity-voice-model"]
 # Enables support for Discord API functionality that's not stable yet, as well as serenity APIs that
 # are allowed to change even in semver non-breaking updates.
-unstable_discord_api = []
+unstable = []
 # Enables some utility functions that can be useful for bot creators.
 utils = []
 voice = ["client", "model"]
@@ -125,7 +125,9 @@ chrono = ["dep:chrono", "typesize?/chrono"]
 
 # This enables all parts of the serenity codebase
 # (Note: all feature-gated APIs to be documented should have their features listed here!)
-full = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
+# 
+# Unstable functionality should be gated under the `unstable` feature.
+full = ["default", "collector", "voice", "voice_model", "interactions_endpoint"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka", "typesize?/mini_moka"]
