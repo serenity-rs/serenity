@@ -415,7 +415,7 @@ impl<'a> CreateCommand<'a> {
     }
 
     /// Specifies if the command is available in DMs.
-    #[cfg_attr(feature = "unstable_discord_api", deprecated = "Use contexts instead")]
+    #[cfg_attr(feature = "unstable", deprecated = "Use contexts instead")]
     pub fn dm_permission(mut self, enabled: bool) -> Self {
         self.dm_permission = Some(enabled);
         self
