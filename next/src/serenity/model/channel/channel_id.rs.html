@@ -1171,23 +1171,6 @@
 <a href="#1169" id="1169">1169</a>
 <a href="#1170" id="1170">1170</a>
 <a href="#1171" id="1171">1171</a>
-<a href="#1172" id="1172">1172</a>
-<a href="#1173" id="1173">1173</a>
-<a href="#1174" id="1174">1174</a>
-<a href="#1175" id="1175">1175</a>
-<a href="#1176" id="1176">1176</a>
-<a href="#1177" id="1177">1177</a>
-<a href="#1178" id="1178">1178</a>
-<a href="#1179" id="1179">1179</a>
-<a href="#1180" id="1180">1180</a>
-<a href="#1181" id="1181">1181</a>
-<a href="#1182" id="1182">1182</a>
-<a href="#1183" id="1183">1183</a>
-<a href="#1184" id="1184">1184</a>
-<a href="#1185" id="1185">1185</a>
-<a href="#1186" id="1186">1186</a>
-<a href="#1187" id="1187">1187</a>
-<a href="#1188" id="1188">1188</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1680,23 +1663,6 @@
         cache_http: <span class="kw-2">&amp;</span><span class="kw">impl </span>CacheHttp,
     ) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; + <span class="lifetime">'_ </span>{
         MessagesIter::stream(cache_http, <span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// Returns the name of whatever channel this id holds.
-    ///
-    /// DM channels don't have a name, so a name is generated according to
-    /// [`PrivateChannel::name()`].
-    ///
-    /// # Errors
-    ///
-    /// Same as [`Self::to_channel()`].
-    </span><span class="kw">pub async fn </span>name(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
-        <span class="kw">let </span>channel = <span class="self">self</span>.to_channel(cache_http).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="kw">match </span>channel {
-            Channel::Guild(channel) =&gt; channel.name.into(),
-            Channel::Private(channel) =&gt; channel.name(),
-        })
     }
 
     <span class="doccomment">/// Pins a [`Message`] to the channel.
