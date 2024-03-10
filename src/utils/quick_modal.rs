@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use to_arraystring::ToArrayString;
+
 use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
@@ -87,9 +89,9 @@ impl<'a> CreateQuickModal<'a> {
         interaction_id: InteractionId,
         token: &str,
     ) -> Result<Option<QuickModalResponse>, crate::Error> {
-        let modal_custom_id = interaction_id.get().to_string();
+        let modal_custom_id = interaction_id.to_arraystring();
         let builder = CreateInteractionResponse::Modal(
-            CreateModal::new(&modal_custom_id, self.title).components(
+            CreateModal::new(modal_custom_id.as_str(), self.title).components(
                 self.input_texts
                     .into_iter()
                     .enumerate()
@@ -102,7 +104,7 @@ impl<'a> CreateQuickModal<'a> {
         builder.execute(&ctx.http, interaction_id, token).await?;
 
         let collector = ModalInteractionCollector::new(ctx.shard.clone())
-            .custom_ids(vec![modal_custom_id.trunc_into()]);
+            .custom_ids(vec![FixedString::from_str_trunc(&modal_custom_id)]);
 
         let collector = match self.timeout {
             Some(timeout) => collector.timeout(timeout),

@@ -14,6 +14,7 @@ use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret as _, Secret};
 use serde::de::DeserializeOwned;
 use serde_json::{from_value, json, to_string, to_vec};
+use to_arraystring::ToArrayString as _;
 use tracing::{debug, warn};
 
 use super::multipart::{Multipart, MultipartUpload};
@@ -364,7 +365,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: Some(&[("delete_message_seconds", delete_message_seconds.to_string())]),
+            params: Some(&[("delete_message_seconds", &delete_message_seconds.to_arraystring())]),
         })
         .await
     }
@@ -905,7 +906,7 @@ impl Http {
                 message_id,
                 reaction: &reaction_type.as_data(),
             },
-            params: Some(&[("burst", burst.to_string())]),
+            params: Some(&[("burst", &burst.to_arraystring())]),
         })
         .await
     }
@@ -2646,11 +2647,14 @@ impl Http {
         files: Vec<CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
+        let thread_id_str;
+        let wait_str = wait.to_arraystring();
         let mut params = ArrayVec::<_, 2>::new();
 
-        params.push(("wait", wait.to_string()));
+        params.push(("wait", wait_str.as_str()));
         if let Some(thread_id) = thread_id {
-            params.push(("thread_id", thread_id.to_string()));
+            thread_id_str = thread_id.to_arraystring();
+            params.push(("thread_id", &thread_id_str));
         }
 
         let mut request = Request {
@@ -2688,6 +2692,14 @@ impl Http {
         token: &str,
         message_id: MessageId,
     ) -> Result<Message> {
+        let thread_id_str;
+        let mut params = None;
+
+        if let Some(thread_id) = thread_id {
+            thread_id_str = thread_id.to_arraystring();
+            params = Some([("thread_id", thread_id_str.as_str())]);
+        }
+
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2698,10 +2710,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: thread_id
-                .map(|thread_id| [("thread_id", thread_id.to_string())])
-                .as_ref()
-                .map(<[_; 1]>::as_slice),
+            params: params.as_ref().map(<[_; 1]>::as_slice),
         })
         .await
     }
@@ -2716,7 +2725,13 @@ impl Http {
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
-        let params = thread_id.map(|thread_id| [("thread_id", thread_id.to_string())]);
+        let thread_id_str;
+        let mut params = None;
+
+        if let Some(thread_id) = thread_id {
+            thread_id_str = thread_id.to_arraystring();
+            params = Some([("thread_id", thread_id_str.as_str())]);
+        }
 
         let mut request = Request {
             body: None,
@@ -2752,6 +2767,14 @@ impl Http {
         token: &str,
         message_id: MessageId,
     ) -> Result<()> {
+        let thread_id_str;
+        let mut params = None;
+
+        if let Some(thread_id) = thread_id {
+            thread_id_str = thread_id.to_arraystring();
+            params = Some([("thread_id", thread_id_str.as_str())]);
+        }
+
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -2762,10 +2785,7 @@ impl Http {
                 token,
                 message_id,
             },
-            params: thread_id
-                .map(|thread_id| [("thread_id", thread_id.to_string())])
-                .as_ref()
-                .map(<[_; 1]>::as_slice),
+            params: params.as_ref().map(<[_; 1]>::as_slice),
         })
         .await
     }
@@ -2810,17 +2830,23 @@ impl Http {
         target: Option<UserPagination>,
         limit: Option<u8>,
     ) -> Result<Vec<Ban>> {
+        let id_str;
+        let limit_str;
         let mut params = ArrayVec::<_, 2>::new();
 
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", limit_str.as_str()));
         }
 
         if let Some(target) = target {
-            match target {
-                UserPagination::After(id) => params.push(("after", id.to_string())),
-                UserPagination::Before(id) => params.push(("before", id.to_string())),
-            }
+            let (name, id) = match target {
+                UserPagination::After(id) => ("after", id),
+                UserPagination::Before(id) => ("before", id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, &id_str));
         }
 
         self.fire(Request {
@@ -2845,18 +2871,23 @@ impl Http {
         before: Option<AuditLogEntryId>,
         limit: Option<u8>,
     ) -> Result<AuditLogs> {
+        let (action_type_str, before_str, limit_str, user_id_str);
         let mut params = ArrayVec::<_, 4>::new();
         if let Some(action_type) = action_type {
-            params.push(("action_type", action_type.num().to_string()));
+            action_type_str = action_type.num().to_arraystring();
+            params.push(("action_type", action_type_str.as_str()));
         }
         if let Some(before) = before {
-            params.push(("before", before.to_string()));
+            before_str = before.to_arraystring();
+            params.push(("before", &before_str));
         }
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", &limit_str));
         }
         if let Some(user_id) = user_id {
-            params.push(("user_id", user_id.to_string()));
+            user_id_str = user_id.to_arraystring();
+            params.push(("user_id", &user_id_str));
         }
 
         self.fire(Request {
@@ -3048,12 +3079,15 @@ impl Http {
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
+        let (before_str, limit_str);
         let mut params = ArrayVec::<_, 2>::new();
         if let Some(before) = before {
-            params.push(("before", before.to_string()));
+            before_str = before.to_string();
+            params.push(("before", before_str.as_str()));
         }
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", &limit_str));
         }
 
         self.fire(Request {
@@ -3076,12 +3110,15 @@ impl Http {
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
+        let (before_str, limit_str);
         let mut params = ArrayVec::<_, 2>::new();
         if let Some(before) = before {
-            params.push(("before", before.to_string()));
+            before_str = before.to_string();
+            params.push(("before", before_str.as_str()));
         }
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", &limit_str));
         }
 
         self.fire(Request {
@@ -3104,12 +3141,15 @@ impl Http {
         before: Option<ChannelId>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
+        let (before_str, limit_str);
         let mut params = ArrayVec::<_, 2>::new();
         if let Some(before) = before {
-            params.push(("before", before.to_string()));
+            before_str = before.to_arraystring();
+            params.push(("before", before_str.as_str()));
         }
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", &limit_str));
         }
 
         self.fire(Request {
@@ -3210,7 +3250,7 @@ impl Http {
                 channel_id,
                 user_id,
             },
-            params: Some(&[("with_member", with_member.to_string())]),
+            params: Some(&[("with_member", &with_member.to_arraystring())]),
         })
         .await
     }
@@ -3308,13 +3348,16 @@ impl Http {
             users: Vec<User>,
         }
 
+        let (after_str, limit_str);
         let mut params = ArrayVec::<_, 2>::new();
         if let Some(after) = after {
-            params.push(("after", after.to_string()));
+            after_str = after.to_arraystring();
+            params.push(("after", after_str.as_str()));
         }
 
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", &limit_str));
         }
 
         let resp: VotersResponse = self
@@ -3465,27 +3508,35 @@ impl Http {
         guild_id: Option<GuildId>,
         exclude_ended: Option<bool>,
     ) -> Result<Vec<Entitlement>> {
+        let (user_id_str, sku_ids_str, before_str, after_str, limit_str, guild_id_str, exclude_str);
         let mut params = ArrayVec::<_, 7>::new();
         if let Some(user_id) = user_id {
-            params.push(("user_id", user_id.to_string()));
+            user_id_str = user_id.to_arraystring();
+            params.push(("user_id", user_id_str.as_str()));
         }
         if let Some(sku_ids) = sku_ids {
-            params.push(("sku_ids", join_to_string(',', sku_ids)));
+            sku_ids_str = join_to_string(',', sku_ids);
+            params.push(("sku_ids", &sku_ids_str));
         }
         if let Some(before) = before {
-            params.push(("before", before.to_string()));
+            before_str = before.to_arraystring();
+            params.push(("before", &before_str));
         }
         if let Some(after) = after {
-            params.push(("after", after.to_string()));
+            after_str = after.to_arraystring();
+            params.push(("after", &after_str));
         }
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", &limit_str));
         }
         if let Some(guild_id) = guild_id {
-            params.push(("guild_id", guild_id.to_string()));
+            guild_id_str = guild_id.to_arraystring();
+            params.push(("guild_id", &guild_id_str));
         }
         if let Some(exclude_ended) = exclude_ended {
-            params.push(("exclude_ended", exclude_ended.to_string()));
+            exclude_str = exclude_ended.to_arraystring();
+            params.push(("exclude_ended", &exclude_str));
         }
 
         self.fire(Request {
@@ -3539,7 +3590,7 @@ impl Http {
             route: Route::Commands {
                 application_id: self.try_application_id()?,
             },
-            params: Some(&[("with_localizations", String::from("true"))]),
+            params: Some(&[("with_localizations", "true")]),
         })
         .await
     }
@@ -3585,7 +3636,7 @@ impl Http {
             route: Route::Guild {
                 guild_id,
             },
-            params: Some(&[("with_counts", String::from("true"))]),
+            params: Some(&[("with_counts", "true")]),
         })
         .await
     }
@@ -3621,7 +3672,7 @@ impl Http {
                 application_id: self.try_application_id()?,
                 guild_id,
             },
-            params: Some(&[("with_localizations", String::from("true"))]),
+            params: Some(&[("with_localizations", "true")]),
         })
         .await
     }
@@ -3793,10 +3844,15 @@ impl Http {
         limit: Option<NonMaxU16>,
         after: Option<UserId>,
     ) -> Result<Vec<Member>> {
+        let (limit_str, after_str);
         let mut params = ArrayVec::<_, 2>::new();
-        params.push(("limit", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()));
+
+        limit_str = limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).get().to_arraystring();
+        params.push(("limit", limit_str.as_str()));
+
         if let Some(after) = after {
-            params.push(("after", after.to_string()));
+            after_str = after.to_arraystring();
+            params.push(("after", &after_str));
         }
 
         let mut value: Value = self
@@ -3825,6 +3881,7 @@ impl Http {
 
     /// Gets the amount of users that can be pruned.
     pub async fn get_guild_prune_count(&self, guild_id: GuildId, days: u8) -> Result<GuildPrune> {
+        let days_str = days.to_arraystring();
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3833,7 +3890,7 @@ impl Http {
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: Some(&[("days", days.to_string())]),
+            params: Some(&[("days", &days_str)]),
         })
         .await
     }
@@ -3914,6 +3971,7 @@ impl Http {
         event_id: ScheduledEventId,
         with_user_count: bool,
     ) -> Result<ScheduledEvent> {
+        let with_user_count_str = with_user_count.to_arraystring();
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3923,7 +3981,7 @@ impl Http {
                 guild_id,
                 event_id,
             },
-            params: Some(&[("with_user_count", with_user_count.to_string())]),
+            params: Some(&[("with_user_count", &with_user_count_str)]),
         })
         .await
     }
@@ -3938,6 +3996,7 @@ impl Http {
         guild_id: GuildId,
         with_user_count: bool,
     ) -> Result<Vec<ScheduledEvent>> {
+        let with_user_count_str = with_user_count.to_arraystring();
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3946,7 +4005,7 @@ impl Http {
             route: Route::GuildScheduledEvents {
                 guild_id,
             },
-            params: Some(&[("with_user_count", with_user_count.to_string())]),
+            params: Some(&[("with_user_count", &with_user_count_str)]),
         })
         .await
     }
@@ -3975,18 +4034,24 @@ impl Http {
         target: Option<UserPagination>,
         with_member: Option<bool>,
     ) -> Result<Vec<ScheduledEventUser>> {
+        let (limit_str, with_member_str, id_str);
         let mut params = ArrayVec::<_, 3>::new();
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", limit_str.as_str()));
         }
         if let Some(with_member) = with_member {
-            params.push(("with_member", with_member.to_string()));
+            with_member_str = with_member.to_arraystring();
+            params.push(("with_member", &with_member_str));
         }
         if let Some(target) = target {
-            match target {
-                UserPagination::After(id) => params.push(("after", id.to_string())),
-                UserPagination::Before(id) => params.push(("before", id.to_string())),
-            }
+            let (name, id) = match target {
+                UserPagination::After(id) => ("after", id),
+                UserPagination::Before(id) => ("before", id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, &id_str));
         }
 
         self.fire(Request {
@@ -4121,15 +4186,20 @@ impl Http {
         target: Option<GuildPagination>,
         limit: Option<u64>,
     ) -> Result<Vec<GuildInfo>> {
+        let (limit_str, id_str);
         let mut params = ArrayVec::<_, 2>::new();
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", limit_str.as_str()));
         }
         if let Some(target) = target {
-            match target {
-                GuildPagination::After(id) => params.push(("after", id.to_string())),
-                GuildPagination::Before(id) => params.push(("before", id.to_string())),
-            }
+            let (name, id) = match target {
+                GuildPagination::After(id) => ("after", id),
+                GuildPagination::Before(id) => ("before", id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, &id_str));
         }
 
         self.fire(Request {
@@ -4211,14 +4281,21 @@ impl Http {
         expiration: bool,
         event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
+        let (member_counts_str, expiration_str, event_id_str);
         #[cfg(feature = "utils")]
         let code = crate::utils::parse_invite(code);
 
         let mut params = ArrayVec::<_, 3>::new();
-        params.push(("member_counts", member_counts.to_string()));
-        params.push(("expiration", expiration.to_string()));
+
+        member_counts_str = member_counts.to_arraystring();
+        params.push(("member_counts", member_counts_str.as_str()));
+
+        expiration_str = expiration.to_arraystring();
+        params.push(("expiration", &expiration_str));
+
         if let Some(event_id) = event_id {
-            params.push(("event_id", event_id.to_string()));
+            event_id_str = event_id.to_arraystring();
+            params.push(("event_id", &event_id_str));
         }
 
         self.fire(Request {
@@ -4284,16 +4361,23 @@ impl Http {
         target: Option<MessagePagination>,
         limit: Option<u8>,
     ) -> Result<Vec<Message>> {
+        let (limit_str, id_str);
         let mut params = ArrayVec::<_, 2>::new();
+
         if let Some(limit) = limit {
-            params.push(("limit", limit.to_string()));
+            limit_str = limit.to_arraystring();
+            params.push(("limit", limit_str.as_str()));
         }
+
         if let Some(target) = target {
-            match target {
-                MessagePagination::After(id) => params.push(("after", id.to_string())),
-                MessagePagination::Around(id) => params.push(("around", id.to_string())),
-                MessagePagination::Before(id) => params.push(("before", id.to_string())),
-            }
+            let (name, id) = match target {
+                MessagePagination::After(id) => ("after", id),
+                MessagePagination::Around(id) => ("around", id),
+                MessagePagination::Before(id) => ("before", id),
+            };
+
+            id_str = id.to_arraystring();
+            params.push((name, &id_str));
         }
 
         self.fire(Request {
@@ -4367,11 +4451,17 @@ impl Http {
         limit: u8,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
+        let (limit_str, after_str);
         let mut params = ArrayVec::<_, 2>::new();
-        params.push(("limit", limit.to_string()));
+
+        limit_str = limit.to_arraystring();
+        params.push(("limit", limit_str.as_str()));
+
         if let Some(after) = after {
-            params.push(("after", after.to_string()));
+            after_str = after.to_arraystring();
+            params.push(("after", &after_str));
         }
+
         self.fire(Request {
             body: None,
             multipart: None,
@@ -4782,6 +4872,7 @@ impl Http {
         query: &str,
         limit: Option<NonMaxU16>,
     ) -> Result<Vec<Member>> {
+        let limit_str = limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).get().to_arraystring();
         let mut value: Value = self
             .fire(Request {
                 body: None,
@@ -4791,10 +4882,7 @@ impl Http {
                 route: Route::GuildMembersSearch {
                     guild_id,
                 },
-                params: Some(&[
-                    ("query", query.to_string()),
-                    ("limit", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT).to_string()),
-                ]),
+                params: Some(&[("query", query), ("limit", &limit_str)]),
             })
             .await?;
 
@@ -4816,6 +4904,7 @@ impl Http {
         days: u8,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildPrune> {
+        let days_str = days.to_arraystring();
         self.fire(Request {
             body: None,
             multipart: None,
@@ -4824,7 +4913,7 @@ impl Http {
             route: Route::GuildPrune {
                 guild_id,
             },
-            params: Some(&[("days", days.to_string())]),
+            params: Some(&[("days", &days_str)]),
         })
         .await
     }
