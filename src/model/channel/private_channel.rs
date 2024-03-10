@@ -181,12 +181,6 @@ impl PrivateChannel {
         self.id.messages(http, builder).await
     }
 
-    /// Returns "DM with $username#discriminator".
-    #[must_use]
-    pub fn name(&self) -> String {
-        format!("DM with {}", self.recipient.tag())
-    }
-
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
     /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
