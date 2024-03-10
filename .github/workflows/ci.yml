@@ -43,13 +43,13 @@ jobs:
           - name: chrono
             features: chrono
           - name: unstable API + typesize
-            features: default unstable_discord_api typesize
+            features: default unstable typesize
             dont-test: true
           - name: builder without model
             features: builder
             dont-test: true
           - name: unstable Discord API (no default features)
-            features: unstable_discord_api
+            features: unstable
             dont-test: true
 
     steps:
@@ -207,7 +207,7 @@ jobs:
 
       - name: Build docs
         run: |
-          cargo doc --no-deps --features collector,voice,unstable_discord_api
+          cargo doc --no-deps --features collector,voice,unstable
         env:
           RUSTDOCFLAGS: -D rustdoc::broken_intra_doc_links
 
