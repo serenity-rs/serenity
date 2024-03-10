@@ -455,7 +455,6 @@
 <a href="#453" id="453">453</a>
 <a href="#454" id="454">454</a>
 <a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::cell::Cell;
 <span class="kw">use </span>std::fmt;
@@ -808,8 +807,7 @@
         vec: <span class="kw-2">&amp;</span>FixedArray&lt;FixedString&gt;,
         serializer: S,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
-        <span class="kw">let </span>vec: Vec&lt;String&gt; = vec.iter().cloned().map(String::from).collect();
-        serializer.serialize_str(<span class="kw-2">&amp;</span>vec.join(<span class="string">", "</span>))
+        serializer.serialize_str(<span class="kw-2">&amp;</span>join_to_string(<span class="string">", "</span>, vec))
     }
 }
 
