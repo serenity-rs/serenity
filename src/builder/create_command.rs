@@ -342,10 +342,10 @@ pub struct CreateCommand<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<CommandType>,
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     #[serde(skip_serializing_if = "Option::is_none")]
     integration_types: Option<Vec<InstallationContext>>,
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     #[serde(skip_serializing_if = "Option::is_none")]
     contexts: Option<Vec<InteractionContext>>,
     nsfw: bool,
@@ -364,9 +364,9 @@ impl<'a> CreateCommand<'a> {
             default_member_permissions: None,
             dm_permission: None,
 
-            #[cfg(feature = "unstable_discord_api")]
+            #[cfg(feature = "unstable")]
             integration_types: None,
-            #[cfg(feature = "unstable_discord_api")]
+            #[cfg(feature = "unstable")]
             contexts: None,
 
             options: Cow::default(),
@@ -416,7 +416,7 @@ impl<'a> CreateCommand<'a> {
     }
 
     /// Specifies if the command is available in DMs.
-    #[cfg_attr(feature = "unstable_discord_api", deprecated = "Use contexts instead")]
+    #[cfg_attr(feature = "unstable", deprecated = "Use contexts instead")]
     pub fn dm_permission(mut self, enabled: bool) -> Self {
         self.dm_permission = Some(enabled);
         self
@@ -463,28 +463,28 @@ impl<'a> CreateCommand<'a> {
         self
     }
 
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     /// Adds an installation context that this application command can be used in.
     pub fn add_integration_type(mut self, integration_type: InstallationContext) -> Self {
         self.integration_types.get_or_insert_with(Vec::default).push(integration_type);
         self
     }
 
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     /// Sets the installation contexts that this application command can be used in.
     pub fn integration_types(mut self, integration_types: Vec<InstallationContext>) -> Self {
         self.integration_types = Some(integration_types);
         self
     }
 
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     /// Adds an interaction context that this application command can be used in.
     pub fn add_context(mut self, context: InteractionContext) -> Self {
         self.contexts.get_or_insert_with(Vec::default).push(context);
         self
     }
 
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     /// Sets the interaction contexts that this application command can be used in.
     pub fn contexts(mut self, contexts: Vec<InteractionContext>) -> Self {
         self.contexts = Some(contexts);
