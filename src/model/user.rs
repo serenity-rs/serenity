@@ -206,8 +206,8 @@ pub enum OnlineStatus {
 
 impl OnlineStatus {
     #[must_use]
-    pub fn name(&self) -> &str {
-        match *self {
+    pub fn name(self) -> &'static str {
+        match self {
             OnlineStatus::DoNotDisturb => "dnd",
             OnlineStatus::Idle => "idle",
             OnlineStatus::Invisible => "invisible",
