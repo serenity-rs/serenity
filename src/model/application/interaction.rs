@@ -2,18 +2,18 @@ use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 use serde_json::from_value;
 
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 use super::InstallationContext;
 use super::{CommandInteraction, ComponentInteraction, ModalInteraction, PingInteraction};
 use crate::internal::prelude::*;
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, InteractionId};
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 use crate::model::id::{GuildId, MessageId, UserId};
 use crate::model::monetization::Entitlement;
 use crate::model::user::User;
 use crate::model::utils::deserialize_val;
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 use crate::model::utils::StrOrInt;
 use crate::model::Permissions;
 
@@ -298,7 +298,7 @@ bitflags! {
 ///
 /// [Discord Docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum AuthorizingIntegrationOwner {
@@ -314,12 +314,12 @@ pub enum AuthorizingIntegrationOwner {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 #[derive(Clone, Debug, Default)]
 #[repr(transparent)]
 pub struct AuthorizingIntegrationOwners(pub Vec<AuthorizingIntegrationOwner>);
 
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         struct Visitor;
@@ -371,7 +371,7 @@ impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
     }
 }
 
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 impl serde::Serialize for AuthorizingIntegrationOwners {
     fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         use serde::ser::SerializeMap;
@@ -428,7 +428,7 @@ pub struct MessageInteraction {
 /// user IDs.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[cfg(feature = "unstable_discord_api")]
+#[cfg(feature = "unstable")]
 pub struct MessageInteractionMetadata {
     /// The ID of the interaction
     pub id: InteractionId,
