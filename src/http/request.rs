@@ -24,7 +24,7 @@ pub struct Request<'a> {
     pub(super) headers: Option<Headers>,
     pub(super) method: LightMethod,
     pub(super) route: Route<'a>,
-    pub(super) params: Option<&'a [(&'static str, String)]>,
+    pub(super) params: Option<&'a [(&'a str, &'a str)]>,
 }
 
 impl<'a> Request<'a> {
@@ -54,7 +54,7 @@ impl<'a> Request<'a> {
         self
     }
 
-    pub fn params(mut self, params: &'a [(&'static str, String)]) -> Self {
+    pub fn params(mut self, params: &'a [(&'a str, &'a str)]) -> Self {
         if params.is_empty() {
             self.params = None;
         } else {
@@ -73,7 +73,7 @@ impl<'a> Request<'a> {
         token: &str,
         proxy: Option<&str>,
     ) -> Result<ReqwestRequestBuilder> {
-        let mut path = self.route.path().to_string();
+        let mut path = self.route.path().into_owned();
 
         if let Some(proxy) = proxy {
             // trim_end_matches to prevent double slashes after the domain
@@ -139,7 +139,7 @@ impl<'a> Request<'a> {
     }
 
     #[must_use]
-    pub fn params_ref(&self) -> Option<&'a [(&'static str, String)]> {
+    pub fn params_ref(&self) -> Option<&'a [(&'a str, &'a str)]> {
         self.params
     }
 }
