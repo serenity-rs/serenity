@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 
 use arrayvec::ArrayVec;
+use to_arraystring::ToArrayString;
 use url::Url;
 
 #[cfg(feature = "http")]
@@ -29,33 +30,40 @@ impl<'a> CreateBotAuthParameters<'a> {
     /// Builds the url with the provided data.
     #[must_use]
     pub fn build(self) -> String {
+        // These bindings have to be defined before `valid_data`, due to Drop order.
+        let (client_id_str, guild_id_str, scope_str, bits_str);
+
         let mut valid_data = ArrayVec::<_, 5>::new();
         let bits = self.permissions.bits();
 
         if let Some(client_id) = self.client_id {
-            valid_data.push(("client_id", client_id.to_string()));
+            client_id_str = client_id.to_arraystring();
+            valid_data.push(("client_id", client_id_str.as_str()));
         }
 
         if !self.scopes.is_empty() {
-            valid_data.push(("scope", join_to_string(',', self.scopes.iter())));
+            scope_str = join_to_string(',', self.scopes.iter());
+            valid_data.push(("scope", &scope_str));
         }
 
         if bits != 0 {
-            valid_data.push(("permissions", bits.to_string()));
+            bits_str = bits.to_arraystring();
+            valid_data.push(("permissions", &bits_str));
         }
 
         if let Some(guild_id) = self.guild_id {
-            valid_data.push(("guild", guild_id.to_string()));
+            guild_id_str = guild_id.to_arraystring();
+            valid_data.push(("guild", &guild_id_str));
         }
 
         if self.disable_guild_select {
-            valid_data.push(("disable_guild_select", self.disable_guild_select.to_string()));
+            valid_data.push(("disable_guild_select", "true"));
         }
 
         let url = Url::parse_with_params("https://discord.com/api/oauth2/authorize", &valid_data)
             .expect("failed to construct URL");
 
-        url.to_string()
+        url.into()
     }
 
     /// Specify the client Id of your application.
