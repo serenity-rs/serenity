@@ -4,6 +4,7 @@ use std::fmt;
 
 use nonmax::NonMaxU64;
 use serde::de::Error;
+use to_arraystring::ToArrayString;
 
 use super::prelude::*;
 
@@ -116,6 +117,13 @@ macro_rules! id_u64 {
 
             newtype_display_impl!($name, |this| this.0.0);
             forward_fromstr_impl!($name, InnerId);
+
+            impl ToArrayString for $name {
+                type ArrayString = <u64 as ToArrayString>::ArrayString;
+                fn to_arraystring(self) -> Self::ArrayString {
+                    self.get().to_arraystring()
+                }
+            }
 
             #[cfg(feature = "typesize")]
             impl typesize::TypeSize for $name {}
