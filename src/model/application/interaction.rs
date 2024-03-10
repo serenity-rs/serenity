@@ -408,7 +408,7 @@ impl serde::Serialize for AuthorizingIntegrationOwners {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
 #[cfg_attr(
-    all(not(ignore_serenity_deprecated), feature = "unstable_discord_api"),
+    all(not(ignore_serenity_deprecated), feature = "unstable"),
     deprecated = "Use Message::interaction_metadata"
 )]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
