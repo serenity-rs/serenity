@@ -117,7 +117,7 @@ pub struct Message {
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::Interaction
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     pub interaction_metadata: Option<Box<MessageInteractionMetadata>>,
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<Box<GuildChannel>>,
