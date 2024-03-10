@@ -311,6 +311,17 @@
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use super</span>::{
@@ -379,6 +390,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) attachments: EditAttachments&lt;<span class="lifetime">'a</span>&gt;,
+    enforce_nonce: bool,
 
     <span class="comment">// The following fields are handled separately.
     </span><span class="attr">#[serde(skip)]
@@ -557,8 +569,18 @@
 
     <span class="doccomment">/// Can be used to verify a message was sent (up to 25 characters). Value will appear in
     /// [`Message::nonce`]
+    ///
+    /// See [`Self::enforce_nonce`] if you would like discord to perform de-duplication.
     </span><span class="kw">pub fn </span>nonce(<span class="kw-2">mut </span><span class="self">self</span>, nonce: Nonce) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.nonce = <span class="prelude-val">Some</span>(nonce);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// If true and [`Self::nonce`] is provided, it will be checked for uniqueness in the past few
+    /// minutes. If another message was created by the same author with the same nonce, that
+    /// message will be returned and no new message will be created.
+    </span><span class="kw">pub fn </span>enforce_nonce(<span class="kw-2">mut </span><span class="self">self</span>, enforce_nonce: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.enforce_nonce = enforce_nonce;
         <span class="self">self
     </span>}
 
