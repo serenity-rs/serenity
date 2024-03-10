@@ -62,10 +62,10 @@ pub struct ComponentInteraction {
     pub entitlements: Vec<Entitlement>,
     /// The owners of the applications that authorized the interaction, such as a guild or user.
     #[serde(default)]
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     pub authorizing_integration_owners: AuthorizingIntegrationOwners,
     /// The context where the interaction was triggered from.
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     pub context: Option<InteractionContext>,
 }
 
