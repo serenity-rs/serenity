@@ -68,6 +68,7 @@ pub struct CreateMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     pub(crate) attachments: EditAttachments,
+    enforce_nonce: bool,
 
     // The following fields are handled separately.
     #[serde(skip)]
@@ -273,8 +274,18 @@ impl CreateMessage {
 
     /// Can be used to verify a message was sent (up to 25 characters). Value will appear in
     /// [`Message::nonce`]
+    ///
+    /// See [`Self::enforce_nonce`] if you would like discord to perform de-duplication.
     pub fn nonce(mut self, nonce: Nonce) -> Self {
         self.nonce = Some(nonce);
+        self
+    }
+
+    /// If true and [`Self::nonce`] is provided, it will be checked for uniqueness in the past few
+    /// minutes. If another message was created by the same author with the same nonce, that
+    /// message will be returned and no new message will be created.
+    pub fn enforce_nonce(mut self, enforce_nonce: bool) -> Self {
+        self.enforce_nonce = enforce_nonce;
         self
     }
 }
