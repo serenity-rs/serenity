@@ -493,23 +493,6 @@ impl ChannelId {
         MessagesIter::stream(cache_http, self)
     }
 
-    /// Returns the name of whatever channel this id holds.
-    ///
-    /// DM channels don't have a name, so a name is generated according to
-    /// [`PrivateChannel::name()`].
-    ///
-    /// # Errors
-    ///
-    /// Same as [`Self::to_channel()`].
-    pub async fn name(self, cache_http: impl CacheHttp) -> Result<String> {
-        let channel = self.to_channel(cache_http).await?;
-
-        Ok(match channel {
-            Channel::Guild(channel) => channel.name.into(),
-            Channel::Private(channel) => channel.name(),
-        })
-    }
-
     /// Pins a [`Message`] to the channel.
     ///
     /// **Note**: Requires the [Manage Messages] permission.
