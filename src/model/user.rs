@@ -353,7 +353,7 @@ bitflags! {
         /// Bot's running with HTTP interactions
         const BOT_HTTP_INTERACTIONS = 1 << 19;
         /// User's flag for suspected spam activity.
-        #[cfg(feature = "unstable_discord_api")]
+        #[cfg(feature = "unstable")]
         const SPAMMER = 1 << 20;
         /// User's flag as active developer
         const ACTIVE_DEVELOPER = 1 << 22;
@@ -438,7 +438,7 @@ pub struct Nameplate {
     pub palette: FixedString,
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(all(feature = "unstable", feature = "model"))]
 impl Nameplate {
     /// Gets the static version of the nameplate's url.
     #[must_use]
@@ -923,12 +923,12 @@ fn avatar_decoration_url(hash: &ImageHash) -> String {
     cdn!("/avatar-decoration-presets/{}.png?size=1024", hash)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(all(feature = "unstable", feature = "model"))]
 fn nameplate_url(path: &str) -> String {
     cdn!("https://cdn.discordapp.com/assets/collectibles/{}/asset.webm", path)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(all(feature = "unstable", feature = "model"))]
 #[cfg(feature = "model")]
 fn static_nameplate_url(path: &str) -> String {
     cdn!("https://cdn.discordapp.com/assets/collectibles/{}/static.png", path)
