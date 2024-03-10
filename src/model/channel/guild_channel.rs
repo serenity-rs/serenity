@@ -682,12 +682,6 @@ impl GuildChannel {
         self.id.messages(http, builder).await
     }
 
-    /// Returns the name of the guild channel.
-    #[must_use]
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
     /// Calculates the permissions of a member.
     ///
     /// The Id of the argument must be a [`Member`] of the [`Guild`] that the channel is in.
