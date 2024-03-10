@@ -241,15 +241,11 @@ impl fmt::Display for Error {
             Self::TooSmall {
                 minimum,
                 value,
-            } => {
-                write!(f, "The {minimum} minimum has been missed by {value}")
-            },
+            } => write!(f, "The {minimum} minimum has been missed by {value}"),
             Self::TooLarge {
                 maximum,
                 value,
-            } => {
-                write!(f, "The {maximum} maximum has been overflowed by {value}")
-            },
+            } => write!(f, "The {maximum} maximum has been overflowed by {value}"),
             Self::GuildNotFound => f.write_str("Guild not found in the cache."),
             Self::RoleNotFound => f.write_str("Role not found in the cache."),
             Self::MemberNotFound => f.write_str("Member not found in the cache."),
