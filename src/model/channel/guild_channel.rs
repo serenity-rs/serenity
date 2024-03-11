@@ -91,9 +91,7 @@ pub struct GuildChannel {
     ///
     /// This is max 99 for voice channels and 10,000 for stage channels (0 refers to no limit).
     pub user_limit: Option<NonMaxU16>,
-    /// Used to tell if the channel is not safe for work. Note however, it's recommended to use
-    /// [`Self::is_nsfw`] as it's gonna be more accurate.
-    // This field can or can not be present sometimes, but if it isn't default to `false`.
+    /// Used to tell if the channel is not safe for work.
     #[serde(default)]
     pub nsfw: bool,
     /// A rate limit that applies per user and excludes bots.
@@ -634,13 +632,6 @@ impl GuildChannel {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn invites(&self, http: &Http) -> Result<Vec<RichInvite>> {
         self.id.invites(http).await
-    }
-
-    /// Determines if the channel is NSFW.
-    #[must_use]
-    #[deprecated = "Use the GuildChannel::nsfw field"]
-    pub fn is_nsfw(&self) -> bool {
-        self.nsfw
     }
 
     /// Gets a message from the channel.
