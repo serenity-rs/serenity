@@ -142,8 +142,10 @@ impl Channel {
     #[inline]
     #[must_use]
     #[cfg(feature = "model")]
+    #[deprecated = "Use the GuildChannel::nsfw field, as PrivateChannel is never NSFW"]
     pub fn is_nsfw(&self) -> bool {
         match self {
+            #[allow(deprecated)]
             Self::Guild(channel) => channel.is_nsfw(),
             Self::Private(_) => false,
         }
@@ -479,44 +481,6 @@ pub struct ThreadsData {
     /// Whether there are potentially more threads that could be returned on a subsequent call.
     #[serde(default)]
     pub has_more: bool,
-}
-
-#[cfg(test)]
-mod test {
-    #[cfg(all(feature = "model", feature = "utils"))]
-    mod model_utils {
-        use crate::model::prelude::*;
-
-        #[test]
-        fn nsfw_checks() {
-            let mut channel = GuildChannel::default();
-            assert!(!channel.is_nsfw());
-            channel.kind = ChannelType::Voice;
-            assert!(!channel.is_nsfw());
-
-            channel.kind = ChannelType::Text;
-            channel.name = "nsfw-".to_string();
-            assert!(!channel.is_nsfw());
-
-            channel.name = "nsfw".to_string();
-            assert!(!channel.is_nsfw());
-            channel.kind = ChannelType::Voice;
-            assert!(!channel.is_nsfw());
-            channel.kind = ChannelType::Text;
-
-            channel.name = "nsf".to_string();
-            channel.nsfw = true;
-            assert!(channel.is_nsfw());
-            channel.nsfw = false;
-            assert!(!channel.is_nsfw());
-
-            let channel = Channel::Guild(channel);
-            assert!(!channel.is_nsfw());
-
-            let private_channel = PrivateChannel::default();
-            assert!(!private_channel.is_nsfw());
-        }
-    }
 }
 
 /// An object that specifies the emoji to use for Forum related emoji parameters.
