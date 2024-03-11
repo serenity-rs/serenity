@@ -156,12 +156,10 @@ impl PrivateChannel {
     }
 
     /// Determines if the channel is NSFW.
-    ///
-    /// **Note**: This method is for consistency. This will always return `false`, due to DMs not
-    /// being considered NSFW.
     #[inline]
     #[must_use]
     #[allow(clippy::unused_self)]
+    #[deprecated = "This always returns false"]
     pub fn is_nsfw(&self) -> bool {
         false
     }

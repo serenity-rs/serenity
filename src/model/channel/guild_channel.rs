@@ -664,13 +664,11 @@ impl GuildChannel {
     }
 
     /// Determines if the channel is NSFW.
-    ///
-    /// Only [text channels][`ChannelType::Text`] are taken into consideration as being NSFW.
-    /// [voice channels][`ChannelType::Voice`] are never NSFW.
     #[inline]
     #[must_use]
+    #[deprecated = "Use the GuildChannel::nsfw field"]
     pub fn is_nsfw(&self) -> bool {
-        self.kind == ChannelType::Text && self.nsfw
+        self.nsfw
     }
 
     /// Gets a message from the channel.
