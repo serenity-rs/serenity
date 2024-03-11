@@ -135,18 +135,6 @@ impl Channel {
         Ok(())
     }
 
-    /// Determines if the channel is NSFW.
-    #[must_use]
-    #[cfg(feature = "model")]
-    #[deprecated = "Use the GuildChannel::nsfw field, as PrivateChannel is never NSFW"]
-    pub fn is_nsfw(&self) -> bool {
-        match self {
-            #[allow(deprecated)]
-            Self::Guild(channel) => channel.is_nsfw(),
-            Self::Private(_) => false,
-        }
-    }
-
     /// Retrieves the Id of the inner [`GuildChannel`], or [`PrivateChannel`].
     #[must_use]
     pub const fn id(&self) -> ChannelId {
