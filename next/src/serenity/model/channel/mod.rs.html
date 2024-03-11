@@ -562,18 +562,6 @@
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
 <a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.
 
 </span><span class="kw">mod </span>attachment;
@@ -708,18 +696,6 @@
         }
 
         <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Determines if the channel is NSFW.
-    </span><span class="attr">#[must_use]
-    #[cfg(feature = <span class="string">"model"</span>)]
-    #[deprecated = <span class="string">"Use the GuildChannel::nsfw field, as PrivateChannel is never NSFW"</span>]
-    </span><span class="kw">pub fn </span>is_nsfw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="attr">#[allow(deprecated)]
-            </span><span class="self">Self</span>::Guild(channel) =&gt; channel.is_nsfw(),
-            <span class="self">Self</span>::Private(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-        }
     }
 
     <span class="doccomment">/// Retrieves the Id of the inner [`GuildChannel`], or [`PrivateChannel`].
