@@ -146,14 +146,6 @@ impl PrivateChannel {
         self.id.edit_message(cache_http, message_id, builder).await
     }
 
-    /// Determines if the channel is NSFW.
-    #[must_use]
-    #[allow(clippy::unused_self)]
-    #[deprecated = "This always returns false"]
-    pub fn is_nsfw(&self) -> bool {
-        false
-    }
-
     /// Gets a message from the channel.
     ///
     /// # Errors

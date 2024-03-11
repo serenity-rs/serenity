@@ -643,13 +643,6 @@ impl GuildChannel {
         self.id.invites(http).await
     }
 
-    /// Determines if the channel is NSFW.
-    #[must_use]
-    #[deprecated = "Use the GuildChannel::nsfw field"]
-    pub fn is_nsfw(&self) -> bool {
-        self.nsfw
-    }
-
     /// Gets a message from the channel.
     ///
     /// Requires the [Read Message History] permission.
