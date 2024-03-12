@@ -555,8 +555,7 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
-    /// not a stage channel.
+    /// Returns a [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
     ///
@@ -568,6 +567,10 @@ impl GuildChannel {
         user_id: impl Into<UserId>,
         builder: EditVoiceState,
     ) -> Result<()> {
+        if self.kind != ChannelType::Stage {
+            return Err(Error::from(ModelError::InvalidChannelType));
+        }
+
         builder.execute(cache_http, (self.guild_id, self.id, Some(user_id.into()))).await
     }
 
@@ -903,11 +906,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: CreateMessage,
     ) -> Result<Message> {
-        #[cfg(feature = "cache")]
-        let msg = builder.execute(cache_http, (self.id, Some(self.guild_id))).await;
-        #[cfg(not(feature = "cache"))]
-        let msg = builder.execute(cache_http, (self.id,)).await;
-        msg
+        builder.execute(cache_http, (self.id, Some(self.guild_id))).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
@@ -1061,12 +1060,22 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    /// Returns [`ModelError::InvalidChannelType`] if the corresponding channel is not of type
+    /// [`ChannelType::Text`] or [`ChannelType::News`].
+    ///
+    /// See [`CreateWebhook::execute`] for a detailed list of other
+    /// possible errors,
     pub async fn create_webhook(
         &self,
         cache_http: impl CacheHttp,
         builder: CreateWebhook<'_>,
     ) -> Result<Webhook> {
+        // forum channels are not text-based, but webhooks can be created in them
+        // and used to send messages in their posts
+        if !self.is_text_based() && self.kind != ChannelType::Forum {
+            return Err(Error::Model(ModelError::InvalidChannelType));
+        }
+
         self.id.create_webhook(cache_http, builder).await
     }
 
@@ -1097,6 +1106,10 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: CreateStageInstance<'_>,
     ) -> Result<StageInstance> {
+        if self.kind != ChannelType::Stage {
+            return Err(Error::Model(ModelError::InvalidChannelType));
+        }
+
         self.id.create_stage_instance(cache_http, builder).await
     }
 
@@ -1113,6 +1126,10 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: EditStageInstance<'_>,
     ) -> Result<StageInstance> {
+        if self.kind != ChannelType::Stage {
+            return Err(Error::Model(ModelError::InvalidChannelType));
+        }
+
         self.id.edit_stage_instance(cache_http, builder).await
     }
 

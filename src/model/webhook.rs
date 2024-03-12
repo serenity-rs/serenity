@@ -173,46 +173,25 @@ impl WebhookChannel {
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
+    #[deprecated = "Use Cache::guild and Guild::channels"]
     pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        cache.as_ref().channel(self.id)
+        #[allow(deprecated)]
+        cache.channel(self.id)
     }
 
-    /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
-    /// the REST API.
+    /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
+    /// a HTTP request.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
-    /// required permissions the HTTP-request will be issued. Additionally, you might want to
-    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
-    /// short duration.
+    /// It is recommended to first check if the channel is accessible via `Cache::guild` and
+    /// `Guild::members`, although this requires a `GuildId`.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
     #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(self.id) {
-                    return Ok(channel.clone());
-                }
-            }
-        }
-
-        let channel = cache_http.http().get_channel(self.id).await?;
-        let guild_channel = channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))?;
-
-        #[cfg(all(feature = "cache", feature = "temp_cache"))]
-        {
-            if let Some(cache) = cache_http.cache() {
-                use crate::cache::MaybeOwnedArc;
-
-                let cached_channel = MaybeOwnedArc::new(guild_channel.clone());
-                cache.temp_channels.insert(cached_channel.id, cached_channel);
-            }
-        }
-
-        Ok(guild_channel)
+        let channel = self.id.to_channel(cache_http).await?;
+        channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }
 

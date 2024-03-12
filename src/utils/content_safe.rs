@@ -222,6 +222,7 @@ fn clean_mention(
     let cache = cache.as_ref();
     match mention {
         Mention::Channel(id) => {
+            #[allow(deprecated)] // This is reworked on next already.
             if let Some(channel) = id.to_channel_cached(cache) {
                 format!("#{}", channel.name).into()
             } else {

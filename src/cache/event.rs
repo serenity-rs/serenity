@@ -82,8 +82,12 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        if let Some(mut channel) = cache.channel_mut(self.channel_id) {
-            channel.last_pin_timestamp = self.last_pin_timestamp;
+        if let Some(guild_id) = self.guild_id {
+            if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
+                if let Some(channel) = guild.channels.get_mut(&self.channel_id) {
+                    channel.last_pin_timestamp = self.last_pin_timestamp;
+                }
+            }
         }
 
         None
@@ -600,14 +604,13 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
     type Output = String;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(mut channel) = cache.channel_mut(self.id) {
-            let old = channel.status.clone();
-            channel.status = self.status.clone();
-            // Discord updates topic but doesn't fire ChannelUpdate.
-            channel.topic = self.status.clone();
-            old
-        } else {
-            None
-        }
+        let mut guild = cache.guilds.get_mut(&self.guild_id)?;
+        let channel = guild.channels.get_mut(&self.id)?;
+
+        let old = channel.status.clone();
+        channel.status = self.status.clone();
+        // Discord updates topic but doesn't fire ChannelUpdate.
+        channel.topic = self.status.clone();
+        old
     }
 }

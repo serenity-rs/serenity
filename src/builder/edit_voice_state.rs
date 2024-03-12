@@ -77,9 +77,6 @@ impl Builder for EditVoiceState {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
-    /// not a stage channel.
-    ///
     /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
     ///
     /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
@@ -90,16 +87,6 @@ impl Builder for EditVoiceState {
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         let (guild_id, channel_id, user_id) = ctx;
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(channel_id) {
-                    if channel.kind != ChannelType::Stage {
-                        return Err(Error::from(ModelError::InvalidChannelType));
-                    }
-                }
-            }
-        }
 
         self.channel_id = Some(channel_id);
         if let Some(user_id) = user_id {

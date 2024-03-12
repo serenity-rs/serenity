@@ -2,6 +2,7 @@
     not(ignore_serenity_deprecated),
     deprecated = "The standard framework is deprecated, and will be removed in 0.13. Please migrate to `poise` for command handling"
 )]
+#![allow(deprecated)] // Entire framework is deprecated anyway.
 
 pub mod help_commands;
 pub mod macros {
