@@ -223,7 +223,7 @@ impl OnlineStatus {
 /// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's creation date.
@@ -348,22 +348,6 @@ bitflags! {
         const SPAMMER = 1 << 20;
         /// User's flag as active developer
         const ACTIVE_DEVELOPER = 1 << 22;
-    }
-}
-
-use std::hash::{Hash, Hasher};
-
-impl PartialEq for User {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for User {}
-
-impl Hash for User {
-    fn hash<H: Hasher>(&self, hasher: &mut H) {
-        self.id.hash(hasher);
     }
 }
 
