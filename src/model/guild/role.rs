@@ -19,7 +19,7 @@ use crate::model::utils::is_false;
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
@@ -74,7 +74,7 @@ pub struct Role {
 /// The colours of a Discord role, secondary_colour and tertiary_colour may only be set if
 /// the [Guild] has the `ENHANCED_ROLE_COLORS` feature.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct RoleColours {
     /// the primary color for the role
@@ -161,7 +161,11 @@ impl fmt::Display for Role {
     }
 }
 
-impl Eq for Role {}
+impl PartialOrd for Role {
+    fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 impl Ord for Role {
     fn cmp(&self, other: &Role) -> Ordering {
@@ -171,18 +175,6 @@ impl Ord for Role {
         } else {
             self.position.cmp(&other.position)
         }
-    }
-}
-
-impl PartialEq for Role {
-    fn eq(&self, other: &Role) -> bool {
-        self.id == other.id
-    }
-}
-
-impl PartialOrd for Role {
-    fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }
 

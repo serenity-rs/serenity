@@ -223,7 +223,7 @@ impl OnlineStatus {
 /// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's creation date.
@@ -364,7 +364,7 @@ bitflags! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-primary-guild)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PrimaryGuild {
     /// The id of the user's primary guild.
@@ -388,7 +388,7 @@ impl PrimaryGuild {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[non_exhaustive]
 /// The data for a [`User`]'s avatar decoration.
 ///
@@ -413,7 +413,7 @@ impl AvatarDecorationData {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#collectibles).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Collectibles {
     /// The [`User`]'s nameplate, if they have one.
@@ -424,7 +424,7 @@ pub struct Collectibles {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#nameplate-nameplate-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Nameplate {
     /// Id of the nameplate SKU
@@ -450,22 +450,6 @@ impl Nameplate {
     #[must_use]
     pub fn url(&self) -> String {
         nameplate_url(&self.asset)
-    }
-}
-
-use std::hash::{Hash, Hasher};
-
-impl PartialEq for User {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for User {}
-
-impl Hash for User {
-    fn hash<H: Hasher>(&self, hasher: &mut H) {
-        self.id.hash(hasher);
     }
 }
 
