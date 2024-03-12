@@ -536,7 +536,7 @@ impl fmt::Display for Member {
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct PartialMember {
     /// Indicator of whether the member can hear in voice channels.

@@ -19,7 +19,7 @@ use crate::model::utils::is_false;
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
@@ -141,7 +141,11 @@ impl fmt::Display for Role {
     }
 }
 
-impl Eq for Role {}
+impl PartialOrd for Role {
+    fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
 impl Ord for Role {
     fn cmp(&self, other: &Role) -> Ordering {
@@ -150,18 +154,6 @@ impl Ord for Role {
         } else {
             self.position.cmp(&other.position)
         }
-    }
-}
-
-impl PartialEq for Role {
-    fn eq(&self, other: &Role) -> bool {
-        self.id == other.id
-    }
-}
-
-impl PartialOrd for Role {
-    fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
-        Some(self.cmp(other))
     }
 }
 
