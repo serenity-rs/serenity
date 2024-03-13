@@ -107,19 +107,13 @@ impl<K: Eq + Hash, V, T> std::ops::Deref for CacheRef<'_, K, V, T> {
 }
 
 type Never = std::convert::Infallible;
-type MappedGuildRef<'a, T> = CacheRef<'a, GuildId, T, Guild>;
 
-pub type MemberRef<'a> = MappedGuildRef<'a, Member>;
-pub type GuildRoleRef<'a> = MappedGuildRef<'a, Role>;
 pub type UserRef<'a> = CacheRef<'a, UserId, User, Never>;
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild, Never>;
 pub type SettingsRef<'a> = CacheRef<'a, Never, Settings, Never>;
-pub type GuildChannelRef<'a> = MappedGuildRef<'a, GuildChannel>;
 pub type CurrentUserRef<'a> = CacheRef<'a, Never, CurrentUser, Never>;
-pub type GuildRolesRef<'a> = MappedGuildRef<'a, HashMap<RoleId, Role>>;
 pub type MessageRef<'a> = CacheRef<'a, ChannelId, Message, VecDeque<Message>>;
 pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, VecDeque<Message>, Never>;
-pub type GuildChannelsRef<'a> = MappedGuildRef<'a, HashMap<ChannelId, GuildChannel>>;
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
@@ -173,10 +167,6 @@ pub struct Cache {
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
     pub(crate) temp_users: MokaCache<UserId, MaybeOwnedArc<User>, BuildHasher>,
-
-    // Channels cache:
-    /// A map of channel ids to the guilds in which the channel data is stored.
-    pub(crate) channels: MaybeMap<ChannelId, GuildId>,
 
     // Guilds cache:
     // ---
@@ -247,8 +237,6 @@ impl Cache {
             temp_messages: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_users: temp_cache(settings.time_to_live),
-
-            channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
 
             guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
@@ -341,26 +329,6 @@ impl Cache {
         self.guilds.iter().map(|i| *i.key()).chain(unavailable_guild_ids).collect()
     }
 
-    /// Retrieves a [`GuildChannel`] from the cache based on the given Id.
-    #[deprecated = "Use Cache::guild and Guild::channels instead"]
-    pub fn channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
-        let guild_id = *self.channels.get(&id)?;
-        let guild_ref = self.guilds.get(&guild_id)?;
-        let channel = guild_ref.try_map(|g| g.channels.get(&id)).ok();
-        if let Some(channel) = channel {
-            return Some(CacheRef::from_mapped_ref(channel));
-        }
-
-        #[cfg(feature = "temp_cache")]
-        {
-            if let Some(channel) = self.temp_channels.get(&id) {
-                return Some(CacheRef::from_arc(channel));
-            }
-        }
-
-        None
-    }
-
     /// Get a reference to the cached messages for a channel based on the given `Id`.
     ///
     /// # Examples
@@ -405,76 +373,9 @@ impl Cache {
         self.guilds.len()
     }
 
-    /// Retrieves a [`Guild`]'s member from the cache based on the guild's and user's given Ids.
-    ///
-    /// # Examples
-    ///
-    /// Retrieving the member object of the user that posted a message, in a
-    /// [`EventHandler::message`] context:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::channel::Message;
-    /// #
-    /// # async fn run(http: Http, cache: Cache, message: Message) {
-    /// #
-    /// let roles_len = {
-    ///     let channel = match cache.channel(message.channel_id) {
-    ///         Some(channel) => channel,
-    ///         None => {
-    ///             if let Err(why) = message.channel_id.say(http, "Error finding channel data").await {
-    ///                 println!("Error sending message: {:?}", why);
-    ///             }
-    ///             return;
-    ///         },
-    ///     };
-    ///
-    ///     cache.member(channel.guild_id, message.author.id).map(|m| m.roles.len())
-    /// };
-    ///
-    /// let message_res = if let Some(roles_len) = roles_len {
-    ///     let msg = format!("You have {} roles", roles_len);
-    ///     message.channel_id.say(&http, &msg).await
-    /// } else {
-    ///     message.channel_id.say(&http, "Error finding member data").await
-    /// };
-    ///
-    /// if let Err(why) = message_res {
-    ///     println!("Error sending message: {:?}", why);
-    /// }
-    /// # }
-    /// ```
-    ///
-    /// [`EventHandler::message`]: crate::client::EventHandler::message
-    /// [`members`]: crate::model::guild::Guild::members
-    #[deprecated = "Use Cache::guild and Guild::members instead"]
-    pub fn member(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
-        let member = self.guilds.get(&guild_id)?.try_map(|g| g.members.get(&user_id)).ok()?;
-        Some(CacheRef::from_mapped_ref(member))
-    }
-
-    #[deprecated = "Use Cache::guild and Guild::roles instead"]
-    pub fn guild_roles(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
-        let roles = self.guilds.get(&guild_id)?.map(|g| &g.roles);
-        Some(CacheRef::from_mapped_ref(roles))
-    }
-
     /// This method clones and returns all unavailable guilds.
     pub fn unavailable_guilds(&self) -> ReadOnlyMapRef<'_, GuildId, ()> {
         self.unavailable_guilds.as_read_only()
-    }
-
-    /// This method returns all channels from a guild of with the given `guild_id`.
-    #[deprecated = "Use Cache::guild and Guild::channels instead"]
-    pub fn guild_channels(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
-        let channels = self.guilds.get(&guild_id)?.map(|g| &g.channels);
-        Some(CacheRef::from_mapped_ref(channels))
-    }
-
-    /// Returns the number of guild channels in the cache.
-    pub fn guild_channel_count(&self) -> usize {
-        self.channels.len()
     }
 
     /// Returns the number of shards.
@@ -517,34 +418,6 @@ impl Cache {
         Some(CacheRef::from_mapped_ref(message))
     }
 
-    /// Retrieves a [`Guild`]'s role by their Ids.
-    ///
-    /// **Note**: This will clone the entire role. Instead, retrieve the guild and retrieve from
-    /// the guild's [`roles`] map to avoid this.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a role from the cache and print its name:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::id::{GuildId, RoleId};
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # let cache = Cache::default();
-    /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(role) = cache.role(GuildId::new(7), RoleId::new(77)) {
-    ///     println!("Role with Id 77 is called {}", role.name);
-    /// };
-    /// ```
-    ///
-    /// [`Guild`]: crate::model::guild::Guild
-    /// [`roles`]: crate::model::guild::Guild::roles
-    #[deprecated = "Use Cache::guild and Guild::roles instead"]
-    pub fn role(&self, guild_id: GuildId, role_id: RoleId) -> Option<GuildRoleRef<'_>> {
-        let role = self.guilds.get(&guild_id)?.try_map(|g| g.roles.get(&role_id)).ok()?;
-        Some(CacheRef::from_mapped_ref(role))
-    }
-
     /// Returns the settings.
     ///
     /// # Examples
@@ -573,25 +446,6 @@ impl Cache {
     /// This method provides a reference to the user used by the bot.
     pub fn current_user(&self) -> CurrentUserRef<'_> {
         CacheRef::from_guard(self.user.read())
-    }
-
-    /// Returns a channel category matching the given ID
-    #[deprecated = "Use Cache::guild, Guild::channels, and GuildChannel::kind"]
-    pub fn category(&self, channel_id: ChannelId) -> Option<GuildChannelRef<'_>> {
-        #[allow(deprecated)]
-        let channel = self.channel(channel_id)?;
-        if channel.kind == ChannelType::Category {
-            Some(channel)
-        } else {
-            None
-        }
-    }
-
-    /// Returns the parent category of the given channel ID.
-    #[deprecated = "Use Cache::guild, Guild::channels, and GuildChannel::parent_id"]
-    pub fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
-        #[allow(deprecated)]
-        self.channel(channel_id)?.parent_id
     }
 
     /// Clones all channel categories in the given guild and returns them.
