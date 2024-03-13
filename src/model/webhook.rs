@@ -8,7 +8,7 @@ use super::utils::secret;
 #[cfg(feature = "model")]
 use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "cache")]
-use crate::cache::{Cache, GuildChannelRef, GuildRef};
+use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
@@ -161,14 +161,6 @@ pub struct WebhookChannel {
 
 #[cfg(feature = "model")]
 impl WebhookChannel {
-    /// Attempts to find a [`GuildChannel`] by its Id in the cache.
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Cache::guild and Guild::channels"]
-    pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        #[allow(deprecated)]
-        cache.channel(self.id)
-    }
-
     /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
     /// a HTTP request.
     ///
