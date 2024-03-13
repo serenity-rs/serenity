@@ -48,7 +48,6 @@ impl CacheUpdate for ChannelCreateEvent {
             .get_mut(&self.channel.guild_id)
             .and_then(|mut g| g.channels.insert(self.channel.id, self.channel.clone()));
 
-        cache.channels.insert(self.channel.id, self.channel.guild_id);
         old_channel
     }
 }
@@ -59,7 +58,6 @@ impl CacheUpdate for ChannelDeleteEvent {
     fn update(&mut self, cache: &Cache) -> Option<VecDeque<Message>> {
         let (channel_id, guild_id) = (self.channel.id, self.channel.guild_id);
 
-        cache.channels.remove(&channel_id);
         cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
 
         // Remove the cached messages for the channel.
@@ -71,8 +69,6 @@ impl CacheUpdate for ChannelUpdateEvent {
     type Output = GuildChannel;
 
     fn update(&mut self, cache: &Cache) -> Option<GuildChannel> {
-        cache.channels.insert(self.channel.id, self.channel.guild_id);
-
         cache
             .guilds
             .get_mut(&self.channel.guild_id)
@@ -104,9 +100,6 @@ impl CacheUpdate for GuildCreateEvent {
         let guild = self.guild.clone();
 
         cache.guilds.insert(self.guild.id, guild);
-        for channel_id in self.guild.channels.keys() {
-            cache.channels.insert(*channel_id, self.guild.id);
-        }
 
         None
     }
@@ -126,9 +119,6 @@ impl CacheUpdate for GuildDeleteEvent {
         match cache.guilds.remove(&self.guild.id) {
             Some(guild) => {
                 for channel_id in guild.1.channels.keys() {
-                    // Remove the channel from the cache.
-                    cache.channels.remove(channel_id);
-
                     // Remove the channel's cached messages.
                     cache.messages.remove(channel_id);
                 }
