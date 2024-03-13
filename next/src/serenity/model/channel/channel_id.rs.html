@@ -1165,12 +1165,6 @@
 <a href="#1163" id="1163">1163</a>
 <a href="#1164" id="1164">1164</a>
 <a href="#1165" id="1165">1165</a>
-<a href="#1166" id="1166">1166</a>
-<a href="#1167" id="1167">1167</a>
-<a href="#1168" id="1168">1168</a>
-<a href="#1169" id="1169">1169</a>
-<a href="#1170" id="1170">1170</a>
-<a href="#1171" id="1171">1171</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1520,27 +1514,27 @@
 
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+    #[deprecated = <span class="string">"Use Cache::guild and Guild::channels instead"</span>]
     </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        cache.channel(<span class="self">self</span>)
+        <span class="attr">#[allow(deprecated)]
+        </span>cache.channel(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
-    /// the REST API.
+    <span class="doccomment">/// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
+    /// a HTTP request.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
-    /// required permissions the HTTP-request will be issued. Additionally, you might want to
-    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
-    /// short duration.
+    /// It is recommended to first check if the channel is accessible via `Cache::guild` and
+    /// `Guild::members`, although this requires a `GuildId`.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
     </span><span class="kw">pub async fn </span>to_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(<span class="self">self</span>) {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(channel.clone()));
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.temp_channels.get(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(GuildChannel::clone(<span class="kw-2">&amp;*</span>channel)));
                 }
             }
         }
@@ -1860,12 +1854,8 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, <span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
-        <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await</span>;
-        msg
-    }
+        builder.execute(cache_http, <span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
 
     <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
     ///
@@ -1987,8 +1977,6 @@
     <span class="doccomment">/// Creates a stage instance.
     ///
     /// # Errors
-    ///
-    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is already a stage instance currently.
     </span><span class="kw">pub async fn </span>create_stage_instance(

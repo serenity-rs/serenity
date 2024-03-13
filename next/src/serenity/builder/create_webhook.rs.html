@@ -76,22 +76,6 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
@@ -148,9 +132,6 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the corresponding
-    /// channel is not of type [`Text`] or [`News`].
-    ///
     /// If the provided name is less than 2 characters, returns [`ModelError::TooSmall`]. If it
     /// is more than 100 characters, returns [`ModelError::TooLarge`].
     ///
@@ -165,19 +146,6 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(channel_id) {
-                    <span class="comment">// forum channels are not text-based, but webhooks can be created in them
-                    // and used to send messages in their posts
-                    </span><span class="kw">if </span>!channel.is_text_based() &amp;&amp; channel.kind != ChannelType::Forum {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
-                    }
-                }
-            }
-        }
-
         <span class="kw">crate</span>::model::error::Minimum::WebhookName.check_underflow(<span class="self">self</span>.name.chars().count())<span class="question-mark">?</span>;
         <span class="kw">crate</span>::model::error::Maximum::WebhookName.check_overflow(<span class="self">self</span>.name.chars().count())<span class="question-mark">?</span>;
 

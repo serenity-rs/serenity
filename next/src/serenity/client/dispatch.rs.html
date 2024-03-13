@@ -514,6 +514,8 @@
 <a href="#512" id="512">512</a>
 <a href="#513" id="513">513</a>
 <a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
@@ -769,8 +771,10 @@
         },
         Event::GuildMemberUpdate(<span class="kw-2">mut </span>event) =&gt; {
             <span class="kw">let </span>before = <span class="macro">if_cache!</span>(event.update(cache));
-            <span class="kw">let </span>after: <span class="prelude-ty">Option</span>&lt;Member&gt; =
-                <span class="macro">if_cache!</span>(cache.member(event.guild_id, event.user.id).map(|m| m.clone()));
+            <span class="kw">let </span>after: <span class="prelude-ty">Option</span>&lt;Member&gt; = <span class="macro">if_cache!</span>({
+                <span class="kw">let </span>guild = cache.guild(event.guild_id);
+                guild.and_then(|g| g.members.get(<span class="kw-2">&amp;</span>event.user.id).cloned())
+            });
 
             FullEvent::GuildMemberUpdate {
                 old_if_available: before,

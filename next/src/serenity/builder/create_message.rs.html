@@ -319,9 +319,6 @@
 <a href="#317" id="317">317</a>
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use super</span>::{
@@ -606,7 +603,7 @@
         <span class="kw-2">mut </span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         channel_id: ChannelId,
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)] </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+        guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
@@ -633,12 +630,9 @@
         }
 
         <span class="comment">// HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
-        </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span><span class="kw">if </span>message.guild_id.is_none() {
-            <span class="comment">// Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
-            // we already know our guild ID), and otherwise find the guild ID in cache
-            </span>message.guild_id = guild_id
-                .or_else(|| <span class="prelude-val">Some</span>(cache_http.cache()<span class="question-mark">?</span>.channel(message.channel_id)<span class="question-mark">?</span>.guild_id));
+            <span class="comment">// If we were called from GuildChannel, we can fill in the GuildId ourselves.
+            </span>message.guild_id = guild_id;
         }
 
         <span class="prelude-val">Ok</span>(message)

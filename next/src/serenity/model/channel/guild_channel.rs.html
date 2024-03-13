@@ -1096,6 +1096,23 @@
 <a href="#1094" id="1094">1094</a>
 <a href="#1095" id="1095">1095</a>
 <a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1624,8 +1641,7 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
-    /// not a stage channel.
+    /// Returns a [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
     ///
@@ -1637,6 +1653,10 @@
         user_id: UserId,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::from(ModelError::InvalidChannelType));
+        }
+
         builder.execute(cache_http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id)).<span class="kw">await
     </span>}
 
@@ -1909,12 +1929,8 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id)).<span class="kw">await</span>;
-        <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, <span class="self">self</span>.id).<span class="kw">await</span>;
-        msg
-    }
+        builder.execute(cache_http, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id)).<span class="kw">await
+    </span>}
 
     <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
     ///
@@ -2056,12 +2072,22 @@
     ///
     /// # Errors
     ///
-    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    /// Returns [`ModelError::InvalidChannelType`] if the corresponding channel is not of type
+    /// [`ChannelType::Text`] or [`ChannelType::News`].
+    ///
+    /// See [`CreateWebhook::execute`] for a detailed list of other
+    /// possible errors,
     </span><span class="kw">pub async fn </span>create_webhook(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateWebhook&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
+        <span class="comment">// forum channels are not text-based, but webhooks can be created in them
+        // and used to send messages in their posts
+        </span><span class="kw">if </span>!<span class="self">self</span>.is_text_based() &amp;&amp; <span class="self">self</span>.kind != ChannelType::Forum {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
+        }
+
         <span class="self">self</span>.id.create_webhook(cache_http, builder).<span class="kw">await
     </span>}
 
@@ -2092,6 +2118,10 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
+        <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
+        }
+
         <span class="self">self</span>.id.create_stage_instance(cache_http, builder).<span class="kw">await
     </span>}
 
@@ -2108,6 +2138,10 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
+        <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
+        }
+
         <span class="self">self</span>.id.edit_stage_instance(cache_http, builder).<span class="kw">await
     </span>}
 

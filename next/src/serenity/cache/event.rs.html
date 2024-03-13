@@ -608,6 +608,9 @@
 <a href="#606" id="606">606</a>
 <a href="#607" id="607">607</a>
 <a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashSet, VecDeque};
 <span class="kw">use </span>std::num::NonZeroU16;
 
@@ -694,8 +697,12 @@
     <span class="kw">type </span>Output = ();
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.channel_mut(<span class="self">self</span>.channel_id) {
-            channel.last_pin_timestamp = <span class="self">self</span>.last_pin_timestamp;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.guild_id {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>guild) = cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = guild.channels.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel_id) {
+                    channel.last_pin_timestamp = <span class="self">self</span>.last_pin_timestamp;
+                }
+            }
         }
 
         <span class="prelude-val">None
@@ -1205,15 +1212,14 @@
     <span class="kw">type </span>Output = FixedString&lt;u16&gt;;
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Output&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>channel) = cache.channel_mut(<span class="self">self</span>.id) {
-            <span class="kw">let </span>old = channel.status.clone();
-            channel.status.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.status);
-            <span class="comment">// Discord updates topic but doesn't fire ChannelUpdate.
-            </span>channel.topic.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.status);
-            old
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
+        <span class="kw">let </span><span class="kw-2">mut </span>guild = cache.guilds.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.guild_id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>channel = guild.channels.get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.id)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>old = channel.status.clone();
+        channel.status.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.status);
+        <span class="comment">// Discord updates topic but doesn't fire ChannelUpdate.
+        </span>channel.topic.clone_from(<span class="kw-2">&amp;</span><span class="self">self</span>.status);
+        old
     }
 }
 </code></pre></div></section></main></body></html>

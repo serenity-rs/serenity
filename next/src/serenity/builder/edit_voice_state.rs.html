@@ -90,20 +90,6 @@
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -174,9 +160,6 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
-    /// not a stage channel.
-    ///
     /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
     ///
     /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
@@ -189,17 +172,6 @@
         channel_id: ChannelId,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(channel_id) {
-                    <span class="kw">if </span>channel.kind != ChannelType::Stage {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::from(ModelError::InvalidChannelType));
-                    }
-                }
-            }
-        }
-
         <span class="self">self</span>.channel_id = <span class="prelude-val">Some</span>(channel_id);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = user_id {
             cache_http.http().edit_voice_state(guild_id, user_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await

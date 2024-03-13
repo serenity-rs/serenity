@@ -523,27 +523,6 @@
 <a href="#521" id="521">521</a>
 <a href="#522" id="522">522</a>
 <a href="#523" id="523">523</a>
-<a href="#524" id="524">524</a>
-<a href="#525" id="525">525</a>
-<a href="#526" id="526">526</a>
-<a href="#527" id="527">527</a>
-<a href="#528" id="528">528</a>
-<a href="#529" id="529">529</a>
-<a href="#530" id="530">530</a>
-<a href="#531" id="531">531</a>
-<a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -709,45 +688,24 @@
 </span><span class="kw">impl </span>WebhookChannel {
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+    #[deprecated = <span class="string">"Use Cache::guild and Guild::channels"</span>]
     </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        cache.channel(<span class="self">self</span>.id)
+        <span class="attr">#[allow(deprecated)]
+        </span>cache.channel(<span class="self">self</span>.id)
     }
 
-    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
-    /// the REST API.
+    <span class="doccomment">/// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
+    /// a HTTP request.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
-    /// required permissions the HTTP-request will be issued. Additionally, you might want to
-    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
-    /// short duration.
+    /// It is recommended to first check if the channel is accessible via `Cache::guild` and
+    /// `Guild::members`, although this requires a `GuildId`.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
     </span><span class="kw">pub async fn </span>to_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(<span class="self">self</span>.id) {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(channel.clone());
-                }
-            }
-        }
-
-        <span class="kw">let </span>channel = cache_http.http().get_channel(<span class="self">self</span>.id).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>guild_channel = channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))<span class="question-mark">?</span>;
-
-        <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"temp_cache"</span>))]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
-
-                <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(guild_channel.clone());
-                cache.temp_channels.insert(cached_channel.id, cached_channel);
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(guild_channel)
+        <span class="kw">let </span>channel = <span class="self">self</span>.id.to_channel(cache_http).<span class="kw">await</span><span class="question-mark">?</span>;
+        channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }
 

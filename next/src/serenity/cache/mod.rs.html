@@ -774,7 +774,7 @@
 <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use </span>dashmap::mapref::one::{MappedRef, MappedRefMut, Ref};
+<span class="kw">use </span>dashmap::mapref::one::{MappedRef, Ref};
 <span class="kw">use </span>dashmap::DashMap;
 <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
 </span><span class="kw">use </span>mini_moka::sync::Cache <span class="kw">as </span>MokaCache;
@@ -1082,6 +1082,7 @@
     }
 
     <span class="doccomment">/// Retrieves a [`GuildChannel`] from the cache based on the given Id.
+    </span><span class="attr">#[deprecated = <span class="string">"Use Cache::guild and Guild::channels instead"</span>]
     </span><span class="kw">pub fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
         <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
@@ -1099,15 +1100,6 @@
 
         <span class="prelude-val">None
     </span>}
-
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>channel_mut(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        id: ChannelId,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;MappedRefMut&lt;<span class="lifetime">'_</span>, GuildId, Guild, GuildChannel, BuildHasher&gt;&gt; {
-        <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
-        <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
-        guild_ref.try_map(|g| g.channels.get_mut(<span class="kw-2">&amp;</span>id)).ok()
-    }
 
     <span class="doccomment">/// Get a reference to the cached messages for a channel based on the given `Id`.
     ///
@@ -1196,12 +1188,14 @@
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
+    </span><span class="attr">#[deprecated = <span class="string">"Use Cache::guild and Guild::members instead"</span>]
     </span><span class="kw">pub fn </span>member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;MemberRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>member = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.try_map(|g| g.members.get(<span class="kw-2">&amp;</span>user_id)).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(member))
     }
 
-    <span class="kw">pub fn </span>guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="attr">#[deprecated = <span class="string">"Use Cache::guild and Guild::roles instead"</span>]
+    </span><span class="kw">pub fn </span>guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>roles = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.map(|g| <span class="kw-2">&amp;</span>g.roles);
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(roles))
     }
@@ -1212,6 +1206,7 @@
     }
 
     <span class="doccomment">/// This method returns all channels from a guild of with the given `guild_id`.
+    </span><span class="attr">#[deprecated = <span class="string">"Use Cache::guild and Guild::channels instead"</span>]
     </span><span class="kw">pub fn </span>guild_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>channels = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.map(|g| <span class="kw-2">&amp;</span>g.channels);
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(channels))
@@ -1284,6 +1279,7 @@
     ///
     /// [`Guild`]: crate::model::guild::Guild
     /// [`roles`]: crate::model::guild::Guild::roles
+    </span><span class="attr">#[deprecated = <span class="string">"Use Cache::guild and Guild::roles instead"</span>]
     </span><span class="kw">pub fn </span>role(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, role_id: RoleId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRoleRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>role = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.try_map(|g| g.roles.get(<span class="kw-2">&amp;</span>role_id)).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(role))
@@ -1320,8 +1316,10 @@
     }
 
     <span class="doccomment">/// Returns a channel category matching the given ID
+    </span><span class="attr">#[deprecated = <span class="string">"Use Cache::guild, Guild::channels, and GuildChannel::kind"</span>]
     </span><span class="kw">pub fn </span>category(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="kw">let </span>channel = <span class="self">self</span>.channel(channel_id)<span class="question-mark">?</span>;
+        <span class="attr">#[allow(deprecated)]
+        </span><span class="kw">let </span>channel = <span class="self">self</span>.channel(channel_id)<span class="question-mark">?</span>;
         <span class="kw">if </span>channel.kind == ChannelType::Category {
             <span class="prelude-val">Some</span>(channel)
         } <span class="kw">else </span>{
@@ -1330,8 +1328,10 @@
     }
 
     <span class="doccomment">/// Returns the parent category of the given channel ID.
+    </span><span class="attr">#[deprecated = <span class="string">"Use Cache::guild, Guild::channels, and GuildChannel::parent_id"</span>]
     </span><span class="kw">pub fn </span>channel_category_id(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
-        <span class="self">self</span>.channel(channel_id)<span class="question-mark">?</span>.parent_id
+        <span class="attr">#[allow(deprecated)]
+        </span><span class="self">self</span>.channel(channel_id)<span class="question-mark">?</span>.parent_id
     }
 
     <span class="doccomment">/// Clones all channel categories in the given guild and returns them.
