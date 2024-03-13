@@ -300,8 +300,8 @@ impl<'a> CreateMessage<'a> {
             if !self.attachments.is_empty() {
                 req |= Permissions::ATTACH_FILES;
             }
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, channel_id, req)?;
+            if let (Some(cache), Some(guild_id)) = (cache_http.cache(), guild_id) {
+                crate::utils::user_has_perms_cache(cache, guild_id, channel_id, req)?;
             }
         }
 
