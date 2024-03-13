@@ -1263,16 +1263,6 @@ impl Guild {
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(cache, lhs_id, rhs_id)
-    }
-
-    #[cfg(feature = "cache")]
-    fn _greater_member_hierarchy(
-        &self,
-        cache: &Cache,
-        lhs_id: UserId,
-        rhs_id: UserId,
-    ) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
             return None;
