@@ -353,14 +353,6 @@ impl PartialGuild {
         self.id.channels(http).await
     }
 
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Cache::guild and Guild::channels"]
-    pub fn channel_id_from_name(&self, cache: &Cache, name: &str) -> Option<ChannelId> {
-        let guild = cache.guild(self.id)?;
-        #[allow(deprecated)]
-        guild.channel_id_from_name(cache, name)
-    }
-
     /// Creates a [`GuildChannel`] in the guild.
     ///
     /// Refer to [`Http::create_channel`] for more information.
