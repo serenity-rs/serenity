@@ -79,7 +79,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        builder.execute(cache_http, self).await
+        builder.execute(cache_http, self, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
@@ -301,7 +301,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
     ) -> Result<GuildChannel> {
-        builder.execute(cache_http, self).await
+        builder.execute(cache_http, self, None).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.

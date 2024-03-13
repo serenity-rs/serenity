@@ -160,10 +160,6 @@ pub struct Cache {
     #[cfg(feature = "temp_cache")]
     pub(crate) temp_users: MokaCache<UserId, MaybeOwnedArc<User>, BuildHasher>,
 
-    // Channels cache:
-    /// A map of channel ids to the guilds in which the channel data is stored.
-    pub(crate) channels: MaybeMap<ChannelId, GuildId>,
-
     // Guilds cache:
     // ---
     /// A map of guilds with full data available. This includes data like [`Role`]s and [`Emoji`]s
@@ -235,8 +231,6 @@ impl Cache {
             temp_messages: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_users: temp_cache(settings.time_to_live),
-
-            channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
 
             guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
@@ -378,11 +372,6 @@ impl Cache {
     /// This method clones and returns all unavailable guilds.
     pub fn unavailable_guilds(&self) -> ReadOnlyMapRef<'_, GuildId, ()> {
         self.unavailable_guilds.as_read_only()
-    }
-
-    /// Returns the number of guild channels in the cache.
-    pub fn guild_channel_count(&self) -> usize {
-        self.channels.len()
     }
 
     /// Returns the number of shards.

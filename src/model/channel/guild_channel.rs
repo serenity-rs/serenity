@@ -240,7 +240,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        builder.execute(cache_http, self.id).await
+        builder.execute(cache_http, self.id, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
@@ -343,7 +343,12 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, self.id, Permissions::MANAGE_CHANNELS)?;
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    self.guild_id,
+                    self.id,
+                    Permissions::MANAGE_CHANNELS,
+                )?;
             }
         }
 
@@ -455,7 +460,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
     ) -> Result<()> {
-        let channel = builder.execute(cache_http, self.id).await?;
+        let channel = builder.execute(cache_http, self.id, Some(self.guild_id)).await?;
         *self = channel;
         Ok(())
     }
