@@ -61,9 +61,6 @@ impl<'a> Builder for CreateWebhook<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidChannelType`] if the corresponding
-    /// channel is not of type [`Text`] or [`News`].
-    ///
     /// If the provided name is less than 2 characters, returns [`ModelError::NameTooShort`]. If it
     /// is more than 100 characters, returns [`ModelError::NameTooLong`].
     ///
@@ -77,19 +74,6 @@ impl<'a> Builder for CreateWebhook<'a> {
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(ctx) {
-                    // forum channels are not text-based, but webhooks can be created in them
-                    // and used to send messages in their posts
-                    if !channel.is_text_based() && channel.kind != ChannelType::Forum {
-                        return Err(Error::Model(ModelError::InvalidChannelType));
-                    }
-                }
-            }
-        }
-
         if self.name.len() < 2 {
             return Err(Error::Model(ModelError::NameTooShort));
         } else if self.name.len() > 100 {

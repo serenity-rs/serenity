@@ -427,21 +427,15 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
+    #[deprecated = "Iterate through Guild::channels and use Iterator::find"]
     pub fn channel_id_from_name(
         &self,
-        cache: impl AsRef<Cache>,
+        #[allow(unused_variables)] cache: impl AsRef<Cache>,
         name: impl AsRef<str>,
     ) -> Option<ChannelId> {
         let name = name.as_ref();
-        let guild_channels = cache.as_ref().guild_channels(self.id)?;
 
-        for (id, channel) in guild_channels.iter() {
-            if channel.name == name {
-                return Some(*id);
-            }
-        }
-
-        None
+        self.channels.values().find(|c| c.name == name).map(|c| c.id)
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between

@@ -31,7 +31,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use dashmap::mapref::entry::Entry;
-use dashmap::mapref::one::{MappedRef, MappedRefMut, Ref};
+use dashmap::mapref::one::{MappedRef, Ref};
 use dashmap::DashMap;
 #[cfg(feature = "temp_cache")]
 use mini_moka::sync::Cache as MokaCache;
@@ -368,6 +368,7 @@ impl Cache {
 
     /// Retrieves a [`GuildChannel`] from the cache based on the given Id.
     #[inline]
+    #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannelRef<'_>> {
         self._channel(id.into())
     }
@@ -388,15 +389,6 @@ impl Cache {
         }
 
         None
-    }
-
-    pub(super) fn channel_mut(
-        &self,
-        id: ChannelId,
-    ) -> Option<MappedRefMut<'_, GuildId, Guild, GuildChannel, BuildHasher>> {
-        let guild_id = *self.channels.get(&id)?;
-        let guild_ref = self.guilds.get_mut(&guild_id)?;
-        guild_ref.try_map(|g| g.channels.get_mut(&id)).ok()
     }
 
     /// Get a reference to the cached messages for a channel based on the given `Id`.
@@ -492,6 +484,7 @@ impl Cache {
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
     #[inline]
+    #[deprecated = "Use Cache::guild and Guild::members instead"]
     pub fn member(
         &self,
         guild_id: impl Into<GuildId>,
@@ -506,6 +499,7 @@ impl Cache {
     }
 
     #[inline]
+    #[deprecated = "Use Cache::guild and Guild::roles instead"]
     pub fn guild_roles(&self, guild_id: impl Into<GuildId>) -> Option<GuildRolesRef<'_>> {
         self._guild_roles(guild_id.into())
     }
@@ -523,6 +517,7 @@ impl Cache {
 
     /// This method returns all channels from a guild of with the given `guild_id`.
     #[inline]
+    #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn guild_channels(&self, guild_id: impl Into<GuildId>) -> Option<GuildChannelsRef<'_>> {
         self._guild_channels(guild_id.into())
     }
@@ -608,6 +603,7 @@ impl Cache {
     /// [`Guild`]: crate::model::guild::Guild
     /// [`roles`]: crate::model::guild::Guild::roles
     #[inline]
+    #[deprecated = "Use Cache::guild and Guild::roles instead"]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<GuildRoleRef<'_>>
     where
         G: Into<GuildId>,
@@ -703,7 +699,9 @@ impl Cache {
     }
 
     /// Returns a channel category matching the given ID
+    #[deprecated = "Use Cache::guild, Guild::channels, and GuildChannel::kind"]
     pub fn category(&self, channel_id: ChannelId) -> Option<GuildChannelRef<'_>> {
+        #[allow(deprecated)]
         let channel = self.channel(channel_id)?;
         if channel.kind == ChannelType::Category {
             Some(channel)
@@ -713,7 +711,9 @@ impl Cache {
     }
 
     /// Returns the parent category of the given channel ID.
+    #[deprecated = "Use Cache::guild, Guild::channels, and GuildChannel::parent_id"]
     pub fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
+        #[allow(deprecated)]
         self.channel(channel_id)?.parent_id
     }
 

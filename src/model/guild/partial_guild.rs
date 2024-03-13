@@ -377,21 +377,16 @@ impl PartialGuild {
     }
 
     #[cfg(feature = "cache")]
+    #[deprecated = "Use Cache::guild and Guild::channels"]
     pub fn channel_id_from_name(
         &self,
         cache: impl AsRef<Cache>,
         name: impl AsRef<str>,
     ) -> Option<ChannelId> {
-        let name = name.as_ref();
-        let guild_channels = cache.as_ref().guild_channels(self.id)?;
-
-        for (id, channel) in guild_channels.iter() {
-            if channel.name == name {
-                return Some(*id);
-            }
-        }
-
-        None
+        let cache = cache.as_ref();
+        let guild = cache.guild(self.id)?;
+        #[allow(deprecated)]
+        guild.channel_id_from_name(cache, name)
     }
 
     /// Creates a [`GuildChannel`] in the guild.

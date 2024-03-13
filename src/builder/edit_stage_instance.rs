@@ -56,8 +56,6 @@ impl<'a> Builder for EditStageInstance<'a> {
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
-    ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
     /// instance currently.
     async fn execute(
@@ -65,17 +63,6 @@ impl<'a> Builder for EditStageInstance<'a> {
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(ctx) {
-                    if channel.kind != ChannelType::Stage {
-                        return Err(Error::Model(ModelError::InvalidChannelType));
-                    }
-                }
-            }
-        }
-
         cache_http.http().edit_stage_instance(ctx, &self, self.audit_log_reason).await
     }
 }

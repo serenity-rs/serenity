@@ -293,10 +293,7 @@ impl CreateMessage {
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 impl Builder for CreateMessage {
-    #[cfg(feature = "cache")]
     type Context<'ctx> = (ChannelId, Option<GuildId>);
-    #[cfg(not(feature = "cache"))]
-    type Context<'ctx> = (ChannelId,);
     type Built = Message;
 
     /// Send a message to the channel.
@@ -319,12 +316,8 @@ impl Builder for CreateMessage {
     async fn execute(
         mut self,
         cache_http: impl CacheHttp,
-        ctx: Self::Context<'_>,
+        (channel_id, guild_id): Self::Context<'_>,
     ) -> Result<Self::Built> {
-        let channel_id = ctx.0;
-        #[cfg(feature = "cache")]
-        let guild_id = ctx.1;
-
         #[cfg(feature = "cache")]
         {
             let mut req = Permissions::SEND_MESSAGES;
@@ -350,12 +343,9 @@ impl Builder for CreateMessage {
         }
 
         // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
-        #[cfg(feature = "cache")]
         if message.guild_id.is_none() {
-            // Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
-            // we already know our guild ID), and otherwise find the guild ID in cache
-            message.guild_id = guild_id
-                .or_else(|| Some(cache_http.cache()?.channel(message.channel_id)?.guild_id));
+            // If we were called from GuildChannel, we can fill in the GuildId ourselves.
+            message.guild_id = guild_id;
         }
 
         Ok(message)

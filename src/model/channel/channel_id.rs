@@ -375,28 +375,28 @@ impl ChannelId {
     /// Attempts to find a [`GuildChannel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
+    #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        cache.as_ref().channel(self)
+        #[allow(deprecated)]
+        cache.channel(self)
     }
 
-    /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
-    /// the REST API.
+    /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
+    /// a HTTP request.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
-    /// required permissions the HTTP-request will be issued. Additionally, you might want to
-    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
-    /// short duration.
+    /// It is recommended to first check if the channel is accessible via `Cache::guild` and
+    /// `Guild::members`, although this requires a `GuildId`.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
     #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
-        #[cfg(feature = "cache")]
+        #[cfg(feature = "temp_cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(self) {
-                    return Ok(Channel::Guild(channel.clone()));
+                if let Some(channel) = cache.temp_channels.get(&self) {
+                    return Ok(Channel::Guild(GuildChannel::clone(&*channel)));
                 }
             }
         }
@@ -739,11 +739,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: CreateMessage,
     ) -> Result<Message> {
-        #[cfg(feature = "cache")]
-        let msg = builder.execute(cache_http, (self, None)).await;
-        #[cfg(not(feature = "cache"))]
-        let msg = builder.execute(cache_http, (self,)).await;
-        msg
+        builder.execute(cache_http, (self, None)).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
@@ -875,8 +871,6 @@ impl ChannelId {
     /// Creates a stage instance.
     ///
     /// # Errors
-    ///
-    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is already a stage instance currently.
     pub async fn create_stage_instance(
