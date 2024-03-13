@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (3b1717c05 2024-03-10)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (a165f1f65 2024-03-12)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -542,27 +542,6 @@
 <a href="#540" id="540">540</a>
 <a href="#541" id="541">541</a>
 <a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
-<a href="#550" id="550">550</a>
-<a href="#551" id="551">551</a>
-<a href="#552" id="552">552</a>
-<a href="#553" id="553">553</a>
-<a href="#554" id="554">554</a>
-<a href="#555" id="555">555</a>
-<a href="#556" id="556">556</a>
-<a href="#557" id="557">557</a>
-<a href="#558" id="558">558</a>
-<a href="#559" id="559">559</a>
-<a href="#560" id="560">560</a>
-<a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.
 
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -738,46 +717,25 @@
     <span class="doccomment">/// Attempts to find a [`GuildChannel`] by its Id in the cache.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[inline]
+    #[deprecated = <span class="string">"Use Cache::guild and Guild::channels"</span>]
     </span><span class="kw">pub fn </span>to_channel_cached(<span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        cache.as_ref().channel(<span class="self">self</span>.id)
+        <span class="attr">#[allow(deprecated)]
+        </span>cache.channel(<span class="self">self</span>.id)
     }
 
-    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
-    /// the REST API.
+    <span class="doccomment">/// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
+    /// a HTTP request.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
-    /// required permissions the HTTP-request will be issued. Additionally, you might want to
-    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
-    /// short duration.
+    /// It is recommended to first check if the channel is accessible via `Cache::guild` and
+    /// `Guild::members`, although this requires a `GuildId`.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>to_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.channel(<span class="self">self</span>.id) {
-                    <span class="kw">return </span><span class="prelude-val">Ok</span>(channel.clone());
-                }
-            }
-        }
-
-        <span class="kw">let </span>channel = cache_http.http().get_channel(<span class="self">self</span>.id).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let </span>guild_channel = channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))<span class="question-mark">?</span>;
-
-        <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"temp_cache"</span>))]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
-
-                <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(guild_channel.clone());
-                cache.temp_channels.insert(cached_channel.id, cached_channel);
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(guild_channel)
+        <span class="kw">let </span>channel = <span class="self">self</span>.id.to_channel(cache_http).<span class="kw">await</span><span class="question-mark">?</span>;
+        channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }
 

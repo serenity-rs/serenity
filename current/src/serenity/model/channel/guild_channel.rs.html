@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (3b1717c05 2024-03-10)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (a165f1f65 2024-03-12)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1199,6 +1199,23 @@
 <a href="#1197" id="1197">1197</a>
 <a href="#1198" id="1198">1198</a>
 <a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1756,8 +1773,7 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
-    /// not a stage channel.
+    /// Returns a [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
     ///
@@ -1769,6 +1785,10 @@
         user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::from(ModelError::InvalidChannelType));
+        }
+
         builder.execute(cache_http, (<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id.into()))).<span class="kw">await
     </span>}
 
@@ -2104,12 +2124,8 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateMessage,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await</span>;
-        <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
-        </span><span class="kw">let </span>msg = builder.execute(cache_http, (<span class="self">self</span>.id,)).<span class="kw">await</span>;
-        msg
-    }
+        builder.execute(cache_http, (<span class="self">self</span>.id, <span class="prelude-val">Some</span>(<span class="self">self</span>.guild_id))).<span class="kw">await
+    </span>}
 
     <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
     ///
@@ -2262,12 +2278,22 @@
     ///
     /// # Errors
     ///
-    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    /// Returns [`ModelError::InvalidChannelType`] if the corresponding channel is not of type
+    /// [`ChannelType::Text`] or [`ChannelType::News`].
+    ///
+    /// See [`CreateWebhook::execute`] for a detailed list of other
+    /// possible errors,
     </span><span class="kw">pub async fn </span>create_webhook(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateWebhook&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
+        <span class="comment">// forum channels are not text-based, but webhooks can be created in them
+        // and used to send messages in their posts
+        </span><span class="kw">if </span>!<span class="self">self</span>.is_text_based() &amp;&amp; <span class="self">self</span>.kind != ChannelType::Forum {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
+        }
+
         <span class="self">self</span>.id.create_webhook(cache_http, builder).<span class="kw">await
     </span>}
 
@@ -2298,6 +2324,10 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
+        <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
+        }
+
         <span class="self">self</span>.id.create_stage_instance(cache_http, builder).<span class="kw">await
     </span>}
 
@@ -2314,6 +2344,10 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: EditStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
+        <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
+        }
+
         <span class="self">self</span>.id.edit_stage_instance(cache_http, builder).<span class="kw">await
     </span>}
 
