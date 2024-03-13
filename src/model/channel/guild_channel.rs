@@ -249,89 +249,17 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        builder.execute(cache_http, self.id).await
+        builder.execute(cache_http, self.id, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
     /// [`Role`] within a [`Channel`].
     ///
-    /// Refer to the documentation for [`PermissionOverwrite`]s for more information.
-    ///
-    /// Requires the [Manage Channels] permission.
-    ///
-    /// # Examples
-    ///
-    /// Creating a permission overwrite for a member by specifying the
-    /// [`PermissionOverwriteType::Member`] variant, allowing it the [Send Messages] permission,
-    /// but denying the [Send TTS Messages] and [Attach Files] permissions:
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
-    /// # use std::sync::Arc;
-    /// #
-    /// # let http: Arc<Http> = unimplemented!();
-    /// # let cache = Cache::default();
-    /// # let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
-    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
-    /// use serenity::model::{ModelError, Permissions};
-    /// let allow = Permissions::SEND_MESSAGES;
-    /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
-    /// let overwrite = PermissionOverwrite {
-    ///     allow,
-    ///     deny,
-    ///     kind: PermissionOverwriteType::Member(user_id),
-    /// };
-    /// // assuming the cache has been unlocked
-    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
-    ///
-    /// channel.create_permission(&http, overwrite).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// Creating a permission overwrite for a role by specifying the
-    /// [`PermissionOverwriteType::Role`] variant, allowing it the [Manage Webhooks]
-    /// permission, but denying the [Send TTS Messages] and [Attach Files]
-    /// permissions:
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId, RoleId}};
-    /// # use std::sync::Arc;
-    /// #
-    /// # let http: Arc<Http> = unimplemented!();
-    /// # let cache = Cache::default();
-    /// # let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));
-    /// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};
-    /// use serenity::model::{ModelError, Permissions};
-    ///
-    /// let allow = Permissions::SEND_MESSAGES;
-    /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
-    /// let overwrite = PermissionOverwrite {
-    ///     allow,
-    ///     deny,
-    ///     kind: PermissionOverwriteType::Role(role_id),
-    /// };
-    ///
-    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
-    ///
-    /// channel.create_permission(&http, overwrite).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
+    /// See [`ChannelId::create_permission`] for more detailed documentation.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Attach Files]: Permissions::ATTACH_FILES
-    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
     pub async fn create_permission(&self, http: &Http, target: PermissionOverwrite) -> Result<()> {
         self.id.create_permission(http, target).await
     }
@@ -352,7 +280,12 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(cache, self.id, Permissions::MANAGE_CHANNELS)?;
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    self.guild_id,
+                    self.id,
+                    Permissions::MANAGE_CHANNELS,
+                )?;
             }
         }
 
@@ -464,7 +397,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
     ) -> Result<()> {
-        let channel = builder.execute(cache_http, self.id).await?;
+        let channel = builder.execute(cache_http, self.id, Some(self.guild_id)).await?;
         *self = channel;
         Ok(())
     }
@@ -516,16 +449,18 @@ impl GuildChannel {
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use std::sync::Arc;
-    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
+    /// # use serenity::{cache::Cache, http::Http, model::id::{GuildId, ChannelId, UserId}};
     /// #
     /// # let http: Http = unimplemented!();
     /// # let cache = Cache::default();
-    /// # let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
+    /// # let (guild_id, channel_id, user_id) = (GuildId::new(1), ChannelId::new(1), UserId::new(1));
     /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
-    /// // assuming the cache has been unlocked
-    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = {
+    ///     let guild = cache.guild(guild_id).ok_or(ModelError::ItemMissing)?;
+    ///     guild.channels.get(&channel_id).ok_or(ModelError::ItemMissing)?.clone()
+    /// };
     ///
     /// let builder = EditVoiceState::new().suppress(false);
     /// channel.edit_voice_state(&http, user_id, builder).await?;
@@ -567,16 +502,18 @@ impl GuildChannel {
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use std::sync::Arc;
-    /// # use serenity::{cache::Cache, http::Http, model::id::ChannelId};
+    /// # use serenity::{cache::Cache, http::Http, model::id::{GuildId, ChannelId}};
     /// #
     /// # let http: Http = unimplemented!();
     /// # let cache = Cache::default();
-    /// # let channel_id = ChannelId::new(1);
+    /// # let (guild_id, channel_id) = (GuildId::new(1), ChannelId::new(1));
     /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
-    /// // assuming the cache has been unlocked
-    /// let channel = cache.channel(channel_id).ok_or(ModelError::ItemMissing)?;
+    /// let channel = {
+    ///     let guild = cache.guild(guild_id).ok_or(ModelError::ItemMissing)?;
+    ///     guild.channels.get(&channel_id).ok_or(ModelError::ItemMissing)?.clone()
+    /// };
     ///
     /// // Send a request to speak
     /// let builder = EditVoiceState::new().request_to_speak(true);
@@ -691,9 +628,12 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: &Context, msg: &Message) {
-    ///         let channel = match context.cache.channel(msg.channel_id) {
-    ///             Some(channel) => channel,
-    ///             None => return,
+    ///         let Some(guild) = msg.guild(&context.cache) else {
+    ///             return;
+    ///         };
+    ///
+    ///         let Some(channel) = guild.channels.get(&msg.channel_id) else {
+    ///             return;
     ///         };
     ///
     ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, msg.author.id) {

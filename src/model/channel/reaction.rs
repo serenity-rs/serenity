@@ -133,9 +133,10 @@ impl Reaction {
                     user_id = None;
                 }
 
-                if user_id.is_some() {
+                if let (Some(_), Some(guild_id)) = (user_id, self.guild_id) {
                     crate::utils::user_has_perms_cache(
                         cache,
+                        guild_id,
                         self.channel_id,
                         Permissions::MANAGE_MESSAGES,
                     )?;
@@ -164,9 +165,10 @@ impl Reaction {
     pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if let (Some(cache), Some(guild_id)) = (cache_http.cache(), self.guild_id) {
                 crate::utils::user_has_perms_cache(
                     cache,
+                    guild_id,
                     self.channel_id,
                     Permissions::MANAGE_MESSAGES,
                 )?;
