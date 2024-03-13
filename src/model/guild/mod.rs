@@ -435,7 +435,11 @@ impl Guild {
 
     #[cfg(feature = "cache")]
     #[deprecated = "Iterate through Guild::channels and use Iterator::find"]
-    pub fn channel_id_from_name(&self, cache: &Cache, name: &str) -> Option<ChannelId> {
+    pub fn channel_id_from_name(
+        &self,
+        #[allow(unused_variables)] cache: &Cache,
+        name: &str,
+    ) -> Option<ChannelId> {
         self.channels.values().find(|c| &*c.name == name).map(|c| c.id)
     }
 
