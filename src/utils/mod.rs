@@ -426,10 +426,11 @@ pub(crate) fn user_has_guild_perms(
 #[cfg(all(feature = "cache", feature = "model"))]
 pub(crate) fn user_has_perms_cache(
     cache: &Cache,
+    guild_id: GuildId,
     channel_id: ChannelId,
     required_permissions: Permissions,
 ) -> Result<()> {
-    match user_perms(cache, channel_id) {
+    match user_perms(cache, guild_id, channel_id) {
         Ok(perms) => {
             if perms.contains(required_permissions) {
                 Ok(())
@@ -446,11 +447,11 @@ pub(crate) fn user_has_perms_cache(
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub(crate) fn user_perms(cache: &Cache, channel_id: ChannelId) -> Result<Permissions> {
-    let Some(guild_id) = cache.channels.get(&channel_id).map(|c| *c) else {
-        return Err(Error::Model(ModelError::ChannelNotFound));
-    };
-
+pub(crate) fn user_perms(
+    cache: &Cache,
+    guild_id: GuildId,
+    channel_id: ChannelId,
+) -> Result<Permissions> {
     let Some(guild) = cache.guild(guild_id) else {
         return Err(Error::Model(ModelError::GuildNotFound));
     };
