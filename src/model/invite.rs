@@ -99,9 +99,10 @@ impl Invite {
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if let (Some(cache), Some(guild)) = (cache_http.cache(), &self.guild) {
                 crate::utils::user_has_perms_cache(
                     cache,
+                    guild.id,
                     self.channel.id,
                     Permissions::MANAGE_GUILD,
                 )?;
@@ -321,9 +322,10 @@ impl RichInvite {
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if let (Some(cache), Some(guild)) = (cache_http.cache(), &self.guild) {
                 crate::utils::user_has_perms_cache(
                     cache,
+                    guild.id,
                     self.channel.id,
                     Permissions::MANAGE_GUILD,
                 )?;

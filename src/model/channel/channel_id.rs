@@ -21,7 +21,7 @@ use crate::builder::{
     GetMessages,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::{Cache, GuildChannelRef};
+use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
@@ -79,7 +79,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        builder.execute(cache_http, self).await
+        builder.execute(cache_http, self, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
@@ -302,7 +302,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
     ) -> Result<GuildChannel> {
-        builder.execute(cache_http, self).await
+        builder.execute(cache_http, self, None).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -344,14 +344,6 @@ impl ChannelId {
         target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
         http.follow_news_channel(self, target_channel_id).await
-    }
-
-    /// Attempts to find a [`GuildChannel`] by its Id in the cache.
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Cache::guild and Guild::channels instead"]
-    pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        #[allow(deprecated)]
-        cache.channel(self)
     }
 
     /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
