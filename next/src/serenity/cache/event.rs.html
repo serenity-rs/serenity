@@ -601,16 +601,6 @@
 <a href="#599" id="599">599</a>
 <a href="#600" id="600">600</a>
 <a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::{HashSet, VecDeque};
 <span class="kw">use </span>std::num::NonZeroU16;
 
@@ -661,7 +651,6 @@
             .get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel.guild_id)
             .and_then(|<span class="kw-2">mut </span>g| g.channels.insert(<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.clone()));
 
-        cache.channels.insert(<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.guild_id);
         old_channel
     }
 }
@@ -672,7 +661,6 @@
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;VecDeque&lt;Message&gt;&gt; {
         <span class="kw">let </span>(channel_id, guild_id) = (<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.guild_id);
 
-        cache.channels.remove(<span class="kw-2">&amp;</span>channel_id);
         cache.guilds.get_mut(<span class="kw-2">&amp;</span>guild_id).map(|<span class="kw-2">mut </span>g| g.channels.remove(<span class="kw-2">&amp;</span>channel_id));
 
         <span class="comment">// Remove the cached messages for the channel.
@@ -684,8 +672,6 @@
     <span class="kw">type </span>Output = GuildChannel;
 
     <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannel&gt; {
-        cache.channels.insert(<span class="self">self</span>.channel.id, <span class="self">self</span>.channel.guild_id);
-
         cache
             .guilds
             .get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.channel.guild_id)
@@ -717,9 +703,6 @@
         <span class="kw">let </span>guild = <span class="self">self</span>.guild.clone();
 
         cache.guilds.insert(<span class="self">self</span>.guild.id, guild);
-        <span class="kw">for </span>channel_id <span class="kw">in </span><span class="self">self</span>.guild.channels.keys() {
-            cache.channels.insert(<span class="kw-2">*</span>channel_id, <span class="self">self</span>.guild.id);
-        }
 
         <span class="prelude-val">None
     </span>}
@@ -739,9 +722,6 @@
         <span class="kw">match </span>cache.guilds.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.guild.id) {
             <span class="prelude-val">Some</span>(guild) =&gt; {
                 <span class="kw">for </span>channel_id <span class="kw">in </span>guild.<span class="number">1</span>.channels.keys() {
-                    <span class="comment">// Remove the channel from the cache.
-                    </span>cache.channels.remove(channel_id);
-
                     <span class="comment">// Remove the channel's cached messages.
                     </span>cache.messages.remove(channel_id);
                 }

@@ -1090,6 +1090,16 @@
 <a href="#1088" id="1088">1088</a>
 <a href="#1089" id="1089">1089</a>
 <a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1258,10 +1268,11 @@
     </span><span class="kw">pub async fn </span>crosspost(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id &amp;&amp; <span class="self">self</span>.guild_id.is_some() {
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
+                <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id {
                     utils::user_has_perms_cache(
                         cache,
+                        guild_id,
                         <span class="self">self</span>.channel_id,
                         Permissions::MANAGE_MESSAGES,
                     )<span class="question-mark">?</span>;
@@ -1315,10 +1326,11 @@
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
                 <span class="kw">if </span><span class="self">self</span>.author.id != cache.current_user().id {
                     utils::user_has_perms_cache(
                         cache,
+                        guild_id,
                         <span class="self">self</span>.channel_id,
                         Permissions::MANAGE_MESSAGES,
                     )<span class="question-mark">?</span>;
@@ -1342,8 +1354,13 @@
     </span><span class="kw">pub async fn </span>delete_reactions(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(cache, <span class="self">self</span>.channel_id, Permissions::MANAGE_MESSAGES)<span class="question-mark">?</span>;
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
+                utils::user_has_perms_cache(
+                    cache,
+                    guild_id,
+                    <span class="self">self</span>.channel_id,
+                    Permissions::MANAGE_MESSAGES,
+                )<span class="question-mark">?</span>;
             }
         }
 
@@ -1387,8 +1404,13 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(cache, <span class="self">self</span>.channel_id, Permissions::MANAGE_MESSAGES)<span class="question-mark">?</span>;
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
+                utils::user_has_perms_cache(
+                    cache,
+                    guild_id,
+                    <span class="self">self</span>.channel_id,
+                    Permissions::MANAGE_MESSAGES,
+                )<span class="question-mark">?</span>;
             }
         }
 
@@ -1559,14 +1581,13 @@
     </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
-                    utils::user_has_perms_cache(
-                        cache,
-                        <span class="self">self</span>.channel_id,
-                        Permissions::MANAGE_MESSAGES,
-                    )<span class="question-mark">?</span>;
-                }
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
+                utils::user_has_perms_cache(
+                    cache,
+                    guild_id,
+                    <span class="self">self</span>.channel_id,
+                    Permissions::MANAGE_MESSAGES,
+                )<span class="question-mark">?</span>;
             }
         }
 
@@ -1603,9 +1624,10 @@
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(guild_id) = <span class="self">self</span>.guild_id {
                     utils::user_has_perms_cache(
                         cache,
+                        guild_id,
                         <span class="self">self</span>.channel_id,
                         Permissions::ADD_REACTIONS,
                     )<span class="question-mark">?</span>;
@@ -1710,14 +1732,13 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
-                    utils::user_has_perms_cache(
-                        cache,
-                        <span class="self">self</span>.channel_id,
-                        Permissions::SEND_MESSAGES,
-                    )<span class="question-mark">?</span>;
-                }
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
+                utils::user_has_perms_cache(
+                    cache,
+                    guild_id,
+                    <span class="self">self</span>.channel_id,
+                    Permissions::SEND_MESSAGES,
+                )<span class="question-mark">?</span>;
             }
         }
 
@@ -1778,14 +1799,13 @@
     </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if </span><span class="self">self</span>.guild_id.is_some() {
-                    utils::user_has_perms_cache(
-                        cache,
-                        <span class="self">self</span>.channel_id,
-                        Permissions::MANAGE_MESSAGES,
-                    )<span class="question-mark">?</span>;
-                }
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
+                utils::user_has_perms_cache(
+                    cache,
+                    guild_id,
+                    <span class="self">self</span>.channel_id,
+                    Permissions::MANAGE_MESSAGES,
+                )<span class="question-mark">?</span>;
             }
         }
 

@@ -1467,15 +1467,6 @@
 <a href="#1465" id="1465">1465</a>
 <a href="#1466" id="1466">1466</a>
 <a href="#1467" id="1467">1467</a>
-<a href="#1468" id="1468">1468</a>
-<a href="#1469" id="1469">1469</a>
-<a href="#1470" id="1470">1470</a>
-<a href="#1471" id="1471">1471</a>
-<a href="#1472" id="1472">1472</a>
-<a href="#1473" id="1473">1473</a>
-<a href="#1474" id="1474">1474</a>
-<a href="#1475" id="1475">1475</a>
-<a href="#1476" id="1476">1476</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>nonmax::{NonMaxU16, NonMaxU64};
 <span class="kw">use </span>serde::Serialize;
 
@@ -1830,15 +1821,6 @@
     </span><span class="kw">pub async fn </span>channels(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;HashMap&lt;ChannelId, GuildChannel&gt;&gt; {
         <span class="self">self</span>.id.channels(http).<span class="kw">await
     </span>}
-
-    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    #[deprecated = <span class="string">"Use Cache::guild and Guild::channels"</span>]
-    </span><span class="kw">pub fn </span>channel_id_from_name(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
-        <span class="kw">let </span>cache = cache.as_ref();
-        <span class="kw">let </span>guild = cache.guild(<span class="self">self</span>.id)<span class="question-mark">?</span>;
-        <span class="attr">#[allow(deprecated)]
-        </span>guild.channel_id_from_name(cache, name)
-    }
 
     <span class="doccomment">/// Creates a [`GuildChannel`] in the guild.
     ///

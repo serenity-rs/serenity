@@ -611,8 +611,8 @@
             <span class="kw">if </span>!<span class="self">self</span>.attachments.is_empty() {
                 req |= Permissions::ATTACH_FILES;
             }
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">crate</span>::utils::user_has_perms_cache(cache, channel_id, req)<span class="question-mark">?</span>;
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), guild_id) {
+                <span class="kw">crate</span>::utils::user_has_perms_cache(cache, guild_id, channel_id, req)<span class="question-mark">?</span>;
             }
         }
 

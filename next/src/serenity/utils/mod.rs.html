@@ -551,6 +551,7 @@
 <a href="#549" id="549">549</a>
 <a href="#550" id="550">550</a>
 <a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
@@ -979,10 +980,11 @@
 </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_has_perms_cache(
     cache: <span class="kw-2">&amp;</span>Cache,
+    guild_id: GuildId,
     channel_id: ChannelId,
     required_permissions: Permissions,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-    <span class="kw">match </span>user_perms(cache, channel_id) {
+    <span class="kw">match </span>user_perms(cache, guild_id, channel_id) {
         <span class="prelude-val">Ok</span>(perms) =&gt; {
             <span class="kw">if </span>perms.contains(required_permissions) {
                 <span class="prelude-val">Ok</span>(())
@@ -999,11 +1001,11 @@
 }
 
 <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_perms(cache: <span class="kw-2">&amp;</span>Cache, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
-    <span class="kw">let </span><span class="prelude-val">Some</span>(guild_id) = cache.channels.get(<span class="kw-2">&amp;</span>channel_id).map(|c| <span class="kw-2">*</span>c) <span class="kw">else </span>{
-        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::ChannelNotFound));
-    };
-
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_perms(
+    cache: <span class="kw-2">&amp;</span>Cache,
+    guild_id: GuildId,
+    channel_id: ChannelId,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
     <span class="kw">let </span><span class="prelude-val">Some</span>(guild) = cache.guild(guild_id) <span class="kw">else </span>{
         <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::GuildNotFound));
     };

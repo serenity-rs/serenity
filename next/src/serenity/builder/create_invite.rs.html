@@ -225,6 +225,8 @@
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
 <a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -435,12 +437,14 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         channel_id: ChannelId,
+        guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), guild_id) {
                 <span class="kw">crate</span>::utils::user_has_perms_cache(
                     cache,
+                    guild_id,
                     channel_id,
                     Permissions::CREATE_INSTANT_INVITE,
                 )<span class="question-mark">?</span>;

@@ -331,6 +331,9 @@
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
 <a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>nonmax::NonMaxU16;
@@ -640,18 +643,21 @@
         <span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         channel_id: ChannelId,
+        guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), guild_id) {
                 <span class="kw">crate</span>::utils::user_has_perms_cache(
                     cache,
+                    guild_id,
                     channel_id,
                     Permissions::MANAGE_CHANNELS,
                 )<span class="question-mark">?</span>;
                 <span class="kw">if </span><span class="self">self</span>.permission_overwrites.is_some() {
                     <span class="kw">crate</span>::utils::user_has_perms_cache(
                         cache,
+                        guild_id,
                         channel_id,
                         Permissions::MANAGE_ROLES,
                     )<span class="question-mark">?</span>;
