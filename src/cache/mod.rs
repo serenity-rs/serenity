@@ -450,20 +450,12 @@ impl Cache {
     /// [`members`]: crate::model::guild::Guild::members
     #[deprecated = "Use Cache::guild and Guild::members instead"]
     pub fn member(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
-        self.member_(guild_id, user_id)
-    }
-
-    fn member_(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
         let member = self.guilds.get(&guild_id)?.try_map(|g| g.members.get(&user_id)).ok()?;
         Some(CacheRef::from_mapped_ref(member))
     }
 
     #[deprecated = "Use Cache::guild and Guild::roles instead"]
     pub fn guild_roles(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
-        self.guild_roles_(guild_id)
-    }
-
-    fn guild_roles_(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
         let roles = self.guilds.get(&guild_id)?.map(|g| &g.roles);
         Some(CacheRef::from_mapped_ref(roles))
     }
@@ -476,10 +468,6 @@ impl Cache {
     /// This method returns all channels from a guild of with the given `guild_id`.
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn guild_channels(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
-        self.guild_channels_(guild_id)
-    }
-
-    fn guild_channels_(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
         let channels = self.guilds.get(&guild_id)?.map(|g| &g.channels);
         Some(CacheRef::from_mapped_ref(channels))
     }
