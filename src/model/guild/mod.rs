@@ -433,16 +433,6 @@ impl Guild {
         Ok(())
     }
 
-    #[cfg(feature = "cache")]
-    #[deprecated = "Iterate through Guild::channels and use Iterator::find"]
-    pub fn channel_id_from_name(
-        &self,
-        #[allow(unused_variables)] cache: &Cache,
-        name: &str,
-    ) -> Option<ChannelId> {
-        self.channels.values().find(|c| &*c.name == name).map(|c| c.id)
-    }
-
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
     /// the range 0 and 7.
     ///
