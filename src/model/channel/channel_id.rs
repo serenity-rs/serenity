@@ -21,7 +21,7 @@ use crate::builder::{
     GetMessages,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::{Cache, GuildChannelRef};
+use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
@@ -343,14 +343,6 @@ impl ChannelId {
         target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
         http.follow_news_channel(self, target_channel_id).await
-    }
-
-    /// Attempts to find a [`GuildChannel`] by its Id in the cache.
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Cache::guild and Guild::channels instead"]
-    pub fn to_channel_cached(self, cache: &Cache) -> Option<GuildChannelRef<'_>> {
-        #[allow(deprecated)]
-        cache.channel(self)
     }
 
     /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
