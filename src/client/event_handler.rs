@@ -4,6 +4,7 @@ use std::num::NonZeroU16;
 
 use async_trait::async_trait;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
+use serde::{Serialize, Deserialize};
 
 use super::context::Context;
 use crate::gateway::ShardStageUpdateEvent;
@@ -32,7 +33,7 @@ macro_rules! event_handler {
 
         /// This enum stores every possible event that an [`EventHandler`] can receive.
         #[cfg_attr(not(feature = "unstable"), non_exhaustive)]
-        #[derive(Clone, Debug, VariantNames, IntoStaticStr, EnumCount)]
+        #[derive(Clone, Debug, Serialize, Deserialize, VariantNames, IntoStaticStr, EnumCount)]
         #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
         pub enum FullEvent {
             $(
