@@ -1068,7 +1068,20 @@ impl GuildId {
         cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
     ) -> Result<Member> {
-        cache_http.http().get_member(self, user_id.into()).await
+        let user_id = user_id.into();
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = cache.guild(self) {
+                    if let Some(member) = guild.members.get(&user_id) {
+                        return Ok(member.clone());
+                    }
+                }
+            }
+        }
+
+        cache_http.http().get_member(self, user_id).await
     }
 
     /// Gets a list of the guild's members.
