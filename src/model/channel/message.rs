@@ -874,6 +874,12 @@ impl Message {
     }
 }
 
+impl ExtractKey<MessageId> for Message {
+    fn extract_key(&self) -> &MessageId {
+        &self.id
+    }
+}
+
 impl From<Message> for MessageId {
     /// Gets the Id of a [`Message`].
     fn from(message: Message) -> MessageId {
