@@ -313,6 +313,8 @@
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -599,6 +601,8 @@
         <span class="doccomment">/// Interaction message will only be visible to sender and will
         /// be quickly deleted.
         </span><span class="kw">const </span>EPHEMERAL = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="doccomment">/// Does not trigger push notifications or desktop notifications.
+        </span><span class="kw">const </span>SUPPRESS_NOTIFICATIONS = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
     }
 }
 
