@@ -148,11 +148,9 @@ pub struct Guild {
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
     /// A mapping of the guild's roles.
-    #[serde(with = "roles")]
-    pub roles: HashMap<RoleId, Role>,
+    pub roles: ExtractMap<RoleId, Role>,
     /// All of the guild's custom emojis.
-    #[serde(with = "emojis")]
-    pub emojis: HashMap<EmojiId, Emoji>,
+    pub emojis: ExtractMap<EmojiId, Emoji>,
     /// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
@@ -239,8 +237,7 @@ pub struct Guild {
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
     pub nsfw_level: NsfwLevel,
     /// All of the guild's custom stickers.
-    #[serde(with = "stickers")]
-    pub stickers: HashMap<StickerId, Sticker>,
+    pub stickers: ExtractMap<StickerId, Sticker>,
     /// Whether the guild has the boost progress bar enabled
     pub premium_progress_bar_enabled: bool,
 
@@ -257,22 +254,17 @@ pub struct Guild {
     /// The number of members in the guild.
     pub member_count: u64,
     /// A mapping of [`User`]s to their current voice state.
-    #[serde(serialize_with = "serialize_map_values")]
-    #[serde(deserialize_with = "deserialize_voice_states")]
-    pub voice_states: HashMap<UserId, VoiceState>,
+    pub voice_states: ExtractMap<UserId, VoiceState>,
     /// Users who are members of the guild.
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received if the
     /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
-    #[serde(with = "members")]
-    pub members: HashMap<UserId, Member>,
+    pub members: ExtractMap<UserId, Member>,
     /// All voice and text channels contained within a guild.
     ///
     /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
     /// from or connect to them).
-    #[serde(serialize_with = "serialize_map_values")]
-    #[serde(deserialize_with = "deserialize_guild_channels")]
-    pub channels: HashMap<ChannelId, GuildChannel>,
+    pub channels: ExtractMap<ChannelId, GuildChannel>,
     /// All active threads in this guild that current user has permission to view.
     ///
     /// A thread is guaranteed (for errors, not for panics) to be cached if a `MESSAGE_CREATE`
@@ -282,8 +274,7 @@ pub struct Guild {
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// **Note**: This will be empty unless the "guild presences" privileged intent is enabled.
-    #[serde(with = "presences")]
-    pub presences: HashMap<UserId, Presence>,
+    pub presences: ExtractMap<UserId, Presence>,
     /// The stage instances in this guild.
     pub stage_instances: FixedArray<StageInstance>,
     /// The stage instances in this guild.
@@ -390,7 +381,7 @@ impl Guild {
     #[must_use]
     pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
-        self.channels.values().find(|&channel| {
+        self.channels.iter().find(|&channel| {
             channel.kind != ChannelType::Category
                 && self.user_permissions_in(channel, member).view_channel()
         })
@@ -402,11 +393,11 @@ impl Guild {
     /// **Note**: This is very costly if used in a server with lots of channels, members, or both.
     #[must_use]
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
-        self.channels.values().find(|&channel| {
+        self.channels.iter().find(|&channel| {
             channel.kind != ChannelType::Category
                 && self
                     .members
-                    .values()
+                    .iter()
                     .map(|member| self.user_permissions_in(channel, member))
                     .all(Permissions::view_channel)
         })
@@ -589,7 +580,7 @@ impl Guild {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild is currently unavailable.
-    pub async fn channels(&self, http: &Http) -> Result<HashMap<ChannelId, GuildChannel>> {
+    pub async fn channels(&self, http: &Http) -> Result<ExtractMap<ChannelId, GuildChannel>> {
         self.id.channels(http).await
     }
 
@@ -1536,9 +1527,8 @@ impl Guild {
     /// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
     pub fn members_with_status(&self, status: OnlineStatus) -> impl Iterator<Item = &Member> {
-        self.members.iter().filter_map(move |(id, member)| match self.presences.get(id) {
-            Some(presence) if presence.status == status => Some(member),
-            _ => None,
+        self.members.iter().filter(move |member| {
+            self.presences.get(&member.user.id).is_some_and(|p| p.status == status)
         })
     }
 
@@ -1565,7 +1555,7 @@ impl Guild {
             None => (name, None),
         };
 
-        for member in self.members.values() {
+        for member in &self.members {
             if &*member.user.name == username
                 && discrim.map_or(true, |d| member.user.discriminator == d)
             {
@@ -1573,7 +1563,7 @@ impl Guild {
             }
         }
 
-        self.members.values().find(|member| member.nick.as_deref().is_some_and(|nick| nick == name))
+        self.members.iter().find(|member| member.nick.as_deref().is_some_and(|nick| nick == name))
     }
 
     /// Retrieves all [`Member`] that start with a given [`String`].
@@ -1606,7 +1596,7 @@ impl Guild {
 
         let mut members = self
             .members
-            .values()
+            .iter()
             .filter_map(|member| {
                 let username = &member.user.name;
 
@@ -1663,7 +1653,7 @@ impl Guild {
     ) -> Vec<(&Member, String)> {
         let mut members = self
             .members
-            .values()
+            .iter()
             .filter_map(|member| {
                 let username = &member.user.name;
 
@@ -1715,7 +1705,7 @@ impl Guild {
     ) -> Vec<(&Member, String)> {
         let mut members = self
             .members
-            .values()
+            .iter()
             .filter_map(|member| {
                 let name = &member.user.name;
                 contains(name, substring, case_sensitive).then(|| (member, name.clone().into()))
@@ -1760,7 +1750,7 @@ impl Guild {
     ) -> Vec<(&Member, String)> {
         let mut members = self
             .members
-            .values()
+            .iter()
             .filter_map(|member| {
                 let nick = member.nick.as_ref().unwrap_or(&member.user.name);
                 contains(nick, substring, case_sensitive).then(|| (member, nick.clone().into()))
@@ -1878,7 +1868,7 @@ impl Guild {
         member_user_id: UserId,
         member_roles: &[RoleId],
         guild_id: GuildId,
-        guild_roles: &HashMap<RoleId, Role>,
+        guild_roles: &ExtractMap<RoleId, Role>,
         guild_owner_id: UserId,
     ) -> Permissions {
         let mut everyone_allow_overwrites = Permissions::empty();
@@ -2264,7 +2254,7 @@ impl Guild {
     /// ```
     #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
-        self.roles.values().find(|role| role_name == &*role.name)
+        self.roles.iter().find(|role| role_name == &*role.name)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this
@@ -2616,7 +2606,6 @@ enum_number! {
 mod test {
     #[cfg(feature = "model")]
     mod model {
-        use std::collections::*;
         use std::num::NonZeroU16;
 
         use crate::model::prelude::*;
@@ -2637,7 +2626,7 @@ mod test {
             let m = gen_member();
 
             Guild {
-                members: HashMap::from([(m.user.id, m)]),
+                members: ExtractMap::from_iter([m]),
                 ..Default::default()
             }
         }

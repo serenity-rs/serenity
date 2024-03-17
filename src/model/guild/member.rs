@@ -181,7 +181,7 @@ impl Member {
 
         let member = guild.members.get(&self.user.id)?;
 
-        for channel in guild.channels.values() {
+        for channel in &guild.channels {
             if channel.kind != ChannelType::Category
                 && guild.user_permissions_in(channel, member).view_channel()
             {
@@ -468,8 +468,8 @@ impl Member {
                 .guild(self.guild_id)?
                 .roles
                 .iter()
-                .filter(|(id, _)| self.roles.contains(id))
-                .map(|(_, role)| role.clone())
+                .filter(|r| self.roles.contains(&r.id))
+                .cloned()
                 .collect(),
         )
     }
@@ -520,6 +520,12 @@ impl fmt::Display for Member {
     /// This is in the format of `<@USER_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.user.mention(), f)
+    }
+}
+
+impl ExtractKey<UserId> for Member {
+    fn extract_key(&self) -> &UserId {
+        &self.user.id
     }
 }
 
