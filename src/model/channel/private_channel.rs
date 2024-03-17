@@ -294,7 +294,7 @@ impl PrivateChannel {
     /// # let cache = Cache::default();
     /// # let channel: PrivateChannel = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
-    /// let typing = channel.start_typing(&http);
+    /// let typing = channel.start_typing(http);
     ///
     /// // Run some long-running process
     /// long_process();
@@ -307,8 +307,8 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// May return [`Error::Http`] if the current user cannot send a direct message to this user.
-    pub fn start_typing(self, http: &Arc<Http>) -> Typing {
-        http.start_typing(self.id)
+    pub fn start_typing(self, http: Arc<Http>) -> Typing {
+        self.id.start_typing(http)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
