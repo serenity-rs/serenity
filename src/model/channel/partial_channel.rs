@@ -30,6 +30,12 @@ pub struct PartialChannel {
     pub parent_id: Option<ChannelId>,
 }
 
+impl ExtractKey<ChannelId> for PartialChannel {
+    fn extract_key(&self) -> &ChannelId {
+        &self.id
+    }
+}
+
 /// A container for the IDs returned by following a news channel.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/channel#followed-channel-object).

@@ -84,7 +84,7 @@ impl ArgumentConvert for Role {
         }
 
         #[cfg(feature = "cache")]
-        if let Some(role) = roles.values().find(|role| role.name.eq_ignore_ascii_case(s)) {
+        if let Some(role) = roles.iter().find(|role| role.name.eq_ignore_ascii_case(s)) {
             return Ok(role.clone());
         }
         #[cfg(not(feature = "cache"))]

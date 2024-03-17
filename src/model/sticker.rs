@@ -221,6 +221,12 @@ impl Sticker {
     }
 }
 
+impl ExtractKey<StickerId> for Sticker {
+    fn extract_key(&self) -> &StickerId {
+        &self.id
+    }
+}
+
 enum_number! {
     /// Differentiates between sticker types.
     ///
