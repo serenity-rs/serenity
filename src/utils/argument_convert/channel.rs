@@ -54,7 +54,7 @@ async fn lookup_channel_global(
     #[cfg(feature = "cache")]
     if let Some(cache) = ctx.cache() {
         if let Some(guild) = cache.guild(guild_id) {
-            let channel = guild.channels.values().find(|c| c.name.eq_ignore_ascii_case(s));
+            let channel = guild.channels.iter().find(|c| c.name.eq_ignore_ascii_case(s));
             if let Some(channel) = channel {
                 return Ok(Channel::Guild(channel.clone()));
             }

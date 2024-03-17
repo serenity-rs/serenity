@@ -298,6 +298,12 @@ pub struct User {
     pub collectibles: Option<Collectibles>,
 }
 
+impl ExtractKey<UserId> for User {
+    fn extract_key(&self) -> &UserId {
+        &self.id
+    }
+}
+
 enum_number! {
     /// Premium types denote the level of premium a user has. Visit the [Nitro](https://discord.com/nitro)
     /// page to learn more about the premium plans Discord currently offers.

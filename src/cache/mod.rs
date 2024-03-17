@@ -449,16 +449,14 @@ impl Cache {
     }
 
     /// Clones all channel categories in the given guild and returns them.
-    pub fn guild_categories(&self, guild_id: GuildId) -> Option<HashMap<ChannelId, GuildChannel>> {
+    pub fn guild_categories(
+        &self,
+        guild_id: GuildId,
+    ) -> Option<ExtractMap<ChannelId, GuildChannel>> {
         let guild = self.guilds.get(&guild_id)?;
-        Some(
-            guild
-                .channels
-                .iter()
-                .filter(|(_id, channel)| channel.kind == ChannelType::Category)
-                .map(|(id, channel)| (*id, channel.clone()))
-                .collect(),
-        )
+
+        let filter = |channel: &&GuildChannel| channel.kind == ChannelType::Category;
+        Some(guild.channels.iter().filter(filter).cloned().collect())
     }
 
     /// Inserts new messages into the message cache for a channel manually.
@@ -575,7 +573,7 @@ mod test {
         let mut guild_create = GuildCreateEvent {
             guild: Guild {
                 id: GuildId::new(1),
-                channels: HashMap::from([(ChannelId::new(2), channel)]),
+                channels: ExtractMap::from_iter([channel]),
                 ..Default::default()
             },
         };

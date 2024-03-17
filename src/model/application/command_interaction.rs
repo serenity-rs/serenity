@@ -17,6 +17,7 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
+use crate::internal::utils::lending_for_each;
 use crate::model::application::{CommandOptionType, CommandType};
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
@@ -250,7 +251,9 @@ impl<'de> Deserialize<'de> for CommandInteraction {
                 // If `member` is present, `user` wasn't sent and is still filled with default data
                 interaction.user = member.user.clone();
             }
-            interaction.data.resolved.roles.values_mut().for_each(|r| r.guild_id = guild_id);
+
+            let mut role_iter = interaction.data.resolved.roles.iter_mut();
+            lending_for_each!(role_iter, |r| r.guild_id = guild_id);
         }
         Ok(interaction)
     }
@@ -483,23 +486,44 @@ pub enum ResolvedTarget<'a> {
 #[non_exhaustive]
 pub struct CommandDataResolved {
     /// The resolved users.
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub users: HashMap<UserId, User>,
+    #[serde(
+        default,
+        skip_serializing_if = "ExtractMap::is_empty",
+        serialize_with = "extract_map::serialize_as_map"
+    )]
+    pub users: ExtractMap<UserId, User>,
     /// The resolved partial members.
+    // Cannot use ExtractMap, as PartialMember does not always store an ID.
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub members: HashMap<UserId, PartialMember>,
     /// The resolved roles.
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub roles: HashMap<RoleId, Role>,
+    #[serde(
+        default,
+        skip_serializing_if = "ExtractMap::is_empty",
+        serialize_with = "extract_map::serialize_as_map"
+    )]
+    pub roles: ExtractMap<RoleId, Role>,
     /// The resolved partial channels.
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub channels: HashMap<ChannelId, PartialChannel>,
+    #[serde(
+        default,
+        skip_serializing_if = "ExtractMap::is_empty",
+        serialize_with = "extract_map::serialize_as_map"
+    )]
+    pub channels: ExtractMap<ChannelId, PartialChannel>,
     /// The resolved messages.
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub messages: HashMap<MessageId, Message>,
+    #[serde(
+        default,
+        skip_serializing_if = "ExtractMap::is_empty",
+        serialize_with = "extract_map::serialize_as_map"
+    )]
+    pub messages: ExtractMap<MessageId, Message>,
     /// The resolved attachments.
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub attachments: HashMap<AttachmentId, Attachment>,
+    #[serde(
+        default,
+        skip_serializing_if = "ExtractMap::is_empty",
+        serialize_with = "extract_map::serialize_as_map"
+    )]
+    pub attachments: ExtractMap<AttachmentId, Attachment>,
 }
 
 /// A set of a parameter and a value from the user.
