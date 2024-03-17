@@ -1,3 +1,5 @@
+use nonmax::NonMaxU8;
+
 #[cfg(feature = "http")]
 use crate::http::{CacheHttp, MessagePagination};
 #[cfg(feature = "http")]
@@ -48,7 +50,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct GetMessages {
     search_filter: Option<SearchFilter>,
-    limit: Option<u8>,
+    limit: Option<NonMaxU8>,
 }
 
 impl GetMessages {
@@ -83,7 +85,7 @@ impl GetMessages {
     /// **Note**: This field is capped to 100 messages due to a Discord limitation. If an amount
     /// larger than 100 is supplied, it will be truncated.
     pub fn limit(mut self, limit: u8) -> Self {
-        self.limit = Some(limit.min(100));
+        self.limit = NonMaxU8::new(limit.min(100));
         self
     }
 
