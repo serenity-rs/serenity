@@ -21,7 +21,6 @@ use super::multipart::{Multipart, MultipartUpload};
 use super::ratelimiting::Ratelimiter;
 use super::request::Request;
 use super::routing::Route;
-use super::typing::Typing;
 use super::{
     ErrorResponse,
     GuildPagination,
@@ -312,10 +311,6 @@ impl Http {
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
-    ///
-    /// **Note**: Requires the [Manage Roles] permission and respect of role hierarchy.
-    ///
-    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_member_role(
         &self,
         guild_id: GuildId,
@@ -343,10 +338,6 @@ impl Http {
     ///
     /// Passing a `delete_message_days` of `0` is equivalent to not removing any messages. Up to
     /// `7` days' worth of messages may be deleted.
-    ///
-    /// **Note**: Requires that you have the [Ban Members] permission.
-    ///
-    /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn ban_user(
         &self,
         guild_id: GuildId,
@@ -394,12 +385,6 @@ impl Http {
     }
 
     /// Broadcasts that the current user is typing in the given [`Channel`].
-    ///
-    /// This lasts for about 10 seconds, and will then need to be renewed to indicate that the
-    /// current user is still typing.
-    ///
-    /// This should rarely be used for bots, although it is a good indicator that a long-running
-    /// command is still being processed.
     pub async fn broadcast_typing(&self, channel_id: ChannelId) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -415,13 +400,6 @@ impl Http {
     }
 
     /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
-    ///
-    /// Refer to the Discord's [docs] for information on what fields this requires.
-    ///
-    /// **Note**: Requires the [Manage Channels] permission.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-channel
-    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(
         &self,
         guild_id: GuildId,
@@ -506,18 +484,8 @@ impl Http {
         .await
     }
 
-    /// Shortcut for [`Self::create_forum_post_with_attachments`]
-    pub async fn create_forum_post(
-        &self,
-        channel_id: ChannelId,
-        map: &impl serde::Serialize,
-        audit_log_reason: Option<&str>,
-    ) -> Result<GuildChannel> {
-        self.create_forum_post_with_attachments(channel_id, map, vec![], audit_log_reason).await
-    }
-
     /// Creates a forum post channel in the [`GuildChannel`] given its Id.
-    pub async fn create_forum_post_with_attachments(
+    pub async fn create_forum_post(
         &self,
         channel_id: ChannelId,
         map: &impl serde::Serialize,
@@ -542,12 +510,6 @@ impl Http {
     }
 
     /// Creates an emoji in the given [`Guild`] with the given data.
-    ///
-    /// See [`Guild::create_emoji`] for required fields.
-    ///
-    /// **Note**: Requires the [Create Guild Expressions] permission.
-    ///
-    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     pub async fn create_emoji(
         &self,
         guild_id: GuildId,
@@ -621,15 +583,6 @@ impl Http {
     }
 
     /// Creates a new global command.
-    ///
-    /// New global commands will be available in all guilds after 1 hour.
-    ///
-    /// Refer to Discord's [docs] for field information.
-    ///
-    /// **Note**: Creating a command with the same name as an existing command for your application
-    /// will overwrite the old command.
-    ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     pub async fn create_global_command(&self, map: &impl serde::Serialize) -> Result<Command> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -687,34 +640,7 @@ impl Http {
     /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
     /// over a [`Shard`], if at least one is running.
     ///
-    /// **Note**: This endpoint is currently limited to 10 active guilds. The limits are raised for
-    /// whitelisted [GameBridge] applications. See the [documentation on this endpoint] for more
-    /// info.
-    ///
-    /// # Examples
-    ///
-    /// Create a guild called `"test"` in the [US West region]:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::Http;
-    /// use serde_json::json;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let map = json!({
-    ///     "name": "test",
-    /// });
-    ///
-    /// let _result = http.create_guild(&map).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
     /// [`Shard`]: crate::gateway::Shard
-    /// [GameBridge]: https://discord.com/developers/docs/topics/gamebridge
-    /// [documentation on this endpoint]:
-    /// https://discord.com/developers/docs/resources/guild#create-guild
-    /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub async fn create_guild(&self, map: &Value) -> Result<PartialGuild> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -730,10 +656,6 @@ impl Http {
     /// Creates a new guild command.
     ///
     /// New guild commands will be available in the guild immediately.
-    ///
-    /// Refer to Discord's [docs] for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
     pub async fn create_guild_command(
         &self,
         guild_id: GuildId,
@@ -754,13 +676,6 @@ impl Http {
     }
 
     /// Creates an [`Integration`] for a [`Guild`].
-    ///
-    /// Refer to Discord's [docs] for field information.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: Permissions::MANAGE_GUILD
-    /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-integration
     pub async fn create_guild_integration(
         &self,
         guild_id: GuildId,
@@ -783,11 +698,6 @@ impl Http {
     }
 
     /// Creates a response to an [`Interaction`] from the gateway.
-    ///
-    /// Refer to Discord's [docs] for the object it takes.
-    ///
-    /// [`Interaction`]: crate::model::application::Interaction
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     pub async fn create_interaction_response(
         &self,
         interaction_id: InteractionId,
@@ -821,15 +731,6 @@ impl Http {
     }
 
     /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
-    ///
-    /// Refer to Discord's [docs] for field information.
-    ///
-    /// All fields are optional.
-    ///
-    /// **Note**: Requires the [Create Instant Invite] permission.
-    ///
-    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    /// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite
     pub async fn create_invite(
         &self,
         channel_id: ChannelId,
@@ -960,12 +861,6 @@ impl Http {
     }
 
     /// Creates a Guild Scheduled Event.
-    ///
-    /// Refer to Discord's docs for field information.
-    ///
-    /// **Note**: Requires the [Create Events] permission.
-    ///
-    /// [Create Events]: Permissions::CREATE_EVENTS
     pub async fn create_scheduled_event(
         &self,
         guild_id: GuildId,
@@ -987,10 +882,6 @@ impl Http {
     }
 
     /// Creates a sticker.
-    ///
-    /// **Note**: Requires the [Create Guild Expressions] permission.
-    ///
-    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     pub async fn create_sticker(
         &self,
         guild_id: GuildId,
@@ -1054,32 +945,7 @@ impl Http {
         .await
     }
 
-    /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in the given data.
-    ///
-    /// This method requires authentication.
-    ///
-    /// The Value is a map with the values of:
-    /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar (_optional_);
-    /// - **name**: the name of the webhook, limited to between 2 and 100 characters long.
-    ///
-    /// # Examples
-    ///
-    /// Creating a webhook named `test`:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::Http;
-    /// use serde_json::json;
-    /// use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let channel_id = ChannelId::new(81384788765712384);
-    /// let map = json!({"name": "test"});
-    ///
-    /// let webhook = http.create_webhook(channel_id, &map, None).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
+    /// Creates a webhook for the given [`GuildChannel`]'s Id, passing in the given data.
     pub async fn create_webhook(
         &self,
         channel_id: ChannelId,
@@ -1140,8 +1006,6 @@ impl Http {
     }
 
     /// Deletes an emoji from a guild.
-    ///
-    /// See [`GuildId::delete_emoji`] for permissions requirements.
     pub async fn delete_emoji(
         &self,
         guild_id: GuildId,
@@ -1333,23 +1197,6 @@ impl Http {
     }
 
     /// Deletes all of the [`Reaction`]s associated with a [`Message`].
-    ///
-    /// # Examples
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// #
-    /// use serenity::model::id::{ChannelId, MessageId};
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let channel_id = ChannelId::new(7);
-    /// let message_id = MessageId::new(8);
-    ///
-    /// http.delete_message_reactions(channel_id, message_id).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn delete_message_reactions(
         &self,
         channel_id: ChannelId,
@@ -1499,11 +1346,6 @@ impl Http {
     }
 
     /// Deletes a [Scheduled Event] from a server.
-    ///
-    /// **Note**: Requires the [Manage Events] permission.
-    ///
-    /// [Scheduled Event]: crate::model::guild::ScheduledEvent
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn delete_scheduled_event(
         &self,
         guild_id: GuildId,
@@ -1524,8 +1366,6 @@ impl Http {
     }
 
     /// Deletes a sticker from a server.
-    ///
-    /// See [`GuildId::delete_sticker`] for permissions requirements.
     pub async fn delete_sticker(
         &self,
         guild_id: GuildId,
@@ -1564,24 +1404,6 @@ impl Http {
     }
 
     /// Deletes a [`Webhook`] given its Id.
-    ///
-    /// This method requires authentication, whereas [`Self::delete_webhook_with_token`] does not.
-    ///
-    /// # Examples
-    ///
-    /// Deletes a webhook given its Id:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::Http;
-    /// use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let webhook_id = WebhookId::new(245037420704169985);
-    /// http.delete_webhook(webhook_id, None).await?;
-    /// Ok(())
-    /// # }
-    /// ```
     pub async fn delete_webhook(
         &self,
         webhook_id: WebhookId,
@@ -1603,24 +1425,6 @@ impl Http {
     /// Deletes a [`Webhook`] given its Id and unique token.
     ///
     /// This method does _not_ require authentication.
-    ///
-    /// # Examples
-    ///
-    /// Deletes a webhook given its Id and unique token:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let id = WebhookId::new(245037420704169985);
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    ///
-    /// http.delete_webhook_with_token(id, token, None).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn delete_webhook_with_token(
         &self,
         webhook_id: WebhookId,
@@ -1684,8 +1488,6 @@ impl Http {
     }
 
     /// Changes guild emoji information.
-    ///
-    /// See [`GuildId::edit_emoji`] for permissions requirements.
     pub async fn edit_emoji(
         &self,
         guild_id: GuildId,
@@ -1734,10 +1536,6 @@ impl Http {
     }
 
     /// Edits a follow-up message for an interaction.
-    ///
-    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     pub async fn edit_followup_message(
         &self,
         interaction_token: &str,
@@ -1772,10 +1570,6 @@ impl Http {
     }
 
     /// Get a follow-up message for an interaction.
-    ///
-    /// Refer to Discord's [docs] for Get Webhook Message for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#get-webhook-message
     pub async fn get_followup_message(
         &self,
         interaction_token: &str,
@@ -1797,12 +1591,6 @@ impl Http {
     }
 
     /// Edits a global command.
-    ///
-    /// Updates will be available in all guilds after 1 hour.
-    ///
-    /// Refer to Discord's [docs] for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
     pub async fn edit_global_command(
         &self,
         command_id: CommandId,
@@ -1845,12 +1633,6 @@ impl Http {
     }
 
     /// Edits a guild command.
-    ///
-    /// Updates for guild commands will be available immediately.
-    ///
-    /// Refer to Discord's [docs] for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     pub async fn edit_guild_command(
         &self,
         guild_id: GuildId,
@@ -1873,12 +1655,6 @@ impl Http {
     }
 
     /// Edits a guild command permissions.
-    ///
-    /// Updates for guild commands will be available immediately.
-    ///
-    /// Refer to Discord's [documentation] for field information.
-    ///
-    /// [documentation]: https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
     pub async fn edit_guild_command_permissions(
         &self,
         guild_id: GuildId,
@@ -2170,10 +1946,6 @@ impl Http {
     }
 
     /// Edits the initial interaction response.
-    ///
-    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     pub async fn edit_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -2368,35 +2140,6 @@ impl Http {
     }
 
     /// Changes another user's voice state in a stage channel.
-    ///
-    /// The Value is a map with values of:
-    /// - **channel_id**: ID of the channel the user is currently in (**required**)
-    /// - **suppress**: Bool which toggles user's suppressed state. Setting this to `false` will
-    ///   invite the user to speak.
-    ///
-    /// # Example
-    ///
-    /// Suppress a user
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::Http;
-    /// use serde_json::json;
-    /// use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let guild_id = GuildId::new(187450744427773963);
-    /// let user_id = UserId::new(150443906511667200);
-    /// let map = json!({
-    ///     "channel_id": "826929611849334784",
-    ///     "suppress": true,
-    /// });
-    ///
-    /// // Edit state for another user
-    /// http.edit_voice_state(guild_id, user_id, &map).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn edit_voice_state(
         &self,
         guild_id: GuildId,
@@ -2418,38 +2161,6 @@ impl Http {
     }
 
     /// Changes the current user's voice state in a stage channel.
-    ///
-    /// The Value is a map with values of:
-    ///
-    /// - **channel_id**: ID of the channel the user is currently in (**required**)
-    /// - **suppress**: Bool which toggles user's suppressed state. Setting this to `false` will
-    ///   invite the user to speak.
-    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's request to speak. This
-    ///   can be any present or future time.
-    ///
-    /// # Example
-    ///
-    /// Unsuppress the current bot user
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::Http;
-    /// use serde_json::json;
-    /// use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let guild_id = GuildId::new(187450744427773963);
-    /// let map = json!({
-    ///     "channel_id": "826929611849334784",
-    ///     "suppress": false,
-    ///     "request_to_speak_timestamp": "2021-03-31T18:45:31.297561+00:00"
-    /// });
-    ///
-    /// // Edit state for current user
-    /// http.edit_voice_state_me(guild_id, &map).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn edit_voice_state_me(
         &self,
         guild_id: GuildId,
@@ -2491,37 +2202,6 @@ impl Http {
     }
 
     /// Edits a the webhook with the given data.
-    ///
-    /// The Value is a map with optional values of:
-    /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar (_optional_);
-    /// - **name**: the name of the webhook, limited to between 2 and 100 characters long.
-    ///
-    /// Note that, unlike with [`Self::create_webhook`], _all_ values are optional.
-    ///
-    /// This method requires authentication, whereas [`Self::edit_webhook_with_token`] does not.
-    ///
-    /// # Examples
-    ///
-    /// Edit the image of a webhook given its Id and unique token:
-    ///
-    /// ```rust,no_run
-    /// use serenity::builder::CreateAttachment;
-    /// use serenity::http::Http;
-    /// use serde_json::json;
-    /// use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let id = WebhookId::new(245037420704169985);
-    /// let image = CreateAttachment::path("./webhook_img.png").await?;
-    /// let map = json!({
-    ///     "avatar": image.to_base64(),
-    /// });
-    ///
-    /// let edited = http.edit_webhook(id, &map, None).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn edit_webhook(
         &self,
         webhook_id: WebhookId,
@@ -2542,30 +2222,6 @@ impl Http {
     }
 
     /// Edits the webhook with the given data.
-    ///
-    /// Refer to the documentation for [`Self::edit_webhook`] for more information.
-    ///
-    /// This method does _not_ require authentication.
-    ///
-    /// # Examples
-    ///
-    /// Edit the name of a webhook given its Id and unique token:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::Http;
-    /// use serde_json::json;
-    /// use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let id = WebhookId::new(245037420704169985);
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let map = json!({"name": "new name"});
-    ///
-    /// let edited = http.edit_webhook_with_token(id, token, &map, None).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn edit_webhook_with_token(
         &self,
         webhook_id: WebhookId,
@@ -2590,55 +2246,6 @@ impl Http {
     }
 
     /// Executes a webhook, posting a [`Message`] in the webhook's associated [`Channel`].
-    ///
-    /// This method does _not_ require authentication.
-    ///
-    /// If `thread_id` is not `None`, then the message will be sent to the thread in the webhook's
-    /// associated [`Channel`] with the corresponding Id, which will be automatically unarchived.
-    ///
-    /// If `wait` is `false`, this function will return `Ok(None)` on success. Otherwise, it will
-    /// wait for server confirmation of the message having been sent, and return `Ok(Some(msg))`.
-    /// From the [Discord docs]:
-    ///
-    /// > waits for server confirmation of message send before response, and returns the created
-    /// > message body (defaults to false; when false a message that is not saved does not return
-    /// > an error)
-    ///
-    /// The map can _optionally_ contain the following data:
-    /// - `avatar_url`: Override the default avatar of the webhook with a URL.
-    /// - `tts`: Whether this is a text-to-speech message (defaults to `false`).
-    /// - `username`: Override the default username of the webhook.
-    ///
-    /// Additionally, _at least one_ of the following must be given:
-    /// - `content`: The content of the message.
-    /// - `embeds`: An array of rich embeds.
-    ///
-    /// **Note**: For embed objects, all fields are registered by Discord except for `height`,
-    /// `provider`, `proxy_url`, `type` (it will always be `rich`), `video`, and `width`. The rest
-    /// will be determined by Discord.
-    ///
-    /// # Examples
-    ///
-    /// Sending a webhook with message content of `test`:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::Http;
-    /// use serde_json::json;
-    /// use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let id = WebhookId::new(245037420704169985);
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let map = json!({"content": "test"});
-    /// let files = vec![];
-    ///
-    /// let message = http.execute_webhook(id, None, token, true, files, &map).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook(
         &self,
         webhook_id: WebhookId,
@@ -2905,8 +2512,6 @@ impl Http {
     }
 
     /// Retrieves all auto moderation rules in a guild.
-    ///
-    /// This method requires `MANAGE_GUILD` permissions.
     pub async fn get_automod_rules(&self, guild_id: GuildId) -> Result<Vec<Rule>> {
         self.fire(Request {
             body: None,
@@ -2922,8 +2527,6 @@ impl Http {
     }
 
     /// Retrieves an auto moderation rule in a guild.
-    ///
-    /// This method requires `MANAGE_GUILD` permissions.
     pub async fn get_automod_rule(&self, guild_id: GuildId, rule_id: RuleId) -> Result<Rule> {
         self.fire(Request {
             body: None,
@@ -2940,8 +2543,6 @@ impl Http {
     }
 
     /// Creates an auto moderation rule in a guild.
-    ///
-    /// This method requires `MANAGE_GUILD` permissions.
     pub async fn create_automod_rule(
         &self,
         guild_id: GuildId,
@@ -2964,8 +2565,6 @@ impl Http {
     }
 
     /// Retrieves an auto moderation rule in a guild.
-    ///
-    /// This method requires `MANAGE_GUILD` permissions.
     pub async fn edit_automod_rule(
         &self,
         guild_id: GuildId,
@@ -2990,8 +2589,6 @@ impl Http {
     }
 
     /// Deletes an auto moderation rule in a guild.
-    ///
-    /// This method requires `MANAGE_GUILD` permissions.
     pub async fn delete_automod_rule(
         &self,
         guild_id: GuildId,
@@ -3257,25 +2854,6 @@ impl Http {
     }
 
     /// Retrieves the webhooks for the given [channel][`GuildChannel`]'s Id.
-    ///
-    /// This method requires authentication.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve all of the webhooks owned by a channel:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let channel_id = ChannelId::new(81384788765712384);
-    ///
-    /// let webhooks = http.get_channel_webhooks(channel_id).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn get_channel_webhooks(&self, channel_id: ChannelId) -> Result<Vec<Webhook>> {
         self.fire(Request {
             body: None,
@@ -3965,10 +3543,6 @@ impl Http {
     }
 
     /// Gets a scheduled event by Id.
-    ///
-    /// **Note**: Requires the [View Channel] permission for the channel associated with the event.
-    ///
-    /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn get_scheduled_event(
         &self,
         guild_id: GuildId,
@@ -3991,10 +3565,6 @@ impl Http {
     }
 
     /// Gets a list of all scheduled events for the corresponding guild.
-    ///
-    /// **Note**: Requires the [View Channel] permission at the guild level.
-    ///
-    /// [View Channel]: Permissions::VIEW_CHANNEL
     pub async fn get_scheduled_events(
         &self,
         guild_id: GuildId,
@@ -4016,20 +3586,6 @@ impl Http {
 
     /// Gets a list of all interested users for the corresponding scheduled event, with additional
     /// options for filtering.
-    ///
-    /// If `limit` is left unset, by default at most 100 users are returned.
-    ///
-    /// If `target` is set, then users will be filtered by Id, such that their Id comes before or
-    /// after the provided [`UserId`] wrapped by the [`UserPagination`].
-    ///
-    /// If `with_member` is set to `Some(true)`, then the [`member`] field of the user struct will
-    /// be populated with [`Guild Member`] information, if the interested user is a member of the
-    /// guild the event takes place in.
-    ///
-    /// **Note**: Requires the [View Channel] permission for the channel associated with the event.
-    ///
-    /// [`member`]: ScheduledEventUser::member
-    /// [`Guild Member`]: crate::model::guild::Member
     pub async fn get_scheduled_event_users(
         &self,
         guild_id: GuildId,
@@ -4125,26 +3681,7 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
-    /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
-    ///
-    /// This method requires authentication.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve all of the webhooks owned by a guild:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let guild_id = GuildId::new(81384788765712384);
-    ///
-    /// let webhooks = http.get_guild_webhooks(guild_id).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
+    /// Retrieves the webhooks for the given [`Guild`]'s Id.
     pub async fn get_guild_webhooks(&self, guild_id: GuildId) -> Result<Vec<Webhook>> {
         self.fire(Request {
             body: None,
@@ -4160,31 +3697,6 @@ impl Http {
     }
 
     /// Gets a paginated list of the current user's guilds.
-    ///
-    /// The `limit` has a maximum value of 100.
-    ///
-    /// [Discord's documentation][docs]
-    ///
-    /// # Examples
-    ///
-    /// Get the first 10 guilds after a certain guild's Id:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// use serenity::http::GuildPagination;
-    /// use serenity::model::id::GuildId;
-    ///
-    /// let guild_id = GuildId::new(81384788765712384);
-    ///
-    /// let guilds = http.get_guilds(Some(GuildPagination::After(guild_id)), Some(10)).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guilds
     pub async fn get_guilds(
         &self,
         target: Option<GuildPagination>,
@@ -4219,33 +3731,9 @@ impl Http {
 
     /// Returns a guild [`Member`] object for the current user.
     ///
-    /// # Authorization
-    ///
     /// This method only works for user tokens with the [`GuildsMembersRead`] OAuth2 scope.
     ///
     /// [`GuildsMembersRead`]: crate::model::application::Scope::GuildsMembersRead
-    ///
-    /// # Examples
-    ///
-    /// Get the member object for the current user within the specified guild.
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// use serenity::model::id::GuildId;
-    ///
-    /// let guild_id = GuildId::new(81384788765712384);
-    ///
-    /// let member = http.get_current_user_guild_member(guild_id).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// See the [Discord Developer Portal documentation][docs] for more.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
     pub async fn get_current_user_guild_member(&self, guild_id: GuildId) -> Result<Member> {
         let mut value: Value = self
             .fire(Request {
@@ -4268,16 +3756,6 @@ impl Http {
     }
 
     /// Gets information about a specific invite.
-    ///
-    /// # Arguments
-    /// * `code` - The invite code.
-    /// * `member_counts` - Whether to include information about the current number of members in
-    ///   the server that the invite belongs to.
-    /// * `expiration` - Whether to include information about when the invite expires.
-    /// * `event_id` - An optional server event ID to include with the invite.
-    ///
-    /// More information about these arguments can be found on Discord's
-    /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
     pub async fn get_invite(
         &self,
         code: &str,
@@ -4621,22 +4099,6 @@ impl Http {
     ///
     /// This method requires authentication, whereas [`Http::get_webhook_with_token`] and
     /// [`Http::get_webhook_from_url`] do not.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a webhook by Id:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
-    ///
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let id = WebhookId::new(245037420704169985);
-    /// let webhook = http.get_webhook(id).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn get_webhook(&self, webhook_id: WebhookId) -> Result<Webhook> {
         self.fire(Request {
             body: None,
@@ -4654,24 +4116,6 @@ impl Http {
     /// Retrieves a webhook given its Id and unique token.
     ///
     /// This method does _not_ require authentication.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a webhook by Id and its unique token:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let id = WebhookId::new(245037420704169985);
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    ///
-    /// let webhook = http.get_webhook_with_token(id, token).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub async fn get_webhook_with_token(
         &self,
         webhook_id: WebhookId,
@@ -4694,21 +4138,6 @@ impl Http {
     /// Retrieves a webhook given its url.
     ///
     /// This method does _not_ require authentication
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a webhook by url:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let webhook = http.get_webhook_from_url(url).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     #[cfg(feature = "utils")]
     pub async fn get_webhook_from_url(&self, url: &str) -> Result<Webhook> {
         let url = Url::parse(url).map_err(HttpError::Url)?;
@@ -4765,10 +4194,6 @@ impl Http {
     }
 
     /// Sends a message to a channel.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`HttpError::UnsuccessfulRequest`] if the files are too large to send.
     pub async fn send_message(
         &self,
         channel_id: ChannelId,
@@ -4842,10 +4267,6 @@ impl Http {
     }
 
     /// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
-    ///
-    /// **Note**: Requires the [Manage Roles] permission and respect of role hierarchy.
-    ///
-    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_member_role(
         &self,
         guild_id: GuildId,
@@ -4942,46 +4363,6 @@ impl Http {
         .await
     }
 
-    /// Starts typing in the specified [`Channel`] for an indefinite period of time.
-    ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
-    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
-    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
-    /// dropped.
-    ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief
-    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
-    /// is dropped.
-    ///
-    /// This should rarely be used for bots, although it is a good indicator that a long-running
-    /// command is still being processed.
-    ///
-    /// ## Examples
-    ///
-    /// ```rust,no_run
-    /// # use std::sync::Arc;
-    /// # use serenity::http::{Http, Typing};
-    /// # use serenity::Result;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// # fn long_process() {}
-    /// # fn main() {
-    /// # let http: Arc<Http> = unimplemented!();
-    /// // Initiate typing (assuming http is `Arc<Http>`)
-    /// let channel_id = ChannelId::new(7);
-    /// let typing = http.start_typing(channel_id);
-    ///
-    /// // Run some long-running process
-    /// long_process();
-    ///
-    /// // Stop typing
-    /// typing.stop();
-    /// # }
-    /// ```
-    pub fn start_typing(self: &Arc<Self>, channel_id: ChannelId) -> Typing {
-        Typing::start(Arc::clone(self), channel_id)
-    }
-
     /// Unpins a message from a channel.
     pub async fn unpin_message(
         &self,
@@ -5008,35 +4389,6 @@ impl Http {
     /// If you don't need to deserialize the response and want the response instance itself, use
     /// [`Self::request`].
     ///
-    /// # Examples
-    ///
-    /// Create a new message and deserialize the response into a [`Message`]:
-    ///
-    /// ```rust,no_run
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use serenity::http::Http;
-    /// #
-    /// # let http: Http = unimplemented!();
-    /// use serenity::{
-    ///     http::{LightMethod, Request, Route},
-    ///     model::prelude::*,
-    /// };
-    ///
-    /// let bytes = vec![
-    ///     // payload bytes here
-    /// ];
-    /// let channel_id = ChannelId::new(381880193700069377);
-    /// let route = Route::ChannelMessages { channel_id };
-    ///
-    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
-    ///
-    /// let message: Message = http.fire(request).await?;
-    ///
-    /// println!("Message content: {}", message.content);
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
@@ -5050,33 +4402,6 @@ impl Http {
     ///
     /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response into some
     /// type.
-    ///
-    /// # Examples
-    ///
-    /// Send a body of bytes over the create message endpoint:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// use serenity::http::{LightMethod, Request, Route};
-    ///
-    /// let bytes = vec![
-    ///     // payload bytes here
-    /// ];
-    /// let channel_id = ChannelId::new(381880193700069377);
-    /// let route = Route::ChannelMessages { channel_id };
-    ///
-    /// let mut request = Request::new(route, LightMethod::Post).body(Some(bytes));
-    ///
-    /// let response = http.request(request).await?;
-    ///
-    /// println!("Response successful?: {}", response.status().is_success());
-    /// # Ok(())
-    /// # }
-    /// ```
     #[cfg_attr(feature = "tracing_instrument", instrument)]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
