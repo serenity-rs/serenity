@@ -192,7 +192,7 @@ event_handler! {
     /// Dispatched when the emojis are updated.
     ///
     /// Provides the guild's id and the new state of the emojis in the guild.
-    GuildEmojisUpdate { guild_id: GuildId, current_state: HashMap<EmojiId, Emoji> } => async fn guild_emojis_update(&self, ctx: Context);
+    GuildEmojisUpdate { guild_id: GuildId, current_state: ExtractMap<EmojiId, Emoji> } => async fn guild_emojis_update(&self, ctx: Context);
 
     /// Dispatched when a guild's integration is added, updated or removed.
     ///
@@ -250,7 +250,7 @@ event_handler! {
     /// Dispatched when the stickers are updated.
     ///
     /// Provides the guild's id and the new state of the stickers in the guild.
-    GuildStickersUpdate { guild_id: GuildId, current_state: HashMap<StickerId, Sticker> } => async fn guild_stickers_update(&self, ctx: Context);
+    GuildStickersUpdate { guild_id: GuildId, current_state: ExtractMap<StickerId, Sticker> } => async fn guild_stickers_update(&self, ctx: Context);
 
     /// Dispatched when the guild is updated.
     ///
