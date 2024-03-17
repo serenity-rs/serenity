@@ -64,7 +64,6 @@ pub use self::timestamp::Timestamp;
 pub mod prelude {
     pub(crate) use std::collections::HashMap;
 
-    pub(crate) use serde::de::Visitor;
     pub(crate) use serde::{Deserialize, Deserializer};
 
     pub use super::guild::automod::EventType as AutomodEventType;
