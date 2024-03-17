@@ -1122,6 +1122,7 @@ pub enum Event {
     ///
     /// [`Command`]: crate::model::application::Command
     /// [`EventHandler::command_permissions_update`]: crate::client::EventHandler::command_permissions_update
+    #[serde(rename = "APPLICATION_COMMAND_PERMISSIONS_UPDATE")]
     CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     /// A [`Rule`] was created.
     ///
@@ -1129,6 +1130,7 @@ pub enum Event {
     ///
     /// [`EventHandler::auto_moderation_rule_create`]:
     /// crate::client::EventHandler::auto_moderation_rule_create
+    #[serde(rename = "AUTO_MODERATION_RULE_CREATE")]
     AutoModRuleCreate(AutoModRuleCreateEvent),
     /// A [`Rule`] has been updated.
     ///
@@ -1136,6 +1138,7 @@ pub enum Event {
     ///
     /// [`EventHandler::auto_moderation_rule_update`]:
     /// crate::client::EventHandler::auto_moderation_rule_update
+    #[serde(rename = "AUTO_MODERATION_RULE_UPDATE")]
     AutoModRuleUpdate(AutoModRuleUpdateEvent),
     /// A [`Rule`] was deleted.
     ///
@@ -1143,6 +1146,7 @@ pub enum Event {
     ///
     /// [`EventHandler::auto_moderation_rule_delete`]:
     /// crate::client::EventHandler::auto_moderation_rule_delete
+    #[serde(rename = "AUTO_MODERATION_RULE_DELETE")]
     AutoModRuleDelete(AutoModRuleDeleteEvent),
     /// A [`Rule`] was triggered and an action was executed.
     ///
