@@ -223,6 +223,7 @@ mod tests {
 
         let member = Member {
             nick: Some(FixedString::from_static_trunc("Ferris")),
+            user: user.clone(),
             ..Default::default()
         };
 
@@ -238,9 +239,9 @@ mod tests {
             ..Default::default()
         };
 
-        guild.channels.insert(channel.id, channel.clone());
-        guild.members.insert(user.id, member.clone());
-        guild.roles.insert(role.id, role);
+        guild.channels.insert(channel.clone());
+        guild.members.insert(member.clone());
+        guild.roles.insert(role);
 
         let with_user_mentions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
         <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
