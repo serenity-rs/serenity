@@ -138,7 +138,11 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>nonmax::NonMaxU8;
+
+<span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, MessagePagination};
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
@@ -188,7 +192,7 @@
 #[must_use]
 </span><span class="kw">pub struct </span>GetMessages {
     search_filter: <span class="prelude-ty">Option</span>&lt;SearchFilter&gt;,
-    limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
 }
 
 <span class="kw">impl </span>GetMessages {
@@ -223,7 +227,7 @@
     /// **Note**: This field is capped to 100 messages due to a Discord limitation. If an amount
     /// larger than 100 is supplied, it will be truncated.
     </span><span class="kw">pub fn </span>limit(<span class="kw-2">mut </span><span class="self">self</span>, limit: u8) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.limit = <span class="prelude-val">Some</span>(limit.min(<span class="number">100</span>));
+        <span class="self">self</span>.limit = NonMaxU8::new(limit.min(<span class="number">100</span>));
         <span class="self">self
     </span>}
 
