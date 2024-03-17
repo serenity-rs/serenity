@@ -1,5 +1,7 @@
 use std::borrow::Cow;
 
+use nonmax::NonMaxU8;
+
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::Result;
@@ -18,7 +20,7 @@ pub struct GetEntitlements<'a> {
     sku_ids: Option<Cow<'a, [SkuId]>>,
     before: Option<EntitlementId>,
     after: Option<EntitlementId>,
-    limit: Option<u8>,
+    limit: Option<NonMaxU8>,
     guild_id: Option<GuildId>,
     exclude_ended: Option<bool>,
 }
@@ -51,7 +53,7 @@ impl<'a> GetEntitlements<'a> {
     /// Limits the number of entitlements that may be returned.
     ///
     /// This is limited to `0..=100`.
-    pub fn limit(mut self, limit: u8) -> Self {
+    pub fn limit(mut self, limit: NonMaxU8) -> Self {
         self.limit = Some(limit);
         self
     }
