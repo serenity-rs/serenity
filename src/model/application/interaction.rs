@@ -284,6 +284,8 @@ bitflags! {
         /// Interaction message will only be visible to sender and will
         /// be quickly deleted.
         const EPHEMERAL = 1 << 6;
+        /// Does not trigger push notifications or desktop notifications.
+        const SUPPRESS_NOTIFICATIONS = 1 << 12;
     }
 }
 
