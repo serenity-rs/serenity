@@ -64,7 +64,7 @@ impl ArgumentConvert for Emoji {
         }
 
         if let Some(emoji) =
-            guild.emojis.values().find(|emoji| emoji.name.eq_ignore_ascii_case(s)).cloned()
+            guild.emojis.iter().find(|emoji| emoji.name.eq_ignore_ascii_case(s)).cloned()
         {
             return Ok(emoji);
         }
