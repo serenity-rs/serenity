@@ -45,7 +45,7 @@ impl CacheUpdate for ChannelCreateEvent {
         let old_channel = cache
             .guilds
             .get_mut(&self.channel.guild_id)
-            .and_then(|mut g| g.channels.insert(self.channel.id, self.channel.clone()));
+            .and_then(|mut g| g.channels.insert(self.channel.clone()));
 
         old_channel
     }
@@ -71,7 +71,7 @@ impl CacheUpdate for ChannelUpdateEvent {
         cache
             .guilds
             .get_mut(&self.channel.guild_id)
-            .and_then(|mut g| g.channels.insert(self.channel.id, self.channel.clone()))
+            .and_then(|mut g| g.channels.insert(self.channel.clone()))
     }
 }
 
@@ -81,7 +81,7 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
     fn update(&mut self, cache: &Cache) -> Option<()> {
         if let Some(guild_id) = self.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
-                if let Some(channel) = guild.channels.get_mut(&self.channel_id) {
+                if let Some(mut channel) = guild.channels.get_mut(&self.channel_id) {
                     channel.last_pin_timestamp = self.last_pin_timestamp;
                 }
             }
@@ -117,9 +117,9 @@ impl CacheUpdate for GuildDeleteEvent {
 
         match cache.guilds.remove(&self.guild.id) {
             Some(guild) => {
-                for channel_id in guild.1.channels.keys() {
+                for channel in &guild.1.channels {
                     // Remove the channel's cached messages.
-                    cache.messages.remove(channel_id);
+                    cache.messages.remove(&channel.id);
                 }
 
                 Some(guild.1)
@@ -147,7 +147,7 @@ impl CacheUpdate for GuildMemberAddEvent {
     fn update(&mut self, cache: &Cache) -> Option<()> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.member.guild_id) {
             guild.member_count += 1;
-            guild.members.insert(self.member.user.id, self.member.clone());
+            guild.members.insert(self.member.clone());
         }
 
         None
@@ -172,7 +172,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
-            let item = if let Some(member) = guild.members.get_mut(&self.user.id) {
+            let item = if let Some(mut member) = guild.members.get_mut(&self.user.id) {
                 let item = Some(member.clone());
 
                 member.joined_at.clone_from(&Some(self.joined_at));
@@ -212,7 +212,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 new_member.set_deaf(self.deaf());
                 new_member.set_mute(self.mute());
 
-                guild.members.insert(self.user.id, new_member);
+                guild.members.insert(new_member);
             }
 
             item
@@ -238,11 +238,7 @@ impl CacheUpdate for GuildRoleCreateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        cache
-            .guilds
-            .get_mut(&self.role.guild_id)
-            .map(|mut g| g.roles.insert(self.role.id, self.role.clone()));
-
+        cache.guilds.get_mut(&self.role.guild_id).map(|mut g| g.roles.insert(self.role.clone()));
         None
     }
 }
@@ -260,8 +256,8 @@ impl CacheUpdate for GuildRoleUpdateEvent {
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.role.guild_id) {
-            if let Some(role) = guild.roles.get_mut(&self.role.id) {
-                return Some(std::mem::replace(role, self.role.clone()));
+            if let Some(mut role) = guild.roles.get_mut(&self.role.id) {
+                return Some(std::mem::replace(&mut *role, self.role.clone()));
             }
         }
 
@@ -327,9 +323,14 @@ impl CacheUpdate for MessageCreateEvent {
         let guild = self.message.guild_id.and_then(|g_id| cache.guilds.get_mut(&g_id));
 
         if let Some(mut guild) = guild {
-            if let Some(channel) = guild.channels.get_mut(&self.message.channel_id) {
-                update_channel_last_message_id(&self.message, channel, cache);
-            } else {
+            let mut found_channel = false;
+            if let Some(mut channel) = guild.channels.get_mut(&self.message.channel_id) {
+                update_channel_last_message_id(&self.message, &mut channel, cache);
+                found_channel = true;
+            }
+
+            // found_channel is to avoid limitations of the NLL borrow checker.
+            if !found_channel {
                 // This may be a thread.
                 let thread =
                     guild.threads.iter_mut().find(|thread| thread.id == self.message.channel_id);
@@ -402,25 +403,27 @@ impl CacheUpdate for PresenceUpdateEvent {
                 if self.presence.status == OnlineStatus::Offline {
                     guild.presences.remove(&self.presence.user.id);
                 } else {
-                    guild.presences.insert(self.presence.user.id, self.presence.clone());
+                    guild.presences.insert(self.presence.clone());
                 }
 
                 // Create a partial member instance out of the presence update data.
                 if let Some(user) = self.presence.user.to_user() {
-                    guild.members.entry(self.presence.user.id).or_insert_with(|| Member {
-                        guild_id,
-                        joined_at: None,
-                        nick: None,
-                        user,
-                        roles: FixedArray::default(),
-                        premium_since: None,
-                        permissions: None,
-                        avatar: None,
-                        communication_disabled_until: None,
-                        flags: GuildMemberFlags::default(),
-                        unusual_dm_activity_until: None,
-                        __generated_flags: MemberGeneratedFlags::empty(),
-                    });
+                    if !guild.members.contains_key(&self.presence.user.id) {
+                        guild.members.insert(Member {
+                            guild_id,
+                            joined_at: None,
+                            nick: None,
+                            user,
+                            roles: FixedArray::default(),
+                            premium_since: None,
+                            permissions: None,
+                            avatar: None,
+                            communication_disabled_until: None,
+                            flags: GuildMemberFlags::default(),
+                            unusual_dm_activity_until: None,
+                            __generated_flags: MemberGeneratedFlags::empty(),
+                        });
+                    }
                 }
             }
         }
@@ -553,12 +556,14 @@ impl CacheUpdate for VoiceStateUpdateEvent {
         if let Some(guild_id) = self.voice_state.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
                 if let Some(member) = &self.voice_state.member {
-                    guild.members.insert(member.user.id, member.clone());
+                    guild.members.insert(member.clone());
                 }
 
                 if self.voice_state.channel_id.is_some() {
                     // Update or add to the voice state list
-                    guild.voice_states.insert(self.voice_state.user_id, self.voice_state.clone())
+                    let old_state = guild.voice_states.remove(&self.voice_state.user_id);
+                    guild.voice_states.insert(self.voice_state.clone());
+                    old_state
                 } else {
                     // Remove the user from the voice state list
                     guild.voice_states.remove(&self.voice_state.user_id)
@@ -577,7 +582,7 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;
-        let channel = guild.channels.get_mut(&self.id)?;
+        let mut channel = guild.channels.get_mut(&self.id)?;
 
         let old = channel.status.clone();
         channel.status.clone_from(&self.status);
