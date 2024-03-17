@@ -17,7 +17,7 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 
-use nonmax::{NonMaxU16, NonMaxU64};
+use nonmax::{NonMaxU16, NonMaxU64, NonMaxU8};
 #[cfg(feature = "model")]
 use tracing::{error, warn};
 
@@ -525,7 +525,7 @@ impl Guild {
         &self,
         cache_http: impl CacheHttp,
         target: Option<UserPagination>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU16>,
     ) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
@@ -570,7 +570,7 @@ impl Guild {
         action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
     ) -> Result<AuditLogs> {
         self.id.audit_logs(http, action_type, user_id, before, limit).await
     }
@@ -2056,7 +2056,7 @@ impl Guild {
         &self,
         http: &Http,
         event_id: ScheduledEventId,
-        limit: Option<u64>,
+        limit: Option<NonMaxU8>,
     ) -> Result<Vec<ScheduledEventUser>> {
         self.id.scheduled_event_users(http, event_id, limit).await
     }
@@ -2076,7 +2076,7 @@ impl Guild {
         &self,
         http: &Http,
         event_id: ScheduledEventId,
-        limit: Option<u64>,
+        limit: Option<NonMaxU8>,
         target: Option<UserPagination>,
         with_member: Option<bool>,
     ) -> Result<Vec<ScheduledEventUser>> {
