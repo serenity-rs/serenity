@@ -19,6 +19,8 @@ pub struct EditProfile {
     username: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     avatar: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    banner: Option<Option<String>>,
 }
 
 impl EditProfile {
@@ -62,6 +64,18 @@ impl EditProfile {
     /// discriminators with the requested username, an error will occur.
     pub fn username(mut self, username: impl Into<String>) -> Self {
         self.username = Some(username.into());
+        self
+    }
+
+    /// Sets the banner of the current user.
+    pub fn banner(mut self, banner: &CreateAttachment) -> Self {
+        self.banner = Some(Some(banner.to_base64()));
+        self
+    }
+
+    /// Deletes the current user's banner, resetting it to the default.
+    pub fn delete_banner(mut self) -> Self {
+        self.banner = Some(None);
         self
     }
 }
