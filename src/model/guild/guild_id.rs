@@ -300,10 +300,8 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user is not in the guild.
-    pub async fn channels(self, http: &Http) -> Result<HashMap<ChannelId, GuildChannel>> {
-        let channels = http.get_channels(self).await?;
-
-        Ok(channels.into_iter().map(|c| (c.id, c)).collect())
+    pub async fn channels(self, http: &Http) -> Result<ExtractMap<ChannelId, GuildChannel>> {
+        http.get_channels(self).await
     }
 
     /// Creates a [`GuildChannel`] in the the guild.
@@ -833,10 +831,8 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user is not in
     /// the guild.
-    pub async fn roles(self, http: &Http) -> Result<HashMap<RoleId, Role>> {
-        let roles = http.get_guild_roles(self).await?;
-
-        Ok(roles.into_iter().map(|r| (r.id, r)).collect())
+    pub async fn roles(self, http: &Http) -> Result<ExtractMap<RoleId, Role>> {
+        http.get_guild_roles(self).await
     }
 
     /// Gets the default permission role (@everyone) from the guild.

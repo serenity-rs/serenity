@@ -1,11 +1,9 @@
 use std::cell::Cell;
 use std::fmt;
-use std::hash::Hash;
-use std::marker::PhantomData;
 
 use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
-use serde::ser::{Serialize, SerializeSeq, Serializer};
+use serde::ser::SerializeSeq;
 use serde_cow::CowStr;
 use small_fixed_array::FixedString;
 
@@ -160,7 +158,7 @@ impl<'de> serde::Deserialize<'de> for StrOrInt<'de> {
 #[track_caller]
 pub(crate) fn assert_json<T>(data: &T, json: Value)
 where
-    T: Serialize + for<'de> Deserialize<'de> + PartialEq + std::fmt::Debug,
+    T: serde::Serialize + for<'de> Deserialize<'de> + PartialEq + std::fmt::Debug,
 {
     // test serialization
     let serialized = serde_json::to_value(data).unwrap();
@@ -177,69 +175,6 @@ where
     );
 }
 
-/// Used with `#[serde(with = "emojis")]`
-pub mod emojis {
-    use std::collections::HashMap;
-
-    use serde::Deserializer;
-
-    use super::SequenceToMapVisitor;
-    use crate::model::guild::Emoji;
-    use crate::model::id::EmojiId;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> Result<HashMap<EmojiId, Emoji>, D::Error> {
-        deserializer.deserialize_seq(SequenceToMapVisitor::new(|emoji: &Emoji| emoji.id))
-    }
-
-    pub use super::serialize_map_values as serialize;
-}
-
-pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
-    deserializer.deserialize_seq(SequenceToMapVisitor::new(|channel: &GuildChannel| channel.id))
-}
-
-/// Used with `#[serde(with = "members")]
-pub mod members {
-    use std::collections::HashMap;
-
-    use serde::Deserializer;
-
-    use super::SequenceToMapVisitor;
-    use crate::model::guild::Member;
-    use crate::model::id::UserId;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> Result<HashMap<UserId, Member>, D::Error> {
-        deserializer.deserialize_seq(SequenceToMapVisitor::new(|member: &Member| member.user.id))
-    }
-
-    pub use super::serialize_map_values as serialize;
-}
-
-/// Used with `#[serde(with = "presences")]`
-pub mod presences {
-    use std::collections::HashMap;
-
-    use serde::Deserializer;
-
-    use super::SequenceToMapVisitor;
-    use crate::model::gateway::Presence;
-    use crate::model::id::UserId;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> Result<HashMap<UserId, Presence>, D::Error> {
-        deserializer.deserialize_seq(SequenceToMapVisitor::new(|p: &Presence| p.user.id))
-    }
-
-    pub use super::serialize_map_values as serialize;
-}
-
 pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<FixedArray<ActivityButton>, D::Error> {
@@ -254,44 +189,6 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
                 .collect(),
         )
     })
-}
-
-/// Used with `#[serde(with = "roles")]`
-pub mod roles {
-    use std::collections::HashMap;
-
-    use serde::Deserializer;
-
-    use super::SequenceToMapVisitor;
-    use crate::model::guild::Role;
-    use crate::model::id::RoleId;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> Result<HashMap<RoleId, Role>, D::Error> {
-        deserializer.deserialize_seq(SequenceToMapVisitor::new(|role: &Role| role.id))
-    }
-
-    pub use super::serialize_map_values as serialize;
-}
-
-/// Used with `#[serde(with = "stickers")]`
-pub mod stickers {
-    use std::collections::HashMap;
-
-    use serde::Deserializer;
-
-    use super::SequenceToMapVisitor;
-    use crate::model::id::StickerId;
-    use crate::model::sticker::Sticker;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> Result<HashMap<StickerId, Sticker>, D::Error> {
-        deserializer.deserialize_seq(SequenceToMapVisitor::new(|sticker: &Sticker| sticker.id))
-    }
-
-    pub use super::serialize_map_values as serialize;
 }
 
 /// Used with `#[serde(with = "comma_separated_string")]`
@@ -363,59 +260,6 @@ pub mod secret {
         serializer: Sr,
     ) -> Result<Sr::Ok, Sr::Error> {
         secret.as_ref().map(ExposeSecret::expose_secret).serialize(serializer)
-    }
-}
-
-pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
-    deserializer.deserialize_seq(SequenceToMapVisitor::new(|state: &VoiceState| state.user_id))
-}
-
-pub fn serialize_map_values<K, S: Serializer, V: Serialize>(
-    map: &HashMap<K, V>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    serializer.collect_seq(map.values())
-}
-
-/// Deserializes a sequence and builds a `HashMap` with the key extraction function.
-pub(in crate::model) struct SequenceToMapVisitor<F, V> {
-    key: F,
-    marker: PhantomData<V>,
-}
-
-impl<F, V> SequenceToMapVisitor<F, V> {
-    pub fn new(key: F) -> Self {
-        Self {
-            key,
-            marker: PhantomData,
-        }
-    }
-}
-
-impl<'de, F, K, V> Visitor<'de> for SequenceToMapVisitor<F, V>
-where
-    K: Eq + Hash,
-    V: Deserialize<'de>,
-    F: FnMut(&V) -> K,
-{
-    type Value = HashMap<K, V>;
-
-    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str("sequence")
-    }
-
-    fn visit_seq<A>(mut self, mut seq: A) -> StdResult<Self::Value, A::Error>
-    where
-        A: serde::de::SeqAccess<'de>,
-    {
-        let mut map = seq.size_hint().map_or_else(HashMap::new, HashMap::with_capacity);
-        while let Some(elem) = seq.next_element()? {
-            map.insert((self.key)(&elem), elem);
-        }
-
-        Ok(map)
     }
 }
 

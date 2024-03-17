@@ -317,6 +317,12 @@ pub struct Presence {
     pub client_status: Option<ClientStatus>,
 }
 
+impl ExtractKey<UserId> for Presence {
+    fn extract_key(&self) -> &UserId {
+        &self.user.id
+    }
+}
+
 /// An initial set of information given after IDENTIFYing to the gateway.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).

@@ -54,6 +54,12 @@ pub struct VoiceState {
     pub request_to_speak_timestamp: Option<Timestamp>,
 }
 
+impl extract_map::ExtractKey<UserId> for VoiceState {
+    fn extract_key(&self) -> &UserId {
+        &self.user_id
+    }
+}
+
 // Manual impl needed to insert guild_id into Member
 impl<'de> Deserialize<'de> for VoiceStateGeneratedOriginal {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {

@@ -14,15 +14,9 @@ use tracing::{debug, warn};
 
 use crate::constants::Opcode;
 use crate::internal::prelude::*;
+use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
-use crate::model::utils::{
-    deserialize_val,
-    emojis,
-    members,
-    remove_from_map,
-    remove_from_map_opt,
-    stickers,
-};
+use crate::model::utils::{deserialize_val, remove_from_map, remove_from_map_opt};
 
 /// Requires no gateway intents.
 ///
@@ -179,9 +173,9 @@ pub struct GuildCreateEvent {
 impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild: Guild = Guild::deserialize(deserializer)?;
-        guild.channels.values_mut().for_each(|x| x.guild_id = guild.id);
-        guild.members.values_mut().for_each(|x| x.guild_id = guild.id);
-        guild.roles.values_mut().for_each(|x| x.guild_id = guild.id);
+        lending_for_each!(guild.channels.iter_mut(), |x| x.guild_id = guild.id);
+        lending_for_each!(guild.members.iter_mut(), |x| x.guild_id = guild.id);
+        lending_for_each!(guild.roles.iter_mut(), |x| x.guild_id = guild.id);
         Ok(Self {
             guild,
         })
@@ -206,8 +200,7 @@ pub struct GuildDeleteEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildEmojisUpdateEvent {
-    #[serde(with = "emojis")]
-    pub emojis: HashMap<EmojiId, Emoji>,
+    pub emojis: ExtractMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
 }
 
@@ -279,8 +272,7 @@ pub struct GuildMembersChunkEvent {
     /// ID of the guild.
     pub guild_id: GuildId,
     /// Set of guild members.
-    #[serde(with = "members")]
-    pub members: HashMap<UserId, Member>,
+    pub members: ExtractMap<UserId, Member>,
     /// Chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count).
     pub chunk_index: u32,
     /// Total number of expected chunks for this response.
@@ -300,7 +292,7 @@ pub struct GuildMembersChunkEvent {
 impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut event = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
-        event.members.values_mut().for_each(|m| m.guild_id = event.guild_id);
+        lending_for_each!(event.members.iter_mut(), |m| m.guild_id = event.guild_id);
         Ok(event)
     }
 }
@@ -379,8 +371,7 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildStickersUpdateEvent {
-    #[serde(with = "stickers")]
-    pub stickers: HashMap<StickerId, Sticker>,
+    pub stickers: ExtractMap<StickerId, Sticker>,
     pub guild_id: GuildId,
 }
 
