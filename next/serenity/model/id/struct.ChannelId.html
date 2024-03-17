@@ -301,7 +301,7 @@ restrictions and requirements.</p>
 <h5 id="errors-24"><a class="doc-anchor" href="#errors-24">§</a>Errors</h5>
 <p>See <a href="../../builder/struct.CreateMessage.html#method.execute" title="method serenity::builder::CreateMessage::execute"><code>CreateMessage::execute</code></a> for a list of possible errors, and their corresponding
 reasons.</p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.start_typing" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/channel_id.rs.html#723-725">source</a><h4 class="code-header">pub fn <a href="#method.start_typing" class="fn">start_typing</a>(self, http: &amp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../../http/struct.Http.html" title="struct serenity::http::Http">Http</a>&gt;) -&gt; <a class="struct" href="../../http/struct.Typing.html" title="struct serenity::http::Typing">Typing</a></h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Starts typing in the channel for an indefinite period of time.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.start_typing" class="method"><a class="src rightside" href="../../../src/serenity/model/channel/channel_id.rs.html#723-725">source</a><h4 class="code-header">pub fn <a href="#method.start_typing" class="fn">start_typing</a>(self, http: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../../http/struct.Http.html" title="struct serenity::http::Http">Http</a>&gt;) -&gt; <a class="struct" href="../../http/struct.Typing.html" title="struct serenity::http::Typing">Typing</a></h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Starts typing in the channel for an indefinite period of time.</p>
 <p>Returns <a href="../../http/struct.Typing.html" title="struct serenity::http::Typing"><code>Typing</code></a> that is used to trigger the typing. <a href="../../http/struct.Typing.html#method.stop" title="method serenity::http::Typing::stop"><code>Typing::stop</code></a> must be called on
 the returned struct to stop typing. Note that on some clients, typing may persist for a few
 seconds after <a href="../../http/struct.Typing.html#method.stop" title="method serenity::http::Typing::stop"><code>Typing::stop</code></a> is called. Typing is also stopped when the struct is
@@ -313,7 +313,7 @@ is dropped.</p>
 command is still being processed.</p>
 <h6 id="examples-4"><a class="doc-anchor" href="#examples-4">§</a>Examples</h6>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Initiate typing (assuming http is `Arc&lt;Http&gt;`)
-</span><span class="kw">let </span>typing = ChannelId::new(<span class="number">7</span>).start_typing(<span class="kw-2">&amp;</span>http);
+</span><span class="kw">let </span>typing = ChannelId::new(<span class="number">7</span>).start_typing(http);
 
 <span class="comment">// Run some long-running process
 </span>long_process();

@@ -1845,7 +1845,7 @@
     /// # let cache = Cache::default();
     /// # let channel: GuildChannel = unimplemented!();
     /// // Initiate typing (assuming http is `Arc&lt;Http&gt;` and `channel` is bound)
-    /// let typing = channel.start_typing(&amp;http);
+    /// let typing = channel.start_typing(http);
     ///
     /// // Run some long-running process
     /// long_process();
@@ -1855,8 +1855,8 @@
     /// # }
     /// ```
     </span><span class="attr">#[allow(clippy::missing_errors_doc)]
-    </span><span class="kw">pub fn </span>start_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Arc&lt;Http&gt;) -&gt; Typing {
-        http.start_typing(<span class="self">self</span>.id)
+    </span><span class="kw">pub fn </span>start_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, http: Arc&lt;Http&gt;) -&gt; Typing {
+        <span class="self">self</span>.id.start_typing(http)
     }
 
     <span class="doccomment">/// Unpins a [`Message`] in the channel given by its Id.

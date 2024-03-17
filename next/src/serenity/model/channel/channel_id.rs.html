@@ -1865,7 +1865,7 @@
     /// # fn main() {
     /// # let http: Arc&lt;Http&gt; = unimplemented!();
     /// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)
-    /// let typing = ChannelId::new(7).start_typing(&amp;http);
+    /// let typing = ChannelId::new(7).start_typing(http);
     ///
     /// // Run some long-running process
     /// long_process();
@@ -1879,8 +1879,8 @@
     ///
     /// Returns [`Error::Http`] if the current user lacks permission
     /// to send messages in this channel.
-    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Arc&lt;Http&gt;) -&gt; Typing {
-        http.start_typing(<span class="self">self</span>)
+    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>, http: Arc&lt;Http&gt;) -&gt; Typing {
+        Typing::start(http, <span class="self">self</span>)
     }
 
     <span class="doccomment">/// Unpins a [`Message`] in the channel given by its Id.

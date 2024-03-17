@@ -105,7 +105,6 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>nonmax::NonMaxU16;
@@ -208,8 +207,7 @@
     </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     </span><span class="kw">pub async fn </span>execute(<span class="kw-2">mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="kw">let </span>files = <span class="self">self</span>.message.attachments.take_files();
-        http.create_forum_post_with_attachments(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, files, <span class="self">self</span>.audit_log_reason)
-            .<span class="kw">await
+        http.create_forum_post(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, files, <span class="self">self</span>.audit_log_reason).<span class="kw">await
     </span>}
 }
 </code></pre></div></section></main></body></html>
