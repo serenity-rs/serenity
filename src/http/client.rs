@@ -3273,7 +3273,10 @@ impl Http {
     }
 
     /// Gets all channels in a guild.
-    pub async fn get_channels(&self, guild_id: GuildId) -> Result<Vec<GuildChannel>> {
+    pub async fn get_channels(
+        &self,
+        guild_id: GuildId,
+    ) -> Result<ExtractMap<ChannelId, GuildChannel>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3881,7 +3884,7 @@ impl Http {
     }
 
     /// Retrieves a list of roles in a [`Guild`].
-    pub async fn get_guild_roles(&self, guild_id: GuildId) -> Result<Vec<Role>> {
+    pub async fn get_guild_roles(&self, guild_id: GuildId) -> Result<ExtractMap<RoleId, Role>> {
         let mut value: Value = self
             .fire(Request {
                 body: None,

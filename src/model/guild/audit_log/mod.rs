@@ -7,7 +7,7 @@ mod change;
 mod utils;
 
 pub use change::{AffectedRole, Change, EntityType};
-use utils::{optional_string, users, webhooks};
+use utils::optional_string;
 
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -350,11 +350,9 @@ pub struct AuditLogs {
     /// map since archived threads might not be kept in memory by clients.
     pub threads: FixedArray<GuildChannel>,
     /// List of users referenced in the audit log.
-    #[serde(with = "users")]
-    pub users: HashMap<UserId, User>,
+    pub users: ExtractMap<UserId, User>,
     /// List of webhooks referenced in the audit log.
-    #[serde(with = "webhooks")]
-    pub webhooks: HashMap<WebhookId, Webhook>,
+    pub webhooks: ExtractMap<WebhookId, Webhook>,
 }
 
 /// Partial version of [`Integration`], used in [`AuditLogs::integrations`].
