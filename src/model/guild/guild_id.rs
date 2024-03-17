@@ -2,7 +2,7 @@ use std::fmt;
 
 #[cfg(feature = "model")]
 use futures::stream::Stream;
-use nonmax::NonMaxU16;
+use nonmax::{NonMaxU16, NonMaxU8};
 use serde_json::json;
 
 #[cfg(feature = "model")]
@@ -238,7 +238,7 @@ impl GuildId {
         self,
         http: &Http,
         target: Option<UserPagination>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU16>,
     ) -> Result<Vec<Ban>> {
         http.get_bans(self, target, limit).await
     }
@@ -259,7 +259,7 @@ impl GuildId {
         action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
     ) -> Result<AuditLogs> {
         http.get_audit_logs(self, action_type, user_id, before, limit).await
     }
@@ -1181,7 +1181,7 @@ impl GuildId {
         self,
         http: &Http,
         event_id: ScheduledEventId,
-        limit: Option<u64>,
+        limit: Option<NonMaxU8>,
     ) -> Result<Vec<ScheduledEventUser>> {
         http.get_scheduled_event_users(self, event_id, limit, None, None).await
     }
@@ -1201,7 +1201,7 @@ impl GuildId {
         self,
         http: &Http,
         event_id: ScheduledEventId,
-        limit: Option<u64>,
+        limit: Option<NonMaxU8>,
         target: Option<UserPagination>,
         with_member: Option<bool>,
     ) -> Result<Vec<ScheduledEventUser>> {
