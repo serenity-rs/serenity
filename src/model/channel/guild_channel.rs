@@ -852,7 +852,7 @@ impl GuildChannel {
         match self.kind {
             ChannelType::Voice | ChannelType::Stage => Ok(guild
                 .voice_states
-                .values()
+                .iter()
                 .filter_map(|v| {
                     v.channel_id.and_then(|c| {
                         if c == self.id {
@@ -865,7 +865,7 @@ impl GuildChannel {
                 .collect()),
             ChannelType::News | ChannelType::Text => Ok(guild
                 .members
-                .values()
+                .iter()
                 .filter(|member| {
                     guild.user_permissions_in(self, member).contains(Permissions::VIEW_CHANNEL)
                 })
@@ -1038,6 +1038,12 @@ impl fmt::Display for GuildChannel {
     /// Formats the channel, creating a mention of it.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.id.mention(), f)
+    }
+}
+
+impl ExtractKey<ChannelId> for GuildChannel {
+    fn extract_key(&self) -> &ChannelId {
+        &self.id
     }
 }
 

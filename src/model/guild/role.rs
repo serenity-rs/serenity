@@ -141,6 +141,12 @@ impl fmt::Display for Role {
     }
 }
 
+impl ExtractKey<RoleId> for Role {
+    fn extract_key(&self) -> &RoleId {
+        &self.id
+    }
+}
+
 impl PartialOrd for Role {
     fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
         Some(self.cmp(other))

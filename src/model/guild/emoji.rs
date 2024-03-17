@@ -85,6 +85,12 @@ impl fmt::Display for Emoji {
     }
 }
 
+impl ExtractKey<EmojiId> for Emoji {
+    fn extract_key(&self) -> &EmojiId {
+        &self.id
+    }
+}
+
 impl From<Emoji> for EmojiId {
     /// Gets the Id of an [`Emoji`].
     fn from(emoji: Emoji) -> EmojiId {
