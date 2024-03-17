@@ -873,6 +873,12 @@ impl Message {
     }
 }
 
+impl ExtractKey<MessageId> for Message {
+    fn extract_key(&self) -> &MessageId {
+        &self.id
+    }
+}
+
 impl From<Message> for MessageId {
     /// Gets the Id of a [`Message`].
     fn from(message: Message) -> MessageId {
@@ -1430,9 +1436,8 @@ pub struct PollAnswerCount {
 // all tests here require cache, move if non-cache test is added
 #[cfg(all(test, feature = "cache"))]
 mod tests {
-    use std::collections::HashMap;
-
     use dashmap::DashMap;
+    use extract_map::ExtractMap;
     use small_fixed_array::FixedArray;
 
     use super::{
@@ -1448,6 +1453,16 @@ mod tests {
     };
     use crate::cache::wrappers::MaybeMap;
     use crate::cache::Cache;
+
+    fn new_extract_map<K, T>(val: T) -> ExtractMap<K, T>
+    where
+        K: std::hash::Hash + Eq,
+        T: extract_map::ExtractKey<K>,
+    {
+        let mut map = ExtractMap::new();
+        map.insert(val);
+        map
+    }
 
     /// Test that author_permissions checks the permissions in a channel, not just the guild.
     #[test]
@@ -1471,11 +1486,11 @@ mod tests {
 
         // Guild with the author and channel cached, default (empty) permissions.
         let guild = Guild {
-            channels: HashMap::from([(channel.id, channel)]),
-            members: HashMap::from([(author.id, Member {
+            channels: new_extract_map(channel),
+            members: new_extract_map(Member {
                 user: author.clone(),
                 ..Default::default()
-            })]),
+            }),
             ..Default::default()
         };
 
