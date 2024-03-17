@@ -24,10 +24,10 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
+use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::icon_url;
-use crate::model::utils::{emojis, roles, stickers};
 
 /// Partial information about a [`Guild`]. This does not include information like member data.
 ///
@@ -82,11 +82,9 @@ pub struct PartialGuild {
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
     /// A mapping of the guild's roles.
-    #[serde(with = "roles")]
-    pub roles: HashMap<RoleId, Role>,
+    pub roles: ExtractMap<RoleId, Role>,
     /// All of the guild's custom emojis.
-    #[serde(with = "emojis")]
-    pub emojis: HashMap<EmojiId, Emoji>,
+    pub emojis: ExtractMap<EmojiId, Emoji>,
     /// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
@@ -173,8 +171,7 @@ pub struct PartialGuild {
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
     pub nsfw_level: NsfwLevel,
     /// All of the guild's custom stickers.
-    #[serde(with = "stickers")]
-    pub stickers: HashMap<StickerId, Sticker>,
+    pub stickers: ExtractMap<StickerId, Sticker>,
     /// Whether the guild has the boost progress bar enabled
     pub premium_progress_bar_enabled: bool,
 }
@@ -349,7 +346,7 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user is not in the guild or if the guild is
     /// otherwise unavailable.
-    pub async fn channels(&self, http: &Http) -> Result<HashMap<ChannelId, GuildChannel>> {
+    pub async fn channels(&self, http: &Http) -> Result<ExtractMap<ChannelId, GuildChannel>> {
         self.id.channels(http).await
     }
 
@@ -1339,7 +1336,7 @@ impl PartialGuild {
     /// ```
     #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
-        self.roles.values().find(|role| role_name == &*role.name)
+        self.roles.iter().find(|role| role_name == &*role.name)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this
@@ -1383,7 +1380,7 @@ impl PartialGuild {
 impl<'de> Deserialize<'de> for PartialGuildGeneratedOriginal {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
-        guild.roles.values_mut().for_each(|r| r.guild_id = guild.id);
+        lending_for_each!(guild.roles.iter_mut(), |r| r.guild_id = guild.id);
         Ok(guild)
     }
 }

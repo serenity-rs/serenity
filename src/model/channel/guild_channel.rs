@@ -845,7 +845,7 @@ impl GuildChannel {
         match self.kind {
             ChannelType::Voice | ChannelType::Stage => Ok(guild
                 .voice_states
-                .values()
+                .iter()
                 .filter_map(|v| {
                     v.channel_id.and_then(|c| {
                         if c == self.id {
@@ -859,12 +859,12 @@ impl GuildChannel {
             ChannelType::News | ChannelType::Text => Ok(guild
                 .members
                 .iter()
-                .filter(|(id, _)| {
-                    self.permissions_for_user(cache, **id)
+                .filter(|m| {
+                    self.permissions_for_user(cache, m.user.id)
                         .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                         .unwrap_or(false)
                 })
-                .map(|e| e.1.clone())
+                .cloned()
                 .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
@@ -1033,6 +1033,12 @@ impl fmt::Display for GuildChannel {
     /// Formats the channel, creating a mention of it.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.id.mention(), f)
+    }
+}
+
+impl ExtractKey<ChannelId> for GuildChannel {
+    fn extract_key(&self) -> &ChannelId {
+        &self.id
     }
 }
 
