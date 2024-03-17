@@ -92,6 +92,12 @@ pub struct Webhook {
     pub url: Option<SecretString>,
 }
 
+impl ExtractKey<WebhookId> for Webhook {
+    fn extract_key(&self) -> &WebhookId {
+        &self.id
+    }
+}
+
 /// The guild object returned by a [`Webhook`], of type [`WebhookType::ChannelFollower`].
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
