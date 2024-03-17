@@ -5,7 +5,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
 use arrayvec::ArrayVec;
-use nonmax::NonMaxU16;
+use nonmax::{NonMaxU16, NonMaxU8};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::header::{HeaderMap as Headers, HeaderValue};
 #[cfg(feature = "utils")]
@@ -2436,14 +2436,14 @@ impl Http {
         &self,
         guild_id: GuildId,
         target: Option<UserPagination>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU16>,
     ) -> Result<Vec<Ban>> {
         let id_str;
         let limit_str;
         let mut params = ArrayVec::<_, 2>::new();
 
         if let Some(limit) = limit {
-            limit_str = limit.to_arraystring();
+            limit_str = limit.get().to_arraystring();
             params.push(("limit", limit_str.as_str()));
         }
 
@@ -2477,7 +2477,7 @@ impl Http {
         action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
     ) -> Result<AuditLogs> {
         let (action_type_str, before_str, limit_str, user_id_str);
         let mut params = ArrayVec::<_, 4>::new();
@@ -2490,7 +2490,7 @@ impl Http {
             params.push(("before", &before_str));
         }
         if let Some(limit) = limit {
-            limit_str = limit.to_arraystring();
+            limit_str = limit.get().to_arraystring();
             params.push(("limit", &limit_str));
         }
         if let Some(user_id) = user_id {
@@ -3086,7 +3086,7 @@ impl Http {
         sku_ids: Option<&[SkuId]>,
         before: Option<EntitlementId>,
         after: Option<EntitlementId>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
         guild_id: Option<GuildId>,
         exclude_ended: Option<bool>,
     ) -> Result<Vec<Entitlement>> {
@@ -3109,7 +3109,7 @@ impl Http {
             params.push(("after", &after_str));
         }
         if let Some(limit) = limit {
-            limit_str = limit.to_arraystring();
+            limit_str = limit.get().to_arraystring();
             params.push(("limit", &limit_str));
         }
         if let Some(guild_id) = guild_id {
@@ -3590,14 +3590,14 @@ impl Http {
         &self,
         guild_id: GuildId,
         event_id: ScheduledEventId,
-        limit: Option<u64>,
+        limit: Option<NonMaxU8>,
         target: Option<UserPagination>,
         with_member: Option<bool>,
     ) -> Result<Vec<ScheduledEventUser>> {
         let (limit_str, with_member_str, id_str);
         let mut params = ArrayVec::<_, 3>::new();
         if let Some(limit) = limit {
-            limit_str = limit.to_arraystring();
+            limit_str = limit.get().to_arraystring();
             params.push(("limit", limit_str.as_str()));
         }
         if let Some(with_member) = with_member {
@@ -3700,12 +3700,12 @@ impl Http {
     pub async fn get_guilds(
         &self,
         target: Option<GuildPagination>,
-        limit: Option<u64>,
+        limit: Option<NonMaxU8>,
     ) -> Result<Vec<GuildInfo>> {
         let (limit_str, id_str);
         let mut params = ArrayVec::<_, 2>::new();
         if let Some(limit) = limit {
-            limit_str = limit.to_arraystring();
+            limit_str = limit.get().to_arraystring();
             params.push(("limit", limit_str.as_str()));
         }
         if let Some(target) = target {
@@ -3841,13 +3841,13 @@ impl Http {
         &self,
         channel_id: ChannelId,
         target: Option<MessagePagination>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
     ) -> Result<Vec<Message>> {
         let (limit_str, id_str);
         let mut params = ArrayVec::<_, 2>::new();
 
         if let Some(limit) = limit {
-            limit_str = limit.to_arraystring();
+            limit_str = limit.get().to_arraystring();
             params.push(("limit", limit_str.as_str()));
         }
 
