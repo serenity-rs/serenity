@@ -1,11 +1,15 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
+#[cfg(feature = "unstable_discord_api")]
+use super::InstallationContext;
 use super::{CommandInteraction, ComponentInteraction, ModalInteraction, PingInteraction};
 use crate::internal::prelude::*;
 use crate::json::from_value;
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, InteractionId};
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::id::{GuildId, MessageId, UserId};
 use crate::model::monetization::Entitlement;
 use crate::model::user::User;
 use crate::model::utils::deserialize_val;
@@ -289,11 +293,103 @@ bitflags! {
     }
 }
 
+/// A cleaned up enum for determining the authorizing owner for an [`Interaction`].
+///
+/// [Discord Docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[cfg(feature = "unstable_discord_api")]
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub enum AuthorizingIntegrationOwner {
+    /// The [`Application`] was installed to a guild, containing the id if invoked in said guild.
+    ///
+    /// [`Application`]: super::CurrentApplicationInfo
+    GuildInstall(Option<GuildId>),
+    /// The [`Application`] was installed to a user, containing the id of said user.
+    ///
+    /// [`Application`]: super::CurrentApplicationInfo
+    UserInstall(UserId),
+    Unknown(InstallationContext),
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[cfg(feature = "unstable_discord_api")]
+#[derive(Clone, Debug, Default)]
+#[repr(transparent)]
+pub struct AuthorizingIntegrationOwners(Vec<AuthorizingIntegrationOwner>);
+
+#[cfg(feature = "unstable_discord_api")]
+impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        struct Visitor;
+
+        impl<'de> serde::de::Visitor<'de> for Visitor {
+            type Value = AuthorizingIntegrationOwners;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("a hashmap containing keys of InstallationContext and values based on those keys")
+            }
+
+            fn visit_map<A>(self, mut map: A) -> StdResult<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
+                use crate::model::utils::CowStr;
+
+                let mut out = Vec::new();
+                while let Some(key_str) = map.next_key::<CowStr<'_>>()? {
+                    let key_int = key_str.0.parse::<u8>().map_err(serde::de::Error::custom)?;
+                    let value = match InstallationContext::from(key_int) {
+                        InstallationContext::Guild => {
+                            AuthorizingIntegrationOwner::GuildInstall(map.next_value()?)
+                        },
+                        InstallationContext::User => {
+                            AuthorizingIntegrationOwner::UserInstall(map.next_value()?)
+                        },
+                        key => AuthorizingIntegrationOwner::Unknown(key),
+                    };
+
+                    out.push(value);
+                }
+
+                Ok(AuthorizingIntegrationOwners(out))
+            }
+        }
+
+        deserializer.deserialize_map(Visitor)
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+impl serde::Serialize for AuthorizingIntegrationOwners {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        use serde::ser::SerializeMap;
+
+        let mut serializer = serializer.serialize_map(Some(self.0.len()))?;
+        for value in &self.0 {
+            match value {
+                AuthorizingIntegrationOwner::GuildInstall(inner) => {
+                    serializer.serialize_entry(&InstallationContext::Guild, &inner)
+                },
+                AuthorizingIntegrationOwner::UserInstall(inner) => {
+                    serializer.serialize_entry(&InstallationContext::User, &inner)
+                },
+                AuthorizingIntegrationOwner::Unknown(inner) => {
+                    serializer.serialize_entry(&inner, &())
+                },
+            }?;
+        }
+
+        serializer.end()
+    }
+}
+
 /// Sent when a [`Message`] is a response to an [`Interaction`].
 ///
 /// [`Message`]: crate::model::channel::Message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
+#[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Use Message::interaction_metadata")]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -312,4 +408,30 @@ pub struct MessageInteraction {
     /// The member who invoked the interaction in the guild.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<PartialMember>,
+}
+
+/// Metadata about the interaction, including the source of the interaction relevant server and
+/// user IDs.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg(feature = "unstable_discord_api")]
+pub struct MessageInteractionMetadata {
+    /// The ID of the interaction
+    pub id: InteractionId,
+    /// The type of interaction
+    #[serde(rename = "type")]
+    pub kind: InteractionType,
+    /// The ID of the user who triggered the interaction
+    pub user_id: UserId,
+    /// The IDs for installation context(s) related to an interaction.
+    #[serde(default)]
+    pub authorizing_integration_owners: AuthorizingIntegrationOwners,
+    /// The ID of the original response message, present only on follow-up messages.
+    pub original_response_message_id: Option<MessageId>,
+    /// ID of the message that contained interactive component, present only on messages created
+    /// from component interactions.
+    pub interacted_message_id: Option<MessageId>,
+    /// Metadata for the interaction that was used to open the modal, present only on modal submit
+    /// interactions
+    pub triggering_interaction_metadata: Option<Box<MessageInteractionMetadata>>,
 }
