@@ -37,7 +37,9 @@
 
 use std::borrow::Cow;
 use std::fmt;
+use std::future::Future;
 use std::str::{self, FromStr};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::SystemTime;
 
@@ -45,9 +47,10 @@ use dashmap::DashMap;
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
 use secrecy::{ExposeSecret as _, Secret};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, Semaphore};
+use tokio::task::JoinHandle;
 use tokio::time::{sleep, Duration};
-use tracing::debug;
+use tracing::{debug, trace, warn};
 
 pub use super::routing::RatelimitingBucket;
 use super::{HttpError, LightMethod, Request, Token};
@@ -59,7 +62,7 @@ use crate::internal::prelude::*;
 #[non_exhaustive]
 pub struct RatelimitInfo {
     pub timeout: std::time::Duration,
-    pub limit: i64,
+    pub limit: u64,
     pub method: LightMethod,
     pub path: Cow<'static, str>,
     pub global: bool,
@@ -96,11 +99,10 @@ impl fmt::Debug for Ratelimiter {
         f.debug_struct("Ratelimiter")
             .field("client", &self.client)
             .field("global", &self.global)
-            .field("routes", &self.routes)
             .field("token", &self.token)
             .field("absolute_ratelimits", &self.absolute_ratelimits)
             .field("ratelimit_callback", &"Fn(RatelimitInfo)")
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
@@ -157,8 +159,8 @@ impl Ratelimiter {
     ///     channel_id,
     /// };
     /// if let Some(route) = routes.get(&route.ratelimiting_bucket()) {
-    ///     if let Some(reset) = route.reset() {
-    ///         println!("Reset time at: {:?}", reset);
+    ///     if let Some(reset) = route.resets_in() {
+    ///         println!("Resets in {:?}", reset);
     ///     }
     /// }
     /// # Ok(())
@@ -185,13 +187,13 @@ impl Ratelimiter {
             // - sleep if there is 0 remaining
             // - then, perform the request
             let ratelimiting_bucket = req.route.ratelimiting_bucket();
-            let delay_time = {
+            let wait_for_ready = {
                 let mut bucket = self.routes.entry(ratelimiting_bucket).or_default();
                 bucket.pre_hook(&req, &*self.ratelimit_callback.read())
             };
 
-            if let Some(delay_time) = delay_time {
-                sleep(delay_time).await;
+            if let Some(wait_for_ready) = wait_for_ready {
+                wait_for_ready.await;
             }
 
             let request = req.clone().build(&self.client, self.token.expose_secret(), None)?;
@@ -201,14 +203,12 @@ impl Ratelimiter {
             // for the value of the header 'retry-after' - which is in milliseconds - and then
             // `continue` to try again
             //
-            // If it didn't ratelimit, subtract one from the Ratelimit's 'remaining'.
-            //
-            // Update `reset` with the value of 'x-ratelimit-reset' header. Similarly, update
-            // `reset-after` with the 'x-ratelimit-reset-after' header.
+            // Depending on if absolute_ratelimits is true, update reset with the value of
+            // 'x-ratelimit-reset' or 'x-ratelimit-reset-after'
             //
             // It _may_ be possible for the limit to be raised at any time, so check if it did from
-            // the value of the 'x-ratelimit-limit' header. If the limit was 5 and is now 7, add 2
-            // to the 'remaining'
+            // the value of the 'x-ratelimit-limit' header. If we have too few permits, add more, or
+            // remove some if we have too many.
             if ratelimiting_bucket.is_none() {
                 return Ok(response);
             }
@@ -220,8 +220,9 @@ impl Ratelimiter {
                     if let Some(retry_after) =
                         parse_header::<f64>(response.headers(), "retry-after")?
                     {
+                        trace!(?response, "global ratelimit hit");
                         debug!(
-                            "Ratelimited on route {:?} for {:?}s",
+                            "Globally ratelimited on route {:?} for {:?}s",
                             ratelimiting_bucket, retry_after
                         );
                         (self.ratelimit_callback.read())(RatelimitInfo {
@@ -239,23 +240,27 @@ impl Ratelimiter {
                     },
                 )
             } else {
-                let delay_time = if let Some(mut bucket) = self.routes.get_mut(&ratelimiting_bucket)
-                {
-                    bucket.post_hook(
-                        &response,
-                        &req,
-                        &*self.ratelimit_callback.read(),
-                        self.absolute_ratelimits,
-                    )
-                } else {
-                    Ok(None)
-                };
+                let maybe_block_until_ready =
+                    if let Some(mut bucket) = self.routes.get_mut(&ratelimiting_bucket) {
+                        bucket.post_hook(
+                            &response,
+                            &req,
+                            &*self.ratelimit_callback.read(),
+                            self.absolute_ratelimits,
+                        )
+                    } else {
+                        Ok(None)
+                    };
 
-                if let Ok(Some(delay_time)) = delay_time {
-                    sleep(delay_time).await;
-                };
-
-                delay_time.map(|d| d.is_some())
+                match maybe_block_until_ready {
+                    Ok(Some(block_until_ready)) => {
+                        // awaiting this future will block until the ratelimit is over
+                        block_until_ready.await;
+                        Ok(true)
+                    },
+                    Ok(None) => Ok(false),
+                    Err(why) => Err(why),
+                }
             };
 
             if !redo.unwrap_or(true) {
@@ -277,13 +282,13 @@ impl Ratelimiter {
 #[derive(Debug)]
 pub struct Ratelimit {
     /// The total number of requests that can be made in a period of time.
-    limit: i64,
-    /// The number of requests remaining in the period of time.
-    remaining: i64,
-    /// The absolute time when the interval resets.
-    reset: Option<SystemTime>,
-    /// The total time when the interval resets.
-    reset_after: Option<Duration>,
+    limit: usize,
+    /// The time when the interval resets.
+    reset: ResetDuration,
+    /// A queue of handles to only allow a few requests at a time upon ratelimit.
+    queue: Arc<Semaphore>,
+    /// JoinHandle to a task that will replenish the permit count at the end of the reset time.
+    replenish_task: Option<JoinHandle<()>>,
 }
 
 impl Ratelimit {
@@ -293,46 +298,58 @@ impl Ratelimit {
         &mut self,
         req: &Request<'_>,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
-    ) -> Option<std::time::Duration> {
+    ) -> Option<impl Future<Output = ()>> {
         if self.limit() == 0 {
+            trace!("Ratelimit is 0, not ratelimiting");
             return None;
         }
 
-        let Some(reset) = self.reset else {
-            // We're probably in the past.
-            self.remaining = self.limit;
-            return None;
-        };
-
-        let Ok(delay) = reset.duration_since(SystemTime::now()) else {
-            // if duration is negative (i.e. adequate time has passed since last call to this api)
-            if self.remaining() != 0 {
-                self.remaining -= 1;
+        if self.reset.is_unknown() {
+            // We're probably in the past. Reset the ratelimit and return.
+            debug!(?self, "Ratelimit reset time is unknown, resetting");
+            if self.queue.available_permits() < self.limit {
+                self.queue.add_permits(self.limit - self.queue.available_permits());
             }
             return None;
-        };
-
-        if self.remaining() == 0 {
-            debug!(
-                "Pre-emptive ratelimit on route {:?} for {}ms",
-                req.route.ratelimiting_bucket(),
-                delay.as_millis(),
-            );
-            ratelimit_callback(RatelimitInfo {
-                timeout: delay,
-                limit: self.limit,
-                method: req.method,
-                path: req.route.path(),
-                global: false,
-            });
-
-            Some(delay)
-        } else {
-            self.remaining -= 1;
-            None
         }
+
+        if let Some(delay) = self.reset.delay_remaining() {
+            if self.remaining() == 0 {
+                debug!(
+                    "Pre-emptive ratelimit on route {:?} for {}ms",
+                    req.route.ratelimiting_bucket(),
+                    delay.as_millis(),
+                );
+                ratelimit_callback(RatelimitInfo {
+                    timeout: delay,
+                    limit: self.limit as u64,
+                    method: req.method,
+                    path: req.route.path(),
+                    global: false,
+                });
+            }
+        } else {
+            // if no delay remains (i.e. adequate time has passed since last call to this api)
+            // replenish the permit count
+            debug!("Ratelimit reset time is in the past, resetting");
+            if self.queue.available_permits() < self.limit {
+                self.queue.add_permits(self.limit - self.queue.available_permits());
+            }
+        }
+
+        let q2 = Arc::clone(&self.queue);
+        Some(async move {
+            trace!(?q2, "Acquiring ratelimit permit");
+            q2.acquire_owned()
+                .await
+                .expect("internal ratelimiter semaphore should never be closed")
+                .forget();
+        })
     }
 
+    /// If `Ok(Some(_))` is returned, awaiting the returned future will
+    /// ratelimit for as long as necessary to continue.
+    ///
     /// # Errors
     ///
     /// Errors if unable to parse response headers.
@@ -343,48 +360,68 @@ impl Ratelimit {
         req: &Request<'_>,
         ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
         absolute_ratelimits: bool,
-    ) -> Result<Option<Duration>> {
+    ) -> Result<Option<impl Future<Output = ()>>> {
         if let Some(limit) = parse_header(response.headers(), "x-ratelimit-limit")? {
+            if self.limit != limit {
+                trace!(?self, "Ratelimit limit changed from {} to {}", self.limit, limit);
+            }
             self.limit = limit;
         }
 
-        if let Some(remaining) = parse_header(response.headers(), "x-ratelimit-remaining")? {
-            self.remaining = remaining;
-        }
+        let Some(remaining) = parse_header(response.headers(), "x-ratelimit-remaining")? else {
+            warn!(?self, "Ratelimit remaining header not found");
+            // we rely on this header to update future state, not much we can do
+            return Ok(None);
+        };
 
         if absolute_ratelimits {
             if let Some(reset) = parse_header::<f64>(response.headers(), "x-ratelimit-reset")? {
-                self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
+                self.reset = ResetDuration::SystemTime(
+                    std::time::UNIX_EPOCH + Duration::from_secs_f64(reset),
+                );
             }
-        }
-
-        if let Some(reset_after) =
+        } else if let Some(reset_after) =
             parse_header::<f64>(response.headers(), "x-ratelimit-reset-after")?
         {
-            if !absolute_ratelimits {
-                self.reset = Some(SystemTime::now() + Duration::from_secs_f64(reset_after));
-            }
-
-            self.reset_after = Some(Duration::from_secs_f64(reset_after));
+            self.reset =
+                ResetDuration::Duration(SystemTime::now(), Duration::from_secs_f64(reset_after));
+        } else {
+            warn!(?self, "Ratelimit reset-after header not found");
         }
+
+        // update the ratelimit state and replenish the permit count at the end of the reset time
+        if response.status() == StatusCode::TOO_MANY_REQUESTS {
+            // oops we got ratelimited, prevent replenishment at the wrong time
+            self.replenish_task.take().map(|t| t.abort());
+        }
+        self.update_state(self.limit, remaining, self.reset);
 
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             None
-        } else if let Some(retry_after) = parse_header::<f64>(response.headers(), "retry-after")? {
-            debug!(
-                "Ratelimited on route {:?} for {:?}s",
-                req.route.ratelimiting_bucket(),
-                retry_after
-            );
+        } else if let Some(retry_after) =
+            parse_header::<f64>(response.headers(), "x-ratelimit-reset-after")?
+        {
+            let timeout = Duration::from_secs_f64(retry_after);
+            debug!("Ratelimited on route {:?} for {:?}", req.route.ratelimiting_bucket(), timeout);
             ratelimit_callback(RatelimitInfo {
-                timeout: Duration::from_secs_f64(retry_after),
-                limit: self.limit,
+                timeout,
+                limit: self.limit as u64,
                 method: req.method,
                 path: req.route.path(),
                 global: false,
             });
 
-            Some(Duration::from_secs_f64(retry_after))
+            let q2 = Arc::clone(&self.queue);
+            Some(async move {
+                // we do not forget the permit here, as pre_hook will do that when the loop
+                // iteration returns to the top in Ratelimiter::perform
+                // this simply waits for the ratelimit to be over and then continues
+                drop(
+                    q2.acquire_owned()
+                        .await
+                        .expect("internal ratelimiter semaphore should never be closed"),
+                );
+            })
         } else {
             None
         })
@@ -392,37 +429,149 @@ impl Ratelimit {
 
     /// The total number of requests that can be made in a period of time.
     #[must_use]
-    pub const fn limit(&self) -> i64 {
-        self.limit
+    pub const fn limit(&self) -> u64 {
+        self.limit as u64
     }
 
     /// The number of requests remaining in the period of time.
     #[must_use]
-    pub const fn remaining(&self) -> i64 {
-        self.remaining
+    pub fn remaining(&self) -> u64 {
+        self.queue.available_permits() as u64
     }
 
-    /// The absolute time in milliseconds when the interval resets.
+    /// The time when the interval resets. Returns None if the reset time is unknown, or if it is in
+    /// the past.
     #[must_use]
-    pub const fn reset(&self) -> Option<SystemTime> {
-        self.reset
+    pub fn resets_in(&self) -> Option<Duration> {
+        self.reset.delay_remaining()
     }
 
-    /// The total time in milliseconds when the interval resets.
-    #[must_use]
-    pub const fn reset_after(&self) -> Option<Duration> {
-        self.reset_after
+    /// Update the internal ratelimiter state with new values.
+    fn update_state(&mut self, limit: usize, actual_remaining: u64, reset: ResetDuration) {
+        let internal_remaining = self.remaining();
+
+        match actual_remaining.cmp(&internal_remaining) {
+            std::cmp::Ordering::Greater => {
+                // discord says we have more remaining than we actually do
+                trace!(
+                    ?self,
+                    "Ratelimit remaining header is higher than internal state: {} > {}",
+                    actual_remaining,
+                    internal_remaining
+                );
+                self.queue.add_permits((actual_remaining - internal_remaining) as usize);
+            },
+            std::cmp::Ordering::Less => {
+                // opposite of the above, forget some extra permits
+                trace!(
+                    ?self,
+                    "Ratelimit remaining header is lower than internal state: {} < {}",
+                    actual_remaining,
+                    internal_remaining
+                );
+                self.queue
+                    .try_acquire_many((internal_remaining - actual_remaining) as u32)
+                    .expect("there should be enough spare ratelimit permits available to drain")
+                    .forget();
+            },
+            std::cmp::Ordering::Equal => {
+                // no change
+            },
+        }
+
+        // if unknown, we don't know how long to sleep for
+        if reset.is_unknown() {
+            return;
+        }
+
+        // spawn a task to replenish the permit count at the end of the reset time
+        let queue = Arc::clone(&self.queue);
+        if self.replenish_task.is_none() {
+            let replenish_task = tokio::spawn(async move {
+                let delay = reset.delay_remaining();
+                if let Some(delay) = delay {
+                    debug!("Ratelimit reset time is in the future, resetting in {:?}", delay);
+                    sleep(delay).await;
+                } else {
+                    warn!( "Ratelimit reset time is in the past, resetting (shouldn't happen in this code path)");
+                }
+
+                let internal_remaining = queue.available_permits();
+                match limit.cmp(&internal_remaining) {
+                    std::cmp::Ordering::Greater => {
+                        // discord says we have more remaining than we actually do
+                        trace!(
+                            "Reset count is higher than internal state: {} > {}",
+                            limit,
+                            internal_remaining
+                        );
+                        queue.add_permits(limit - internal_remaining);
+                    },
+                    std::cmp::Ordering::Less => {
+                        // opposite of the above, forget some extra permits
+                        trace!(
+                            "Reset count is lower than internal state: {} < {} (should not happen in this code path)",
+                            limit,
+                            internal_remaining
+                        );
+                        queue
+                            .try_acquire_many((internal_remaining - limit) as u32)
+                            .expect(
+                                "there should be enough spare ratelimit permits available to drain",
+                            )
+                            .forget();
+                    },
+                    std::cmp::Ordering::Equal => {
+                        trace!(
+                            "Reset count is the same as internal state: {} = {}",
+                            limit,
+                            internal_remaining
+                        );
+                        // no change
+                    },
+                }
+            });
+
+            self.replenish_task = Some(replenish_task);
+        }
     }
 }
 
 impl Default for Ratelimit {
     fn default() -> Self {
         Self {
-            limit: i64::MAX,
-            remaining: i64::MAX,
-            reset: None,
-            reset_after: None,
+            limit: u32::MAX as usize, // the maximum number of permits we can fetch at a single time
+            reset: ResetDuration::Unknown,
+            queue: Arc::new(Semaphore::new(1)),
+            replenish_task: None,
         }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+enum ResetDuration {
+    Duration(SystemTime, Duration),
+    SystemTime(SystemTime),
+    Unknown,
+}
+
+impl ResetDuration {
+    fn is_unknown(&self) -> bool {
+        matches!(self, Self::Unknown)
+    }
+
+    fn is_in_past(&self) -> bool {
+        self.delay_remaining().map_or(false, |d| d.as_nanos() == 0)
+    }
+
+    /// Returns the duration until the reset time, if known and in the future.
+    fn delay_remaining(&self) -> Option<Duration> {
+        let ts = match self {
+            Self::Duration(at, plus_time) => Some(*at + *plus_time),
+            Self::SystemTime(at) => Some(*at),
+            Self::Unknown => None,
+        };
+        ts?.duration_since(SystemTime::now()).ok()
     }
 }
 
