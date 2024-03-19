@@ -16,7 +16,8 @@ pub(crate) fn join_to_string(
 // Required because of https://github.com/Crazytieguy/gat-lending-iterator/issues/31
 macro_rules! lending_for_each {
     ($iter:expr, |$item:ident| $body:expr ) => {
-        while let Some(mut $item) = $iter.next() {
+        let mut __iter = $iter;
+        while let Some(mut $item) = __iter.next() {
             $body
         }
     };
