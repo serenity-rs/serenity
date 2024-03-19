@@ -252,8 +252,8 @@ impl<'de> Deserialize<'de> for CommandInteraction {
                 interaction.user = member.user.clone();
             }
 
-            let mut role_iter = interaction.data.resolved.roles.iter_mut();
-            lending_for_each!(role_iter, |r| r.guild_id = guild_id);
+            let iter = interaction.data.resolved.roles.iter_mut();
+            lending_for_each!(iter, |r| r.guild_id = guild_id);
         }
         Ok(interaction)
     }
