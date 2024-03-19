@@ -901,6 +901,7 @@
 <a href="#899" id="899">899</a>
 <a href="#900" id="900">900</a>
 <a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>serde::de::{Deserializer, Error <span class="kw">as </span>DeError};
@@ -1148,7 +1149,8 @@
                 </span>interaction.user = member.user.clone();
             }
 
-            <span class="macro">lending_for_each!</span>(interaction.data.resolved.roles.iter_mut(), |r| r.guild_id = guild_id);
+            <span class="kw">let </span>iter = interaction.data.resolved.roles.iter_mut();
+            <span class="macro">lending_for_each!</span>(iter, |r| r.guild_id = guild_id);
         }
         <span class="prelude-val">Ok</span>(interaction)
     }
