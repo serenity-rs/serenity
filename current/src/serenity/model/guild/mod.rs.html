@@ -2792,19 +2792,6 @@
 <a href="#2790" id="2790">2790</a>
 <a href="#2791" id="2791">2791</a>
 <a href="#2792" id="2792">2792</a>
-<a href="#2793" id="2793">2793</a>
-<a href="#2794" id="2794">2794</a>
-<a href="#2795" id="2795">2795</a>
-<a href="#2796" id="2796">2796</a>
-<a href="#2797" id="2797">2797</a>
-<a href="#2798" id="2798">2798</a>
-<a href="#2799" id="2799">2799</a>
-<a href="#2800" id="2800">2800</a>
-<a href="#2801" id="2801">2801</a>
-<a href="#2802" id="2802">2802</a>
-<a href="#2803" id="2803">2803</a>
-<a href="#2804" id="2804">2804</a>
-<a href="#2805" id="2805">2805</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4668,15 +4655,6 @@
     }
 
     <span class="doccomment">/// Calculate a [`Member`]'s permissions in the guild.
-    ///
-    /// If member caching is enabled the cache will be checked first. If not found it will resort
-    /// to an http request.
-    ///
-    /// Cache is still required to look up roles.
-    ///
-    /// # Errors
-    ///
-    /// See [`Guild::member`].
     </span><span class="attr">#[inline]
     #[cfg(feature = <span class="string">"cache"</span>)]
     #[must_use]
@@ -4705,10 +4683,6 @@
     </span>}
 
     <span class="doccomment">/// Calculate a [`Member`]'s permissions in a given channel in the guild.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Model`] if the [`Member`] has a non-existent role for some reason.
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>user_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
