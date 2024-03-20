@@ -1861,15 +1861,6 @@ impl Guild {
     }
 
     /// Calculate a [`Member`]'s permissions in the guild.
-    ///
-    /// If member caching is enabled the cache will be checked first. If not found it will resort
-    /// to an http request.
-    ///
-    /// Cache is still required to look up roles.
-    ///
-    /// # Errors
-    ///
-    /// See [`Guild::member`].
     #[inline]
     #[cfg(feature = "cache")]
     #[must_use]
@@ -1898,10 +1889,6 @@ impl Guild {
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Model`] if the [`Member`] has a non-existent role for some reason.
     #[inline]
     #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
