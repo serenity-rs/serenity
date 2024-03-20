@@ -1865,7 +1865,14 @@ impl Guild {
     #[cfg(feature = "cache")]
     #[must_use]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
-        Self::_user_permissions_in(None, member, &self.roles, self.owner_id, self.id)
+        Self::_user_permissions_in(
+            None,
+            member.user.id,
+            &member.roles,
+            self.id,
+            &self.roles,
+            self.owner_id,
+        )
     }
 
     /// Moves a member to a specific voice channel.
@@ -1892,16 +1899,50 @@ impl Guild {
     #[inline]
     #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
-        Self::_user_permissions_in(Some(channel), member, &self.roles, self.owner_id, self.id)
+        Self::_user_permissions_in(
+            Some(channel),
+            member.user.id,
+            &member.roles,
+            self.id,
+            &self.roles,
+            self.owner_id,
+        )
+    }
+
+    /// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+    #[must_use]
+    pub fn partial_member_permissions_in(
+        &self,
+        channel: &GuildChannel,
+        member_id: UserId,
+        member: &PartialMember,
+    ) -> Permissions {
+        if let Some(user) = &member.user {
+            assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
+        }
+
+        Self::_user_permissions_in(
+            Some(channel),
+            member_id,
+            &member.roles,
+            self.id,
+            &self.roles,
+            self.owner_id,
+        )
     }
 
     /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn _user_permissions_in(
         channel: Option<&GuildChannel>,
-        member: &Member,
+        member_user_id: UserId,
+        member_roles: &[RoleId],
+        guild_id: GuildId,
         guild_roles: &HashMap<RoleId, Role>,
         guild_owner_id: UserId,
-        guild_id: GuildId,
     ) -> Permissions {
         let mut everyone_allow_overwrites = Permissions::empty();
         let mut everyone_deny_overwrites = Permissions::empty();
@@ -1914,7 +1955,7 @@ impl Guild {
             for overwrite in &channel.permission_overwrites {
                 match overwrite.kind {
                     PermissionOverwriteType::Member(user_id) => {
-                        if member.user.id == user_id {
+                        if member_user_id == user_id {
                             member_allow_overwrites = overwrite.allow;
                             member_deny_overwrites = overwrite.deny;
                         }
@@ -1923,7 +1964,7 @@ impl Guild {
                         if role_id.get() == guild_id.get() {
                             everyone_allow_overwrites = overwrite.allow;
                             everyone_deny_overwrites = overwrite.deny;
-                        } else if member.roles.contains(&role_id) {
+                        } else if member_roles.contains(&role_id) {
                             roles_allow_overwrites.push(overwrite.allow);
                             roles_deny_overwrites.push(overwrite.deny);
                         }
@@ -1933,7 +1974,7 @@ impl Guild {
         }
 
         calculate_permissions(CalculatePermissions {
-            is_guild_owner: member.user.id == guild_owner_id,
+            is_guild_owner: member_user_id == guild_owner_id,
             everyone_permissions: if let Some(role) = guild_roles.get(&RoleId::new(guild_id.get()))
             {
                 role.permissions
@@ -1941,8 +1982,7 @@ impl Guild {
                 error!("@everyone role missing in {}", guild_id);
                 Permissions::empty()
             },
-            user_roles_permissions: member
-                .roles
+            user_roles_permissions: member_roles
                 .iter()
                 .map(|role_id| {
                     if let Some(role) = guild_roles.get(role_id) {
@@ -1950,7 +1990,7 @@ impl Guild {
                     } else {
                         warn!(
                             "{} on {} has non-existent role {:?}",
-                            member.user.id, guild_id, role_id
+                            member_user_id, guild_id, role_id
                         );
                         Permissions::empty()
                     }
