@@ -552,6 +552,8 @@
 <a href="#550" id="550">550</a>
 <a href="#551" id="551">551</a>
 <a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
@@ -1032,11 +1034,13 @@
 /// use serenity::model::id::GuildId;
 /// use serenity::utils;
 ///
-/// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);
+/// let guild_id = GuildId::new(81384788765712384);
+/// let shard_total = std::num::NonZeroU16::new(17).unwrap();
+///
+/// assert_eq!(utils::shard_id(guild_id, shard_total), 7);
 /// ```
 </span><span class="attr">#[must_use]
-</span><span class="kw">pub fn </span>shard_id(guild_id: GuildId, shard_count: u16) -&gt; u16 {
-    <span class="kw">let </span>shard_count = check_shard_total(shard_count);
+</span><span class="kw">pub fn </span>shard_id(guild_id: GuildId, shard_count: NonZeroU16) -&gt; u16 {
     ((guild_id.get() &gt;&gt; <span class="number">22</span>) % u64::from(shard_count.get())) <span class="kw">as </span>u16
 }
 

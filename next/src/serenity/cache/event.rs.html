@@ -1072,7 +1072,7 @@
         <span class="kw">for </span>guild_entry <span class="kw">in </span>cache.guilds.iter() {
             <span class="kw">let </span>guild = guild_entry.key();
             <span class="comment">// Only handle data for our shard.
-            </span><span class="kw">if </span><span class="kw">crate</span>::utils::shard_id(<span class="kw-2">*</span>guild, shard_data.total.get()) == shard_data.id.<span class="number">0
+            </span><span class="kw">if </span><span class="kw">crate</span>::utils::shard_id(<span class="kw-2">*</span>guild, shard_data.total) == shard_data.id.<span class="number">0
                 </span>&amp;&amp; !ready_guilds_hashset.contains(guild)
             {
                 guilds_to_remove.push(<span class="kw-2">*</span>guild);

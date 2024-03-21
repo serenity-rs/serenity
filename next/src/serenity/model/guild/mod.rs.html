@@ -2499,34 +2499,6 @@
 <a href="#2497" id="2497">2497</a>
 <a href="#2498" id="2498">2498</a>
 <a href="#2499" id="2499">2499</a>
-<a href="#2500" id="2500">2500</a>
-<a href="#2501" id="2501">2501</a>
-<a href="#2502" id="2502">2502</a>
-<a href="#2503" id="2503">2503</a>
-<a href="#2504" id="2504">2504</a>
-<a href="#2505" id="2505">2505</a>
-<a href="#2506" id="2506">2506</a>
-<a href="#2507" id="2507">2507</a>
-<a href="#2508" id="2508">2508</a>
-<a href="#2509" id="2509">2509</a>
-<a href="#2510" id="2510">2510</a>
-<a href="#2511" id="2511">2511</a>
-<a href="#2512" id="2512">2512</a>
-<a href="#2513" id="2513">2513</a>
-<a href="#2514" id="2514">2514</a>
-<a href="#2515" id="2515">2515</a>
-<a href="#2516" id="2516">2516</a>
-<a href="#2517" id="2517">2517</a>
-<a href="#2518" id="2518">2518</a>
-<a href="#2519" id="2519">2519</a>
-<a href="#2520" id="2520">2520</a>
-<a href="#2521" id="2521">2521</a>
-<a href="#2522" id="2522">2522</a>
-<a href="#2523" id="2523">2523</a>
-<a href="#2524" id="2524">2524</a>
-<a href="#2525" id="2525">2525</a>
-<a href="#2526" id="2526">2526</a>
-<a href="#2527" id="2527">2527</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4492,39 +4464,11 @@
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total number of shards.
-    ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to retrieve the total
-    /// number of shards in use. If you already have the total, consider using [`utils::shard_id`].
-    ///
-    /// [`utils::shard_id`]: crate::utils::shard_id
-    </span><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"utils"</span>))]
-    </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache) -&gt; u16 {
-        <span class="self">self</span>.id.shard_id(cache)
-    }
-
-    <span class="doccomment">/// Returns the Id of the shard associated with the guild.
-    ///
-    /// When the cache is enabled this will automatically retrieve the total number of shards.
-    ///
-    /// When the cache is not enabled, the total number of shards being used will need to be
-    /// passed.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
-    ///
-    /// ```rust,ignore
-    /// use serenity::utils;
-    ///
-    /// // assumes a `guild` has already been bound
-    ///
-    /// assert_eq!(guild.shard_id(17), 7);
-    /// ```
-    </span><span class="attr">#[cfg(all(feature = <span class="string">"utils"</span>, not(feature = <span class="string">"cache"</span>)))]
-    #[must_use]
-    </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_count: u16) -&gt; u16 {
-        <span class="self">self</span>.id.shard_id(shard_count)
+    /// See the documentation for [`GuildId::shard_id`].
+    </span><span class="attr">#[must_use]
+    #[cfg(feature = <span class="string">"utils"</span>)]
+    </span><span class="kw">pub fn </span>shard_id(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_total: std::num::NonZeroU16) -&gt; u16 {
+        <span class="self">self</span>.id.shard_id(shard_total)
     }
 
     <span class="doccomment">/// Returns the formatted URL of the guild's splash image, if one exists.
