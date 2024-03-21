@@ -478,11 +478,13 @@ pub(crate) fn user_perms(
 /// use serenity::model::id::GuildId;
 /// use serenity::utils;
 ///
-/// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);
+/// let guild_id = GuildId::new(81384788765712384);
+/// let shard_total = std::num::NonZeroU16::new(17).unwrap();
+///
+/// assert_eq!(utils::shard_id(guild_id, shard_total), 7);
 /// ```
 #[must_use]
-pub fn shard_id(guild_id: GuildId, shard_count: u16) -> u16 {
-    let shard_count = check_shard_total(shard_count);
+pub fn shard_id(guild_id: GuildId, shard_count: NonZeroU16) -> u16 {
     ((guild_id.get() >> 22) % u64::from(shard_count.get())) as u16
 }
 
