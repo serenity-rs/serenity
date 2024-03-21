@@ -451,7 +451,7 @@ impl CacheUpdate for ReadyEvent {
         for guild_entry in cache.guilds.iter() {
             let guild = guild_entry.key();
             // Only handle data for our shard.
-            if crate::utils::shard_id(*guild, shard_data.total.get()) == shard_data.id.0
+            if crate::utils::shard_id(*guild, shard_data.total) == shard_data.id.0
                 && !ready_guilds_hashset.contains(guild)
             {
                 guilds_to_remove.push(*guild);

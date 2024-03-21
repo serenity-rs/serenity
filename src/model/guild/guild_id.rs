@@ -1251,40 +1251,13 @@ impl GuildId {
 
     /// Returns the Id of the shard associated with the guild.
     ///
-    /// When the cache is enabled this will automatically retrieve the total number of shards.
-    ///
-    /// **Note**: When the cache is enabled, this function unlocks the cache to retrieve the total
-    /// number of shards in use. If you already have the total, consider using [`utils::shard_id`].
+    /// This is just a shortcut for [`utils::shard_id`], the shard count should
+    /// be fetched using [`Cache::shard_count`] if possible.
     ///
     /// [`utils::shard_id`]: crate::utils::shard_id
-    #[cfg(all(feature = "cache", feature = "utils"))]
     #[must_use]
-    pub fn shard_id(self, cache: &Cache) -> u16 {
-        crate::utils::shard_id(self, cache.shard_count().get())
-    }
-
-    /// Returns the Id of the shard associated with the guild.
-    ///
-    /// When the cache is enabled this will automatically retrieve the total number of shards.
-    ///
-    /// When the cache is not enabled, the total number of shards being used will need to be
-    /// passed.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve the Id of the shard for a guild with Id `81384788765712384`, using 17 shards:
-    ///
-    /// ```rust
-    /// use serenity::model::id::GuildId;
-    /// use serenity::utils;
-    ///
-    /// let guild_id = GuildId::new(81384788765712384);
-    ///
-    /// assert_eq!(guild_id.shard_id(17), 7);
-    /// ```
-    #[cfg(all(feature = "utils", not(feature = "cache")))]
-    #[must_use]
-    pub fn shard_id(self, shard_count: u16) -> u16 {
+    #[cfg(feature = "utils")]
+    pub fn shard_id(self, shard_count: std::num::NonZeroU16) -> u16 {
         crate::utils::shard_id(self, shard_count)
     }
 
