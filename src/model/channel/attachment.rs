@@ -1,10 +1,11 @@
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
+use serde_cow::CowStr;
 
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use crate::model::utils::{is_false, CowStr};
+use crate::model::utils::is_false;
 
 fn base64_bytes<'de, D>(deserializer: D) -> Result<Option<Vec<u8>>, D::Error>
 where

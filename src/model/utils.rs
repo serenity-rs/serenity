@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use std::fmt;
 use std::hash::Hash;
 use std::marker::PhantomData;
@@ -80,44 +79,6 @@ where
         Ok(NonZeroU64::new(val).map(Id::from))
     } else {
         Ok(None)
-    }
-}
-
-pub(super) struct CowStr<'de>(pub Cow<'de, str>);
-
-impl<'de> serde::Deserialize<'de> for CowStr<'de> {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        struct CowStrVisitor;
-        impl<'de> serde::de::Visitor<'de> for CowStrVisitor {
-            type Value = CowStr<'de>;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("a string")
-            }
-
-            fn visit_borrowed_str<E>(self, val: &'de str) -> StdResult<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                Ok(CowStr(Cow::Borrowed(val)))
-            }
-
-            fn visit_str<E>(self, val: &str) -> StdResult<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                self.visit_string(val.into())
-            }
-
-            fn visit_string<E>(self, val: String) -> StdResult<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                Ok(CowStr(Cow::Owned(val)))
-            }
-        }
-
-        deserializer.deserialize_string(CowStrVisitor)
     }
 }
 
@@ -320,8 +281,7 @@ pub mod stickers {
 /// Used with `#[serde(with = "comma_separated_string")]`
 pub mod comma_separated_string {
     use serde::{Deserialize, Deserializer, Serializer};
-
-    use super::CowStr;
+    use serde_cow::CowStr;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
