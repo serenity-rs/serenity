@@ -13,7 +13,6 @@ use serenity::framework::standard::{Args, CommandResult, Configuration, Standard
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
-use tokio::sync::RwLock;
 
 // A container type is created for inserting into the Client's `data`, which allows for data to be
 // accessible across all events and framework commands, or anywhere else that has a copy of the

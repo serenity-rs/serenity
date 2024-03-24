@@ -21,13 +21,11 @@ use std::time::Instant;
 use rillrate::prime::table::{Col, Row};
 use rillrate::prime::*;
 use serenity::async_trait;
-use serenity::client::{Client, Context, EventHandler};
 use serenity::framework::standard::macros::{command, group, hook};
 use serenity::framework::standard::{CommandResult, Configuration, StandardFramework};
 use serenity::gateway::ShardManager;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
-use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
 
 // Name used to group dashboards.

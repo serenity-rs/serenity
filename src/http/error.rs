@@ -251,7 +251,6 @@ mod test {
     use reqwest::ResponseBuilderExt;
 
     use super::*;
-    use crate::json::to_string;
 
     #[tokio::test]
     async fn test_error_response_into() {

@@ -508,9 +508,8 @@ enum_number! {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
 
-    use super::{Action, *};
+    use super::*;
     use crate::json::{assert_json, json};
 
     #[test]
