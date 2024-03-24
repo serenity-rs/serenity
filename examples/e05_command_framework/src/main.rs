@@ -33,7 +33,7 @@ use serenity::framework::standard::{
 use serenity::gateway::ShardManager;
 use serenity::http::Http;
 use serenity::model::channel::Message;
-use serenity::model::gateway::{GatewayIntents, Ready};
+use serenity::model::gateway::Ready;
 use serenity::model::id::UserId;
 use serenity::model::permissions::Permissions;
 use serenity::prelude::*;

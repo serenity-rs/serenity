@@ -106,7 +106,7 @@ pub struct TeamMember {
     pub membership_state: MembershipState,
     /// The list of permissions of the member on the team.
     ///
-    /// NOTE: Will always be ["*"] for now.
+    /// NOTE: Will always be "*" for now.
     pub permissions: Vec<String>,
     /// The ID of the team they are a member of.
     pub team_id: GenericId,

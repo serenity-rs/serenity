@@ -586,34 +586,34 @@ impl MessageUpdateEvent {
         message.channel_id = *channel_id;
 
         if let Some(x) = author { message.author = x.clone() }
-        if let Some(x) = content { message.content = x.clone() }
+        if let Some(x) = content { message.content.clone_from(x) }
         if let Some(x) = timestamp { message.timestamp = x.clone() }
         message.edited_timestamp = *edited_timestamp;
         if let Some(x) = tts { message.tts = x.clone() }
         if let Some(x) = mention_everyone { message.mention_everyone = x.clone() }
-        if let Some(x) = mentions { message.mentions = x.clone() }
-        if let Some(x) = mention_roles { message.mention_roles = x.clone() }
-        if let Some(x) = mention_channels { message.mention_channels = x.clone() }
-        if let Some(x) = attachments { message.attachments = x.clone() }
-        if let Some(x) = embeds { message.embeds = x.clone() }
-        if let Some(x) = reactions { message.reactions = x.clone() }
+        if let Some(x) = mentions { message.mentions.clone_from(x) }
+        if let Some(x) = mention_roles { message.mention_roles.clone_from(x) }
+        if let Some(x) = mention_channels { message.mention_channels.clone_from(x) }
+        if let Some(x) = attachments { message.attachments.clone_from(x) }
+        if let Some(x) = embeds { message.embeds.clone_from(x) }
+        if let Some(x) = reactions { message.reactions.clone_from(x) }
         if let Some(x) = pinned { message.pinned = x.clone() }
-        if let Some(x) = webhook_id { message.webhook_id = x.clone() }
+        if let Some(x) = webhook_id { message.webhook_id.clone_from(x) }
         if let Some(x) = kind { message.kind = x.clone() }
-        if let Some(x) = activity { message.activity = x.clone() }
-        if let Some(x) = application { message.application = x.clone() }
-        if let Some(x) = application_id { message.application_id = x.clone() }
-        if let Some(x) = message_reference { message.message_reference = x.clone() }
-        if let Some(x) = flags { message.flags = x.clone() }
-        if let Some(x) = referenced_message { message.referenced_message = x.clone() }
-        if let Some(x) = interaction { message.interaction = x.clone() }
-        if let Some(x) = thread { message.thread = x.clone() }
-        if let Some(x) = components { message.components = x.clone() }
-        if let Some(x) = sticker_items { message.sticker_items = x.clone() }
-        if let Some(x) = position { message.position = x.clone() }
-        if let Some(x) = role_subscription_data { message.role_subscription_data = x.clone() }
+        if let Some(x) = activity { message.activity.clone_from(x) }
+        if let Some(x) = application { message.application.clone_from(x) }
+        if let Some(x) = application_id { message.application_id.clone_from(x) }
+        if let Some(x) = message_reference { message.message_reference.clone_from(x) }
+        if let Some(x) = flags { message.flags.clone_from(x) }
+        if let Some(x) = referenced_message { message.referenced_message.clone_from(x) }
+        if let Some(x) = interaction { message.interaction.clone_from(x) }
+        if let Some(x) = thread { message.thread.clone_from(x) }
+        if let Some(x) = components { message.components.clone_from(x) }
+        if let Some(x) = sticker_items { message.sticker_items.clone_from(x) }
+        if let Some(x) = position { message.position.clone_from(x) }
+        if let Some(x) = role_subscription_data { message.role_subscription_data.clone_from(x) }
         message.guild_id = *guild_id;
-        if let Some(x) = member { message.member = x.clone() }
+        if let Some(x) = member { message.member.clone_from(x) }
     }
 }
 

@@ -379,7 +379,7 @@ impl IntoFuture for ClientBuilder {
                 shard_init: 0,
                 shard_total: 0,
                 #[cfg(feature = "voice")]
-                voice_manager: voice_manager.as_ref().map(Arc::clone),
+                voice_manager: voice_manager.clone(),
                 ws_url: Arc::clone(&ws_url),
                 #[cfg(feature = "cache")]
                 cache: Arc::clone(&cache),
