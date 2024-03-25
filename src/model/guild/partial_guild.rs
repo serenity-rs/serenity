@@ -1095,7 +1095,40 @@ impl PartialGuild {
     #[cfg(feature = "cache")]
     #[must_use]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
-        Guild::_user_permissions_in(None, member, &self.roles, self.owner_id, self.id)
+        Guild::_user_permissions_in(
+            None,
+            member.user.id,
+            &member.roles,
+            self.id,
+            &self.roles,
+            self.owner_id,
+        )
+    }
+
+    /// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+    #[must_use]
+    pub fn partial_member_permissions_in(
+        &self,
+        channel: &GuildChannel,
+        member_id: UserId,
+        member: &PartialMember,
+    ) -> Permissions {
+        if let Some(user) = &member.user {
+            assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
+        }
+
+        Guild::_user_permissions_in(
+            Some(channel),
+            member_id,
+            &member.roles,
+            self.id,
+            &self.roles,
+            self.owner_id,
+        )
     }
 
     /// Re-orders the channels of the guild.
@@ -1336,7 +1369,14 @@ impl PartialGuild {
     #[inline]
     #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
-        Guild::_user_permissions_in(Some(channel), member, &self.roles, self.owner_id, self.id)
+        Guild::_user_permissions_in(
+            Some(channel),
+            member.user.id,
+            &member.roles,
+            self.id,
+            &self.roles,
+            self.owner_id,
+        )
     }
 
     /// Calculate a [`Role`]'s permissions in a given channel in the guild.
