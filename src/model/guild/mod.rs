@@ -1372,13 +1372,13 @@ impl Guild {
         lhs_id: impl Into<UserId>,
         rhs_id: impl Into<UserId>,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
+        self._greater_member_hierarchy(cache.as_ref(), lhs_id.into(), rhs_id.into())
     }
 
     #[cfg(feature = "cache")]
     fn _greater_member_hierarchy(
         &self,
-        cache: impl AsRef<Cache>,
+        cache: &Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -1395,9 +1395,9 @@ impl Guild {
         }
 
         let lhs =
-            self.members.get(&lhs_id)?.highest_role_info(&cache).unwrap_or((RoleId::new(1), 0));
+            self.members.get(&lhs_id)?.highest_role_info(cache).unwrap_or((RoleId::new(1), 0));
         let rhs =
-            self.members.get(&rhs_id)?.highest_role_info(&cache).unwrap_or((RoleId::new(1), 0));
+            self.members.get(&rhs_id)?.highest_role_info(cache).unwrap_or((RoleId::new(1), 0));
 
         // If LHS and RHS both have no top position or have the same role ID, then no one wins.
         if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
