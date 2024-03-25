@@ -1352,6 +1352,33 @@ impl Guild {
         guild_id.into().to_partial_guild(cache_http).await
     }
 
+    /// Gets the highest role a [`Member`] of this Guild has.
+    ///
+    /// Returns None if the member has no roles or the member from this guild.
+    #[must_use]
+    pub fn member_highest_role(&self, member: &Member) -> Option<&Role> {
+        let mut highest: Option<&Role> = None;
+
+        for role_id in &member.roles {
+            if let Some(role) = self.roles.get(role_id) {
+                // Skip this role if this role in iteration has:
+                // - a position less than the recorded highest
+                // - a position equal to the recorded, but a higher ID
+                if let Some(highest) = highest {
+                    if role.position < highest.position
+                        || (role.position == highest.position && role.id > highest.id)
+                    {
+                        continue;
+                    }
+                }
+
+                highest = Some(role);
+            }
+        }
+
+        highest
+    }
+
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
     /// Hierarchy is essentially who has the [`Role`] with the highest [`position`].
@@ -1368,20 +1395,15 @@ impl Guild {
     #[inline]
     pub fn greater_member_hierarchy(
         &self,
-        cache: impl AsRef<Cache>,
+        #[allow(unused_variables)] _cache: impl AsRef<Cache>,
         lhs_id: impl Into<UserId>,
         rhs_id: impl Into<UserId>,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(cache.as_ref(), lhs_id.into(), rhs_id.into())
+        self._greater_member_hierarchy(lhs_id.into(), rhs_id.into())
     }
 
     #[cfg(feature = "cache")]
-    fn _greater_member_hierarchy(
-        &self,
-        cache: &Cache,
-        lhs_id: UserId,
-        rhs_id: UserId,
-    ) -> Option<UserId> {
+    fn _greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
             return None;
@@ -1394,10 +1416,13 @@ impl Guild {
             return Some(rhs_id);
         }
 
-        let lhs =
-            self.members.get(&lhs_id)?.highest_role_info(cache).unwrap_or((RoleId::new(1), 0));
-        let rhs =
-            self.members.get(&rhs_id)?.highest_role_info(cache).unwrap_or((RoleId::new(1), 0));
+        let lhs = self
+            .member_highest_role(self.members.get(&lhs_id)?)
+            .map_or((RoleId::new(1), 0), |r| (r.id, r.position));
+
+        let rhs = self
+            .member_highest_role(self.members.get(&rhs_id)?)
+            .map_or((RoleId::new(1), 0), |r| (r.id, r.position));
 
         // If LHS and RHS both have no top position or have the same role ID, then no one wins.
         if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
