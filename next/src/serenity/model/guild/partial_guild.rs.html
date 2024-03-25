@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><title>partial_guild.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (1388d7a06 2024-03-20)" data-channel="nightly" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><title>partial_guild.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (0824b300e 2024-03-24)" data-channel="nightly" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1414,14 +1414,6 @@
 <a href="#1412" id="1412">1412</a>
 <a href="#1413" id="1413">1413</a>
 <a href="#1414" id="1414">1414</a>
-<a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
-<a href="#1417" id="1417">1417</a>
-<a href="#1418" id="1418">1418</a>
-<a href="#1419" id="1419">1419</a>
-<a href="#1420" id="1420">1420</a>
-<a href="#1421" id="1421">1421</a>
-<a href="#1422" id="1422">1422</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>nonmax::{NonMaxU16, NonMaxU64, NonMaxU8};
 <span class="kw">use </span>serde::Serialize;
 
@@ -2335,70 +2327,55 @@
     ///
     /// [`position`]: Role::position
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+    #[deprecated = <span class="string">"Use Cache::guild and Guild::greater_member_hierarchy"</span>]
     </span><span class="kw">pub fn </span>greater_member_hierarchy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache: <span class="kw-2">&amp;</span>Cache,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
-        <span class="comment">// Check that the IDs are the same. If they are, neither is greater.
-        </span><span class="kw">if </span>lhs_id == rhs_id {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
-        }
-
-        <span class="comment">// Check if either user is the guild owner.
-        </span><span class="kw">if </span>lhs_id == <span class="self">self</span>.owner_id {
-            <span class="kw">return </span><span class="prelude-val">Some</span>(lhs_id);
-        } <span class="kw">else if </span>rhs_id == <span class="self">self</span>.owner_id {
-            <span class="kw">return </span><span class="prelude-val">Some</span>(rhs_id);
-        }
-
-        <span class="kw">let </span>(lhs, rhs) = {
-            <span class="kw">let </span>default = (RoleId::new(<span class="number">1</span>), <span class="number">0</span>);
-
-            <span class="comment">// Clone is necessary, highest_role_info goes into cache.
-            </span><span class="kw">let </span>(lhs, rhs) = {
-                <span class="kw">let </span>guild = cache.guild(<span class="self">self</span>.id)<span class="question-mark">?</span>;
-                (guild.members.get(<span class="kw-2">&amp;</span>lhs_id)<span class="question-mark">?</span>.clone(), guild.members.get(<span class="kw-2">&amp;</span>rhs_id)<span class="question-mark">?</span>.clone())
-            };
-
-            (
-                lhs.highest_role_info(cache).unwrap_or(default),
-                rhs.highest_role_info(cache).unwrap_or(default),
-            )
-        };
-
-        <span class="comment">// If LHS and RHS both have no top position or have the same role ID, then no one wins.
-        </span><span class="kw">if </span>(lhs.<span class="number">1 </span>== <span class="number">0 </span>&amp;&amp; rhs.<span class="number">1 </span>== <span class="number">0</span>) || (lhs.<span class="number">0 </span>== rhs.<span class="number">0</span>) {
-            <span class="kw">return </span><span class="prelude-val">None</span>;
-        }
-
-        <span class="comment">// If LHS's top position is higher than RHS, then LHS wins.
-        </span><span class="kw">if </span>lhs.<span class="number">1 </span>&gt; rhs.<span class="number">1 </span>{
-            <span class="kw">return </span><span class="prelude-val">Some</span>(lhs_id);
-        }
-
-        <span class="comment">// If RHS's top position is higher than LHS, then RHS wins.
-        </span><span class="kw">if </span>rhs.<span class="number">1 </span>&gt; lhs.<span class="number">1 </span>{
-            <span class="kw">return </span><span class="prelude-val">Some</span>(rhs_id);
-        }
-
-        <span class="comment">// If LHS and RHS both have the same position, but LHS has the lower role ID, then LHS
-        // wins.
-        //
-        // If RHS has the higher role ID, then RHS wins.
-        </span><span class="kw">if </span>lhs.<span class="number">1 </span>== rhs.<span class="number">1 </span>&amp;&amp; lhs.<span class="number">0 </span>&lt; rhs.<span class="number">0 </span>{
-            <span class="prelude-val">Some</span>(lhs_id)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(rhs_id)
-        }
+        <span class="kw">let </span>guild = cache.guild(<span class="self">self</span>.id)<span class="question-mark">?</span>;
+        guild.greater_member_hierarchy(cache, lhs_id, rhs_id)
     }
 
     <span class="doccomment">/// Calculate a [`Member`]'s permissions in the guild.
     </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
-        Guild::_user_permissions_in(<span class="prelude-val">None</span>, member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
+        Guild::_user_permissions_in(
+            <span class="prelude-val">None</span>,
+            member.user.id,
+            <span class="kw-2">&amp;</span>member.roles,
+            <span class="self">self</span>.id,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+            <span class="self">self</span>.owner_id,
+        )
+    }
+
+    <span class="doccomment">/// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>partial_member_permissions_in(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        channel: <span class="kw-2">&amp;</span>GuildChannel,
+        member_id: UserId,
+        member: <span class="kw-2">&amp;</span>PartialMember,
+    ) -&gt; Permissions {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="kw-2">&amp;</span>member.user {
+            <span class="macro">assert_eq!</span>(user.id, member_id, <span class="string">"User::id does not match provided PartialMember"</span>);
+        }
+
+        Guild::_user_permissions_in(
+            <span class="prelude-val">Some</span>(channel),
+            member_id,
+            <span class="kw-2">&amp;</span>member.roles,
+            <span class="self">self</span>.id,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+            <span class="self">self</span>.owner_id,
+        )
     }
 
     <span class="doccomment">/// Re-orders the channels of the guild.
@@ -2616,7 +2593,14 @@
     <span class="doccomment">/// Calculate a [`Member`]'s permissions in a given channel in the guild.
     </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>user_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
-        Guild::_user_permissions_in(<span class="prelude-val">Some</span>(channel), member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
+        Guild::_user_permissions_in(
+            <span class="prelude-val">Some</span>(channel),
+            member.user.id,
+            <span class="kw-2">&amp;</span>member.roles,
+            <span class="self">self</span>.id,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+            <span class="self">self</span>.owner_id,
+        )
     }
 
     <span class="doccomment">/// Gets the number of [`Member`]s that would be pruned with the given number of days.
