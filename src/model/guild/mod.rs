@@ -1269,7 +1269,6 @@ impl Guild {
     ///
     /// [`position`]: Role::position
     #[must_use]
-    #[cfg(feature = "cache")]
     pub fn greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
