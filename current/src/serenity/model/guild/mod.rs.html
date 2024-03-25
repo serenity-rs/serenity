@@ -2832,6 +2832,31 @@
 <a href="#2830" id="2830">2830</a>
 <a href="#2831" id="2831">2831</a>
 <a href="#2832" id="2832">2832</a>
+<a href="#2833" id="2833">2833</a>
+<a href="#2834" id="2834">2834</a>
+<a href="#2835" id="2835">2835</a>
+<a href="#2836" id="2836">2836</a>
+<a href="#2837" id="2837">2837</a>
+<a href="#2838" id="2838">2838</a>
+<a href="#2839" id="2839">2839</a>
+<a href="#2840" id="2840">2840</a>
+<a href="#2841" id="2841">2841</a>
+<a href="#2842" id="2842">2842</a>
+<a href="#2843" id="2843">2843</a>
+<a href="#2844" id="2844">2844</a>
+<a href="#2845" id="2845">2845</a>
+<a href="#2846" id="2846">2846</a>
+<a href="#2847" id="2847">2847</a>
+<a href="#2848" id="2848">2848</a>
+<a href="#2849" id="2849">2849</a>
+<a href="#2850" id="2850">2850</a>
+<a href="#2851" id="2851">2851</a>
+<a href="#2852" id="2852">2852</a>
+<a href="#2853" id="2853">2853</a>
+<a href="#2854" id="2854">2854</a>
+<a href="#2855" id="2855">2855</a>
+<a href="#2856" id="2856">2856</a>
+<a href="#2857" id="2857">2857</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4186,6 +4211,33 @@
         guild_id.into().to_partial_guild(cache_http).<span class="kw">await
     </span>}
 
+    <span class="doccomment">/// Gets the highest role a [`Member`] of this Guild has.
+    ///
+    /// Returns None if the member has no roles or the member from this guild.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>member_highest_role(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>highest: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; = <span class="prelude-val">None</span>;
+
+        <span class="kw">for </span>role_id <span class="kw">in </span><span class="kw-2">&amp;</span>member.roles {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = <span class="self">self</span>.roles.get(role_id) {
+                <span class="comment">// Skip this role if this role in iteration has:
+                // - a position less than the recorded highest
+                // - a position equal to the recorded, but a higher ID
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(highest) = highest {
+                    <span class="kw">if </span>role.position &lt; highest.position
+                        || (role.position == highest.position &amp;&amp; role.id &gt; highest.id)
+                    {
+                        <span class="kw">continue</span>;
+                    }
+                }
+
+                highest = <span class="prelude-val">Some</span>(role);
+            }
+        }
+
+        highest
+    }
+
     <span class="doccomment">/// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
     /// Hierarchy is essentially who has the [`Role`] with the highest [`position`].
@@ -4202,20 +4254,15 @@
     #[inline]
     </span><span class="kw">pub fn </span>greater_member_hierarchy(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
+        <span class="attr">#[allow(unused_variables)] </span>_cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
         lhs_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
         rhs_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
-        <span class="self">self</span>._greater_member_hierarchy(<span class="kw-2">&amp;</span>cache, lhs_id.into(), rhs_id.into())
+        <span class="self">self</span>._greater_member_hierarchy(lhs_id.into(), rhs_id.into())
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    </span><span class="kw">fn </span>_greater_member_hierarchy(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache: <span class="kw">impl </span>AsRef&lt;Cache&gt;,
-        lhs_id: UserId,
-        rhs_id: UserId,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
+    </span><span class="kw">fn </span>_greater_member_hierarchy(<span class="kw-2">&amp;</span><span class="self">self</span>, lhs_id: UserId, rhs_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;UserId&gt; {
         <span class="comment">// Check that the IDs are the same. If they are, neither is greater.
         </span><span class="kw">if </span>lhs_id == rhs_id {
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -4228,10 +4275,13 @@
             <span class="kw">return </span><span class="prelude-val">Some</span>(rhs_id);
         }
 
-        <span class="kw">let </span>lhs =
-            <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>lhs_id)<span class="question-mark">?</span>.highest_role_info(<span class="kw-2">&amp;</span>cache).unwrap_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>));
-        <span class="kw">let </span>rhs =
-            <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>rhs_id)<span class="question-mark">?</span>.highest_role_info(<span class="kw-2">&amp;</span>cache).unwrap_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>));
+        <span class="kw">let </span>lhs = <span class="self">self
+            </span>.member_highest_role(<span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>lhs_id)<span class="question-mark">?</span>)
+            .map_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>), |r| (r.id, r.position));
+
+        <span class="kw">let </span>rhs = <span class="self">self
+            </span>.member_highest_role(<span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>rhs_id)<span class="question-mark">?</span>)
+            .map_or((RoleId::new(<span class="number">1</span>), <span class="number">0</span>), |r| (r.id, r.position));
 
         <span class="comment">// If LHS and RHS both have no top position or have the same role ID, then no one wins.
         </span><span class="kw">if </span>(lhs.<span class="number">1 </span>== <span class="number">0 </span>&amp;&amp; rhs.<span class="number">1 </span>== <span class="number">0</span>) || (lhs.<span class="number">0 </span>== rhs.<span class="number">0</span>) {
