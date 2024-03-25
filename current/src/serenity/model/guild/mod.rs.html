@@ -2792,6 +2792,46 @@
 <a href="#2790" id="2790">2790</a>
 <a href="#2791" id="2791">2791</a>
 <a href="#2792" id="2792">2792</a>
+<a href="#2793" id="2793">2793</a>
+<a href="#2794" id="2794">2794</a>
+<a href="#2795" id="2795">2795</a>
+<a href="#2796" id="2796">2796</a>
+<a href="#2797" id="2797">2797</a>
+<a href="#2798" id="2798">2798</a>
+<a href="#2799" id="2799">2799</a>
+<a href="#2800" id="2800">2800</a>
+<a href="#2801" id="2801">2801</a>
+<a href="#2802" id="2802">2802</a>
+<a href="#2803" id="2803">2803</a>
+<a href="#2804" id="2804">2804</a>
+<a href="#2805" id="2805">2805</a>
+<a href="#2806" id="2806">2806</a>
+<a href="#2807" id="2807">2807</a>
+<a href="#2808" id="2808">2808</a>
+<a href="#2809" id="2809">2809</a>
+<a href="#2810" id="2810">2810</a>
+<a href="#2811" id="2811">2811</a>
+<a href="#2812" id="2812">2812</a>
+<a href="#2813" id="2813">2813</a>
+<a href="#2814" id="2814">2814</a>
+<a href="#2815" id="2815">2815</a>
+<a href="#2816" id="2816">2816</a>
+<a href="#2817" id="2817">2817</a>
+<a href="#2818" id="2818">2818</a>
+<a href="#2819" id="2819">2819</a>
+<a href="#2820" id="2820">2820</a>
+<a href="#2821" id="2821">2821</a>
+<a href="#2822" id="2822">2822</a>
+<a href="#2823" id="2823">2823</a>
+<a href="#2824" id="2824">2824</a>
+<a href="#2825" id="2825">2825</a>
+<a href="#2826" id="2826">2826</a>
+<a href="#2827" id="2827">2827</a>
+<a href="#2828" id="2828">2828</a>
+<a href="#2829" id="2829">2829</a>
+<a href="#2830" id="2830">2830</a>
+<a href="#2831" id="2831">2831</a>
+<a href="#2832" id="2832">2832</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4659,7 +4699,14 @@
     #[cfg(feature = <span class="string">"cache"</span>)]
     #[must_use]
     </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
-        <span class="self">Self</span>::_user_permissions_in(<span class="prelude-val">None</span>, member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
+        <span class="self">Self</span>::_user_permissions_in(
+            <span class="prelude-val">None</span>,
+            member.user.id,
+            <span class="kw-2">&amp;</span>member.roles,
+            <span class="self">self</span>.id,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+            <span class="self">self</span>.owner_id,
+        )
     }
 
     <span class="doccomment">/// Moves a member to a specific voice channel.
@@ -4686,16 +4733,50 @@
     </span><span class="attr">#[inline]
     #[must_use]
     </span><span class="kw">pub fn </span>user_permissions_in(<span class="kw-2">&amp;</span><span class="self">self</span>, channel: <span class="kw-2">&amp;</span>GuildChannel, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
-        <span class="self">Self</span>::_user_permissions_in(<span class="prelude-val">Some</span>(channel), member, <span class="kw-2">&amp;</span><span class="self">self</span>.roles, <span class="self">self</span>.owner_id, <span class="self">self</span>.id)
+        <span class="self">Self</span>::_user_permissions_in(
+            <span class="prelude-val">Some</span>(channel),
+            member.user.id,
+            <span class="kw-2">&amp;</span>member.roles,
+            <span class="self">self</span>.id,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+            <span class="self">self</span>.owner_id,
+        )
+    }
+
+    <span class="doccomment">/// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>partial_member_permissions_in(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        channel: <span class="kw-2">&amp;</span>GuildChannel,
+        member_id: UserId,
+        member: <span class="kw-2">&amp;</span>PartialMember,
+    ) -&gt; Permissions {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="kw-2">&amp;</span>member.user {
+            <span class="macro">assert_eq!</span>(user.id, member_id, <span class="string">"User::id does not match provided PartialMember"</span>);
+        }
+
+        <span class="self">Self</span>::_user_permissions_in(
+            <span class="prelude-val">Some</span>(channel),
+            member_id,
+            <span class="kw-2">&amp;</span>member.roles,
+            <span class="self">self</span>.id,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+            <span class="self">self</span>.owner_id,
+        )
     }
 
     <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>_user_permissions_in(
         channel: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>GuildChannel&gt;,
-        member: <span class="kw-2">&amp;</span>Member,
+        member_user_id: UserId,
+        member_roles: <span class="kw-2">&amp;</span>[RoleId],
+        guild_id: GuildId,
         guild_roles: <span class="kw-2">&amp;</span>HashMap&lt;RoleId, Role&gt;,
         guild_owner_id: UserId,
-        guild_id: GuildId,
     ) -&gt; Permissions {
         <span class="kw">let </span><span class="kw-2">mut </span>everyone_allow_overwrites = Permissions::empty();
         <span class="kw">let </span><span class="kw-2">mut </span>everyone_deny_overwrites = Permissions::empty();
@@ -4708,7 +4789,7 @@
             <span class="kw">for </span>overwrite <span class="kw">in </span><span class="kw-2">&amp;</span>channel.permission_overwrites {
                 <span class="kw">match </span>overwrite.kind {
                     PermissionOverwriteType::Member(user_id) =&gt; {
-                        <span class="kw">if </span>member.user.id == user_id {
+                        <span class="kw">if </span>member_user_id == user_id {
                             member_allow_overwrites = overwrite.allow;
                             member_deny_overwrites = overwrite.deny;
                         }
@@ -4717,7 +4798,7 @@
                         <span class="kw">if </span>role_id.get() == guild_id.get() {
                             everyone_allow_overwrites = overwrite.allow;
                             everyone_deny_overwrites = overwrite.deny;
-                        } <span class="kw">else if </span>member.roles.contains(<span class="kw-2">&amp;</span>role_id) {
+                        } <span class="kw">else if </span>member_roles.contains(<span class="kw-2">&amp;</span>role_id) {
                             roles_allow_overwrites.push(overwrite.allow);
                             roles_deny_overwrites.push(overwrite.deny);
                         }
@@ -4727,7 +4808,7 @@
         }
 
         calculate_permissions(CalculatePermissions {
-            is_guild_owner: member.user.id == guild_owner_id,
+            is_guild_owner: member_user_id == guild_owner_id,
             everyone_permissions: <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(<span class="kw-2">&amp;</span>RoleId::new(guild_id.get()))
             {
                 role.permissions
@@ -4735,8 +4816,7 @@
                 <span class="macro">error!</span>(<span class="string">"@everyone role missing in {}"</span>, guild_id);
                 Permissions::empty()
             },
-            user_roles_permissions: member
-                .roles
+            user_roles_permissions: member_roles
                 .iter()
                 .map(|role_id| {
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(role_id) {
@@ -4744,7 +4824,7 @@
                     } <span class="kw">else </span>{
                         <span class="macro">warn!</span>(
                             <span class="string">"{} on {} has non-existent role {:?}"</span>,
-                            member.user.id, guild_id, role_id
+                            member_user_id, guild_id, role_id
                         );
                         Permissions::empty()
                     }
