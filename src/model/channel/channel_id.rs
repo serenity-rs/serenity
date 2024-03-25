@@ -1007,6 +1007,22 @@ impl ChannelId {
         http.as_ref().remove_thread_channel_member(self, user_id).await
     }
 
+    /// Gets a thread member, if this channel is a thread.
+    ///
+    /// `with_member` controls if ThreadMember::member should be `Some`
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the channel is not a thread channel
+    pub async fn get_thread_member(
+        self,
+        http: impl AsRef<Http>,
+        user_id: UserId,
+        with_member: bool,
+    ) -> Result<ThreadMember> {
+        http.as_ref().get_thread_channel_member(self, user_id, with_member).await
+    }
+
     /// Gets private archived threads of a channel.
     ///
     /// # Errors

@@ -2988,6 +2988,26 @@ impl Http {
         .await
     }
 
+    pub async fn get_thread_channel_member(
+        &self,
+        channel_id: ChannelId,
+        user_id: UserId,
+        with_member: bool,
+    ) -> Result<ThreadMember> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::ChannelThreadMember {
+                channel_id,
+                user_id,
+            },
+            params: Some(vec![("with_member", with_member.to_string())]),
+        })
+        .await
+    }
+
     /// Retrieves the webhooks for the given [channel][`GuildChannel`]'s Id.
     ///
     /// This method requires authentication.
