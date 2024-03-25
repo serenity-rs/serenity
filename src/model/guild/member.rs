@@ -283,27 +283,14 @@ impl Member {
     /// The "highest role in hierarchy" is defined as the role with the highest position. If two or
     /// more roles have the same highest position, then the role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
+    #[deprecated = "Use Guild::member_highest_role"]
     pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, u16)> {
-        let guild = cache.as_ref().guild(self.guild_id)?;
-
-        let mut highest = None;
-
-        for role_id in &self.roles {
-            if let Some(role) = guild.roles.get(role_id) {
-                // Skip this role if this role in iteration has:
-                // - a position less than the recorded highest
-                // - a position equal to the recorded, but a higher ID
-                if let Some((id, pos)) = highest {
-                    if role.position < pos || (role.position == pos && role.id > id) {
-                        continue;
-                    }
-                }
-
-                highest = Some((role.id, role.position));
-            }
-        }
-
-        highest
+        cache
+            .as_ref()
+            .guild(self.guild_id)
+            .as_ref()
+            .and_then(|g| g.member_highest_role(self))
+            .map(|r| (r.id, r.position))
     }
 
     /// Kick the member from the guild.
