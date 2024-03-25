@@ -2118,11 +2118,11 @@
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     </span><span class="kw">pub async fn </span>get_thread_member(
         <span class="self">self</span>,
-        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+        http: <span class="kw-2">&amp;</span>Http,
         user_id: UserId,
         with_member: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ThreadMember&gt; {
-        http.as_ref().get_thread_channel_member(<span class="self">self</span>, user_id, with_member).<span class="kw">await
+        http.get_thread_channel_member(<span class="self">self</span>, user_id, with_member).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets private archived threads of a channel.
