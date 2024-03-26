@@ -272,24 +272,6 @@ impl Member {
         Ok(())
     }
 
-    /// Retrieves the ID and position of the member's highest role in the hierarchy, if they have
-    /// one.
-    ///
-    /// This _may_ return [`None`] if the user has roles, but they are not present in the cache for
-    /// cache inconsistency reasons.
-    ///
-    /// The "highest role in hierarchy" is defined as the role with the highest position. If two or
-    /// more roles have the same highest position, then the role with the lowest ID is the highest.
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Guild::member_highest_role"]
-    pub fn highest_role_info(&self, cache: &Cache) -> Option<(RoleId, i16)> {
-        cache
-            .guild(self.guild_id)
-            .as_ref()
-            .and_then(|g| g.member_highest_role(self))
-            .map(|r| (r.id, r.position))
-    }
-
     /// Kick the member from the guild.
     ///
     /// **Note**: Requires the [Kick Members] permission.
