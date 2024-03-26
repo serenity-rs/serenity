@@ -367,7 +367,7 @@ impl Guild {
     fn check_hierarchy(&self, cache: &Cache, other_user: UserId) -> Result<()> {
         let current_id = cache.current_user().id;
 
-        if let Some(higher) = self.greater_member_hierarchy(cache, other_user, current_id) {
+        if let Some(higher) = self.greater_member_hierarchy(other_user, current_id) {
             if higher != current_id {
                 return Err(Error::Model(ModelError::Hierarchy));
             }
@@ -1309,13 +1309,8 @@ impl Guild {
     /// owner, their ID is returned.
     ///
     /// [`position`]: Role::position
-    #[cfg(feature = "cache")]
-    pub fn greater_member_hierarchy(
-        &self,
-        #[allow(unused_variables)] cache: &Cache,
-        lhs_id: UserId,
-        rhs_id: UserId,
-    ) -> Option<UserId> {
+    #[must_use]
+    pub fn greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
             return None;
