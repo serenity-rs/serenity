@@ -15,8 +15,6 @@ use crate::builder::{
     EditRole,
     EditSticker,
 };
-#[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
-use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "collector")]
@@ -896,30 +894,6 @@ impl PartialGuild {
     /// in the guild.
     pub async fn get(cache_http: impl CacheHttp, guild_id: GuildId) -> Result<PartialGuild> {
         guild_id.to_partial_guild(cache_http).await
-    }
-
-    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
-    ///
-    /// Hierarchy is essentially who has the [`Role`] with the highest [`position`].
-    ///
-    /// Returns [`None`] if at least one of the given users' member instances is not present.
-    /// Returns [`None`] if the users have the same hierarchy, as neither are greater than the
-    /// other.
-    ///
-    /// If both user IDs are the same, [`None`] is returned. If one of the users is the guild
-    /// owner, their ID is returned.
-    ///
-    /// [`position`]: Role::position
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Cache::guild and Guild::greater_member_hierarchy"]
-    pub fn greater_member_hierarchy(
-        &self,
-        cache: &Cache,
-        lhs_id: UserId,
-        rhs_id: UserId,
-    ) -> Option<UserId> {
-        let guild = cache.guild(self.id)?;
-        guild.greater_member_hierarchy(cache, lhs_id, rhs_id)
     }
 
     /// Calculate a [`Member`]'s permissions in the guild.
