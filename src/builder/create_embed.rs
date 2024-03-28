@@ -271,7 +271,8 @@ impl From<EmbedAuthor> for CreateEmbedAuthor {
 
 impl From<User> for CreateEmbedAuthor {
     fn from(user: User) -> Self {
-        Self::new(user.name).icon_url(user.face())
+        let avatar_icon = user.face();
+        Self::new(user.name).icon_url(avatar_icon)
     }
 }
 
