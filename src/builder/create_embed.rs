@@ -269,6 +269,7 @@ impl From<EmbedAuthor> for CreateEmbedAuthor {
     }
 }
 
+#[cfg(feature = "model")]
 impl From<User> for CreateEmbedAuthor {
     fn from(user: User) -> Self {
         let avatar_icon = user.face();
