@@ -617,13 +617,19 @@ impl Guild {
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://discord.com/developers/docs/change-log#deprecating-guild-creation-by-apps"]
     pub async fn create(http: &Http, name: &str, icon: Option<ImageHash>) -> Result<PartialGuild> {
-        let map = serde_json::json!({
-            "icon": icon,
-            "name": name,
-        });
+        #[derive(serde::Serialize)]
+        struct CreateGuild<'a> {
+            name: &'a str,
+            icon: Option<ImageHash>,
+        }
+
+        let body = CreateGuild {
+            name,
+            icon,
+        };
 
         #[allow(deprecated)]
-        http.create_guild(&map).await
+        http.create_guild(&body).await
     }
 
     /// Creates a new [`Channel`] in the guild.
