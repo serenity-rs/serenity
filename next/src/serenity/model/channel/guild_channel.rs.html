@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (5f2c7d2bf 2024-03-25)" data-channel="nightly" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/guild_channel.rs`."><title>guild_channel.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (c9f8f3438 2024-03-27)" data-channel="nightly" data-search-js="search-42d8da7a6b9792c2.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-12cf3b4f4f9dc36d.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1051,14 +1051,6 @@
 <a href="#1049" id="1049">1049</a>
 <a href="#1050" id="1050">1050</a>
 <a href="#1051" id="1051">1051</a>
-<a href="#1052" id="1052">1052</a>
-<a href="#1053" id="1053">1053</a>
-<a href="#1054" id="1054">1054</a>
-<a href="#1055" id="1055">1055</a>
-<a href="#1056" id="1056">1056</a>
-<a href="#1057" id="1057">1057</a>
-<a href="#1058" id="1058">1058</a>
-<a href="#1059" id="1059">1059</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1530,7 +1522,7 @@
     /// [Mute Members]: Permissions::MUTE_MEMBERS
     </span><span class="kw">pub async fn </span>edit_voice_state(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         user_id: UserId,
         builder: EditVoiceState,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
@@ -1538,7 +1530,7 @@
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::from(ModelError::InvalidChannelType));
         }
 
-        builder.execute(cache_http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id)).<span class="kw">await
+        builder.execute(http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">Some</span>(user_id)).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the current user's voice state in a stage channel.
@@ -1587,12 +1579,8 @@
     ///
     /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
     /// [Mute Members]: Permissions::MUTE_MEMBERS
-    </span><span class="kw">pub async fn </span>edit_own_voice_state(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: EditVoiceState,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        builder.execute(cache_http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>edit_own_voice_state(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: EditVoiceState) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        builder.execute(http, <span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Follows the News Channel
@@ -1963,18 +1951,14 @@
     ///
     /// See [`CreateWebhook::execute`] for a detailed list of other
     /// possible errors,
-    </span><span class="kw">pub async fn </span>create_webhook(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateWebhook&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
+    </span><span class="kw">pub async fn </span>create_webhook(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateWebhook&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Webhook&gt; {
         <span class="comment">// forum channels are not text-based, but webhooks can be created in them
         // and used to send messages in their posts
         </span><span class="kw">if </span>!<span class="self">self</span>.is_text_based() &amp;&amp; <span class="self">self</span>.kind != ChannelType::Forum {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
         }
 
-        <span class="self">self</span>.id.create_webhook(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_webhook(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets a stage instance.
@@ -2001,14 +1985,14 @@
     /// Returns [`Error::Http`] if there is already a stage instance currently.
     </span><span class="kw">pub async fn </span>create_stage_instance(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
         <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
         }
 
-        <span class="self">self</span>.id.create_stage_instance(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_stage_instance(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the stage instance
@@ -2021,14 +2005,14 @@
     /// instance currently.
     </span><span class="kw">pub async fn </span>edit_stage_instance(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: EditStageInstance&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;StageInstance&gt; {
         <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
         }
 
-        <span class="self">self</span>.id.edit_stage_instance(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.edit_stage_instance(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a stage instance.
