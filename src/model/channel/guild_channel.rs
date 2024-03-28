@@ -478,7 +478,7 @@ impl GuildChannel {
     /// [Mute Members]: Permissions::MUTE_MEMBERS
     pub async fn edit_voice_state(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         user_id: UserId,
         builder: EditVoiceState,
     ) -> Result<()> {
@@ -486,7 +486,7 @@ impl GuildChannel {
             return Err(Error::from(ModelError::InvalidChannelType));
         }
 
-        builder.execute(cache_http, self.guild_id, self.id, Some(user_id)).await
+        builder.execute(http, self.guild_id, self.id, Some(user_id)).await
     }
 
     /// Edits the current user's voice state in a stage channel.
@@ -535,12 +535,8 @@ impl GuildChannel {
     ///
     /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
     /// [Mute Members]: Permissions::MUTE_MEMBERS
-    pub async fn edit_own_voice_state(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: EditVoiceState,
-    ) -> Result<()> {
-        builder.execute(cache_http, self.guild_id, self.id, None).await
+    pub async fn edit_own_voice_state(&self, http: &Http, builder: EditVoiceState) -> Result<()> {
+        builder.execute(http, self.guild_id, self.id, None).await
     }
 
     /// Follows the News Channel
@@ -910,18 +906,14 @@ impl GuildChannel {
     ///
     /// See [`CreateWebhook::execute`] for a detailed list of other
     /// possible errors,
-    pub async fn create_webhook(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateWebhook<'_>,
-    ) -> Result<Webhook> {
+    pub async fn create_webhook(&self, http: &Http, builder: CreateWebhook<'_>) -> Result<Webhook> {
         // forum channels are not text-based, but webhooks can be created in them
         // and used to send messages in their posts
         if !self.is_text_based() && self.kind != ChannelType::Forum {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        self.id.create_webhook(cache_http, builder).await
+        self.id.create_webhook(http, builder).await
     }
 
     /// Gets a stage instance.
@@ -948,14 +940,14 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if there is already a stage instance currently.
     pub async fn create_stage_instance(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateStageInstance<'_>,
     ) -> Result<StageInstance> {
         if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        self.id.create_stage_instance(cache_http, builder).await
+        self.id.create_stage_instance(http, builder).await
     }
 
     /// Edits the stage instance
@@ -968,14 +960,14 @@ impl GuildChannel {
     /// instance currently.
     pub async fn edit_stage_instance(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: EditStageInstance<'_>,
     ) -> Result<StageInstance> {
         if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        self.id.edit_stage_instance(cache_http, builder).await
+        self.id.edit_stage_instance(http, builder).await
     }
 
     /// Deletes a stage instance.
