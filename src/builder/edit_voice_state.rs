@@ -1,5 +1,5 @@
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -75,16 +75,16 @@ impl EditVoiceState {
     #[cfg(feature = "http")]
     pub async fn execute(
         mut self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         guild_id: GuildId,
         channel_id: ChannelId,
         user_id: Option<UserId>,
     ) -> Result<()> {
         self.channel_id = Some(channel_id);
         if let Some(user_id) = user_id {
-            cache_http.http().edit_voice_state(guild_id, user_id, &self).await
+            http.edit_voice_state(guild_id, user_id, &self).await
         } else {
-            cache_http.http().edit_voice_state_me(guild_id, &self).await
+            http.edit_voice_state_me(guild_id, &self).await
         }
     }
 }
