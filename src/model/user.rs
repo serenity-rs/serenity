@@ -7,8 +7,6 @@ use std::num::NonZeroU16;
 use std::ops::{Deref, DerefMut};
 
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "model")]
-use serde_json::json;
 
 use super::prelude::*;
 #[cfg(feature = "model")]
@@ -636,11 +634,16 @@ impl UserId {
     ///
     /// [current user]: CurrentUser
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
-        let map = json!({
-            "recipient_id": self,
-        });
+        #[derive(serde::Serialize)]
+        struct CreateDmChannel {
+            recipient_id: UserId,
+        }
 
-        cache_http.http().create_private_channel(&map).await
+        let body = CreateDmChannel {
+            recipient_id: self,
+        };
+
+        cache_http.http().create_private_channel(&body).await
     }
 
     /// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
