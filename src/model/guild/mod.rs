@@ -1485,15 +1485,11 @@ impl Guild {
     ///
     /// Returns an [`Error::Http`] if the user is not in the guild or if the guild is otherwise
     /// unavailable.
-    pub async fn member(
-        &self,
-        cache_http: impl CacheHttp,
-        user_id: UserId,
-    ) -> Result<Cow<'_, Member>> {
+    pub async fn member(&self, http: &Http, user_id: UserId) -> Result<Cow<'_, Member>> {
         if let Some(member) = self.members.get(&user_id) {
             Ok(Cow::Borrowed(member))
         } else {
-            cache_http.http().get_member(self.id, user_id).await.map(Cow::Owned)
+            http.get_member(self.id, user_id).await.map(Cow::Owned)
         }
     }
 

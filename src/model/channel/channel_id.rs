@@ -756,12 +756,8 @@ impl ChannelId {
     /// # Errors
     ///
     /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
-    pub async fn create_webhook(
-        self,
-        cache_http: impl CacheHttp,
-        builder: CreateWebhook<'_>,
-    ) -> Result<Webhook> {
-        builder.execute(cache_http, self).await
+    pub async fn create_webhook(self, http: &Http, builder: CreateWebhook<'_>) -> Result<Webhook> {
+        builder.execute(http, self).await
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this
@@ -807,10 +803,10 @@ impl ChannelId {
     /// Returns [`Error::Http`] if there is already a stage instance currently.
     pub async fn create_stage_instance(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateStageInstance<'_>,
     ) -> Result<StageInstance> {
-        builder.execute(cache_http, self).await
+        builder.execute(http, self).await
     }
 
     /// Edits the stage instance
@@ -823,10 +819,10 @@ impl ChannelId {
     /// instance currently.
     pub async fn edit_stage_instance(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: EditStageInstance<'_>,
     ) -> Result<StageInstance> {
-        builder.execute(cache_http, self).await
+        builder.execute(http, self).await
     }
 
     /// Edits a thread.
