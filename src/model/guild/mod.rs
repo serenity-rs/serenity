@@ -610,12 +610,18 @@ impl Guild {
     /// [`Shard`]: crate::gateway::Shard
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub async fn create(http: &Http, name: &str, icon: Option<ImageHash>) -> Result<PartialGuild> {
-        let map = serde_json::json!({
-            "icon": icon,
-            "name": name,
-        });
+        #[derive(serde::Serialize)]
+        struct CreateGuild<'a> {
+            name: &'a str,
+            icon: Option<ImageHash>,
+        }
 
-        http.create_guild(&map).await
+        let body = CreateGuild {
+            name,
+            icon,
+        };
+
+        http.create_guild(&body).await
     }
 
     /// Creates a new [`Channel`] in the guild.
