@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -52,11 +52,7 @@ impl<'a> EditStageInstance<'a> {
     /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
     /// instance currently.
     #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-    ) -> Result<StageInstance> {
-        cache_http.http().edit_stage_instance(channel_id, &self, self.audit_log_reason).await
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<StageInstance> {
+        http.edit_stage_instance(channel_id, &self, self.audit_log_reason).await
     }
 }

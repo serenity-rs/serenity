@@ -203,7 +203,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         let guild = guild_id.to_guild_cached(&ctx.cache).unwrap().clone();
         let perms = guild.user_permissions_in(
             &channel_id.to_channel(ctx).await?.guild().unwrap(),
-            &*guild.member(ctx, msg.author.id).await?,
+            &*guild.member(&ctx.http, msg.author.id).await?,
         );
         channel_id.say(ctx, format!("{:?}", perms)).await?;
     } else if let Some(forum_channel_id) = msg.content.strip_prefix("createforumpostin ") {
