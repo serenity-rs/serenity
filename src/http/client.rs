@@ -511,7 +511,7 @@ impl Http {
     pub async fn create_emoji(
         &self,
         guild_id: GuildId,
-        map: &Value,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
         self.fire(Request {
@@ -620,7 +620,7 @@ impl Http {
     /// over a [`Shard`], if at least one is running.
     ///
     /// [`Shard`]: crate::gateway::Shard
-    pub async fn create_guild(&self, map: &Value) -> Result<PartialGuild> {
+    pub async fn create_guild(&self, map: &impl serde::Serialize) -> Result<PartialGuild> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
@@ -659,7 +659,7 @@ impl Http {
         &self,
         guild_id: GuildId,
         integration_id: IntegrationId,
-        map: &Value,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -756,7 +756,10 @@ impl Http {
     }
 
     /// Creates a private channel with a user.
-    pub async fn create_private_channel(&self, map: &Value) -> Result<PrivateChannel> {
+    pub async fn create_private_channel(
+        &self,
+        map: &impl serde::Serialize,
+    ) -> Result<PrivateChannel> {
         let body = to_vec(map)?;
 
         self.fire(Request {
@@ -1426,7 +1429,7 @@ impl Http {
         &self,
         guild_id: GuildId,
         emoji_id: EmojiId,
-        map: &Value,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
         let body = to_vec(map)?;
@@ -1611,7 +1614,7 @@ impl Http {
     pub async fn edit_guild_mfa_level(
         &self,
         guild_id: GuildId,
-        value: &Value,
+        value: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<MfaLevel> {
         #[derive(Deserialize)]
@@ -1795,14 +1798,11 @@ impl Http {
     pub async fn edit_nickname(
         &self,
         guild_id: GuildId,
-        new_nickname: Option<&str>,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        let map = json!({ "nick": new_nickname });
-        let body = to_vec(&map)?;
-
         self.wind(200, Request {
-            body: Some(body),
+            body: Some(to_vec(&map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -1818,13 +1818,10 @@ impl Http {
     pub async fn follow_news_channel(
         &self,
         news_channel_id: ChannelId,
-        target_channel_id: ChannelId,
+        map: &impl serde::Serialize,
     ) -> Result<FollowedChannel> {
-        let map = json!({ "webhook_channel_id": target_channel_id });
-        let body = to_vec(&map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(&map)?),
             multipart: None,
             headers: None,
             method: LightMethod::Post,
@@ -1935,19 +1932,12 @@ impl Http {
     pub async fn edit_role_position(
         &self,
         guild_id: GuildId,
-        role_id: RoleId,
-        position: i16,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
-        let map = json!([{
-            "id": role_id,
-            "position": position,
-        }]);
-        let body = to_vec(&map)?;
-
         let mut value: Value = self
             .fire(Request {
-                body: Some(body),
+                body: Some(to_vec(&map)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 method: LightMethod::Patch,
