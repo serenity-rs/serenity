@@ -106,10 +106,14 @@ pub struct Message {
     pub flags: Option<MessageFlags>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
+    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Use interaction_metadata")]
+    #[allow(deprecated)]
+    pub interaction: Option<Box<MessageInteraction>>,
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::Interaction
-    pub interaction: Option<Box<MessageInteraction>>,
+    #[cfg(feature = "unstable_discord_api")]
+    pub interaction_metadata: Option<MessageInteractionMetadata>,
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<GuildChannel>,
     /// The components of this message
