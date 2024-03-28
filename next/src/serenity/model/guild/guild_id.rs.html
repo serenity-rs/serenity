@@ -1658,12 +1658,69 @@
 <a href="#1656" id="1656">1656</a>
 <a href="#1657" id="1657">1657</a>
 <a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
+<a href="#1665" id="1665">1665</a>
+<a href="#1666" id="1666">1666</a>
+<a href="#1667" id="1667">1667</a>
+<a href="#1668" id="1668">1668</a>
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
+<a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>futures::stream::Stream;
 <span class="kw">use </span>nonmax::{NonMaxU16, NonMaxU8};
-<span class="kw">use </span>serde_json::json;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::builder::{
@@ -1991,12 +2048,18 @@
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     </span><span class="kw">pub async fn </span>create_emoji(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, name: <span class="kw-2">&amp;</span>str, image: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">"name"</span>: name,
-            <span class="string">"image"</span>: image,
-        });
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>CreateEmoji&lt;<span class="lifetime">'a</span>&gt; {
+            name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+            image: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+        }
 
-        http.create_emoji(<span class="self">self</span>, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
+        <span class="kw">let </span>body = CreateEmoji {
+            name,
+            image,
+        };
+
+        http.create_emoji(<span class="self">self</span>, <span class="kw-2">&amp;</span>body, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates an integration for the guild.
@@ -2014,12 +2077,19 @@
         integration_id: IntegrationId,
         kind: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">"id"</span>: integration_id,
-            <span class="string">"type"</span>: kind,
-        });
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>CreateIntegration&lt;<span class="lifetime">'a</span>&gt; {
+            id: IntegrationId,
+            <span class="attr">#[serde(rename = <span class="string">"type"</span>)]
+            </span>kind: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+        }
 
-        http.create_guild_integration(<span class="self">self</span>, integration_id, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
+        <span class="kw">let </span>body = CreateIntegration {
+            id: integration_id,
+            kind,
+        };
+
+        http.create_guild_integration(<span class="self">self</span>, integration_id, <span class="kw-2">&amp;</span>body, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a new role in the guild with the data set, if any.
@@ -2207,9 +2277,14 @@
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     </span><span class="kw">pub async fn </span>edit_emoji(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, emoji_id: EmojiId, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">"name"</span>: name,
-        });
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>EditEmoji&lt;<span class="lifetime">'a</span>&gt; {
+            name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+        }
+
+        <span class="kw">let </span>map = EditEmoji {
+            name,
+        };
 
         http.edit_emoji(<span class="self">self</span>, emoji_id, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
@@ -2264,10 +2339,16 @@
         mfa_level: MfaLevel,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;MfaLevel&gt; {
-        <span class="kw">let </span>value = <span class="macro">json!</span>({
-            <span class="string">"level"</span>: mfa_level,
-        });
-        http.edit_guild_mfa_level(<span class="self">self</span>, <span class="kw-2">&amp;</span>value, audit_log_reason).<span class="kw">await
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>EditMfaModel {
+            level: MfaLevel,
+        }
+
+        <span class="kw">let </span>map = EditMfaModel {
+            level: mfa_level,
+        };
+
+        http.edit_guild_mfa_level(<span class="self">self</span>, <span class="kw-2">&amp;</span>map, audit_log_reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the current user's nickname for the guild.
@@ -2282,7 +2363,16 @@
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
     </span><span class="kw">pub async fn </span>edit_nickname(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, new_nickname: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.edit_nickname(<span class="self">self</span>, new_nickname, <span class="prelude-val">None</span>).<span class="kw">await
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>EditNickname&lt;<span class="lifetime">'a</span>&gt; {
+            nick: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+        }
+
+        <span class="kw">let </span>map = EditNickname {
+            nick: new_nickname,
+        };
+
+        http.edit_nickname(<span class="self">self</span>, <span class="kw-2">&amp;</span>map, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a [`Role`], optionally setting its new fields.
@@ -2407,7 +2497,33 @@
         role_id: RoleId,
         position: i16,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
-        http.edit_role_position(<span class="self">self</span>, role_id, position, <span class="prelude-val">None</span>).<span class="kw">await
+        <span class="self">self</span>.edit_role_position_with_reason(http, role_id, position, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Edit the position of a [`Role`] relative to all others in the [`Guild`].
+    ///
+    /// # Errors
+    ///
+    /// See [`GuildId::edit_role_position`] for more details.
+    </span><span class="kw">pub async fn </span>edit_role_position_with_reason(
+        <span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        role_id: RoleId,
+        position: i16,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>EditRole {
+            id: RoleId,
+            position: i16,
+        }
+
+        <span class="kw">let </span>map = EditRole {
+            id: role_id,
+            position,
+        };
+
+        http.edit_role_position(<span class="self">self</span>, <span class="kw-2">&amp;</span>map, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the guild's welcome screen.

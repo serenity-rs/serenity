@@ -1169,6 +1169,15 @@
 <a href="#1167" id="1167">1167</a>
 <a href="#1168" id="1168">1168</a>
 <a href="#1169" id="1169">1169</a>
+<a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1513,7 +1522,16 @@
         http: <span class="kw-2">&amp;</span>Http,
         target_channel_id: ChannelId,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;FollowedChannel&gt; {
-        http.follow_news_channel(<span class="self">self</span>, target_channel_id).<span class="kw">await
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>FollowChannel {
+            webhook_channel_id: ChannelId,
+        }
+
+        <span class="kw">let </span>map = FollowChannel {
+            webhook_channel_id: target_channel_id,
+        };
+
+        http.follow_news_channel(<span class="self">self</span>, <span class="kw-2">&amp;</span>map).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs

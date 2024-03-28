@@ -2560,6 +2560,12 @@
 <a href="#2558" id="2558">2558</a>
 <a href="#2559" id="2559">2559</a>
 <a href="#2560" id="2560">2560</a>
+<a href="#2561" id="2561">2561</a>
+<a href="#2562" id="2562">2562</a>
+<a href="#2563" id="2563">2563</a>
+<a href="#2564" id="2564">2564</a>
+<a href="#2565" id="2565">2565</a>
+<a href="#2566" id="2566">2566</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -3131,12 +3137,18 @@
     /// [`Shard`]: crate::gateway::Shard
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     </span><span class="kw">pub async fn </span>create(http: <span class="kw-2">&amp;</span>Http, name: <span class="kw-2">&amp;</span>str, icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;PartialGuild&gt; {
-        <span class="kw">let </span>map = <span class="macro">serde_json::json!</span>({
-            <span class="string">"icon"</span>: icon,
-            <span class="string">"name"</span>: name,
-        });
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>CreateGuild&lt;<span class="lifetime">'a</span>&gt; {
+            name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
+            icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
+        }
 
-        http.create_guild(<span class="kw-2">&amp;</span>map).<span class="kw">await
+        <span class="kw">let </span>body = CreateGuild {
+            name,
+            icon,
+        };
+
+        http.create_guild(<span class="kw-2">&amp;</span>body).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a new [`Channel`] in the guild.

@@ -840,6 +840,9 @@
 <a href="#838" id="838">838</a>
 <a href="#839" id="839">839</a>
 <a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -849,8 +852,6 @@
 <span class="kw">use </span>std::ops::{Deref, DerefMut};
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span>serde_json::json;
 
 <span class="kw">use </span><span class="kw">super</span>::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1478,11 +1479,16 @@
     ///
     /// [current user]: CurrentUser
     </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
-        <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">"recipient_id"</span>: <span class="self">self</span>,
-        });
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>CreateDmChannel {
+            recipient_id: UserId,
+        }
 
-        cache_http.http().create_private_channel(<span class="kw-2">&amp;</span>map).<span class="kw">await
+        <span class="kw">let </span>body = CreateDmChannel {
+            recipient_id: <span class="self">self</span>,
+        };
+
+        cache_http.http().create_private_channel(<span class="kw-2">&amp;</span>body).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
