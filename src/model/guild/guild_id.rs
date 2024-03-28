@@ -3,7 +3,6 @@ use std::fmt;
 #[cfg(feature = "model")]
 use futures::stream::Stream;
 use nonmax::{NonMaxU16, NonMaxU8};
-use serde_json::json;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -362,12 +361,18 @@ impl GuildId {
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     pub async fn create_emoji(self, http: &Http, name: &str, image: &str) -> Result<Emoji> {
-        let map = json!({
-            "name": name,
-            "image": image,
-        });
+        #[derive(serde::Serialize)]
+        struct CreateEmoji<'a> {
+            name: &'a str,
+            image: &'a str,
+        }
 
-        http.create_emoji(self, &map, None).await
+        let body = CreateEmoji {
+            name,
+            image,
+        };
+
+        http.create_emoji(self, &body, None).await
     }
 
     /// Creates an integration for the guild.
@@ -385,12 +390,19 @@ impl GuildId {
         integration_id: IntegrationId,
         kind: &str,
     ) -> Result<()> {
-        let map = json!({
-            "id": integration_id,
-            "type": kind,
-        });
+        #[derive(serde::Serialize)]
+        struct CreateIntegration<'a> {
+            id: IntegrationId,
+            #[serde(rename = "type")]
+            kind: &'a str,
+        }
 
-        http.create_guild_integration(self, integration_id, &map, None).await
+        let body = CreateIntegration {
+            id: integration_id,
+            kind,
+        };
+
+        http.create_guild_integration(self, integration_id, &body, None).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -578,9 +590,14 @@ impl GuildId {
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
     pub async fn edit_emoji(self, http: &Http, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
-        let map = json!({
-            "name": name,
-        });
+        #[derive(serde::Serialize)]
+        struct EditEmoji<'a> {
+            name: &'a str,
+        }
+
+        let map = EditEmoji {
+            name,
+        };
 
         http.edit_emoji(self, emoji_id, &map, None).await
     }
@@ -635,10 +652,16 @@ impl GuildId {
         mfa_level: MfaLevel,
         audit_log_reason: Option<&str>,
     ) -> Result<MfaLevel> {
-        let value = json!({
-            "level": mfa_level,
-        });
-        http.edit_guild_mfa_level(self, &value, audit_log_reason).await
+        #[derive(serde::Serialize)]
+        struct EditMfaModel {
+            level: MfaLevel,
+        }
+
+        let map = EditMfaModel {
+            level: mfa_level,
+        };
+
+        http.edit_guild_mfa_level(self, &map, audit_log_reason).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -653,7 +676,16 @@ impl GuildId {
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
     pub async fn edit_nickname(self, http: &Http, new_nickname: Option<&str>) -> Result<()> {
-        http.edit_nickname(self, new_nickname, None).await
+        #[derive(serde::Serialize)]
+        struct EditNickname<'a> {
+            nick: Option<&'a str>,
+        }
+
+        let map = EditNickname {
+            nick: new_nickname,
+        };
+
+        http.edit_nickname(self, &map, None).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -778,7 +810,33 @@ impl GuildId {
         role_id: RoleId,
         position: i16,
     ) -> Result<Vec<Role>> {
-        http.edit_role_position(self, role_id, position, None).await
+        self.edit_role_position_with_reason(http, role_id, position, None).await
+    }
+
+    /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
+    ///
+    /// # Errors
+    ///
+    /// See [`GuildId::edit_role_position`] for more details.
+    pub async fn edit_role_position_with_reason(
+        self,
+        http: &Http,
+        role_id: RoleId,
+        position: i16,
+        reason: Option<&str>,
+    ) -> Result<Vec<Role>> {
+        #[derive(serde::Serialize)]
+        struct EditRole {
+            id: RoleId,
+            position: i16,
+        }
+
+        let map = EditRole {
+            id: role_id,
+            position,
+        };
+
+        http.edit_role_position(self, &map, reason).await
     }
 
     /// Edits the guild's welcome screen.

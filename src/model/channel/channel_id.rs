@@ -343,7 +343,16 @@ impl ChannelId {
         http: &Http,
         target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
-        http.follow_news_channel(self, target_channel_id).await
+        #[derive(serde::Serialize)]
+        struct FollowChannel {
+            webhook_channel_id: ChannelId,
+        }
+
+        let map = FollowChannel {
+            webhook_channel_id: target_channel_id,
+        };
+
+        http.follow_news_channel(self, &map).await
     }
 
     /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
