@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -59,12 +59,8 @@ impl<'a> CreateStageInstance<'a> {
     ///
     /// Returns [`Error::Http`] if there is already a stage instance currently.
     #[cfg(feature = "http")]
-    pub async fn execute(
-        mut self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-    ) -> Result<StageInstance> {
+    pub async fn execute(mut self, http: &Http, channel_id: ChannelId) -> Result<StageInstance> {
         self.channel_id = Some(channel_id);
-        cache_http.http().create_stage_instance(&self, self.audit_log_reason).await
+        http.create_stage_instance(&self, self.audit_log_reason).await
     }
 }
