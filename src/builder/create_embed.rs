@@ -269,6 +269,14 @@ impl From<EmbedAuthor> for CreateEmbedAuthor {
     }
 }
 
+#[cfg(feature = "model")]
+impl From<User> for CreateEmbedAuthor {
+    fn from(user: User) -> Self {
+        let avatar_icon = user.face();
+        Self::new(user.name).icon_url(avatar_icon)
+    }
+}
+
 /// A builder to create the footer data for an embed. See [`CreateEmbed::footer`]
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
