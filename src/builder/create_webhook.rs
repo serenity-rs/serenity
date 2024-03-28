@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -63,14 +63,10 @@ impl<'a> CreateWebhook<'a> {
     /// [`Text`]: ChannelType::Text
     /// [`News`]: ChannelType::News
     #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-    ) -> Result<Webhook> {
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<Webhook> {
         crate::model::error::Minimum::WebhookName.check_underflow(self.name.chars().count())?;
         crate::model::error::Maximum::WebhookName.check_overflow(self.name.chars().count())?;
 
-        cache_http.http().create_webhook(channel_id, &self, self.audit_log_reason).await
+        http.create_webhook(channel_id, &self, self.audit_log_reason).await
     }
 }
