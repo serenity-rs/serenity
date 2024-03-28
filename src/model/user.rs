@@ -7,8 +7,6 @@ use std::num::NonZeroU16;
 use std::ops::{Deref, DerefMut};
 
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "model")]
-use serde_json::json;
 
 use super::prelude::*;
 #[cfg(feature = "model")]
@@ -620,6 +618,11 @@ impl UserId {
     ///
     /// [current user]: CurrentUser
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+        #[derive(serde::Serialize)]
+        struct CreateDmChannel {
+            recipient_id: UserId,
+        }
+
         #[cfg(feature = "temp_cache")]
         if let Some(cache) = cache_http.cache() {
             if let Some(private_channel) = cache.temp_private_channels.get(&self) {
@@ -627,11 +630,11 @@ impl UserId {
             }
         }
 
-        let map = json!({
-            "recipient_id": self,
-        });
+        let body = CreateDmChannel {
+            recipient_id: self,
+        };
 
-        let channel = cache_http.http().create_private_channel(&map).await?;
+        let channel = cache_http.http().create_private_channel(&body).await?;
 
         #[cfg(feature = "temp_cache")]
         if let Some(cache) = cache_http.cache() {
