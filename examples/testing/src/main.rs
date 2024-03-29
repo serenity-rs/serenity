@@ -192,7 +192,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .flags(MessageFlags::IS_VOICE_MESSAGE)
             .add_file(CreateAttachment::url(&ctx.http, audio_url, "testing.ogg").await?);
 
-        msg.author.dm(ctx, builder).await?;
+        msg.author.dm(&ctx.http, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
         let mut channel =
             channel.trim().parse::<ChannelId>().unwrap().to_channel(ctx).await?.guild().unwrap();
