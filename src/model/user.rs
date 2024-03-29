@@ -432,43 +432,17 @@ impl User {
     ///
     /// # Examples
     ///
-    /// When a user sends a message with a content of `"~help"`, DM the author a help message
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
-    /// # struct Handler;
-    /// use serenity::builder::CreateMessage;
-    ///
-    /// #[serenity::async_trait]
-    /// # #[cfg(feature = "client")]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "~help" {
-    ///             let builder = CreateMessage::new().content("Helpful info here.");
-    ///
-    ///             if let Err(why) = msg.author.direct_message(&ctx, builder).await {
-    ///                 println!("Err sending help: {why:?}");
-    ///                 let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
-    ///             };
-    ///         }
-    ///     }
-    /// }
-    /// ```
+    /// See [`UserId::direct_message`] for examples.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged is a bot user.
-    ///
-    /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
-    ///
-    /// Returns an [`Error::Json`] if there is an error deserializing the API response.
+    /// See [`UserId::direct_message`] for errors.
     pub async fn direct_message(
         &self,
         cache_http: impl CacheHttp,
         builder: CreateMessage,
     ) -> Result<Message> {
-        self.create_dm_channel(&cache_http).await?.send_message(cache_http, builder).await
+        self.id.direct_message(cache_http, builder).await
     }
 
     /// This is an alias of [`Self::direct_message`].
@@ -666,6 +640,57 @@ impl UserId {
         });
 
         cache_http.http().create_private_channel(&map).await
+    }
+
+    /// Sends a message to a user through a direct message channel. This is a channel that can only
+    /// be accessed by you and the recipient.
+    ///
+    /// # Examples
+    ///
+    /// When a user sends a message with a content of `"~help"`, DM the author a help message
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// # struct Handler;
+    /// use serenity::builder::CreateMessage;
+    ///
+    /// #[serenity::async_trait]
+    /// # #[cfg(feature = "client")]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
+    ///         if msg.content == "~help" {
+    ///             let builder = CreateMessage::new().content("Helpful info here.");
+    ///
+    ///             if let Err(why) = msg.author.id.direct_message(&ctx, builder).await {
+    ///                 println!("Err sending help: {why:?}");
+    ///                 let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
+    ///             };
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged is a bot user.
+    ///
+    /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
+    ///
+    /// Returns an [`Error::Json`] if there is an error deserializing the API response.
+    pub async fn direct_message(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage,
+    ) -> Result<Message> {
+        self.create_dm_channel(&cache_http).await?.send_message(cache_http, builder).await
+    }
+
+    /// This is an alias of [`Self::direct_message`].
+    #[allow(clippy::missing_errors_doc)]
+    #[inline]
+    pub async fn dm(self, cache_http: impl CacheHttp, builder: CreateMessage) -> Result<Message> {
+        self.direct_message(cache_http, builder).await
     }
 
     /// Attempts to find a [`User`] by its Id in the cache.
