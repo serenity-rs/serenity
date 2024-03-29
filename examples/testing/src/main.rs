@@ -184,18 +184,11 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         let audio_url =
             "https://upload.wikimedia.org/wikipedia/commons/8/81/Short_Silent%2C_Empty_Audio.ogg";
         // As of 2023-04-20, bots are still not allowed to sending voice messages
-        msg.author
-            .id
-            .create_dm_channel(ctx)
-            .await?
-            .id
-            .send_message(
-                ctx,
-                CreateMessage::new()
-                    .flags(MessageFlags::IS_VOICE_MESSAGE)
-                    .add_file(CreateAttachment::url(ctx, audio_url).await?),
-            )
-            .await?;
+        let builder = CreateMessage::new()
+            .flags(MessageFlags::IS_VOICE_MESSAGE)
+            .add_file(CreateAttachment::url(ctx, audio_url).await?);
+
+        msg.author.dm(ctx, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
         let mut channel =
             channel.trim().parse::<ChannelId>().unwrap().to_channel(ctx).await?.guild().unwrap();
