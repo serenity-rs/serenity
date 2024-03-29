@@ -131,7 +131,7 @@ impl EventHandler for Handler {
 
         // Delete the orig message or there will be dangling components (components that still
         // exist, but no collector is running so any user who presses them sees an error)
-        m.delete(&ctx).await.unwrap()
+        m.delete(&ctx, None).await.unwrap()
     }
 }
 
