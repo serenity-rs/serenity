@@ -1025,11 +1025,11 @@ impl PartialGuild {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn start_prune(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         days: u8,
         reason: Option<&str>,
     ) -> Result<GuildPrune> {
-        self.id.start_prune(cache_http.http(), days, reason).await
+        self.id.start_prune(http, days, reason).await
     }
 
     /// Kicks a [`Member`] from the guild.
