@@ -271,7 +271,7 @@ impl Message {
     /// current user does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let (Some(cache), Some(guild_id)) = (cache_http.cache(), self.guild_id) {
@@ -286,7 +286,7 @@ impl Message {
             }
         }
 
-        self.channel_id.delete_message(cache_http.http(), self.id).await
+        self.channel_id.delete_message(cache_http.http(), self.id, reason).await
     }
 
     /// Deletes all of the [`Reaction`]s associated with the message.
@@ -527,7 +527,7 @@ impl Message {
     /// does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn pin(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let (Some(cache), Some(guild_id)) = (cache_http.cache(), self.guild_id) {
@@ -540,7 +540,7 @@ impl Message {
             }
         }
 
-        self.channel_id.pin(cache_http.http(), self.id).await
+        self.channel_id.pin(cache_http.http(), self.id, reason).await
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.
@@ -749,7 +749,7 @@ impl Message {
     /// does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn unpin(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let (Some(cache), Some(guild_id)) = (cache_http.cache(), self.guild_id) {
@@ -762,7 +762,7 @@ impl Message {
             }
         }
 
-        cache_http.http().unpin_message(self.channel_id, self.id, None).await
+        cache_http.http().unpin_message(self.channel_id, self.id, reason).await
     }
 
     /// Ends the [`Poll`] on this message, if there is one.

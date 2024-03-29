@@ -260,8 +260,13 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_permission(&self, http: &Http, target: PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(http, target).await
+    pub async fn create_permission(
+        &self,
+        http: &Http,
+        target: PermissionOverwrite,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.create_permission(http, target, reason).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -276,7 +281,11 @@ impl GuildChannel {
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
+    pub async fn delete(
+        &self,
+        cache_http: impl CacheHttp,
+        reason: Option<&str>,
+    ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -289,7 +298,7 @@ impl GuildChannel {
             }
         }
 
-        let channel = self.id.delete(cache_http.http()).await?;
+        let channel = self.id.delete(cache_http.http(), reason).await?;
         channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
@@ -307,8 +316,13 @@ impl GuildChannel {
     /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages(&self, http: &Http, message_ids: &[MessageId]) -> Result<()> {
-        self.id.delete_messages(http, message_ids).await
+    pub async fn delete_messages(
+        &self,
+        http: &Http,
+        message_ids: &[MessageId],
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.delete_messages(http, message_ids, reason).await
     }
 
     /// Deletes all permission overrides in the channel from a member or role.
@@ -324,8 +338,9 @@ impl GuildChannel {
         &self,
         http: &Http,
         permission_type: PermissionOverwriteType,
+        reason: Option<&str>,
     ) -> Result<()> {
-        self.id.delete_permission(http, permission_type).await
+        self.id.delete_permission(http, permission_type, reason).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -664,8 +679,13 @@ impl GuildChannel {
     /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(&self, http: &Http, message_id: MessageId) -> Result<()> {
-        self.id.pin(http, message_id).await
+    pub async fn pin(
+        &self,
+        http: &Http,
+        message_id: MessageId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.pin(http, message_id, reason).await
     }
 
     /// Gets all channel's pins.
@@ -813,8 +833,13 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(&self, http: &Http, message_id: MessageId) -> Result<()> {
-        self.id.unpin(http, message_id).await
+    pub async fn unpin(
+        &self,
+        http: &Http,
+        message_id: MessageId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.unpin(http, message_id, reason).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -977,12 +1002,12 @@ impl GuildChannel {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
-    pub async fn delete_stage_instance(&self, http: &Http) -> Result<()> {
+    pub async fn delete_stage_instance(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        self.id.delete_stage_instance(http).await
+        self.id.delete_stage_instance(http, reason).await
     }
 
     /// Creates a public thread that is connected to a message.
