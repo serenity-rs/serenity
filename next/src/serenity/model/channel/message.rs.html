@@ -1329,7 +1329,7 @@
     /// current user does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
@@ -1344,7 +1344,7 @@
             }
         }
 
-        <span class="self">self</span>.channel_id.delete_message(cache_http.http(), <span class="self">self</span>.id).<span class="kw">await
+        <span class="self">self</span>.channel_id.delete_message(cache_http.http(), <span class="self">self</span>.id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes all of the [`Reaction`]s associated with the message.
@@ -1584,7 +1584,7 @@
     /// does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
@@ -1597,7 +1597,7 @@
             }
         }
 
-        <span class="self">self</span>.channel_id.pin(cache_http.http(), <span class="self">self</span>.id).<span class="kw">await
+        <span class="self">self</span>.channel_id.pin(cache_http.http(), <span class="self">self</span>.id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// React to the message with a custom [`Emoji`] or unicode character.
@@ -1802,7 +1802,7 @@
     /// does not have the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
@@ -1815,7 +1815,7 @@
             }
         }
 
-        cache_http.http().unpin_message(<span class="self">self</span>.channel_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
+        cache_http.http().unpin_message(<span class="self">self</span>.channel_id, <span class="self">self</span>.id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Tries to return author's nickname in the current channel's guild.

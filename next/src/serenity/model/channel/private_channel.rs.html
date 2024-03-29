@@ -330,6 +330,7 @@
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -401,7 +402,8 @@
     /// closing a private channel on the client, which can be re-opened.
     </span><span class="attr">#[allow(clippy::missing_errors_doc)]
     </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
-        <span class="self">self</span>.id.delete(http).<span class="kw">await</span><span class="question-mark">?</span>.private().ok_or(Error::Model(ModelError::InvalidChannelType))
+        <span class="kw">let </span>resp = <span class="self">self</span>.id.delete(http, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        resp.private().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
     <span class="doccomment">/// Deletes all messages by Ids from the given vector in the channel.
@@ -419,7 +421,7 @@
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     </span><span class="kw">pub async fn </span>delete_messages(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_ids: <span class="kw-2">&amp;</span>[MessageId]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_messages(http, message_ids).<span class="kw">await
+        <span class="self">self</span>.id.delete_messages(http, message_ids, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes all permission overrides in the channel from a member or role.
@@ -433,7 +435,7 @@
         http: <span class="kw-2">&amp;</span>Http,
         permission_type: PermissionOverwriteType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_permission(http, permission_type).<span class="kw">await
+        <span class="self">self</span>.id.delete_permission(http, permission_type, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the given [`Reaction`] from the channel.
@@ -534,7 +536,7 @@
     ///
     /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
     </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.pin(http, message_id).<span class="kw">await
+        <span class="self">self</span>.id.pin(http, message_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the list of messages that have been pinned in the private channel.
@@ -650,7 +652,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
     /// or if the channel already has the limit of 50 pinned messages.
     </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.unpin(http, message_id).<span class="kw">await
+        <span class="self">self</span>.id.unpin(http, message_id, <span class="prelude-val">None</span>).<span class="kw">await
     </span>}
 }
 

@@ -1051,6 +1051,31 @@
 <a href="#1049" id="1049">1049</a>
 <a href="#1050" id="1050">1050</a>
 <a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::fmt;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -1304,8 +1329,13 @@
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    </span><span class="kw">pub async fn </span>create_permission(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, target: PermissionOverwrite) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.create_permission(http, target).<span class="kw">await
+    </span><span class="kw">pub async fn </span>create_permission(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        target: PermissionOverwrite,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.create_permission(http, target, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes this channel, returning the channel on a successful deletion.
@@ -1320,7 +1350,11 @@
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
+    </span><span class="kw">pub async fn </span>delete(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
@@ -1333,7 +1367,7 @@
             }
         }
 
-        <span class="kw">let </span>channel = <span class="self">self</span>.id.delete(cache_http.http()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>channel = <span class="self">self</span>.id.delete(cache_http.http(), reason).<span class="kw">await</span><span class="question-mark">?</span>;
         channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
@@ -1351,8 +1385,13 @@
     /// delete either 0 or more than 100 messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete_messages(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_ids: <span class="kw-2">&amp;</span>[MessageId]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_messages(http, message_ids).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_messages(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        message_ids: <span class="kw-2">&amp;</span>[MessageId],
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.delete_messages(http, message_ids, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes all permission overrides in the channel from a member or role.
@@ -1368,8 +1407,9 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw-2">&amp;</span>Http,
         permission_type: PermissionOverwriteType,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_permission(http, permission_type).<span class="kw">await
+        <span class="self">self</span>.id.delete_permission(http, permission_type, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the given [`Reaction`] from the channel.
@@ -1707,8 +1747,13 @@
     /// too many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>pin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.pin(http, message_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>pin(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        message_id: MessageId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.pin(http, message_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets all channel's pins.
@@ -1856,8 +1901,13 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>unpin(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.unpin(http, message_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>unpin(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        message_id: MessageId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.unpin(http, message_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the channel's webhooks.
@@ -2022,12 +2072,12 @@
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
-    </span><span class="kw">pub async fn </span>delete_stage_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_stage_instance(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">if </span><span class="self">self</span>.kind != ChannelType::Stage {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidChannelType));
         }
 
-        <span class="self">self</span>.id.delete_stage_instance(http).<span class="kw">await
+        <span class="self">self</span>.id.delete_stage_instance(http, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a public thread that is connected to a message.

@@ -2566,6 +2566,33 @@
 <a href="#2564" id="2564">2564</a>
 <a href="#2565" id="2565">2565</a>
 <a href="#2566" id="2566">2566</a>
+<a href="#2567" id="2567">2567</a>
+<a href="#2568" id="2568">2568</a>
+<a href="#2569" id="2569">2569</a>
+<a href="#2570" id="2570">2570</a>
+<a href="#2571" id="2571">2571</a>
+<a href="#2572" id="2572">2572</a>
+<a href="#2573" id="2573">2573</a>
+<a href="#2574" id="2574">2574</a>
+<a href="#2575" id="2575">2575</a>
+<a href="#2576" id="2576">2576</a>
+<a href="#2577" id="2577">2577</a>
+<a href="#2578" id="2578">2578</a>
+<a href="#2579" id="2579">2579</a>
+<a href="#2580" id="2580">2580</a>
+<a href="#2581" id="2581">2581</a>
+<a href="#2582" id="2582">2582</a>
+<a href="#2583" id="2583">2583</a>
+<a href="#2584" id="2584">2584</a>
+<a href="#2585" id="2585">2585</a>
+<a href="#2586" id="2586">2586</a>
+<a href="#2587" id="2587">2587</a>
+<a href="#2588" id="2588">2588</a>
+<a href="#2589" id="2589">2589</a>
+<a href="#2590" id="2590">2590</a>
+<a href="#2591" id="2591">2591</a>
+<a href="#2592" id="2592">2592</a>
+<a href="#2593" id="2593">2593</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2910,8 +2937,13 @@
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>delete_automod_rule(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, rule_id: RuleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_automod_rule(http, rule_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_automod_rule(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        rule_id: RuleId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.delete_automod_rule(http, rule_id, reason).<span class="kw">await
     </span>}
 
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
@@ -2986,7 +3018,7 @@
     ///
     /// ```rust,ignore
     /// // assumes a `user` and `guild` have already been bound
-    /// let _ = guild.ban(user, 4);
+    /// let _ = guild.ban(user, 4, None);
     /// ```
     ///
     /// # Errors
@@ -3001,23 +3033,12 @@
     /// Otherwise returns [`Error::Http`] if the member cannot be banned.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    </span><span class="kw">pub async fn </span>ban(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, user: UserId, dmd: u8) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.ban_with_reason(cache_http, user, dmd, <span class="string">""</span>).<span class="kw">await
-    </span>}
-
-    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
-    /// documentation.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the possible reasons [`Self::ban`] may return an error, an
-    /// [`ModelError::TooLarge`] may also be returned if the reason is too long.
-    </span><span class="kw">pub async fn </span>ban_with_reason(
+    </span><span class="kw">pub async fn </span>ban(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         user: UserId,
         dmd: u8,
-        reason: <span class="kw-2">&amp;</span>str,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
@@ -3028,7 +3049,7 @@
             }
         }
 
-        <span class="self">self</span>.id.ban_with_reason(cache_http.http(), user, dmd, reason).<span class="kw">await
+        <span class="self">self</span>.id.ban(cache_http.http(), user, dmd, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the formatted URL of the guild's banner image, if one exists.
@@ -3211,8 +3232,14 @@
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`CreateAttachment`]: crate::builder::CreateAttachment
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>create_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, name: <span class="kw-2">&amp;</span>str, image: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="self">self</span>.id.create_emoji(http, name, image).<span class="kw">await
+    </span><span class="kw">pub async fn </span>create_emoji(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        name: <span class="kw-2">&amp;</span>str,
+        image: <span class="kw-2">&amp;</span>str,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+        <span class="self">self</span>.id.create_emoji(http, name, image, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates an integration for the guild.
@@ -3229,8 +3256,9 @@
         http: <span class="kw-2">&amp;</span>Http,
         integration_id: IntegrationId,
         kind: <span class="kw-2">&amp;</span>str,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.create_integration(http, integration_id, kind).<span class="kw">await
+        <span class="self">self</span>.id.create_integration(http, integration_id, kind, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Create a guild specific application [`Command`].
@@ -3442,8 +3470,13 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>delete_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_emoji(http, emoji_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_emoji(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        emoji_id: EmojiId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.delete_emoji(http, emoji_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes an integration by Id from the guild.
@@ -3460,8 +3493,9 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw-2">&amp;</span>Http,
         integration_id: IntegrationId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_integration(http, integration_id).<span class="kw">await
+        <span class="self">self</span>.id.delete_integration(http, integration_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a [`Role`] by Id from the guild.
@@ -3475,8 +3509,13 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete the role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>delete_role(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, role_id: RoleId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_role(http, role_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_role(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        role_id: RoleId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.delete_role(http, role_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a [`ScheduledEvent`] by id from the guild.
@@ -3511,8 +3550,13 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>delete_sticker(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, sticker_id: StickerId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.delete_sticker(http, sticker_id).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_sticker(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        sticker_id: StickerId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.delete_sticker(http, sticker_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the current guild with new data where specified.
@@ -3576,8 +3620,14 @@
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    </span><span class="kw">pub async fn </span>edit_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, emoji_id: EmojiId, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
-        <span class="self">self</span>.id.edit_emoji(http, emoji_id, name).<span class="kw">await
+    </span><span class="kw">pub async fn </span>edit_emoji(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        emoji_id: EmojiId,
+        name: <span class="kw-2">&amp;</span>str,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+        <span class="self">self</span>.id.edit_emoji(http, emoji_id, name, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
@@ -3636,6 +3686,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
         new_nickname: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
@@ -3644,7 +3695,7 @@
             }
         }
 
-        <span class="self">self</span>.id.edit_nickname(cache_http.http(), new_nickname).<span class="kw">await
+        <span class="self">self</span>.id.edit_nickname(cache_http.http(), new_nickname, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a role, optionally setting its fields.
@@ -3691,8 +3742,9 @@
         http: <span class="kw-2">&amp;</span>Http,
         role_id: RoleId,
         position: i16,
+        audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
-        <span class="self">self</span>.id.edit_role_position(http, role_id, position).<span class="kw">await
+        <span class="self">self</span>.id.edit_role_position(http, role_id, position, audit_log_reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Modifies a scheduled event in the guild with the data set, if any.
@@ -3973,16 +4025,8 @@
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    </span><span class="kw">pub async fn </span>kick(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.kick(http, user_id).<span class="kw">await
-    </span>}
-
-    <span class="doccomment">/// # Errors
-    ///
-    /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
-    /// the reason is too long.
-    </span><span class="kw">pub async fn </span>kick_with_reason(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId, reason: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>.id.kick_with_reason(http, user_id, reason).<span class="kw">await
+    </span><span class="kw">pub async fn </span>kick(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.id.kick(http, user_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns a guild [`Member`] object for the current user.
@@ -4647,7 +4691,12 @@
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    </span><span class="kw">pub async fn </span>start_prune(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
+    </span><span class="kw">pub async fn </span>start_prune(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        days: u8,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
@@ -4655,7 +4704,7 @@
             }
         }
 
-        <span class="self">self</span>.id.start_prune(cache_http.http(), days).<span class="kw">await
+        <span class="self">self</span>.id.start_prune(cache_http.http(), days, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Unbans the given [`User`] from the guild.
@@ -4670,7 +4719,12 @@
     /// Otherwise will return an [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    </span><span class="kw">pub async fn </span>unban(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>unban(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        user_id: UserId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
@@ -4678,7 +4732,7 @@
             }
         }
 
-        <span class="self">self</span>.id.unban(cache_http.http(), user_id).<span class="kw">await
+        <span class="self">self</span>.id.unban(cache_http.http(), user_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieve's the guild's vanity URL.

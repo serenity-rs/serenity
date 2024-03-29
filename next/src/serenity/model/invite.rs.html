@@ -481,7 +481,7 @@
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild)) = (cache_http.cache(), <span class="kw-2">&amp;</span><span class="self">self</span>.guild) {
@@ -494,7 +494,7 @@
             }
         }
 
-        cache_http.http().delete_invite(<span class="kw-2">&amp;</span><span class="self">self</span>.code, <span class="prelude-val">None</span>).<span class="kw">await
+        cache_http.http().delete_invite(<span class="kw-2">&amp;</span><span class="self">self</span>.code, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Gets information about an invite.
@@ -674,7 +674,7 @@
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild)) = (cache_http.cache(), <span class="kw-2">&amp;</span><span class="self">self</span>.guild) {
@@ -687,7 +687,7 @@
             }
         }
 
-        cache_http.http().delete_invite(<span class="kw-2">&amp;</span><span class="self">self</span>.code, <span class="prelude-val">None</span>).<span class="kw">await
+        cache_http.http().delete_invite(<span class="kw-2">&amp;</span><span class="self">self</span>.code, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns a URL to use for the invite.

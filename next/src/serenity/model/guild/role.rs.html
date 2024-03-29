@@ -337,8 +337,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete this role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.delete_role(<span class="self">self</span>.guild_id, <span class="self">self</span>.id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.guild_id.delete_role(http, <span class="self">self</span>.id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a [`Role`], optionally setting its new fields.

@@ -1178,6 +1178,27 @@
 <a href="#1176" id="1176">1176</a>
 <a href="#1177" id="1177">1177</a>
 <a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span>std::sync::Arc;
@@ -1275,9 +1296,14 @@
     /// set.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">pub async fn </span>create_permission(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, target: PermissionOverwrite) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>create_permission(
+        <span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        target: PermissionOverwrite,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>data: PermissionOverwriteData = target.into();
-        http.create_permission(<span class="self">self</span>, data.id, <span class="kw-2">&amp;</span>data, <span class="prelude-val">None</span>).<span class="kw">await
+        http.create_permission(<span class="self">self</span>, data.id, <span class="kw-2">&amp;</span>data, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -1310,8 +1336,8 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    </span><span class="kw">pub async fn </span>delete(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-        http.delete_channel(<span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
+        http.delete_channel(<span class="self">self</span>, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes a [`Message`] given its Id.
@@ -1326,8 +1352,13 @@
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete_message(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.delete_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_message(
+        <span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        message_id: MessageId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_message(<span class="self">self</span>, message_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes all messages by Ids from the given vector in the given channel.
@@ -1346,7 +1377,12 @@
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>delete_messages(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_ids: <span class="kw-2">&amp;</span>[MessageId]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    </span><span class="kw">pub async fn </span>delete_messages(
+        <span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        message_ids: <span class="kw-2">&amp;</span>[MessageId],
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">use </span><span class="kw">crate</span>::model::error::{Maximum, Minimum};
 
         <span class="attr">#[derive(serde::Serialize)]
@@ -1358,13 +1394,13 @@
         Maximum::BulkDeleteAmount.check_overflow(message_ids.len())<span class="question-mark">?</span>;
 
         <span class="kw">if </span>message_ids.len() == <span class="number">1 </span>{
-            <span class="self">self</span>.delete_message(http, message_ids[<span class="number">0</span>]).<span class="kw">await
+            <span class="self">self</span>.delete_message(http, message_ids[<span class="number">0</span>], reason).<span class="kw">await
         </span>} <span class="kw">else </span>{
             <span class="kw">let </span>req = DeleteMessages {
                 messages: message_ids,
             };
 
-            http.delete_messages(<span class="self">self</span>, <span class="kw-2">&amp;</span>req, <span class="prelude-val">None</span>).<span class="kw">await
+            http.delete_messages(<span class="self">self</span>, <span class="kw-2">&amp;</span>req, reason).<span class="kw">await
         </span>}
     }
 
@@ -1381,12 +1417,13 @@
         <span class="self">self</span>,
         http: <span class="kw-2">&amp;</span>Http,
         permission_type: PermissionOverwriteType,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>id = <span class="kw">match </span>permission_type {
             PermissionOverwriteType::Member(id) =&gt; id.into(),
             PermissionOverwriteType::Role(id) =&gt; id.get().into(),
         };
-        http.delete_permission(<span class="self">self</span>, id, <span class="prelude-val">None</span>).<span class="kw">await
+        http.delete_permission(<span class="self">self</span>, id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the given [`Reaction`] from the channel.
@@ -1683,8 +1720,8 @@
     /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>pin(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.pin_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>pin(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.pin_message(<span class="self">self</span>, message_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Crossposts a [`Message`].
@@ -1922,8 +1959,13 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    </span><span class="kw">pub async fn </span>unpin(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.unpin_message(<span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>unpin(
+        <span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        message_id: MessageId,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.unpin_message(<span class="self">self</span>, message_id, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the channel's webhooks.
@@ -2028,8 +2070,8 @@
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
-    </span><span class="kw">pub async fn </span>delete_stage_instance(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        http.delete_stage_instance(<span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_stage_instance(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_stage_instance(<span class="self">self</span>, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a public thread that is connected to a message.
