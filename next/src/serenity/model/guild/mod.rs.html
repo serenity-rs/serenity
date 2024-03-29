@@ -3430,7 +3430,7 @@
         cache_http: <span class="kw">impl </span>CacheHttp,
         builder: CreateSticker&lt;<span class="lifetime">'a</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        <span class="self">self</span>.id.create_sticker(cache_http.http(), builder).<span class="kw">await
+        <span class="self">self</span>.id.create_sticker(cache_http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the current guild if the current user is the owner of the

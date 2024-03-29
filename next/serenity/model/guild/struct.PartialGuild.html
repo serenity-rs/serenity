@@ -543,7 +543,7 @@ and default value is 1000.</p>
 <p>Returns an <a href="../../prelude/enum.SerenityError.html#variant.Http" title="variant serenity::prelude::SerenityError::Http"><code>Error::Http</code></a> if the API returns an error.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.start_prune" class="method"><a class="src rightside" href="../../../src/serenity/model/guild/partial_guild.rs.html#1026-1033">source</a><h4 class="code-header">pub async fn <a href="#method.start_prune" class="fn">start_prune</a>(
     &amp;self,
-    cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>,
+    http: &amp;<a class="struct" href="../../http/struct.Http.html" title="struct serenity::http::Http">Http</a>,
     days: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>,
     reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;
 ) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="struct.GuildPrune.html" title="struct serenity::model::guild::GuildPrune">GuildPrune</a>&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>model</code></strong> only.</div></span></summary><div class="docblock"><p>Starts a prune of <a href="struct.Member.html" title="struct serenity::model::guild::Member"><code>Member</code></a>s.</p>

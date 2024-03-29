@@ -835,14 +835,6 @@
 <a href="#833" id="833">833</a>
 <a href="#834" id="834">834</a>
 <a href="#835" id="835">835</a>
-<a href="#836" id="836">836</a>
-<a href="#837" id="837">837</a>
-<a href="#838" id="838">838</a>
-<a href="#839" id="839">839</a>
-<a href="#840" id="840">840</a>
-<a href="#841" id="841">841</a>
-<a href="#842" id="842">842</a>
-<a href="#843" id="843">843</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1229,12 +1221,12 @@
     /// # Errors
     ///
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
-    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
+    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="kw">if </span><span class="self">self</span>.bot() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MessagingBot));
         }
 
-        <span class="self">self</span>.id.create_dm_channel(cache_http).<span class="kw">await
+        <span class="self">self</span>.id.create_dm_channel(http).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the time that this user was created at.
@@ -1271,7 +1263,7 @@
     ///         if msg.content == "~help" {
     ///             let builder = CreateMessage::new().content("Helpful info here.");
     ///
-    ///             if let Err(why) = msg.author.direct_message(&amp;ctx, builder).await {
+    ///             if let Err(why) = msg.author.direct_message(&amp;ctx.http, builder).await {
     ///                 println!("Err sending help: {why:?}");
     ///                 let _ = msg.reply(&amp;ctx, "There was an error DMing you help.").await;
     ///             };
@@ -1287,22 +1279,14 @@
     /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
     ///
     /// Returns an [`Error::Json`] if there is an error deserializing the API response.
-    </span><span class="kw">pub async fn </span>direct_message(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.create_dm_channel(<span class="kw-2">&amp;</span>cache_http).<span class="kw">await</span><span class="question-mark">?</span>.send_message(cache_http, builder).<span class="kw">await
+    </span><span class="kw">pub async fn </span>direct_message(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>.create_dm_channel(http).<span class="kw">await</span><span class="question-mark">?</span>.send_message(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// This is an alias of [`Self::direct_message`].
     </span><span class="attr">#[allow(clippy::missing_errors_doc)]
-    </span><span class="kw">pub async fn </span>dm(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.direct_message(cache_http, builder).<span class="kw">await
+    </span><span class="kw">pub async fn </span>dm(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>.direct_message(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the URL to the user's avatar, falling back to the default avatar if needed.
@@ -1478,7 +1462,7 @@
     /// returned by the Discord API.
     ///
     /// [current user]: CurrentUser
-    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
+    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="attr">#[derive(serde::Serialize)]
         </span><span class="kw">struct </span>CreateDmChannel {
             recipient_id: UserId,
@@ -1488,7 +1472,7 @@
             recipient_id: <span class="self">self</span>,
         };
 
-        cache_http.http().create_private_channel(<span class="kw-2">&amp;</span>body).<span class="kw">await
+        http.create_private_channel(<span class="kw-2">&amp;</span>body).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
