@@ -292,12 +292,12 @@ impl Webhook {
     ///
     /// Returns [`Error::Http`] if the webhook does not exist, the token is invalid, or if the
     /// webhook could not otherwise be deleted.
-    pub async fn delete(&self, http: &Http) -> Result<()> {
+    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         match &self.token {
             Some(token) => {
-                http.delete_webhook_with_token(self.id, token.expose_secret(), None).await
+                http.delete_webhook_with_token(self.id, token.expose_secret(), reason).await
             },
-            None => http.delete_webhook(self.id, None).await,
+            None => http.delete_webhook(self.id, reason).await,
         }
     }
 

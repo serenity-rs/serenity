@@ -69,7 +69,8 @@ impl PrivateChannel {
     /// closing a private channel on the client, which can be re-opened.
     #[allow(clippy::missing_errors_doc)]
     pub async fn delete(&self, http: &Http) -> Result<PrivateChannel> {
-        self.id.delete(http).await?.private().ok_or(Error::Model(ModelError::InvalidChannelType))
+        let resp = self.id.delete(http, None).await?;
+        resp.private().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.
@@ -87,7 +88,7 @@ impl PrivateChannel {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_messages(&self, http: &Http, message_ids: &[MessageId]) -> Result<()> {
-        self.id.delete_messages(http, message_ids).await
+        self.id.delete_messages(http, message_ids, None).await
     }
 
     /// Deletes all permission overrides in the channel from a member or role.
@@ -101,7 +102,7 @@ impl PrivateChannel {
         http: &Http,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
-        self.id.delete_permission(http, permission_type).await
+        self.id.delete_permission(http, permission_type, None).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -202,7 +203,7 @@ impl PrivateChannel {
     ///
     /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
     pub async fn pin(&self, http: &Http, message_id: MessageId) -> Result<()> {
-        self.id.pin(http, message_id).await
+        self.id.pin(http, message_id, None).await
     }
 
     /// Retrieves the list of messages that have been pinned in the private channel.
@@ -318,7 +319,7 @@ impl PrivateChannel {
     /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
     /// or if the channel already has the limit of 50 pinned messages.
     pub async fn unpin(&self, http: &Http, message_id: MessageId) -> Result<()> {
-        self.id.unpin(http, message_id).await
+        self.id.unpin(http, message_id, None).await
     }
 }
 
