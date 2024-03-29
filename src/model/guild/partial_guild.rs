@@ -251,8 +251,13 @@ impl PartialGuild {
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn delete_automod_rule(&self, http: &Http, rule_id: RuleId) -> Result<()> {
-        self.id.delete_automod_rule(http, rule_id).await
+    pub async fn delete_automod_rule(
+        &self,
+        http: &Http,
+        rule_id: RuleId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.delete_automod_rule(http, rule_id, reason).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
@@ -399,8 +404,14 @@ impl PartialGuild {
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_emoji(&self, http: &Http, name: &str, image: &str) -> Result<Emoji> {
-        self.id.create_emoji(http, name, image).await
+    pub async fn create_emoji(
+        &self,
+        http: &Http,
+        name: &str,
+        image: &str,
+        reason: Option<&str>,
+    ) -> Result<Emoji> {
+        self.id.create_emoji(http, name, image, reason).await
     }
 
     /// Creates an integration for the guild.
@@ -417,8 +428,9 @@ impl PartialGuild {
         http: &Http,
         integration_id: IntegrationId,
         kind: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
-        self.id.create_integration(http, integration_id, kind).await
+        self.id.create_integration(http, integration_id, kind, reason).await
     }
 
     /// Create a guild specific application [`Command`].
@@ -599,8 +611,13 @@ impl PartialGuild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_emoji(&self, http: &Http, emoji_id: EmojiId) -> Result<()> {
-        self.id.delete_emoji(http, emoji_id).await
+    pub async fn delete_emoji(
+        &self,
+        http: &Http,
+        emoji_id: EmojiId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.delete_emoji(http, emoji_id, reason).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -617,8 +634,9 @@ impl PartialGuild {
         &self,
         http: &Http,
         integration_id: IntegrationId,
+        reason: Option<&str>,
     ) -> Result<()> {
-        self.id.delete_integration(http, integration_id).await
+        self.id.delete_integration(http, integration_id, reason).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -633,8 +651,13 @@ impl PartialGuild {
     /// does not exist in the Guild.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
-        self.id.delete_role(http, role_id).await
+    pub async fn delete_role(
+        &self,
+        http: &Http,
+        role_id: RoleId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.delete_role(http, role_id, reason).await
     }
 
     /// Deletes a [`Sticker`] by Id from the guild.
@@ -650,8 +673,13 @@ impl PartialGuild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_sticker(&self, http: &Http, sticker_id: StickerId) -> Result<()> {
-        self.id.delete_sticker(http, sticker_id).await
+    pub async fn delete_sticker(
+        &self,
+        http: &Http,
+        sticker_id: StickerId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.delete_sticker(http, sticker_id, reason).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -695,8 +723,14 @@ impl PartialGuild {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn edit_emoji(&self, http: &Http, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
-        self.id.edit_emoji(http, emoji_id, name).await
+    pub async fn edit_emoji(
+        &self,
+        http: &Http,
+        emoji_id: EmojiId,
+        name: &str,
+        reason: Option<&str>,
+    ) -> Result<Emoji> {
+        self.id.edit_emoji(http, emoji_id, name, reason).await
     }
 
     /// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
@@ -748,8 +782,13 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission to change their nickname.
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-    pub async fn edit_nickname(&self, http: &Http, new_nickname: Option<&str>) -> Result<()> {
-        self.id.edit_nickname(http, new_nickname).await
+    pub async fn edit_nickname(
+        &self,
+        http: &Http,
+        new_nickname: Option<&str>,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        self.id.edit_nickname(http, new_nickname, reason).await
     }
 
     /// Edits a role, optionally setting its fields.
@@ -984,8 +1023,13 @@ impl PartialGuild {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
-        self.id.start_prune(cache_http.http(), days).await
+    pub async fn start_prune(
+        &self,
+        cache_http: impl CacheHttp,
+        days: u8,
+        reason: Option<&str>,
+    ) -> Result<GuildPrune> {
+        self.id.start_prune(cache_http.http(), days, reason).await
     }
 
     /// Kicks a [`Member`] from the guild.
@@ -1202,8 +1246,8 @@ impl PartialGuild {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     /// [`Guild::unban`]: crate::model::guild::Guild::unban
-    pub async fn unban(&self, http: &Http, user_id: UserId) -> Result<()> {
-        self.id.unban(http, user_id).await
+    pub async fn unban(&self, http: &Http, user_id: UserId, reason: Option<&str>) -> Result<()> {
+        self.id.unban(http, user_id, reason).await
     }
 
     /// Retrieve's the guild's vanity URL.

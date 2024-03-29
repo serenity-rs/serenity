@@ -231,7 +231,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             serenity::utils::parse_message_url(forum_post_url).unwrap();
         msg.channel_id.say(ctx, format!("Deleting <#{}> in 10 seconds...", channel_id)).await?;
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-        channel_id.delete(&ctx.http).await?;
+        channel_id.delete(&ctx.http, None).await?;
     } else {
         return Ok(());
     }

@@ -96,8 +96,8 @@ impl Member {
     /// Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
-        http.add_member_role(self.guild_id, self.user.id, role_id, None).await
+    pub async fn add_role(&self, http: &Http, role_id: RoleId, reason: Option<&str>) -> Result<()> {
+        http.add_member_role(self.guild_id, self.user.id, role_id, reason).await
     }
 
     /// Adds one or multiple [`Role`]s to the member.
@@ -110,9 +110,14 @@ impl Member {
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_roles(&self, http: &Http, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn add_roles(
+        &self,
+        http: &Http,
+        role_ids: &[RoleId],
+        reason: Option<&str>,
+    ) -> Result<()> {
         for &role_id in role_ids {
-            self.add_role(http, role_id).await?;
+            self.add_role(http, role_id, reason).await?;
         }
 
         Ok(())
@@ -359,8 +364,13 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
-        http.remove_member_role(self.guild_id, self.user.id, role_id, None).await
+    pub async fn remove_role(
+        &self,
+        http: &Http,
+        role_id: RoleId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.remove_member_role(self.guild_id, self.user.id, role_id, reason).await
     }
 
     /// Removes one or multiple [`Role`]s from the member.
@@ -373,9 +383,14 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_roles(&self, http: &Http, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn remove_roles(
+        &self,
+        http: &Http,
+        role_ids: &[RoleId],
+        reason: Option<&str>,
+    ) -> Result<()> {
         for &role_id in role_ids {
-            self.remove_role(http, role_id).await?;
+            self.remove_role(http, role_id, reason).await?;
         }
 
         Ok(())
@@ -409,8 +424,8 @@ impl Member {
     /// does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn unban(&self, http: &Http) -> Result<()> {
-        http.remove_ban(self.guild_id, self.user.id, None).await
+    pub async fn unban(&self, http: &Http, reason: Option<&str>) -> Result<()> {
+        http.remove_ban(self.guild_id, self.user.id, reason).await
     }
 
     /// Returns the formatted URL of the member's per guild avatar, if one exists.
