@@ -190,7 +190,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         // As of 2023-04-20, bots are still not allowed to sending voice messages
         msg.author
             .id
-            .create_dm_channel(ctx)
+            .create_dm_channel(&ctx.http)
             .await?
             .id
             .send_message(

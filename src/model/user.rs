@@ -384,12 +384,12 @@ impl User {
     /// # Errors
     ///
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
-    pub async fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+    pub async fn create_dm_channel(&self, http: &Http) -> Result<PrivateChannel> {
         if self.bot() {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
-        self.id.create_dm_channel(cache_http).await
+        self.id.create_dm_channel(http).await
     }
 
     /// Retrieves the time that this user was created at.
@@ -426,7 +426,7 @@ impl User {
     ///         if msg.content == "~help" {
     ///             let builder = CreateMessage::new().content("Helpful info here.");
     ///
-    ///             if let Err(why) = msg.author.direct_message(&ctx, builder).await {
+    ///             if let Err(why) = msg.author.direct_message(&ctx.http, builder).await {
     ///                 println!("Err sending help: {why:?}");
     ///                 let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
     ///             };
@@ -442,22 +442,14 @@ impl User {
     /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
     ///
     /// Returns an [`Error::Json`] if there is an error deserializing the API response.
-    pub async fn direct_message(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
-    ) -> Result<Message> {
-        self.create_dm_channel(&cache_http).await?.send_message(cache_http, builder).await
+    pub async fn direct_message(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
+        self.create_dm_channel(http).await?.send_message(http, builder).await
     }
 
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
-    pub async fn dm(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
-    ) -> Result<Message> {
-        self.direct_message(cache_http, builder).await
+    pub async fn dm(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
+        self.direct_message(http, builder).await
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default avatar if needed.
@@ -633,7 +625,7 @@ impl UserId {
     /// returned by the Discord API.
     ///
     /// [current user]: CurrentUser
-    pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+    pub async fn create_dm_channel(self, http: &Http) -> Result<PrivateChannel> {
         #[derive(serde::Serialize)]
         struct CreateDmChannel {
             recipient_id: UserId,
@@ -643,7 +635,7 @@ impl UserId {
             recipient_id: self,
         };
 
-        cache_http.http().create_private_channel(&body).await
+        http.create_private_channel(&body).await
     }
 
     /// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
