@@ -80,8 +80,8 @@ impl Role {
     /// Returns [`Error::Http`] if the current user lacks permission to delete this role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete(&mut self, http: &Http) -> Result<()> {
-        http.delete_role(self.guild_id, self.id, None).await
+    pub async fn delete(&mut self, http: &Http, reason: Option<&str>) -> Result<()> {
+        self.guild_id.delete_role(http, self.id, reason).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.

@@ -164,9 +164,9 @@ impl Sticker {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete(&self, http: &Http) -> Result<()> {
+    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            guild_id.delete_sticker(http, self.id).await
+            guild_id.delete_sticker(http, self.id, reason).await
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
         }
