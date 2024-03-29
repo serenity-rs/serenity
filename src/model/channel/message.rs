@@ -813,7 +813,26 @@ impl Message {
 
     /// Retrieves the message channel's category ID if the channel has one.
     pub async fn category_id(&self, cache_http: impl CacheHttp) -> Option<ChannelId> {
-        self.channel_id.to_channel(cache_http).await.ok()?.guild()?.parent_id
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            if let Some(guild) = cache.guild(self.guild_id?) {
+                let channel = guild.channels.get(&self.channel_id)?;
+                return if channel.thread_metadata.is_some() {
+                    let thread_parent = guild.channels.get(&channel.parent_id?)?;
+                    thread_parent.parent_id
+                } else {
+                    channel.parent_id
+                };
+            }
+        }
+
+        let channel = self.channel_id.to_channel(&cache_http).await.ok()?.guild()?;
+        if channel.thread_metadata.is_some() {
+            let thread_parent = channel.parent_id?.to_channel(cache_http).await.ok()?.guild()?;
+            thread_parent.parent_id
+        } else {
+            channel.parent_id
+        }
     }
 }
 
