@@ -876,7 +876,7 @@ impl Guild {
         cache_http: impl CacheHttp,
         builder: CreateSticker<'_>,
     ) -> Result<Sticker> {
-        self.id.create_sticker(cache_http.http(), builder).await
+        self.id.create_sticker(cache_http, builder).await
     }
 
     /// Deletes the current guild if the current user is the owner of the
