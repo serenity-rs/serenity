@@ -95,9 +95,14 @@ impl ChannelId {
     /// set.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn create_permission(self, http: &Http, target: PermissionOverwrite) -> Result<()> {
+    pub async fn create_permission(
+        self,
+        http: &Http,
+        target: PermissionOverwrite,
+        reason: Option<&str>,
+    ) -> Result<()> {
         let data: PermissionOverwriteData = target.into();
-        http.create_permission(self, data.id, &data, None).await
+        http.create_permission(self, data.id, &data, reason).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -130,8 +135,8 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn delete(self, http: &Http) -> Result<Channel> {
-        http.delete_channel(self, None).await
+    pub async fn delete(self, http: &Http, reason: Option<&str>) -> Result<Channel> {
+        http.delete_channel(self, reason).await
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -146,8 +151,13 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_message(self, http: &Http, message_id: MessageId) -> Result<()> {
-        http.delete_message(self, message_id, None).await
+    pub async fn delete_message(
+        self,
+        http: &Http,
+        message_id: MessageId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.delete_message(self, message_id, reason).await
     }
 
     /// Deletes messages by Ids from the given vector in the given channel.
@@ -167,7 +177,12 @@ impl ChannelId {
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages(self, http: &Http, message_ids: &[MessageId]) -> Result<()> {
+    pub async fn delete_messages(
+        self,
+        http: &Http,
+        message_ids: &[MessageId],
+        reason: Option<&str>,
+    ) -> Result<()> {
         use crate::model::error::{Maximum, Minimum};
 
         #[derive(serde::Serialize)]
@@ -179,13 +194,13 @@ impl ChannelId {
         Maximum::BulkDeleteAmount.check_overflow(message_ids.len())?;
 
         if message_ids.len() == 1 {
-            self.delete_message(http, message_ids[0]).await
+            self.delete_message(http, message_ids[0], reason).await
         } else {
             let req = DeleteMessages {
                 messages: message_ids,
             };
 
-            http.delete_messages(self, &req, None).await
+            http.delete_messages(self, &req, reason).await
         }
     }
 
@@ -202,12 +217,13 @@ impl ChannelId {
         self,
         http: &Http,
         permission_type: PermissionOverwriteType,
+        reason: Option<&str>,
     ) -> Result<()> {
         let id = match permission_type {
             PermissionOverwriteType::Member(id) => id.into(),
             PermissionOverwriteType::Role(id) => id.get().into(),
         };
-        http.delete_permission(self, id, None).await
+        http.delete_permission(self, id, reason).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -504,8 +520,8 @@ impl ChannelId {
     /// many pinned messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(self, http: &Http, message_id: MessageId) -> Result<()> {
-        http.pin_message(self, message_id, None).await
+    pub async fn pin(self, http: &Http, message_id: MessageId, reason: Option<&str>) -> Result<()> {
+        http.pin_message(self, message_id, reason).await
     }
 
     /// Crossposts a [`Message`].
@@ -743,8 +759,13 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(self, http: &Http, message_id: MessageId) -> Result<()> {
-        http.unpin_message(self, message_id, None).await
+    pub async fn unpin(
+        self,
+        http: &Http,
+        message_id: MessageId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.unpin_message(self, message_id, reason).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -849,8 +870,8 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
-    pub async fn delete_stage_instance(self, http: &Http) -> Result<()> {
-        http.delete_stage_instance(self, None).await
+    pub async fn delete_stage_instance(self, http: &Http, reason: Option<&str>) -> Result<()> {
+        http.delete_stage_instance(self, reason).await
     }
 
     /// Creates a public thread that is connected to a message.

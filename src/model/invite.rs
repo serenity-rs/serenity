@@ -94,7 +94,7 @@ impl Invite {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
+    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
             if let (Some(cache), Some(guild)) = (cache_http.cache(), &self.guild) {
@@ -107,7 +107,7 @@ impl Invite {
             }
         }
 
-        cache_http.http().delete_invite(&self.code, None).await
+        cache_http.http().delete_invite(&self.code, reason).await
     }
 
     /// Gets information about an invite.
@@ -288,7 +288,7 @@ impl RichInvite {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
+    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
             if let (Some(cache), Some(guild)) = (cache_http.cache(), &self.guild) {
@@ -301,7 +301,7 @@ impl RichInvite {
             }
         }
 
-        cache_http.http().delete_invite(&self.code, None).await
+        cache_http.http().delete_invite(&self.code, reason).await
     }
 
     /// Returns a URL to use for the invite.
