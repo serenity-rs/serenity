@@ -393,6 +393,14 @@
 <a href="#391" id="391">391</a>
 <a href="#392" id="392">392</a>
 <a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Developer note:
 //!
 //! This is a set of embed builders for rich embeds.
@@ -697,6 +705,14 @@
             url: author.url.map(|f| f.into_string().into()),
             icon_url: author.icon_url.map(|f| f.into_string().into()),
         }
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+</span><span class="kw">impl </span>From&lt;User&gt; <span class="kw">for </span>CreateEmbedAuthor&lt;<span class="lifetime">'_</span>&gt; {
+    <span class="kw">fn </span>from(user: User) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>avatar_icon = user.face();
+        <span class="self">Self</span>::new(user.name).icon_url(avatar_icon)
     }
 }
 

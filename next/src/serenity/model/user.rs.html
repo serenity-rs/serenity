@@ -835,6 +835,27 @@
 <a href="#833" id="833">833</a>
 <a href="#834" id="834">834</a>
 <a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1248,39 +1269,13 @@
     ///
     /// # Examples
     ///
-    /// When a user sends a message with a content of `"~help"`, DM the author a help message
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
-    /// # struct Handler;
-    /// use serenity::builder::CreateMessage;
-    ///
-    /// #[serenity::async_trait]
-    /// # #[cfg(feature = "client")]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
-    ///         if msg.content == "~help" {
-    ///             let builder = CreateMessage::new().content("Helpful info here.");
-    ///
-    ///             if let Err(why) = msg.author.direct_message(&amp;ctx.http, builder).await {
-    ///                 println!("Err sending help: {why:?}");
-    ///                 let _ = msg.reply(&amp;ctx, "There was an error DMing you help.").await;
-    ///             };
-    ///         }
-    ///     }
-    /// }
-    /// ```
+    /// See [`UserId::direct_message`] for examples.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged is a bot user.
-    ///
-    /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
-    ///
-    /// Returns an [`Error::Json`] if there is an error deserializing the API response.
+    /// See [`UserId::direct_message`] for errors.
     </span><span class="kw">pub async fn </span>direct_message(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.create_dm_channel(http).<span class="kw">await</span><span class="question-mark">?</span>.send_message(http, builder).<span class="kw">await
+        <span class="self">self</span>.id.direct_message(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// This is an alias of [`Self::direct_message`].
@@ -1473,6 +1468,53 @@
         };
 
         http.create_private_channel(<span class="kw-2">&amp;</span>body).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Sends a message to a user through a direct message channel. This is a channel that can only
+    /// be accessed by you and the recipient.
+    ///
+    /// # Examples
+    ///
+    /// When a user sends a message with a content of `"~help"`, DM the author a help message
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::prelude::*;
+    /// # struct Handler;
+    /// use serenity::builder::CreateMessage;
+    ///
+    /// #[serenity::async_trait]
+    /// # #[cfg(feature = "client")]
+    /// impl EventHandler for Handler {
+    ///     async fn message(&amp;self, ctx: &amp;Context, msg: &amp;Message) {
+    ///         if msg.content == "~help" {
+    ///             let builder = CreateMessage::new().content("Helpful info here.");
+    ///
+    ///             if let Err(why) = msg.author.id.direct_message(&amp;ctx, builder).await {
+    ///                 println!("Err sending help: {why:?}");
+    ///                 let _ = msg.reply(&amp;ctx, "There was an error DMing you help.").await;
+    ///             };
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged is a bot user.
+    ///
+    /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
+    ///
+    /// Returns an [`Error::Json`] if there is an error deserializing the API response.
+    </span><span class="kw">pub async fn </span>direct_message(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>.create_dm_channel(http).<span class="kw">await</span><span class="question-mark">?</span>.send_message(http, builder).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// This is an alias of [`Self::direct_message`].
+    </span><span class="attr">#[allow(clippy::missing_errors_doc)]
+    #[inline]
+    </span><span class="kw">pub async fn </span>dm(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>.direct_message(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the

@@ -1106,6 +1106,25 @@
 <a href="#1104" id="1104">1104</a>
 <a href="#1105" id="1105">1105</a>
 <a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1892,7 +1911,26 @@
 
     <span class="doccomment">/// Retrieves the message channel's category ID if the channel has one.
     </span><span class="kw">pub async fn </span>category_id(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Option</span>&lt;ChannelId&gt; {
-        <span class="self">self</span>.channel_id.to_channel(cache_http).<span class="kw">await</span>.ok()<span class="question-mark">?</span>.guild()<span class="question-mark">?</span>.parent_id
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(guild) = cache.guild(<span class="self">self</span>.guild_id<span class="question-mark">?</span>) {
+                <span class="kw">let </span>channel = guild.channels.get(<span class="kw-2">&amp;</span><span class="self">self</span>.channel_id)<span class="question-mark">?</span>;
+                <span class="kw">return if </span>channel.thread_metadata.is_some() {
+                    <span class="kw">let </span>thread_parent = guild.channels.get(<span class="kw-2">&amp;</span>channel.parent_id<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+                    thread_parent.parent_id
+                } <span class="kw">else </span>{
+                    channel.parent_id
+                };
+            }
+        }
+
+        <span class="kw">let </span>channel = <span class="self">self</span>.channel_id.to_channel(<span class="kw-2">&amp;</span>cache_http).<span class="kw">await</span>.ok()<span class="question-mark">?</span>.guild()<span class="question-mark">?</span>;
+        <span class="kw">if </span>channel.thread_metadata.is_some() {
+            <span class="kw">let </span>thread_parent = channel.parent_id<span class="question-mark">?</span>.to_channel(cache_http).<span class="kw">await</span>.ok()<span class="question-mark">?</span>.guild()<span class="question-mark">?</span>;
+            thread_parent.parent_id
+        } <span class="kw">else </span>{
+            channel.parent_id
+        }
     }
 }
 
