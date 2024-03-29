@@ -31,6 +31,7 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+use crate::model::error::Maximum;
 use crate::model::guild::SerializeIter;
 use crate::model::prelude::*;
 
@@ -191,30 +192,7 @@ impl GuildId {
     /// Also can return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(self, http: &Http, user: UserId, dmd: u8) -> Result<()> {
-        self._ban(http, user, dmd, None).await
-    }
-
-    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
-    /// documentation.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::ban`] may return an error, may also return
-    /// [`ModelError::TooLarge`] if `reason` is too long.
-    pub async fn ban_with_reason(
-        self,
-        http: &Http,
-        user: UserId,
-        dmd: u8,
-        reason: &str,
-    ) -> Result<()> {
-        self._ban(http, user, dmd, Some(reason)).await
-    }
-
-    async fn _ban(self, http: &Http, user: UserId, dmd: u8, reason: Option<&str>) -> Result<()> {
-        use crate::model::error::Maximum;
-
+    pub async fn ban(self, http: &Http, user: UserId, dmd: u8, reason: Option<&str>) -> Result<()> {
         Maximum::DeleteMessageDays.check_overflow(dmd.into())?;
         if let Some(reason) = reason {
             Maximum::AuditLogReason.check_overflow(reason.len())?;
@@ -619,18 +597,22 @@ impl GuildId {
         self,
         http: &Http,
         mfa_level: MfaLevel,
-        audit_log_reason: Option<&str>,
+        reason: Option<&str>,
     ) -> Result<MfaLevel> {
         #[derive(serde::Serialize)]
         struct EditMfaModel {
             level: MfaLevel,
         }
 
+        if let Some(reason) = reason {
+            Maximum::AuditLogReason.check_overflow(reason.len())?;
+        }
+
         let map = EditMfaModel {
             level: mfa_level,
         };
 
-        http.edit_guild_mfa_level(self, &map, audit_log_reason).await
+        http.edit_guild_mfa_level(self, &map, reason).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -778,26 +760,16 @@ impl GuildId {
         http: &Http,
         role_id: RoleId,
         position: i16,
-    ) -> Result<Vec<Role>> {
-        self.edit_role_position_with_reason(http, role_id, position, None).await
-    }
-
-    /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
-    ///
-    /// # Errors
-    ///
-    /// See [`GuildId::edit_role_position`] for more details.
-    pub async fn edit_role_position_with_reason(
-        self,
-        http: &Http,
-        role_id: RoleId,
-        position: i16,
         reason: Option<&str>,
     ) -> Result<Vec<Role>> {
         #[derive(serde::Serialize)]
         struct EditRole {
             id: RoleId,
             position: i16,
+        }
+
+        if let Some(reason) = reason {
+            Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
 
         let map = EditRole {
@@ -970,16 +942,12 @@ impl GuildId {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(self, http: &Http, user_id: UserId) -> Result<()> {
-        http.kick_member(self, user_id, None).await
-    }
+    pub async fn kick(self, http: &Http, user_id: UserId, reason: Option<&str>) -> Result<()> {
+        if let Some(reason) = reason {
+            Maximum::AuditLogReason.check_overflow(reason.len())?;
+        }
 
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
-    /// the reason is too long.
-    pub async fn kick_with_reason(self, http: &Http, user_id: UserId, reason: &str) -> Result<()> {
-        http.kick_member(self, user_id, Some(reason)).await
+        http.kick_member(self, user_id, reason).await
     }
 
     /// Returns a guild [`Member`] object for the current user.

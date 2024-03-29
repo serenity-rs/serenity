@@ -418,7 +418,7 @@ impl Guild {
     ///
     /// ```rust,ignore
     /// // assumes a `user` and `guild` have already been bound
-    /// let _ = guild.ban(user, 4);
+    /// let _ = guild.ban(user, 4, None);
     /// ```
     ///
     /// # Errors
@@ -433,23 +433,12 @@ impl Guild {
     /// Otherwise returns [`Error::Http`] if the member cannot be banned.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(&self, cache_http: impl CacheHttp, user: UserId, dmd: u8) -> Result<()> {
-        self.ban_with_reason(cache_http, user, dmd, "").await
-    }
-
-    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
-    /// documentation.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the possible reasons [`Self::ban`] may return an error, an
-    /// [`ModelError::TooLarge`] may also be returned if the reason is too long.
-    pub async fn ban_with_reason(
+    pub async fn ban(
         &self,
         cache_http: impl CacheHttp,
         user: UserId,
         dmd: u8,
-        reason: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -460,7 +449,7 @@ impl Guild {
             }
         }
 
-        self.id.ban_with_reason(cache_http.http(), user, dmd, reason).await
+        self.id.ban(cache_http.http(), user, dmd, reason).await
     }
 
     /// Returns the formatted URL of the guild's banner image, if one exists.
@@ -1123,8 +1112,9 @@ impl Guild {
         http: &Http,
         role_id: RoleId,
         position: i16,
+        audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
-        self.id.edit_role_position(http, role_id, position).await
+        self.id.edit_role_position(http, role_id, position, audit_log_reason).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -1405,16 +1395,8 @@ impl Guild {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, http: &Http, user_id: UserId) -> Result<()> {
-        self.id.kick(http, user_id).await
-    }
-
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
-    /// the reason is too long.
-    pub async fn kick_with_reason(&self, http: &Http, user_id: UserId, reason: &str) -> Result<()> {
-        self.id.kick_with_reason(http, user_id, reason).await
+    pub async fn kick(&self, http: &Http, user_id: UserId, reason: Option<&str>) -> Result<()> {
+        self.id.kick(http, user_id, reason).await
     }
 
     /// Returns a guild [`Member`] object for the current user.

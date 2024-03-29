@@ -277,25 +277,14 @@ impl PartialGuild {
     /// Also may return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(&self, http: &Http, user: UserId, dmd: u8) -> Result<()> {
-        self.ban_with_reason(http, user, dmd, "").await
-    }
-
-    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
-    /// documentation.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::ban`] may return an error, can also return an error if
-    /// the reason is too long.
-    pub async fn ban_with_reason(
+    pub async fn ban(
         &self,
         http: &Http,
         user: UserId,
         dmd: u8,
-        reason: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
-        self.id.ban_with_reason(http, user, dmd, reason).await
+        self.id.ban(http, user, dmd, reason).await
     }
 
     /// Gets a list of the guild's bans, with additional options and filtering. See
@@ -807,8 +796,9 @@ impl PartialGuild {
         http: &Http,
         role_id: RoleId,
         position: i16,
+        audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
-        self.id.edit_role_position(http, role_id, position).await
+        self.id.edit_role_position(http, role_id, position, audit_log_reason).await
     }
 
     /// Edits a sticker.
@@ -1007,16 +997,8 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, http: &Http, user_id: UserId) -> Result<()> {
-        self.id.kick(http, user_id).await
-    }
-
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::kick`] may return an error, can also return an error if
-    /// the reason is too long.
-    pub async fn kick_with_reason(&self, http: &Http, user_id: UserId, reason: &str) -> Result<()> {
-        self.id.kick_with_reason(http, user_id, reason).await
+    pub async fn kick(&self, http: &Http, user_id: UserId, reason: Option<&str>) -> Result<()> {
+        self.id.kick(http, user_id, reason).await
     }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.

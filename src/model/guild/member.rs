@@ -129,19 +129,8 @@ impl Member {
     /// return [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(&self, http: &Http, dmd: u8) -> Result<()> {
-        self.ban_with_reason(http, dmd, "").await
-    }
-
-    /// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further
-    /// documentation.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the errors [`Self::ban`] may return, can also return
-    /// [`ModelError::TooLarge`] if the length of the reason is greater than 512.
-    pub async fn ban_with_reason(&self, http: &Http, dmd: u8, reason: &str) -> Result<()> {
-        self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
+    pub async fn ban(&self, http: &Http, dmd: u8, audit_log_reason: Option<&str>) -> Result<()> {
+        self.guild_id.ban(http, self.user.id, dmd, audit_log_reason).await
     }
 
     /// Determines the member's colour.
@@ -270,7 +259,7 @@ impl Member {
     ///
     /// ```rust,ignore
     /// // assuming a `member` has already been bound
-    /// match member.kick().await {
+    /// match member.kick(None).await {
     ///     Ok(()) => println!("Successfully kicked member"),
     ///     Err(Error::Model(ModelError::GuildNotFound)) => {
     ///         println!("Couldn't determine guild of member");
@@ -293,38 +282,7 @@ impl Member {
     /// Otherwise will return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.kick_with_reason(cache_http, "").await
-    }
-
-    /// Kicks the member from the guild, with a reason.
-    ///
-    /// **Note**: Requires the [Kick Members] permission.
-    ///
-    /// # Examples
-    ///
-    /// Kicks a member from it's guild, with an optional reason:
-    ///
-    /// ```rust,ignore
-    /// match member.kick(&ctx.http, "A Reason").await {
-    ///     Ok(()) => println!("Successfully kicked member"),
-    ///     Err(Error::Model(ModelError::GuildNotFound)) => {
-    ///         println!("Couldn't determine guild of member");
-    ///     },
-    ///     Err(Error::Model(ModelError::InvalidPermissions(missing_perms))) => {
-    ///         println!("Didn't have permissions; missing: {:?}", missing_perms);
-    ///     },
-    ///     _ => {},
-    /// }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::kick`] may return an error, can also return an error if
-    /// the given reason is too long.
-    ///
-    /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
+    pub async fn kick(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -337,7 +295,7 @@ impl Member {
             }
         }
 
-        self.guild_id.kick_with_reason(cache_http.http(), self.user.id, reason).await
+        self.guild_id.kick(cache_http.http(), self.user.id, reason).await
     }
 
     /// Moves the member to a voice channel.
