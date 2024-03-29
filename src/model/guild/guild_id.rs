@@ -31,6 +31,7 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+use crate::model::error::Maximum;
 use crate::model::guild::SerializeIter;
 use crate::model::prelude::*;
 
@@ -138,8 +139,13 @@ impl GuildId {
     /// does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn delete_automod_rule(self, http: &Http, rule_id: RuleId) -> Result<()> {
-        http.delete_automod_rule(self, rule_id, None).await
+    pub async fn delete_automod_rule(
+        self,
+        http: &Http,
+        rule_id: RuleId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.delete_automod_rule(self, rule_id, reason).await
     }
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
@@ -178,7 +184,7 @@ impl GuildId {
     /// # let http: Http = unimplemented!();
     /// # let user = UserId::new(1);
     /// // assuming a `user` has already been bound
-    /// let _ = GuildId::new(81384788765712384).ban(&http, user, 4).await;
+    /// let _ = GuildId::new(81384788765712384).ban(&http, user, 4, None).await;
     /// # Ok(())
     /// # }
     /// ```
@@ -191,30 +197,7 @@ impl GuildId {
     /// Also can return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(self, http: &Http, user: UserId, dmd: u8) -> Result<()> {
-        self._ban(http, user, dmd, None).await
-    }
-
-    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
-    /// documentation.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::ban`] may return an error, may also return
-    /// [`ModelError::TooLarge`] if `reason` is too long.
-    pub async fn ban_with_reason(
-        self,
-        http: &Http,
-        user: UserId,
-        dmd: u8,
-        reason: &str,
-    ) -> Result<()> {
-        self._ban(http, user, dmd, Some(reason)).await
-    }
-
-    async fn _ban(self, http: &Http, user: UserId, dmd: u8, reason: Option<&str>) -> Result<()> {
-        use crate::model::error::Maximum;
-
+    pub async fn ban(self, http: &Http, user: UserId, dmd: u8, reason: Option<&str>) -> Result<()> {
         Maximum::DeleteMessageDays.check_overflow(dmd.into())?;
         if let Some(reason) = reason {
             Maximum::AuditLogReason.check_overflow(reason.len())?;
@@ -329,7 +312,13 @@ impl GuildId {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_emoji(self, http: &Http, name: &str, image: &str) -> Result<Emoji> {
+    pub async fn create_emoji(
+        self,
+        http: &Http,
+        name: &str,
+        image: &str,
+        reason: Option<&str>,
+    ) -> Result<Emoji> {
         #[derive(serde::Serialize)]
         struct CreateEmoji<'a> {
             name: &'a str,
@@ -341,7 +330,7 @@ impl GuildId {
             image,
         };
 
-        http.create_emoji(self, &body, None).await
+        http.create_emoji(self, &body, reason).await
     }
 
     /// Creates an integration for the guild.
@@ -358,6 +347,7 @@ impl GuildId {
         http: &Http,
         integration_id: IntegrationId,
         kind: &str,
+        reason: Option<&str>,
     ) -> Result<()> {
         #[derive(serde::Serialize)]
         struct CreateIntegration<'a> {
@@ -371,7 +361,7 @@ impl GuildId {
             kind,
         };
 
-        http.create_guild_integration(self, integration_id, &body, None).await
+        http.create_guild_integration(self, integration_id, &body, reason).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -453,8 +443,13 @@ impl GuildId {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_emoji(self, http: &Http, emoji_id: EmojiId) -> Result<()> {
-        http.delete_emoji(self, emoji_id, None).await
+    pub async fn delete_emoji(
+        self,
+        http: &Http,
+        emoji_id: EmojiId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.delete_emoji(self, emoji_id, reason).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -471,8 +466,9 @@ impl GuildId {
         self,
         http: &Http,
         integration_id: IntegrationId,
+        reason: Option<&str>,
     ) -> Result<()> {
-        http.delete_guild_integration(self, integration_id, None).await
+        http.delete_guild_integration(self, integration_id, reason).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -487,8 +483,13 @@ impl GuildId {
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn delete_role(self, http: &Http, role_id: RoleId) -> Result<()> {
-        http.delete_role(self, role_id, None).await
+    pub async fn delete_role(
+        self,
+        http: &Http,
+        role_id: RoleId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.delete_role(self, role_id, reason).await
     }
 
     /// Deletes a specified scheduled event in the guild.
@@ -523,8 +524,13 @@ impl GuildId {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn delete_sticker(self, http: &Http, sticker_id: StickerId) -> Result<()> {
-        http.delete_sticker(self, sticker_id, None).await
+    pub async fn delete_sticker(
+        self,
+        http: &Http,
+        sticker_id: StickerId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.delete_sticker(self, sticker_id, reason).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -558,7 +564,13 @@ impl GuildId {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
-    pub async fn edit_emoji(self, http: &Http, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
+    pub async fn edit_emoji(
+        self,
+        http: &Http,
+        emoji_id: EmojiId,
+        name: &str,
+        reason: Option<&str>,
+    ) -> Result<Emoji> {
         #[derive(serde::Serialize)]
         struct EditEmoji<'a> {
             name: &'a str,
@@ -568,7 +580,7 @@ impl GuildId {
             name,
         };
 
-        http.edit_emoji(self, emoji_id, &map, None).await
+        http.edit_emoji(self, emoji_id, &map, reason).await
     }
 
     /// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
@@ -619,18 +631,22 @@ impl GuildId {
         self,
         http: &Http,
         mfa_level: MfaLevel,
-        audit_log_reason: Option<&str>,
+        reason: Option<&str>,
     ) -> Result<MfaLevel> {
         #[derive(serde::Serialize)]
         struct EditMfaModel {
             level: MfaLevel,
         }
 
+        if let Some(reason) = reason {
+            Maximum::AuditLogReason.check_overflow(reason.len())?;
+        }
+
         let map = EditMfaModel {
             level: mfa_level,
         };
 
-        http.edit_guild_mfa_level(self, &map, audit_log_reason).await
+        http.edit_guild_mfa_level(self, &map, reason).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -644,7 +660,12 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-    pub async fn edit_nickname(self, http: &Http, new_nickname: Option<&str>) -> Result<()> {
+    pub async fn edit_nickname(
+        self,
+        http: &Http,
+        new_nickname: Option<&str>,
+        reason: Option<&str>,
+    ) -> Result<()> {
         #[derive(serde::Serialize)]
         struct EditNickname<'a> {
             nick: Option<&'a str>,
@@ -654,7 +675,7 @@ impl GuildId {
             nick: new_nickname,
         };
 
-        http.edit_nickname(self, &map, None).await
+        http.edit_nickname(self, &map, reason).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -778,26 +799,16 @@ impl GuildId {
         http: &Http,
         role_id: RoleId,
         position: i16,
-    ) -> Result<Vec<Role>> {
-        self.edit_role_position_with_reason(http, role_id, position, None).await
-    }
-
-    /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
-    ///
-    /// # Errors
-    ///
-    /// See [`GuildId::edit_role_position`] for more details.
-    pub async fn edit_role_position_with_reason(
-        self,
-        http: &Http,
-        role_id: RoleId,
-        position: i16,
         reason: Option<&str>,
     ) -> Result<Vec<Role>> {
         #[derive(serde::Serialize)]
         struct EditRole {
             id: RoleId,
             position: i16,
+        }
+
+        if let Some(reason) = reason {
+            Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
 
         let map = EditRole {
@@ -970,16 +981,12 @@ impl GuildId {
     /// Returns [`Error::Http`] if the member cannot be kicked by the current user.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(self, http: &Http, user_id: UserId) -> Result<()> {
-        http.kick_member(self, user_id, None).await
-    }
+    pub async fn kick(self, http: &Http, user_id: UserId, reason: Option<&str>) -> Result<()> {
+        if let Some(reason) = reason {
+            Maximum::AuditLogReason.check_overflow(reason.len())?;
+        }
 
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::kick`] may return an error, may also return an error if
-    /// the reason is too long.
-    pub async fn kick_with_reason(self, http: &Http, user_id: UserId, reason: &str) -> Result<()> {
-        http.kick_member(self, user_id, Some(reason)).await
+        http.kick_member(self, user_id, reason).await
     }
 
     /// Returns a guild [`Member`] object for the current user.
@@ -1307,8 +1314,13 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn start_prune(self, http: &Http, days: u8) -> Result<GuildPrune> {
-        http.start_guild_prune(self, days, None).await
+    pub async fn start_prune(
+        self,
+        http: &Http,
+        days: u8,
+        reason: Option<&str>,
+    ) -> Result<GuildPrune> {
+        http.start_guild_prune(self, days, reason).await
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1320,8 +1332,8 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn unban(self, http: &Http, user_id: UserId) -> Result<()> {
-        http.remove_ban(self, user_id, None).await
+    pub async fn unban(self, http: &Http, user_id: UserId, reason: Option<&str>) -> Result<()> {
+        http.remove_ban(self, user_id, reason).await
     }
 
     /// Retrieve's the guild's vanity URL.
