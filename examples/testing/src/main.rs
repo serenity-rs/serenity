@@ -148,7 +148,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
     } else if let Some(user_id) = msg.content.strip_prefix("ban ") {
         // Test if banning without a reason actually works
         let user_id: UserId = user_id.trim().parse().unwrap();
-        guild_id.ban(&ctx.http, user_id, 0).await?;
+        guild_id.ban(&ctx.http, user_id, 0, None).await?;
     } else if msg.content == "createtags" {
         channel_id
             .edit(
@@ -219,7 +219,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             serenity::utils::parse_message_url(forum_post_url).unwrap();
         msg.channel_id.say(ctx, format!("Deleting <#{}> in 10 seconds...", channel_id)).await?;
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
-        channel_id.delete(&ctx.http).await?;
+        channel_id.delete(&ctx.http, None).await?;
     } else {
         return Ok(());
     }
