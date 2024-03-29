@@ -416,12 +416,8 @@ impl User {
     /// # Errors
     ///
     /// See [`UserId::direct_message`] for errors.
-    pub async fn direct_message(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
-    ) -> Result<Message> {
-        self.id.direct_message(cache_http, builder).await
+    pub async fn direct_message(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
+        self.id.direct_message(http, builder).await
     }
 
     /// Calculates the user's display name.
@@ -436,12 +432,8 @@ impl User {
 
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
-    pub async fn dm(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
-    ) -> Result<Message> {
-        self.direct_message(cache_http, builder).await
+    pub async fn dm(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
+        self.direct_message(http, builder).await
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default avatar if needed.
@@ -667,7 +659,7 @@ impl UserId {
     ///         if msg.content == "~help" {
     ///             let builder = CreateMessage::new().content("Helpful info here.");
     ///
-    ///             if let Err(why) = msg.author.id.direct_message(&ctx, builder).await {
+    ///             if let Err(why) = msg.author.id.direct_message(&ctx.http, builder).await {
     ///                 println!("Err sending help: {why:?}");
     ///                 let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
     ///             };
@@ -688,17 +680,13 @@ impl UserId {
         cache_http: impl CacheHttp,
         builder: CreateMessage<'_>,
     ) -> Result<Message> {
-        self.create_dm_channel(&cache_http).await?.send_message(cache_http, builder).await
+        self.create_dm_channel(&cache_http).await?.send_message(cache_http.http(), builder).await
     }
 
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
-    pub async fn dm(
-        self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
-    ) -> Result<Message> {
-        self.direct_message(cache_http, builder).await
+    pub async fn dm(self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
+        self.direct_message(http, builder).await
     }
 
     /// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
