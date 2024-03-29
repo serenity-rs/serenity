@@ -122,10 +122,10 @@ impl Channel {
     /// lacks permission.
     ///
     /// Otherwise will return [`Error::Http`] if the current user does not have permission.
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
         match self {
             Self::Guild(public_channel) => {
-                public_channel.delete(cache_http).await?;
+                public_channel.delete(cache_http, reason).await?;
             },
             Self::Private(private_channel) => {
                 private_channel.delete(cache_http.http()).await?;
