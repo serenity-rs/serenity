@@ -107,8 +107,8 @@ impl Member {
     /// Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
-        http.add_member_role(self.guild_id, self.user.id, role_id, None).await
+    pub async fn add_role(&self, http: &Http, role_id: RoleId, reason: Option<&str>) -> Result<()> {
+        http.add_member_role(self.guild_id, self.user.id, role_id, reason).await
     }
 
     /// Adds one or multiple [`Role`]s to the member.
@@ -121,9 +121,14 @@ impl Member {
     /// does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_roles(&self, http: &Http, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn add_roles(
+        &self,
+        http: &Http,
+        role_ids: &[RoleId],
+        reason: Option<&str>,
+    ) -> Result<()> {
         for &role_id in role_ids {
-            self.add_role(http, role_id).await?;
+            self.add_role(http, role_id, reason).await?;
         }
 
         Ok(())
@@ -140,19 +145,8 @@ impl Member {
     /// return [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(&self, http: &Http, dmd: u8) -> Result<()> {
-        self.ban_with_reason(http, dmd, "").await
-    }
-
-    /// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further
-    /// documentation.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the errors [`Self::ban`] may return, can also return
-    /// [`ModelError::TooLarge`] if the length of the reason is greater than 512.
-    pub async fn ban_with_reason(&self, http: &Http, dmd: u8, reason: &str) -> Result<()> {
-        self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
+    pub async fn ban(&self, http: &Http, dmd: u8, audit_log_reason: Option<&str>) -> Result<()> {
+        self.guild_id.ban(http, self.user.id, dmd, audit_log_reason).await
     }
 
     /// Determines the member's colour.
@@ -282,7 +276,7 @@ impl Member {
     ///
     /// ```rust,ignore
     /// // assuming a `member` has already been bound
-    /// match member.kick().await {
+    /// match member.kick(None).await {
     ///     Ok(()) => println!("Successfully kicked member"),
     ///     Err(Error::Model(ModelError::GuildNotFound)) => {
     ///         println!("Couldn't determine guild of member");
@@ -305,38 +299,7 @@ impl Member {
     /// Otherwise will return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.kick_with_reason(cache_http, "").await
-    }
-
-    /// Kicks the member from the guild, with a reason.
-    ///
-    /// **Note**: Requires the [Kick Members] permission.
-    ///
-    /// # Examples
-    ///
-    /// Kicks a member from it's guild, with an optional reason:
-    ///
-    /// ```rust,ignore
-    /// match member.kick(&ctx.http, "A Reason").await {
-    ///     Ok(()) => println!("Successfully kicked member"),
-    ///     Err(Error::Model(ModelError::GuildNotFound)) => {
-    ///         println!("Couldn't determine guild of member");
-    ///     },
-    ///     Err(Error::Model(ModelError::InvalidPermissions(missing_perms))) => {
-    ///         println!("Didn't have permissions; missing: {:?}", missing_perms);
-    ///     },
-    ///     _ => {},
-    /// }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::kick`] may return an error, can also return an error if
-    /// the given reason is too long.
-    ///
-    /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
+    pub async fn kick(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -349,7 +312,7 @@ impl Member {
             }
         }
 
-        self.guild_id.kick_with_reason(cache_http.http(), self.user.id, reason).await
+        self.guild_id.kick(cache_http.http(), self.user.id, reason).await
     }
 
     /// Moves the member to a voice channel.
@@ -416,8 +379,13 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_role(&self, http: &Http, role_id: RoleId) -> Result<()> {
-        http.remove_member_role(self.guild_id, self.user.id, role_id, None).await
+    pub async fn remove_role(
+        &self,
+        http: &Http,
+        role_id: RoleId,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.remove_member_role(self.guild_id, self.user.id, role_id, reason).await
     }
 
     /// Removes one or multiple [`Role`]s from the member.
@@ -430,9 +398,14 @@ impl Member {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_roles(&self, http: &Http, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn remove_roles(
+        &self,
+        http: &Http,
+        role_ids: &[RoleId],
+        reason: Option<&str>,
+    ) -> Result<()> {
         for &role_id in role_ids {
-            self.remove_role(http, role_id).await?;
+            self.remove_role(http, role_id, reason).await?;
         }
 
         Ok(())
@@ -466,8 +439,8 @@ impl Member {
     /// does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn unban(&self, http: &Http) -> Result<()> {
-        http.remove_ban(self.guild_id, self.user.id, None).await
+    pub async fn unban(&self, http: &Http, reason: Option<&str>) -> Result<()> {
+        http.remove_ban(self.guild_id, self.user.id, reason).await
     }
 
     /// Returns the formatted URL of the member's per guild avatar, if one exists.
