@@ -2857,6 +2857,8 @@
 <a href="#2855" id="2855">2855</a>
 <a href="#2856" id="2856">2856</a>
 <a href="#2857" id="2857">2857</a>
+<a href="#2858" id="2858">2858</a>
+<a href="#2859" id="2859">2859</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4379,12 +4381,14 @@
         <span class="self">self</span>.id.invites(cache_http.http()).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Checks if the guild is 'large'. A guild is considered large if it has more than 250
-    /// members.
+    <span class="doccomment">/// Checks if the guild is 'large'.
+    ///
+    /// A guild is considered large if it has more than 250 members.
     </span><span class="attr">#[inline]
     #[must_use]
+    #[deprecated = <span class="string">"Use Guild::large"</span>]
     </span><span class="kw">pub fn </span>is_large(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.members.len() &gt; LARGE_THRESHOLD <span class="kw">as </span>usize
+        <span class="self">self</span>.member_count &gt; u64::from(LARGE_THRESHOLD)
     }
 
     <span class="doccomment">/// Kicks a [`Member`] from the guild.
