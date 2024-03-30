@@ -203,6 +203,7 @@ impl Message {
 
     /// A util function for determining whether this message was sent by someone else, or the bot.
     #[cfg(feature = "cache")]
+    #[deprecated = "Check Message::author is equal to Cache::current_user"]
     pub fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
         self.author.id == cache.as_ref().current_user().id
     }
@@ -453,6 +454,7 @@ impl Message {
     /// never set for those, which this method relies on.
     #[inline]
     #[must_use]
+    #[deprecated = "Check if guild_id is None if the message is received from the gateway."]
     pub fn is_private(&self) -> bool {
         self.guild_id.is_none()
     }
