@@ -34,7 +34,7 @@ async-trait = "0.1.74"
 tracing = { version = "0.1.40", features = ["log"] }
 serde = { version = "1.0.192", features = ["derive"] }
 url = { version = "2.4.1", features = ["serde"] }
-tokio = { version = "1.34.0", features = ["fs", "macros", "rt", "sync", "time", "io-util"] }
+tokio = { version = "1.34.0", features = ["macros", "rt", "sync", "time", "io-util"] }
 futures = { version = "0.3.29", default-features = false, features = ["std"] }
 time = { version = "0.3.36", features = ["formatting", "parsing", "serde-well-known"] }
 base64 = { version = "0.22.0" }
@@ -90,7 +90,7 @@ default_no_backend = [
 
 # Enables builder structs to configure Discord HTTP requests. Without this feature, you have to
 # construct JSON manually at some places.
-builder = []
+builder = ["tokio/fs"]
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
 cache = ["fxhash", "dashmap", "parking_lot"]
