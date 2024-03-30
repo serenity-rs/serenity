@@ -1520,12 +1520,14 @@ impl Guild {
         self.id.invites(cache_http.http()).await
     }
 
-    /// Checks if the guild is 'large'. A guild is considered large if it has more than 250
-    /// members.
+    /// Checks if the guild is 'large'.
+    ///
+    /// A guild is considered large if it has more than 250 members.
     #[inline]
     #[must_use]
+    #[deprecated = "Use Guild::large"]
     pub fn is_large(&self) -> bool {
-        self.members.len() > LARGE_THRESHOLD as usize
+        self.member_count > u64::from(LARGE_THRESHOLD)
     }
 
     /// Kicks a [`Member`] from the guild.
