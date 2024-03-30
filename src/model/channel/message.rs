@@ -454,7 +454,7 @@ impl Message {
     /// never set for those, which this method relies on.
     #[inline]
     #[must_use]
-    #[deprecated = "Check if guild_id is None if the message is recieved from the gateway."]
+    #[deprecated = "Check if guild_id is None if the message is received from the gateway."]
     pub fn is_private(&self) -> bool {
         self.guild_id.is_none()
     }
