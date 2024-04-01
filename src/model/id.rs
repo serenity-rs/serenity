@@ -288,6 +288,17 @@ id_u64! {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct ShardId(pub u32);
 
+impl ShardId {
+    /// Retrieves the value as a [`u32`].
+    ///
+    /// This is not a [`u64`] as [`ShardId`]s are not a discord concept and are simply used for
+    /// internal type safety.
+    #[must_use]
+    pub fn get(self) -> u32 {
+        self.0
+    }
+}
+
 impl fmt::Display for ShardId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
