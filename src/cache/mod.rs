@@ -159,6 +159,11 @@ pub struct Cache {
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
     pub(crate) temp_channels: MokaCache<ChannelId, MaybeOwnedArc<GuildChannel>, BuildHasher>,
+    /// Cache of private channels created via create_dm_channel.
+    ///
+    /// The TTL for each value is configured in CacheSettings.
+    #[cfg(feature = "temp_cache")]
+    pub(crate) temp_private_channels: MokaCache<UserId, MaybeOwnedArc<PrivateChannel>, BuildHasher>,
     /// Cache of messages that have been fetched via message.
     ///
     /// The TTL for each value is configured in CacheSettings.
@@ -262,6 +267,8 @@ impl Cache {
         }
 
         Self {
+            #[cfg(feature = "temp_cache")]
+            temp_private_channels: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_channels: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]

@@ -635,11 +635,28 @@ impl UserId {
     ///
     /// [current user]: CurrentUser
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+        #[cfg(feature = "temp_cache")]
+        if let Some(cache) = cache_http.cache() {
+            if let Some(private_channel) = cache.temp_private_channels.get(&self) {
+                return Ok(PrivateChannel::clone(&private_channel));
+            }
+        }
+
         let map = json!({
             "recipient_id": self,
         });
 
-        cache_http.http().create_private_channel(&map).await
+        let channel = cache_http.http().create_private_channel(&map).await?;
+
+        #[cfg(feature = "temp_cache")]
+        if let Some(cache) = cache_http.cache() {
+            use crate::cache::MaybeOwnedArc;
+
+            let cached_channel = MaybeOwnedArc::new(channel.clone());
+            cache.temp_private_channels.insert(self, cached_channel);
+        }
+
+        Ok(channel)
     }
 
     /// Sends a message to a user through a direct message channel. This is a channel that can only
