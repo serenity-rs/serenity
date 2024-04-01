@@ -33,6 +33,7 @@ use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
+use crate::model::guild::SerializeIter;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
@@ -247,6 +248,37 @@ impl GuildId {
         }
 
         http.as_ref().ban_user(self, user, dmd, reason).await
+    }
+
+    /// Bans multiple users from the guild, returning the users that were and weren't banned, and
+    /// optionally deleting messages that are younger than the provided `delete_message_seconds`.
+    ///
+    /// # Errors
+    ///
+    /// Errors if none of the users are banned or you do not have the
+    /// required [`BAN_MEMBERS`] and [`MANAGE_GUILD`] permissions.
+    ///
+    /// [`BAN_MEMBERS`]: Permissions::BAN_MEMBERS
+    /// [`MANAGE_GUILD`]: Permissions::MANAGE_GUILD
+    pub async fn bulk_ban(
+        self,
+        http: &Http,
+        users: impl IntoIterator<Item = UserId>,
+        delete_message_seconds: u32,
+        reason: Option<&str>,
+    ) -> Result<BulkBanResponse> {
+        #[derive(serde::Serialize)]
+        struct BulkBan<I> {
+            user_ids: I,
+            delete_message_seconds: u32,
+        }
+
+        let map = BulkBan {
+            user_ids: SerializeIter::new(users.into_iter()),
+            delete_message_seconds,
+        };
+
+        http.bulk_ban_users(self, &map, reason).await
     }
 
     /// Gets a list of the guild's bans, with additional options and filtering. See

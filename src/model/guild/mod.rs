@@ -75,6 +75,18 @@ pub struct Ban {
     pub user: User,
 }
 
+/// The response from [`GuildId::bulk_ban`].
+///
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/6720).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct BulkBanResponse {
+    /// The users that were successfully banned.
+    banned_users: Vec<UserId>,
+    /// The users that were not successfully banned.
+    failed_users: Vec<UserId>,
+}
+
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct AfkMetadata {
@@ -511,6 +523,28 @@ impl Guild {
         }
 
         self.id.ban_with_reason(cache_http.http(), user, dmd, reason).await
+    }
+
+    /// Bans multiple users from the guild, returning the users that were and weren't banned.
+    ///
+    /// # Errors
+    ///
+    /// See [`GuildId::bulk_ban`] for more information.
+    pub async fn bulk_ban(
+        &self,
+        cache_http: impl CacheHttp,
+        users: impl IntoIterator<Item = UserId>,
+        delete_message_seconds: u32,
+        reason: Option<&str>,
+    ) -> Result<BulkBanResponse> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::BAN_MEMBERS & Permissions::MANAGE_GUILD)?;
+            }
+        }
+
+        self.id.bulk_ban(cache_http.http(), users, delete_message_seconds, reason).await
     }
 
     /// Returns the formatted URL of the guild's banner image, if one exists.

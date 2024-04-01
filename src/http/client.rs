@@ -302,6 +302,28 @@ impl Http {
         .await
     }
 
+    /// Bans multiple users from a [`Guild`], optionally removing their messages.
+    ///
+    /// See the [Discord Docs](https://github.com/discord/discord-api-docs/pull/6720) for more information.
+    pub async fn bulk_ban_users(
+        &self,
+        guild_id: GuildId,
+        map: &impl serde::Serialize,
+        reason: Option<&str>,
+    ) -> Result<BulkBanResponse> {
+        self.fire(Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: reason.map(reason_into_header),
+            method: LightMethod::Post,
+            route: Route::GuildBulkBan {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Broadcasts that the current user is typing in the given [`Channel`].
     ///
     /// This lasts for about 10 seconds, and will then need to be renewed to indicate that the
