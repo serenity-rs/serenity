@@ -895,6 +895,23 @@
 <a href="#893" id="893">893</a>
 <a href="#894" id="894">894</a>
 <a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1532,12 +1549,29 @@
     ///
     /// [current user]: CurrentUser
     </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
+        <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(private_channel) = cache.temp_private_channels.get(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(PrivateChannel::clone(<span class="kw-2">&amp;</span>private_channel));
+            }
+        }
+
         <span class="kw">let </span>map = <span class="macro">json!</span>({
             <span class="string">"recipient_id"</span>: <span class="self">self</span>,
         });
 
-        cache_http.http().create_private_channel(<span class="kw-2">&amp;</span>map).<span class="kw">await
-    </span>}
+        <span class="kw">let </span>channel = cache_http.http().create_private_channel(<span class="kw-2">&amp;</span>map).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+
+            <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(channel.clone());
+            cache.temp_private_channels.insert(<span class="self">self</span>, cached_channel);
+        }
+
+        <span class="prelude-val">Ok</span>(channel)
+    }
 
     <span class="doccomment">/// Sends a message to a user through a direct message channel. This is a channel that can only
     /// be accessed by you and the recipient.

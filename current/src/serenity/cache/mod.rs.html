@@ -855,6 +855,13 @@
 <a href="#853" id="853">853</a>
 <a href="#854" id="854">854</a>
 <a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
@@ -1016,6 +1023,11 @@
     /// The TTL for each value is configured in CacheSettings.
     </span><span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_channels: MokaCache&lt;ChannelId, MaybeOwnedArc&lt;GuildChannel&gt;, BuildHasher&gt;,
+    <span class="doccomment">/// Cache of private channels created via create_dm_channel.
+    ///
+    /// The TTL for each value is configured in CacheSettings.
+    </span><span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) temp_private_channels: MokaCache&lt;UserId, MaybeOwnedArc&lt;PrivateChannel&gt;, BuildHasher&gt;,
     <span class="doccomment">/// Cache of messages that have been fetched via message.
     ///
     /// The TTL for each value is configured in CacheSettings.
@@ -1119,6 +1131,8 @@
         }
 
         <span class="self">Self </span>{
+            <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+            </span>temp_private_channels: temp_cache(settings.time_to_live),
             <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
             </span>temp_channels: temp_cache(settings.time_to_live),
             <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
