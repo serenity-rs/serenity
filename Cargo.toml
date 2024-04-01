@@ -27,7 +27,7 @@ url = { version = "2.4.1", features = ["serde"] }
 tokio = { version = "1.34.0", features = ["fs", "macros", "rt", "sync", "time", "io-util"] }
 futures = { version = "0.3.29", default-features = false, features = ["std"] }
 dep_time = { version = "0.3.30", package = "time", features = ["formatting", "parsing", "serde-well-known"] }
-base64 = { version = "0.21.5" }
+base64 = { version = "0.22.0" }
 secrecy = { version = "0.8.0", features = ["serde"] }
 arrayvec = { version = "0.7.4", features = ["serde"] }
 serde_cow = { version = "0.1.0" }
