@@ -1682,12 +1682,6 @@ impl Guild {
     /// It would be sorted:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
-    /// **Locking**: First collects a [`Member`]'s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
-    /// the originally correct position. However, since the read-locks are dropped after borrowing
-    /// the name, the names might have been changed by the user, the sorted list cannot account for
-    /// this.
-    ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].
     #[must_use]
@@ -1751,12 +1745,6 @@ impl Guild {
     /// setting `sorted` to `true` will result in an overhead, as both fields have to be considered
     /// again for sorting.
     ///
-    /// **Locking**: First collects a [`Member`]'s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
-    /// the originally correct position. However, since the read-locks are dropped after borrowing
-    /// the name, the names might have been changed by the user, the sorted list cannot account for
-    /// this.
-    ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].
     #[must_use]
@@ -1807,12 +1795,6 @@ impl Guild {
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
-    /// **Locking**: First collects a [`Member`]'s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
-    /// the originally correct position. However, since the read-locks are dropped after borrowing
-    /// the name, the names might have been changed by the user, the sorted list cannot account for
-    /// this.
-    ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].
     #[must_use]
@@ -1855,12 +1837,6 @@ impl Guild {
     ///
     /// **Note**: Instead of panicking, when sorting does not find a nick, the username will be
     /// used (this should never happen).
-    ///
-    /// **Locking**: First collects a [`Member`]'s nick directly or by read-locking all inner
-    /// [`User`]s (in case of no nick, see note above), and then sorts. This ensures that no name
-    /// is being changed after being sorted in the originally correct position. However, since the
-    /// read-locks are dropped after borrowing the name, the names might have been changed by the
-    /// user, the sorted list cannot account for this.
     ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].
