@@ -286,6 +286,8 @@ impl Http {
         delete_message_days: u8,
         reason: Option<&str>,
     ) -> Result<()> {
+        let delete_message_seconds = u32::from(delete_message_days) * 86400;
+
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -295,7 +297,7 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: Some(vec![("delete_message_days", delete_message_days.to_string())]),
+            params: Some(vec![("delete_message_seconds", delete_message_seconds.to_string())]),
         })
         .await
     }
