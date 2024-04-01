@@ -382,6 +382,17 @@
 <a href="#380" id="380">380</a>
 <a href="#381" id="381">381</a>
 <a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
@@ -671,6 +682,17 @@
 </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 </span><span class="kw">pub struct </span>ShardId(<span class="kw">pub </span>u32);
+
+<span class="kw">impl </span>ShardId {
+    <span class="doccomment">/// Retrieves the value as a [`u32`].
+    ///
+    /// This is not a [`u64`] as [`ShardId`]s are not a discord concept and are simply used for
+    /// internal type safety.
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>get(<span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ShardId {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
