@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/shard.rs`."><title>shard.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (88c2f4f5f 2024-04-02)" data-channel="nightly" data-search-js="search-ffac13a0df2b1870.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c97aec732c613ca4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/shard.rs`."><title>shard.rs - source</title><script> if (window.location.protocol !== "file:") document.write(`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2">`)</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e935ef01ae1c1829.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (385fa9d84 2024-04-04)" data-channel="nightly" data-search-js="search-ffac13a0df2b1870.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c97aec732c613ca4.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -774,6 +774,13 @@
 <a href="#772" id="772">772</a>
 <a href="#773" id="773">773</a>
 <a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -851,6 +858,7 @@
     </span><span class="kw">pub </span>started: Instant,
     token: Secret&lt;Token&gt;,
     ws_url: Arc&lt;str&gt;,
+    resume_ws_url: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="kw">pub </span>intents: GatewayIntents,
 }
 
@@ -929,6 +937,7 @@
             session_id,
             shard_info,
             ws_url,
+            resume_ws_url: <span class="prelude-val">None</span>,
             intents,
         })
     }
@@ -1059,6 +1068,7 @@
             Event::Ready(ready) =&gt; {
                 <span class="macro">debug!</span>(<span class="string">"[{:?}] Received Ready"</span>, <span class="self">self</span>.shard_info);
 
+                <span class="self">self</span>.resume_ws_url = <span class="prelude-val">Some</span>(ready.ready.resume_gateway_url.clone());
                 <span class="self">self</span>.session_id = <span class="prelude-val">Some</span>(ready.ready.session_id.clone());
                 <span class="self">self</span>.stage = ConnectionStage::Connected;
 
@@ -1460,15 +1470,19 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Initializes a new WebSocket client.
+    <span class="doccomment">/// Reinitializes an existing WebSocket client, replacing it.
     ///
     /// This will set the stage of the shard before and after instantiation of the client.
+    ///
     /// # Errors
     ///
     /// Errors if unable to establish a websocket connection.
     </span><span class="attr">#[cfg_attr(feature = <span class="string">"tracing_instrument"</span>, instrument(skip(<span class="self">self</span>)))]
-    </span><span class="kw">pub async fn </span>initialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;WsClient&gt; {
+    </span><span class="kw">pub async fn </span>reinitialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;WsClient&gt; {
         <span class="macro">debug!</span>(<span class="string">"[{:?}] Initializing."</span>, <span class="self">self</span>.shard_info);
+
+        <span class="comment">// Reconnect to the resume URL if possible, otherwise use the generic URL.
+        </span><span class="kw">let </span>ws_url = <span class="self">self</span>.resume_ws_url.as_deref().unwrap_or(<span class="kw-2">&amp;</span><span class="self">self</span>.ws_url);
 
         <span class="comment">// We need to do two, sort of three things here:
         // - set the stage of the shard as opening the websocket connection
@@ -1479,7 +1493,7 @@
         // Hello is received.
         </span><span class="self">self</span>.stage = ConnectionStage::Connecting;
         <span class="self">self</span>.started = Instant::now();
-        <span class="kw">let </span>client = connect(<span class="kw-2">&amp;</span><span class="self">self</span>.ws_url).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>client = connect(ws_url).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.stage = ConnectionStage::Handshake;
 
         <span class="prelude-val">Ok</span>(client)
@@ -1503,7 +1517,7 @@
     </span><span class="kw">pub async fn </span>resume(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="macro">debug!</span>(<span class="string">"[{:?}] Attempting to resume"</span>, <span class="self">self</span>.shard_info);
 
-        <span class="self">self</span>.client = <span class="self">self</span>.initialize().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.client = <span class="self">self</span>.reinitialize().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.stage = ConnectionStage::Resuming;
 
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.session_id {
@@ -1524,7 +1538,7 @@
         <span class="macro">info!</span>(<span class="string">"[{:?}] Attempting to reconnect"</span>, <span class="self">self</span>.shard_info());
 
         <span class="self">self</span>.reset();
-        <span class="self">self</span>.client = <span class="self">self</span>.initialize().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.client = <span class="self">self</span>.reinitialize().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
