@@ -75,6 +75,7 @@ pub struct Shard {
     pub started: Instant,
     token: Secret<Token>,
     ws_url: Arc<str>,
+    resume_ws_url: Option<FixedString>,
     pub intents: GatewayIntents,
 }
 
@@ -153,6 +154,7 @@ impl Shard {
             session_id,
             shard_info,
             ws_url,
+            resume_ws_url: None,
             intents,
         })
     }
@@ -283,6 +285,7 @@ impl Shard {
             Event::Ready(ready) => {
                 debug!("[{:?}] Received Ready", self.shard_info);
 
+                self.resume_ws_url = Some(ready.ready.resume_gateway_url.clone());
                 self.session_id = Some(ready.ready.session_id.clone());
                 self.stage = ConnectionStage::Connected;
 
@@ -684,15 +687,19 @@ impl Shard {
         Ok(())
     }
 
-    /// Initializes a new WebSocket client.
+    /// Reinitializes an existing WebSocket client, replacing it.
     ///
     /// This will set the stage of the shard before and after instantiation of the client.
+    ///
     /// # Errors
     ///
     /// Errors if unable to establish a websocket connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn initialize(&mut self) -> Result<WsClient> {
+    pub async fn reinitialize(&mut self) -> Result<WsClient> {
         debug!("[{:?}] Initializing.", self.shard_info);
+
+        // Reconnect to the resume URL if possible, otherwise use the generic URL.
+        let ws_url = self.resume_ws_url.as_deref().unwrap_or(&self.ws_url);
 
         // We need to do two, sort of three things here:
         // - set the stage of the shard as opening the websocket connection
@@ -703,7 +710,7 @@ impl Shard {
         // Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
-        let client = connect(&self.ws_url).await?;
+        let client = connect(ws_url).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)
@@ -727,7 +734,7 @@ impl Shard {
     pub async fn resume(&mut self) -> Result<()> {
         debug!("[{:?}] Attempting to resume", self.shard_info);
 
-        self.client = self.initialize().await?;
+        self.client = self.reinitialize().await?;
         self.stage = ConnectionStage::Resuming;
 
         match &self.session_id {
@@ -748,7 +755,7 @@ impl Shard {
         info!("[{:?}] Attempting to reconnect", self.shard_info());
 
         self.reset();
-        self.client = self.initialize().await?;
+        self.client = self.reinitialize().await?;
 
         Ok(())
     }
