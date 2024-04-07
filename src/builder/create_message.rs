@@ -334,6 +334,9 @@ impl Builder for CreateMessage {
         let http = cache_http.http();
 
         let files = self.attachments.take_files();
+        if self.allowed_mentions.is_none() {
+            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+        }
 
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut message = http.send_message(channel_id, files, &self).await?;

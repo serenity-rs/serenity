@@ -151,7 +151,14 @@ impl Builder for CreateInteractionResponse {
             _ => Vec::new(),
         };
 
-        cache_http.http().create_interaction_response(ctx.0, ctx.1, &self, files).await
+        let http = cache_http.http();
+        if let Self::Message(msg) | Self::Defer(msg) | Self::UpdateMessage(msg) = &mut self {
+            if msg.allowed_mentions.is_none() {
+                msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
+            }
+        };
+
+        http.create_interaction_response(ctx.0, ctx.1, &self, files).await
     }
 }
 

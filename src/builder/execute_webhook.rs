@@ -362,6 +362,11 @@ impl Builder for ExecuteWebhook {
 
         let files = self.attachments.take_files();
 
-        cache_http.http().execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
+        let http = cache_http.http();
+        if self.allowed_mentions.is_none() {
+            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+        }
+
+        http.execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
     }
 }
