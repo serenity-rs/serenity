@@ -210,6 +210,10 @@ routes! ('a, {
     api!("/guilds/{}/bans/{}", guild_id, user_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));
 
+    GuildBulkBan { guild_id: GuildId },
+    api!("/guilds/{}/bulk-ban", guild_id),
+    Some(RatelimitingKind::PathAndId(guild_id.into()));
+
     GuildBans { guild_id: GuildId },
     api!("/guilds/{}/bans", guild_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));

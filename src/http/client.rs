@@ -299,6 +299,8 @@ impl Http {
         delete_message_days: u8,
         reason: Option<&str>,
     ) -> Result<()> {
+        let delete_message_seconds = u32::from(delete_message_days) * 86400;
+
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -308,7 +310,29 @@ impl Http {
                 guild_id,
                 user_id,
             },
-            params: Some(vec![("delete_message_days", delete_message_days.to_string())]),
+            params: Some(vec![("delete_message_seconds", delete_message_seconds.to_string())]),
+        })
+        .await
+    }
+
+    /// Bans multiple users from a [`Guild`], optionally removing their messages.
+    ///
+    /// See the [Discord Docs](https://github.com/discord/discord-api-docs/pull/6720) for more information.
+    pub async fn bulk_ban_users(
+        &self,
+        guild_id: GuildId,
+        map: &impl serde::Serialize,
+        reason: Option<&str>,
+    ) -> Result<BulkBanResponse> {
+        self.fire(Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: reason.map(reason_into_header),
+            method: LightMethod::Post,
+            route: Route::GuildBulkBan {
+                guild_id,
+            },
+            params: None,
         })
         .await
     }
