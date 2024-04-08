@@ -472,6 +472,10 @@
 <a href="#470" id="470">470</a>
 <a href="#471" id="471">471</a>
 <a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::num::NonZeroU64;
 
@@ -682,6 +686,10 @@
 
     GuildBan { guild_id: GuildId, user_id: UserId },
     <span class="macro">api!</span>(<span class="string">"/guilds/{}/bans/{}"</span>, guild_id, user_id),
+    <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.into()));
+
+    GuildBulkBan { guild_id: GuildId },
+    <span class="macro">api!</span>(<span class="string">"/guilds/{}/bulk-ban"</span>, guild_id),
     <span class="prelude-val">Some</span>(RatelimitingKind::PathAndId(guild_id.into()));
 
     GuildBans { guild_id: GuildId },

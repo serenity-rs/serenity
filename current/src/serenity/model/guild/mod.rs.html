@@ -2835,6 +2835,40 @@
 <a href="#2833" id="2833">2833</a>
 <a href="#2834" id="2834">2834</a>
 <a href="#2835" id="2835">2835</a>
+<a href="#2836" id="2836">2836</a>
+<a href="#2837" id="2837">2837</a>
+<a href="#2838" id="2838">2838</a>
+<a href="#2839" id="2839">2839</a>
+<a href="#2840" id="2840">2840</a>
+<a href="#2841" id="2841">2841</a>
+<a href="#2842" id="2842">2842</a>
+<a href="#2843" id="2843">2843</a>
+<a href="#2844" id="2844">2844</a>
+<a href="#2845" id="2845">2845</a>
+<a href="#2846" id="2846">2846</a>
+<a href="#2847" id="2847">2847</a>
+<a href="#2848" id="2848">2848</a>
+<a href="#2849" id="2849">2849</a>
+<a href="#2850" id="2850">2850</a>
+<a href="#2851" id="2851">2851</a>
+<a href="#2852" id="2852">2852</a>
+<a href="#2853" id="2853">2853</a>
+<a href="#2854" id="2854">2854</a>
+<a href="#2855" id="2855">2855</a>
+<a href="#2856" id="2856">2856</a>
+<a href="#2857" id="2857">2857</a>
+<a href="#2858" id="2858">2858</a>
+<a href="#2859" id="2859">2859</a>
+<a href="#2860" id="2860">2860</a>
+<a href="#2861" id="2861">2861</a>
+<a href="#2862" id="2862">2862</a>
+<a href="#2863" id="2863">2863</a>
+<a href="#2864" id="2864">2864</a>
+<a href="#2865" id="2865">2865</a>
+<a href="#2866" id="2866">2866</a>
+<a href="#2867" id="2867">2867</a>
+<a href="#2868" id="2868">2868</a>
+<a href="#2869" id="2869">2869</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2910,6 +2944,18 @@
     </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="doccomment">/// The user that was banned.
     </span><span class="kw">pub </span>user: User,
+}
+
+<span class="doccomment">/// The response from [`GuildId::bulk_ban`].
+///
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/6720).
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>BulkBanResponse {
+    <span class="doccomment">/// The users that were successfully banned.
+    </span>banned_users: Vec&lt;UserId&gt;,
+    <span class="doccomment">/// The users that were not successfully banned.
+    </span>failed_users: Vec&lt;UserId&gt;,
 }
 
 <span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
@@ -3348,6 +3394,28 @@
         }
 
         <span class="self">self</span>.id.ban_with_reason(cache_http.http(), user, dmd, reason).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Bans multiple users from the guild, returning the users that were and weren't banned.
+    ///
+    /// # Errors
+    ///
+    /// See [`GuildId::bulk_ban`] for more information.
+    </span><span class="kw">pub async fn </span>bulk_ban(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        users: <span class="kw">impl </span>IntoIterator&lt;Item = UserId&gt;,
+        delete_message_seconds: u32,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;BulkBanResponse&gt; {
+        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+                <span class="self">self</span>.require_perms(cache, Permissions::BAN_MEMBERS &amp; Permissions::MANAGE_GUILD)<span class="question-mark">?</span>;
+            }
+        }
+
+        <span class="self">self</span>.id.bulk_ban(cache_http.http(), users, delete_message_seconds, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the formatted URL of the guild's banner image, if one exists.

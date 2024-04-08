@@ -4718,6 +4718,30 @@
 <a href="#4716" id="4716">4716</a>
 <a href="#4717" id="4717">4717</a>
 <a href="#4718" id="4718">4718</a>
+<a href="#4719" id="4719">4719</a>
+<a href="#4720" id="4720">4720</a>
+<a href="#4721" id="4721">4721</a>
+<a href="#4722" id="4722">4722</a>
+<a href="#4723" id="4723">4723</a>
+<a href="#4724" id="4724">4724</a>
+<a href="#4725" id="4725">4725</a>
+<a href="#4726" id="4726">4726</a>
+<a href="#4727" id="4727">4727</a>
+<a href="#4728" id="4728">4728</a>
+<a href="#4729" id="4729">4729</a>
+<a href="#4730" id="4730">4730</a>
+<a href="#4731" id="4731">4731</a>
+<a href="#4732" id="4732">4732</a>
+<a href="#4733" id="4733">4733</a>
+<a href="#4734" id="4734">4734</a>
+<a href="#4735" id="4735">4735</a>
+<a href="#4736" id="4736">4736</a>
+<a href="#4737" id="4737">4737</a>
+<a href="#4738" id="4738">4738</a>
+<a href="#4739" id="4739">4739</a>
+<a href="#4740" id="4740">4740</a>
+<a href="#4741" id="4741">4741</a>
+<a href="#4742" id="4742">4742</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -5019,6 +5043,8 @@
         delete_message_days: u8,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>delete_message_seconds = u32::from(delete_message_days) * <span class="number">86400</span>;
+
         <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">None</span>,
             multipart: <span class="prelude-val">None</span>,
@@ -5028,7 +5054,29 @@
                 guild_id,
                 user_id,
             },
-            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">"delete_message_days"</span>, delete_message_days.to_string())]),
+            params: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="string">"delete_message_seconds"</span>, delete_message_seconds.to_string())]),
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Bans multiple users from a [`Guild`], optionally removing their messages.
+    ///
+    /// See the [Discord Docs](https://github.com/discord/discord-api-docs/pull/6720) for more information.
+    </span><span class="kw">pub async fn </span>bulk_ban_users(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        guild_id: GuildId,
+        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;BulkBanResponse&gt; {
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
+            multipart: <span class="prelude-val">None</span>,
+            headers: reason.map(reason_into_header),
+            method: LightMethod::Post,
+            route: Route::GuildBulkBan {
+                guild_id,
+            },
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
