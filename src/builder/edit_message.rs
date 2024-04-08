@@ -267,6 +267,11 @@ impl Builder for EditMessage {
 
         let files = self.attachments.as_mut().map_or(Vec::new(), |a| a.take_files());
 
-        cache_http.http().edit_message(ctx.0, ctx.1, &self, files).await
+        let http = cache_http.http();
+        if self.allowed_mentions.is_none() {
+            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+        }
+
+        http.edit_message(ctx.0, ctx.1, &self, files).await
     }
 }

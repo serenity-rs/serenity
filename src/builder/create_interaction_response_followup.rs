@@ -189,6 +189,10 @@ impl Builder for CreateInteractionResponseFollowup {
         let files = self.attachments.take_files();
 
         let http = cache_http.http();
+        if self.allowed_mentions.is_none() {
+            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+        }
+
         match ctx.0 {
             Some(id) => http.as_ref().edit_followup_message(ctx.1, id, &self, files).await,
             None => http.as_ref().create_followup_message(ctx.1, &self, files).await,

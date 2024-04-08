@@ -27,7 +27,7 @@ use super::{
     MessagePagination,
     UserPagination,
 };
-use crate::builder::CreateAttachment;
+use crate::builder::{CreateAllowedMentions, CreateAttachment};
 use crate::constants;
 use crate::internal::prelude::*;
 use crate::json::*;
@@ -56,6 +56,7 @@ pub struct HttpBuilder {
     token: SecretString,
     proxy: Option<String>,
     application_id: Option<ApplicationId>,
+    default_allowed_mentions: Option<CreateAllowedMentions>,
 }
 
 impl HttpBuilder {
@@ -69,6 +70,7 @@ impl HttpBuilder {
             token: SecretString::new(parse_token(token)),
             proxy: None,
             application_id: None,
+            default_allowed_mentions: None,
         }
     }
 
@@ -127,6 +129,15 @@ impl HttpBuilder {
         self
     }
 
+    /// Sets the [`CreateAllowedMentions`] used by default for each request that would use it.
+    ///
+    /// This only takes effect if you are calling through the model or builder methods, not directly
+    /// calling [`Http`] methods, as [`Http`] is simply used as a convenient storage for these.
+    pub fn default_allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
+        self.default_allowed_mentions = Some(allowed_mentions);
+        self
+    }
+
     /// Use the given configuration to build the `Http` client.
     #[must_use]
     pub fn build(self) -> Http {
@@ -148,6 +159,7 @@ impl HttpBuilder {
             proxy: self.proxy,
             token: self.token,
             application_id,
+            default_allowed_mentions: self.default_allowed_mentions,
         }
     }
 }
@@ -186,6 +198,7 @@ pub struct Http {
     pub proxy: Option<String>,
     token: SecretString,
     application_id: AtomicU64,
+    pub default_allowed_mentions: Option<CreateAllowedMentions>,
 }
 
 impl Http {
