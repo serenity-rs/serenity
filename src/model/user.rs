@@ -689,13 +689,8 @@ impl UserId {
         self.direct_message(http, builder).await
     }
 
-    /// First attempts to find a [`User`] by its Id in the cache, upon failure requests it via the
-    /// REST API.
-    ///
-    /// **Note**: If the cache is not enabled, REST API will be used only.
-    ///
-    /// **Note**: If the cache is enabled, you might want to enable the `temp_cache` feature to
-    /// cache user data retrieved by this function for a short duration.
+    /// First attempts to find a [`User`] by its Id in the `temp_cache` if enabled,
+    /// upon failure requests it via the REST API.
     ///
     /// # Errors
     ///
