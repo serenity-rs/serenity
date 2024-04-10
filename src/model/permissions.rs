@@ -360,9 +360,10 @@ bitflags::bitflags! {
         const USE_EXTERNAL_SOUNDS = 1 << 45;
         /// Allows sending voice messages.
         const SEND_VOICE_MESSAGES = 1 << 46;
-        // Allows setting the status of a voice channel.
+        /// Allows setting the status of a voice channel.
         const SET_VOICE_CHANNEL_STATUS = 1 << 48;
-
+        /// Allows attaching polls to message sends.
+        const SEND_POLLS = 1 << 49;
     }
 }
 
@@ -800,6 +801,14 @@ impl Permissions {
     #[must_use]
     pub const fn use_vad(self) -> bool {
         self.contains(Self::USE_VAD)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the [Send Polls] permission.
+    ///
+    /// [Send Polls]: Self::SEND_POLLS
+    #[must_use]
+    pub const fn send_polls(self) -> bool {
+        self.contains(Self::SEND_POLLS)
     }
 }
 

@@ -186,6 +186,14 @@ routes! ('a, {
     api!("/channels/{}/users/@me/threads/archived/private", channel_id),
     Some(RatelimitingKind::PathAndId(channel_id.into()));
 
+    ChannelPollGetAnswerVoters { channel_id: ChannelId, message_id: MessageId, answer_id: AnswerId },
+    api!("/channels/{}/polls/{}/answers/{}", channel_id, message_id, answer_id),
+    Some(RatelimitingKind::PathAndId(channel_id.into()));
+
+    ChannelPollExpire { channel_id: ChannelId, message_id: MessageId },
+    api!("/channels/{}/polls/{}/expire", channel_id, message_id),
+    Some(RatelimitingKind::PathAndId(channel_id.into()));
+
     Gateway,
     api!("/gateway"),
     Some(RatelimitingKind::Path);

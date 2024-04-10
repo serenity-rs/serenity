@@ -473,6 +473,14 @@ event_handler! {
     /// be set.
     EntitlementDelete { entitlement: Entitlement } => async fn entitlement_delete(&self, ctx: Context);
 
+    /// Dispatched when a user votes on a message poll.
+    ///
+    /// This will be dispatched multiple times if multiple answers are selected.
+    MessagePollVoteAdd { event: MessagePollVoteAddEvent } => async fn poll_vote_add(&self, ctx: Context);
+
+    /// Dispatched when a user removes a previous vote on a poll.
+    MessagePollVoteRemove { event: MessagePollVoteRemoveEvent } => async fn poll_vote_remove(&self, ctx: Context);
+
     /// Dispatched when an HTTP rate limit is hit
     Ratelimit { data: RatelimitInfo } => async fn ratelimit(&self);
 }

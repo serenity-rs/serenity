@@ -3124,6 +3124,66 @@ impl Http {
         .await
     }
 
+    /// Get a list of users that voted for this specific answer.
+    pub async fn get_poll_answer_voters(
+        &self,
+        channel_id: ChannelId,
+        message_id: MessageId,
+        answer_id: AnswerId,
+        after: Option<UserId>,
+        limit: Option<u8>,
+    ) -> Result<Vec<User>> {
+        #[derive(serde::Deserialize)]
+        struct VotersResponse {
+            users: Vec<User>,
+        }
+
+        let mut params = Vec::with_capacity(2);
+        if let Some(after) = after {
+            params.push(("after", after.to_string()));
+        }
+
+        if let Some(limit) = limit {
+            params.push(("limit", limit.to_string()));
+        }
+
+        let resp: VotersResponse = self
+            .fire(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::ChannelPollGetAnswerVoters {
+                    channel_id,
+                    message_id,
+                    answer_id,
+                },
+                params: Some(params),
+            })
+            .await?;
+
+        Ok(resp.users)
+    }
+
+    pub async fn expire_poll(
+        &self,
+        channel_id: ChannelId,
+        message_id: MessageId,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Post,
+            route: Route::ChannelPollExpire {
+                channel_id,
+                message_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Gets information about the current application.
     ///
     /// **Note**: Only applications may use this endpoint.
