@@ -402,8 +402,6 @@ pub mod colours {
 
 #[cfg(test)]
 mod test {
-    use std::u32;
-
     use super::Colour;
 
     #[test]

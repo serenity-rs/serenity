@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::mem::Discriminant;
 use std::num::NonZeroU64;
 
 use crate::model::id::*;
@@ -59,10 +60,13 @@ macro_rules! routes {
                     )+
                 };
 
-                // To avoid adding a lifetime on RatelimitingBucket and causing lifetime infection,
-                // we transmute the Discriminant<Route<'a>> to Discriminant<Route<'static>>.
+                // This avoids adding a lifetime on RatelimitingBucket and causing lifetime infection
                 // SAFETY: std::mem::discriminant erases lifetimes.
-                let discriminant = unsafe { std::mem::transmute(std::mem::discriminant(self)) };
+                let discriminant = unsafe {
+                    std::mem::transmute::<Discriminant<Route<'a>>, Discriminant<Route<'static>>>(
+                        std::mem::discriminant(self),
+                    )
+                };
 
                 RatelimitingBucket(ratelimiting_kind.map(|r| {
                     let id = match r {
