@@ -609,8 +609,6 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
 
         let old = channel.status.clone();
         channel.status.clone_from(&self.status);
-        // Discord updates topic but doesn't fire ChannelUpdate.
-        channel.topic.clone_from(&self.status);
         old
     }
 }
