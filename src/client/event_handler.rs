@@ -8,6 +8,7 @@ use crate::model::prelude::*;
 macro_rules! event_handler {
     ( $(
         $( #[doc = $doc:literal] )*
+        $( #[deprecated = $deprecated:literal] )?
         $( #[cfg(feature = $feature:literal)] )?
         $variant_name:ident { $( $arg_name:ident: $arg_type:ty ),* } => async fn $method_name:ident(&self $(, $context:ident: Context)?);
     )* ) => {
@@ -17,6 +18,7 @@ macro_rules! event_handler {
             $(
                 $( #[doc = $doc] )*
                 $( #[cfg(feature = $feature)] )?
+                $( #[deprecated = $deprecated] )?
                 async fn $method_name(&self, $($context: Context,)? $( $arg_name: $arg_type ),*) {
                     // Suppress unused argument warnings
                     drop(( $($context,)? $($arg_name),* ))
@@ -32,6 +34,7 @@ macro_rules! event_handler {
             $(
                 $( #[doc = $doc] )*
                 $( #[cfg(feature = $feature)] )?
+                $( #[deprecated = $deprecated] )?
                 $variant_name {
                     $( $arg_name: $arg_type ),*
                 },
@@ -51,6 +54,7 @@ macro_rules! event_handler {
             /// ```
             #[must_use]
             pub fn snake_case_name(&self) -> &'static str {
+                #[allow(deprecated)]
                 match self {
                     $(
                         $( #[cfg(feature = $feature)] )?
@@ -61,6 +65,7 @@ macro_rules! event_handler {
 
             /// Runs the given [`EventHandler`]'s code for this event.
             pub async fn dispatch(self, ctx: Context, handler: &dyn EventHandler) {
+                #[allow(deprecated)]
                 match self {
                     $(
                         $( #[cfg(feature = $feature)] )?
@@ -298,7 +303,7 @@ event_handler! {
     /// Provides the channel's id and the message's id.
     ReactionRemoveEmoji { removed_reactions: Reaction } => async fn reaction_remove_emoji(&self, ctx: Context);
 
-    /// This event is legacy, and likely no longer sent by discord.
+    #[deprecated = "This event does not exist"]
     PresenceReplace { presences: Vec<Presence> } => async fn presence_replace(&self, ctx: Context);
 
     /// Dispatched when a user's presence is updated (e.g off -> on).

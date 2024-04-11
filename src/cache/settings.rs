@@ -32,7 +32,7 @@ pub struct Settings {
     ///
     /// Defaults to true.
     pub cache_channels: bool,
-    /// Whether to cache user and presence data received from gateway.
+    /// Whether to cache user data received from gateway.
     ///
     /// Defaults to true.
     pub cache_users: bool,

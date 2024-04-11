@@ -206,9 +206,6 @@ pub struct Cache {
     /// [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other structs such as members or
     /// recipients may still exist.
     pub(crate) users: MaybeMap<UserId, User>,
-    /// A map of users' presences. This is updated in real-time. Note that status updates are often
-    /// "eaten" by the gateway, and this should not be treated as being entirely 100% accurate.
-    pub(crate) presences: MaybeMap<UserId, Presence>,
 
     // Messages cache:
     // ---
@@ -282,7 +279,6 @@ impl Cache {
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
 
             users: MaybeMap(settings.cache_users.then(DashMap::default)),
-            presences: MaybeMap(settings.cache_users.then(DashMap::default)),
 
             messages: DashMap::default(),
             message_queue: DashMap::default(),
