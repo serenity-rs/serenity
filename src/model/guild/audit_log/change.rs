@@ -320,11 +320,11 @@ mod tests {
         let value = Change::SystemChannelFlags {
             old: Some(
                 SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS
-                    | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATION_REPLYS,
+                    | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATION_REPLIES,
             ),
             new: Some(
                 SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS
-                    | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATION_REPLYS
+                    | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATION_REPLIES
                     | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS,
             ),
         };
