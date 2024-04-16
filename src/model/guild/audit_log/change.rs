@@ -6,6 +6,7 @@ use crate::model::guild::{
     DefaultMessageNotificationLevel,
     ExplicitContentFilter,
     MfaLevel,
+    SystemChannelFlags,
     VerificationLevel,
 };
 use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, UserId};
@@ -238,6 +239,8 @@ generate_change! {
     "splash_hash" => SplashHash(ImageHash),
     /// Status of guild scheduled event was changed.
     "status" => Status(u64),
+    /// System channel settings were changed.
+    "system_channel_flags" => SystemChannelFlags(SystemChannelFlags),
     /// ID of the system channel was changed.
     "system_channel_id" => SystemChannelId(ChannelId),
     /// Related emoji of a sticker was changed.
@@ -310,5 +313,24 @@ mod tests {
             new: Some(Permissions::MANAGE_GUILD),
         };
         assert_json(&value, json!({"key": "permissions", "old_value": "0", "new_value": "32"}));
+    }
+
+    #[test]
+    fn system_channels() {
+        let value = Change::SystemChannelFlags {
+            old: Some(
+                SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS
+                    | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATION_REPLIES,
+            ),
+            new: Some(
+                SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS
+                    | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATION_REPLIES
+                    | SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS,
+            ),
+        };
+        assert_json(
+            &value,
+            json!({"key": "system_channel_flags", "old_value": 12, "new_value": 13 }),
+        );
     }
 }
