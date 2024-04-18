@@ -96,14 +96,27 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// This is used in the library internally because Discord expects image data as base64 in many
     /// places.
+    /// Defaults to a media type of "image/png" for everything that is not a png, jpg or gif file.
     #[must_use]
     pub fn to_base64(&self) -> String {
-        let mut encoded = {
+        let encoded = {
             use base64::Engine;
             base64::prelude::BASE64_STANDARD.encode(&self.data)
         };
-        encoded.insert_str(0, "data:image/png;base64,");
-        encoded
+        let media_type = self.media_type();
+        format!("data:{media_type};base64,{encoded}")
+    }
+
+    /// Tries to detect the media type using the first few bytes of a file
+    fn media_type(&self) -> &str {
+        // magic byte values from https://en.m.wikipedia.org/wiki/List_of_file_signatures
+
+        match &*self.data {
+            &[0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A, ..] => "image/png",
+            &[0xFF, 0xD8, 0xFF, 0xDB | 0xEE | 0xE0, ..] => "image/jpg",
+            &[b'G', b'I', b'F', 0x38, 0x37 | 0x39, 0x61, ..] => "image/gif",
+            _ => "image/png", // defaulting to png because discord doesn't actually care
+        }
     }
 
     /// Sets a description for the file (max 1024 characters).
