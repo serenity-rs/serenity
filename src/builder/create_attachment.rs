@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::fmt::Display;
 use std::path::Path;
 
 use serde::ser::{Serialize, SerializeSeq, Serializer};
@@ -12,6 +13,49 @@ use crate::http::Http;
 use crate::model::channel::Message;
 use crate::model::id::AttachmentId;
 
+/// Enum descibing supported media types for [`CreateAttachment`]
+/// 
+/// [Discord docs](https://discord.com/developers/docs/reference#image-data)
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+#[must_use]
+pub enum MediaType {
+    Png,
+    Jpg,
+    Gif,
+}
+
+impl Display for MediaType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MediaType::Png => write!(f, "image/png"),
+            MediaType::Jpg => write!(f, "image/jpg"),
+            MediaType::Gif => write!(f, "image/gif"),
+        }
+    }
+}
+
+impl MediaType {
+    pub fn guess_from_extension<'a>(ext: impl Into<Cow<'a, str>>) -> Option<Self> {
+        match &*ext.into().to_lowercase() {
+            "png" => Some(Self::Png),
+            "jpg" | "jpeg" => Some(Self::Jpg),
+            "gif" => Some(Self::Gif),
+            _ => None,
+        }
+    }
+
+    pub fn guess_from_data<'a>(data: impl Into<Cow<'a, [u8]>>) -> Option<Self> {
+        // magic byte values from https://en.m.wikipedia.org/wiki/List_of_file_signatures
+        match &*data.into() {
+            &[0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A, ..] => Some(Self::Png),
+            &[0xFF, 0xD8, 0xFF, 0xDB | 0xEE | 0xE0, ..] => Some(Self::Jpg),
+            &[b'G', b'I', b'F', 0x38, 0x37 | 0x39, 0x61, ..] => Some(Self::Gif),
+            _ => None,
+        }
+    }
+}
+
 /// Struct that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
@@ -24,6 +68,7 @@ pub struct CreateAttachment<'a> {
     pub filename: Cow<'static, str>,
     pub description: Option<Cow<'a, str>>,
     pub data: Cow<'static, [u8]>,
+    pub media_type: MediaType,
 }
 
 impl<'a> CreateAttachment<'a> {
@@ -31,11 +76,13 @@ impl<'a> CreateAttachment<'a> {
     pub fn bytes(
         data: impl Into<Cow<'static, [u8]>>,
         filename: impl Into<Cow<'static, str>>,
+        media_type: MediaType,
     ) -> Self {
         CreateAttachment {
             data: data.into(),
             filename: filename.into(),
             description: None,
+            media_type,
         }
     }
 
@@ -44,8 +91,8 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// [`Error::Io`] if reading the file fails.
-    pub async fn path(path: impl AsRef<Path>) -> Result<Self> {
-        async fn inner(path: &Path) -> Result<CreateAttachment<'static>> {
+    pub async fn path(path: impl AsRef<Path>, media_type: MediaType) -> Result<Self> {
+        async fn inner(path: &Path, media_type: MediaType) -> Result<CreateAttachment<'static>> {
             let mut file = File::open(path).await?;
             let mut data = Vec::new();
             file.read_to_end(&mut data).await?;
@@ -57,10 +104,10 @@ impl<'a> CreateAttachment<'a> {
                 )
             })?;
 
-            Ok(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned()))
+            Ok(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned(), media_type))
         }
 
-        inner(path.as_ref()).await
+        inner(path.as_ref(), media_type).await
     }
 
     /// Builds an [`CreateAttachment`] by reading from a file handler.
@@ -68,11 +115,15 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// [`Error::Io`] error if reading the file fails.
-    pub async fn file(file: &File, filename: impl Into<Cow<'static, str>>) -> Result<Self> {
+    pub async fn file(
+        file: &File,
+        filename: impl Into<Cow<'static, str>>,
+        media_type: MediaType,
+    ) -> Result<Self> {
         let mut data = Vec::new();
         file.try_clone().await?.read_to_end(&mut data).await?;
 
-        Ok(CreateAttachment::bytes(data, filename))
+        Ok(CreateAttachment::bytes(data, filename, media_type))
     }
 
     /// Builds an [`CreateAttachment`] by downloading attachment data from a URL.
@@ -85,11 +136,12 @@ impl<'a> CreateAttachment<'a> {
         http: &Http,
         url: impl reqwest::IntoUrl,
         filename: impl Into<Cow<'static, str>>,
+        media_type: MediaType,
     ) -> Result<Self> {
         let response = http.client.get(url).send().await?;
         let data = response.bytes().await?.to_vec();
 
-        Ok(CreateAttachment::bytes(data, filename))
+        Ok(CreateAttachment::bytes(data, filename, media_type))
     }
 
     /// Converts the stored data to the base64 representation.
@@ -103,20 +155,8 @@ impl<'a> CreateAttachment<'a> {
             use base64::Engine;
             base64::prelude::BASE64_STANDARD.encode(&self.data)
         };
-        let media_type = self.media_type();
-        format!("data:{media_type};base64,{encoded}")
-    }
 
-    /// Tries to detect the media type using the first few bytes of a file
-    fn media_type(&self) -> &str {
-        // magic byte values from https://en.m.wikipedia.org/wiki/List_of_file_signatures
-
-        match &*self.data {
-            &[0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A, ..] => "image/png",
-            &[0xFF, 0xD8, 0xFF, 0xDB | 0xEE | 0xE0, ..] => "image/jpg",
-            &[b'G', b'I', b'F', 0x38, 0x37 | 0x39, 0x61, ..] => "image/gif",
-            _ => "image/png", // defaulting to png because discord doesn't actually care
-        }
+        format!("data:{};base64,{}", self.media_type, encoded)
     }
 
     /// Sets a description for the file (max 1024 characters).
@@ -272,6 +312,7 @@ impl<'a> EditAttachments<'a> {
                 let cloned_attachment = CreateAttachment::bytes(
                     std::mem::take(&mut attachment.data),
                     attachment.filename.clone(),
+                    attachment.media_type.clone(),
                 );
 
                 files.push(cloned_attachment);
