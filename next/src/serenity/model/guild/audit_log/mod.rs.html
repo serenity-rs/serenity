@@ -525,6 +525,7 @@
 <a href="#525" id="525">525</a>
 <a href="#526" id="526">526</a>
 <a href="#527" id="527">527</a>
+<a href="#528" id="528">528</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.
 
 </span><span class="kw">use </span>nonmax::{NonMaxU32, NonMaxU64};
@@ -909,9 +910,10 @@
     <span class="doccomment">/// What was the reasoning by doing an action on a target? If there was one.
     </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The user that did this action on a target.
-    </span><span class="kw">pub </span>user_id: UserId,
+    </span><span class="kw">pub </span>user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
     <span class="doccomment">/// What changes were made.
-    </span><span class="kw">pub </span>changes: <span class="prelude-ty">Option</span>&lt;Vec&lt;Change&gt;&gt;,
+    </span><span class="attr">#[serde(default)]
+    </span><span class="kw">pub </span>changes: Vec&lt;Change&gt;,
     <span class="doccomment">/// The id of this entry.
     </span><span class="kw">pub </span>id: AuditLogEntryId,
     <span class="doccomment">/// Some optional data associated with this entry.
