@@ -182,8 +182,8 @@ impl<'a> EditGuild<'a> {
     /// guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn banner(mut self, banner: Option<Cow<'a, str>>) -> Self {
-        self.banner = Some(banner);
+    pub fn banner(mut self, banner: Option<&CreateAttachment<'_>>) -> Self {
+        self.banner = Some(banner.map(CreateAttachment::to_base64).map(Cow::from));
         self
     }
 
