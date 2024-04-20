@@ -143,7 +143,6 @@ pub fn print_ranking() {
         ("Presence", std::mem::size_of::<Presence>()),
         ("PresenceUpdateEvent", std::mem::size_of::<PresenceUpdateEvent>()),
         ("PresenceUser", std::mem::size_of::<PresenceUser>()),
-        ("PresencesReplaceEvent", std::mem::size_of::<PresencesReplaceEvent>()),
         ("PrivateChannel", std::mem::size_of::<PrivateChannel>()),
         ("Reaction", std::mem::size_of::<Reaction>()),
         ("ReactionAddEvent", std::mem::size_of::<ReactionAddEvent>()),

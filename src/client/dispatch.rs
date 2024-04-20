@@ -317,12 +317,9 @@ fn update_cache_with_event(
                 event,
             }
         },
-        Event::PresencesReplace(mut event) => {
-            update_cache!(cache, event);
-
-            FullEvent::PresenceReplace {
-                presences: event.presences,
-            }
+        #[allow(deprecated)]
+        Event::PresencesReplace(event) => FullEvent::PresenceReplace {
+            presences: event.presences,
         },
         Event::PresenceUpdate(mut event) => {
             update_cache!(cache, event);

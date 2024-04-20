@@ -629,6 +629,7 @@ pub struct PresenceUpdateEvent {
 }
 
 /// Not officially documented.
+#[cfg_attr(not(ignore_serenity_deprecated), deprecated = "This event doesn't exist")]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
@@ -1218,6 +1219,7 @@ pub enum Event {
     /// A member's presence state (or username or avatar) has changed
     PresenceUpdate(PresenceUpdateEvent),
     /// The presence list of the user's friends should be replaced entirely
+    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "This event doesn't exist")]
     PresencesReplace(PresencesReplaceEvent),
     /// A reaction was added to a message.
     ///

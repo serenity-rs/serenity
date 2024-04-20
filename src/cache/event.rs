@@ -22,7 +22,6 @@ use crate::model::event::{
     MessageCreateEvent,
     MessageUpdateEvent,
     PresenceUpdateEvent,
-    PresencesReplaceEvent,
     ReadyEvent,
     ThreadCreateEvent,
     ThreadDeleteEvent,
@@ -458,18 +457,6 @@ impl CacheUpdate for PresenceUpdateEvent {
                     });
                 }
             }
-        }
-
-        None
-    }
-}
-
-impl CacheUpdate for PresencesReplaceEvent {
-    type Output = ();
-
-    fn update(&mut self, cache: &Cache) -> Option<()> {
-        for presence in &self.presences {
-            cache.presences.insert(presence.user.id, presence.clone());
         }
 
         None
