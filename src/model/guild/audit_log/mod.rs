@@ -383,9 +383,10 @@ pub struct AuditLogEntry {
     /// What was the reasoning by doing an action on a target? If there was one.
     pub reason: Option<FixedString>,
     /// The user that did this action on a target.
-    pub user_id: UserId,
+    pub user_id: Option<UserId>,
     /// What changes were made.
-    pub changes: Option<Vec<Change>>,
+    #[serde(default)]
+    pub changes: Vec<Change>,
     /// The id of this entry.
     pub id: AuditLogEntryId,
     /// Some optional data associated with this entry.
