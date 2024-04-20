@@ -1264,6 +1264,7 @@ pub enum Event {
     /// Fired when the status of a Voice Channel changes.
     VoiceChannelStatusUpdate(VoiceChannelStatusUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
+    #[serde(rename = "WEBHOOKS_UPDATE")]
     WebhookUpdate(WebhookUpdateEvent),
     /// An interaction was created.
     InteractionCreate(InteractionCreateEvent),
