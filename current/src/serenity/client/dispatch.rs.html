@@ -489,9 +489,6 @@
 <a href="#489" id="489">489</a>
 <a href="#490" id="490">490</a>
 <a href="#491" id="491">491</a>
-<a href="#492" id="492">492</a>
-<a href="#493" id="493">493</a>
-<a href="#494" id="494">494</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>tracing::debug;
@@ -811,12 +808,9 @@
                 event,
             }
         },
-        Event::PresencesReplace(<span class="kw-2">mut </span>event) =&gt; {
-            <span class="macro">update_cache!</span>(cache, event);
-
-            FullEvent::PresenceReplace {
-                presences: event.presences,
-            }
+        <span class="attr">#[allow(deprecated)]
+        </span>Event::PresencesReplace(event) =&gt; FullEvent::PresenceReplace {
+            presences: event.presences,
         },
         Event::PresenceUpdate(<span class="kw-2">mut </span>event) =&gt; {
             <span class="macro">update_cache!</span>(cache, event);

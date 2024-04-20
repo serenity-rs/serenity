@@ -1327,6 +1327,8 @@
 <a href="#1327" id="1327">1327</a>
 <a href="#1328" id="1328">1328</a>
 <a href="#1329" id="1329">1329</a>
+<a href="#1330" id="1330">1330</a>
+<a href="#1331" id="1331">1331</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1958,7 +1960,8 @@
 }
 
 <span class="doccomment">/// Not officially documented.
-</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+</span><span class="attr">#[cfg_attr(not(ignore_serenity_deprecated), deprecated = <span class="string">"This event doesn't exist"</span>)]
+#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -2547,6 +2550,7 @@
     <span class="doccomment">/// A member's presence state (or username or avatar) has changed
     </span>PresenceUpdate(PresenceUpdateEvent),
     <span class="doccomment">/// The presence list of the user's friends should be replaced entirely
+    </span><span class="attr">#[cfg_attr(not(ignore_serenity_deprecated), deprecated = <span class="string">"This event doesn't exist"</span>)]
     </span>PresencesReplace(PresencesReplaceEvent),
     <span class="doccomment">/// A reaction was added to a message.
     ///

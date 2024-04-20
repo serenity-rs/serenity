@@ -478,6 +478,11 @@
 <a href="#478" id="478">478</a>
 <a href="#479" id="479">479</a>
 <a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
 
 <span class="kw">use </span><span class="kw">super</span>::context::Context;
@@ -488,7 +493,8 @@
 <span class="macro">macro_rules!</span> event_handler {
     ( $(
         $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>:literal] </span>)*
-        $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>:literal)] </span>)<span class="question-mark">?
+        $( <span class="attr">#[deprecated = <span class="macro-nonterminal">$deprecated</span>:literal] </span>)<span class="question-mark">?
+        </span>$( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>:literal)] </span>)<span class="question-mark">?
         </span><span class="macro-nonterminal">$variant_name</span>:ident { $( <span class="macro-nonterminal">$arg_name</span>:ident: <span class="macro-nonterminal">$arg_type</span>:ty ),* } =&gt; <span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>:ident(<span class="kw-2">&amp;</span><span class="self">self </span>$(, <span class="macro-nonterminal">$context</span>:ident: Context)<span class="question-mark">?</span>);
     )* ) =&gt; {
         <span class="doccomment">/// The core trait for handling events by serenity.
@@ -497,6 +503,7 @@
             $(
                 $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)*
                 $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+                </span>$( <span class="attr">#[deprecated = <span class="macro-nonterminal">$deprecated</span>] </span>)<span class="question-mark">?
                 </span><span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, $(<span class="macro-nonterminal">$context</span>: Context,)<span class="question-mark">? </span>$( <span class="macro-nonterminal">$arg_name</span>: <span class="macro-nonterminal">$arg_type </span>),<span class="kw-2">*</span>) {
                     <span class="comment">// Suppress unused argument warnings
                     </span>drop(( $(<span class="macro-nonterminal">$context</span>,)<span class="question-mark">? </span>$(<span class="macro-nonterminal">$arg_name</span>),* ))
@@ -512,6 +519,7 @@
             $(
                 $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)*
                 $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+                </span>$( <span class="attr">#[deprecated = <span class="macro-nonterminal">$deprecated</span>] </span>)<span class="question-mark">?
                 </span><span class="macro-nonterminal">$variant_name </span>{
                     $( <span class="macro-nonterminal">$arg_name</span>: <span class="macro-nonterminal">$arg_type </span>),*
                 },
@@ -531,7 +539,8 @@
             /// ```
             </span><span class="attr">#[must_use]
             </span><span class="kw">pub fn </span>snake_case_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
-                <span class="kw">match </span><span class="self">self </span>{
+                <span class="attr">#[allow(deprecated)]
+                </span><span class="kw">match </span><span class="self">self </span>{
                     $(
                         $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
                         </span><span class="self">Self</span>::<span class="macro-nonterminal">$variant_name </span>{ .. } =&gt; <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
@@ -541,7 +550,8 @@
 
             <span class="doccomment">/// Runs the given [`EventHandler`]'s code for this event.
             </span><span class="kw">pub async fn </span>dispatch(<span class="self">self</span>, ctx: Context, handler: <span class="kw-2">&amp;</span><span class="kw">dyn </span>EventHandler) {
-                <span class="kw">match </span><span class="self">self </span>{
+                <span class="attr">#[allow(deprecated)]
+                </span><span class="kw">match </span><span class="self">self </span>{
                     $(
                         $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
                         </span><span class="self">Self</span>::<span class="macro-nonterminal">$variant_name </span>{ $( <span class="macro-nonterminal">$arg_name </span>),* } =&gt; {
@@ -778,7 +788,7 @@
     /// Provides the channel's id and the message's id.
     </span>ReactionRemoveEmoji { removed_reactions: Reaction } =&gt; <span class="kw">async fn </span>reaction_remove_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
 
-    <span class="doccomment">/// This event is legacy, and likely no longer sent by discord.
+    <span class="attr">#[deprecated = <span class="string">"This event does not exist"</span>]
     </span>PresenceReplace { presences: Vec&lt;Presence&gt; } =&gt; <span class="kw">async fn </span>presence_replace(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
 
     <span class="doccomment">/// Dispatched when a user's presence is updated (e.g off -&gt; on).
