@@ -138,11 +138,12 @@ impl StdError for Error {
             Self::Model(inner) => Some(inner),
             #[cfg(feature = "client")]
             Self::Client(inner) => Some(inner),
+            #[cfg(feature = "gateway")]
+            Self::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
             Self::Http(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => Some(inner),
-            _ => None,
         }
     }
 }
