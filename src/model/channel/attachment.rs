@@ -105,8 +105,8 @@ impl Attachment {
     /// #[serenity::async_trait]
     /// # #[cfg(feature = "client")]
     /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: &Context, message: &Message) {
-    ///         for attachment in &message.attachments {
+    ///     async fn message(&self, context: Context, message: Message) {
+    ///         for attachment in message.attachments {
     ///             let content = match attachment.download().await {
     ///                 Ok(content) => content,
     ///                 Err(why) => {

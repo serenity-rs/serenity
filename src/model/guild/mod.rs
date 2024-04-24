@@ -2237,7 +2237,7 @@ impl Guild {
     /// #[serenity::async_trait]
     /// #[cfg(all(feature = "cache", feature = "client"))]
     /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: &Context, msg: &Message) {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
     ///             if let Some(guild) = guild_id.to_guild_cached(&ctx.cache) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
