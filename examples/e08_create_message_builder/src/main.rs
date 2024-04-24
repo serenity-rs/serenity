@@ -11,7 +11,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: &Context, msg: &Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!hello" {
             // The create message builder allows you to easily create embeds and messages using a
             // builder syntax.
@@ -43,7 +43,7 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
