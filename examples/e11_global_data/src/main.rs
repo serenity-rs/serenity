@@ -21,7 +21,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: &Context, msg: &Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         // Since data is located in Context, this means you are able to use it within events!
         let data = ctx.data::<UserData>();
 
@@ -54,7 +54,7 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

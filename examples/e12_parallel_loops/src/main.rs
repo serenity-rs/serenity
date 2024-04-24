@@ -17,7 +17,7 @@ struct Handler {
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: &Context, msg: &Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         if msg.content.starts_with("!ping") {
             if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
                 eprintln!("Error sending message: {why:?}");
@@ -25,13 +25,13 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _ctx: &Context, ready: &Ready) {
+    async fn ready(&self, _ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 
     // We use the cache_ready event just in case some cache operation is required in whatever use
     // case you have for this.
-    async fn cache_ready(&self, ctx: &Context, _guilds: &Vec<GuildId>) {
+    async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
         println!("Cache built successfully!");
 
         // We need to check that the loop is not already running when this event triggers, as this
@@ -53,10 +53,9 @@ impl EventHandler for Handler {
             });
 
             // And of course, we can run more than one thread at different timings.
-            let ctx2 = ctx.clone();
             tokio::spawn(async move {
                 loop {
-                    set_activity_to_current_time(&ctx2);
+                    set_activity_to_current_time(&ctx);
                     tokio::time::sleep(Duration::from_secs(60)).await;
                 }
             });

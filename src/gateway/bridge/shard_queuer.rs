@@ -23,7 +23,7 @@ use super::{
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::{EventHandler, RawEventHandler};
+use crate::client::InternalEventHandler;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
@@ -43,14 +43,11 @@ pub struct ShardQueuer {
     ///
     /// [`Client::data`]: crate::Client::data
     pub data: Arc<dyn std::any::Any + Send + Sync>,
-    /// A reference to an [`EventHandler`], such as the one given to the [`Client`].
+    /// A reference to [`EventHandler`] or [`RawEventHandler`].
     ///
-    /// [`Client`]: crate::Client
-    pub event_handlers: Vec<Arc<dyn EventHandler>>,
-    /// A reference to an [`RawEventHandler`], such as the one given to the [`Client`].
-    ///
-    /// [`Client`]: crate::Client
-    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    /// [`EventHandler`]: crate::client::EventHandler
+    /// [`RawEventHandler`]: crate::client::RawEventHandler
+    pub event_handler: Option<InternalEventHandler>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
     pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
@@ -226,8 +223,7 @@ impl ShardQueuer {
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
-            event_handlers: self.event_handlers.clone(),
-            raw_event_handlers: self.raw_event_handlers.clone(),
+            event_handler: self.event_handler.clone(),
             #[cfg(feature = "framework")]
             framework: self.framework.get().cloned(),
             manager: Arc::clone(&self.manager),
