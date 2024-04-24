@@ -1,3 +1,4 @@
+use std::num::NonZeroUsize;
 use std::time::Duration;
 
 /// Settings for the cache.
@@ -20,6 +21,12 @@ pub struct Settings {
     ///
     /// Defaults to 0.
     pub max_messages: usize,
+    /// The maximum number of messages to store in the message cache, in total.
+    ///
+    /// See [`Self::max_messages`] to disable the cache entirely.
+    ///
+    /// Defaults to None, meaning no limit set.
+    pub max_messages_total: Option<NonZeroUsize>,
     /// How long temporarily-cached data should be stored before being thrown out.
     ///
     /// Defaults to one hour.
@@ -42,6 +49,7 @@ impl Default for Settings {
     fn default() -> Self {
         Self {
             max_messages: 0,
+            max_messages_total: None,
             time_to_live: Duration::from_secs(60 * 60),
             cache_guilds: true,
             cache_channels: true,

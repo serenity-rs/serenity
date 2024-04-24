@@ -25,6 +25,7 @@
 
 use std::collections::{HashSet, VecDeque};
 use std::hash::Hash;
+use std::sync::atomic::AtomicUsize;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 #[cfg(feature = "temp_cache")]
@@ -216,6 +217,10 @@ pub struct Cache {
     /// cache. When a maximum number of messages are in a channel's cache, we can pop the front and
     /// remove that ID from the cache.
     pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, BuildHasher>,
+    /// Total number of messages stored across all channels.
+    ///
+    /// Must not exceed [`Settings::max_messages_total`]
+    pub(crate) total_messages: Option<AtomicUsize>,
 
     // Miscellanous fixed-size data
     // ---
@@ -282,6 +287,7 @@ impl Cache {
 
             messages: DashMap::default(),
             message_queue: DashMap::default(),
+            total_messages: settings.max_messages_total.map(|_| AtomicUsize::new(0)),
 
             shard_data: RwLock::new(CachedShardData {
                 total: 1,
