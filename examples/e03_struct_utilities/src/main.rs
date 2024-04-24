@@ -10,7 +10,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, context: &Context, msg: &Message) {
+    async fn message(&self, context: Context, msg: Message) {
         if msg.content == "!messageme" {
             // If the `utils`-feature is enabled, then model structs will have a lot of useful
             // methods implemented, to avoid using an often otherwise bulky Context, or even much
@@ -27,7 +27,7 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
