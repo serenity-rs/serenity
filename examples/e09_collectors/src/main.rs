@@ -15,11 +15,11 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 
-    async fn message(&self, ctx: &Context, msg: &Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         let mut score = 0u32;
         let _ = msg.reply(&ctx, "How was that crusty crab called again? 10 seconds time!").await;
 
