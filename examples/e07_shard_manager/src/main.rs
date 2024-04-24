@@ -31,7 +31,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         if let Some(shard) = ready.shard {
             // Note that array index 0 is 0-indexed, while index 1 is 1-indexed.
             //

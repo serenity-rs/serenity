@@ -268,7 +268,7 @@ impl Cache {
     /// #[serenity::async_trait]
     /// # #[cfg(feature = "client")]
     /// impl EventHandler for Handler {
-    ///     async fn cache_ready(&self, ctx: &Context, _: &Vec<GuildId>) {
+    ///     async fn cache_ready(&self, ctx: Context, _: Vec<GuildId>) {
     ///         println!("{} unknown members", ctx.cache.unknown_members());
     ///     }
     /// }
@@ -309,7 +309,7 @@ impl Cache {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&self, context: &Context, _: &Ready) {
+    ///     async fn ready(&self, context: Context, _: Ready) {
     ///         let guilds = context.cache.guilds().len();
     ///
     ///         println!("Guilds in the Cache: {}", guilds);
