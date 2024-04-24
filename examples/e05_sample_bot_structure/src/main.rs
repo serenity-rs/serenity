@@ -13,7 +13,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn interaction_create(&self, ctx: &Context, interaction: &Interaction) {
+    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
             println!("Received command interaction: {command:#?}");
 
@@ -22,7 +22,7 @@ impl EventHandler for Handler {
                 "id" => Some(commands::id::run(&command.data.options())),
                 "attachmentinput" => Some(commands::attachmentinput::run(&command.data.options())),
                 "modal" => {
-                    commands::modal::run(ctx, command).await.unwrap();
+                    commands::modal::run(&ctx, &command).await.unwrap();
                     None
                 },
                 _ => Some("not implemented :(".to_string()),
@@ -38,7 +38,7 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, ctx: &Context, ready: &Ready) {
+    async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
         let guild_id = GuildId::new(
