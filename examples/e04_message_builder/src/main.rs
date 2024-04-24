@@ -10,7 +10,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, context: &Context, msg: &Message) {
+    async fn message(&self, context: Context, msg: Message) {
         if msg.content == "!ping" {
             let channel = match msg.channel_id.to_channel(&context).await {
                 Ok(channel) => channel,
@@ -38,7 +38,7 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
