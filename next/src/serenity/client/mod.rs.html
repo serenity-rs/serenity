@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (fb898629a 2024-04-21)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (244da22fa 2024-04-23)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -790,6 +790,13 @@
 <a href="#790" id="790">790</a>
 <a href="#791" id="791">791</a>
 <a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot's token, as well as event handlers.
 //! Dispatching events to configured handlers and starting the shards' connections are handled
 //! directly via the client. In addition, the `http` module and `Cache` are also automatically
@@ -828,7 +835,7 @@
 <span class="kw">pub use </span><span class="self">self</span>::context::Context;
 <span class="kw">pub use </span><span class="self">self</span>::error::Error <span class="kw">as </span>ClientError;
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-</span><span class="kw">pub use </span><span class="self">self</span>::event_handler::{EventHandler, FullEvent, RawEventHandler};
+</span><span class="kw">pub use </span><span class="self">self</span>::event_handler::{EventHandler, FullEvent, InternalEventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">super</span>::gateway::GatewayError;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
@@ -844,6 +851,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::{ShardManager, ShardManagerOptions};
 <span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::internal::tokio::spawn_named;
 <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::gateway::GatewayIntents;
 <span class="kw">use </span><span class="kw">crate</span>::model::id::ApplicationId;
@@ -865,8 +873,8 @@
     </span>framework: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
     </span>voice_manager: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>VoiceGatewayManager&gt;&gt;,
-    event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
-    raw_event_handlers: Vec&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
+    event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     presence: PresenceData,
 }
 
@@ -899,8 +907,8 @@
             </span>framework: <span class="prelude-val">None</span>,
             <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
             </span>voice_manager: <span class="prelude-val">None</span>,
-            event_handlers: <span class="macro">vec!</span>[],
-            raw_event_handlers: <span class="macro">vec!</span>[],
+            event_handler: <span class="prelude-val">None</span>,
+            raw_event_handler: <span class="prelude-val">None</span>,
             presence: PresenceData::default(),
         }
     }
@@ -1024,29 +1032,30 @@
     </span><span class="kw">where
         </span>H: EventHandler + <span class="lifetime">'static</span>,
     {
-        <span class="self">self</span>.event_handlers.push(event_handler.into());
-
+        <span class="self">self</span>.event_handler = <span class="prelude-val">Some</span>(event_handler.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Gets the added event handlers. See [`Self::event_handler`] for more info.
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>get_event_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Arc&lt;<span class="kw">dyn </span>EventHandler&gt;] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.event_handlers
+    </span><span class="kw">pub fn </span>get_event_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt; {
+        <span class="self">self</span>.event_handler.as_ref()
     }
 
     <span class="doccomment">/// Adds an event handler with a single method where all received gateway events will be
     /// dispatched.
-    </span><span class="kw">pub fn </span>raw_event_handler&lt;H: RawEventHandler + <span class="lifetime">'static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, raw_event_handler: H) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.raw_event_handlers.push(Arc::new(raw_event_handler));
-
+    </span><span class="kw">pub fn </span>raw_event_handler&lt;H&gt;(<span class="kw-2">mut </span><span class="self">self</span>, raw_event_handler: <span class="kw">impl </span>Into&lt;Arc&lt;H&gt;&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>H: RawEventHandler + <span class="lifetime">'static</span>,
+    {
+        <span class="self">self</span>.raw_event_handler = <span class="prelude-val">Some</span>(raw_event_handler.into());
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
     </span><span class="attr">#[must_use]
-    </span><span class="kw">pub fn </span>get_raw_event_handlers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.raw_event_handlers
+    </span><span class="kw">pub fn </span>get_raw_event_handler(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt; {
+        <span class="self">self</span>.raw_event_handler.as_ref()
     }
 
     <span class="doccomment">/// Sets the initial activity.
@@ -1081,21 +1090,27 @@
         <span class="kw">let </span>data = <span class="self">self</span>.data.unwrap_or(Arc::new(()));
         <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
         </span><span class="kw">let </span>framework = <span class="self">self</span>.framework;
-        <span class="kw">let </span>event_handlers = <span class="self">self</span>.event_handlers;
-        <span class="kw">let </span>raw_event_handlers = <span class="self">self</span>.raw_event_handlers;
         <span class="kw">let </span>intents = <span class="self">self</span>.intents;
         <span class="kw">let </span>presence = <span class="self">self</span>.presence;
         <span class="kw">let </span>http = <span class="self">self</span>.http;
 
+        <span class="kw">let </span>event_handler = <span class="kw">match </span>(<span class="self">self</span>.event_handler, <span class="self">self</span>.raw_event_handler) {
+            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="macro">panic!</span>(<span class="string">"Cannot provide both a normal and raw event handlers"</span>),
+            (<span class="prelude-val">Some</span>(h), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(InternalEventHandler::Normal(h)),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(h)) =&gt; <span class="prelude-val">Some</span>(InternalEventHandler::Raw(h)),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+        };
+
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;</span>http.ratelimiter {
-            <span class="kw">let </span>event_handlers_clone = event_handlers.clone();
-            ratelimiter.set_ratelimit_callback(Box::new(<span class="kw">move </span>|info| {
-                <span class="kw">for </span>event_handler <span class="kw">in </span><span class="kw-2">&amp;</span>event_handlers_clone {
-                    <span class="kw">let </span>info = info.clone();
-                    <span class="kw">let </span>event_handler = Arc::clone(event_handler);
-                    tokio::spawn(<span class="kw">async move </span>{ event_handler.ratelimit(<span class="kw-2">&amp;</span>info).<span class="kw">await </span>});
-                }
-            }));
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(InternalEventHandler::Normal(event_handler)) = <span class="kw-2">&amp;</span>event_handler {
+                <span class="kw">let </span>event_handler = Arc::clone(event_handler);
+                ratelimiter.set_ratelimit_callback(Box::new(<span class="kw">move </span>|info| {
+                    <span class="kw">let </span>event_handler = Arc::clone(<span class="kw-2">&amp;</span>event_handler);
+                    spawn_named(<span class="string">"ratelimit::dispatch"</span>, <span class="kw">async move </span>{
+                        event_handler.ratelimit(info).<span class="kw">await</span>;
+                    });
+                }));
+            }
         }
 
         <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
@@ -1121,8 +1136,7 @@
             </span><span class="kw">let </span>framework_cell = Arc::new(OnceLock::new());
             <span class="kw">let </span>(shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(<span class="kw-2">&amp;</span>data),
-                event_handlers,
-                raw_event_handlers,
+                event_handler,
                 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
                 </span>framework: Arc::clone(<span class="kw-2">&amp;</span>framework_cell),
                 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
@@ -1186,7 +1200,7 @@
 ///
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     async fn message(&amp;self, context: &amp;Context, msg: &amp;Message) {
+///     async fn message(&amp;self, context: Context, msg: Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say(&amp;context, "Pong!");
 ///         }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/event_handler.rs`."><title>event_handler.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (fb898629a 2024-04-21)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/event_handler.rs`."><title>event_handler.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (244da22fa 2024-04-23)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -484,9 +484,17 @@
 <a href="#484" id="484">484</a>
 <a href="#485" id="485">485</a>
 <a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::num::NonZeroU16;
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>strum::{EnumCount, IntoStaticStr, VariantNames};
@@ -508,7 +516,7 @@
             $(
                 $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)*
                 $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
-                </span><span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, $(<span class="macro-nonterminal">$context</span>: <span class="kw-2">&amp;</span>Context,)<span class="question-mark">? </span>$( <span class="macro-nonterminal">$arg_name</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$arg_type </span>),<span class="kw-2">*</span>) {
+                </span><span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, $(<span class="macro-nonterminal">$context</span>: Context,)<span class="question-mark">? </span>$( <span class="macro-nonterminal">$arg_name</span>: <span class="macro-nonterminal">$arg_type </span>),<span class="kw-2">*</span>) {
                     <span class="comment">// Suppress unused argument warnings
                     </span><span class="attr">#[allow(dropping_references, dropping_copy_types)]
                     </span>drop(( $(<span class="macro-nonterminal">$context</span>,)<span class="question-mark">? </span>$(<span class="macro-nonterminal">$arg_name</span>),* ))
@@ -552,7 +560,7 @@
             }
 
             <span class="doccomment">/// Runs the given [`EventHandler`]'s code for this event.
-            </span><span class="kw">pub async fn </span>dispatch(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>Context, handler: <span class="kw-2">&amp;</span><span class="kw">dyn </span>EventHandler) {
+            </span><span class="kw">pub async fn </span>dispatch(<span class="self">self</span>, ctx: Context, handler: <span class="kw-2">&amp;</span><span class="kw">dyn </span>EventHandler) {
                 <span class="kw">match </span><span class="self">self </span>{
                     $(
                         $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
@@ -969,5 +977,11 @@
 </span><span class="kw">pub trait </span>RawEventHandler: Send + Sync {
     <span class="doccomment">/// Dispatched when any event occurs
     </span><span class="kw">async fn </span>raw_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _ctx: Context, _ev: Event) {}
+}
+
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">pub enum </span>InternalEventHandler {
+    Raw(Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;),
+    Normal(Arc&lt;<span class="kw">dyn </span>EventHandler&gt;),
 }
 </code></pre></div></section></main></body></html>
