@@ -24,7 +24,7 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: &Context, msg: &Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!ping" {
             println!("Shard {}", ctx.shard_id);
 
@@ -34,7 +34,7 @@ impl EventHandler for Handler {
         }
     }
 
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

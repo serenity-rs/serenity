@@ -10,17 +10,17 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     // This event will be dispatched for guilds, but not for direct messages.
-    async fn message(&self, _ctx: &Context, msg: &Message) {
+    async fn message(&self, _ctx: Context, msg: Message) {
         println!("Received message: {}", msg.content);
     }
 
     // As the intents set in this example, this event shall never be dispatched.
     // Try it by changing your status.
-    async fn presence_update(&self, _ctx: &Context, _new_data: &Presence) {
+    async fn presence_update(&self, _ctx: Context, _new_data: Presence) {
         println!("Presence Update");
     }
 
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
