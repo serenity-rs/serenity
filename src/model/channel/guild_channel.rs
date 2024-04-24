@@ -638,7 +638,7 @@ impl GuildChannel {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: &Context, msg: &Message) {
+    ///     async fn message(&self, context: Context, msg: Message) {
     ///         let Some(guild) = msg.guild(&context.cache) else {
     ///             return;
     ///         };

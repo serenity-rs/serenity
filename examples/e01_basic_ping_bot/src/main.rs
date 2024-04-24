@@ -13,7 +13,7 @@ impl EventHandler for Handler {
     //
     // Event handlers are dispatched through a threadpool, and so multiple events can be dispatched
     // simultaneously.
-    async fn message(&self, ctx: &Context, msg: &Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!ping" {
             // Sending a message can fail, due to a network error, an authentication error, or lack
             // of permissions to post in the channel, so log to stdout when some error happens,
@@ -29,7 +29,7 @@ impl EventHandler for Handler {
     // Ids, current user data, private channels, and more.
     //
     // In this case, just print what the current user's username is.
-    async fn ready(&self, _: &Context, ready: &Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

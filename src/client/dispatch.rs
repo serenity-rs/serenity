@@ -1,14 +1,13 @@
 use std::sync::Arc;
 
 #[cfg(feature = "gateway")]
-use super::event_handler::{EventHandler, RawEventHandler};
+use super::event_handler::InternalEventHandler;
 use super::{Context, FullEvent};
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::internal::prelude::*;
-use crate::internal::tokio::spawn_named;
 use crate::model::channel::ChannelType;
 use crate::model::event::Event;
 use crate::model::guild::Member;
@@ -41,24 +40,23 @@ macro_rules! update_cache {
     ($cache:ident, $event:ident) => {};
 }
 
-pub(crate) fn dispatch_model(
+/// Calls the user's event handlers and the framework handler.
+///
+/// This MUST be called from a different task to the recv_event loop, to allow for
+/// intra-shard concurrency between the shard loop and event handler.
+pub(crate) async fn dispatch_model(
     event: Event,
     context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
-    event_handlers: &[Arc<dyn EventHandler>],
-    raw_event_handlers: &[Arc<dyn RawEventHandler>],
+    event_handler: Option<InternalEventHandler>,
 ) {
-    struct DispatchContext {
-        context: Context,
-        full_event: FullEvent,
-        task_name: &'static str,
-        extra_event: Option<FullEvent>,
-    }
-
-    for raw_handler in raw_event_handlers {
-        let (handler, context, event) = (Arc::clone(raw_handler), context.clone(), event.clone());
-        tokio::spawn(async move { handler.raw_event(context, event).await });
-    }
+    let handler = match event_handler {
+        Some(InternalEventHandler::Normal(handler)) => Some(handler),
+        Some(InternalEventHandler::Raw(raw_handler)) => {
+            return raw_handler.raw_event(context, event).await;
+        },
+        None => None,
+    };
 
     let (full_event, extra_event) = update_cache_with_event(
         #[cfg(feature = "cache")]
@@ -66,49 +64,21 @@ pub(crate) fn dispatch_model(
         event,
     );
 
-    let dispatch_ctx = Arc::new(DispatchContext {
-        task_name: full_event.snake_case_name(),
-        context,
-        full_event,
-        extra_event,
-    });
-
-    for handler in event_handlers {
-        let handler = Arc::clone(handler);
-        let dispatch_ctx = Arc::clone(&dispatch_ctx);
-
-        spawn_named(dispatch_ctx.task_name, async move {
-            let DispatchContext {
-                context,
-                full_event,
-                extra_event,
-                ..
-            } = &*dispatch_ctx;
-
-            if let Some(extra_event) = extra_event {
-                extra_event.dispatch(context, &*handler).await;
-            }
-
-            full_event.dispatch(context, &*handler).await;
-        });
-    }
-
     #[cfg(feature = "framework")]
     if let Some(framework) = framework {
-        spawn_named("dispatch::framework::dispatch", async move {
-            let DispatchContext {
-                context,
-                full_event,
-                extra_event,
-                ..
-            } = &*dispatch_ctx;
+        if let Some(extra_event) = &extra_event {
+            framework.dispatch(&context, extra_event).await;
+        }
 
-            if let Some(extra_event) = extra_event {
-                framework.dispatch(context, extra_event).await;
-            }
+        framework.dispatch(&context, &full_event).await;
+    }
 
-            framework.dispatch(context, full_event).await;
-        });
+    if let Some(handler) = handler {
+        if let Some(extra_event) = extra_event {
+            extra_event.dispatch(context.clone(), &*handler).await;
+        }
+
+        full_event.dispatch(context, &*handler).await;
     }
 }
 

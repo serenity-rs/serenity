@@ -38,7 +38,7 @@ use tracing::debug;
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
-pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
+pub use self::event_handler::{EventHandler, FullEvent, InternalEventHandler, RawEventHandler};
 #[cfg(feature = "gateway")]
 use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
@@ -54,6 +54,7 @@ use crate::gateway::{ActivityData, PresenceData};
 use crate::gateway::{ShardManager, ShardManagerOptions};
 use crate::http::Http;
 use crate::internal::prelude::*;
+use crate::internal::tokio::spawn_named;
 #[cfg(feature = "gateway")]
 use crate::model::gateway::GatewayIntents;
 use crate::model::id::ApplicationId;
@@ -75,8 +76,8 @@ pub struct ClientBuilder {
     framework: Option<Box<dyn Framework>>,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
-    event_handlers: Vec<Arc<dyn EventHandler>>,
-    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    event_handler: Option<Arc<dyn EventHandler>>,
+    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     presence: PresenceData,
 }
 
@@ -109,8 +110,8 @@ impl ClientBuilder {
             framework: None,
             #[cfg(feature = "voice")]
             voice_manager: None,
-            event_handlers: vec![],
-            raw_event_handlers: vec![],
+            event_handler: None,
+            raw_event_handler: None,
             presence: PresenceData::default(),
         }
     }
@@ -234,29 +235,30 @@ impl ClientBuilder {
     where
         H: EventHandler + 'static,
     {
-        self.event_handlers.push(event_handler.into());
-
+        self.event_handler = Some(event_handler.into());
         self
     }
 
     /// Gets the added event handlers. See [`Self::event_handler`] for more info.
     #[must_use]
-    pub fn get_event_handlers(&self) -> &[Arc<dyn EventHandler>] {
-        &self.event_handlers
+    pub fn get_event_handler(&self) -> Option<&Arc<dyn EventHandler>> {
+        self.event_handler.as_ref()
     }
 
     /// Adds an event handler with a single method where all received gateway events will be
     /// dispatched.
-    pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
-        self.raw_event_handlers.push(Arc::new(raw_event_handler));
-
+    pub fn raw_event_handler<H>(mut self, raw_event_handler: impl Into<Arc<H>>) -> Self
+    where
+        H: RawEventHandler + 'static,
+    {
+        self.raw_event_handler = Some(raw_event_handler.into());
         self
     }
 
     /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
     #[must_use]
-    pub fn get_raw_event_handlers(&self) -> &[Arc<dyn RawEventHandler>] {
-        &self.raw_event_handlers
+    pub fn get_raw_event_handler(&self) -> Option<&Arc<dyn RawEventHandler>> {
+        self.raw_event_handler.as_ref()
     }
 
     /// Sets the initial activity.
@@ -291,21 +293,27 @@ impl IntoFuture for ClientBuilder {
         let data = self.data.unwrap_or(Arc::new(()));
         #[cfg(feature = "framework")]
         let framework = self.framework;
-        let event_handlers = self.event_handlers;
-        let raw_event_handlers = self.raw_event_handlers;
         let intents = self.intents;
         let presence = self.presence;
         let http = self.http;
 
+        let event_handler = match (self.event_handler, self.raw_event_handler) {
+            (Some(_), Some(_)) => panic!("Cannot provide both a normal and raw event handlers"),
+            (Some(h), None) => Some(InternalEventHandler::Normal(h)),
+            (None, Some(h)) => Some(InternalEventHandler::Raw(h)),
+            (None, None) => None,
+        };
+
         if let Some(ratelimiter) = &http.ratelimiter {
-            let event_handlers_clone = event_handlers.clone();
-            ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-                for event_handler in &event_handlers_clone {
-                    let info = info.clone();
-                    let event_handler = Arc::clone(event_handler);
-                    tokio::spawn(async move { event_handler.ratelimit(&info).await });
-                }
-            }));
+            if let Some(InternalEventHandler::Normal(event_handler)) = &event_handler {
+                let event_handler = Arc::clone(event_handler);
+                ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+                    let event_handler = Arc::clone(&event_handler);
+                    spawn_named("ratelimit::dispatch", async move {
+                        event_handler.ratelimit(info).await;
+                    });
+                }));
+            }
         }
 
         #[cfg(feature = "voice")]
@@ -331,8 +339,7 @@ impl IntoFuture for ClientBuilder {
             let framework_cell = Arc::new(OnceLock::new());
             let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
-                event_handlers,
-                raw_event_handlers,
+                event_handler,
                 #[cfg(feature = "framework")]
                 framework: Arc::clone(&framework_cell),
                 #[cfg(feature = "voice")]
@@ -398,7 +405,7 @@ impl IntoFuture for ClientBuilder {
 ///
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     async fn message(&self, context: &Context, msg: &Message) {
+///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say(&context, "Pong!");
 ///         }
