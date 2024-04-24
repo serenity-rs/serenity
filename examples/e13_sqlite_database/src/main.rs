@@ -12,7 +12,7 @@ struct Bot {
 
 #[async_trait]
 impl EventHandler for Bot {
-    async fn message(&self, ctx: &Context, msg: &Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         let user_id = msg.author.id.get() as i64;
 
         if let Some(task_description) = msg.content.strip_prefix("~todo add") {

@@ -16,7 +16,7 @@ use super::{ShardId, ShardManager, ShardRunnerMessage};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::dispatch::dispatch_model;
-use crate::client::{Context, EventHandler, RawEventHandler};
+use crate::client::{Context, InternalEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, ReconnectType, Shard, ShardAction};
@@ -28,8 +28,7 @@ use crate::model::event::{Event, GatewayEvent};
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
     data: Arc<dyn std::any::Any + Send + Sync>,
-    event_handlers: Vec<Arc<dyn EventHandler>>,
-    raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    event_handler: Option<InternalEventHandler>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework>>,
     manager: Arc<ShardManager>,
@@ -56,8 +55,7 @@ impl ShardRunner {
             runner_rx: rx,
             runner_tx: tx,
             data: opt.data,
-            event_handlers: opt.event_handlers,
-            raw_event_handlers: opt.raw_event_handlers,
+            event_handler: opt.event_handler,
             #[cfg(feature = "framework")]
             framework: opt.framework,
             manager: opt.manager,
@@ -120,15 +118,17 @@ impl ShardRunner {
             if post != pre {
                 self.update_manager().await;
 
-                for event_handler in self.event_handlers.clone() {
+                if let Some(InternalEventHandler::Normal(event_handler)) = &self.event_handler {
+                    let event_handler = Arc::clone(event_handler);
                     let context = self.make_context();
                     let event = ShardStageUpdateEvent {
                         new: post,
                         old: pre,
                         shard_id: self.shard.shard_info().id,
                     };
+
                     spawn_named("dispatch::event_handler::shard_stage_update", async move {
-                        event_handler.shard_stage_update(&context, &event).await;
+                        event_handler.shard_stage_update(context, event).await;
                     });
                 }
             }
@@ -172,14 +172,15 @@ impl ShardRunner {
             if let Some(event) = event {
                 #[cfg(feature = "collector")]
                 self.collectors.lock().expect("poison").retain_mut(|callback| (callback.0)(&event));
-
-                dispatch_model(
-                    event,
-                    self.make_context(),
-                    #[cfg(feature = "framework")]
-                    self.framework.clone(),
-                    &self.event_handlers,
-                    &self.raw_event_handlers,
+                spawn_named(
+                    "shard_runner::dispatch",
+                    dispatch_model(
+                        event,
+                        self.make_context(),
+                        #[cfg(feature = "framework")]
+                        self.framework.clone(),
+                        self.event_handler.clone(),
+                    ),
                 );
             }
 
@@ -473,8 +474,7 @@ impl ShardRunner {
 /// Options to be passed to [`ShardRunner::new`].
 pub struct ShardRunnerOptions {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
-    pub event_handlers: Vec<Arc<dyn EventHandler>>,
-    pub raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
+    pub event_handler: Option<InternalEventHandler>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework>>,
     pub manager: Arc<ShardManager>,
