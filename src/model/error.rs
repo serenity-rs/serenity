@@ -116,7 +116,7 @@ impl fmt::Display for Minimum {
 /// #[serenity::async_trait]
 /// #[cfg(feature = "client")]
 /// impl EventHandler for Handler {
-///     async fn guild_ban_removal(&self, ctx: &Context, guild_id: &GuildId, user: &User) {
+///     async fn guild_ban_removal(&self, ctx: Context, guild_id: GuildId, user: User) {
 ///         match guild_id.ban(&ctx.http, user.id, 8, Some("No unbanning people!")).await {
 ///             Ok(()) => {
 ///                 // Ban successful.
