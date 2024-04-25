@@ -99,7 +99,8 @@ pub struct ShardRunnerInfo {
 /// collector should still receive events, it should return `true`. Once it returns `false`, it is
 /// removed.
 #[derive(Clone)]
-pub struct CollectorCallback(pub Arc<Box<dyn Fn(&Event) -> bool + Send + Sync>>);
+pub struct CollectorCallback(pub Arc<dyn Fn(&Event) -> bool + Send + Sync>);
+
 impl std::fmt::Debug for CollectorCallback {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("CollectorCallback").finish()
@@ -108,6 +109,6 @@ impl std::fmt::Debug for CollectorCallback {
 
 impl PartialEq for CollectorCallback {
     fn eq(&self, other: &Self) -> bool {
-        Arc::as_ptr(&self.0) == Arc::as_ptr(&other.0)
+        std::ptr::addr_eq(Arc::as_ptr(&self.0), Arc::as_ptr(&other.0))
     }
 }

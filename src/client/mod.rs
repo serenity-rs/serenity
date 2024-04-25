@@ -163,8 +163,8 @@ impl ClientBuilder {
     /// [`Framework`] on [`Arc<YourFrameworkType>`] instead of `YourFrameworkType`.
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
-    where
-        F: Framework + 'static,
+        where
+            F: Framework + 'static,
     {
         self.framework = Some(Box::new(framework));
 
@@ -182,8 +182,8 @@ impl ClientBuilder {
     /// gateway and then consider - based on its settings - whether to dispatch a command.
     #[cfg(feature = "voice")]
     pub fn voice_manager<V>(mut self, voice_manager: impl Into<Arc<V>>) -> Self
-    where
-        V: VoiceGatewayManager + 'static,
+        where
+            V: VoiceGatewayManager + 'static,
     {
         self.voice_manager = Some(voice_manager.into());
         self
@@ -230,8 +230,8 @@ impl ClientBuilder {
 
     /// Adds an event handler with multiple methods for each possible event.
     pub fn event_handler<H>(mut self, event_handler: impl Into<Arc<H>>) -> Self
-    where
-        H: EventHandler + 'static,
+        where
+            H: EventHandler + 'static,
     {
         self.event_handler = Some(event_handler.into());
         self
@@ -246,8 +246,8 @@ impl ClientBuilder {
     /// Adds an event handler with a single method where all received gateway events will be
     /// dispatched.
     pub fn raw_event_handler<H>(mut self, raw_event_handler: impl Into<Arc<H>>) -> Self
-    where
-        H: RawEventHandler + 'static,
+        where
+            H: RawEventHandler + 'static,
     {
         self.raw_event_handler = Some(raw_event_handler.into());
         self
@@ -290,7 +290,7 @@ impl IntoFuture for ClientBuilder {
     fn into_future(self) -> Self::IntoFuture {
         let data = self.data.unwrap_or(Arc::new(()));
         #[cfg(feature = "framework")]
-        let framework = self.framework;
+            let framework = self.framework;
         let intents = self.intents;
         let presence = self.presence;
         let http = self.http;
@@ -315,10 +315,10 @@ impl IntoFuture for ClientBuilder {
         }
 
         #[cfg(feature = "voice")]
-        let voice_manager = self.voice_manager;
+            let voice_manager = self.voice_manager;
 
         #[cfg(feature = "cache")]
-        let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
+            let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
             let (ws_url, shard_total, max_concurrency) = match http.get_bot_gateway().await {
@@ -330,11 +330,11 @@ impl IntoFuture for ClientBuilder {
                 Err(err) => {
                     tracing::warn!("HTTP request to get gateway URL failed: {err}");
                     (Arc::from("wss://gateway.discord.gg"), NonZeroU16::MIN, NonZeroU16::MIN)
-                },
+                }
             };
 
             #[cfg(feature = "framework")]
-            let framework_cell = Arc::new(OnceLock::new());
+                let framework_cell = Arc::new(OnceLock::new());
             let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
                 event_handler,
@@ -765,7 +765,7 @@ impl Client {
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
             #[cfg(feature = "cache")]
-            let cache_user_id = {
+                let cache_user_id = {
                 let cache_user = self.cache.current_user();
                 if cache_user.id == UserId::default() {
                     None
@@ -775,7 +775,7 @@ impl Client {
             };
 
             #[cfg(not(feature = "cache"))]
-            let cache_user_id: Option<UserId> = None;
+                let cache_user_id: Option<UserId> = None;
 
             let user_id = match cache_user_id {
                 Some(u) => u,
