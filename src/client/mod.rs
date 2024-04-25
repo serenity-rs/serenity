@@ -31,7 +31,7 @@ use std::sync::OnceLock;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
-use tracing::debug;
+use tracing::{debug};
 
 pub use self::context::Context;
 pub use self::error::Error as ClientError;

@@ -1,3 +1,7 @@
+// Or we'll get deprecation warnings from our own deprecated type (seriously Rust?)
+#![allow(deprecated)]
+
+use std::sync::Arc;
 use futures::future::pending;
 use futures::{Stream, StreamExt as _};
 
@@ -35,11 +39,11 @@ pub fn collect<T: Send + 'static>(
     let (sender, mut receiver) = tokio::sync::mpsc::unbounded_channel();
 
     // Register an event callback in the shard. It's kept alive as long as we return `true`
-    shard.add_collector(CollectorCallback(Box::new(move |event| match extractor(event) {
+    shard.add_collector(CollectorCallback(Arc::new(Box::new(move |event| match extractor(event) {
         // If this event matches, we send it to the receiver stream
         Some(item) => sender.send(item).is_ok(),
         None => !sender.is_closed(),
-    })));
+    }))));
 
     // Convert the mpsc Receiver into a Stream
     futures::stream::poll_fn(move |cx| receiver.poll_recv(cx))
