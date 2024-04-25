@@ -5,6 +5,29 @@ use std::num::{NonZeroI64, NonZeroU64};
 
 use super::Timestamp;
 
+macro_rules! newtype_display_impl {
+    ($name:ident) => {
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                let inner = self.0;
+                fmt::Display::fmt(&inner, f)
+            }
+        }
+    };
+}
+
+macro_rules! forward_fromstr_impl {
+    ($name:ident) => {
+        impl std::str::FromStr for $name {
+            type Err = <u64 as std::str::FromStr>::Err;
+
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                Ok(Self(s.parse()?))
+            }
+        }
+    };
+}
+
 macro_rules! id_u64 {
     ($($name:ident;)*) => {
         $(
@@ -35,6 +58,9 @@ macro_rules! id_u64 {
                     Timestamp::from_discord_id(self.get())
                 }
             }
+
+            newtype_display_impl!($name);
+            forward_fromstr_impl!($name);
 
             impl Default for $name {
                 fn default() -> Self {
@@ -75,13 +101,6 @@ macro_rules! id_u64 {
                 }
             }
 
-            impl fmt::Display for $name {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    let inner = self.0;
-                    fmt::Display::fmt(&inner, f)
-                }
-            }
-
             impl From<$name> for NonZeroU64 {
                 fn from(id: $name) -> NonZeroU64 {
                     id.0
@@ -103,14 +122,6 @@ macro_rules! id_u64 {
             impl From<$name> for i64 {
                 fn from(id: $name) -> i64 {
                     id.get() as i64
-                }
-            }
-
-            impl std::str::FromStr for $name {
-                type Err = <u64 as std::str::FromStr>::Err;
-
-                fn from_str(s: &str) -> Result<Self, Self::Err> {
-                    Ok(Self(s.parse()?))
                 }
             }
 
@@ -299,11 +310,30 @@ impl ShardId {
     }
 }
 
-impl fmt::Display for ShardId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+newtype_display_impl!(ShardId);
+
+/// An identifier for a [`Poll Answer`](super::channel::PollAnswer).
+///
+/// This is identifier is special as it is not a snowflake.
+///
+/// The specific algorithm used is currently just a sequential index but this is subject to change.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+#[repr(packed)]
+pub struct AnswerId(u8);
+
+impl AnswerId {
+    /// Retrieves the value as a [`u64`].
+    ///
+    /// Keep in mind that this is **not a snowflake** and the values are subject to change.
+    #[must_use]
+    pub fn get(self) -> u64 {
+        self.0.into()
     }
 }
+
+newtype_display_impl!(AnswerId);
+forward_fromstr_impl!(AnswerId);
 
 mod snowflake {
     use std::fmt;

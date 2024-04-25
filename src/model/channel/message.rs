@@ -138,6 +138,12 @@ pub struct Message {
     ///
     /// Only present in [`MessageCreateEvent`].
     pub member: Option<Box<PartialMember>>,
+    /// A poll that may be attached to a message.
+    ///
+    /// This is often omitted, so is boxed to improve memory usage.
+    ///
+    /// Only present in [`MessageCreateEvent`].
+    pub poll: Option<Box<Poll>>,
 }
 
 #[cfg(feature = "model")]
@@ -735,6 +741,15 @@ impl Message {
         cache_http.http().unpin_message(self.channel_id, self.id, None).await
     }
 
+    /// Ends the [`Poll`] on this message, if there is one.
+    ///
+    /// # Errors
+    ///
+    /// See [`ChannelId::end_poll`] for more information.
+    pub async fn end_poll(&self, http: impl AsRef<Http>) -> Result<Self> {
+        self.channel_id.end_poll(http, self.id).await
+    }
+
     /// Tries to return author's nickname in the current channel's guild.
     ///
     /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
@@ -1156,4 +1171,131 @@ pub struct RoleSubscriptionData {
     pub total_months_subscribed: u16,
     /// Whether this notification is for a renewal rather than a new purchase.
     pub is_renewal: bool,
+}
+
+/// A poll that has been attached to a [`Message`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/poll#poll-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Poll {
+    pub question: PollMedia,
+    pub answers: Vec<PollAnswer>,
+    pub expiry: Option<Timestamp>,
+    pub allow_multiselect: bool,
+    pub layout_type: PollLayoutType,
+    /// The results of the Poll.
+    ///
+    /// None does **not** mean that there are no results, simply that Discord has not provide them.
+    /// See the discord docs for a more detailed explaination.
+    pub results: Option<PollResults>,
+}
+
+/// A piece of data used in mutliple parts of the [`Poll`] structure.
+///
+/// Currently holds text and an optional emoji, but this is expected to change in future
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/poll#poll-media-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PollMedia {
+    pub text: Option<String>,
+    pub emoji: Option<PollMediaEmoji>,
+}
+
+/// The "Partial Emoji" attached to a [`PollMedia`] model.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/poll#poll-media-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum PollMediaEmoji {
+    Name(String),
+    Id(EmojiId),
+}
+
+impl<'de> serde::Deserialize<'de> for PollMediaEmoji {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        #[derive(serde::Deserialize)]
+        struct RawPollMediaEmoji {
+            name: Option<String>,
+            id: Option<EmojiId>,
+        }
+
+        let raw = RawPollMediaEmoji::deserialize(deserializer)?;
+        if let Some(name) = raw.name {
+            Ok(PollMediaEmoji::Name(name))
+        } else if let Some(id) = raw.id {
+            Ok(PollMediaEmoji::Id(id))
+        } else {
+            Err(serde::de::Error::duplicate_field("emoji"))
+        }
+    }
+}
+
+impl From<String> for PollMediaEmoji {
+    fn from(value: String) -> Self {
+        Self::Name(value)
+    }
+}
+
+impl From<EmojiId> for PollMediaEmoji {
+    fn from(value: EmojiId) -> Self {
+        Self::Id(value)
+    }
+}
+
+/// A possible answer for a [`Poll`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/poll#poll-answer-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PollAnswer {
+    pub answer_id: AnswerId,
+    pub poll_media: PollMedia,
+}
+
+enum_number! {
+    /// Represents the different layouts that a [`Poll`] may have.
+    ///
+    /// Currently, there is only the one option.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/poll#layout-type)
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum PollLayoutType {
+        #[default]
+        Default = 1,
+        _ => Unknown(u8),
+    }
+}
+
+/// The model for the results of a [`Poll`].
+///
+/// If `is_finalized` is `false`, `answer_counts` will be inaccurate due to Discord's scale.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/poll#poll-results-object-poll-results-object-structure)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PollResults {
+    pub is_finalized: bool,
+    pub answer_counts: Vec<PollAnswerCount>,
+}
+
+/// The count of a single [`PollAnswer`]'s results.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/poll#poll-results-object-poll-answer-count-object-structure)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PollAnswerCount {
+    pub id: AnswerId,
+    pub count: u64,
+    pub me_voted: bool,
 }

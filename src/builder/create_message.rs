@@ -1,3 +1,4 @@
+use super::create_poll::Ready;
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
 use super::{
@@ -5,6 +6,7 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
+    CreatePoll,
     EditAttachments,
 };
 #[cfg(feature = "http")]
@@ -69,6 +71,8 @@ pub struct CreateMessage {
     flags: Option<MessageFlags>,
     pub(crate) attachments: EditAttachments,
     enforce_nonce: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    poll: Option<CreatePoll<super::create_poll::Ready>>,
 
     // The following fields are handled separately.
     #[serde(skip)]
@@ -286,6 +290,12 @@ impl CreateMessage {
     /// message will be returned and no new message will be created.
     pub fn enforce_nonce(mut self, enforce_nonce: bool) -> Self {
         self.enforce_nonce = enforce_nonce;
+        self
+    }
+
+    /// Sets the [`Poll`] for this message.
+    pub fn poll(mut self, poll: CreatePoll<Ready>) -> Self {
+        self.poll = Some(poll);
         self
     }
 }

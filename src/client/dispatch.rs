@@ -485,6 +485,12 @@ fn update_cache_with_event(
         Event::EntitlementDelete(event) => FullEvent::EntitlementDelete {
             entitlement: event.entitlement,
         },
+        Event::MessagePollVoteAdd(event) => FullEvent::MessagePollVoteAdd {
+            event,
+        },
+        Event::MessagePollVoteRemove(event) => FullEvent::MessagePollVoteRemove {
+            event,
+        },
     };
 
     Some((event, extra_event))

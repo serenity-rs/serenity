@@ -576,6 +576,15 @@ bitflags! {
         /// Enables the following gateway events:
         /// - AUTO_MODERATION_ACTION_EXECUTION
         const AUTO_MODERATION_EXECUTION = 1 << 21;
+
+        /// Enables the following gateway events for guilds:
+        /// - MESSAGE_POLL_VOTE_ADD
+        /// - MESSAGE_POLL_VOTE_REMOVE
+        const GUILD_MESSAGE_POLLS = 1 << 24;
+        /// Enables the following gateway events for direct messages:
+        /// - MESSAGE_POLL_VOTE_ADD
+        /// - MESSAGE_POLL_VOTE_REMOVE
+        const DIRECT_MESSAGE_POLLS = 1 << 25;
     }
 }
 

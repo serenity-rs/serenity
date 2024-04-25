@@ -1064,6 +1064,31 @@ impl ChannelId {
     ) -> Result<ThreadsData> {
         http.as_ref().get_channel_joined_archived_private_threads(self, before, limit).await
     }
+
+    /// Get a list of users that voted for this specific answer.
+    ///
+    /// # Errors
+    ///
+    /// If the message does not have a poll.
+    pub async fn get_poll_answer_voters(
+        self,
+        http: impl AsRef<Http>,
+        message_id: MessageId,
+        answer_id: AnswerId,
+        after: Option<UserId>,
+        limit: Option<u8>,
+    ) -> Result<Vec<User>> {
+        http.as_ref().get_poll_answer_voters(self, message_id, answer_id, after, limit).await
+    }
+
+    /// Ends the [`Poll`] on a given [`MessageId`], if there is one.
+    ///
+    /// # Errors
+    ///
+    /// If the message does not have a poll, or if the poll was not created by the current user.
+    pub async fn end_poll(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<Message> {
+        http.as_ref().expire_poll(self, message_id).await
+    }
 }
 
 #[cfg(feature = "model")]

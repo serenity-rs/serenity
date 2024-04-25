@@ -1058,6 +1058,34 @@ pub struct EntitlementDeleteEvent {
     pub entitlement: Entitlement,
 }
 
+/// Requires [`GatewayIntents::GUILD_MESSAGE_POLLS`] or [`GatewayIntents::DIRECT_MESSAGE_POLLS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-add)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessagePollVoteAddEvent {
+    pub user_id: UserId,
+    pub channel_id: ChannelId,
+    pub message_id: MessageId,
+    pub guild_id: Option<GuildId>,
+    pub answer_id: AnswerId,
+}
+
+/// Requires [`GatewayIntents::GUILD_MESSAGE_POLLS`] or [`GatewayIntents::DIRECT_MESSAGE_POLLS`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-poll-vote-remove)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessagePollVoteRemoveEvent {
+    pub user_id: UserId,
+    pub channel_id: ChannelId,
+    pub message_id: MessageId,
+    pub guild_id: Option<GuildId>,
+    pub answer_id: AnswerId,
+}
+
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#payload-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[allow(clippy::large_enum_variant)]
@@ -1311,6 +1339,10 @@ pub enum Event {
     EntitlementUpdate(EntitlementUpdateEvent),
     /// A user's entitlement was deleted by Discord, or refunded.
     EntitlementDelete(EntitlementDeleteEvent),
+    /// A user has voted on a Message Poll.
+    MessagePollVoteAdd(MessagePollVoteAddEvent),
+    /// A user has removed a previous vote on a Message Poll.
+    MessagePollVoteRemove(MessagePollVoteRemoveEvent),
     /// An event type not covered by the above
     #[serde(untagged)]
     Unknown(UnknownEvent),
