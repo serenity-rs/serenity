@@ -175,7 +175,10 @@ impl ShardRunner {
                     Some(InternalEventHandler::Normal(handler)) => {
                         handler.filter_event(&context, &event)
                     },
-                    _ => true,
+                    Some(InternalEventHandler::Raw(handler)) => {
+                        handler.filter_event(&context, &event)
+                    },
+                    None => true,
                 } {
                     #[cfg(feature = "collector")]
                     {

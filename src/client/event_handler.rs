@@ -496,6 +496,18 @@ event_handler! {
 pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
     async fn raw_event(&self, _ctx: Context, _ev: Event) {}
+
+    /// Check if `event` should be dispatched (`true`) or ignored (`false`) by the bot.
+    /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and this EventHandler trait.
+    ///
+    /// WARNING: This method will be run synchronously for every received event in the main dispatch loop of the receiving shard!
+    /// It should be as fast as possible to not block the bot from handling events!
+    fn filter_event(&self, context: &Context, event: &Event) -> bool {
+        // Suppress unused argument warnings
+        #[allow(dropping_references, dropping_copy_types)]
+        drop(( context, event ));
+        true
+    }
 }
 
 #[derive(Clone)]
