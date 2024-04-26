@@ -1,9 +1,9 @@
 // Or we'll get deprecation warnings from our own deprecated type (seriously Rust?)
 #![allow(deprecated)]
 
-use std::sync::Arc;
 use futures::future::pending;
 use futures::{Stream, StreamExt as _};
+use std::sync::Arc;
 
 use crate::gateway::{CollectorCallback, ShardMessenger};
 use crate::internal::prelude::*;
@@ -35,7 +35,7 @@ use crate::model::prelude::*;
 pub fn collect<T: Send + 'static>(
     shard: &ShardMessenger,
     extractor: impl Fn(&Event) -> Option<T> + Send + Sync + 'static,
-) -> impl Stream<Item=T> {
+) -> impl Stream<Item = T> {
     let (sender, mut receiver) = tokio::sync::mpsc::unbounded_channel();
 
     // Register an event callback in the shard. It's kept alive as long as we return `true`

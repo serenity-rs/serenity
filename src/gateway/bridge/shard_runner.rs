@@ -137,7 +137,7 @@ impl ShardRunner {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
                     self.request_restart().await;
                     return Ok(());
-                }
+                },
                 Some(other) => {
                     if let Err(e) = self.action(&other).await {
                         debug!(
@@ -150,7 +150,7 @@ impl ShardRunner {
                             ReconnectType::Reidentify => {
                                 self.request_restart().await;
                                 return Ok(());
-                            }
+                            },
                             ReconnectType::Resume => {
                                 if let Err(why) = self.shard.resume().await {
                                     warn!(
@@ -162,11 +162,11 @@ impl ShardRunner {
                                     self.request_restart().await;
                                     return Ok(());
                                 }
-                            }
+                            },
                         };
                     }
-                }
-                None => {}
+                },
+                None => {},
             }
 
             if let Some(event) = event {
@@ -174,7 +174,8 @@ impl ShardRunner {
                 {
                     let read_lock = self.collectors.read();
                     // search all collectors to be removed and clone the Arcs
-                    let to_remove: Vec<_> = read_lock.iter().filter(|callback| !callback.0(&event)).cloned().collect();
+                    let to_remove: Vec<_> =
+                        read_lock.iter().filter(|callback| !callback.0(&event)).cloned().collect();
                     drop(read_lock);
                     // remove all found arcs from the collection
                     // this compares the inner pointer of the Arc
@@ -188,7 +189,7 @@ impl ShardRunner {
                         event,
                         self.make_context(),
                         #[cfg(feature = "framework")]
-                            self.framework.clone(),
+                        self.framework.clone(),
                         self.event_handler.clone(),
                     ),
                 );
@@ -221,7 +222,7 @@ impl ShardRunner {
             ShardAction::Reconnect(ReconnectType::Reidentify) => {
                 self.request_restart().await;
                 Ok(())
-            }
+            },
             ShardAction::Reconnect(ReconnectType::Resume) => self.shard.resume().await,
             ShardAction::Heartbeat => self.shard.heartbeat().await,
             ShardAction::Identify => self.shard.identify().await,
@@ -246,10 +247,7 @@ impl ShardRunner {
         drop(
             self.shard
                 .client
-                .close(Some(CloseFrame {
-                    code: close_code.into(),
-                    reason: Cow::from(""),
-                }))
+                .close(Some(CloseFrame { code: close_code.into(), reason: Cow::from("") }))
                 .await,
         );
 
@@ -264,7 +262,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
                     break;
-                }
+                },
                 _ => continue,
             }
         }
@@ -281,7 +279,7 @@ impl ShardRunner {
             self.shard.shard_info().id,
             Arc::clone(&self.http),
             #[cfg(feature = "cache")]
-                Arc::clone(&self.cache),
+            Arc::clone(&self.cache),
         )
     }
 
@@ -296,38 +294,29 @@ impl ShardRunner {
         match msg {
             ShardRunnerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
             ShardRunnerMessage::Shutdown(id, code) => self.checked_shutdown(id, code).await,
-            ShardRunnerMessage::ChunkGuild {
-                guild_id,
-                limit,
-                presences,
-                filter,
-                nonce,
-            } => self
+            ShardRunnerMessage::ChunkGuild { guild_id, limit, presences, filter, nonce } => self
                 .shard
                 .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
                 .await
                 .is_ok(),
             ShardRunnerMessage::Close(code, reason) => {
                 let reason = reason.unwrap_or_default();
-                let close = CloseFrame {
-                    code: code.into(),
-                    reason: Cow::from(reason),
-                };
+                let close = CloseFrame { code: code.into(), reason: Cow::from(reason) };
                 self.shard.client.close(Some(close)).await.is_ok()
-            }
+            },
             ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
             ShardRunnerMessage::SetActivity(activity) => {
                 self.shard.set_activity(activity);
                 self.shard.update_presence().await.is_ok()
-            }
+            },
             ShardRunnerMessage::SetPresence(activity, status) => {
                 self.shard.set_presence(activity, status);
                 self.shard.update_presence().await.is_ok()
-            }
+            },
             ShardRunnerMessage::SetStatus(status) => {
                 self.shard.set_status(status);
                 self.shard.update_presence().await.is_ok()
-            }
+            },
         }
     }
 
@@ -340,18 +329,18 @@ impl ShardRunner {
                     voice_manager
                         .register_shard(self.shard.shard_info().id.0, self.runner_tx.clone())
                         .await;
-                }
+                },
                 Event::VoiceServerUpdate(event) => {
                     voice_manager
                         .server_update(event.guild_id, event.endpoint.as_deref(), &event.token)
                         .await;
-                }
+                },
                 Event::VoiceStateUpdate(event) => {
                     if let Some(guild_id) = event.voice_state.guild_id {
                         voice_manager.state_update(guild_id, &event.voice_state).await;
                     }
-                }
-                _ => {}
+                },
+                _ => {},
             }
         }
     }
@@ -371,7 +360,7 @@ impl ShardRunner {
                     if !self.handle_rx_value(value).await {
                         return false;
                     }
-                }
+                },
                 Ok(None) => {
                     warn!(
                         "[ShardRunner {:?}] Sending half DC; restarting",
@@ -380,7 +369,7 @@ impl ShardRunner {
 
                     self.request_restart().await;
                     return false;
-                }
+                },
                 Err(_) => break,
             }
         }
@@ -397,7 +386,7 @@ impl ShardRunner {
             Ok(Some(inner)) => Ok(inner),
             Ok(None) => {
                 return Ok((None, None, true));
-            }
+            },
             Err(Error::Tungstenite(tung_err)) if matches!(*tung_err, TungsteniteError::Io(_)) => {
                 debug!("Attempting to auto-reconnect");
 
@@ -412,11 +401,11 @@ impl ShardRunner {
 
                             return Ok((None, None, false));
                         }
-                    }
+                    },
                 }
 
                 return Ok((None, None, true));
-            }
+            },
             Err(why) => Err(why),
         };
 
@@ -424,20 +413,20 @@ impl ShardRunner {
         let (action, event) = match self.shard.handle_event(gateway_event) {
             Ok((action, event)) => (action, event),
             Err(Error::Gateway(
-                    why @ (GatewayError::InvalidAuthentication
-                    | GatewayError::InvalidGatewayIntents
-                    | GatewayError::DisallowedGatewayIntents),
-                )) => {
+                why @ (GatewayError::InvalidAuthentication
+                | GatewayError::InvalidGatewayIntents
+                | GatewayError::DisallowedGatewayIntents),
+            )) => {
                 error!("Shard handler received fatal err: {why:?}");
 
                 self.manager.return_with_value(Err(why.clone())).await;
                 return Err(Error::Gateway(why));
-            }
+            },
             Err(Error::Json(_)) => return Ok((None, None, true)),
             Err(why) => {
                 error!("Shard handler recieved err: {why:?}");
                 return Ok((None, None, true));
-            }
+            },
         };
 
         if is_ack {
