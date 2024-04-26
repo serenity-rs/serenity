@@ -59,7 +59,7 @@ percent-encoding = { version = "2.3.0", optional = true }
 mini-moka = { version = "0.10.2", optional = true }
 mime_guess = { version = "2.0.4", optional = true }
 dashmap = { version = "5.5.3", features = ["serde"], optional = true }
-parking_lot = { version = "0.12.1", optional = true }
+parking_lot = { version = "0.12.1"}
 ed25519-dalek = { version = "2.0.0", optional = true }
 typesize = { version = "0.1.6", optional = true, features = ["url", "time", "serde_json", "secrecy", "dashmap", "parking_lot", "nonmax", "extract_map_01", "details"] }
 # serde feature only allows for serialisation,
@@ -93,7 +93,7 @@ default_no_backend = [
 builder = ["tokio/fs"]
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
-cache = ["fxhash", "dashmap", "parking_lot"]
+cache = ["fxhash", "dashmap"]
 # Enables collectors, a utility feature that lets you await interaction events in code with
 # zero setup, without needing to setup an InteractionCreate event listener.
 collector = ["gateway", "model"]
@@ -105,7 +105,7 @@ framework = ["client", "model", "utils"]
 # Enables gateway support, which allows bots to listen for Discord events.
 gateway = ["flate2"]
 # Enables HTTP, which enables bots to execute actions on Discord.
-http = ["dashmap", "parking_lot", "mime_guess", "percent-encoding"]
+http = ["dashmap", "mime_guess", "percent-encoding"]
 # Enables wrapper methods around HTTP requests on model types.
 # Requires "builder" to configure the requests and "http" to execute them.
 # Note: the model type definitions themselves are always active, regardless of this feature.
@@ -126,7 +126,7 @@ chrono = ["dep:chrono", "typesize?/chrono"]
 
 # This enables all parts of the serenity codebase
 # (Note: all feature-gated APIs to be documented should have their features listed here!)
-# 
+#
 # Unstable functionality should be gated under the `unstable` feature.
 full = ["default", "collector", "voice", "voice_model", "interactions_endpoint"]
 

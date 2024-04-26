@@ -21,7 +21,7 @@ use crate::model::prelude::*;
 pub struct ShardMessenger {
     pub(crate) tx: Sender<ShardRunnerMessage>,
     #[cfg(feature = "collector")]
-    pub(crate) collectors: Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
+    pub(crate) collectors: Arc<parking_lot::RwLock<Vec<CollectorCallback>>>,
 }
 
 impl ShardMessenger {
@@ -211,6 +211,6 @@ impl ShardMessenger {
 
     #[cfg(feature = "collector")]
     pub fn add_collector(&self, collector: CollectorCallback) {
-        self.collectors.lock().expect("poison").push(collector);
+        self.collectors.write().push(collector);
     }
 }
