@@ -109,6 +109,6 @@ impl std::fmt::Debug for CollectorCallback {
 
 impl PartialEq for CollectorCallback {
     fn eq(&self, other: &Self) -> bool {
-        Arc::ptr_eq(&self, &other)
+        Arc::ptr_eq(&self.0, &other.0)
     }
 }
