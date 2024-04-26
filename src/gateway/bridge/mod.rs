@@ -51,6 +51,7 @@ mod voice;
 
 use std::fmt;
 use std::num::NonZeroU16;
+use std::sync::Arc;
 use std::time::Duration as StdDuration;
 
 pub use self::event::ShardStageUpdateEvent;
@@ -97,9 +98,17 @@ pub struct ShardRunnerInfo {
 /// Newtype around a callback that will be called on every incoming request. As long as this
 /// collector should still receive events, it should return `true`. Once it returns `false`, it is
 /// removed.
-pub struct CollectorCallback(pub Box<dyn Fn(&Event) -> bool + Send + Sync>);
+#[derive(Clone)]
+pub struct CollectorCallback(pub Arc<dyn Fn(&Event) -> bool + Send + Sync>);
+
 impl std::fmt::Debug for CollectorCallback {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("CollectorCallback").finish()
+    }
+}
+
+impl PartialEq for CollectorCallback {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
     }
 }
