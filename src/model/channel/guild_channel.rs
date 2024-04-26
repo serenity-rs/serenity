@@ -348,7 +348,7 @@ impl GuildChannel {
         http: &Http,
         message_id: MessageId,
         user_id: Option<UserId>,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
     ) -> Result<()> {
         self.id.delete_reaction(http, message_id, user_id, reaction_type).await
     }
@@ -716,7 +716,7 @@ impl GuildChannel {
         &self,
         http: &Http,
         message_id: MessageId,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
         limit: Option<u8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {

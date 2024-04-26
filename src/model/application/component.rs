@@ -160,7 +160,7 @@ pub struct Button {
     pub label: Option<FixedString>,
     /// The emoji of this button, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub emoji: Option<ReactionType>,
+    pub emoji: Option<FixedReactionType>,
     /// Whether the button is disabled.
     #[serde(default)]
     pub disabled: bool,
@@ -228,7 +228,7 @@ pub struct SelectMenuOption {
     /// The description shown for this option.
     pub description: Option<FixedString>,
     /// The emoji displayed on this option.
-    pub emoji: Option<ReactionType>,
+    pub emoji: Option<FixedReactionType>,
     /// Render this option as the default selection.
     #[serde(default)]
     pub default: bool,

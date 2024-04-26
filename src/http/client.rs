@@ -738,7 +738,7 @@ impl Http {
         &self,
         channel_id: ChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        reaction_type: &ReactionType<'_>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1118,7 +1118,7 @@ impl Http {
         &self,
         channel_id: ChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        reaction_type: ReactionType<'_>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1181,7 +1181,7 @@ impl Http {
         channel_id: ChannelId,
         message_id: MessageId,
         user_id: UserId,
-        reaction_type: &ReactionType,
+        reaction_type: ReactionType<'_>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1204,7 +1204,7 @@ impl Http {
         &self,
         channel_id: ChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        reaction_type: ReactionType<'_>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -3627,7 +3627,7 @@ impl Http {
         &self,
         channel_id: ChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        reaction_type: ReactionType<'_>,
         limit: u8,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {

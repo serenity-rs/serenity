@@ -47,7 +47,7 @@ pub struct CreateButton<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     custom_id: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    emoji: Option<ReactionType>,
+    emoji: Option<ReactionType<'a>>,
     #[serde(default)]
     disabled: bool,
 }
@@ -113,7 +113,7 @@ impl<'a> CreateButton<'a> {
     }
 
     /// Sets emoji of the button.
-    pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
+    pub fn emoji(mut self, emoji: impl Into<ReactionType<'a>>) -> Self {
         self.emoji = Some(emoji.into());
         self
     }
@@ -300,7 +300,7 @@ pub struct CreateSelectMenuOption<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    emoji: Option<ReactionType>,
+    emoji: Option<ReactionType<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default: Option<bool>,
 }
@@ -337,7 +337,7 @@ impl<'a> CreateSelectMenuOption<'a> {
     }
 
     /// Sets emoji of the option.
-    pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
+    pub fn emoji(mut self, emoji: impl Into<ReactionType<'a>>) -> Self {
         self.emoji = Some(emoji.into());
         self
     }

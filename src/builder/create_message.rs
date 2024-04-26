@@ -70,7 +70,7 @@ pub struct CreateMessage<'a> {
 
     // The following fields are handled separately.
     #[serde(skip)]
-    reactions: Cow<'a, [ReactionType]>,
+    reactions: Cow<'a, [ReactionType<'a>]>,
 }
 
 impl<'a> CreateMessage<'a> {
@@ -137,7 +137,7 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Adds a list of reactions to create after the message's sent.
-    pub fn reactions(mut self, reactions: impl Into<Cow<'a, [ReactionType]>>) -> Self {
+    pub fn reactions(mut self, reactions: impl Into<Cow<'a, [ReactionType<'a>]>>) -> Self {
         self.reactions = reactions.into();
         self
     }
@@ -305,7 +305,7 @@ impl<'a> CreateMessage<'a> {
         let mut message = http.send_message(channel_id, files, &self).await?;
 
         for reaction in self.reactions.iter() {
-            http.create_reaction(channel_id, message.id, reaction).await?;
+            http.create_reaction(channel_id, message.id, &reaction).await?;
         }
 
         // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort

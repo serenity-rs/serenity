@@ -281,7 +281,7 @@ impl Message {
         &self,
         http: &Http,
         user_id: Option<UserId>,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
     ) -> Result<()> {
         self.channel_id.delete_reaction(http, self.id, user_id, reaction_type).await
     }
@@ -299,7 +299,7 @@ impl Message {
     pub async fn delete_reaction_emoji(
         &self,
         cache_http: impl CacheHttp,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
     ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -315,7 +315,7 @@ impl Message {
 
         cache_http
             .http()
-            .delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into())
+            .delete_message_reaction_emoji(self.channel_id, self.id, reaction_type.into())
             .await
     }
 
@@ -410,7 +410,7 @@ impl Message {
     pub async fn reaction_users(
         &self,
         http: &Http,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
         limit: Option<u8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
@@ -508,45 +508,19 @@ impl Message {
     pub async fn react(
         &self,
         cache_http: impl CacheHttp,
-        reaction_type: impl Into<ReactionType>,
-    ) -> Result<Reaction> {
-        self._react(cache_http, reaction_type.into()).await
-    }
-
-    async fn _react(
-        &self,
-        cache_http: impl CacheHttp,
-        reaction_type: ReactionType,
-    ) -> Result<Reaction> {
-        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
-        let mut user_id = None;
-
+        reaction_type: impl Into<ReactionType<'_>>,
+    ) -> Result<()> {
         #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild_id) = self.guild_id {
-                    utils::user_has_perms_cache(
-                        cache,
-                        guild_id,
-                        self.channel_id,
-                        Permissions::ADD_REACTIONS,
-                    )?;
-                }
-
-                user_id = Some(cache.current_user().id);
-            }
+        if let (Some(cache), Some(guild_id)) = (cache_http.cache(), self.guild_id) {
+            utils::user_has_perms_cache(
+                cache,
+                guild_id,
+                self.channel_id,
+                Permissions::ADD_REACTIONS,
+            )?;
         }
 
-        cache_http.http().create_reaction(self.channel_id, self.id, &reaction_type).await?;
-
-        Ok(Reaction {
-            channel_id: self.channel_id,
-            emoji: reaction_type,
-            message_id: self.id,
-            user_id,
-            guild_id: self.guild_id,
-            member: self.member.as_deref().map(|member| member.clone().into()),
-        })
+        cache_http.http().create_reaction(self.channel_id, self.id, reaction_type.into()).await
     }
 
     /// Uses Discord's inline reply to a user without pinging them.
@@ -847,7 +821,7 @@ pub struct MessageReaction {
     pub me: bool,
     /// The type of reaction.
     #[serde(rename = "emoji")]
-    pub reaction_type: ReactionType,
+    pub reaction_type: FixedReactionType,
 }
 
 enum_number! {

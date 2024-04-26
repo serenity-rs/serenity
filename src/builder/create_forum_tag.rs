@@ -2,6 +2,13 @@ use std::borrow::Cow;
 
 use crate::model::prelude::*;
 
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+enum StrOrChar<'a> {
+    Char(char),
+    Str(Cow<'a, str>),
+}
+
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object-forum-tag-structure)
 ///
 /// Contrary to the [`ForumTag`] struct, only the name field is required.
@@ -11,7 +18,7 @@ pub struct CreateForumTag<'a> {
     name: Cow<'a, str>,
     moderated: bool,
     emoji_id: Option<EmojiId>,
-    emoji_name: Option<Cow<'a, str>>,
+    emoji_name: Option<StrOrChar<'a>>,
 }
 
 impl<'a> CreateForumTag<'a> {
@@ -29,19 +36,17 @@ impl<'a> CreateForumTag<'a> {
         self
     }
 
-    pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
-        match emoji.into() {
+    pub fn emoji(mut self, emoji: impl Into<ReactionType<'a>>) -> Self {
+        let (emoji_id, emoji_name) = match emoji.into() {
             ReactionType::Custom {
                 id, ..
-            } => {
-                self.emoji_id = Some(id);
-                self.emoji_name = None;
-            },
-            ReactionType::Unicode(unicode_emoji) => {
-                self.emoji_id = None;
-                self.emoji_name = Some(unicode_emoji.into_string().into());
-            },
-        }
+            } => (Some(id), None),
+            ReactionType::Unicode(unicode_emoji) => (None, Some(StrOrChar::Str(unicode_emoji))),
+            ReactionType::UnicodeChar(unicode_char) => (None, Some(StrOrChar::Char(unicode_char))),
+        };
+
+        self.emoji_name = emoji_name;
+        self.emoji_id = emoji_id;
         self
     }
 }

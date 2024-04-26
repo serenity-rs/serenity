@@ -121,9 +121,9 @@ impl ChannelId {
         self,
         http: &Http,
         message_id: MessageId,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl AsRef<ReactionType<'_>>,
     ) -> Result<()> {
-        http.create_reaction(self, message_id, &reaction_type.into()).await
+        http.create_reaction(self, message_id, reaction_type.as_ref()).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -241,12 +241,12 @@ impl ChannelId {
         http: &Http,
         message_id: MessageId,
         user_id: Option<UserId>,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
     ) -> Result<()> {
         let reaction_type = reaction_type.into();
         match user_id {
-            Some(user_id) => http.delete_reaction(self, message_id, user_id, &reaction_type).await,
-            None => http.delete_reaction_me(self, message_id, &reaction_type).await,
+            Some(user_id) => http.delete_reaction(self, message_id, user_id, reaction_type).await,
+            None => http.delete_reaction_me(self, message_id, reaction_type).await,
         }
     }
     /// Deletes all of the [`Reaction`]s associated with the provided message id.
@@ -277,9 +277,9 @@ impl ChannelId {
         self,
         http: &Http,
         message_id: MessageId,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
     ) -> Result<()> {
-        http.delete_message_reaction_emoji(self, message_id, &reaction_type.into()).await
+        http.delete_message_reaction_emoji(self, message_id, reaction_type.into()).await
     }
 
     /// Edits a channel's settings.
@@ -589,13 +589,13 @@ impl ChannelId {
         self,
         http: &Http,
         message_id: MessageId,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
         limit: Option<u8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        http.get_reaction_users(self, message_id, &reaction_type.into(), limit, after).await
+        http.get_reaction_users(self, message_id, reaction_type.into(), limit, after).await
     }
 
     /// Sends a message with just the given message content in the channel.

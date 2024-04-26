@@ -1,8 +1,8 @@
+use std::borrow::Cow;
 use std::cmp::Ordering;
 #[cfg(doc)]
 use std::fmt::Display as _;
 use std::fmt::{self, Write as _};
-use std::str::FromStr;
 
 use nonmax::NonMaxU8;
 #[cfg(feature = "http")]
@@ -39,7 +39,7 @@ pub struct Reaction {
     /// The optional object of the member which added the reaction.
     pub member: Option<Member>,
     /// The reactive emoji used.
-    pub emoji: ReactionType,
+    pub emoji: FixedReactionType,
 }
 
 // Manual impl needed to insert guild_id into PartialMember
@@ -214,7 +214,7 @@ impl Reaction {
     pub async fn users(
         &self,
         http: &Http,
-        reaction_type: impl Into<ReactionType>,
+        reaction_type: impl Into<ReactionType<'_>>,
         limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
@@ -224,7 +224,7 @@ impl Reaction {
     async fn _users(
         &self,
         http: &Http,
-        reaction_type: &ReactionType,
+        reaction_type: &ReactionType<'_>,
         limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
@@ -243,7 +243,7 @@ impl Reaction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
-pub enum ReactionType {
+pub enum FixedReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the guild.
     Custom {
         /// Whether the emoji is animated.
@@ -259,7 +259,7 @@ pub enum ReactionType {
 }
 
 // Manual impl needed to decide enum variant by presence of `id`
-impl<'de> Deserialize<'de> for ReactionType {
+impl<'de> Deserialize<'de> for FixedReactionType {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         struct PartialEmoji {
@@ -270,24 +270,66 @@ impl<'de> Deserialize<'de> for ReactionType {
         }
         let emoji = PartialEmoji::deserialize(deserializer)?;
         Ok(match (emoji.id, emoji.name) {
-            (Some(id), name) => ReactionType::Custom {
+            (Some(id), name) => Self::Custom {
                 animated: emoji.animated,
                 id,
                 name,
             },
-            (None, Some(name)) => ReactionType::Unicode(name),
+            (None, Some(name)) => Self::Unicode(name),
             (None, None) => return Err(DeError::custom("invalid reaction type data")),
         })
     }
 }
 
-impl Serialize for ReactionType {
+impl serde::Serialize for FixedReactionType {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let reaction_type = match self {
+            Self::Custom {
+                id,
+                name,
+                animated,
+            } => ReactionType::Custom {
+                id: *id,
+                animated: *animated,
+                name: Cow::Borrowed(name.as_str()),
+            },
+            Self::Unicode(name) => ReactionType::Unicode(Cow::Borrowed(name)),
+        };
+
+        reaction_type.serialize(serializer)
+    }
+}
+
+/// The type of a [`Reaction`] to send.
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[non_exhaustive]
+pub enum ReactionType<'a> {
+    /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the guild.
+    Custom {
+        /// Whether the emoji is animated.
+        animated: bool,
+        /// The Id of the custom [`Emoji`].
+        id: EmojiId,
+        /// The name of the custom emoji. This is primarily used for decoration and distinguishing
+        /// the emoji client-side.
+        name: Option<Cow<'a, str>>,
+    },
+    /// A reaction with a twemoji.
+    Unicode(Cow<'a, str>),
+    /// A character reaction with a twemoji.
+    UnicodeChar(char),
+}
+
+impl Serialize for ReactionType<'_> {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
     where
         S: Serializer,
     {
         match self {
-            ReactionType::Custom {
+            Self::Custom {
                 animated,
                 id,
                 name,
@@ -300,7 +342,14 @@ impl Serialize for ReactionType {
 
                 map.end()
             },
-            ReactionType::Unicode(name) => {
+            Self::Unicode(name) => {
+                let mut map = serializer.serialize_map(Some(1))?;
+
+                map.serialize_entry("name", name)?;
+
+                map.end()
+            },
+            Self::UnicodeChar(name) => {
                 let mut map = serializer.serialize_map(Some(1))?;
 
                 map.serialize_entry("name", name)?;
@@ -311,7 +360,7 @@ impl Serialize for ReactionType {
     }
 }
 
-impl ReactionType {
+impl ReactionType<'_> {
     /// Creates a data-esque display of the type. This is not very useful for displaying, as the
     /// primary client can not render it, but can be useful for debugging.
     ///
@@ -333,7 +382,9 @@ impl ReactionType {
             },
         }
     }
+}
 
+impl FixedReactionType {
     /// Helper function to allow testing equality of unicode emojis without having to perform any
     /// allocation. Will always return false if the reaction was not a unicode reaction.
     #[must_use]
@@ -359,7 +410,7 @@ impl ReactionType {
     }
 }
 
-impl From<char> for ReactionType {
+impl From<char> for ReactionType<'static> {
     /// Creates a [`ReactionType`] from a `char`.
     ///
     /// # Examples
@@ -380,14 +431,14 @@ impl From<char> for ReactionType {
     /// #
     /// # fn main() {}
     /// ```
-    fn from(ch: char) -> ReactionType {
-        ReactionType::Unicode(ch.to_string().trunc_into())
+    fn from(ch: char) -> Self {
+        Self::UnicodeChar(ch)
     }
 }
 
-impl From<Emoji> for ReactionType {
-    fn from(emoji: Emoji) -> ReactionType {
-        ReactionType::Custom {
+impl From<Emoji> for FixedReactionType {
+    fn from(emoji: Emoji) -> Self {
+        Self::Custom {
             animated: emoji.animated(),
             id: emoji.id,
             name: Some(emoji.name),
@@ -395,9 +446,9 @@ impl From<Emoji> for ReactionType {
     }
 }
 
-impl From<EmojiId> for ReactionType {
-    fn from(emoji_id: EmojiId) -> ReactionType {
-        ReactionType::Custom {
+impl From<EmojiId> for ReactionType<'static> {
+    fn from(emoji_id: EmojiId) -> Self {
+        Self::Custom {
             animated: false,
             id: emoji_id,
             name: None,
@@ -405,9 +456,9 @@ impl From<EmojiId> for ReactionType {
     }
 }
 
-impl From<EmojiIdentifier> for ReactionType {
-    fn from(emoji_id: EmojiIdentifier) -> ReactionType {
-        ReactionType::Custom {
+impl From<EmojiIdentifier> for FixedReactionType {
+    fn from(emoji_id: EmojiIdentifier) -> Self {
+        Self::Custom {
             animated: emoji_id.animated,
             id: emoji_id.id,
             name: Some(emoji_id.name),
@@ -415,113 +466,7 @@ impl From<EmojiIdentifier> for ReactionType {
     }
 }
 
-#[derive(Debug)]
-pub struct ReactionConversionError;
-
-impl fmt::Display for ReactionConversionError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("failed to convert from a string to ReactionType")
-    }
-}
-
-impl std::error::Error for ReactionConversionError {}
-
-impl TryFrom<String> for ReactionType {
-    type Error = ReactionConversionError;
-
-    fn try_from(emoji_string: String) -> std::result::Result<Self, Self::Error> {
-        if emoji_string.is_empty() {
-            return Err(ReactionConversionError);
-        }
-
-        if !emoji_string.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_string.trunc_into()));
-        }
-        ReactionType::try_from(&emoji_string[..])
-    }
-}
-
-impl<'a> TryFrom<&'a str> for ReactionType {
-    /// Creates a [`ReactionType`] from a string slice.
-    ///
-    /// # Examples
-    ///
-    /// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the rest of the library:
-    ///
-    /// ```rust
-    /// use std::convert::TryInto;
-    /// use std::fmt::Debug;
-    ///
-    /// use serenity::model::channel::ReactionType;
-    ///
-    /// fn foo<R: TryInto<ReactionType>>(bar: R)
-    /// where
-    ///     R::Error: Debug,
-    /// {
-    ///     println!("{:?}", bar.try_into().unwrap());
-    /// }
-    ///
-    /// foo("🍎");
-    /// ```
-    ///
-    /// Creating a [`ReactionType`] from a custom emoji argument in the following format:
-    ///
-    /// ```rust
-    /// use serenity::model::channel::ReactionType;
-    /// use serenity::model::id::EmojiId;
-    /// use serenity::small_fixed_array::FixedString;
-    ///
-    /// let emoji_string = "<:customemoji:600404340292059257>";
-    /// let reaction = ReactionType::try_from(emoji_string).unwrap();
-    /// let reaction2 = ReactionType::Custom {
-    ///     animated: false,
-    ///     id: EmojiId::new(600404340292059257),
-    ///     name: Some(FixedString::from_static_trunc("customemoji")),
-    /// };
-    ///
-    /// assert_eq!(reaction, reaction2);
-    /// ```
-
-    type Error = ReactionConversionError;
-
-    fn try_from(emoji_str: &str) -> std::result::Result<Self, Self::Error> {
-        if emoji_str.is_empty() {
-            return Err(ReactionConversionError);
-        }
-
-        if !emoji_str.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_str.to_string().trunc_into()));
-        }
-
-        if !emoji_str.ends_with('>') {
-            return Err(ReactionConversionError);
-        }
-
-        let emoji_str = emoji_str.trim_matches(&['<', '>'] as &[char]);
-
-        let mut split_iter = emoji_str.split(':');
-
-        let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
-        let name = Some(split_iter.next().ok_or(ReactionConversionError)?.to_string().trunc_into());
-        let id = split_iter.next().and_then(|s| s.parse().ok()).ok_or(ReactionConversionError)?;
-
-        Ok(ReactionType::Custom {
-            animated,
-            id,
-            name,
-        })
-    }
-}
-
-impl FromStr for ReactionType {
-    type Err = ReactionConversionError;
-
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        ReactionType::try_from(s)
-    }
-}
-
-impl fmt::Display for ReactionType {
+impl fmt::Display for FixedReactionType {
     /// Formats the reaction type, displaying the associated emoji in a way that clients can
     /// understand.
     ///
@@ -530,7 +475,7 @@ impl fmt::Display for ReactionType {
     /// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ReactionType::Custom {
+            Self::Custom {
                 animated,
                 id,
                 name,
