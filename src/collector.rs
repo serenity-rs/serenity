@@ -1,9 +1,10 @@
 // Or we'll get deprecation warnings from our own deprecated type (seriously Rust?)
 #![allow(deprecated)]
 
+use std::sync::Arc;
+
 use futures::future::pending;
 use futures::{Stream, StreamExt as _};
-use std::sync::Arc;
 
 use crate::gateway::{CollectorCallback, ShardMessenger};
 use crate::internal::prelude::*;

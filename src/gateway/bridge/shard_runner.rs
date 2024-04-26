@@ -247,7 +247,10 @@ impl ShardRunner {
         drop(
             self.shard
                 .client
-                .close(Some(CloseFrame { code: close_code.into(), reason: Cow::from("") }))
+                .close(Some(CloseFrame {
+                    code: close_code.into(),
+                    reason: Cow::from(""),
+                }))
                 .await,
         );
 
@@ -294,14 +297,23 @@ impl ShardRunner {
         match msg {
             ShardRunnerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
             ShardRunnerMessage::Shutdown(id, code) => self.checked_shutdown(id, code).await,
-            ShardRunnerMessage::ChunkGuild { guild_id, limit, presences, filter, nonce } => self
+            ShardRunnerMessage::ChunkGuild {
+                guild_id,
+                limit,
+                presences,
+                filter,
+                nonce,
+            } => self
                 .shard
                 .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
                 .await
                 .is_ok(),
             ShardRunnerMessage::Close(code, reason) => {
                 let reason = reason.unwrap_or_default();
-                let close = CloseFrame { code: code.into(), reason: Cow::from(reason) };
+                let close = CloseFrame {
+                    code: code.into(),
+                    reason: Cow::from(reason),
+                };
                 self.shard.client.close(Some(close)).await.is_ok()
             },
             ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
