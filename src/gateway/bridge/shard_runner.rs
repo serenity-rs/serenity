@@ -43,7 +43,7 @@ pub struct ShardRunner {
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     #[cfg(feature = "collector")]
-    pub(crate) collectors: Arc<std::sync::Mutex<Vec<CollectorCallback>>>,
+    pub(crate) collectors: Arc<parking_lot::RwLock<Vec<CollectorCallback>>>,
 }
 
 impl ShardRunner {
@@ -66,7 +66,7 @@ impl ShardRunner {
             cache: opt.cache,
             http: opt.http,
             #[cfg(feature = "collector")]
-            collectors: Arc::new(std::sync::Mutex::new(vec![])),
+            collectors: Arc::new(parking_lot::RwLock::new(vec![])),
         }
     }
 
@@ -171,7 +171,18 @@ impl ShardRunner {
 
             if let Some(event) = event {
                 #[cfg(feature = "collector")]
-                self.collectors.lock().expect("poison").retain_mut(|callback| (callback.0)(&event));
+                {
+                    let read_lock = self.collectors.read();
+                    // search all collectors to be removed and clone the Arcs
+                    let to_remove: Vec<_> =
+                        read_lock.iter().filter(|callback| !callback.0(&event)).cloned().collect();
+                    drop(read_lock);
+                    // remove all found arcs from the collection
+                    // this compares the inner pointer of the Arc
+                    if !to_remove.is_empty() {
+                        self.collectors.write().retain(|f| !to_remove.contains(f));
+                    }
+                }
                 spawn_named(
                     "shard_runner::dispatch",
                     dispatch_model(
