@@ -506,7 +506,8 @@ pub trait RawEventHandler: Send + Sync {
 
     /// Checks if the `event` should be dispatched (`true`) or ignored (`false`).
     ///
-    /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and this `EventHandler` trait.
+    /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and
+    /// this `EventHandler` trait.
     ///
     /// ## Warning
     ///
