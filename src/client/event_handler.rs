@@ -31,6 +31,25 @@ macro_rules! event_handler {
                     drop(( $($context,)? $($arg_name),* ))
                 }
             )*
+
+            /// Checks if the `event` should be dispatched (`true`) or ignored (`false`).
+            ///
+            /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and this `EventHandler` trait.
+            ///
+            /// ## Warning
+            ///
+            /// This will run synchronously on every event in the dispatch loop
+            /// of the shard that is receiving the event. If your filter code
+            /// takes too long, it may delay other events from being dispatched
+            /// in a timely manner. It is recommended to keep the runtime
+            /// complexity of the filter code low to avoid unnecessarily blocking
+            /// your bot.
+            fn filter_event(&self, context: &Context, event: &Event) -> bool {
+                    // Suppress unused argument warnings
+                    #[allow(dropping_references, dropping_copy_types)]
+                    drop(( context, event ));
+                true
+            }
         }
 
         /// This enum stores every possible event that an [`EventHandler`] can receive.
@@ -498,6 +517,26 @@ event_handler! {
 pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
     async fn raw_event(&self, _ctx: Context, _ev: Event) {}
+
+    /// Checks if the `event` should be dispatched (`true`) or ignored (`false`).
+    ///
+    /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and
+    /// this `EventHandler` trait.
+    ///
+    /// ## Warning
+    ///
+    /// This will run synchronously on every event in the dispatch loop
+    /// of the shard that is receiving the event. If your filter code
+    /// takes too long, it may delay other events from being dispatched
+    /// in a timely manner. It is recommended to keep the runtime
+    /// complexity of the filter code low to avoid unnecessarily blocking
+    /// your bot.
+    fn filter_event(&self, context: &Context, event: &Event) -> bool {
+        // Suppress unused argument warnings
+        #[allow(dropping_references, dropping_copy_types)]
+        drop((context, event));
+        true
+    }
 }
 
 #[derive(Clone)]
