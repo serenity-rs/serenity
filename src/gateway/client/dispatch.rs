@@ -62,11 +62,13 @@ pub(crate) async fn dispatch_model(
 
     #[cfg(feature = "framework")]
     if let Some(framework) = framework {
-        if let Some(extra_event) = &extra_event {
-            framework.dispatch(&context, extra_event).await;
-        }
+        if framework.dispatch_automatically() {
+            if let Some(extra_event) = &extra_event {
+                framework.dispatch(&context, extra_event).await;
+            }
 
-        framework.dispatch(&context, &full_event).await;
+            framework.dispatch(&context, &full_event).await;
+        }
     }
 
     if let Some(handler) = event_handler {
@@ -85,7 +87,7 @@ pub(crate) async fn dispatch_model(
 ///
 /// Can return `None` if an event is unknown.
 #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
-fn update_cache_with_event(
+pub fn update_cache_with_event(
     #[cfg(feature = "cache")] cache: &Cache,
     event: Event,
 ) -> (FullEvent, Option<FullEvent>) {

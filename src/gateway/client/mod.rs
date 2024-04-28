@@ -24,7 +24,7 @@
 //! [`sharding`]: crate::gateway::sharding
 
 mod context;
-pub(crate) mod dispatch;
+pub mod dispatch;
 mod event_handler;
 
 use std::future::IntoFuture;
