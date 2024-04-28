@@ -496,6 +496,22 @@
 <a href="#496" id="496">496</a>
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
+<a href="#499" id="499">499</a>
+<a href="#500" id="500">500</a>
+<a href="#501" id="501">501</a>
+<a href="#502" id="502">502</a>
+<a href="#503" id="503">503</a>
+<a href="#504" id="504">504</a>
+<a href="#505" id="505">505</a>
+<a href="#506" id="506">506</a>
+<a href="#507" id="507">507</a>
+<a href="#508" id="508">508</a>
+<a href="#509" id="509">509</a>
+<a href="#510" id="510">510</a>
+<a href="#511" id="511">511</a>
+<a href="#512" id="512">512</a>
+<a href="#513" id="513">513</a>
+<a href="#514" id="514">514</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -668,29 +684,45 @@
             }
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = event {
-                <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
-                </span>{
-                    <span class="kw">let </span>read_lock = <span class="self">self</span>.collectors.read();
-                    <span class="comment">// search all collectors to be removed and clone the Arcs
-                    </span><span class="kw">let </span>to_remove: Vec&lt;<span class="kw">_</span>&gt; =
-                        read_lock.iter().filter(|callback| !callback.<span class="number">0</span>(<span class="kw-2">&amp;</span>event)).cloned().collect();
-                    drop(read_lock);
-                    <span class="comment">// remove all found arcs from the collection
-                    // this compares the inner pointer of the Arc
-                    </span><span class="kw">if </span>!to_remove.is_empty() {
-                        <span class="self">self</span>.collectors.write().retain(|f| !to_remove.contains(f));
+                <span class="kw">let </span>context = <span class="self">self</span>.make_context();
+                <span class="kw">let </span>can_dispatch = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.event_handler {
+                    <span class="prelude-val">Some</span>(InternalEventHandler::Normal(handler)) =&gt; {
+                        handler.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event)
+                    },
+                    <span class="prelude-val">Some</span>(InternalEventHandler::Raw(handler)) =&gt; {
+                        handler.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event)
+                    },
+                    <span class="prelude-val">None </span>=&gt; <span class="bool-val">true</span>,
+                };
+
+                <span class="kw">if </span>can_dispatch {
+                    <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
+                    </span>{
+                        <span class="kw">let </span>read_lock = <span class="self">self</span>.collectors.read();
+                        <span class="comment">// search all collectors to be removed and clone the Arcs
+                        </span><span class="kw">let </span>to_remove: Vec&lt;<span class="kw">_</span>&gt; = read_lock
+                            .iter()
+                            .filter(|callback| !callback.<span class="number">0</span>(<span class="kw-2">&amp;</span>event))
+                            .cloned()
+                            .collect();
+                        drop(read_lock);
+                        <span class="comment">// remove all found arcs from the collection
+                        // this compares the inner pointer of the Arc
+                        </span><span class="kw">if </span>!to_remove.is_empty() {
+                            <span class="self">self</span>.collectors.write().retain(|f| !to_remove.contains(f));
+                        }
                     }
+                    spawn_named(
+                        <span class="string">"shard_runner::dispatch"</span>,
+                        dispatch_model(
+                            event,
+                            context,
+                            <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
+                            </span><span class="self">self</span>.framework.clone(),
+                            <span class="self">self</span>.event_handler.clone(),
+                        ),
+                    );
                 }
-                spawn_named(
-                    <span class="string">"shard_runner::dispatch"</span>,
-                    dispatch_model(
-                        event,
-                        <span class="self">self</span>.make_context(),
-                        <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
-                        </span><span class="self">self</span>.framework.clone(),
-                        <span class="self">self</span>.event_handler.clone(),
-                    ),
-                );
             }
 
             <span class="kw">if </span>!successful &amp;&amp; !<span class="self">self</span>.shard.stage().is_connecting() {
