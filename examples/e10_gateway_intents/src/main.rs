@@ -16,7 +16,12 @@ impl EventHandler for Handler {
 
     // As the intents set in this example, this event shall never be dispatched.
     // Try it by changing your status.
-    async fn presence_update(&self, _ctx: Context, _new_data: Presence) {
+    async fn presence_update(
+        &self,
+        _ctx: Context,
+        _old_data: Option<Presence>,
+        _new_data: Presence,
+    ) {
         println!("Presence Update");
     }
 
