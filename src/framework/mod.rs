@@ -22,6 +22,14 @@ pub trait Framework: Send + Sync {
     }
     /// Called on every incoming event.
     async fn dispatch(&self, ctx: &Context, event: &FullEvent);
+    /// If [`Framework::dispatch`] should be called
+    /// automatically (`true`) or manually by the developer (`false`)
+    ///
+    /// This allows the developer to make checks and call other functions before commands are
+    /// handled at all.
+    fn dispatch_automatically(&self) -> bool {
+        true
+    }
 }
 
 #[async_trait]

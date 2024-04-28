@@ -16,7 +16,7 @@
 
 mod context;
 #[cfg(feature = "gateway")]
-pub(crate) mod dispatch;
+pub mod dispatch;
 mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
