@@ -40,7 +40,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct GuildChannel {
     /// The unique Id of the channel.
     pub id: ChannelId,
@@ -182,7 +182,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum ForumLayoutType {
         /// No default has been set for forum channel.
         #[default]
@@ -1208,7 +1208,7 @@ impl fmt::Display for GuildChannel {
 /// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct PartialGuildChannel {
     /// The channel Id.
     pub id: ChannelId,

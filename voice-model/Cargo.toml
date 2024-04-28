@@ -35,3 +35,7 @@ serde_test = "1"
 name = "deserialisation"
 path = "benches/de.rs"
 harness = false
+
+[features]
+# Disables all "#[non_exhaustive]" macros to ensure, that all enum variants or struct fields are required when pattern matching.
+unstable_exhaustive_types = []

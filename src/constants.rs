@@ -35,8 +35,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum Opcode {
         /// Dispatches an event.
         Dispatch = 0,

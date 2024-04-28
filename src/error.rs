@@ -30,7 +30,7 @@ pub type Result<T, E = Error> = StdResult<T, E>;
 /// The most common error types, the [`ClientError`] and [`GatewayError`] enums, are both wrapped
 /// around this in the form of the [`Self::Client`] and [`Self::Gateway`] variants.
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum Error {
     /// An error while decoding a payload.
     Decode(&'static str, Value),

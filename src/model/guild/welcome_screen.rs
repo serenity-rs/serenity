@@ -7,7 +7,7 @@ use crate::model::id::{ChannelId, EmojiId};
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct GuildWelcomeScreen {
     /// The server description shown in the welcome screen.
     pub description: Option<String>,
@@ -22,7 +22,7 @@ pub struct GuildWelcomeScreen {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct GuildWelcomeChannel {
     /// The channel Id.
     pub channel_id: ChannelId,
@@ -92,7 +92,7 @@ impl Serialize for GuildWelcomeChannel {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum GuildWelcomeChannelEmoji {
     /// A custom emoji.
     Custom { id: EmojiId, name: String },

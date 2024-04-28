@@ -973,7 +973,7 @@ impl EmbedMessageBuilding for MessageBuilder {
 /// use serenity::utils::ContentModifier::{Bold, Italic};
 /// let content: Content = Bold + Italic + "text";
 /// ```
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum ContentModifier {
     Italic,
     Bold,

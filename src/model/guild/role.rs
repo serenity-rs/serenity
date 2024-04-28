@@ -26,7 +26,7 @@ fn minus1_as_0<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<u16,
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
     pub id: RoleId,
@@ -218,7 +218,7 @@ impl From<&Role> for RoleId {
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure).
 #[derive(Clone, Debug, Default, Eq, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct RoleTags {
     /// The Id of the bot the [`Role`] belongs to.
     pub bot_id: Option<UserId>,

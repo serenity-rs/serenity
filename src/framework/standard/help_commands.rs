@@ -120,7 +120,7 @@ pub struct SuggestedCommandName {
 
 /// A single command containing all related pieces of information.
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Command<'a> {
     pub name: &'static str,
     pub group_name: &'static str,
@@ -172,7 +172,7 @@ impl Suggestions {
 /// Covers possible outcomes of a help-request and yields relevant data in customised textual
 /// representation.
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum CustomisedHelpData<'a> {
     /// To display suggested commands.
     SuggestedCommands { help_description: String, suggestions: Suggestions },

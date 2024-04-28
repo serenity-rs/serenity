@@ -20,7 +20,7 @@ use crate::model::ModelError;
 /// [Discord docs](https://discord.com/developers/docs/resources/emoji#emoji-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Emoji {
     /// Whether the emoji is animated.
     #[serde(default)]

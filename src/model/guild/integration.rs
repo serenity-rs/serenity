@@ -7,7 +7,7 @@ use crate::model::prelude::*;
 /// [extra fields 2](https://discord.com/developers/docs/topics/gateway-events#integration-update),
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Integration {
     pub id: IntegrationId,
     pub name: String,
@@ -38,7 +38,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum IntegrationExpireBehaviour {
         RemoveRole = 0,
         Kick = 1,
@@ -58,7 +58,7 @@ impl From<Integration> for IntegrationId {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-account-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct IntegrationAccount {
     pub id: String,
     pub name: String,
@@ -69,7 +69,7 @@ pub struct IntegrationAccount {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-application-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct IntegrationApplication {
     pub id: ApplicationId,
     pub name: String,

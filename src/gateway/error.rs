@@ -8,7 +8,7 @@ use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 /// Note that - from a user standpoint - there should be no situation in which you manually handle
 /// these.
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum Error {
     /// There was an error building a URL.
     BuildingUrl,

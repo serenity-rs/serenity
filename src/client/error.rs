@@ -8,7 +8,7 @@ use std::fmt;
 /// [`Client`]: super::Client
 /// [`Error::Client`]: crate::Error::Client
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum Error {
     /// When a shard has completely failed to reboot after resume and/or reconnect attempts.
     ShardBootFailure,

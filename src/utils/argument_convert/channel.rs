@@ -5,7 +5,7 @@ use crate::model::prelude::*;
 use crate::prelude::*;
 
 /// Error that can be returned from [`Channel::convert`].
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 #[derive(Debug)]
 pub enum ChannelParseError {
     /// When channel retrieval via HTTP failed
@@ -105,7 +105,7 @@ impl ArgumentConvert for Channel {
 }
 
 /// Error that can be returned from [`GuildChannel::convert`].
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 #[derive(Debug)]
 pub enum GuildChannelParseError {
     /// When channel retrieval via HTTP failed

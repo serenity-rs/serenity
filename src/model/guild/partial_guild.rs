@@ -33,7 +33,7 @@ use crate::model::utils::{emojis, roles, stickers};
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct PartialGuild {
     // ======
     // These fields are copy-pasted from the top part of Guild, and the omitted fields filled in
