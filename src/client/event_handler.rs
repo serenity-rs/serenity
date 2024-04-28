@@ -315,11 +315,12 @@ event_handler! {
 
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///
-    /// Provides the presence's new data.
+    /// Provides the presence's new data, as well as the old presence data if the
+    /// cache feature is enabled and the data is available.
     ///
     /// Note: This event will not trigger unless the "guild presences" privileged intent is enabled
     /// on the bot application page.
-    PresenceUpdate { new_data: Presence } => async fn presence_update(&self, ctx: Context);
+    PresenceUpdate { old_data: Option<Presence>, new_data: Presence } => async fn presence_update(&self, ctx: Context);
 
     /// Dispatched upon startup.
     ///
