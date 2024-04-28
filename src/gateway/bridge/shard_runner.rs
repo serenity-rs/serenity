@@ -171,7 +171,7 @@ impl ShardRunner {
 
             if let Some(event) = event {
                 let context = self.make_context();
-                if match &self.event_handler {
+                let can_dispatch = match &self.event_handler {
                     Some(InternalEventHandler::Normal(handler)) => {
                         handler.filter_event(&context, &event)
                     },
@@ -179,7 +179,9 @@ impl ShardRunner {
                         handler.filter_event(&context, &event)
                     },
                     None => true,
-                } {
+                };
+
+                if can_dispatch {
                     #[cfg(feature = "collector")]
                     {
                         let read_lock = self.collectors.read();
