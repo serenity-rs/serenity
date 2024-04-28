@@ -170,29 +170,45 @@ impl ShardRunner {
             }
 
             if let Some(event) = event {
-                #[cfg(feature = "collector")]
-                {
-                    let read_lock = self.collectors.read();
-                    // search all collectors to be removed and clone the Arcs
-                    let to_remove: Vec<_> =
-                        read_lock.iter().filter(|callback| !callback.0(&event)).cloned().collect();
-                    drop(read_lock);
-                    // remove all found arcs from the collection
-                    // this compares the inner pointer of the Arc
-                    if !to_remove.is_empty() {
-                        self.collectors.write().retain(|f| !to_remove.contains(f));
+                let context = self.make_context();
+                let can_dispatch = match &self.event_handler {
+                    Some(InternalEventHandler::Normal(handler)) => {
+                        handler.filter_event(&context, &event)
+                    },
+                    Some(InternalEventHandler::Raw(handler)) => {
+                        handler.filter_event(&context, &event)
+                    },
+                    None => true,
+                };
+
+                if can_dispatch {
+                    #[cfg(feature = "collector")]
+                    {
+                        let read_lock = self.collectors.read();
+                        // search all collectors to be removed and clone the Arcs
+                        let to_remove: Vec<_> = read_lock
+                            .iter()
+                            .filter(|callback| !callback.0(&event))
+                            .cloned()
+                            .collect();
+                        drop(read_lock);
+                        // remove all found arcs from the collection
+                        // this compares the inner pointer of the Arc
+                        if !to_remove.is_empty() {
+                            self.collectors.write().retain(|f| !to_remove.contains(f));
+                        }
                     }
+                    spawn_named(
+                        "shard_runner::dispatch",
+                        dispatch_model(
+                            event,
+                            context,
+                            #[cfg(feature = "framework")]
+                            self.framework.clone(),
+                            self.event_handler.clone(),
+                        ),
+                    );
                 }
-                spawn_named(
-                    "shard_runner::dispatch",
-                    dispatch_model(
-                        event,
-                        self.make_context(),
-                        #[cfg(feature = "framework")]
-                        self.framework.clone(),
-                        self.event_handler.clone(),
-                    ),
-                );
             }
 
             if !successful && !self.shard.stage().is_connecting() {
