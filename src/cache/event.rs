@@ -32,7 +32,7 @@ use crate::model::event::{
     VoiceChannelStatusUpdateEvent,
     VoiceStateUpdateEvent,
 };
-use crate::model::gateway::ShardInfo;
+use crate::model::gateway::{Presence, ShardInfo};
 use crate::model::guild::{Guild, GuildMemberFlags, Member, MemberGeneratedFlags, Role};
 use crate::model::id::ShardId;
 use crate::model::user::{CurrentUser, OnlineStatus};
@@ -394,11 +394,13 @@ impl CacheUpdate for MessageUpdateEvent {
 }
 
 impl CacheUpdate for PresenceUpdateEvent {
-    type Output = ();
+    type Output = Presence;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Presence> {
         if let Some(guild_id) = self.presence.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
+                let old = guild.presences.get(&self.presence.user.id).cloned();
+
                 // If the member went offline, remove them from the presence list.
                 if self.presence.status == OnlineStatus::Offline {
                     guild.presences.remove(&self.presence.user.id);
@@ -425,6 +427,8 @@ impl CacheUpdate for PresenceUpdateEvent {
                         });
                     }
                 }
+
+                return old;
             }
         }
 
