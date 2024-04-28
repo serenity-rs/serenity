@@ -504,13 +504,18 @@ pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
     async fn raw_event(&self, _ctx: Context, _ev: Event) {}
 
-    /// Check if `event` should be dispatched (`true`) or ignored (`false`) by the bot.
-    /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and
-    /// this EventHandler trait.
+    /// Checks if the `event` should be dispatched (`true`) or ignored (`false`).
     ///
-    /// WARNING: This method will be run synchronously for every received event in the main dispatch
-    /// loop of the receiving shard! It should be as fast as possible to not block the bot from
-    /// handling events!
+    /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and this `EventHandler` trait.
+    ///
+    /// ## Warning
+    ///
+    /// This will run synchronously on every event in the dispatch loop
+    /// of the shard that is receiving the event. If your filter code
+    /// takes too long, it may delay other events from being dispatched
+    /// in a timely manner. It is recommended to keep the runtime
+    /// complexity of the filter code low to avoid unnecessarily blocking
+    /// your bot.
     fn filter_event(&self, context: &Context, event: &Event) -> bool {
         // Suppress unused argument warnings
         #[allow(dropping_references, dropping_copy_types)]
