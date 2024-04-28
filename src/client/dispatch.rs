@@ -319,9 +319,10 @@ fn update_cache_with_event(
             presences: event.presences.into_vec(),
         },
         Event::PresenceUpdate(mut event) => {
-            update_cache!(cache, event);
+            let old_data = if_cache!(event.update(cache));
 
             FullEvent::PresenceUpdate {
+                old_data,
                 new_data: event.presence,
             }
         },
