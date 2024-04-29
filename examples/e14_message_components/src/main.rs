@@ -37,7 +37,7 @@ impl EventHandler for Handler {
         let m = msg
             .channel_id
             .send_message(
-                &ctx,
+                &ctx.http,
                 CreateMessage::new().content("Please select your favorite animal").select_menu(
                     CreateSelectMenu::new("animal_select", CreateSelectMenuKind::String {
                         options: Cow::Borrowed(&[
@@ -65,7 +65,7 @@ impl EventHandler for Handler {
         {
             Some(x) => x,
             None => {
-                m.reply(&ctx, "Timed out").await.unwrap();
+                m.reply(&ctx.http, "Timed out").await.unwrap();
                 return;
             },
         };
