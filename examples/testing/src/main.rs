@@ -133,7 +133,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if msg.content == "reactionremoveemoji" {
         // Test new ReactionRemoveEmoji gateway event: https://github.com/serenity-rs/serenity/issues/2248
         msg.react(&ctx.http, '👍').await?;
-        msg.delete_reaction_emoji(ctx, '👍').await?;
+        msg.delete_reaction_emoji(&ctx.http, '👍').await?;
     } else if msg.content == "testautomodregex" {
         guild_id
             .create_automod_rule(

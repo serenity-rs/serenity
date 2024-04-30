@@ -158,7 +158,7 @@ impl Message {
     /// Returns a [`ModelError::CannotCrosspostMessage`] if the message cannot be crossposted.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<Message> {
+    pub async fn crosspost(&self, http: &Http) -> Result<Message> {
         if let Some(flags) = self.flags {
             if flags.contains(MessageFlags::CROSSPOSTED) {
                 return Err(Error::Model(ModelError::MessageAlreadyCrossposted));
@@ -169,7 +169,7 @@ impl Message {
             }
         }
 
-        self.channel_id.crosspost(cache_http.http(), self.id).await
+        self.channel_id.crosspost(http, self.id).await
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
@@ -202,8 +202,8 @@ impl Message {
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
-        self.channel_id.delete_message(cache_http.http(), self.id, reason).await
+    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<()> {
+        self.channel_id.delete_message(http, self.id, reason).await
     }
 
     /// Deletes all of the [`Reaction`]s associated with the message.
@@ -215,8 +215,8 @@ impl Message {
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_reactions(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.channel_id.delete_reactions(cache_http.http(), self.id).await
+    pub async fn delete_reactions(&self, http: &Http) -> Result<()> {
+        self.channel_id.delete_reactions(http, self.id).await
     }
 
     /// Deletes the given [`Reaction`] from the message.
@@ -250,13 +250,10 @@ impl Message {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reaction_emoji(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        cache_http
-            .http()
-            .delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into())
-            .await
+        http.delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into()).await
     }
 
     /// Edits this message, replacing the original content with new content.
@@ -417,8 +414,8 @@ impl Message {
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
-        self.channel_id.pin(cache_http.http(), self.id, reason).await
+    pub async fn pin(&self, http: &Http, reason: Option<&str>) -> Result<()> {
+        self.channel_id.pin(http, self.id, reason).await
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.

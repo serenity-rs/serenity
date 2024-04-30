@@ -6,7 +6,7 @@ use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 
 /// Information about an invite code.
@@ -270,8 +270,8 @@ impl RichInvite {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<Invite> {
-        cache_http.http().delete_invite(&self.code, reason).await
+    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<Invite> {
+        http.delete_invite(&self.code, reason).await
     }
 
     /// Returns a URL to use for the invite.
