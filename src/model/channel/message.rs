@@ -432,12 +432,7 @@ impl Message {
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     /// [permissions]: crate::model::permissions
     pub async fn react(&self, http: &Http, reaction_type: impl Into<ReactionType>) -> Result<()> {
-        self._react(http, reaction_type.into()).await
-    }
-
-    async fn _react(&self, http: &Http, reaction_type: ReactionType) -> Result<()> {
-        http.create_reaction(self.channel_id, self.id, &reaction_type).await?;
-        Ok(())
+        http.create_reaction(self.channel_id, self.id, &reaction_type.into()).await
     }
 
     /// Uses Discord's inline reply to a user without pinging them.
