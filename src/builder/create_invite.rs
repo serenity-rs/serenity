@@ -1,5 +1,5 @@
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -15,9 +15,10 @@ use crate::model::prelude::*;
 /// ```rust,no_run
 /// # use serenity::{prelude::*, model::prelude::*};
 /// use serenity::builder::CreateInvite;
-/// # async fn run(context: impl CacheHttp, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
+/// use serenity::http::Http;
+/// # async fn run(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
 /// let builder = CreateInvite::new().max_age(3600).max_uses(10);
-/// let creation = channel.create_invite(&context, builder).await?;
+/// let creation = channel.create_invite(http, builder).await?;
 /// # Ok(())
 /// # }
 /// ```
@@ -64,11 +65,11 @@ impl<'a> CreateInvite<'a> {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::CacheHttp;
+    /// # use serenity::http::Http;
     /// #
-    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn example(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
     /// let builder = CreateInvite::new().max_age(3600);
-    /// let invite = channel.create_invite(context, builder).await?;
+    /// let invite = channel.create_invite(http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -92,11 +93,11 @@ impl<'a> CreateInvite<'a> {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::CacheHttp;
+    /// # use serenity::http::Http;
     /// #
-    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn example(http:  &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
     /// let builder = CreateInvite::new().max_uses(5);
-    /// let invite = channel.create_invite(context, builder).await?;
+    /// let invite = channel.create_invite(http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -116,11 +117,11 @@ impl<'a> CreateInvite<'a> {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::CacheHttp;
+    /// # use serenity::http::Http;
     /// #
-    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn example(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
     /// let builder = CreateInvite::new().temporary(true);
-    /// let invite = channel.create_invite(context, builder).await?;
+    /// let invite = channel.create_invite(http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -140,11 +141,11 @@ impl<'a> CreateInvite<'a> {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::CacheHttp;
+    /// # use serenity::http::Http;
     /// #
-    /// # async fn example(context: impl CacheHttp, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn example(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
     /// let builder = CreateInvite::new().unique(true);
-    /// let invite = channel.create_invite(context, builder).await?;
+    /// let invite = channel.create_invite(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -199,29 +200,12 @@ impl<'a> CreateInvite<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is
+    /// given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-        guild_id: Option<GuildId>,
-    ) -> Result<RichInvite> {
-        #[cfg(feature = "cache")]
-        {
-            if let (Some(cache), Some(guild_id)) = (cache_http.cache(), guild_id) {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    guild_id,
-                    channel_id,
-                    Permissions::CREATE_INSTANT_INVITE,
-                )?;
-            }
-        }
-
-        cache_http.http().create_invite(channel_id, &self, self.audit_log_reason).await
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<RichInvite> {
+        http.create_invite(channel_id, &self, self.audit_log_reason).await
     }
 }
