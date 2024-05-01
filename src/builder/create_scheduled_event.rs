@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -127,20 +127,12 @@ impl<'a> CreateScheduledEvent<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: GuildId,
-    ) -> Result<ScheduledEvent> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, channel_id, Permissions::CREATE_EVENTS)?;
-
-        cache_http.http().create_scheduled_event(channel_id, &self, self.audit_log_reason).await
+    pub async fn execute(self, http: &Http, channel_id: GuildId) -> Result<ScheduledEvent> {
+        http.create_scheduled_event(channel_id, &self, self.audit_log_reason).await
     }
 }
 
