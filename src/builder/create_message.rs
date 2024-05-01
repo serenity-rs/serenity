@@ -10,7 +10,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -282,39 +282,24 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Returns a [`ModelError::TooLarge`] if the message contents are over the above limits.
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Attach Files]: Permissions::ATTACH_FILES
     #[cfg(feature = "http")]
     pub async fn execute(
         mut self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         channel_id: ChannelId,
         guild_id: Option<GuildId>,
     ) -> Result<Message> {
-        #[cfg(feature = "cache")]
-        {
-            let mut req = Permissions::SEND_MESSAGES;
-            if !self.attachments.is_empty() {
-                req |= Permissions::ATTACH_FILES;
-            }
-            if let (Some(cache), Some(guild_id)) = (cache_http.cache(), guild_id) {
-                crate::utils::user_has_perms_cache(cache, guild_id, channel_id, req)?;
-            }
-        }
-
         self.check_length()?;
-
-        let http = cache_http.http();
 
         let files = self.attachments.take_files();
         if self.allowed_mentions.is_none() {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut message = http.send_message(channel_id, files, &self).await?;
 
         for reaction in self.reactions.iter() {
