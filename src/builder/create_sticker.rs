@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
@@ -77,25 +77,17 @@ impl<'a> CreateSticker<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     #[cfg(feature = "http")]
-    pub async fn execute(self, cache_http: impl CacheHttp, guild_id: GuildId) -> Result<Sticker> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(
-            &cache_http,
-            guild_id,
-            Permissions::CREATE_GUILD_EXPRESSIONS,
-        )?;
-
+    pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<Sticker> {
         let map = vec![
             ("name".into(), self.name),
             ("tags".into(), self.tags),
             ("description".into(), self.description),
         ];
 
-        cache_http.http().create_sticker(guild_id, map, self.file, self.audit_log_reason).await
+        http.create_sticker(guild_id, map, self.file, self.audit_log_reason).await
     }
 }

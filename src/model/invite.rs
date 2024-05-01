@@ -6,7 +6,7 @@ use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 
 /// Information about an invite code.
@@ -68,16 +68,15 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     pub async fn create(
-        cache_http: impl CacheHttp,
+        http: &Http,
         channel_id: ChannelId,
         builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
-        channel_id.create_invite(cache_http, builder).await
+        channel_id.create_invite(http, builder).await
     }
 
     /// Deletes the invite.
@@ -86,28 +85,13 @@ impl Invite {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have the required [permission].
-    ///
-    /// Otherwise may return [`Error::Http`] if permissions are lacking, or if the invite is
+    /// Returns [`Error::Http`] if the current user lacks permission or if the invite is
     /// invalid.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<Invite> {
-        #[cfg(feature = "cache")]
-        {
-            if let (Some(cache), Some(guild)) = (cache_http.cache(), &self.guild) {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    guild.id,
-                    self.channel.id,
-                    Permissions::MANAGE_GUILD,
-                )?;
-            }
-        }
-
-        cache_http.http().delete_invite(&self.code, reason).await
+    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<Invite> {
+        http.delete_invite(&self.code, reason).await
     }
 
     /// Gets information about an invite.
@@ -283,25 +267,12 @@ impl RichInvite {
     ///
     /// # Errors
     ///
-    /// If the `cache` feature is enabled, then this returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have the required [permission].
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<Invite> {
-        #[cfg(feature = "cache")]
-        {
-            if let (Some(cache), Some(guild)) = (cache_http.cache(), &self.guild) {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    guild.id,
-                    self.channel.id,
-                    Permissions::MANAGE_GUILD,
-                )?;
-            }
-        }
-
-        cache_http.http().delete_invite(&self.code, reason).await
+    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<Invite> {
+        http.delete_invite(&self.code, reason).await
     }
 
     /// Returns a URL to use for the invite.
