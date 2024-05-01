@@ -372,16 +372,15 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateChannel<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_channel(cache_http, builder).await
+        self.id.create_channel(http, builder).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -559,8 +558,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn create_role(&self, http: &Http, builder: EditRole<'_>) -> Result<Role> {
@@ -573,16 +571,15 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     pub async fn create_sticker<'a>(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateSticker<'a>,
     ) -> Result<Sticker> {
-        self.id.create_sticker(cache_http, builder).await
+        self.id.create_sticker(http, builder).await
     }
 
     /// Deletes the current guild if the current user is the owner of the
@@ -688,12 +685,11 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild<'_>) -> Result<()> {
-        let guild = self.id.edit(cache_http, builder).await?;
+    pub async fn edit(&mut self, http: &Http, builder: EditGuild<'_>) -> Result<()> {
+        let guild = self.id.edit(http, builder).await?;
 
         self.afk_metadata = guild.afk_metadata;
         self.default_message_notifications = guild.default_message_notifications;
@@ -801,17 +797,16 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn edit_role(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         role_id: RoleId,
         builder: EditRole<'_>,
     ) -> Result<Role> {
-        self.id.edit_role(cache_http, role_id, builder).await
+        self.id.edit_role(http, role_id, builder).await
     }
 
     /// Edits the order of [`Role`]s. Requires the [Manage Roles] permission.
@@ -1013,10 +1008,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to kick members.
     ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
+    /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// Can also return an [`Error::Json`] if there is an error deserializing the API response.
     ///

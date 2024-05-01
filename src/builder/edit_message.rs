@@ -23,11 +23,11 @@ use crate::model::prelude::*;
 /// # use serenity::builder::EditMessage;
 /// # use serenity::model::channel::Message;
 /// # use serenity::model::id::ChannelId;
-/// # use serenity::http::CacheHttp;
+/// # use serenity::http::Http;
 ///
-/// # async fn example(ctx: impl CacheHttp, mut message: Message) -> Result<(), Box<dyn std::error::Error>> {
+/// # async fn example(http: &Http, mut message: Message) -> Result<(), Box<dyn std::error::Error>> {
 /// let builder = EditMessage::new().content("hello");
-/// message.edit(ctx, builder).await?;
+/// message.edit(http, builder).await?;
 /// # Ok(())
 /// # }
 /// ```
@@ -120,7 +120,7 @@ impl<'a> EditMessage<'a> {
     ///
     /// use futures::StreamExt;
     ///
-    /// let mut msg = channel_id.say(ctx, "<link that spawns an embed>").await?;
+    /// let mut msg = channel_id.say(&ctx.http, "<link that spawns an embed>").await?;
     ///
     /// // When the embed appears, a MessageUpdate event is sent and we suppress the embed.
     /// // No MessageUpdate event is sent if the message contains no embeddable link or if the link
