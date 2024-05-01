@@ -115,37 +115,13 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
-    /// user does not have the required [permissions].
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks the required [permissions].
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: crate::model::permissions
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
-        let mut user_id = self.user_id;
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if self.user_id == Some(cache.current_user().id) {
-                    user_id = None;
-                }
-
-                if let (Some(_), Some(guild_id)) = (user_id, self.guild_id) {
-                    crate::utils::user_has_perms_cache(
-                        cache,
-                        guild_id,
-                        self.channel_id,
-                        Permissions::MANAGE_MESSAGES,
-                    )?;
-                }
-            }
-        }
-
+    pub async fn delete(&self, http: &Http) -> Result<()> {
         self.channel_id
-            .delete_reaction(cache_http.http(), self.message_id, user_id, self.emoji.clone())
+            .delete_reaction(http, self.message_id, self.user_id, self.emoji.clone())
             .await
     }
 
@@ -155,29 +131,12 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
-    /// user does not have the required [permissions].
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks [permissions].
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: crate::model::permissions
-    pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let (Some(cache), Some(guild_id)) = (cache_http.cache(), self.guild_id) {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    guild_id,
-                    self.channel_id,
-                    Permissions::MANAGE_MESSAGES,
-                )?;
-            }
-        }
-        cache_http
-            .http()
-            .delete_message_reaction_emoji(self.channel_id, self.message_id, &self.emoji)
-            .await
+    pub async fn delete_all(&self, http: &Http) -> Result<()> {
+        http.delete_message_reaction_emoji(self.channel_id, self.message_id, &self.emoji).await
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -235,8 +194,7 @@ impl Reaction {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidPermissions`] if the current user does not have the required
-    /// [permissions].
+    /// Returns [`Error::Http`] if the current user lacks the required [permissions].
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: crate::model::permissions
@@ -397,13 +355,13 @@ impl From<char> for ReactionType {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "http")]
-    /// # use serenity::http::CacheHttp;
+    /// # use serenity::http::Http;
     /// # use serenity::model::channel::Message;
     /// # use serenity::model::id::ChannelId;
     /// #
     /// # #[cfg(feature = "http")]
-    /// # async fn example(ctx: impl CacheHttp, message: Message) -> Result<(), Box<dyn std::error::Error>> {
-    /// message.react(ctx, '🍎').await?;
+    /// # async fn example(http: &Http, message: Message) -> Result<(), Box<dyn std::error::Error>> {
+    /// message.react(http, '🍎').await?;
     /// # Ok(())
     /// # }
     /// #

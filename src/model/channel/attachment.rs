@@ -111,8 +111,10 @@ impl Attachment {
     ///                 Ok(content) => content,
     ///                 Err(why) => {
     ///                     println!("Error downloading attachment: {:?}", why);
-    ///                     let _ =
-    ///                         message.channel_id.say(&context, "Error downloading attachment").await;
+    ///                     let _ = message
+    ///                         .channel_id
+    ///                         .say(&context.http, "Error downloading attachment")
+    ///                         .await;
     ///
     ///                     return;
     ///                 },
@@ -122,7 +124,7 @@ impl Attachment {
     ///                 Ok(file) => file,
     ///                 Err(why) => {
     ///                     println!("Error creating file: {:?}", why);
-    ///                     let _ = message.channel_id.say(&context, "Error creating file").await;
+    ///                     let _ = message.channel_id.say(&context.http, "Error creating file").await;
     ///
     ///                     return;
     ///                 },
@@ -136,7 +138,7 @@ impl Attachment {
     ///
     ///             let _ = message
     ///                 .channel_id
-    ///                 .say(&context, format!("Saved {:?}", attachment.filename))
+    ///                 .say(&context.http, format!("Saved {:?}", attachment.filename))
     ///                 .await;
     ///         }
     ///     }

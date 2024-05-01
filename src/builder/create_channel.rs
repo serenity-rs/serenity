@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use nonmax::NonMaxU16;
 
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -261,19 +261,11 @@ impl<'a> CreateChannel<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        guild_id: GuildId,
-    ) -> Result<GuildChannel> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_CHANNELS)?;
-
-        cache_http.http().create_channel(guild_id, &self, self.audit_log_reason).await
+    pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<GuildChannel> {
+        http.create_channel(guild_id, &self, self.audit_log_reason).await
     }
 }
