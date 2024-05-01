@@ -41,7 +41,7 @@ pub trait Mentionable {
     ///         member = member.mention(),
     ///         rules = rules_channel.mention(),
     ///     ));
-    ///     to_channel.id.send_message(ctx, builder).await?;
+    ///     to_channel.id.send_message(&ctx.http, builder).await?;
     ///     Ok(())
     /// }
     /// # }

@@ -312,16 +312,15 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateChannel<'_>,
     ) -> Result<GuildChannel> {
-        builder.execute(cache_http, self).await
+        builder.execute(http, self).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -403,8 +402,7 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn create_role(self, http: &Http, builder: EditRole<'_>) -> Result<Role> {
@@ -417,16 +415,15 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Events]: Permissions::CREATE_EVENTS
     pub async fn create_scheduled_event(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateScheduledEvent<'_>,
     ) -> Result<ScheduledEvent> {
-        builder.execute(cache_http, self).await
+        builder.execute(http, self).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
@@ -435,16 +432,11 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_sticker(
-        self,
-        cache_http: impl CacheHttp,
-        builder: CreateSticker<'_>,
-    ) -> Result<Sticker> {
-        builder.execute(cache_http, self).await
+    pub async fn create_sticker(self, http: &Http, builder: CreateSticker<'_>) -> Result<Sticker> {
+        builder.execute(http, self).await
     }
 
     /// Deletes the current guild if the current account is the owner of the
@@ -570,16 +562,11 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit(
-        self,
-        cache_http: impl CacheHttp,
-        builder: EditGuild<'_>,
-    ) -> Result<PartialGuild> {
-        builder.execute(cache_http, self).await
+    pub async fn edit(self, http: &Http, builder: EditGuild<'_>) -> Result<PartialGuild> {
+        builder.execute(http, self).await
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -737,17 +724,16 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn edit_role(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         role_id: RoleId,
         builder: EditRole<'_>,
     ) -> Result<Role> {
-        builder.execute(cache_http, self, Some(role_id)).await
+        builder.execute(http, self, Some(role_id)).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -757,8 +743,7 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     /// [Manage Events]: Permissions::MANAGE_EVENTS

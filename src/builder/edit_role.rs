@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use super::CreateAttachment;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -154,21 +154,16 @@ impl<'a> EditRole<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[cfg(feature = "http")]
     pub async fn execute(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         guild_id: GuildId,
         role_id: Option<RoleId>,
     ) -> Result<Role> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_ROLES)?;
-
-        let http = cache_http.http();
         let role = match role_id {
             Some(role_id) => {
                 http.edit_role(guild_id, role_id, &self, self.audit_log_reason).await?

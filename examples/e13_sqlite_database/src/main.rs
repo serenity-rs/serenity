@@ -30,7 +30,7 @@ impl EventHandler for Bot {
             .unwrap();
 
             let response = format!("Successfully added `{task_description}` to your todo list");
-            msg.channel_id.say(&ctx, response).await.unwrap();
+            msg.channel_id.say(&ctx.http, response).await.unwrap();
         } else if let Some(task_index) = msg.content.strip_prefix("~todo remove") {
             let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
 
@@ -51,7 +51,7 @@ impl EventHandler for Bot {
                 .unwrap();
 
             let response = format!("Successfully completed `{}`!", entry.task);
-            msg.channel_id.say(&ctx, response).await.unwrap();
+            msg.channel_id.say(&ctx.http, response).await.unwrap();
         } else if msg.content.trim() == "~todo list" {
             // "SELECT" will return the task of all rows where user_Id column = user_id in todo.
             let todos = sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
@@ -64,7 +64,7 @@ impl EventHandler for Bot {
                 writeln!(response, "{}. {}", i + 1, todo.task).unwrap();
             }
 
-            msg.channel_id.say(&ctx, response).await.unwrap();
+            msg.channel_id.say(&ctx.http, response).await.unwrap();
         }
     }
 }

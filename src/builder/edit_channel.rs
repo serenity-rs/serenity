@@ -4,7 +4,7 @@ use nonmax::NonMaxU16;
 
 use super::CreateForumTag;
 #[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -229,7 +229,7 @@ impl<'a> EditChannel<'a> {
     /// }];
     ///
     /// let builder = EditChannel::new().name("my_edited_cool_channel").permissions(permissions);
-    /// channel.edit(http, builder).await?;
+    /// channel.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -309,56 +309,28 @@ impl<'a> EditChannel<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-        guild_id: Option<GuildId>,
-    ) -> Result<GuildChannel> {
-        #[cfg(feature = "cache")]
-        {
-            if let (Some(cache), Some(guild_id)) = (cache_http.cache(), guild_id) {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    guild_id,
-                    channel_id,
-                    Permissions::MANAGE_CHANNELS,
-                )?;
-                if self.permission_overwrites.is_some() {
-                    crate::utils::user_has_perms_cache(
-                        cache,
-                        guild_id,
-                        channel_id,
-                        Permissions::MANAGE_ROLES,
-                    )?;
-                }
-            }
-        }
-
-        if let Some(status) = self.status.as_deref() {
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
+        if let Some(status) = &self.status {
             #[derive(Serialize)]
             struct EditVoiceStatusBody<'a> {
                 status: &'a str,
             }
 
-            cache_http
-                .http()
-                .edit_voice_status(
-                    channel_id,
-                    &EditVoiceStatusBody {
-                        status,
-                    },
-                    self.audit_log_reason,
-                )
-                .await?;
+            http.edit_voice_status(
+                channel_id,
+                &EditVoiceStatusBody {
+                    status,
+                },
+                self.audit_log_reason,
+            )
+            .await?;
         }
 
-        cache_http.http().edit_channel(channel_id, &self, self.audit_log_reason).await
+        http.edit_channel(channel_id, &self, self.audit_log_reason).await
     }
 }
