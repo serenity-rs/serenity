@@ -3,8 +3,6 @@
 use std::error::Error as StdError;
 use std::fmt;
 
-use super::Permissions;
-
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Maximum {
@@ -189,13 +187,6 @@ pub enum Error {
     /// When editing a role, if the role is higher in position than the current user's highest
     /// role, then the role can not be edited.
     Hierarchy,
-    /// Indicates that you do not have the required permissions to perform an operation.
-    InvalidPermissions {
-        /// Which permissions were required for the operation
-        required: Permissions,
-        /// Which permissions the bot had
-        present: Permissions,
-    },
     /// An indicator that the [current user] cannot perform an action.
     ///
     /// [current user]: super::user::CurrentUser
@@ -252,9 +243,6 @@ impl fmt::Display for Error {
             Self::ChannelNotFound => f.write_str("Channel not found in the cache."),
             Self::Hierarchy => f.write_str("Role hierarchy prevents this action."),
             Self::InvalidChannelType => f.write_str("The channel cannot perform the action."),
-            Self::InvalidPermissions {
-                ..
-            } => f.write_str("Invalid permissions."),
             Self::InvalidUser => f.write_str("The current user cannot perform the action."),
             Self::ItemMissing => f.write_str("The required item is missing from the cache."),
             Self::MessageAlreadyCrossposted => f.write_str("Message already crossposted."),
