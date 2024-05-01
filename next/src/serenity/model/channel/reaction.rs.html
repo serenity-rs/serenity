@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/reaction.rs`."><title>reaction.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (aed2187d5 2024-04-27)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/reaction.rs`."><title>reaction.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b21aa549bf6d91ff.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (f705de596 2024-04-30)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -511,48 +511,6 @@
 <a href="#511" id="511">511</a>
 <a href="#512" id="512">512</a>
 <a href="#513" id="513">513</a>
-<a href="#514" id="514">514</a>
-<a href="#515" id="515">515</a>
-<a href="#516" id="516">516</a>
-<a href="#517" id="517">517</a>
-<a href="#518" id="518">518</a>
-<a href="#519" id="519">519</a>
-<a href="#520" id="520">520</a>
-<a href="#521" id="521">521</a>
-<a href="#522" id="522">522</a>
-<a href="#523" id="523">523</a>
-<a href="#524" id="524">524</a>
-<a href="#525" id="525">525</a>
-<a href="#526" id="526">526</a>
-<a href="#527" id="527">527</a>
-<a href="#528" id="528">528</a>
-<a href="#529" id="529">529</a>
-<a href="#530" id="530">530</a>
-<a href="#531" id="531">531</a>
-<a href="#532" id="532">532</a>
-<a href="#533" id="533">533</a>
-<a href="#534" id="534">534</a>
-<a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
-<a href="#550" id="550">550</a>
-<a href="#551" id="551">551</a>
-<a href="#552" id="552">552</a>
-<a href="#553" id="553">553</a>
-<a href="#554" id="554">554</a>
-<a href="#555" id="555">555</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering;
 <span class="attr">#[cfg(doc)]
 </span><span class="kw">use </span>std::fmt::Display <span class="kw">as _</span>;
@@ -641,37 +599,13 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
-    /// user does not have the required [permissions].
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks the required [permissions].
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: crate::model::permissions
-    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg_attr(not(feature = <span class="string">"cache"</span>), allow(unused_mut))]
-        </span><span class="kw">let </span><span class="kw-2">mut </span>user_id = <span class="self">self</span>.user_id;
-
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="kw">if </span><span class="self">self</span>.user_id == <span class="prelude-val">Some</span>(cache.current_user().id) {
-                    user_id = <span class="prelude-val">None</span>;
-                }
-
-                <span class="kw">if let </span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(guild_id)) = (user_id, <span class="self">self</span>.guild_id) {
-                    <span class="kw">crate</span>::utils::user_has_perms_cache(
-                        cache,
-                        guild_id,
-                        <span class="self">self</span>.channel_id,
-                        Permissions::MANAGE_MESSAGES,
-                    )<span class="question-mark">?</span>;
-                }
-            }
-        }
-
+    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.channel_id
-            .delete_reaction(cache_http.http(), <span class="self">self</span>.message_id, user_id, <span class="self">self</span>.emoji.clone())
+            .delete_reaction(http, <span class="self">self</span>.message_id, <span class="self">self</span>.user_id, <span class="self">self</span>.emoji.clone())
             .<span class="kw">await
     </span>}
 
@@ -681,29 +615,12 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, then returns a [`ModelError::InvalidPermissions`] if the current
-    /// user does not have the required [permissions].
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks [permissions].
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: crate::model::permissions
-    </span><span class="kw">pub async fn </span>delete_all(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span>(<span class="prelude-val">Some</span>(cache), <span class="prelude-val">Some</span>(guild_id)) = (cache_http.cache(), <span class="self">self</span>.guild_id) {
-                <span class="kw">crate</span>::utils::user_has_perms_cache(
-                    cache,
-                    guild_id,
-                    <span class="self">self</span>.channel_id,
-                    Permissions::MANAGE_MESSAGES,
-                )<span class="question-mark">?</span>;
-            }
-        }
-        cache_http
-            .http()
-            .delete_message_reaction_emoji(<span class="self">self</span>.channel_id, <span class="self">self</span>.message_id, <span class="kw-2">&amp;</span><span class="self">self</span>.emoji)
-            .<span class="kw">await
+    </span><span class="kw">pub async fn </span>delete_all(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.delete_message_reaction_emoji(<span class="self">self</span>.channel_id, <span class="self">self</span>.message_id, <span class="kw-2">&amp;</span><span class="self">self</span>.emoji).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the [`Message`] associated with this reaction.
@@ -761,8 +678,7 @@
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidPermissions`] if the current user does not have the required
-    /// [permissions].
+    /// Returns [`Error::Http`] if the current user lacks the required [permissions].
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: crate::model::permissions
@@ -923,13 +839,13 @@
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "http")]
-    /// # use serenity::http::CacheHttp;
+    /// # use serenity::http::Http;
     /// # use serenity::model::channel::Message;
     /// # use serenity::model::id::ChannelId;
     /// #
     /// # #[cfg(feature = "http")]
-    /// # async fn example(ctx: impl CacheHttp, message: Message) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-    /// message.react(ctx, '🍎').await?;
+    /// # async fn example(http: &amp;Http, message: Message) -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// message.react(http, '🍎').await?;
     /// # Ok(())
     /// # }
     /// #

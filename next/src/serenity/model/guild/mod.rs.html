@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (aed2187d5 2024-04-27)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b21aa549bf6d91ff.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (f705de596 2024-04-30)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2485,114 +2485,6 @@
 <a href="#2485" id="2485">2485</a>
 <a href="#2486" id="2486">2486</a>
 <a href="#2487" id="2487">2487</a>
-<a href="#2488" id="2488">2488</a>
-<a href="#2489" id="2489">2489</a>
-<a href="#2490" id="2490">2490</a>
-<a href="#2491" id="2491">2491</a>
-<a href="#2492" id="2492">2492</a>
-<a href="#2493" id="2493">2493</a>
-<a href="#2494" id="2494">2494</a>
-<a href="#2495" id="2495">2495</a>
-<a href="#2496" id="2496">2496</a>
-<a href="#2497" id="2497">2497</a>
-<a href="#2498" id="2498">2498</a>
-<a href="#2499" id="2499">2499</a>
-<a href="#2500" id="2500">2500</a>
-<a href="#2501" id="2501">2501</a>
-<a href="#2502" id="2502">2502</a>
-<a href="#2503" id="2503">2503</a>
-<a href="#2504" id="2504">2504</a>
-<a href="#2505" id="2505">2505</a>
-<a href="#2506" id="2506">2506</a>
-<a href="#2507" id="2507">2507</a>
-<a href="#2508" id="2508">2508</a>
-<a href="#2509" id="2509">2509</a>
-<a href="#2510" id="2510">2510</a>
-<a href="#2511" id="2511">2511</a>
-<a href="#2512" id="2512">2512</a>
-<a href="#2513" id="2513">2513</a>
-<a href="#2514" id="2514">2514</a>
-<a href="#2515" id="2515">2515</a>
-<a href="#2516" id="2516">2516</a>
-<a href="#2517" id="2517">2517</a>
-<a href="#2518" id="2518">2518</a>
-<a href="#2519" id="2519">2519</a>
-<a href="#2520" id="2520">2520</a>
-<a href="#2521" id="2521">2521</a>
-<a href="#2522" id="2522">2522</a>
-<a href="#2523" id="2523">2523</a>
-<a href="#2524" id="2524">2524</a>
-<a href="#2525" id="2525">2525</a>
-<a href="#2526" id="2526">2526</a>
-<a href="#2527" id="2527">2527</a>
-<a href="#2528" id="2528">2528</a>
-<a href="#2529" id="2529">2529</a>
-<a href="#2530" id="2530">2530</a>
-<a href="#2531" id="2531">2531</a>
-<a href="#2532" id="2532">2532</a>
-<a href="#2533" id="2533">2533</a>
-<a href="#2534" id="2534">2534</a>
-<a href="#2535" id="2535">2535</a>
-<a href="#2536" id="2536">2536</a>
-<a href="#2537" id="2537">2537</a>
-<a href="#2538" id="2538">2538</a>
-<a href="#2539" id="2539">2539</a>
-<a href="#2540" id="2540">2540</a>
-<a href="#2541" id="2541">2541</a>
-<a href="#2542" id="2542">2542</a>
-<a href="#2543" id="2543">2543</a>
-<a href="#2544" id="2544">2544</a>
-<a href="#2545" id="2545">2545</a>
-<a href="#2546" id="2546">2546</a>
-<a href="#2547" id="2547">2547</a>
-<a href="#2548" id="2548">2548</a>
-<a href="#2549" id="2549">2549</a>
-<a href="#2550" id="2550">2550</a>
-<a href="#2551" id="2551">2551</a>
-<a href="#2552" id="2552">2552</a>
-<a href="#2553" id="2553">2553</a>
-<a href="#2554" id="2554">2554</a>
-<a href="#2555" id="2555">2555</a>
-<a href="#2556" id="2556">2556</a>
-<a href="#2557" id="2557">2557</a>
-<a href="#2558" id="2558">2558</a>
-<a href="#2559" id="2559">2559</a>
-<a href="#2560" id="2560">2560</a>
-<a href="#2561" id="2561">2561</a>
-<a href="#2562" id="2562">2562</a>
-<a href="#2563" id="2563">2563</a>
-<a href="#2564" id="2564">2564</a>
-<a href="#2565" id="2565">2565</a>
-<a href="#2566" id="2566">2566</a>
-<a href="#2567" id="2567">2567</a>
-<a href="#2568" id="2568">2568</a>
-<a href="#2569" id="2569">2569</a>
-<a href="#2570" id="2570">2570</a>
-<a href="#2571" id="2571">2571</a>
-<a href="#2572" id="2572">2572</a>
-<a href="#2573" id="2573">2573</a>
-<a href="#2574" id="2574">2574</a>
-<a href="#2575" id="2575">2575</a>
-<a href="#2576" id="2576">2576</a>
-<a href="#2577" id="2577">2577</a>
-<a href="#2578" id="2578">2578</a>
-<a href="#2579" id="2579">2579</a>
-<a href="#2580" id="2580">2580</a>
-<a href="#2581" id="2581">2581</a>
-<a href="#2582" id="2582">2582</a>
-<a href="#2583" id="2583">2583</a>
-<a href="#2584" id="2584">2584</a>
-<a href="#2585" id="2585">2585</a>
-<a href="#2586" id="2586">2586</a>
-<a href="#2587" id="2587">2587</a>
-<a href="#2588" id="2588">2588</a>
-<a href="#2589" id="2589">2589</a>
-<a href="#2590" id="2590">2590</a>
-<a href="#2591" id="2591">2591</a>
-<a href="#2592" id="2592">2592</a>
-<a href="#2593" id="2593">2593</a>
-<a href="#2594" id="2594">2594</a>
-<a href="#2595" id="2595">2595</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2644,8 +2536,6 @@
     EditScheduledEvent,
     EditSticker,
 };
-<span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"model"</span>))]
-</span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -2946,19 +2836,6 @@
         <span class="self">self</span>.id.delete_automod_rule(http, rule_id, reason).<span class="kw">await
     </span>}
 
-    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    </span><span class="kw">fn </span>check_hierarchy(<span class="kw-2">&amp;</span><span class="self">self</span>, cache: <span class="kw-2">&amp;</span>Cache, other_user: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>current_id = cache.current_user().id;
-
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(higher) = <span class="self">self</span>.greater_member_hierarchy(other_user, current_id) {
-            <span class="kw">if </span>higher != current_id {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::Hierarchy));
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
     <span class="doccomment">/// Returns the "default" channel of the guild for the passed user id. (This returns the first
     /// channel that can be read by the user, if there isn't one, returns [`None`])
     </span><span class="attr">#[must_use]
@@ -2986,25 +2863,6 @@
         })
     }
 
-    <span class="doccomment">/// Intentionally not async. Retrieving anything from HTTP here is overkill/undesired
-    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>require_perms(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache: <span class="kw-2">&amp;</span>Cache,
-        required_permissions: Permissions,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(member) = <span class="self">self</span>.members.get(<span class="kw-2">&amp;</span>cache.current_user().id) {
-            <span class="kw">let </span>bot_permissions = <span class="self">self</span>.member_permissions(member);
-            <span class="kw">if </span>!bot_permissions.contains(required_permissions) {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::InvalidPermissions {
-                    required: required_permissions,
-                    present: bot_permissions,
-                }));
-            }
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
     <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
     /// the range 0 and 7.
     ///
@@ -3026,30 +2884,17 @@
     /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
     /// to delete is over the maximum.
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform bans, or may return a [`ModelError::Hierarchy`] if the
-    /// member to be banned has a higher role than the current user.
-    ///
-    /// Otherwise returns [`Error::Http`] if the member cannot be banned.
+    /// Returns [`Error::Http`] if the current user lacks permission to ban the member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     </span><span class="kw">pub async fn </span>ban(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         user: UserId,
         dmd: u8,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::BAN_MEMBERS)<span class="question-mark">?</span>;
-
-                <span class="self">self</span>.check_hierarchy(cache, user)<span class="question-mark">?</span>;
-            }
-        }
-
-        <span class="self">self</span>.id.ban(cache_http.http(), user, dmd, reason).<span class="kw">await
+        <span class="self">self</span>.id.ban(http, user, dmd, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the formatted URL of the guild's banner image, if one exists.
@@ -3065,24 +2910,16 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform bans.
+    /// Returns [`Error::Http`] if the current user lacks permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     </span><span class="kw">pub async fn </span>bans(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         target: <span class="prelude-ty">Option</span>&lt;UserPagination&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;NonMaxU16&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Ban&gt;&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::BAN_MEMBERS)<span class="question-mark">?</span>;
-            }
-        }
-
-        <span class="self">self</span>.id.bans(cache_http.http(), target, limit).<span class="kw">await
+        <span class="self">self</span>.id.bans(http, target, limit).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Adds a [`User`] to this guild with a valid OAuth2 access token.
@@ -3198,16 +3035,15 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     </span><span class="kw">pub async fn </span>create_channel(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateChannel&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildChannel&gt; {
-        <span class="self">self</span>.id.create_channel(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_channel(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -3389,8 +3225,7 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="kw">pub async fn </span>create_role(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: EditRole&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
@@ -3403,16 +3238,15 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     </span><span class="kw">pub async fn </span>create_scheduled_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateScheduledEvent&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
-        <span class="self">self</span>.id.create_scheduled_event(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_scheduled_event(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a new sticker in the guild with the data set, if any.
@@ -3421,16 +3255,15 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     </span><span class="kw">pub async fn </span>create_sticker&lt;<span class="lifetime">'a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         builder: CreateSticker&lt;<span class="lifetime">'a</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Sticker&gt; {
-        <span class="self">self</span>.id.create_sticker(cache_http, builder).<span class="kw">await
+        <span class="self">self</span>.id.create_sticker(http, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Deletes the current guild if the current user is the owner of the
@@ -3585,12 +3418,11 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, builder: EditGuild&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>guild = <span class="self">self</span>.id.edit(cache_http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
+    </span><span class="kw">pub async fn </span>edit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: EditGuild&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>guild = <span class="self">self</span>.id.edit(http, builder).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.afk_metadata = guild.afk_metadata;
         <span class="self">self</span>.default_message_notifications = guild.default_message_notifications;
@@ -3676,8 +3508,7 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to change their own nickname.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// Otherwise will return [`Error::Http`] if the current user lacks permission.
     ///
@@ -3688,13 +3519,6 @@
         new_nickname: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::CHANGE_NICKNAME)<span class="question-mark">?</span>;
-            }
-        }
-
         <span class="self">self</span>.id.edit_nickname(cache_http.http(), new_nickname, reason).<span class="kw">await
     </span>}
 
@@ -3708,17 +3532,16 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     </span><span class="kw">pub async fn </span>edit_role(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
+        http: <span class="kw-2">&amp;</span>Http,
         role_id: RoleId,
         builder: EditRole&lt;<span class="lifetime">'_</span>&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
-        <span class="self">self</span>.id.edit_role(cache_http, role_id, builder).<span class="kw">await
+        <span class="self">self</span>.id.edit_role(http, role_id, builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the order of [`Role`]s. Requires the [Manage Roles] permission.
@@ -3754,8 +3577,7 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     /// [Manage Events]: Permissions::MANAGE_EVENTS
@@ -3992,21 +3814,11 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to see invites.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    </span><span class="kw">pub async fn </span>invites(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::MANAGE_GUILD)<span class="question-mark">?</span>;
-            }
-        }
-
-        <span class="self">self</span>.id.invites(cache_http.http()).<span class="kw">await
+    </span><span class="kw">pub async fn </span>invites(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
+        <span class="self">self</span>.id.invites(http).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Checks if the guild is 'large'.
@@ -4496,28 +4308,19 @@
     ///
     /// See the documentation on [`GuildPrune`] for more information.
     ///
-    /// **Note**: Requires the [Kick Members] permission.
+    /// **Note**: Requires [Manage Guild] and [Kick Members] permission.
     ///
     /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to kick members.
     ///
     /// Otherwise may return [`Error::Http`] if the current user does not have permission. Can also
     /// return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    </span><span class="kw">pub async fn </span>prune_count(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::KICK_MEMBERS)<span class="question-mark">?</span>;
-            }
-        }
-
-        <span class="self">self</span>.id.prune_count(cache_http.http(), days).<span class="kw">await
+    </span><span class="kw">pub async fn </span>prune_count(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
+        <span class="self">self</span>.id.prune_count(http, days).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Re-orders the channels of the guild.
@@ -4679,18 +4482,16 @@
     ///
     /// See the documentation on [`GuildPrune`] for more information.
     ///
-    /// **Note**: Requires the [Kick Members] permission.
+    /// **Note**: Requires [Manage Guild] and [Kick Members] permissions.
     ///
     /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to kick members.
     ///
     /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     ///
     /// Can also return an [`Error::Json`] if there is an error deserializing the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     </span><span class="kw">pub async fn </span>start_prune(
@@ -4699,13 +4500,6 @@
         days: u8,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::KICK_MEMBERS)<span class="question-mark">?</span>;
-            }
-        }
-
         <span class="self">self</span>.id.start_prune(cache_http.http(), days, reason).<span class="kw">await
     </span>}
 
@@ -4715,10 +4509,7 @@
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform bans.
-    ///
-    /// Otherwise will return an [`Error::Http`] if the current user does not have permission.
+    /// Returns [`Error::Http`] if the current user does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     </span><span class="kw">pub async fn </span>unban(
@@ -4727,13 +4518,6 @@
         user_id: UserId,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-        </span>{
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::BAN_MEMBERS)<span class="question-mark">?</span>;
-            }
-        }
-
         <span class="self">self</span>.id.unban(cache_http.http(), user_id, reason).<span class="kw">await
     </span>}
 
