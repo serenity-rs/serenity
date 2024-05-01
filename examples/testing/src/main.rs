@@ -54,7 +54,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if msg.content == "edit" {
         let mut msg = channel_id
             .send_message(
-                &ctx,
+                &ctx.http,
                 CreateMessage::new()
                     .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
@@ -62,12 +62,13 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
         msg.edit(&ctx, EditMessage::new().attachments(EditAttachments::keep_all(&msg))).await?;
     } else if msg.content == "unifiedattachments" {
-        let mut msg = channel_id.send_message(ctx, CreateMessage::new().content("works")).await?;
+        let mut msg =
+            channel_id.send_message(&ctx.http, CreateMessage::new().content("works")).await?;
         msg.edit(ctx, EditMessage::new().content("works still")).await?;
 
         let mut msg = channel_id
             .send_message(
-                ctx,
+                &ctx.http,
                 CreateMessage::new()
                     .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
@@ -86,14 +87,14 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         // Test special characters in audit log reason
         msg.channel_id
             .edit(
-                ctx,
+                &ctx.http,
                 EditChannel::new().name("new-channel-name").audit_log_reason("hello\nworld\n🙂"),
             )
             .await?;
     } else if msg.content == "actionrow" {
         channel_id
             .send_message(
-                ctx,
+                &ctx.http,
                 CreateMessage::new()
                     .button(CreateButton::new("0").label("Foo"))
                     .button(CreateButton::new("1").emoji('🤗').style(ButtonStyle::Secondary))
@@ -113,7 +114,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         loop {
             let msg = channel_id
                 .send_message(
-                    ctx,
+                    &ctx.http,
                     CreateMessage::new()
                         .button(CreateButton::new(custom_id.clone()).label(custom_id)),
                 )
@@ -131,8 +132,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         }
     } else if msg.content == "reactionremoveemoji" {
         // Test new ReactionRemoveEmoji gateway event: https://github.com/serenity-rs/serenity/issues/2248
-        msg.react(ctx, '👍').await?;
-        msg.delete_reaction_emoji(ctx, '👍').await?;
+        msg.react(&ctx.http, '👍').await?;
+        msg.delete_reaction_emoji(&ctx.http, '👍').await?;
     } else if msg.content == "testautomodregex" {
         guild_id
             .create_automod_rule(
@@ -152,7 +153,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if msg.content == "createtags" {
         channel_id
             .edit(
-                &ctx,
+                &ctx.http,
                 EditChannel::new().available_tags(vec![
                     CreateForumTag::new("tag1 :)").emoji('👍'),
                     CreateForumTag::new("tag2 (:").moderated(true),
@@ -174,7 +175,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         use tokio::time::Duration;
 
         let mut msg = channel_id
-            .say(ctx, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id))
+            .say(&ctx.http, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id))
             .await?;
 
         let msg_id = msg.id;
@@ -197,10 +198,10 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         let mut channel =
             channel.trim().parse::<ChannelId>().unwrap().to_channel(ctx).await?.guild().unwrap();
         let parent_id = channel.parent_id.unwrap();
-        channel.edit(ctx, EditChannel::new().category(None)).await?;
-        channel.edit(ctx, EditChannel::new().category(Some(parent_id))).await?;
+        channel.edit(&ctx.http, EditChannel::new().category(None)).await?;
+        channel.edit(&ctx.http, EditChannel::new().category(Some(parent_id))).await?;
     } else if msg.content == "channelperms" {
-        channel_id.say(ctx, format!("{:?}", msg.author_permissions(&ctx.cache))).await?;
+        channel_id.say(&ctx.http, format!("{:?}", msg.author_permissions(&ctx.cache))).await?;
     } else if let Some(forum_channel_id) = msg.content.strip_prefix("createforumpostin ") {
         forum_channel_id
             .parse::<ChannelId>()
@@ -217,14 +218,16 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if let Some(forum_post_url) = msg.content.strip_prefix("deleteforumpost ") {
         let (_guild_id, channel_id, _message_id) =
             serenity::utils::parse_message_url(forum_post_url).unwrap();
-        msg.channel_id.say(ctx, format!("Deleting <#{}> in 10 seconds...", channel_id)).await?;
+        msg.channel_id
+            .say(&ctx.http, format!("Deleting <#{}> in 10 seconds...", channel_id))
+            .await?;
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
         channel_id.delete(&ctx.http, None).await?;
     } else {
         return Ok(());
     }
 
-    msg.react(&ctx, '✅').await?;
+    msg.react(&ctx.http, '✅').await?;
     Ok(())
 }
 

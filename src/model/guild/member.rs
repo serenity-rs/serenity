@@ -7,7 +7,7 @@ use crate::builder::EditMember;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
@@ -281,9 +281,6 @@ impl Member {
     ///     Err(Error::Model(ModelError::GuildNotFound)) => {
     ///         println!("Couldn't determine guild of member");
     ///     },
-    ///     Err(Error::Model(ModelError::InvalidPermissions(missing_perms))) => {
-    ///         println!("Didn't have permissions; missing: {:?}", missing_perms);
-    ///     },
     ///     _ => {},
     /// }
     /// ```
@@ -293,26 +290,11 @@ impl Member {
     /// Returns a [`ModelError::GuildNotFound`] if the Id of the member's guild could not be
     /// determined.
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform the kick.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn kick(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                let lookup = cache.guild(self.guild_id).as_deref().cloned();
-                if let Some(guild) = lookup {
-                    guild.require_perms(cache, Permissions::KICK_MEMBERS)?;
-
-                    guild.check_hierarchy(cache, self.user.id)?;
-                }
-            }
-        }
-
-        self.guild_id.kick(cache_http.http(), self.user.id, reason).await
+    pub async fn kick(&self, http: &Http, reason: Option<&str>) -> Result<()> {
+        self.guild_id.kick(http, self.user.id, reason).await
     }
 
     /// Moves the member to a voice channel.
@@ -435,8 +417,7 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform bans.
+    /// Returns [`Error::Http`] if the current user does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn unban(&self, http: &Http, reason: Option<&str>) -> Result<()> {

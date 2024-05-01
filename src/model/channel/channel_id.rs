@@ -70,16 +70,11 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    pub async fn create_invite(
-        self,
-        cache_http: impl CacheHttp,
-        builder: CreateInvite<'_>,
-    ) -> Result<RichInvite> {
-        builder.execute(cache_http, self, None).await
+    pub async fn create_invite(self, http: &Http, builder: CreateInvite<'_>) -> Result<RichInvite> {
+        builder.execute(http, self).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
@@ -308,17 +303,12 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit(
-        self,
-        cache_http: impl CacheHttp,
-        builder: EditChannel<'_>,
-    ) -> Result<GuildChannel> {
-        builder.execute(cache_http, self, None).await
+    pub async fn edit(self, http: &Http, builder: EditChannel<'_>) -> Result<GuildChannel> {
+        builder.execute(http, self).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -337,11 +327,11 @@ impl ChannelId {
     /// reasons.
     pub async fn edit_message(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
-        builder.execute(cache_http, self, message_id, None).await
+        builder.execute(http, self, message_id, None).await
     }
 
     /// Follows the News Channel
@@ -607,13 +597,9 @@ impl ChannelId {
     ///
     /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
-    pub async fn say(
-        self,
-        cache_http: impl CacheHttp,
-        content: impl Into<Cow<'_, str>>,
-    ) -> Result<Message> {
+    pub async fn say(self, http: &Http, content: impl Into<Cow<'_, str>>) -> Result<Message> {
         let builder = CreateMessage::new().content(content);
-        self.send_message(cache_http, builder).await
+        self.send_message(http, builder).await
     }
 
     /// Sends file(s) along with optional message contents. The filename _must_ be specified.
@@ -684,11 +670,11 @@ impl ChannelId {
     /// [`File`]: tokio::fs::File
     pub async fn send_files<'a>(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         files: impl IntoIterator<Item = CreateAttachment<'a>>,
         builder: CreateMessage<'a>,
     ) -> Result<Message> {
-        self.send_message(cache_http, builder.files(files)).await
+        self.send_message(http, builder.files(files)).await
     }
 
     /// Sends a message to the channel.
@@ -700,12 +686,8 @@ impl ChannelId {
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    pub async fn send_message(
-        self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
-    ) -> Result<Message> {
-        builder.execute(cache_http, self, None).await
+    pub async fn send_message(self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
+        builder.execute(http, self, None).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
