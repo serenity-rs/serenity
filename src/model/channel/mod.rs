@@ -24,7 +24,7 @@ pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
 #[cfg(feature = "model")]
-use crate::http::CacheHttp;
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
@@ -118,17 +118,14 @@ impl Channel {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`], if the current user
-    /// lacks permission.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
-    pub async fn delete(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         match self {
             Self::Guild(public_channel) => {
-                public_channel.delete(cache_http, reason).await?;
+                public_channel.delete(http, reason).await?;
             },
             Self::Private(private_channel) => {
-                private_channel.delete(cache_http.http()).await?;
+                private_channel.delete(http).await?;
             },
         }
 
