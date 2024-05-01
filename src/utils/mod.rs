@@ -29,10 +29,6 @@ pub use self::custom_message::CustomMessage;
 pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
 #[doc(inline)]
 pub use self::token::validate as validate_token;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::http::CacheHttp;
 use crate::model::prelude::*;
 
 /// Retrieves the "code" part of an invite out of a URL.
@@ -405,66 +401,6 @@ pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
         return None;
     }
     Some((webhook_id.parse().ok()?, token))
-}
-
-#[cfg(all(feature = "cache", feature = "model"))]
-pub(crate) fn user_has_guild_perms(
-    cache_http: impl CacheHttp,
-    guild_id: GuildId,
-    permissions: Permissions,
-) -> Result<()> {
-    if let Some(cache) = cache_http.cache() {
-        if let Some(guild) = cache.guild(guild_id) {
-            guild.require_perms(cache, permissions)?;
-        }
-    }
-    Ok(())
-}
-
-/// Tries to find a user's permissions using the cache. Unlike [`user_has_perms`], this function
-/// will return `true` even when the permissions are not in the cache.
-#[cfg(all(feature = "cache", feature = "model"))]
-pub(crate) fn user_has_perms_cache(
-    cache: &Cache,
-    guild_id: GuildId,
-    channel_id: ChannelId,
-    required_permissions: Permissions,
-) -> Result<()> {
-    match user_perms(cache, guild_id, channel_id) {
-        Ok(perms) => {
-            if perms.contains(required_permissions) {
-                Ok(())
-            } else {
-                Err(Error::Model(ModelError::InvalidPermissions {
-                    required: required_permissions,
-                    present: perms,
-                }))
-            }
-        },
-        Err(Error::Model(err)) if err.is_cache_err() => Ok(()),
-        Err(other) => Err(other),
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model"))]
-pub(crate) fn user_perms(
-    cache: &Cache,
-    guild_id: GuildId,
-    channel_id: ChannelId,
-) -> Result<Permissions> {
-    let Some(guild) = cache.guild(guild_id) else {
-        return Err(Error::Model(ModelError::GuildNotFound));
-    };
-
-    let Some(channel) = guild.channels.get(&channel_id) else {
-        return Err(Error::Model(ModelError::ChannelNotFound));
-    };
-
-    let Some(member) = guild.members.get(&cache.current_user().id) else {
-        return Err(Error::Model(ModelError::MemberNotFound));
-    };
-
-    Ok(guild.user_permissions_in(channel, member))
 }
 
 /// Calculates the Id of the shard responsible for a guild, given its Id and total number of shards

@@ -85,7 +85,7 @@ async fn log_system_load(ctx: &Context) {
             false,
         );
     let builder = CreateMessage::new().embed(embed);
-    let message = ChannelId::new(381926291785383946).send_message(&ctx, builder).await;
+    let message = ChannelId::new(381926291785383946).send_message(&ctx.http, builder).await;
     if let Err(why) = message {
         eprintln!("Error sending message: {why:?}");
     };
