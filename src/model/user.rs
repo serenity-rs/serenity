@@ -661,7 +661,7 @@ impl UserId {
     ///
     ///             if let Err(why) = msg.author.id.direct_message(&ctx.http, builder).await {
     ///                 println!("Err sending help: {why:?}");
-    ///                 let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
+    ///                 let _ = msg.reply(&ctx.http, "There was an error DMing you help.").await;
     ///             };
     ///         }
     ///     }

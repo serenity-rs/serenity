@@ -51,8 +51,6 @@ use crate::builder::{
     EditSoundboard,
     EditSticker,
 };
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
 #[cfg(feature = "model")]
@@ -370,19 +368,6 @@ impl Guild {
         self.id.delete_automod_rule(http, rule_id, reason).await
     }
 
-    #[cfg(feature = "cache")]
-    fn check_hierarchy(&self, cache: &Cache, other_user: UserId) -> Result<()> {
-        let current_id = cache.current_user().id;
-
-        if let Some(higher) = self.greater_member_hierarchy(other_user, current_id) {
-            if higher != current_id {
-                return Err(Error::Model(ModelError::Hierarchy));
-            }
-        }
-
-        Ok(())
-    }
-
     /// Returns the "default" channel of the guild for the passed user id. (This returns the first
     /// channel that can be read by the user, if there isn't one, returns [`None`])
     #[must_use]
@@ -410,27 +395,6 @@ impl Guild {
         })
     }
 
-    /// Intentionally not async. Retrieving anything from HTTP here is overkill/undesired
-    #[cfg(feature = "cache")]
-    pub(crate) fn require_perms(
-        &self,
-        cache: &Cache,
-        required_permissions: Permissions,
-    ) -> Result<(), Error> {
-        if let Some(member) = self.members.get(&cache.current_user().id) {
-            // This isn't used for any channel-specific permissions, but sucks still.
-            #[allow(deprecated)]
-            let bot_permissions = self.member_permissions(member);
-            if !bot_permissions.contains(required_permissions) {
-                return Err(Error::Model(ModelError::InvalidPermissions {
-                    required: required_permissions,
-                    present: bot_permissions,
-                }));
-            }
-        }
-        Ok(())
-    }
-
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
     /// the range 0 and 7.
     ///
@@ -452,30 +416,17 @@ impl Guild {
     /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
     /// to delete is over the maximum.
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform bans, or may return a [`ModelError::Hierarchy`] if the
-    /// member to be banned has a higher role than the current user.
-    ///
-    /// Otherwise returns [`Error::Http`] if the member cannot be banned.
+    /// Returns [`Error::Http`] if the current user lacks permission to ban the member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn ban(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         user: UserId,
         dmd: u8,
         reason: Option<&str>,
     ) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::BAN_MEMBERS)?;
-
-                self.check_hierarchy(cache, user)?;
-            }
-        }
-
-        self.id.ban(cache_http.http(), user, dmd, reason).await
+        self.id.ban(http, user, dmd, reason).await
     }
 
     /// Bans multiple users from the guild, returning the users that were and weren't banned.
@@ -485,19 +436,12 @@ impl Guild {
     /// See [`GuildId::bulk_ban`] for more information.
     pub async fn bulk_ban(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         user_ids: &[UserId],
         delete_message_seconds: u32,
         reason: Option<&str>,
     ) -> Result<BulkBanResponse> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::BAN_MEMBERS & Permissions::MANAGE_GUILD)?;
-            }
-        }
-
-        self.id.bulk_ban(cache_http.http(), user_ids, delete_message_seconds, reason).await
+        self.id.bulk_ban(http, user_ids, delete_message_seconds, reason).await
     }
 
     /// Returns the formatted URL of the guild's banner image, if one exists.
@@ -513,24 +457,16 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform bans.
+    /// Returns [`Error::Http`] if the current user lacks permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn bans(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         target: Option<UserPagination>,
         limit: Option<NonMaxU16>,
     ) -> Result<Vec<Ban>> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::BAN_MEMBERS)?;
-            }
-        }
-
-        self.id.bans(cache_http.http(), target, limit).await
+        self.id.bans(http, target, limit).await
     }
 
     /// Gets a user's ban from the guild.
@@ -674,16 +610,15 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateChannel<'_>,
     ) -> Result<GuildChannel> {
-        self.id.create_channel(cache_http, builder).await
+        self.id.create_channel(http, builder).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -865,8 +800,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn create_role(&self, http: &Http, builder: EditRole<'_>) -> Result<Role> {
@@ -879,16 +813,15 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     pub async fn create_scheduled_event(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         builder: CreateScheduledEvent<'_>,
     ) -> Result<ScheduledEvent> {
-        self.id.create_scheduled_event(cache_http, builder).await
+        self.id.create_scheduled_event(http, builder).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
@@ -897,16 +830,11 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_sticker(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateSticker<'_>,
-    ) -> Result<Sticker> {
-        self.id.create_sticker(cache_http, builder).await
+    pub async fn create_sticker(&self, http: &Http, builder: CreateSticker<'_>) -> Result<Sticker> {
+        self.id.create_sticker(http, builder).await
     }
 
     /// Deletes the current guild if the current user is the owner of the
@@ -1061,12 +989,11 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild<'_>) -> Result<()> {
-        let guild = self.id.edit(cache_http, builder).await?;
+    pub async fn edit(&mut self, http: &Http, builder: EditGuild<'_>) -> Result<()> {
+        let guild = self.id.edit(http, builder).await?;
 
         self.afk_metadata = guild.afk_metadata;
         self.default_message_notifications = guild.default_message_notifications;
@@ -1152,8 +1079,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to change their own nickname.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// Otherwise will return [`Error::Http`] if the current user lacks permission.
     ///
@@ -1164,13 +1090,6 @@ impl Guild {
         new_nickname: Option<&str>,
         reason: Option<&str>,
     ) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::CHANGE_NICKNAME)?;
-            }
-        }
-
         self.id.edit_nickname(cache_http.http(), new_nickname, reason).await
     }
 
@@ -1184,17 +1103,16 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn edit_role(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         role_id: RoleId,
         builder: EditRole<'_>,
     ) -> Result<Role> {
-        self.id.edit_role(cache_http, role_id, builder).await
+        self.id.edit_role(http, role_id, builder).await
     }
 
     /// Edits the order of [`Role`]s. Requires the [Manage Roles] permission.
@@ -1230,8 +1148,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Events]: Permissions::CREATE_EVENTS
     /// [Manage Events]: Permissions::MANAGE_EVENTS
@@ -1468,21 +1385,11 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to see invites.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn invites(&self, cache_http: impl CacheHttp) -> Result<Vec<RichInvite>> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::MANAGE_GUILD)?;
-            }
-        }
-
-        self.id.invites(cache_http.http()).await
+    pub async fn invites(&self, http: &Http) -> Result<Vec<RichInvite>> {
+        self.id.invites(http).await
     }
 
     /// Checks if the guild is 'large'.
@@ -1985,28 +1892,19 @@ impl Guild {
     ///
     /// See the documentation on [`GuildPrune`] for more information.
     ///
-    /// **Note**: Requires the [Kick Members] permission.
+    /// **Note**: Requires [Manage Guild] and [Kick Members] permission.
     ///
     /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to kick members.
     ///
     /// Otherwise may return [`Error::Http`] if the current user does not have permission. Can also
     /// return [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn prune_count(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::KICK_MEMBERS)?;
-            }
-        }
-
-        self.id.prune_count(cache_http.http(), days).await
+    pub async fn prune_count(&self, http: &Http, days: u8) -> Result<GuildPrune> {
+        self.id.prune_count(http, days).await
     }
 
     /// Re-orders the channels of the guild.
@@ -2172,9 +2070,6 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to kick members.
-    ///
     /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     ///
     /// Can also return an [`Error::Json`] if there is an error deserializing the API response.
@@ -2189,13 +2084,6 @@ impl Guild {
         days: u8,
         reason: Option<&str>,
     ) -> Result<GuildPrune> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::KICK_MEMBERS | Permissions::MANAGE_GUILD)?;
-            }
-        }
-
         self.id.start_prune(cache_http.http(), days, reason).await
     }
 
@@ -2205,10 +2093,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to perform bans.
-    ///
-    /// Otherwise will return an [`Error::Http`] if the current user does not have permission.
+    /// Returns [`Error::Http`] if the current user does not have permission to perform bans.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn unban(
@@ -2217,13 +2102,6 @@ impl Guild {
         user_id: UserId,
         reason: Option<&str>,
     ) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                self.require_perms(cache, Permissions::BAN_MEMBERS)?;
-            }
-        }
-
         self.id.unban(cache_http.http(), user_id, reason).await
     }
 

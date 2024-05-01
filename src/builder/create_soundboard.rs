@@ -94,13 +94,6 @@ impl<'a> CreateSoundboard<'a> {
         cache_http: impl CacheHttp,
         guild_id: GuildId,
     ) -> Result<Soundboard> {
-        #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(
-            &cache_http,
-            guild_id,
-            Permissions::CREATE_GUILD_EXPRESSIONS,
-        )?;
-
         cache_http.http().create_guild_soundboard(guild_id, &self, self.audit_log_reason).await
     }
 }
