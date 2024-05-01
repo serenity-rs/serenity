@@ -48,7 +48,7 @@ impl EventHandler for Handler {
                 Cow::Owned(format!("OWO Has been said {owo_count} times!"))
             };
 
-            if let Err(err) = msg.reply(ctx, response).await {
+            if let Err(err) = msg.reply(&ctx.http, response).await {
                 eprintln!("Error sending response: {err:?}")
             };
         }

@@ -407,7 +407,7 @@ impl IntoFuture for ClientBuilder {
 /// impl EventHandler for Handler {
 ///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!ping" {
-///             let _ = msg.channel_id.say(&context, "Pong!");
+///             let _ = msg.channel_id.say(&context.http, "Pong!");
 ///         }
 ///     }
 /// }

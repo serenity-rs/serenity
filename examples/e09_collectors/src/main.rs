@@ -21,7 +21,8 @@ impl EventHandler for Handler {
 
     async fn message(&self, ctx: Context, msg: Message) {
         let mut score = 0u32;
-        let _ = msg.reply(&ctx, "How was that crusty crab called again? 10 seconds time!").await;
+        let _ =
+            msg.reply(&ctx.http, "How was that crusty crab called again? 10 seconds time!").await;
 
         // There is a method implemented for some models to conveniently collect replies. They
         // return a builder that can be turned into a Stream, or here, where we can await a
@@ -29,17 +30,17 @@ impl EventHandler for Handler {
         let collector = msg.author.await_reply(ctx.shard.clone()).timeout(Duration::from_secs(10));
         if let Some(answer) = collector.await {
             if answer.content.to_lowercase() == "ferris" {
-                let _ = answer.reply(&ctx, "That's correct!").await;
+                let _ = answer.reply(&ctx.http, "That's correct!").await;
                 score += 1;
             } else {
-                let _ = answer.reply(&ctx, "Wrong, it's Ferris!").await;
+                let _ = answer.reply(&ctx.http, "Wrong, it's Ferris!").await;
             }
         } else {
-            let _ = msg.reply(&ctx, "No answer within 10 seconds.").await;
+            let _ = msg.reply(&ctx.http, "No answer within 10 seconds.").await;
         };
 
         let react_msg = msg
-            .reply(&ctx, "React with the reaction representing 1, you got 10 seconds!")
+            .reply(&ctx.http, "React with the reaction representing 1, you got 10 seconds!")
             .await
             .unwrap();
 
@@ -52,15 +53,15 @@ impl EventHandler for Handler {
         if let Some(reaction) = collector.await {
             let _ = if reaction.emoji.as_data() == "1️⃣" {
                 score += 1;
-                msg.reply(&ctx, "That's correct!").await
+                msg.reply(&ctx.http, "That's correct!").await
             } else {
-                msg.reply(&ctx, "Wrong!").await
+                msg.reply(&ctx.http, "Wrong!").await
             };
         } else {
-            let _ = msg.reply(&ctx, "No reaction within 10 seconds.").await;
+            let _ = msg.reply(&ctx.http, "No reaction within 10 seconds.").await;
         };
 
-        let _ = msg.reply(&ctx, "Write 5 messages in 10 seconds").await;
+        let _ = msg.reply(&ctx.http, "Write 5 messages in 10 seconds").await;
 
         // We can create a collector from scratch too using this builder future.
         let collector = MessageCollector::new(ctx.shard.clone())
@@ -107,7 +108,7 @@ impl EventHandler for Handler {
         })
         .take_until(Box::pin(tokio::time::sleep(Duration::from_secs(20))));
 
-        let _ = msg.reply(&ctx, "Edit each of those 5 messages in 20 seconds").await;
+        let _ = msg.reply(&ctx.http, "Edit each of those 5 messages in 20 seconds").await;
         let mut edited = HashSet::new();
         while let Some(edited_message_id) = collector.next().await {
             edited.insert(edited_message_id);
@@ -118,13 +119,14 @@ impl EventHandler for Handler {
 
         if edited.len() >= 5 {
             score += 1;
-            let _ = msg.reply(&ctx, "Great! You edited 5 out of 5").await;
+            let _ = msg.reply(&ctx.http, "Great! You edited 5 out of 5").await;
         } else {
-            let _ = msg.reply(&ctx, format!("You only edited {} out of 5", edited.len())).await;
+            let _ =
+                msg.reply(&ctx.http, format!("You only edited {} out of 5", edited.len())).await;
         }
 
         let _ = msg
-            .reply(ctx, format!("TIME'S UP! You completed {score} out of 4 tasks correctly!"))
+            .reply(&ctx.http, format!("TIME'S UP! You completed {score} out of 4 tasks correctly!"))
             .await;
     }
 }
