@@ -140,11 +140,11 @@ impl PrivateChannel {
     /// [`EditMessage::execute`]: ../../builder/struct.EditMessage.html#method.execute
     pub async fn edit_message(
         &self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
-        self.id.edit_message(cache_http, message_id, builder).await
+        self.id.edit_message(http, message_id, builder).await
     }
 
     /// Gets a message from the channel.
@@ -222,12 +222,8 @@ impl PrivateChannel {
     /// [`CreateMessage::execute`] for more details.
     ///
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
-    pub async fn say(
-        &self,
-        cache_http: impl CacheHttp,
-        content: impl Into<Cow<'_, str>>,
-    ) -> Result<Message> {
-        self.id.say(cache_http, content).await
+    pub async fn say(&self, http: &Http, content: impl Into<Cow<'_, str>>) -> Result<Message> {
+        self.id.say(http, content).await
     }
 
     /// Sends file(s) along with optional message contents.
@@ -242,11 +238,11 @@ impl PrivateChannel {
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
     pub async fn send_files<'a>(
         self,
-        cache_http: impl CacheHttp,
+        http: &Http,
         files: impl IntoIterator<Item = CreateAttachment<'a>>,
         builder: CreateMessage<'a>,
     ) -> Result<Message> {
-        self.id.send_files(cache_http, files, builder).await
+        self.id.send_files(http, files, builder).await
     }
 
     /// Sends a message to the channel.
@@ -260,12 +256,8 @@ impl PrivateChannel {
     /// reasons.
     ///
     /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
-    pub async fn send_message(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
-    ) -> Result<Message> {
-        self.id.send_message(cache_http, builder).await
+    pub async fn send_message(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
+        self.id.send_message(http, builder).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.

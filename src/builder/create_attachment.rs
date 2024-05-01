@@ -266,11 +266,6 @@ impl<'a> EditAttachments<'a> {
         }
         files
     }
-
-    #[cfg(feature = "cache")]
-    pub(crate) fn is_empty(&self) -> bool {
-        self.new_and_existing_attachments.is_empty()
-    }
 }
 
 impl<'a> Serialize for EditAttachments<'a> {
