@@ -1230,7 +1230,7 @@ impl Guild {
     ///
     /// [`position`]: Role::position
     #[must_use]
-    pub fn greater_member_hierarchy_in(
+    pub fn _greater_member_hierarchy_in(
         guild: &Guild,
         lhs: &Member,
         rhs: &Member,
@@ -1293,7 +1293,7 @@ impl Guild {
     /// [`position`]: Role::position
     #[must_use]
     pub fn greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
-        Self::greater_member_hierarchy_in(
+        Self::_greater_member_hierarchy_in(
             self,
             self.members.get(&lhs_id)?,
             self.members.get(&rhs_id)?,
