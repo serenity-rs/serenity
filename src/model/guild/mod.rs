@@ -1190,15 +1190,15 @@ impl Guild {
         guild_id.to_partial_guild(cache_http).await
     }
 
-    /// Gets the highest role a [`Member`] of this Guild has.
-    ///
-    /// Returns None if the member has no roles or the member from this guild.
-    #[must_use]
-    pub fn member_highest_role(&self, member: &Member) -> Option<&Role> {
+    /// Helper function that can also be used from [`PartialGuild`].
+    pub(crate) fn _member_highest_role_in<'a>(
+        roles: &'a ExtractMap<RoleId, Role>,
+        member: &Member,
+    ) -> Option<&'a Role> {
         let mut highest: Option<&Role> = None;
 
         for role_id in &member.roles {
-            if let Some(role) = self.roles.get(role_id) {
+            if let Some(role) = roles.get(role_id) {
                 // Skip this role if this role in iteration has:
                 // - a position less than the recorded highest
                 // - a position equal to the recorded, but a higher ID
@@ -1217,21 +1217,20 @@ impl Guild {
         highest
     }
 
-    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
+    /// Gets the highest role a [`Member`] of this Guild has.
     ///
-    /// Hierarchy is essentially who has the [`Role`] with the highest [`position`].
-    ///
-    /// Returns [`None`] if at least one of the given users' member instances is not present.
-    /// Returns [`None`] if the users have the same hierarchy, as neither are greater than the
-    /// other.
-    ///
-    /// If both user IDs are the same, [`None`] is returned. If one of the users is the guild
-    /// owner, their ID is returned.
-    ///
-    /// [`position`]: Role::position
+    /// Returns None if the member has no roles or the member from this guild.
     #[must_use]
-    pub fn _greater_member_hierarchy_in(
-        guild: &Guild,
+    pub fn member_highest_role(&self, member: &Member) -> Option<&Role> {
+        Self::_member_highest_role_in(&self.roles, member)
+    }
+
+    /// Helper function that can also be used from [`PartialGuild`].
+    #[must_use]
+    pub(crate) fn _greater_member_hierarchy_in(
+        lhs_highest_role: Option<&Role>,
+        rhs_highest_role: Option<&Role>,
+        owner_id: UserId,
         lhs: &Member,
         rhs: &Member,
     ) -> Option<UserId> {
@@ -1241,17 +1240,15 @@ impl Guild {
         }
 
         // Check if either user is the guild owner.
-        if lhs.user.id == guild.owner_id {
+        if lhs.user.id == owner_id {
             return Some(lhs.user.id);
-        } else if rhs.user.id == guild.owner_id {
+        } else if rhs.user.id == owner_id {
             return Some(rhs.user.id);
         }
 
-        let lhs_role =
-            guild.member_highest_role(lhs).map_or((RoleId::new(1), 0), |r| (r.id, r.position));
+        let lhs_role = lhs_highest_role.map_or((RoleId::new(1), 0), |r| (r.id, r.position));
 
-        let rhs_role =
-            guild.member_highest_role(rhs).map_or((RoleId::new(1), 0), |r| (r.id, r.position));
+        let rhs_role = rhs_highest_role.map_or((RoleId::new(1), 0), |r| (r.id, r.position));
 
         // If LHS and RHS both have no top position or have the same role ID, then no one wins.
         if (lhs_role.1 == 0 && rhs_role.1 == 0) || (lhs_role.0 == rhs_role.0) {
@@ -1293,10 +1290,17 @@ impl Guild {
     /// [`position`]: Role::position
     #[must_use]
     pub fn greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
+        let lhs = self.members.get(&lhs_id)?;
+        let rhs = self.members.get(&rhs_id)?;
+        let lhs_highest_role = self.member_highest_role(lhs);
+        let rhs_highest_role = self.member_highest_role(rhs);
+
         Self::_greater_member_hierarchy_in(
-            self,
-            self.members.get(&lhs_id)?,
-            self.members.get(&rhs_id)?,
+            lhs_highest_role,
+            rhs_highest_role,
+            self.owner_id,
+            lhs,
+            rhs,
         )
     }
 
