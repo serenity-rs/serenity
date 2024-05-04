@@ -1379,7 +1379,11 @@ impl PartialGuild {
     ///
     /// [`position`]: Role::position
     #[must_use]
-    pub fn greater_member_hierarchy_in(pg: &PartialGuild, lhs: &Member, rhs: &Member) -> Option<UserId> {
+    pub fn greater_member_hierarchy_in(
+        pg: &PartialGuild,
+        lhs: &Member,
+        rhs: &Member,
+    ) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs.user.id == rhs.user.id {
             return None;
