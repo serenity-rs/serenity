@@ -1342,7 +1342,8 @@ impl PartialGuild {
     /// Gets the highest role a [`Member`] of this Guild has.
     ///
     /// Returns None if the member has no roles or the member from this guild.
-    pub fn member_highest_role_in<'a>(pg: &'a PartialGuild, member: &Member) -> Option<&'a Role> {
+    #[must_use]
+    pub fn member_highest_role<'a>(pg: &'a PartialGuild, member: &Member) -> Option<&'a Role> {
         let mut highest: Option<&Role> = None;
 
         for role_id in &member.roles {
@@ -1377,7 +1378,8 @@ impl PartialGuild {
     /// owner, their ID is returned.
     ///
     /// [`position`]: Role::position
-    pub fn greater_member_hierarchy_in(pg: &PartialGuild, lhs: &Member, rhs: &Member) -> Option<UserId> {
+    #[must_use]
+    pub fn greater_member_hierarchy(pg: &PartialGuild, lhs: &Member, rhs: &Member) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs.user.id == rhs.user.id {
             return None;
