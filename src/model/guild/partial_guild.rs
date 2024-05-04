@@ -1343,11 +1343,11 @@ impl PartialGuild {
     ///
     /// Returns None if the member has no roles or the member from this guild.
     #[must_use]
-    pub fn member_highest_role_in<'a>(pg: &'a PartialGuild, member: &Member) -> Option<&'a Role> {
+    pub fn member_highest_role(&self, member: &Member) -> Option<&Role> {
         let mut highest: Option<&Role> = None;
 
         for role_id in &member.roles {
-            if let Some(role) = pg.roles.get(role_id) {
+            if let Some(role) = self.roles.get(role_id) {
                 // Skip this role if this role in iteration has:
                 // - a position less than the recorded highest
                 // - a position equal to the recorded, but a higher ID
@@ -1396,11 +1396,11 @@ impl PartialGuild {
             return Some(rhs.user.id);
         }
 
-        let lhs_role = Self::member_highest_role_in(pg, lhs)
-            .map_or((RoleId::new(1), 0), |r| (r.id, r.position));
+        let lhs_role =
+            pg.member_highest_role(lhs).map_or((RoleId::new(1), 0), |r| (r.id, r.position));
 
-        let rhs_role = Self::member_highest_role_in(pg, rhs)
-            .map_or((RoleId::new(1), 0), |r| (r.id, r.position));
+        let rhs_role =
+            pg.member_highest_role(rhs).map_or((RoleId::new(1), 0), |r| (r.id, r.position));
 
         // If LHS and RHS both have no top position or have the same role ID, then no one wins.
         if (lhs_role.1 == 0 && rhs_role.1 == 0) || (lhs_role.0 == rhs_role.0) {
