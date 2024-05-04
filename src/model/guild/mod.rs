@@ -1230,51 +1230,74 @@ impl Guild {
     ///
     /// [`position`]: Role::position
     #[must_use]
-    pub fn greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
+    pub fn greater_member_hierarchy_in(
+        guild: &Guild,
+        lhs: &Member,
+        rhs: &Member,
+    ) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
-        if lhs_id == rhs_id {
+        if lhs.user.id == rhs.user.id {
             return None;
         }
 
         // Check if either user is the guild owner.
-        if lhs_id == self.owner_id {
-            return Some(lhs_id);
-        } else if rhs_id == self.owner_id {
-            return Some(rhs_id);
+        if lhs.user.id == guild.owner_id {
+            return Some(lhs.user.id);
+        } else if rhs.user.id == guild.owner_id {
+            return Some(rhs.user.id);
         }
 
-        let lhs = self
-            .member_highest_role(self.members.get(&lhs_id)?)
-            .map_or((RoleId::new(1), 0), |r| (r.id, r.position));
+        let lhs_role =
+            guild.member_highest_role(lhs).map_or((RoleId::new(1), 0), |r| (r.id, r.position));
 
-        let rhs = self
-            .member_highest_role(self.members.get(&rhs_id)?)
-            .map_or((RoleId::new(1), 0), |r| (r.id, r.position));
+        let rhs_role =
+            guild.member_highest_role(rhs).map_or((RoleId::new(1), 0), |r| (r.id, r.position));
 
         // If LHS and RHS both have no top position or have the same role ID, then no one wins.
-        if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
+        if (lhs_role.1 == 0 && rhs_role.1 == 0) || (lhs_role.0 == rhs_role.0) {
             return None;
         }
 
         // If LHS's top position is higher than RHS, then LHS wins.
-        if lhs.1 > rhs.1 {
-            return Some(lhs_id);
+        if lhs_role.1 > rhs_role.1 {
+            return Some(lhs.user.id);
         }
 
         // If RHS's top position is higher than LHS, then RHS wins.
-        if rhs.1 > lhs.1 {
-            return Some(rhs_id);
+        if rhs_role.1 > lhs_role.1 {
+            return Some(rhs.user.id);
         }
 
         // If LHS and RHS both have the same position, but LHS has the lower role ID, then LHS
         // wins.
         //
         // If RHS has the higher role ID, then RHS wins.
-        if lhs.1 == rhs.1 && lhs.0 < rhs.0 {
-            Some(lhs_id)
+        if lhs_role.1 == rhs_role.1 && lhs_role.0 < rhs_role.0 {
+            Some(lhs.user.id)
         } else {
-            Some(rhs_id)
+            Some(rhs.user.id)
         }
+    }
+
+    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
+    ///
+    /// Hierarchy is essentially who has the [`Role`] with the highest [`position`].
+    ///
+    /// Returns [`None`] if at least one of the given users' member instances is not present.
+    /// Returns [`None`] if the users have the same hierarchy, as neither are greater than the
+    /// other.
+    ///
+    /// If both user IDs are the same, [`None`] is returned. If one of the users is the guild
+    /// owner, their ID is returned.
+    ///
+    /// [`position`]: Role::position
+    #[must_use]
+    pub fn greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
+        Guild::greater_member_hierarchy_in(
+            self,
+            self.members.get(&lhs_id)?,
+            self.members.get(&rhs_id)?,
+        )
     }
 
     /// Returns the formatted URL of the guild's icon, if one exists.
