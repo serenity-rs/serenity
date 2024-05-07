@@ -4,6 +4,8 @@ use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
 
+use to_arraystring::ToArrayString;
+
 use super::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils;
@@ -106,11 +108,26 @@ mention!(value:
 
 impl fmt::Display for Mention {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match *self {
-            Mention::Channel(id) => f.write_fmt(format_args!("<#{id}>")),
-            Mention::Role(id) => f.write_fmt(format_args!("<@&{id}>")),
-            Mention::User(id) => f.write_fmt(format_args!("<@{id}>")),
-        }
+        f.write_str(&self.to_arraystring())
+    }
+}
+
+impl ToArrayString for Mention {
+    type ArrayString = arrayvec::ArrayString<{ 20 + 4 }>;
+
+    fn to_arraystring(self) -> Self::ArrayString {
+        let (prefix, id) = match self {
+            Self::Channel(id) => ("<#", id.get()),
+            Self::Role(id) => ("<@&", id.get()),
+            Self::User(id) => ("<@", id.get()),
+        };
+
+        let mut out = Self::ArrayString::new();
+        out.push_str(prefix);
+        out.push_str(&id.to_arraystring());
+        out.push('>');
+
+        out
     }
 }
 
