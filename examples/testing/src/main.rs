@@ -218,9 +218,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if let Some(forum_post_url) = msg.content.strip_prefix("deleteforumpost ") {
         let (_guild_id, channel_id, _message_id) =
             serenity::utils::parse_message_url(forum_post_url).unwrap();
-        msg.channel_id
-            .say(&ctx.http, format!("Deleting <#{channel_id}> in 10 seconds...",))
-            .await?;
+        msg.channel_id.say(&ctx.http, format!("Deleting <#{channel_id}> in 10 seconds...")).await?;
         tokio::time::sleep(std::time::Duration::from_secs(10)).await;
         channel_id.delete(&ctx.http, None).await?;
     } else {
