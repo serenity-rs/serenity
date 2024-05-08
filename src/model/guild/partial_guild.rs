@@ -934,6 +934,32 @@ impl PartialGuild {
         )
     }
 
+    /// Gets the highest role a [`Member`] of this Guild has.
+    ///
+    /// Returns None if the member has no roles or the member from this guild.
+    #[must_use]
+    pub fn member_highest_role(&self, member: &Member) -> Option<&Role> {
+        Guild::_member_highest_role_in(&self.roles, member)
+    }
+
+    /// See [`Guild::greater_member_hierarchy`] for more information.
+    ///
+    /// Note that unlike [`Guild::greater_member_hierarchy`], this method requires a [`Member`] as
+    /// member data is not available on a [`PartialGuild`].
+    #[must_use]
+    pub fn greater_member_hierarchy(&self, lhs: &Member, rhs: &Member) -> Option<UserId> {
+        let lhs_highest_role = self.member_highest_role(lhs);
+        let rhs_highest_role = self.member_highest_role(rhs);
+
+        Guild::_greater_member_hierarchy_in(
+            lhs_highest_role,
+            rhs_highest_role,
+            self.owner_id,
+            lhs,
+            rhs,
+        )
+    }
+
     /// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
     ///
     /// # Panics
