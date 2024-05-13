@@ -40,7 +40,7 @@ pub mod user;
 pub mod voice;
 pub mod webhook;
 
-#[cfg(feature = "voice-model")]
+#[cfg(feature = "voice_model")]
 pub use serenity_voice_model as voice_gateway;
 
 pub use self::colour::{Color, Colour};

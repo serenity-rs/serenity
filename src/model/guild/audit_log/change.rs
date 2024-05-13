@@ -43,7 +43,7 @@ macro_rules! generate_change {
         $( #[doc = $doc:literal] )?
         $key:literal => $name:ident ($type:ty),
     )* ) => {
-        #[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
+        #[cfg_attr(not(feature = "simd_json"), allow(clippy::derive_partial_eq_without_eq))]
         #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
         #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
         // serde_json's Value impls Eq, simd-json's Value doesn't
