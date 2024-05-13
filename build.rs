@@ -11,4 +11,6 @@ compile_error!(
     If you are unsure, go with `rustls_backend`."
 );
 
-fn main() {}
+fn main() {
+    println!("cargo:rustc-check-cfg=cfg(tokio_unstable, ignore_serenity_deprecated)");
+}
