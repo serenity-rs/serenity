@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-081576b923113409.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.79.0-nightly (ef8b9dcf2 2024-04-24)" data-channel="nightly" data-search-js="search-bf21c90c8c1d92b1.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../serenity/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (ab14f944a 2024-05-13)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1361,6 +1361,14 @@
 <a href="#1361" id="1361">1361</a>
 <a href="#1362" id="1362">1362</a>
 <a href="#1363" id="1363">1363</a>
+<a href="#1364" id="1364">1364</a>
+<a href="#1365" id="1365">1365</a>
+<a href="#1366" id="1366">1366</a>
+<a href="#1367" id="1367">1367</a>
+<a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
+<a href="#1370" id="1370">1370</a>
+<a href="#1371" id="1371">1371</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
@@ -1888,8 +1896,12 @@
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;MessageFlags&gt;&gt;,
     <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;&gt;,
-    <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
+    <span class="attr">#[cfg_attr(not(ignore_serenity_deprecated), deprecated = <span class="string">"Use interaction_metadata"</span>)]
+    #[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
+    #[allow(deprecated)]
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;&gt;,
+    <span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
+    </span><span class="kw">pub </span>interaction_metadata: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteractionMetadata&gt;&gt;&gt;,
     <span class="attr">#[serde(default, deserialize_with = <span class="string">"deserialize_some"</span>)]
     </span><span class="kw">pub </span>thread: <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;GuildChannel&gt;&gt;,
     <span class="kw">pub </span>components: <span class="prelude-ty">Option</span>&lt;Vec&lt;ActionRow&gt;&gt;,
@@ -1933,6 +1945,8 @@
             flags,
             referenced_message,
             interaction,
+            <span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
+            </span>interaction_metadata,
             thread,
             components,
             sticker_items,
@@ -1970,6 +1984,8 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = flags { message.flags.clone_from(x) }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = referenced_message { message.referenced_message.clone_from(x) }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = interaction { message.interaction.clone_from(x) }
+        <span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(x) = interaction_metadata { message.interaction_metadata.clone_from(x) }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = thread { message.thread.clone_from(x) }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = components { message.components.clone_from(x) }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = sticker_items { message.sticker_items.clone_from(x) }
