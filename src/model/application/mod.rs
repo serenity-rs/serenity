@@ -76,6 +76,55 @@ pub struct CurrentApplicationInfo {
     /// The application's role connection verification entry point, which when configured will
     /// render the app as a verification method in the guild role verification configuration.
     pub role_connections_verification_url: Option<String>,
+    #[cfg(feature = "unstable_discord_api")]
+    #[serde(default)]
+    pub integration_types_config:
+        std::collections::HashMap<InstallationContext, InstallationContextConfig>,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+enum_number! {
+    /// An enum representing the [installation contexts].
+    ///
+    /// [interaction contexts](https://discord.com/developers/docs/resources/application#application-object-application-integration-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum InstallationContext {
+        Guild = 0,
+        User = 1,
+        _ => Unknown(u8),
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+enum_number! {
+    /// An enum representing the different [interaction contexts].
+    ///
+    /// [interaction contexts](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum InteractionContext {
+        /// Interaction can be used within servers
+        Guild = 0,
+        /// Interaction can be used within DMs with the app's bot user
+        BotDm = 1,
+        /// Interaction can be used within Group DMs and DMs other than the app's bot user
+        PrivateChannel = 2,
+        _ => Unknown(u8),
+    }
+}
+
+/// Information about how the [`CurrentApplicationInfo`] is installed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-integration-types).
+#[cfg(feature = "unstable_discord_api")]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InstallationContextConfig {
+    pub oauth2_install_params: InstallParams,
 }
 
 /// Information about the Team group of the application.
