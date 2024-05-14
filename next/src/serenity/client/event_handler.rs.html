@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/event_handler.rs`."><title>event_handler.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (ef0027897 2024-05-12)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/client/event_handler.rs`."><title>event_handler.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (ab14f944a 2024-05-13)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -531,6 +531,16 @@
 <a href="#531" id="531">531</a>
 <a href="#532" id="532">532</a>
 <a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::num::NonZeroU16;
@@ -547,7 +557,8 @@
 <span class="macro">macro_rules!</span> event_handler {
     ( $(
         $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>:literal] </span>)*
-        $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>:literal)] </span>)<span class="question-mark">?
+        $( <span class="attr">#[deprecated = <span class="macro-nonterminal">$deprecated</span>:literal] </span>)<span class="question-mark">?
+        </span>$( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>:literal)] </span>)<span class="question-mark">?
         </span><span class="macro-nonterminal">$variant_name</span>:ident { $( <span class="macro-nonterminal">$arg_name</span>:ident: <span class="macro-nonterminal">$arg_type</span>:ty ),* } =&gt; <span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>:ident(<span class="kw-2">&amp;</span><span class="self">self </span>$(, <span class="macro-nonterminal">$context</span>:ident: Context)<span class="question-mark">?</span>);
     )* ) =&gt; {
         <span class="doccomment">/// The core trait for handling events by serenity.
@@ -556,6 +567,7 @@
             $(
                 $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)*
                 $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+                </span>$( <span class="attr">#[deprecated = <span class="macro-nonterminal">$deprecated</span>] </span>)<span class="question-mark">?
                 </span><span class="kw">async fn </span><span class="macro-nonterminal">$method_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, $(<span class="macro-nonterminal">$context</span>: Context,)<span class="question-mark">? </span>$( <span class="macro-nonterminal">$arg_name</span>: <span class="macro-nonterminal">$arg_type </span>),<span class="kw-2">*</span>) {
                     <span class="comment">// Suppress unused argument warnings
                     </span><span class="attr">#[allow(dropping_references, dropping_copy_types)]
@@ -591,6 +603,7 @@
             $(
                 $( <span class="attr">#[doc = <span class="macro-nonterminal">$doc</span>] </span>)*
                 $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
+                </span>$( <span class="attr">#[deprecated = <span class="macro-nonterminal">$deprecated</span>] </span>)<span class="question-mark">?
                 </span><span class="macro-nonterminal">$variant_name </span>{
                     $( <span class="macro-nonterminal">$arg_name</span>: <span class="macro-nonterminal">$arg_type </span>),*
                 },
@@ -610,7 +623,8 @@
             /// ```
             </span><span class="attr">#[must_use]
             </span><span class="kw">pub fn </span>snake_case_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
-                <span class="kw">match </span><span class="self">self </span>{
+                <span class="attr">#[allow(deprecated)]
+                </span><span class="kw">match </span><span class="self">self </span>{
                     $(
                         $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
                         </span><span class="self">Self</span>::<span class="macro-nonterminal">$variant_name </span>{ .. } =&gt; <span class="macro">stringify!</span>(<span class="macro-nonterminal">$method_name</span>),
@@ -620,7 +634,8 @@
 
             <span class="doccomment">/// Runs the given [`EventHandler`]'s code for this event.
             </span><span class="kw">pub async fn </span>dispatch(<span class="self">self</span>, ctx: Context, handler: <span class="kw-2">&amp;</span><span class="kw">dyn </span>EventHandler) {
-                <span class="kw">match </span><span class="self">self </span>{
+                <span class="attr">#[allow(deprecated)]
+                </span><span class="kw">match </span><span class="self">self </span>{
                     $(
                         $( <span class="attr">#[cfg(feature = <span class="macro-nonterminal">$feature</span>)] </span>)<span class="question-mark">?
                         </span><span class="self">Self</span>::<span class="macro-nonterminal">$variant_name </span>{ $( <span class="macro-nonterminal">$arg_name </span>),* } =&gt; {
@@ -857,9 +872,6 @@
     /// Provides the channel's id and the message's id.
     </span>ReactionRemoveEmoji { removed_reactions: Reaction } =&gt; <span class="kw">async fn </span>reaction_remove_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
 
-    <span class="doccomment">/// This event is legacy, and likely no longer sent by discord.
-    </span>PresenceReplace { presences: Vec&lt;Presence&gt; } =&gt; <span class="kw">async fn </span>presence_replace(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
-
     <span class="doccomment">/// Dispatched when a user's presence is updated (e.g off -&gt; on).
     ///
     /// Provides the presence's new data, as well as the old presence data if the
@@ -1027,6 +1039,14 @@
     /// Provides data about the subscription. Specifically, the [`Entitlement::deleted`] field will
     /// be set.
     </span>EntitlementDelete { entitlement: Entitlement } =&gt; <span class="kw">async fn </span>entitlement_delete(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
+
+    <span class="doccomment">/// Dispatched when a user votes on a message poll.
+    ///
+    /// This will be dispatched multiple times if multiple answers are selected.
+    </span>MessagePollVoteAdd { event: MessagePollVoteAddEvent } =&gt; <span class="kw">async fn </span>poll_vote_add(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
+
+    <span class="doccomment">/// Dispatched when a user removes a previous vote on a poll.
+    </span>MessagePollVoteRemove { event: MessagePollVoteRemoveEvent } =&gt; <span class="kw">async fn </span>poll_vote_remove(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: Context);
 
     <span class="doccomment">/// Dispatched when an HTTP rate limit is hit
     </span>Ratelimit { data: RatelimitInfo } =&gt; <span class="kw">async fn </span>ratelimit(<span class="kw-2">&amp;</span><span class="self">self</span>);

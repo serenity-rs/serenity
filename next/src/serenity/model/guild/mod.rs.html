@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (ef0027897 2024-05-12)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (ab14f944a 2024-05-13)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2506,12 +2506,6 @@
 <a href="#2506" id="2506">2506</a>
 <a href="#2507" id="2507">2507</a>
 <a href="#2508" id="2508">2508</a>
-<a href="#2509" id="2509">2509</a>
-<a href="#2510" id="2510">2510</a>
-<a href="#2511" id="2511">2511</a>
-<a href="#2512" id="2512">2512</a>
-<a href="#2513" id="2513">2513</a>
-<a href="#2514" id="2514">2514</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -2565,7 +2559,7 @@
 };
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::collector::{MessageCollector, ReactionCollector};
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<span class="attr">#[cfg(doc)]
 </span><span class="kw">use </span><span class="kw">crate</span>::constants::LARGE_THRESHOLD;
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::ShardMessenger;
@@ -2585,6 +2579,18 @@
     </span><span class="kw">pub </span>reason: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="doccomment">/// The user that was banned.
     </span><span class="kw">pub </span>user: User,
+}
+
+<span class="doccomment">/// The response from [`GuildId::bulk_ban`].
+///
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/6720).
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>BulkBanResponse {
+    <span class="doccomment">/// The users that were successfully banned.
+    </span>banned_users: Vec&lt;UserId&gt;,
+    <span class="doccomment">/// The users that were not successfully banned.
+    </span>failed_users: Vec&lt;UserId&gt;,
 }
 
 <span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
@@ -2922,6 +2928,21 @@
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.id.ban(http, user, dmd, reason).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Bans multiple users from the guild, returning the users that were and weren't banned.
+    ///
+    /// # Errors
+    ///
+    /// See [`GuildId::bulk_ban`] for more information.
+    </span><span class="kw">pub async fn </span>bulk_ban(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        users: <span class="kw">impl </span>IntoIterator&lt;Item = UserId&gt;,
+        delete_message_seconds: u32,
+        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;BulkBanResponse&gt; {
+        <span class="self">self</span>.id.bulk_ban(http, users, delete_message_seconds, reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Returns the formatted URL of the guild's banner image, if one exists.
@@ -3875,15 +3896,6 @@
         <span class="self">self</span>.id.invites(http).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Checks if the guild is 'large'.
-    ///
-    /// A guild is considered large if it has more than 250 members.
-    </span><span class="attr">#[must_use]
-    #[deprecated = <span class="string">"Use Guild::large"</span>]
-    </span><span class="kw">pub fn </span>is_large(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.member_count &gt; u64::from(LARGE_THRESHOLD)
-    }
-
     <span class="doccomment">/// Kicks a [`Member`] from the guild.
     ///
     /// Requires the [Kick Members] permission.
@@ -4010,12 +4022,6 @@
     /// It would be sorted:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
-    /// **Locking**: First collects a [`Member`]'s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
-    /// the originally correct position. However, since the read-locks are dropped after borrowing
-    /// the name, the names might have been changed by the user, the sorted list cannot account for
-    /// this.
-    ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
@@ -4079,12 +4085,6 @@
     /// setting `sorted` to `true` will result in an overhead, as both fields have to be considered
     /// again for sorting.
     ///
-    /// **Locking**: First collects a [`Member`]'s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
-    /// the originally correct position. However, since the read-locks are dropped after borrowing
-    /// the name, the names might have been changed by the user, the sorted list cannot account for
-    /// this.
-    ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
@@ -4135,12 +4135,6 @@
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
-    /// **Locking**: First collects a [`Member`]'s [`User`]-name by read-locking all inner
-    /// [`User`]s, and then sorts. This ensures that no name is being changed after being sorted in
-    /// the originally correct position. However, since the read-locks are dropped after borrowing
-    /// the name, the names might have been changed by the user, the sorted list cannot account for
-    /// this.
-    ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].
     </span><span class="attr">#[must_use]
@@ -4183,12 +4177,6 @@
     ///
     /// **Note**: Instead of panicking, when sorting does not find a nick, the username will be
     /// used (this should never happen).
-    ///
-    /// **Locking**: First collects a [`Member`]'s nick directly or by read-locking all inner
-    /// [`User`]s (in case of no nick, see note above), and then sorts. This ensures that no name
-    /// is being changed after being sorted in the originally correct position. However, since the
-    /// read-locks are dropped after borrowing the name, the names might have been changed by the
-    /// user, the sorted list cannot account for this.
     ///
     /// **Note**: This will only search members that are cached. If you want to search all members
     /// in the guild via the Http API, use [`Self::search_members`].

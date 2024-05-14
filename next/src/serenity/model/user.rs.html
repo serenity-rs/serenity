@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (ef0027897 2024-05-12)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><title>user.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (ab14f944a 2024-05-13)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -849,6 +849,27 @@
 <a href="#849" id="849">849</a>
 <a href="#850" id="850">850</a>
 <a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! User information-related models.
 
 </span><span class="kw">use </span>std::fmt;
@@ -1235,12 +1256,12 @@
     /// # Errors
     ///
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
-    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
+    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="kw">if </span><span class="self">self</span>.bot() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Model(ModelError::MessagingBot));
         }
 
-        <span class="self">self</span>.id.create_dm_channel(http).<span class="kw">await
+        <span class="self">self</span>.id.create_dm_channel(cache_http).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Retrieves the time that this user was created at.
@@ -1450,18 +1471,35 @@
     /// returned by the Discord API.
     ///
     /// [current user]: CurrentUser
-    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
+    </span><span class="kw">pub async fn </span>create_dm_channel(<span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
         <span class="attr">#[derive(serde::Serialize)]
         </span><span class="kw">struct </span>CreateDmChannel {
             recipient_id: UserId,
+        }
+
+        <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(private_channel) = cache.temp_private_channels.get(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(PrivateChannel::clone(<span class="kw-2">&amp;</span>private_channel));
+            }
         }
 
         <span class="kw">let </span>body = CreateDmChannel {
             recipient_id: <span class="self">self</span>,
         };
 
-        http.create_private_channel(<span class="kw-2">&amp;</span>body).<span class="kw">await
-    </span>}
+        <span class="kw">let </span>channel = cache_http.http().create_private_channel(<span class="kw-2">&amp;</span>body).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+            <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+
+            <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(channel.clone());
+            cache.temp_private_channels.insert(<span class="self">self</span>, cached_channel);
+        }
+
+        <span class="prelude-val">Ok</span>(channel)
+    }
 
     <span class="doccomment">/// Sends a message to a user through a direct message channel. This is a channel that can only
     /// be accessed by you and the recipient.
@@ -1499,8 +1537,12 @@
     /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
     ///
     /// Returns an [`Error::Json`] if there is an error deserializing the API response.
-    </span><span class="kw">pub async fn </span>direct_message(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>.create_dm_channel(http).<span class="kw">await</span><span class="question-mark">?</span>.send_message(http, builder).<span class="kw">await
+    </span><span class="kw">pub async fn </span>direct_message(
+        <span class="self">self</span>,
+        cache_http: <span class="kw">impl </span>CacheHttp,
+        builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="self">self</span>.create_dm_channel(<span class="kw-2">&amp;</span>cache_http).<span class="kw">await</span><span class="question-mark">?</span>.send_message(cache_http.http(), builder).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// This is an alias of [`Self::direct_message`].
