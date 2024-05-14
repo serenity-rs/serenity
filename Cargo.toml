@@ -43,7 +43,7 @@ zeroize = { version = "1.7" } # Not used in serenity, but bumps the minimal vers
 arrayvec = { version = "0.7.4", features = ["serde"] }
 serde_cow = { version = "0.1.0" }
 small-fixed-array = { version = "0.4", features = ["serde"] }
-bool_to_bitflags = { version = "0.1.0" }
+bool_to_bitflags = { version = "0.1.2" }
 nonmax = { version = "0.5.5", features = ["serde"] }
 strum = { version = "0.26", features = ["derive"] }
 to-arraystring = "0.1.0"
