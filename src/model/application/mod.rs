@@ -156,11 +156,14 @@ pub struct TeamMember {
     /// The list of permissions of the member on the team.
     ///
     /// NOTE: Will always be "*" for now.
+    #[deprecated = "This field is not sent by the API anymore"]
     pub permissions: Vec<String>,
     /// The ID of the team they are a member of.
     pub team_id: GenericId,
     /// The user type of the team member.
     pub user: User,
+    /// The [`TeamMemberRole`] of the team member.
+    pub role: TeamMemberRole,
 }
 
 enum_number! {
@@ -173,6 +176,17 @@ enum_number! {
         Accepted = 2,
         _ => Unknown(u8),
     }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum TeamMemberRole {
+    Admin,
+    Developer,
+    ReadOnly,
+    #[serde(untagged)]
+    Other(String),
 }
 
 bitflags! {
