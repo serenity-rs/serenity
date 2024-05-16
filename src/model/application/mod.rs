@@ -189,6 +189,37 @@ pub enum TeamMemberRole {
     Other(String),
 }
 
+impl TeamMemberRole {
+    fn discriminant(&self) -> u8 {
+        match self {
+            Self::Admin => 3,
+            Self::Developer => 2,
+            Self::ReadOnly => 1,
+            Self::Other(_) => 0,
+        }
+    }
+}
+
+impl PartialEq for TeamMemberRole {
+    fn eq(&self, other: &Self) -> bool {
+        self.discriminant() == other.discriminant()
+    }
+}
+
+impl Eq for TeamMemberRole {}
+
+impl PartialOrd for TeamMemberRole {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for TeamMemberRole {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.discriminant().cmp(&other.discriminant())
+    }
+}
+
 bitflags! {
     /// The flags of the application.
     ///
@@ -233,4 +264,39 @@ bitflags! {
 pub struct InstallParams {
     pub scopes: Vec<Scope>,
     pub permissions: Permissions,
+}
+
+#[cfg(test)]
+mod team_role_ordering {
+    use super::TeamMemberRole;
+
+    fn other(val: &str) -> TeamMemberRole {
+        TeamMemberRole::Other(String::from(val))
+    }
+
+    #[test]
+    fn test_normal_ordering() {
+        let mut roles = [
+            TeamMemberRole::Developer,
+            TeamMemberRole::Admin,
+            other(""),
+            TeamMemberRole::ReadOnly,
+            other("test"),
+        ];
+
+        roles.sort();
+
+        assert_eq!(roles, [
+            other(""),
+            other("test"),
+            TeamMemberRole::ReadOnly,
+            TeamMemberRole::Developer,
+            TeamMemberRole::Admin,
+        ]);
+    }
+
+    #[test]
+    fn test_other_eq() {
+        assert_eq!(other("").cmp(&other("")), std::cmp::Ordering::Equal);
+    }
 }
