@@ -525,9 +525,11 @@ pub struct MessageUpdateEvent {
     pub flags: Option<Option<MessageFlags>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub referenced_message: Option<Option<Box<Message>>>,
-    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Use interaction_metadata")]
+    #[cfg_attr(
+        all(not(ignore_serenity_deprecated), feature = "unstable_discord_api"),
+        deprecated = "Use interaction_metadata"
+    )]
     #[serde(default, deserialize_with = "deserialize_some")]
-    #[allow(deprecated)]
     pub interaction: Option<Option<Box<MessageInteraction>>>,
     #[cfg(feature = "unstable_discord_api")]
     pub interaction_metadata: Option<Option<Box<MessageInteractionMetadata>>>,

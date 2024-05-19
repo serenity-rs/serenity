@@ -106,8 +106,10 @@ pub struct Message {
     pub flags: Option<MessageFlags>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
-    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Use interaction_metadata")]
-    #[allow(deprecated)]
+    #[cfg_attr(
+        all(not(ignore_serenity_deprecated), feature = "unstable_discord_api"),
+        deprecated = "Use interaction_metadata"
+    )]
     pub interaction: Option<Box<MessageInteraction>>,
     /// Sent if the message is a response to an [`Interaction`].
     ///
