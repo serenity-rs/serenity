@@ -19,8 +19,7 @@
 //!
 //! See [Discord's documentation][docs] for more information.
 //!
-//! If you are not using a bot account or do not require sharding - such as for a small bot - then
-//! use [`Client::start`].
+//! If you do not require sharding - such as for a small bot - then use [`Client::start`].
 //!
 //! There are a few methods of sharding available:
 //! - [`Client::start_autosharded`]: retrieves the number of shards Discord recommends using from

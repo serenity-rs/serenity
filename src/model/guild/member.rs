@@ -62,7 +62,7 @@ pub struct Member {
     /// If the member is currently flagged for sending excessive DMs to non-friend server members
     /// in the last 24 hours.
     ///
-    /// Will be None or a time in the past if the user is not timed out.
+    /// Will be None or a time in the past if the user is not flagged.
     pub unusual_dm_activity_until: Option<Timestamp>,
 }
 
@@ -585,7 +585,7 @@ pub struct PartialMember {
     /// If the member is currently flagged for sending excessive DMs to non-friend server members
     /// in the last 24 hours.
     ///
-    /// Will be None or a time in the past if the user is not timed out.
+    /// Will be None or a time in the past if the user is not flagged.
     pub unusual_dm_activity_until: Option<Timestamp>,
 }
 
