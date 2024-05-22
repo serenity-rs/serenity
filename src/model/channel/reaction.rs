@@ -414,7 +414,7 @@ impl From<EmojiId> for ReactionType {
         ReactionType::Custom {
             animated: false,
             id: emoji_id,
-            name: None,
+            name: Some("emoji".to_string()),
         }
     }
 }
