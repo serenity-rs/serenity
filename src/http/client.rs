@@ -4671,6 +4671,21 @@ impl Http {
         .await
     }
 
+    /// Returns the Onboarding object for the guild.
+    pub async fn get_guild_onboarding(&self, guild_id: GuildId) -> Result<Onboarding> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildOnboarding {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Fires off a request, deserializing the response reader via the given type bound.
     ///
     /// If you don't need to deserialize the response and want the response instance itself, use
