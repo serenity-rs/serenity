@@ -22,18 +22,17 @@ mod sealed {
 
 use sealed::*;
 
-#[derive(serde::Serialize, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[must_use = "Builders do nothing unless built"]
 pub struct CreatePromptOption<Stage: Sealed> {
     channel_ids: Vec<ChannelId>,
     role_ids: Vec<RoleId>,
-    emoji: Option<ReactionType>,
     title: String,
     description: Option<String>,
-
-    #[serde(skip)]
+    emoji: Option<ReactionType>,
     _stage: Stage,
 }
+
 
 impl Default for CreatePromptOption<NeedsChannels> {
     /// See the documentation of [`Self::new`].
@@ -107,5 +106,40 @@ impl<Stage: Sealed> CreatePromptOption<Stage> {
     pub fn description(mut self, description: Option<String>) -> Self {
         self.description = description;
         self
+    }
+}
+
+use serde::ser::{Serialize, Serializer, SerializeStruct};
+
+impl<Stage: Sealed> Serialize for CreatePromptOption<Stage> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("CreatePromptOption", 4)?;
+
+        state.serialize_field("channel_ids", &self.channel_ids)?;
+        state.serialize_field("role_ids", &self.role_ids)?;
+        state.serialize_field("title", &self.title)?;
+        state.serialize_field("description", &self.description)?;
+
+        if let Some(ref emoji) = self.emoji {
+            match emoji {
+                ReactionType::Custom {
+                    animated,
+                    id,
+                    name,
+                } => {
+                    state.serialize_field("emoji_animated", animated)?;
+                    state.serialize_field("emoji_id", id)?;
+                    state.serialize_field("emoji_name", name)?;
+                }
+                ReactionType::Unicode(name) => {
+                    state.serialize_field("emoji_name", name)?;
+                }
+            }
+        }
+
+        state.end()
     }
 }

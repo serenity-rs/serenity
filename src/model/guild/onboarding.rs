@@ -1,5 +1,6 @@
 use crate::all::ReactionType;
-use crate::model::id::{ChannelId, GenericId, GuildId, RoleId};
+use serde::{Deserialize, Deserializer};
+use crate::model::id::{ChannelId, GenericId, GuildId, RoleId, EmojiId};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -41,6 +42,7 @@ pub struct OnboardingPromptOption {
     pub id: GenericId,
     pub channel_ids: Vec<ChannelId>,
     pub role_ids: Vec<RoleId>,
+    #[serde(default, deserialize_with = "onboarding_reaction")]
     pub emoji: Option<ReactionType>,
     pub title: String,
     pub description: Option<String>,
@@ -56,4 +58,29 @@ enum_number! {
         OnboardingAdvanced = 1,
         _ => Unknown(u8),
     }
+}
+
+/// This exists to handle the weird case where discord decides to send every field as null
+/// instead of sending the emoji as null itself.
+fn onboarding_reaction<'de, D>(deserializer: D) -> Result<Option<ReactionType>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    struct PartialEmoji {
+        #[serde(default)]
+        animated: bool,
+        id: Option<EmojiId>,
+        name: Option<String>,
+    }
+    let emoji = PartialEmoji::deserialize(deserializer)?;
+    Ok(match (emoji.id, emoji.name) {
+        (Some(id), name) => Some(ReactionType::Custom {
+            animated: emoji.animated,
+            id,
+            name,
+        }),
+        (None, Some(name)) => Some(ReactionType::Unicode(name)),
+        (None, None) => return Ok(None),
+    })
 }

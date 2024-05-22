@@ -35,6 +35,7 @@ use crate::all::OnboardingPromptType;
 #[derive(serde::Serialize, Clone, Debug)]
 #[must_use = "Builders do nothing unless built"]
 pub struct CreateOnboardingPrompt<Stage: Sealed> {
+    id: u64,
     prompt_type: OnboardingPromptType,
     options: Vec<CreatePromptOption<prompt_option_structure::Ready>>,
     title: String,
@@ -52,6 +53,7 @@ impl Default for CreateOnboardingPrompt<NeedsPromptType> {
         // Producing dummy values is okay as we must transition through all `Stage`s before firing,
         // which fills in the values with real values.
         Self {
+            id: 0,
             prompt_type: OnboardingPromptType::Dropdown,
             options: Vec::new(),
             title: String::new(),
@@ -74,6 +76,7 @@ impl CreateOnboardingPrompt<NeedsPromptType> {
         prompt_type: OnboardingPromptType,
     ) -> CreateOnboardingPrompt<NeedsPromptOptions> {
         CreateOnboardingPrompt {
+            id: self.id,
             prompt_type,
             options: self.options,
             title: self.title,
@@ -92,6 +95,7 @@ impl CreateOnboardingPrompt<NeedsPromptOptions> {
         options: Vec<CreatePromptOption<prompt_option_structure::Ready>>,
     ) -> CreateOnboardingPrompt<NeedsTitle> {
         CreateOnboardingPrompt {
+            id: self.id,
             prompt_type: self.prompt_type,
             options,
             title: self.title,
@@ -107,6 +111,7 @@ impl CreateOnboardingPrompt<NeedsPromptOptions> {
 impl CreateOnboardingPrompt<NeedsTitle> {
     pub fn title(self, title: impl Into<String>) -> CreateOnboardingPrompt<NeedsSingleSelect> {
         CreateOnboardingPrompt {
+            id: self.id,
             prompt_type: self.prompt_type,
             options: self.options,
             title: title.into(),
@@ -122,6 +127,7 @@ impl CreateOnboardingPrompt<NeedsTitle> {
 impl CreateOnboardingPrompt<NeedsSingleSelect> {
     pub fn single_select(self, single_select: bool) -> CreateOnboardingPrompt<NeedsRequired> {
         CreateOnboardingPrompt {
+            id: self.id,
             prompt_type: self.prompt_type,
             options: self.options,
             title: self.title,
@@ -137,6 +143,7 @@ impl CreateOnboardingPrompt<NeedsSingleSelect> {
 impl CreateOnboardingPrompt<NeedsRequired> {
     pub fn required(self, required: bool) -> CreateOnboardingPrompt<NeedsInOnboarding> {
         CreateOnboardingPrompt {
+            id: self.id,
             prompt_type: self.prompt_type,
             options: self.options,
             title: self.title,
@@ -152,6 +159,7 @@ impl CreateOnboardingPrompt<NeedsRequired> {
 impl CreateOnboardingPrompt<NeedsInOnboarding> {
     pub fn in_onboarding(self, in_onboarding: bool) -> CreateOnboardingPrompt<Ready> {
         CreateOnboardingPrompt {
+            id: self.id,
             prompt_type: self.prompt_type,
             options: self.options,
             title: self.title,
