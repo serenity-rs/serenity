@@ -3,7 +3,8 @@ use crate::model::id::ChannelId;
 mod prompt_option_structure;
 mod prompt_structure;
 
-use prompt_structure::CreateOnboardingPrompt;
+pub use prompt_option_structure::CreatePromptOption;
+pub use prompt_structure::CreateOnboardingPrompt;
 
 #[derive(serde::Serialize, Clone, Debug)]
 pub struct NeedsPrompts;

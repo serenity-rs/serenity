@@ -53,11 +53,11 @@ impl Default for CreatePromptOption<NeedsChannels> {
 }
 
 impl CreatePromptOption<NeedsChannels> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self::default()
     }
 
-    fn channels(self, channel_ids: Vec<ChannelId>) -> CreatePromptOption<NeedsRoles> {
+    pub fn channels(self, channel_ids: Vec<ChannelId>) -> CreatePromptOption<NeedsRoles> {
         CreatePromptOption {
             channel_ids,
             role_ids: self.role_ids,
@@ -71,7 +71,7 @@ impl CreatePromptOption<NeedsChannels> {
 }
 
 impl CreatePromptOption<NeedsRoles> {
-    fn roles(self, role_ids: Vec<RoleId>) -> CreatePromptOption<NeedsTitle> {
+    pub fn roles(self, role_ids: Vec<RoleId>) -> CreatePromptOption<NeedsTitle> {
         CreatePromptOption {
             channel_ids: self.channel_ids,
             role_ids,
@@ -85,7 +85,7 @@ impl CreatePromptOption<NeedsRoles> {
 }
 
 impl CreatePromptOption<NeedsTitle> {
-    fn title(self, title: impl Into<String>) -> CreatePromptOption<Ready> {
+    pub fn title(self, title: impl Into<String>) -> CreatePromptOption<Ready> {
         CreatePromptOption {
             channel_ids: self.channel_ids,
             role_ids: self.role_ids,

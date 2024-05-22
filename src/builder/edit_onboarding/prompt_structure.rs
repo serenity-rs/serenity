@@ -28,7 +28,7 @@ mod sealed {
     impl Sealed for Ready {}
 }
 
-pub(super) use sealed::*;
+use sealed::*;
 
 use crate::all::OnboardingPromptType;
 
