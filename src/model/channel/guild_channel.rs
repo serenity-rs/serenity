@@ -90,8 +90,7 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for voice channels.
     pub user_limit: Option<u32>,
-    /// Used to tell if the channel is not safe for work. Note however, it's recommended to use
-    /// [`Self::is_nsfw`] as it's gonna be more accurate.
+    /// Used to tell if the channel is not safe for work.
     // This field can or can not be present sometimes, but if it isn't default to `false`.
     #[serde(default)]
     pub nsfw: bool,
