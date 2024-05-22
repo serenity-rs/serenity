@@ -268,7 +268,6 @@
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` - responsible for maintaining a
 //! WebSocket connection with Discord.
 //!
@@ -290,8 +289,7 @@
 //!
 //! See [Discord's documentation][docs] for more information.
 //!
-//! If you are not using a bot account or do not require sharding - such as for a small bot - then
-//! use [`Client::start`].
+//! If you do not require sharding - such as for a small bot - then use [`Client::start`].
 //!
 //! There are a few methods of sharding available:
 //! - [`Client::start_autosharded`]: retrieves the number of shards Discord recommends using from
