@@ -128,9 +128,6 @@ jobs:
       - name: Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Remove cargo build config
-        run: rm .cargo/config.toml
-
       - name: Build
         run: cargo build
 
