@@ -110,7 +110,7 @@ pub struct Message {
     /// An array of message snapshots, known as forwarded messages.
     #[serde(default, deserialize_with = "deserialize_snapshots")]
     pub message_snapshots: Vec<MessageSnapshot>,
-    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Use interaction_metadata")]
+    #[cfg(not(feature = "unstable"))]
     pub interaction: Option<Box<MessageInteraction>>,
     /// Sent if the message is a response to an [`Interaction`].
     ///
@@ -194,13 +194,6 @@ impl Message {
     /// Can return an error if the HTTP request fails.
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
         self.channel_id.to_channel(cache_http).await
-    }
-
-    /// A util function for determining whether this message was sent by someone else, or the bot.
-    #[cfg(feature = "cache")]
-    #[deprecated = "Check Message::author is equal to Cache::current_user"]
-    pub fn is_own(&self, cache: &Cache) -> bool {
-        self.author.id == cache.current_user().id
     }
 
     /// Calculates the permissions of the message author in the current channel.
@@ -412,17 +405,6 @@ impl Message {
     #[cfg(feature = "cache")]
     pub fn guild<'a>(&self, cache: &'a Cache) -> Option<GuildRef<'a>> {
         cache.guild(self.guild_id?)
-    }
-
-    /// True if message was sent using direct messages.
-    ///
-    /// **Only use this for messages from the gateway (event handler)!** Not for returned Message
-    /// objects from HTTP requests, like [`ChannelId::send_message`], because [`Self::guild_id`] is
-    /// never set for those, which this method relies on.
-    #[must_use]
-    #[deprecated = "Check if guild_id is None if the message is received from the gateway."]
-    pub fn is_private(&self) -> bool {
-        self.guild_id.is_none()
     }
 
     /// Retrieves a clone of the author's Member instance, if this message was sent in a guild.
