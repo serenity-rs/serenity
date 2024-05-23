@@ -51,7 +51,7 @@ use crate::builder::{
 };
 #[cfg(feature = "collector")]
 use crate::collector::{MessageCollector, ReactionCollector};
-#[cfg(feature = "model")]
+#[cfg(doc)]
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "collector")]
 use crate::gateway::ShardMessenger;
@@ -1387,15 +1387,6 @@ impl Guild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn invites(&self, http: &Http) -> Result<Vec<RichInvite>> {
         self.id.invites(http).await
-    }
-
-    /// Checks if the guild is 'large'.
-    ///
-    /// A guild is considered large if it has more than 250 members.
-    #[must_use]
-    #[deprecated = "Use Guild::large"]
-    pub fn is_large(&self) -> bool {
-        self.member_count > u64::from(LARGE_THRESHOLD)
     }
 
     /// Kicks a [`Member`] from the guild.
