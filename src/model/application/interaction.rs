@@ -6,6 +6,7 @@ use serde_json::from_value;
 use super::InstallationContext;
 use super::{CommandInteraction, ComponentInteraction, ModalInteraction, PingInteraction};
 use crate::internal::prelude::*;
+#[cfg(not(feature = "unstable"))]
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, InteractionId};
 #[cfg(feature = "unstable")]
@@ -400,10 +401,7 @@ impl serde::Serialize for AuthorizingIntegrationOwners {
 /// [`Message`]: crate::model::channel::Message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
-#[cfg_attr(
-    all(not(ignore_serenity_deprecated), feature = "unstable_discord_api"),
-    deprecated = "Use Message::interaction_metadata"
-)]
+#[cfg(not(feature = "unstable"))]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
