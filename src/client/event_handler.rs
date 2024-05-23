@@ -329,9 +329,6 @@ event_handler! {
     /// Provides the channel's id and the message's id.
     ReactionRemoveEmoji { removed_reactions: Reaction } => async fn reaction_remove_emoji(&self, ctx: Context);
 
-    #[deprecated = "This event does not exist"]
-    PresenceReplace { presences: Vec<Presence> } => async fn presence_replace(&self, ctx: Context);
-
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///
     /// Provides the presence's new data, as well as the old presence data if the
