@@ -1096,10 +1096,6 @@
 <a href="#1096" id="1096">1096</a>
 <a href="#1097" id="1097">1097</a>
 <a href="#1098" id="1098">1098</a>
-<a href="#1099" id="1099">1099</a>
-<a href="#1100" id="1100">1100</a>
-<a href="#1101" id="1101">1101</a>
-<a href="#1102" id="1102">1102</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1209,11 +1205,7 @@
     </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;MessageFlags&gt;,
     <span class="doccomment">/// The message that was replied to using this message.
     </span><span class="kw">pub </span>referenced_message: <span class="prelude-ty">Option</span>&lt;Box&lt;Message&gt;&gt;, <span class="comment">// Boxed to avoid recursion
-    </span><span class="attr">#[cfg_attr(
-        all(not(ignore_serenity_deprecated), feature = <span class="string">"unstable"</span>),
-        deprecated = <span class="string">"Use interaction_metadata"
-    </span>)]
-    #[cfg(not(feature = <span class="string">"unstable"</span>))]
+    </span><span class="attr">#[cfg(not(feature = <span class="string">"unstable"</span>))]
     </span><span class="kw">pub </span>interaction: <span class="prelude-ty">Option</span>&lt;Box&lt;MessageInteraction&gt;&gt;,
     <span class="doccomment">/// Sent if the message is a response to an [`Interaction`].
     ///

@@ -447,10 +447,6 @@
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
 <a href="#449" id="449">449</a>
-<a href="#450" id="450">450</a>
-<a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::{Deserialize, Deserializer, Error <span class="kw">as </span>DeError};
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 <span class="kw">use </span>serde_json::from_value;
@@ -854,11 +850,7 @@
 /// [`Message`]: crate::model::channel::Message
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
-</span><span class="attr">#[cfg_attr(
-    all(not(ignore_serenity_deprecated), feature = <span class="string">"unstable"</span>),
-    deprecated = <span class="string">"Use Message::interaction_metadata"
-</span>)]
-#[cfg(not(feature = <span class="string">"unstable"</span>))]
+</span><span class="attr">#[cfg(not(feature = <span class="string">"unstable"</span>))]
 #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

@@ -526,6 +526,18 @@
 <a href="#526" id="526">526</a>
 <a href="#527" id="527">527</a>
 <a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
@@ -866,6 +878,9 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     </span>default_member_permissions: <span class="prelude-ty">Option</span>&lt;Permissions&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+    #[cfg(not(feature = <span class="string">"unstable"</span>))]
+    </span>dm_permission: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
     #[serde(rename = <span class="string">"type"</span>)]
     </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"unstable"</span>)]
@@ -888,6 +903,8 @@
             description: <span class="prelude-val">None</span>,
             description_localizations: HashMap::new(),
             default_member_permissions: <span class="prelude-val">None</span>,
+            <span class="attr">#[cfg(not(feature = <span class="string">"unstable"</span>))]
+            </span>dm_permission: <span class="prelude-val">None</span>,
 
             <span class="attr">#[cfg(feature = <span class="string">"unstable"</span>)]
             </span>integration_types: <span class="prelude-val">None</span>,
@@ -937,6 +954,13 @@
     <span class="doccomment">/// Specifies the default permissions required to execute the command.
     </span><span class="kw">pub fn </span>default_member_permissions(<span class="kw-2">mut </span><span class="self">self</span>, permissions: Permissions) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.default_member_permissions = <span class="prelude-val">Some</span>(permissions);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Specifies if the command is available in DMs.
+    </span><span class="attr">#[cfg(not(feature = <span class="string">"unstable"</span>))]
+    </span><span class="kw">pub fn </span>dm_permission(<span class="kw-2">mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.dm_permission = <span class="prelude-val">Some</span>(enabled);
         <span class="self">self
     </span>}
 
