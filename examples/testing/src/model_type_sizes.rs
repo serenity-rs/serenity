@@ -125,7 +125,6 @@ pub fn print_ranking() {
         ("MessageFlags", std::mem::size_of::<MessageFlags>()),
         ("MessageFlags", std::mem::size_of::<MessageFlags>()),
         ("MessageId", std::mem::size_of::<MessageId>()),
-        ("MessageInteraction", std::mem::size_of::<MessageInteraction>()),
         ("MessageReaction", std::mem::size_of::<MessageReaction>()),
         ("MessageReference", std::mem::size_of::<MessageReference>()),
         ("MessageUpdateEvent", std::mem::size_of::<MessageUpdateEvent>()),
