@@ -35,6 +35,8 @@ use crate::all::OnboardingPromptType;
 #[derive(serde::Serialize, Clone, Debug)]
 #[must_use = "Builders do nothing unless built"]
 pub struct CreateOnboardingPrompt<Stage: Sealed> {
+    // we must provide an ID because of a discord bug.
+    // see https://github.com/discord/discord-api-docs/issues/6320
     id: u64,
     prompt_type: OnboardingPromptType,
     options: Vec<CreatePromptOption<prompt_option_structure::Ready>>,
