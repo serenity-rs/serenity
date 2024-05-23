@@ -166,11 +166,6 @@ pub struct Team {
 pub struct TeamMember {
     /// The member's membership state.
     pub membership_state: MembershipState,
-    /// The list of permissions of the member on the team.
-    ///
-    /// NOTE: Will always be "*" for now.
-    #[deprecated = "This field is not sent by the API anymore"]
-    pub permissions: FixedArray<String>,
     /// The ID of the team they are a member of.
     pub team_id: GenericId,
     /// The user type of the team member.
