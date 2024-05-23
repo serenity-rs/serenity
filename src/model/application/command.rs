@@ -75,10 +75,7 @@ pub struct Command {
     /// Indicates whether the command is available in DMs with the app, only for globally-scoped
     /// commands. By default, commands are visible.
     #[serde(default)]
-    #[cfg_attr(
-        all(not(ignore_serenity_deprecated), feature = "unstable"),
-        deprecated = "Use Command::contexts"
-    )]
+    #[cfg(not(feature = "unstable"))]
     pub dm_permission: Option<bool>,
     /// Indicates whether the command is [age-restricted](https://discord.com/developers/docs/interactions/application-commands#agerestricted-commands),
     /// defaults to false.
