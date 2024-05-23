@@ -587,8 +587,8 @@ pub struct MessageUpdateEvent {
     pub flags: Option<Option<MessageFlags>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub referenced_message: Option<Option<Box<Message>>>,
-    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Use interaction_metadata")]
     #[serde(default, deserialize_with = "deserialize_some")]
+    #[cfg(not(feature = "unstable"))]
     pub interaction: Option<Option<Box<MessageInteraction>>>,
     pub interaction_metadata: Option<Option<Box<MessageInteractionMetadata>>>,
     #[serde(default, deserialize_with = "deserialize_some")]
@@ -633,6 +633,7 @@ impl MessageUpdateEvent {
             message_reference,
             flags,
             referenced_message,
+            #[cfg(not(feature = "unstable"))]
             interaction,
             interaction_metadata,
             thread,
@@ -671,6 +672,7 @@ impl MessageUpdateEvent {
         if let Some(x) = message_reference { message.message_reference.clone_from(x) }
         if let Some(x) = flags { message.flags.clone_from(x) }
         if let Some(x) = referenced_message { message.referenced_message.clone_from(x) }
+        #[cfg(not(feature = "unstable"))]
         if let Some(x) = interaction { message.interaction.clone_from(x) }
         if let Some(x) = interaction_metadata { message.interaction_metadata.clone_from(x) }
         if let Some(x) = thread { message.thread.clone_from(x) }
@@ -692,16 +694,6 @@ impl MessageUpdateEvent {
 #[non_exhaustive]
 pub struct PresenceUpdateEvent {
     pub presence: Presence,
-}
-
-/// Not officially documented.
-#[cfg_attr(not(ignore_serenity_deprecated), deprecated = "This event doesn't exist")]
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(transparent)]
-#[non_exhaustive]
-pub struct PresencesReplaceEvent {
-    pub presences: FixedArray<Presence>,
 }
 
 /// Requires [`GatewayIntents::GUILD_MESSAGE_REACTIONS`] or
@@ -1312,9 +1304,6 @@ pub enum Event {
     MessageUpdate(MessageUpdateEvent),
     /// A member's presence state (or username or avatar) has changed
     PresenceUpdate(PresenceUpdateEvent),
-    /// The presence list of the user's friends should be replaced entirely
-    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "This event doesn't exist")]
-    PresencesReplace(PresencesReplaceEvent),
     /// A reaction was added to a message.
     ///
     /// Fires the [`EventHandler::reaction_add`] event handler.
