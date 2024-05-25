@@ -94,7 +94,7 @@ impl CreateOnboardingPrompt<NeedsPromptType> {
 
 impl CreateOnboardingPrompt<NeedsPromptOptions> {
     /// The options users can select for the prompt.
-    /// 
+    ///
     /// Each option must provide at least one role or channel.
     pub fn options(
         self,

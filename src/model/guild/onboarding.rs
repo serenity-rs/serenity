@@ -1,7 +1,7 @@
-use crate::all::ReactionType;
 use serde::{Deserialize, Deserializer};
-use crate::model::id::{ChannelId, GenericId, GuildId, RoleId, EmojiId};
 
+use crate::all::ReactionType;
+use crate::model::id::{ChannelId, EmojiId, GenericId, GuildId, RoleId};
 
 /// Onboarding information for a  [`Guild`].
 ///
@@ -15,7 +15,7 @@ pub struct Onboarding {
     pub guild_id: GuildId,
     /// A list of prompts associated with the onboarding process.
     pub prompts: Vec<OnboardingPrompt>,
-    /// If onboarding is enabled, these channels will be visible by the user regardless of what 
+    /// If onboarding is enabled, these channels will be visible by the user regardless of what
     /// they select in onboarding.
     pub default_channel_ids: Vec<ChannelId>,
     /// Controls if onboarding is enabled, if onboarding is disabled, onboarding requirements are
@@ -26,9 +26,9 @@ pub struct Onboarding {
 }
 
 /// An onboarding prompt, otherwise known as a question.
-/// 
+///
 /// At least one option is required, and there could be up to 50 options.
-/// 
+///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-onboarding-object).
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -63,9 +63,9 @@ enum_number! {
 }
 
 /// An option, otherwise known as an answer, for an onboarding prompt.
-/// 
+///
 /// An answer must provide at least 1 channel or role to be visible.
-/// 
+///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure).
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -88,9 +88,9 @@ pub struct OnboardingPromptOption {
 
 enum_number! {
     /// Defines the criteria used to satisfy Onboarding constraints that are required for enabling.
-    /// 
-    /// Currently only controls what channels count towards the constraints for enabling. 
-    /// 
+    ///
+    /// Currently only controls what channels count towards the constraints for enabling.
+    ///
     /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-mode).
     #[derive(Default, Debug, Clone, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]

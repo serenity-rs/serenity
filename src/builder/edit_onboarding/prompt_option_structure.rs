@@ -33,7 +33,6 @@ pub struct CreatePromptOption<Stage: Sealed> {
     _stage: Stage,
 }
 
-
 impl Default for CreatePromptOption<NeedsChannels> {
     /// See the documentation of [`Self::new`].
     fn default() -> Self {
@@ -57,7 +56,7 @@ impl CreatePromptOption<NeedsChannels> {
     }
 
     /// The channels that become visible when selecting this option.
-    /// 
+    ///
     ///  At least one channel or role must be selected or the option will not be valid.
     pub fn channels(self, channel_ids: Vec<ChannelId>) -> CreatePromptOption<NeedsRoles> {
         CreatePromptOption {
@@ -74,7 +73,7 @@ impl CreatePromptOption<NeedsChannels> {
 
 impl CreatePromptOption<NeedsRoles> {
     /// The roles granted from selecting this option.
-    /// 
+    ///
     ///  At least one channel or role must be selected or the option will not be valid.
     pub fn roles(self, role_ids: Vec<RoleId>) -> CreatePromptOption<NeedsTitle> {
         CreatePromptOption {
@@ -117,7 +116,7 @@ impl<Stage: Sealed> CreatePromptOption<Stage> {
     }
 }
 
-use serde::ser::{Serialize, Serializer, SerializeStruct};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 // This implementation allows us to put the emoji fields on without storing duplicate values.
 impl<Stage: Sealed> Serialize for CreatePromptOption<Stage> {
@@ -142,10 +141,10 @@ impl<Stage: Sealed> Serialize for CreatePromptOption<Stage> {
                     state.serialize_field("emoji_animated", animated)?;
                     state.serialize_field("emoji_id", id)?;
                     state.serialize_field("emoji_name", name)?;
-                }
+                },
                 ReactionType::Unicode(name) => {
                     state.serialize_field("emoji_name", name)?;
-                }
+                },
             }
         }
 

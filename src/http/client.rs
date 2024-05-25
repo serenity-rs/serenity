@@ -4687,7 +4687,12 @@ impl Http {
     }
 
     /// Sets the onboarding configuration for the guild.
-    pub async fn set_guild_onboarding(&self, guild_id: GuildId, map: &impl serde::Serialize, audit_log_reason: Option<&str>) -> Result<Onboarding> {       
+    pub async fn set_guild_onboarding(
+        &self,
+        guild_id: GuildId,
+        map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Onboarding> {
         let body = to_vec(map)?;
 
         self.fire(Request {

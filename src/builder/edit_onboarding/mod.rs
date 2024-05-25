@@ -1,19 +1,14 @@
 #[cfg(feature = "http")]
 use super::Builder;
-
-use crate::model::guild::OnboardingMode;
-use crate::model::id::ChannelId;
-
-#[cfg(feature = "http")]
-use crate::model::id::GuildId;
-#[cfg(feature = "http")]
-use crate::model::Permissions;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
-use crate::model::guild::Onboarding;
-#[cfg(feature = "http")]
 use crate::internal::prelude::*;
+use crate::model::guild::{Onboarding, OnboardingMode};
+#[cfg(feature = "http")]
+use crate::model::prelude::*;
+#[cfg(feature = "http")]
+use crate::model::Permissions;
 
 mod prompt_option_structure;
 mod prompt_structure;
@@ -82,7 +77,7 @@ impl<'a> EditOnboarding<'a, NeedsPrompts> {
         Self::default()
     }
 
-
+    /// The onboarding prompts that users can select the options of.
     pub fn prompts(
         self,
         prompts: Vec<CreateOnboardingPrompt<prompt_structure::Ready>>,
@@ -101,11 +96,10 @@ impl<'a> EditOnboarding<'a, NeedsPrompts> {
 
 impl<'a> EditOnboarding<'a, NeedsChannels> {
     /// The list of default channels the user will have regardless of the answers given.
-    /// 
+    ///
     /// There are restrictions that apply only when onboarding is enabled, but these vary depending
     /// on the current [Self::mode].
-    /// 
-    /// 
+    ///
     /// If the default mode is set, you must provide at least 7 channels, 5 of which must allow
     /// @everyone to read and send messages. if advanced is set, the restrictions apply across the
     /// default channels and the [Self::prompts], provided that they supply the remaining required
@@ -143,7 +137,7 @@ impl<'a> EditOnboarding<'a, NeedsEnabled> {
 
 impl<'a> EditOnboarding<'a, NeedsMode> {
     /// The current onboarding mode that controls where the readable channels are set.
-    /// 
+    ///
     /// If the default mode is set, you must provide at least 7 channels, 5 of which must allow
     /// @everyone to read and send messages. if advanced is set, the restrictions apply across the
     /// default channels and the [Self::prompts], provided that they supply the remaining required
@@ -169,20 +163,34 @@ impl<'a, Stage: Sealed> EditOnboarding<'a, Stage> {
     }
 }
 
-
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
 impl<'a> Builder for EditOnboarding<'a, Ready> {
     type Context<'ctx> = GuildId;
     type Built = Onboarding;
 
+    /// Sets [`Onboarding`] in the guild.
+    ///
+    /// **Note**: Requires the [Manage Roles] and [Manage Guild] permissions.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     async fn execute(
         mut self,
         cache_http: impl CacheHttp,
         ctx: Self::Context<'_>,
     ) -> Result<Self::Built> {
         #[cfg(feature = "cache")]
-        crate::utils::user_has_guild_perms(&cache_http, ctx, Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES)?;
+        crate::utils::user_has_guild_perms(
+            &cache_http,
+            ctx,
+            Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES,
+        )?;
 
         cache_http.http().set_guild_onboarding(ctx, &self, self.audit_log_reason).await
     }
