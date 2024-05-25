@@ -11,7 +11,7 @@
 //! Permissions follow a hierarchy:
 //! - An account can grant roles to users that are of a lower position than its highest role;
 //! - An account can edit roles lesser than its highest role, but can only grant permissions they
-//! have;
+//!   have;
 //! - An account can move only roles lesser than its highest role;
 //! - An account can only kick/ban accounts with a lesser role than its top role.
 //!
