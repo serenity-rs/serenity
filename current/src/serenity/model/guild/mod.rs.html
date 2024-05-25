@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (791adf759 2024-05-21)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (36153f1a4 2024-05-24)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2867,6 +2867,13 @@
 <a href="#2867" id="2867">2867</a>
 <a href="#2868" id="2868">2868</a>
 <a href="#2869" id="2869">2869</a>
+<a href="#2870" id="2870">2870</a>
+<a href="#2871" id="2871">2871</a>
+<a href="#2872" id="2872">2872</a>
+<a href="#2873" id="2873">2873</a>
+<a href="#2874" id="2874">2874</a>
+<a href="#2875" id="2875">2875</a>
+<a href="#2876" id="2876">2876</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4582,6 +4589,7 @@
     ///
     /// For the `prefix` "zey" and the unsorted result:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
@@ -4632,6 +4640,7 @@
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
+    ///
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
     ///
@@ -4641,6 +4650,7 @@
     ///
     /// For the `substring` "zey" and the unsorted result:
     /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
@@ -4687,6 +4697,7 @@
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
+    ///
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
     ///
@@ -4695,6 +4706,7 @@
     ///
     /// For the `substring` "zey" and the unsorted result:
     /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
@@ -4727,6 +4739,7 @@
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
+    ///
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
     ///
@@ -4735,6 +4748,7 @@
     ///
     /// For the `substring` "zey" and the unsorted result:
     /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
