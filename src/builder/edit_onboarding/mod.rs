@@ -82,6 +82,7 @@ impl<'a> EditOnboarding<'a, NeedsPrompts> {
         Self::default()
     }
 
+
     pub fn prompts(
         self,
         prompts: Vec<CreateOnboardingPrompt<prompt_structure::Ready>>,
@@ -99,6 +100,16 @@ impl<'a> EditOnboarding<'a, NeedsPrompts> {
 }
 
 impl<'a> EditOnboarding<'a, NeedsChannels> {
+    /// The list of default channels the user will have regardless of the answers given.
+    /// 
+    /// There are restrictions that apply only when onboarding is enabled, but these vary depending
+    /// on the current [Self::mode].
+    /// 
+    /// 
+    /// If the default mode is set, you must provide at least 7 channels, 5 of which must allow
+    /// @everyone to read and send messages. if advanced is set, the restrictions apply across the
+    /// default channels and the [Self::prompts], provided that they supply the remaining required
+    /// channels.
     pub fn default_channels(
         self,
         default_channel_ids: Vec<ChannelId>,
@@ -116,6 +127,7 @@ impl<'a> EditOnboarding<'a, NeedsChannels> {
 }
 
 impl<'a> EditOnboarding<'a, NeedsEnabled> {
+    /// Whether onboarding is enabled or not.
     pub fn enabled(self, enabled: bool) -> EditOnboarding<'a, NeedsMode> {
         EditOnboarding {
             prompts: self.prompts,
@@ -130,6 +142,12 @@ impl<'a> EditOnboarding<'a, NeedsEnabled> {
 }
 
 impl<'a> EditOnboarding<'a, NeedsMode> {
+    /// The current onboarding mode that controls where the readable channels are set.
+    /// 
+    /// If the default mode is set, you must provide at least 7 channels, 5 of which must allow
+    /// @everyone to read and send messages. if advanced is set, the restrictions apply across the
+    /// default channels and the [Self::prompts], provided that they supply the remaining required
+    /// channels.
     pub fn mode(self, mode: OnboardingMode) -> EditOnboarding<'a, Ready> {
         EditOnboarding {
             prompts: self.prompts,
@@ -144,7 +162,8 @@ impl<'a> EditOnboarding<'a, NeedsMode> {
 }
 
 impl<'a, Stage: Sealed> EditOnboarding<'a, Stage> {
-    pub fn emoji(mut self, audit_log_reason: &'a str) -> Self {
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, audit_log_reason: &'a str) -> Self {
         self.audit_log_reason = Some(audit_log_reason);
         self
     }

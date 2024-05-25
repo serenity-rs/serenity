@@ -73,6 +73,7 @@ impl CreateOnboardingPrompt<NeedsPromptType> {
         Self::default()
     }
 
+    /// The type of prompt provided to the user.
     pub fn prompt_type(
         self,
         prompt_type: OnboardingPromptType,
@@ -92,6 +93,9 @@ impl CreateOnboardingPrompt<NeedsPromptType> {
 }
 
 impl CreateOnboardingPrompt<NeedsPromptOptions> {
+    /// The options users can select for the prompt.
+    /// 
+    /// Each option must provide at least one role or channel.
     pub fn options(
         self,
         options: Vec<CreatePromptOption<prompt_option_structure::Ready>>,
@@ -111,6 +115,7 @@ impl CreateOnboardingPrompt<NeedsPromptOptions> {
 }
 
 impl CreateOnboardingPrompt<NeedsTitle> {
+    /// Sets the title of the prompt.
     pub fn title(self, title: impl Into<String>) -> CreateOnboardingPrompt<NeedsSingleSelect> {
         CreateOnboardingPrompt {
             id: self.id,
@@ -127,6 +132,7 @@ impl CreateOnboardingPrompt<NeedsTitle> {
 }
 
 impl CreateOnboardingPrompt<NeedsSingleSelect> {
+    /// Controls if the user can select multiple options of the prompt.
     pub fn single_select(self, single_select: bool) -> CreateOnboardingPrompt<NeedsRequired> {
         CreateOnboardingPrompt {
             id: self.id,
@@ -143,6 +149,7 @@ impl CreateOnboardingPrompt<NeedsSingleSelect> {
 }
 
 impl CreateOnboardingPrompt<NeedsRequired> {
+    /// Controls if the user is required to answer the question before completing onboarding.
     pub fn required(self, required: bool) -> CreateOnboardingPrompt<NeedsInOnboarding> {
         CreateOnboardingPrompt {
             id: self.id,
@@ -159,6 +166,7 @@ impl CreateOnboardingPrompt<NeedsRequired> {
 }
 
 impl CreateOnboardingPrompt<NeedsInOnboarding> {
+    /// Controls if the prompt is visible in onboarding, or only in the Channels & Roles tab.
     pub fn in_onboarding(self, in_onboarding: bool) -> CreateOnboardingPrompt<Ready> {
         CreateOnboardingPrompt {
             id: self.id,

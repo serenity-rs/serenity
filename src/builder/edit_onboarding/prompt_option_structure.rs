@@ -56,6 +56,9 @@ impl CreatePromptOption<NeedsChannels> {
         Self::default()
     }
 
+    /// The channels that become visible when selecting this option.
+    /// 
+    ///  At least one channel or role must be selected or the option will not be valid.
     pub fn channels(self, channel_ids: Vec<ChannelId>) -> CreatePromptOption<NeedsRoles> {
         CreatePromptOption {
             channel_ids,
@@ -70,6 +73,9 @@ impl CreatePromptOption<NeedsChannels> {
 }
 
 impl CreatePromptOption<NeedsRoles> {
+    /// The roles granted from selecting this option.
+    /// 
+    ///  At least one channel or role must be selected or the option will not be valid.
     pub fn roles(self, role_ids: Vec<RoleId>) -> CreatePromptOption<NeedsTitle> {
         CreatePromptOption {
             channel_ids: self.channel_ids,
@@ -84,6 +90,7 @@ impl CreatePromptOption<NeedsRoles> {
 }
 
 impl CreatePromptOption<NeedsTitle> {
+    /// The title of the option.
     pub fn title(self, title: impl Into<String>) -> CreatePromptOption<Ready> {
         CreatePromptOption {
             channel_ids: self.channel_ids,
@@ -98,19 +105,21 @@ impl CreatePromptOption<NeedsTitle> {
 }
 
 impl<Stage: Sealed> CreatePromptOption<Stage> {
+    /// The emoji to appear alongside the option.
     pub fn emoji(mut self, emoji: ReactionType) -> Self {
         self.emoji = Some(emoji);
         self
     }
-
-    pub fn description(mut self, description: Option<String>) -> Self {
-        self.description = description;
+    /// The description of the option.
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.description = Some(description.into());
         self
     }
 }
 
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 
+// This implementation allows us to put the emoji fields on without storing duplicate values.
 impl<Stage: Sealed> Serialize for CreatePromptOption<Stage> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
