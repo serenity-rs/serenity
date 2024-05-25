@@ -5,7 +5,6 @@ use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::guild::{Onboarding, OnboardingMode};
-#[cfg(feature = "http")]
 use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::Permissions;
