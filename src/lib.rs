@@ -141,7 +141,7 @@ compile_error!(
 /// Not exported:
 /// - [`crate::json`]: it's a general-purpose JSON wrapper, not intrinsic to serenity
 /// - [`crate::framework::standard`]: has many standard_framework-specific items that may collide
-/// with items from the rest of serenity
+///   with items from the rest of serenity
 pub mod all {
     #[cfg(feature = "builder")]
     #[doc(no_inline)]

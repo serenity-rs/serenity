@@ -205,7 +205,7 @@ impl fmt::Display for Channel {
     /// This will return a different format for each type of channel:
     /// - [`PrivateChannel`]s: the recipient's name;
     /// - [`GuildChannel`]s: a string mentioning the channel that users who can see the channel can
-    /// click on.
+    ///   click on.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),

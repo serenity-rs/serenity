@@ -23,13 +23,13 @@
 //!
 //! There are a few methods of sharding available:
 //! - [`Client::start_autosharded`]: retrieves the number of shards Discord recommends using from
-//! the API, and then automatically starts that number of shards.
+//!   the API, and then automatically starts that number of shards.
 //! - [`Client::start_shard`]: starts a single shard for use in the instance, handled by the
-//! instance of the Client. Use this if you only want 1 shard handled by this instance.
-//! - [`Client::start_shards`]: starts all shards in this instance. This is best for when you want
-//! a completely shared State.
+//!   instance of the Client. Use this if you only want 1 shard handled by this instance.
+//! - [`Client::start_shards`]: starts all shards in this instance. This is best for when you want a
+//!   completely shared State.
 //! - [`Client::start_shard_range`]: start a range of shards within this instance. This should be
-//! used when you, for example, want to split 10 shards across 3 instances.
+//!   used when you, for example, want to split 10 shards across 3 instances.
 //!
 //! [`Client`]: crate::Client
 //! [`Client::start`]: crate::Client::start

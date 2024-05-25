@@ -3973,8 +3973,8 @@ impl Http {
     ///
     /// # Arguments
     /// * `code` - The invite code.
-    /// * `member_counts` - Whether to include information about the current number
-    /// of members in the server that the invite belongs to.
+    /// * `member_counts` - Whether to include information about the current number of members in
+    ///   the server that the invite belongs to.
     /// * `expiration` - Whether to include information about when the invite expires.
     /// * `event_id` - An optional server event ID to include with the invite.
     ///

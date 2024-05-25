@@ -1713,6 +1713,7 @@ impl Guild {
     ///
     /// For the `prefix` "zey" and the unsorted result:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
@@ -1763,6 +1764,7 @@ impl Guild {
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
+    ///
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
     ///
@@ -1772,6 +1774,7 @@ impl Guild {
     ///
     /// For the `substring` "zey" and the unsorted result:
     /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
@@ -1818,6 +1821,7 @@ impl Guild {
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
+    ///
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
     ///
@@ -1826,6 +1830,7 @@ impl Guild {
     ///
     /// For the `substring` "zey" and the unsorted result:
     /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
@@ -1858,6 +1863,7 @@ impl Guild {
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
+    ///
     /// If 'case_sensitive' is false, the following are not found:
     /// - "zeYLa", "meiyLa", "LYAdenislyA"
     ///
@@ -1866,6 +1872,7 @@ impl Guild {
     ///
     /// For the `substring` "zey" and the unsorted result:
     /// - "azey", "zey", "zeyla", "zeylaa", "zeyzeyzey"
+    ///
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
