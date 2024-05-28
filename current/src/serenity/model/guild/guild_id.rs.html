@@ -3305,7 +3305,7 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    /// [Manage Guild]: Permissions::KICK_MEMBERS
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>start_prune(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
         http.as_ref().start_guild_prune(<span class="self">self</span>, days, <span class="prelude-val">None</span>).<span class="kw">await

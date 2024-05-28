@@ -657,9 +657,9 @@
     /// Returns a boolean indicating whether a shard runner was present. This is _not_ necessary an
     /// indicator of whether the shard runner was successfully shut down.
     ///
-    /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
-    /// - no longer exists, then the shard runner will not know it should shut down. This _should
-    /// never happen_. It may already be stopped.
+    /// **Note**: If the receiving end of an mpsc channel - owned by the shard runner - no longer
+    /// exists, then the shard runner will not know it should shut down. This _should never happen_.
+    /// It may already be stopped.
     </span><span class="attr">#[instrument(skip(<span class="self">self</span>))]
     </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;</span><span class="self">self</span>, shard_id: ShardId, code: u16) {
         <span class="kw">const </span>TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(<span class="number">5</span>);
