@@ -254,9 +254,9 @@ impl ShardManager {
     /// Returns a boolean indicating whether a shard runner was present. This is _not_ necessary an
     /// indicator of whether the shard runner was successfully shut down.
     ///
-    /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
-    /// - no longer exists, then the shard runner will not know it should shut down. This _should
-    /// never happen_. It may already be stopped.
+    /// **Note**: If the receiving end of an mpsc channel - owned by the shard runner - no longer
+    /// exists, then the shard runner will not know it should shut down. This _should never happen_.
+    /// It may already be stopped.
     #[instrument(skip(self))]
     pub async fn shutdown(&self, shard_id: ShardId, code: u16) {
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);

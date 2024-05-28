@@ -230,9 +230,9 @@ impl ShardQueuer {
 
     /// Attempts to shut down the shard runner by Id.
     ///
-    /// **Note**: If the receiving end of an mpsc channel - theoretically owned by the shard runner
-    /// - no longer exists, then the shard runner will not know it should shut down. This _should
-    /// never happen_. It may already be stopped.
+    /// **Note**: If the receiving end of an mpsc channel - owned by the shard runner - no longer
+    /// exists, then the shard runner will not know it should shut down. This _should never happen_.
+    /// It may already be stopped.
     #[instrument(skip(self))]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);

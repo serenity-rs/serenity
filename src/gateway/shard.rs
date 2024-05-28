@@ -423,7 +423,7 @@ impl Shard {
     /// The best case scenario is that one of two values is returned:
     /// - `Ok(None)`: a heartbeat, late hello, or session invalidation was received;
     /// - `Ok(Some((event, None)))`: an op0 dispatch was received, and the shard's voice state will
-    /// be updated, _if_ the `voice` feature is enabled.
+    ///   be updated, _if_ the `voice` feature is enabled.
     ///
     /// # Errors
     ///
