@@ -50,7 +50,7 @@ pub struct Reaction {
     /// Colours used for the super reaction animation.
     ///
     /// Only present on the ReactionAdd gateway event.
-    #[serde(rename = "burst_colors")]
+    #[serde(rename = "burst_colors", default, deserialize_with = "discord_colours")]
     pub burst_colours: Option<Vec<Colour>>,
     /// The type of reaction.
     #[serde(rename = "type")]
@@ -84,6 +84,40 @@ impl<'de> Deserialize<'de> for Reaction {
 impl Serialize for Reaction {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
+    }
+}
+
+fn discord_colours<'de, D>(deserializer: D) -> Result<Option<Vec<Colour>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let vec_str: Option<Vec<String>> = Deserialize::deserialize(deserializer)?;
+
+    let Some(vec_str) = vec_str else { return Ok(None) };
+
+    if vec_str.is_empty() {
+        return Ok(None);
+    }
+
+    let colours: Result<Vec<_>, _> = vec_str
+        .iter()
+        .map(|s| {
+            let s = s.strip_prefix('#').ok_or_else(|| DeError::custom("Invalid colour data"))?;
+
+            if s.len() != 6 {
+                return Err(DeError::custom("Invalid colour data length"));
+            }
+
+            match u32::from_str_radix(s, 16) {
+                Ok(c) => Ok(Colour::new(c)),
+                Err(_) => Err(DeError::custom("Invalid colour data")),
+            }
+        })
+        .collect();
+
+    match colours {
+        Ok(colours) => Ok(Some(colours)),
+        Err(err) => Err(err),
     }
 }
 
