@@ -1,12 +1,8 @@
-use std::sync::Arc;
-
 #[cfg(feature = "gateway")]
 use super::event_handler::InternalEventHandler;
 use super::{Context, FullEvent};
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 use crate::internal::prelude::*;
 use crate::model::channel::ChannelType;
 use crate::model::event::Event;
@@ -47,7 +43,6 @@ macro_rules! update_cache {
 pub(crate) async fn dispatch_model(
     event: Event,
     context: Context,
-    #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
     event_handler: Option<InternalEventHandler>,
 ) {
     let handler = match event_handler {
@@ -63,15 +58,6 @@ pub(crate) async fn dispatch_model(
         &context.cache,
         event,
     );
-
-    #[cfg(feature = "framework")]
-    if let Some(framework) = framework {
-        if let Some(extra_event) = &extra_event {
-            framework.dispatch(&context, extra_event).await;
-        }
-
-        framework.dispatch(&context, &full_event).await;
-    }
 
     if let Some(handler) = handler {
         if let Some(extra_event) = extra_event {

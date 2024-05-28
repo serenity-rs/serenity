@@ -95,8 +95,6 @@ pub mod cache;
 pub mod client;
 #[cfg(feature = "collector")]
 pub mod collector;
-#[cfg(feature = "framework")]
-pub mod framework;
 #[cfg(feature = "gateway")]
 pub mod gateway;
 #[cfg(feature = "http")]
@@ -130,9 +128,6 @@ pub mod all {
     pub use crate::collector::*;
     #[doc(no_inline)]
     pub use crate::constants::{close_codes::*, *};
-    #[cfg(feature = "framework")]
-    #[doc(no_inline)]
-    pub use crate::framework::*;
     #[cfg(feature = "gateway")]
     #[doc(no_inline)]
     pub use crate::gateway::*;

@@ -1,8 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 use std::num::NonZeroU16;
 use std::sync::Arc;
-#[cfg(feature = "framework")]
-use std::sync::OnceLock;
 
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::StreamExt;
@@ -24,8 +22,6 @@ use super::{
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::InternalEventHandler;
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -48,9 +44,6 @@ pub struct ShardQueuer {
     /// [`EventHandler`]: crate::client::EventHandler
     /// [`RawEventHandler`]: crate::client::RawEventHandler
     pub event_handler: Option<InternalEventHandler>,
-    /// A copy of the framework
-    #[cfg(feature = "framework")]
-    pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
@@ -224,8 +217,6 @@ impl ShardQueuer {
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
             event_handler: self.event_handler.clone(),
-            #[cfg(feature = "framework")]
-            framework: self.framework.get().cloned(),
             manager: Arc::clone(&self.manager),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),

@@ -25,8 +25,6 @@ use std::future::IntoFuture;
 use std::num::NonZeroU16;
 use std::ops::Range;
 use std::sync::Arc;
-#[cfg(feature = "framework")]
-use std::sync::OnceLock;
 
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
@@ -43,8 +41,6 @@ use super::gateway::GatewayError;
 pub use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::cache::Settings as CacheSettings;
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ActivityData, PresenceData};
@@ -70,8 +66,6 @@ pub struct ClientBuilder {
     intents: GatewayIntents,
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
-    #[cfg(feature = "framework")]
-    framework: Option<Box<dyn Framework>>,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     event_handler: Option<Arc<dyn EventHandler>>,
@@ -93,10 +87,6 @@ impl ClientBuilder {
 
     /// Construct a new builder with a [`Http`] instance to calls methods on for the client
     /// construction.
-    ///
-    /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
-    /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
-    /// panic.
     pub fn new_with_http(http: Arc<Http>, intents: GatewayIntents) -> Self {
         Self {
             http,
@@ -104,8 +94,6 @@ impl ClientBuilder {
             data: None,
             #[cfg(feature = "cache")]
             cache_settings: CacheSettings::default(),
-            #[cfg(feature = "framework")]
-            framework: None,
             #[cfg(feature = "voice")]
             voice_manager: None,
             event_handler: None,
@@ -154,28 +142,6 @@ impl ClientBuilder {
     #[must_use]
     pub fn get_cache_settings(&self) -> &CacheSettings {
         &self.cache_settings
-    }
-
-    /// Sets the command framework to be used. It will receive messages sent over the gateway and
-    /// then consider - based on its settings - whether to dispatch a command.
-    ///
-    /// *Info*: If a reference to the framework is required for manual dispatch, you can implement
-    /// [`Framework`] on [`Arc<YourFrameworkType>`] instead of `YourFrameworkType`.
-    #[cfg(feature = "framework")]
-    pub fn framework<F>(mut self, framework: F) -> Self
-    where
-        F: Framework + 'static,
-    {
-        self.framework = Some(Box::new(framework));
-
-        self
-    }
-
-    /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
-    #[cfg(feature = "framework")]
-    #[must_use]
-    pub fn get_framework(&self) -> Option<&dyn Framework> {
-        self.framework.as_deref()
     }
 
     /// Sets the voice gateway handler to be used. It will receive voice events sent over the
@@ -289,8 +255,6 @@ impl IntoFuture for ClientBuilder {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn into_future(self) -> Self::IntoFuture {
         let data = self.data.unwrap_or(Arc::new(()));
-        #[cfg(feature = "framework")]
-        let framework = self.framework;
         let intents = self.intents;
         let presence = self.presence;
         let http = self.http;
@@ -333,13 +297,9 @@ impl IntoFuture for ClientBuilder {
                 },
             };
 
-            #[cfg(feature = "framework")]
-            let framework_cell = Arc::new(OnceLock::new());
             let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
                 event_handler,
-                #[cfg(feature = "framework")]
-                framework: Arc::clone(&framework_cell),
                 #[cfg(feature = "voice")]
                 voice_manager: voice_manager.clone(),
                 ws_url: Arc::clone(&ws_url),
@@ -352,7 +312,7 @@ impl IntoFuture for ClientBuilder {
                 max_concurrency,
             });
 
-            let client = Client {
+            Ok(Client {
                 data,
                 shard_manager,
                 shard_manager_return_value: shard_manager_ret_value,
@@ -362,15 +322,7 @@ impl IntoFuture for ClientBuilder {
                 #[cfg(feature = "cache")]
                 cache,
                 http,
-            };
-            #[cfg(feature = "framework")]
-            if let Some(mut framework) = framework {
-                framework.init(&client).await;
-                if let Err(_existing) = framework_cell.set(framework.into()) {
-                    tracing::warn!("overwrote existing contents of framework OnceLock");
-                }
-            }
-            Ok(client)
+            })
         })
     }
 }

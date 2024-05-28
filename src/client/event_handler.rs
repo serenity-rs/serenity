@@ -52,6 +52,20 @@ macro_rules! event_handler {
             }
         }
 
+        pub trait PassthroughEventHandler: 'static + Send + Sync {
+            fn get_child_handler(&self) -> &impl EventHandler;
+        }
+
+        #[async_trait]
+        impl<T: PassthroughEventHandler> EventHandler for T {
+            $(
+                $( #[cfg(feature = $feature)] )?
+                async fn $method_name(&self, $($context: Context,)? $( $arg_name: $arg_type ),*) {
+                    self.get_child_handler().$method_name($($context,)? $($arg_name),*).await
+                }
+            )*
+        }
+
         /// This enum stores every possible event that an [`EventHandler`] can receive.
         #[cfg_attr(not(feature = "unstable"), non_exhaustive)]
         #[derive(Clone, Debug, VariantNames, IntoStaticStr, EnumCount)]

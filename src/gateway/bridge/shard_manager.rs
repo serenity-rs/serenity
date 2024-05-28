@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::num::NonZeroU16;
 use std::sync::Arc;
-#[cfg(feature = "framework")]
-use std::sync::OnceLock;
 use std::time::Duration;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
@@ -17,8 +15,6 @@ use super::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInf
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::InternalEventHandler;
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -128,8 +124,6 @@ impl ShardManager {
         let mut shard_queuer = ShardQueuer {
             data: opt.data,
             event_handler: opt.event_handler,
-            #[cfg(feature = "framework")]
-            framework: opt.framework,
             last_start: None,
             manager: Arc::clone(&manager),
             queue: ShardQueue::new(opt.max_concurrency),
@@ -357,8 +351,6 @@ impl Drop for ShardManager {
 pub struct ShardManagerOptions {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
     pub event_handler: Option<InternalEventHandler>,
-    #[cfg(feature = "framework")]
-    pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     pub ws_url: Arc<str>,

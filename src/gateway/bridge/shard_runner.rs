@@ -17,8 +17,6 @@ use super::{ShardId, ShardManager, ShardRunnerMessage};
 use crate::cache::Cache;
 use crate::client::dispatch::dispatch_model;
 use crate::client::{Context, InternalEventHandler};
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 use crate::gateway::{GatewayError, ReconnectType, Shard, ShardAction};
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -29,8 +27,6 @@ use crate::model::event::{Event, GatewayEvent};
 pub struct ShardRunner {
     data: Arc<dyn std::any::Any + Send + Sync>,
     event_handler: Option<InternalEventHandler>,
-    #[cfg(feature = "framework")]
-    framework: Option<Arc<dyn Framework>>,
     manager: Arc<ShardManager>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<ShardRunnerMessage>,
@@ -56,8 +52,6 @@ impl ShardRunner {
             runner_tx: tx,
             data: opt.data,
             event_handler: opt.event_handler,
-            #[cfg(feature = "framework")]
-            framework: opt.framework,
             manager: opt.manager,
             shard: opt.shard,
             #[cfg(feature = "voice")]
@@ -200,13 +194,7 @@ impl ShardRunner {
                     }
                     spawn_named(
                         "shard_runner::dispatch",
-                        dispatch_model(
-                            event,
-                            context,
-                            #[cfg(feature = "framework")]
-                            self.framework.clone(),
-                            self.event_handler.clone(),
-                        ),
+                        dispatch_model(event, context, self.event_handler.clone()),
                     );
                 }
             }
@@ -502,8 +490,6 @@ impl ShardRunner {
 pub struct ShardRunnerOptions {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
     pub event_handler: Option<InternalEventHandler>,
-    #[cfg(feature = "framework")]
-    pub framework: Option<Arc<dyn Framework>>,
     pub manager: Arc<ShardManager>,
     pub shard: Shard,
     #[cfg(feature = "voice")]
