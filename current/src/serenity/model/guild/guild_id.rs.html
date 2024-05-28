@@ -1865,6 +1865,7 @@
 <a href="#1865" id="1865">1865</a>
 <a href="#1866" id="1866">1866</a>
 <a href="#1867" id="1867">1867</a>
+<a href="#1868" id="1868">1868</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -3297,13 +3298,14 @@
     ///
     /// See the documentation on [`GuildPrune`] for more information.
     ///
-    /// **Note**: Requires the [Kick Members] permission.
+    /// **Note**: Requires [Kick Members] and [Manage Guild] permissions.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [Manage Guild]: Permissions::KICK_MEMBERS
     </span><span class="attr">#[inline]
     </span><span class="kw">pub async fn </span>start_prune(<span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
         http.as_ref().start_guild_prune(<span class="self">self</span>, days, <span class="prelude-val">None</span>).<span class="kw">await

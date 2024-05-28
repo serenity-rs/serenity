@@ -2874,6 +2874,7 @@
 <a href="#2874" id="2874">2874</a>
 <a href="#2875" id="2875">2875</a>
 <a href="#2876" id="2876">2876</a>
+<a href="#2877" id="2877">2877</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -5230,7 +5231,7 @@
     ///
     /// See the documentation on [`GuildPrune`] for more information.
     ///
-    /// **Note**: Requires the [Kick Members] permission.
+    /// **Note**: Requires [Kick Members] and [Manage Guild] permissions.
     ///
     /// # Errors
     ///
@@ -5242,13 +5243,14 @@
     /// Can also return an [`Error::Json`] if there is an error deserializing the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     </span><span class="kw">pub async fn </span>start_prune(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp, days: u8) -&gt; <span class="prelude-ty">Result</span>&lt;GuildPrune&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
         </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-                <span class="self">self</span>.require_perms(cache, Permissions::KICK_MEMBERS)<span class="question-mark">?</span>;
+                <span class="self">self</span>.require_perms(cache, Permissions::KICK_MEMBERS | Permissions::MANAGE_GUILD)<span class="question-mark">?</span>;
             }
         }
 
