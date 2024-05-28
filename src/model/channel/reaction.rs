@@ -36,9 +36,38 @@ pub struct Reaction {
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
     /// The optional object of the member which added the reaction.
+    ///
+    /// Not present on the ReactionRemove gateway event.
     pub member: Option<Member>,
     /// The reactive emoji used.
     pub emoji: ReactionType,
+    /// The Id of the user who sent the message which this reacted to.
+    ///
+    /// Only present on the ReactionAdd gateway event.
+    pub message_author_id: Option<UserId>,
+    /// Indicates if this was a super reaction.
+    pub burst: bool,
+    /// Colours used for the super reaction animation.
+    ///
+    /// Only present on the ReactionAdd gateway event.
+    #[serde(rename = "burst_colors")]
+    pub burst_colours: Option<Vec<Colour>>,
+    /// The type of reaction.
+    #[serde(rename = "type")]
+    pub reaction_type: ReactionTypes,
+}
+
+enum_number! {
+    /// A list of types a reaction can be.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ReactionTypes {
+        Normal = 0,
+        Burst = 1,
+        _ => Unknown(u8),
+    }
 }
 
 // Manual impl needed to insert guild_id into PartialMember
