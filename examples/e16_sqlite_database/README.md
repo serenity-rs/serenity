@@ -19,8 +19,9 @@ DATABASE_URL=sqlite:database.sqlite
 # Running the example
 
 ```sh
-# Note: due to a bug in SQLx, you have to provide the full path to DATABASE_URL when compiling
-# Once the bug is fixed, you can omit `DATABASE_URL=...` and let SQLx read the `.env` file
+# Note: due to a bug in SQLx (https://github.com/launchbadge/sqlx/issues/3099),
+# you have to provide the full path to `DATABASE_URL` when compiling.
+# Once the bug is fixed, you can omit `DATABASE_URL=...` and let SQLx read the `.env` file.
 DATABASE_URL=sqlite:examples/e16_sqlite_database/database.sqlite DISCORD_TOKEN=... cargo run
 ```
 
