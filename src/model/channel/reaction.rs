@@ -8,6 +8,7 @@ use std::str::FromStr;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeMap, Serializer};
+use serde_cow::CowStr;
 #[cfg(feature = "model")]
 use tracing::warn;
 
@@ -91,7 +92,7 @@ fn discord_colours<'de, D>(deserializer: D) -> Result<Option<Vec<Colour>>, D::Er
 where
     D: Deserializer<'de>,
 {
-    let vec_str: Option<Vec<String>> = Deserialize::deserialize(deserializer)?;
+    let vec_str: Option<Vec<CowStr<'_>>> = Deserialize::deserialize(deserializer)?;
 
     let Some(vec_str) = vec_str else { return Ok(None) };
 
@@ -102,7 +103,7 @@ where
     let colours: Result<Vec<_>, _> = vec_str
         .iter()
         .map(|s| {
-            let s = s.strip_prefix('#').ok_or_else(|| DeError::custom("Invalid colour data"))?;
+            let s = s.0.strip_prefix('#').ok_or_else(|| DeError::custom("Invalid colour data"))?;
 
             if s.len() != 6 {
                 return Err(DeError::custom("Invalid colour data length"));
