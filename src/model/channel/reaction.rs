@@ -8,6 +8,7 @@ use std::str::FromStr;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeMap, Serializer};
+use serde_cow::CowStr;
 #[cfg(feature = "model")]
 use tracing::warn;
 
@@ -36,9 +37,38 @@ pub struct Reaction {
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
     /// The optional object of the member which added the reaction.
+    ///
+    /// Not present on the ReactionRemove gateway event.
     pub member: Option<Member>,
     /// The reactive emoji used.
     pub emoji: ReactionType,
+    /// The Id of the user who sent the message which this reacted to.
+    ///
+    /// Only present on the ReactionAdd gateway event.
+    pub message_author_id: Option<UserId>,
+    /// Indicates if this was a super reaction.
+    pub burst: bool,
+    /// Colours used for the super reaction animation.
+    ///
+    /// Only present on the ReactionAdd gateway event.
+    #[serde(rename = "burst_colors", default, deserialize_with = "discord_colours")]
+    pub burst_colours: Option<Vec<Colour>>,
+    /// The type of reaction.
+    #[serde(rename = "type")]
+    pub reaction_type: ReactionTypes,
+}
+
+enum_number! {
+    /// A list of types a reaction can be.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ReactionTypes {
+        Normal = 0,
+        Burst = 1,
+        _ => Unknown(u8),
+    }
 }
 
 // Manual impl needed to insert guild_id into PartialMember
@@ -55,6 +85,40 @@ impl<'de> Deserialize<'de> for Reaction {
 impl Serialize for Reaction {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         Self::serialize(self, serializer) // calls #[serde(remote)]-generated inherent method
+    }
+}
+
+fn discord_colours<'de, D>(deserializer: D) -> Result<Option<Vec<Colour>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let vec_str: Option<Vec<CowStr<'_>>> = Deserialize::deserialize(deserializer)?;
+
+    let Some(vec_str) = vec_str else { return Ok(None) };
+
+    if vec_str.is_empty() {
+        return Ok(None);
+    }
+
+    let colours: Result<Vec<_>, _> = vec_str
+        .iter()
+        .map(|s| {
+            let s = s.0.strip_prefix('#').ok_or_else(|| DeError::custom("Invalid colour data"))?;
+
+            if s.len() != 6 {
+                return Err(DeError::custom("Invalid colour data length"));
+            }
+
+            match u32::from_str_radix(s, 16) {
+                Ok(c) => Ok(Colour::new(c)),
+                Err(_) => Err(DeError::custom("Invalid colour data")),
+            }
+        })
+        .collect();
+
+    match colours {
+        Ok(colours) => Ok(Some(colours)),
+        Err(err) => Err(err),
     }
 }
 

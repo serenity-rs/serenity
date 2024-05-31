@@ -539,13 +539,35 @@ impl Message {
         cache_http: impl CacheHttp,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<Reaction> {
-        self._react(cache_http, reaction_type.into()).await
+        self._react(cache_http, reaction_type.into(), false).await
+    }
+
+    /// React to the message with a custom [`Emoji`] or unicode character.
+    ///
+    /// **Note**: Requires  [Add Reactions] and [Use External Emojis] permissions.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have the required [permissions].
+    ///
+    /// [Add Reactions]: Permissions::ADD_REACTIONS
+    /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
+    /// [permissions]: crate::model::permissions
+    #[inline]
+    pub async fn super_react(
+        &self,
+        cache_http: impl CacheHttp,
+        reaction_type: impl Into<ReactionType>,
+    ) -> Result<Reaction> {
+        self._react(cache_http, reaction_type.into(), true).await
     }
 
     async fn _react(
         &self,
         cache_http: impl CacheHttp,
         reaction_type: ReactionType,
+        burst: bool,
     ) -> Result<Reaction> {
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut user_id = None;
@@ -559,13 +581,30 @@ impl Message {
                         self.channel_id,
                         Permissions::ADD_REACTIONS,
                     )?;
+
+                    if burst {
+                        utils::user_has_perms_cache(
+                            cache,
+                            self.channel_id,
+                            Permissions::USE_EXTERNAL_EMOJIS,
+                        )?;
+                    }
                 }
 
                 user_id = Some(cache.current_user().id);
             }
         }
 
-        cache_http.http().create_reaction(self.channel_id, self.id, &reaction_type).await?;
+        let reaction_types = if burst {
+            cache_http
+                .http()
+                .create_super_reaction(self.channel_id, self.id, &reaction_type)
+                .await?;
+            ReactionTypes::Burst
+        } else {
+            cache_http.http().create_reaction(self.channel_id, self.id, &reaction_type).await?;
+            ReactionTypes::Normal
+        };
 
         Ok(Reaction {
             channel_id: self.channel_id,
@@ -574,6 +613,10 @@ impl Message {
             user_id,
             guild_id: self.guild_id,
             member: self.member.as_deref().map(|member| member.clone().into()),
+            message_author_id: None,
+            burst,
+            burst_colours: None,
+            reaction_type: reaction_types,
         })
     }
 
@@ -891,13 +934,31 @@ impl<'a> From<&'a Message> for MessageId {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageReaction {
-    /// The amount of the type of reaction that have been sent for the associated message.
+    /// The amount of the type of reaction that have been sent for the associated message
+    /// including super reactions.
     pub count: u64,
-    /// Indicator of whether the current user has sent the type of reaction.
+    /// A breakdown of what reactions were from regular reactions and super reactions.
+    pub count_details: CountDetails,
+    /// Indicator of whether the current user has sent this type of reaction.
     pub me: bool,
+    /// Indicator of whether the current user has sent the type of super-reaction.
+    pub me_burst: bool,
     /// The type of reaction.
     #[serde(rename = "emoji")]
     pub reaction_type: ReactionType,
+    // The colours used for super reactions.
+    pub burst_colours: Vec<Colour>,
+}
+
+/// A representation of reaction count details.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-count-details-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct CountDetails {
+    pub burst: u64,
+    pub normal: u64,
 }
 
 enum_number! {
