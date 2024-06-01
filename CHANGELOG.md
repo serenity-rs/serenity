@@ -3,9 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.12.2] - 2024-XX-XX
+## [0.12.2] - 2024-06-01
 
 Thanks to the following for their contributions:
+
 - [@bend-n]
 - [@GnomedDev]
 - [@jamesbt365]
@@ -30,6 +31,7 @@ These deprecation messages include a migration path, it is recommended to go one
 - ([#2861](https://github.com/serenity-rs/serenity/pull/2861)) `TeamMember::permissions` is always `["*"]`, so is useless.
 
 ### Other notable changes
+
 - ([#2790](https://github.com/serenity-rs/serenity/pull/2790])) Added `CreateMessage::enforce_nonce`, to prevent sending duplicate messages.
 - ([#2801](https://github.com/serenity-rs/serenity/pull/2801)) Added `EditProfile::banner`, allowing banners to be set for bots.
 - ([#2810](https://github.com/serenity-rs/serenity/pull/2810)) Added `ChannelId::get_thread_member`.
@@ -40,6 +42,7 @@ These deprecation messages include a migration path, it is recommended to go one
 - ([#2830](https://github.com/serenity-rs/serenity/pull/2830)) Added `Guild`(`Id`)`::bulk_ban`, allowing bulk banning without hitting rate limits.
 - ([#2836](https://github.com/serenity-rs/serenity/pull/2836)) Added support for **Message Polls**, including reading and sending them.
 - ([#2807](https://github.com/serenity-rs/serenity/pull/2807)) Added support for **User Apps**, alllowing user-installable application commands.
+- ([#2882](https://github.com/serenity-rs/serenity/pull/2882)) Added support for super reactions.
 - Many documentation fixes and other optimisations to improve memory and CPU usage.
 
 ## [0.12.1] - 2024-02-28
