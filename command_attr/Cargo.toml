@@ -2,7 +2,7 @@
 name = "command_attr"
 version = "0.5.1"
 authors = ["acdenisSK <acdenissk69@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Procedural macros for command creation for the Serenity library."
 license = "ISC"
 
