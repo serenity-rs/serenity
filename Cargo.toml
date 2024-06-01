@@ -52,7 +52,7 @@ ed25519-dalek = { version = "2.0.0", optional = true }
 typesize = { version = "0.1.2", optional = true, features = ["url", "time", "serde_json", "secrecy", "dashmap", "parking_lot", "details"] }
 # serde feature only allows for serialisation,
 # Serenity workspace crates
-command_attr = { version = "0.5.1", path = "./command_attr", optional = true }
+command_attr = { version = "0.5.2", path = "./command_attr", optional = true }
 serenity-voice-model = { version = "0.2.0", path = "./voice-model", optional = true }
 
 [dev-dependencies.http_crate]
