@@ -5,19 +5,7 @@ use syn::parse::{Error, Parse, ParseStream, Result as SynResult};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::token::{Comma, Mut};
-use syn::{
-    braced,
-    bracketed,
-    parenthesized,
-    parse_quote,
-    Attribute,
-    Ident,
-    Lifetime,
-    Lit,
-    Path,
-    PathSegment,
-    Type,
-};
+use syn::{parenthesized, parse_quote, Attribute, Ident, Lifetime, Lit, Path, PathSegment, Type};
 
 use crate::structures::CommandFun;
 
@@ -89,30 +77,6 @@ macro_rules! propagate_err {
             Err(e) => return $crate::util::into_stream(&e),
         }
     }};
-}
-
-#[derive(Debug)]
-pub struct Bracketed<T>(pub Punctuated<T, Comma>);
-
-impl<T: Parse> Parse for Bracketed<T> {
-    fn parse(input: ParseStream<'_>) -> SynResult<Self> {
-        let content;
-        bracketed!(content in input);
-
-        Ok(Bracketed(content.parse_terminated(T::parse)?))
-    }
-}
-
-#[derive(Debug)]
-pub struct Braced<T>(pub Punctuated<T, Comma>);
-
-impl<T: Parse> Parse for Braced<T> {
-    fn parse(input: ParseStream<'_>) -> SynResult<Self> {
-        let content;
-        braced!(content in input);
-
-        Ok(Braced(content.parse_terminated(T::parse)?))
-    }
 }
 
 #[derive(Debug)]
