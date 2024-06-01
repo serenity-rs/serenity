@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.12.2] - 2024-XX-XX
+
+Thanks to the following for their contributions:
+- [@bend-n]
+- [@GnomedDev]
+- [@jamesbt365]
+- [@MidSpike]
+- [@mkrasnitski]
+- [@RegenJacob]
+
+### Deprecations
+
+Continuing with the deprecations started in 0.12.1, many more methods and fields have been deprecated in order to make an easier upgrade path to 0.13.
+
+These deprecation messages include a migration path, it is recommended to go one by one using `cargo check` and migrate each warning to reduce the burden migrating to 0.13. Following is a list of the deprecation PRs and the justification for these changes.
+
+- ([#2791](https://github.com/serenity-rs/serenity/pull/2791)) The `Channel::is_nsfw` method was wrong, useless, and served better by `GuildChannel::nsfw`
+- ([#2794](https://github.com/serenity-rs/serenity/pull/2794)) These cache methods needed arcane borrow checker dances internally, and obscure the simplicity of the cache.
+- ([#2816](https://github.com/serenity-rs/serenity/pull/2816)) `Member::highest_role_info` is now strictly less powerful than the new `Guild::member_highest_role` and can avoid a cache lookup if used correctly.
+- ([#2825](https://github.com/serenity-rs/serenity/pull/2825))
+- - `Guild::is_large` is less accurate than `Guild::large`
+- - `Message::is_own` is super simple to implement yourself
+- - `Message::is_private` simply checks if `Message::guild_id` is `none`.
+- ([#2838](https://github.com/serenity-rs/serenity/pull/2838)) `Event::PresencesReplace` does not exist, and is a relic from when serenity supported user accounts.
+- ([#2861](https://github.com/serenity-rs/serenity/pull/2861)) `TeamMember::permissions` is always `["*"]`, so is useless.
+
+### Other notable changes
+- ([#2790](https://github.com/serenity-rs/serenity/pull/2790])) Added `CreateMessage::enforce_nonce`, to prevent sending duplicate messages.
+- ([#2801](https://github.com/serenity-rs/serenity/pull/2801)) Added `EditProfile::banner`, allowing banners to be set for bots.
+- ([#2810](https://github.com/serenity-rs/serenity/pull/2810)) Added `ChannelId::get_thread_member`.
+- ([#2812](https://github.com/serenity-rs/serenity/pull/2812)) Added `Guild::partial_member_permissions_in`, which can be used to avoid fetching a `Member` in message events just to check permissions.
+- ([#2819](https://github.com/serenity-rs/serenity/pull/2819)) Added `From<User>` for `CreateEmbedAuthor`, setting the author name and icon to the `User`'s info.
+- ([#2813](https://github.com/serenity-rs/serenity/pull/2813)) Added `UserId::direct_message`, so you don't need a full `User` to direct message.
+- ([#2834](https://github.com/serenity-rs/serenity/pull/2834)) Added `Http::default_allowed_mentions` to set the `AllowedMentions` to be used with every request.
+- ([#2830](https://github.com/serenity-rs/serenity/pull/2830)) Added `Guild`(`Id`)`::bulk_ban`, allowing bulk banning without hitting rate limits.
+- ([#2836](https://github.com/serenity-rs/serenity/pull/2836)) Added support for **Message Polls**, including reading and sending them.
+- ([#2807](https://github.com/serenity-rs/serenity/pull/2807)) Added support for **User Apps**, alllowing user-installable application commands.
+- Many documentation fixes and other optimisations to improve memory and CPU usage.
+
 ## [0.12.1] - 2024-02-28
 
 Thanks to the following for their contributions:
@@ -5381,6 +5420,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.12.2]: https://github.com/serenity-rs/serenity/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/serenity-rs/serenity/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/serenity-rs/serenity/compare/v0.11.7...v0.12.0
 [0.11.7]: https://github.com/serenity-rs/serenity/compare/v0.11.6...v0.11.7
@@ -5506,6 +5546,7 @@ Initial commit.
 [@baeuric]: https://github.com/baeuric
 [@barzamin]: https://github.com/barzamin
 [@bdashore3]: https://github.com/bdashore3
+[@bend-n]: https://github.com/bend-n
 [@benjaminrsherman]: https://github.com/benjaminrsherman
 [@ben-brook]: https://github.com/ben-brook
 [@bikeshedder]: https://github.com/bikeshedder
@@ -5638,6 +5679,7 @@ Initial commit.
 [@megumisonoda]: https://github.com/megumisonoda
 [@mendess]: https://github.com/mendess
 [@merlleu]: https://github.com/merlleu
+[@MidSpike]: https://github.com/MidSpike
 [@Miezhiko]: https://github.com/Miezhiko
 [@miqbalrr]: https://github.com/miqbalrr
 [@mjsir911]: https://github.com/mjsir911
@@ -5673,6 +5715,7 @@ Initial commit.
 [@Roughsketch]: https://github.com/Roughsketch
 [@Rstar284]: https://github.com/Rstar284
 [@rasm47]: https://github.com/rasm47
+[@RegenJacob]: https://github.com/RegenJacob
 [@rsaihe]: https://github.com/rsaihe
 [@Ruthenic]: https://github.com/Ruthenic
 [@SOF3]: https://github.com/SOF3
