@@ -493,7 +493,7 @@ impl ChannelId {
     /// Streams over all the messages in a channel.
     ///
     /// This is accomplished and equivalent to repeated calls to [`Self::messages`]. A buffer of at
-    /// most 100 messages is used to reduce the number of calls. necessary.
+    /// most 100 messages is used to reduce the number of calls necessary.
     ///
     /// The stream returns the newest message first, followed by older messages.
     ///
