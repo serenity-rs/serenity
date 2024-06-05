@@ -947,6 +947,7 @@ pub struct MessageReaction {
     #[serde(rename = "emoji")]
     pub reaction_type: ReactionType,
     // The colours used for super reactions.
+    #[serde(rename = "burst_colors")]
     pub burst_colours: Vec<Colour>,
 }
 
