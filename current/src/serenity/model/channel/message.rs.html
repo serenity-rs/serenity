@@ -1366,6 +1366,7 @@
 <a href="#1366" id="1366">1366</a>
 <a href="#1367" id="1367">1367</a>
 <a href="#1368" id="1368">1368</a>
+<a href="#1369" id="1369">1369</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -2315,6 +2316,7 @@
     </span><span class="attr">#[serde(rename = <span class="string">"emoji"</span>)]
     </span><span class="kw">pub </span>reaction_type: ReactionType,
     <span class="comment">// The colours used for super reactions.
+    </span><span class="attr">#[serde(rename = <span class="string">"burst_colors"</span>)]
     </span><span class="kw">pub </span>burst_colours: Vec&lt;Colour&gt;,
 }
 
