@@ -198,6 +198,13 @@ impl CreateEmbed {
         super::check_overflow(length, crate::constants::EMBED_MAX_LENGTH)
             .map_err(|overflow| Error::Model(ModelError::EmbedTooLarge(overflow)))
     }
+
+    /// Consumes the [`CreateEmbed`], returning the wrapped [`Embed`].
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> Embed {
+        self.0
+    }
 }
 
 impl Default for CreateEmbed {
