@@ -1026,6 +1026,10 @@ enum_number! {
         StageSpeaker = 29,
         StageTopic = 31,
         GuildApplicationPremiumSubscription = 32,
+        GuildIncidentAlertModeEnabled = 36,
+        GuildIncidentAlertModeDisabled = 37,
+        GuildIncidentReportRaid = 38,
+        GuildIncidentReportFalseAlarm = 39,
         _ => Unknown(u8),
     }
 }
