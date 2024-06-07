@@ -22,7 +22,7 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
-use crate::model::utils::StrOrInt;
+use crate::model::utils::{discord_colours, StrOrInt};
 #[cfg(all(feature = "model", feature = "cache"))]
 use crate::utils;
 
@@ -947,7 +947,7 @@ pub struct MessageReaction {
     #[serde(rename = "emoji")]
     pub reaction_type: ReactionType,
     // The colours used for super reactions.
-    #[serde(rename = "burst_colors")]
+    #[serde(rename = "burst_colors", deserialize_with = "discord_colours")]
     pub burst_colours: Vec<Colour>,
 }
 
