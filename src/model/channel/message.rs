@@ -819,6 +819,8 @@ impl Message {
     ///
     /// [`guild_id`]: Self::guild_id
     #[inline]
+    #[allow(deprecated)]
+    #[deprecated = "Use Self::link if Message was recieved via an event, otherwise use MessageId::link to provide the guild_id yourself."]
     pub async fn link_ensured(&self, cache_http: impl CacheHttp) -> String {
         self.id.link_ensured(cache_http, self.channel_id, self.guild_id).await
     }
@@ -1197,6 +1199,7 @@ impl MessageId {
     }
 
     /// Same as [`Self::link`] but tries to find the [`GuildId`] if it is not provided.
+    #[deprecated = "Use GuildChannel::guild_id if you have no GuildId"]
     pub async fn link_ensured(
         &self,
         cache_http: impl CacheHttp,
