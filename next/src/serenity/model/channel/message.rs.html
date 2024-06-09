@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><title>message.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (84b40fc90 2024-05-27)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/message.rs`."><title>message.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (f21554f7f 2024-06-08)" data-channel="nightly" data-search-js="search-9d4fa2dd5e5a7e17.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1096,6 +1096,49 @@
 <a href="#1096" id="1096">1096</a>
 <a href="#1097" id="1097">1097</a>
 <a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1122,7 +1165,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::utils::StrOrInt;
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::{discord_colours, StrOrInt};
 
 <span class="doccomment">/// A representation of a message over a guild's text channel, a group, or a private channel.
 ///
@@ -1516,9 +1559,26 @@
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
-    /// [permissions]: crate::model::permissions
     </span><span class="kw">pub async fn </span>react(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         http.create_reaction(<span class="self">self</span>.channel_id, <span class="self">self</span>.id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// React to the message with a custom [`Emoji`] or unicode character.
+    ///
+    /// **Note**: Requires [Add Reactions] and [Use External Emojis] permissions.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
+    ///
+    /// [Add Reactions]: Permissions::ADD_REACTIONS
+    /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
+    </span><span class="kw">pub async fn </span>super_react(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        http: <span class="kw-2">&amp;</span>Http,
+        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        http.create_super_reaction(<span class="self">self</span>.channel_id, <span class="self">self</span>.id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Uses Discord's inline reply to a user without pinging them.
@@ -1672,6 +1732,8 @@
     <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`] if Discord does not provide it.
     ///
     /// [`guild_id`]: Self::guild_id
+    </span><span class="attr">#[allow(deprecated)]
+    #[deprecated = <span class="string">"Use Self::link if Message was recieved via an event, otherwise use MessageId::link to provide the guild_id yourself."</span>]
     </span><span class="kw">pub async fn </span>link_ensured(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; String {
         <span class="self">self</span>.id.link_ensured(cache_http, <span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id).<span class="kw">await
     </span>}
@@ -1784,13 +1846,32 @@
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 </span><span class="kw">pub struct </span>MessageReaction {
-    <span class="doccomment">/// The amount of the type of reaction that have been sent for the associated message.
+    <span class="doccomment">/// The amount of the type of reaction that have been sent for the associated message
+    /// including super reactions.
     </span><span class="kw">pub </span>count: u64,
-    <span class="doccomment">/// Indicator of whether the current user has sent the type of reaction.
+    <span class="doccomment">/// A breakdown of what reactions were from regular reactions and super reactions.
+    </span><span class="kw">pub </span>count_details: CountDetails,
+    <span class="doccomment">/// Indicator of whether the current user has sent this type of reaction.
     </span><span class="kw">pub </span>me: bool,
+    <span class="doccomment">/// Indicator of whether the current user has sent the type of super-reaction.
+    </span><span class="kw">pub </span>me_burst: bool,
     <span class="doccomment">/// The type of reaction.
     </span><span class="attr">#[serde(rename = <span class="string">"emoji"</span>)]
     </span><span class="kw">pub </span>reaction_type: ReactionType,
+    <span class="comment">// The colours used for super reactions.
+    </span><span class="attr">#[serde(rename = <span class="string">"burst_colors"</span>, deserialize_with = <span class="string">"discord_colours"</span>)]
+    </span><span class="kw">pub </span>burst_colours: Vec&lt;Colour&gt;,
+}
+
+<span class="doccomment">/// A representation of reaction count details.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-count-details-object).
+</span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CountDetails {
+    <span class="kw">pub </span>burst: u64,
+    <span class="kw">pub </span>normal: u64,
 }
 
 <span class="macro">enum_number!</span> {
@@ -1856,6 +1937,10 @@
         StageSpeaker = <span class="number">29</span>,
         StageTopic = <span class="number">31</span>,
         GuildApplicationPremiumSubscription = <span class="number">32</span>,
+        GuildIncidentAlertModeEnabled = <span class="number">36</span>,
+        GuildIncidentAlertModeDisabled = <span class="number">37</span>,
+        GuildIncidentReportRaid = <span class="number">38</span>,
+        GuildIncidentReportFalseAlarm = <span class="number">39</span>,
         <span class="kw">_ </span>=&gt; Unknown(u8),
     }
 }
@@ -2021,6 +2106,7 @@
     }
 
     <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`] if it is not provided.
+    </span><span class="attr">#[deprecated = <span class="string">"Use GuildChannel::guild_id if you have no GuildId"</span>]
     </span><span class="kw">pub async fn </span>link_ensured(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         cache_http: <span class="kw">impl </span>CacheHttp,
