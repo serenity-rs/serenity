@@ -4,7 +4,9 @@ use std::hash::Hash;
 use std::marker::PhantomData;
 use std::num::NonZeroU64;
 
+use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
+use serde_cow::CowStr;
 
 use super::prelude::*;
 
@@ -425,4 +427,48 @@ where
 
         Ok(map)
     }
+}
+
+pub fn discord_colours_opt<'de, D>(deserializer: D) -> Result<Option<Vec<Colour>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let vec_str: Option<Vec<CowStr<'_>>> = Deserialize::deserialize(deserializer)?;
+
+    let Some(vec_str) = vec_str else { return Ok(None) };
+
+    if vec_str.is_empty() {
+        return Ok(None);
+    }
+
+    deserialize_colours::<D>(vec_str).map(Some)
+}
+
+pub fn discord_colours<'de, D>(deserializer: D) -> Result<Vec<Colour>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let vec_str: Vec<CowStr<'_>> = Deserialize::deserialize(deserializer)?;
+
+    deserialize_colours::<D>(vec_str)
+}
+
+fn deserialize_colours<'de, D>(vec_str: Vec<CowStr<'_>>) -> Result<Vec<Colour>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    vec_str
+        .into_iter()
+        .map(|s| {
+            let s = s.0.strip_prefix('#').ok_or_else(|| DeError::custom("Invalid colour data"))?;
+
+            if s.len() != 6 {
+                return Err(DeError::custom("Invalid colour data length"));
+            }
+
+            u32::from_str_radix(s, 16)
+                .map(Colour::new)
+                .map_err(|_| DeError::custom("Invalid colour data"))
+        })
+        .collect()
 }
