@@ -610,15 +610,6 @@ impl Message {
         self.id.link(self.channel_id, self.guild_id)
     }
 
-    /// Same as [`Self::link`] but tries to find the [`GuildId`] if Discord does not provide it.
-    ///
-    /// [`guild_id`]: Self::guild_id
-    #[allow(deprecated)]
-    #[deprecated = "Use Self::link if Message was recieved via an event, otherwise use MessageId::link to provide the guild_id yourself."]
-    pub async fn link_ensured(&self, cache_http: impl CacheHttp) -> String {
-        self.id.link_ensured(cache_http, self.channel_id, self.guild_id).await
-    }
-
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this
     /// message.
     #[cfg(feature = "collector")]
@@ -1077,27 +1068,6 @@ impl MessageId {
         } else {
             format!("https://discord.com/channels/@me/{channel_id}/{self}")
         }
-    }
-
-    /// Same as [`Self::link`] but tries to find the [`GuildId`] if it is not provided.
-    #[deprecated = "Use GuildChannel::guild_id if you have no GuildId"]
-    pub async fn link_ensured(
-        &self,
-        cache_http: impl CacheHttp,
-        channel_id: ChannelId,
-        mut guild_id: Option<GuildId>,
-    ) -> String {
-        if guild_id.is_none() {
-            let found_channel = channel_id.to_channel(cache_http).await;
-
-            if let Ok(channel) = found_channel {
-                if let Some(c) = channel.guild() {
-                    guild_id = Some(c.guild_id);
-                }
-            }
-        }
-
-        self.link(channel_id, guild_id)
     }
 }
 
