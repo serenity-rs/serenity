@@ -1109,36 +1109,6 @@
 <a href="#1109" id="1109">1109</a>
 <a href="#1110" id="1110">1110</a>
 <a href="#1111" id="1111">1111</a>
-<a href="#1112" id="1112">1112</a>
-<a href="#1113" id="1113">1113</a>
-<a href="#1114" id="1114">1114</a>
-<a href="#1115" id="1115">1115</a>
-<a href="#1116" id="1116">1116</a>
-<a href="#1117" id="1117">1117</a>
-<a href="#1118" id="1118">1118</a>
-<a href="#1119" id="1119">1119</a>
-<a href="#1120" id="1120">1120</a>
-<a href="#1121" id="1121">1121</a>
-<a href="#1122" id="1122">1122</a>
-<a href="#1123" id="1123">1123</a>
-<a href="#1124" id="1124">1124</a>
-<a href="#1125" id="1125">1125</a>
-<a href="#1126" id="1126">1126</a>
-<a href="#1127" id="1127">1127</a>
-<a href="#1128" id="1128">1128</a>
-<a href="#1129" id="1129">1129</a>
-<a href="#1130" id="1130">1130</a>
-<a href="#1131" id="1131">1131</a>
-<a href="#1132" id="1132">1132</a>
-<a href="#1133" id="1133">1133</a>
-<a href="#1134" id="1134">1134</a>
-<a href="#1135" id="1135">1135</a>
-<a href="#1136" id="1136">1136</a>
-<a href="#1137" id="1137">1137</a>
-<a href="#1138" id="1138">1138</a>
-<a href="#1139" id="1139">1139</a>
-<a href="#1140" id="1140">1140</a>
-<a href="#1141" id="1141">1141</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -1729,15 +1699,6 @@
         <span class="self">self</span>.id.link(<span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id)
     }
 
-    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`] if Discord does not provide it.
-    ///
-    /// [`guild_id`]: Self::guild_id
-    </span><span class="attr">#[allow(deprecated)]
-    #[deprecated = <span class="string">"Use Self::link if Message was recieved via an event, otherwise use MessageId::link to provide the guild_id yourself."</span>]
-    </span><span class="kw">pub async fn </span>link_ensured(<span class="kw-2">&amp;</span><span class="self">self</span>, cache_http: <span class="kw">impl </span>CacheHttp) -&gt; String {
-        <span class="self">self</span>.id.link_ensured(cache_http, <span class="self">self</span>.channel_id, <span class="self">self</span>.guild_id).<span class="kw">await
-    </span>}
-
     <span class="doccomment">/// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this
     /// message.
     </span><span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
@@ -2103,27 +2064,6 @@
         } <span class="kw">else </span>{
             <span class="macro">format!</span>(<span class="string">"https://discord.com/channels/@me/{channel_id}/{self}"</span>)
         }
-    }
-
-    <span class="doccomment">/// Same as [`Self::link`] but tries to find the [`GuildId`] if it is not provided.
-    </span><span class="attr">#[deprecated = <span class="string">"Use GuildChannel::guild_id if you have no GuildId"</span>]
-    </span><span class="kw">pub async fn </span>link_ensured(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        cache_http: <span class="kw">impl </span>CacheHttp,
-        channel_id: ChannelId,
-        <span class="kw-2">mut </span>guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-    ) -&gt; String {
-        <span class="kw">if </span>guild_id.is_none() {
-            <span class="kw">let </span>found_channel = channel_id.to_channel(cache_http).<span class="kw">await</span>;
-
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(channel) = found_channel {
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = channel.guild() {
-                    guild_id = <span class="prelude-val">Some</span>(c.guild_id);
-                }
-            }
-        }
-
-        <span class="self">self</span>.link(channel_id, guild_id)
     }
 }
 
