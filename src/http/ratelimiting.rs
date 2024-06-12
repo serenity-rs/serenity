@@ -35,23 +35,24 @@
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
-use std::borrow::Cow;
 use std::fmt;
 use std::str::{self, FromStr};
 use std::sync::Arc;
 use std::time::SystemTime;
 
 use dashmap::DashMap;
-use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
+use reqwest::header::HeaderMap;
 use secrecy::{ExposeSecret as _, Secret};
 use tokio::sync::Mutex;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 use tracing::debug;
 
-pub use super::routing::RatelimitingBucket;
-use super::{HttpError, LightMethod, Request, Token};
+use crate::all::OwnedRoute;
 use crate::internal::prelude::*;
+
+use super::{HttpError, LightMethod, Request, Token};
+pub use super::routing::RatelimitingBucket;
 
 /// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
 /// is initialized to call the `EventHandler::ratelimit()` method.
@@ -61,7 +62,7 @@ pub struct RatelimitInfo {
     pub timeout: std::time::Duration,
     pub limit: i64,
     pub method: LightMethod,
-    pub path: Cow<'static, str>,
+    pub route: OwnedRoute,
     pub global: bool,
 }
 
@@ -228,7 +229,7 @@ impl Ratelimiter {
                             timeout: Duration::from_secs_f64(retry_after),
                             limit: 50,
                             method: req.method,
-                            path: req.route.path(),
+                            route: req.route.get_owned_route(),
                             global: true,
                         });
                         sleep(Duration::from_secs_f64(retry_after)).await;
@@ -322,7 +323,7 @@ impl Ratelimit {
                 timeout: delay,
                 limit: self.limit,
                 method: req.method,
-                path: req.route.path(),
+                route: req.route.get_owned_route(),
                 global: false,
             });
 
@@ -380,7 +381,7 @@ impl Ratelimit {
                 timeout: Duration::from_secs_f64(retry_after),
                 limit: self.limit,
                 method: req.method,
-                path: req.route.path(),
+                route: req.route.get_owned_route(),
                 global: false,
             });
 
@@ -444,9 +445,10 @@ mod tests {
 
     use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 
-    use super::parse_header;
     use crate::error::Error;
     use crate::http::HttpError;
+
+    use super::parse_header;
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
 
