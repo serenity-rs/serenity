@@ -2,7 +2,10 @@ use std::error::Error as StdError;
 use std::fmt;
 use std::str::FromStr;
 
+use aformat::{ArrayString, ToArrayString};
+
 use crate::all::Timestamp;
+use crate::internal::prelude::*;
 
 /// Represents a combination of a timestamp and a style for formatting time in messages.
 ///
@@ -81,17 +84,33 @@ impl From<Timestamp> for FormattedTimestamp {
     }
 }
 
-impl fmt::Display for FormattedTimestamp {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.style {
-            Some(style) => write!(f, "<t:{}:{}>", self.timestamp, style),
-            None => write!(f, "<t:{}>", self.timestamp),
+impl ToArrayString for FormattedTimestamp {
+    const MAX_LENGTH: usize = 27;
+    type ArrayString = ArrayString<27>;
+
+    fn to_arraystring(self) -> Self::ArrayString {
+        let mut out = Self::ArrayString::new();
+        if let Some(style) = self.style {
+            aformat_into!(out, "<t:{}:{}>", self.timestamp, style);
+        } else {
+            aformat_into!(out, "<t:{}>", self.timestamp);
         }
+
+        out
     }
 }
 
-impl fmt::Display for FormattedTimestampStyle {
+impl fmt::Display for FormattedTimestamp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.to_arraystring())
+    }
+}
+
+impl ToArrayString for FormattedTimestampStyle {
+    const MAX_LENGTH: usize = 1;
+    type ArrayString = ArrayString<1>;
+
+    fn to_arraystring(self) -> Self::ArrayString {
         let style = match self {
             Self::ShortTime => "t",
             Self::LongTime => "T",
@@ -101,7 +120,15 @@ impl fmt::Display for FormattedTimestampStyle {
             Self::LongDateTime => "F",
             Self::RelativeTime => "R",
         };
-        f.write_str(style)
+
+        ArrayString::from(style)
+            .expect("One ASCII character should fit into an ArrayString of one capacity")
+    }
+}
+
+impl fmt::Display for FormattedTimestampStyle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.to_arraystring())
     }
 }
 
@@ -175,12 +202,11 @@ mod tests {
         let timestamp = Timestamp::now();
 
         let time = FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::ShortDateTime));
-
-        let time_str = time.to_string();
+        let time_str = time.to_arraystring();
 
         assert_eq!(
             time_str,
-            format!(
+            aformat!(
                 "<t:{}:{}>",
                 timestamp.unix_timestamp(),
                 FormattedTimestampStyle::ShortDateTime
@@ -189,20 +215,20 @@ mod tests {
 
         let unstyled = FormattedTimestamp::new(timestamp, None);
 
-        let unstyled_str = unstyled.to_string();
+        let unstyled_str = unstyled.to_arraystring();
 
-        assert_eq!(unstyled_str, format!("<t:{}>", timestamp.unix_timestamp()));
+        assert_eq!(&*unstyled_str, &*aformat!("<t:{}>", timestamp.unix_timestamp()));
     }
 
     #[test]
     fn test_message_time_style() {
-        assert_eq!(FormattedTimestampStyle::ShortTime.to_string(), "t");
-        assert_eq!(FormattedTimestampStyle::LongTime.to_string(), "T");
-        assert_eq!(FormattedTimestampStyle::ShortDate.to_string(), "d");
-        assert_eq!(FormattedTimestampStyle::LongDate.to_string(), "D");
-        assert_eq!(FormattedTimestampStyle::ShortDateTime.to_string(), "f");
-        assert_eq!(FormattedTimestampStyle::LongDateTime.to_string(), "F");
-        assert_eq!(FormattedTimestampStyle::RelativeTime.to_string(), "R");
+        assert_eq!(&*FormattedTimestampStyle::ShortTime.to_arraystring(), "t");
+        assert_eq!(&*FormattedTimestampStyle::LongTime.to_arraystring(), "T");
+        assert_eq!(&*FormattedTimestampStyle::ShortDate.to_arraystring(), "d");
+        assert_eq!(&*FormattedTimestampStyle::LongDate.to_arraystring(), "D");
+        assert_eq!(&*FormattedTimestampStyle::ShortDateTime.to_arraystring(), "f");
+        assert_eq!(&*FormattedTimestampStyle::LongDateTime.to_arraystring(), "F");
+        assert_eq!(&*FormattedTimestampStyle::RelativeTime.to_arraystring(), "R");
     }
 
     #[test]
@@ -211,7 +237,7 @@ mod tests {
 
         let time = FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::ShortDateTime));
 
-        let time_str = format!(
+        let time_str = aformat!(
             "<t:{}:{}>",
             timestamp.unix_timestamp(),
             FormattedTimestampStyle::ShortDateTime
@@ -223,7 +249,7 @@ mod tests {
 
         let unstyled = FormattedTimestamp::new(timestamp, None);
 
-        let unstyled_str = format!("<t:{}>", timestamp.unix_timestamp());
+        let unstyled_str = aformat!("<t:{}>", timestamp.unix_timestamp());
 
         let unstyled_parsed = unstyled_str.parse::<FormattedTimestamp>().unwrap();
 

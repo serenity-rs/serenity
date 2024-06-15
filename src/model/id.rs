@@ -3,9 +3,9 @@
 use std::fmt;
 
 use nonmax::NonMaxU64;
-use to_arraystring::ToArrayString;
 
 use super::Timestamp;
+use crate::internal::prelude::*;
 
 macro_rules! newtype_display_impl {
     ($name:ident) => {
@@ -116,6 +116,8 @@ macro_rules! id_u64 {
 
             impl ToArrayString for $name {
                 type ArrayString = <u64 as ToArrayString>::ArrayString;
+                const MAX_LENGTH: usize = <u64 as ToArrayString>::MAX_LENGTH;
+
                 fn to_arraystring(self) -> Self::ArrayString {
                     self.get().to_arraystring()
                 }
