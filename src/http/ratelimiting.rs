@@ -41,18 +41,17 @@ use std::sync::Arc;
 use std::time::SystemTime;
 
 use dashmap::DashMap;
-use reqwest::{Client, Response, StatusCode};
 use reqwest::header::HeaderMap;
+use reqwest::{Client, Response, StatusCode};
 use secrecy::{ExposeSecret as _, Secret};
 use tokio::sync::Mutex;
-use tokio::time::{Duration, sleep};
+use tokio::time::{sleep, Duration};
 use tracing::debug;
 
+pub use super::routing::RatelimitingBucket;
+use super::{HttpError, LightMethod, Request, Token};
 use crate::all::OwnedRoute;
 use crate::internal::prelude::*;
-
-use super::{HttpError, LightMethod, Request, Token};
-pub use super::routing::RatelimitingBucket;
 
 /// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
 /// is initialized to call the `EventHandler::ratelimit()` method.
@@ -445,10 +444,9 @@ mod tests {
 
     use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 
+    use super::parse_header;
     use crate::error::Error;
     use crate::http::HttpError;
-
-    use super::parse_header;
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
 
