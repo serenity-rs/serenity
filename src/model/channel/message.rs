@@ -1,8 +1,6 @@
 //! Models relating to Discord channels.
 
 use std::borrow::Cow;
-#[cfg(feature = "model")]
-use std::fmt::Display;
 
 use nonmax::NonMaxU64;
 
@@ -471,83 +469,43 @@ impl Message {
 
     /// Uses Discord's inline reply to a user without pinging them.
     ///
-    /// User mentions are generally around 20 or 21 characters long.
-    ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
-    /// limit, containing the number of unicode code points over the limit.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// See the documentation of [`CreateMessage::execute`] for possible errors.
     pub async fn reply(&self, http: &Http, content: impl Into<Cow<'_, str>>) -> Result<Message> {
-        self.reply_(http, content, Some(false)).await
+        self.reply_(http, content.into(), false).await
     }
 
     /// Uses Discord's inline reply to a user with a ping.
     ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-    ///
-    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
-    /// limit, containing the number of unicode code points over the limit.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// See the documentation of [`CreateMessage::execute`] for possible errors.
     pub async fn reply_ping(
         &self,
         http: &Http,
         content: impl Into<Cow<'_, str>>,
     ) -> Result<Message> {
-        self.reply_(http, content, Some(true)).await
+        self.reply_(http, content.into(), true).await
     }
 
-    /// Replies to the user, mentioning them prior to the content in the form of: `@<USER_ID>
-    /// YOUR_CONTENT`.
-    ///
-    /// User mentions are generally around 20 or 21 characters long.
-    ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-    ///
-    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
-    /// limit, containing the number of unicode code points over the limit.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn reply_mention(&self, http: &Http, content: impl Display) -> Result<Message> {
-        self.reply_(http, format!("{} {content}", self.author.mention()), None).await
-    }
+    async fn reply_(&self, http: &Http, content: Cow<'_, str>, ping_user: bool) -> Result<Message> {
+        let default_allowed_mentions = http.default_allowed_mentions.clone();
+        let allowed_mentions = default_allowed_mentions.unwrap_or_else(|| {
+            CreateAllowedMentions::new().everyone(true).all_users(true).all_roles(true)
+        });
 
-    /// `inlined` decides whether this reply is inlined and whether it pings.
-    async fn reply_(
-        &self,
-        http: &Http,
-        content: impl Into<Cow<'_, str>>,
-        inlined: Option<bool>,
-    ) -> Result<Message> {
-        let mut builder = CreateMessage::new().content(content);
-        if let Some(ping_user) = inlined {
-            let allowed_mentions = CreateAllowedMentions::new()
-                .replied_user(ping_user)
-                // By providing allowed_mentions, Discord disabled _all_ pings by default so we
-                // need to re-enable them
-                .everyone(true)
-                .all_users(true)
-                .all_roles(true);
-            builder = builder.reference_message(self).allowed_mentions(allowed_mentions);
-        }
+        let builder = CreateMessage::new()
+            .content(content)
+            .reference_message(self)
+            .allowed_mentions(allowed_mentions.replied_user(ping_user));
+
         self.channel_id.send_message(http, builder).await
     }
 
