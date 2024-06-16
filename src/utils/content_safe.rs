@@ -165,7 +165,7 @@ fn clean_mentions(
 ) -> String {
     let s = s.as_ref();
     let mut content = String::with_capacity(s.len());
-    let mut brackets = s.match_indices(|c| c == '<' || c == '>').peekable();
+    let mut brackets = s.match_indices(['<', '>']).peekable();
     let mut progress = 0;
     while let Some((idx1, b1)) = brackets.next() {
         // Find inner-most pairs of angle brackets
