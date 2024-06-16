@@ -161,8 +161,8 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             )
             .await?;
     } else if msg.content == "assigntags" {
-        let forum_id = channel_id.to_channel(ctx).await?.guild().unwrap().parent_id.unwrap();
-        let forum = forum_id.to_channel(ctx).await?.guild().unwrap();
+        let forum_id = msg.guild_channel(&ctx).await?.parent_id.unwrap();
+        let forum = forum_id.to_guild_channel(&ctx, msg.guild_id).await?;
         channel_id
             .edit_thread(
                 &ctx.http,
@@ -195,15 +195,18 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
 
         msg.author.dm(&ctx.http, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
-        let mut channel =
-            channel.trim().parse::<ChannelId>().unwrap().to_channel(ctx).await?.guild().unwrap();
+        let mut channel = {
+            let channel_id = channel.trim().parse::<ChannelId>().unwrap();
+            channel_id.to_guild_channel(&ctx, msg.guild_id).await.unwrap()
+        };
+
         let parent_id = channel.parent_id.unwrap();
         channel.edit(&ctx.http, EditChannel::new().category(None)).await?;
         channel.edit(&ctx.http, EditChannel::new().category(Some(parent_id))).await?;
     } else if msg.content == "channelperms" {
         let guild = guild_id.to_guild_cached(&ctx.cache).unwrap().clone();
         let perms = guild.user_permissions_in(
-            &channel_id.to_channel(ctx).await?.guild().unwrap(),
+            guild.channels.get(&channel_id).unwrap(),
             &*guild.member(&ctx.http, msg.author.id).await?,
         );
         channel_id.say(&ctx.http, format!("{:?}", perms)).await?;

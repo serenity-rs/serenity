@@ -104,7 +104,7 @@ impl Reaction {
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
-        self.channel_id.to_channel(cache_http).await
+        self.channel_id.to_channel(cache_http, self.guild_id).await
     }
 
     /// Deletes the reaction, but only if the current user is the user who made the reaction or has

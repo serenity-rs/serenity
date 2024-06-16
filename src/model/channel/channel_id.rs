@@ -361,22 +361,29 @@ impl ChannelId {
         http.follow_news_channel(self, &map).await
     }
 
-    /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
-    /// a HTTP request.
-    ///
-    /// It is recommended to first check if the channel is accessible via `Cache::guild` and
-    /// `Guild::members`, although this requires a `GuildId`.
+    /// Attempts to retrieve the channel from the guild cache, otherwise from HTTP/temp cache.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
-    pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
-        #[cfg(feature = "temp_cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.temp_channels.get(&self) {
-                    return Ok(Channel::Guild(GuildChannel::clone(&*channel)));
+    pub async fn to_channel(
+        self,
+        cache_http: impl CacheHttp,
+        guild_id: Option<GuildId>,
+    ) -> Result<Channel> {
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            if let Some(guild_id) = guild_id {
+                if let Some(guild) = cache.guild(guild_id) {
+                    if let Some(channel) = guild.channels.get(&self) {
+                        return Ok(Channel::Guild(channel.clone()));
+                    }
                 }
+            }
+
+            #[cfg(feature = "temp_cache")]
+            if let Some(channel) = cache.temp_channels.get(&self) {
+                return Ok(Channel::Guild(GuildChannel::clone(&*channel)));
             }
         }
 
@@ -395,6 +402,29 @@ impl ChannelId {
         }
 
         Ok(channel)
+    }
+
+    /// Fetches a channel from the cache, falling back to HTTP/temp cache.
+    ///
+    /// It is highly recommended to pass the `guild_id` parameter as otherwise this may perform many
+    /// HTTP requests.
+    ///
+    /// # Errors
+    ///
+    /// Errors if the HTTP fallback fails, or if the channel does not come from the guild passed.
+    pub async fn to_guild_channel(
+        self,
+        cache_http: impl CacheHttp,
+        guild_id: Option<GuildId>,
+    ) -> Result<GuildChannel> {
+        let channel = self.to_channel(cache_http, guild_id).await?;
+        let guild_channel = channel.guild().ok_or(ModelError::InvalidChannelType)?;
+
+        if guild_id.is_some_and(|id| guild_channel.guild_id != id) {
+            return Err(Error::Model(ModelError::ChannelNotFound));
+        }
+
+        Ok(guild_channel)
     }
 
     /// Gets all of the channel's invites.
