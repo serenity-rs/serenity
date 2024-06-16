@@ -184,16 +184,23 @@ impl Message {
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
-    /// the REST API.
-    ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
-    /// required permissions the HTTP-request will be issued.
+    /// HTTP.
     ///
     /// # Errors
     ///
     /// Can return an error if the HTTP request fails.
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
-        self.channel_id.to_channel(cache_http).await
+        self.channel_id.to_channel(cache_http, self.guild_id).await
+    }
+
+    /// First attempts to find the [`GuildChannel`] by it's Id in the cache, upon failure requests
+    /// it via HTTP.
+    ///
+    /// # Errors
+    ///
+    /// Can return an error if the HTTP request fails, or this is executed in a DM channel.
+    pub async fn guild_channel(&self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
+        self.channel_id.to_guild_channel(cache_http, self.guild_id).await
     }
 
     /// Calculates the permissions of the message author in the current channel.
@@ -676,9 +683,10 @@ impl Message {
             }
         }
 
-        let channel = self.channel_id.to_channel(&cache_http).await.ok()?.guild()?;
+        let http = cache_http.http();
+        let channel = http.get_channel(self.channel_id).await.ok()?.guild()?;
         if channel.thread_metadata.is_some() {
-            let thread_parent = channel.parent_id?.to_channel(cache_http).await.ok()?.guild()?;
+            let thread_parent = http.get_channel(channel.parent_id?).await.ok()?.guild()?;
             thread_parent.parent_id
         } else {
             channel.parent_id
