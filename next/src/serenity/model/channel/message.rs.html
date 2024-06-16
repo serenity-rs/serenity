@@ -1075,53 +1075,9 @@
 <a href="#1075" id="1075">1075</a>
 <a href="#1076" id="1076">1076</a>
 <a href="#1077" id="1077">1077</a>
-<a href="#1078" id="1078">1078</a>
-<a href="#1079" id="1079">1079</a>
-<a href="#1080" id="1080">1080</a>
-<a href="#1081" id="1081">1081</a>
-<a href="#1082" id="1082">1082</a>
-<a href="#1083" id="1083">1083</a>
-<a href="#1084" id="1084">1084</a>
-<a href="#1085" id="1085">1085</a>
-<a href="#1086" id="1086">1086</a>
-<a href="#1087" id="1087">1087</a>
-<a href="#1088" id="1088">1088</a>
-<a href="#1089" id="1089">1089</a>
-<a href="#1090" id="1090">1090</a>
-<a href="#1091" id="1091">1091</a>
-<a href="#1092" id="1092">1092</a>
-<a href="#1093" id="1093">1093</a>
-<a href="#1094" id="1094">1094</a>
-<a href="#1095" id="1095">1095</a>
-<a href="#1096" id="1096">1096</a>
-<a href="#1097" id="1097">1097</a>
-<a href="#1098" id="1098">1098</a>
-<a href="#1099" id="1099">1099</a>
-<a href="#1100" id="1100">1100</a>
-<a href="#1101" id="1101">1101</a>
-<a href="#1102" id="1102">1102</a>
-<a href="#1103" id="1103">1103</a>
-<a href="#1104" id="1104">1104</a>
-<a href="#1105" id="1105">1105</a>
-<a href="#1106" id="1106">1106</a>
-<a href="#1107" id="1107">1107</a>
-<a href="#1108" id="1108">1108</a>
-<a href="#1109" id="1109">1109</a>
-<a href="#1110" id="1110">1110</a>
-<a href="#1111" id="1111">1111</a>
-<a href="#1112" id="1112">1112</a>
-<a href="#1113" id="1113">1113</a>
-<a href="#1114" id="1114">1114</a>
-<a href="#1115" id="1115">1115</a>
-<a href="#1116" id="1116">1116</a>
-<a href="#1117" id="1117">1117</a>
-<a href="#1118" id="1118">1118</a>
-<a href="#1119" id="1119">1119</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.
 
 </span><span class="kw">use </span>std::borrow::Cow;
-<span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-</span><span class="kw">use </span>std::fmt::Display;
 
 <span class="kw">use </span>nonmax::NonMaxU64;
 
@@ -1568,83 +1524,43 @@
 
     <span class="doccomment">/// Uses Discord's inline reply to a user without pinging them.
     ///
-    /// User mentions are generally around 20 or 21 characters long.
-    ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
-    /// limit, containing the number of unicode code points over the limit.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// See the documentation of [`CreateMessage::execute`] for possible errors.
     </span><span class="kw">pub async fn </span>reply(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>._reply(http, content, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)).<span class="kw">await
+        <span class="self">self</span>._reply(http, content.into(), <span class="bool-val">false</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Uses Discord's inline reply to a user with a ping.
     ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-    ///
-    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
-    /// limit, containing the number of unicode code points over the limit.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// See the documentation of [`CreateMessage::execute`] for possible errors.
     </span><span class="kw">pub async fn </span>reply_ping(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw-2">&amp;</span>Http,
         content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>._reply(http, content, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="kw">await
+        <span class="self">self</span>._reply(http, content.into(), <span class="bool-val">true</span>).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Replies to the user, mentioning them prior to the content in the form of: `@&lt;USER_ID&gt;
-    /// YOUR_CONTENT`.
-    ///
-    /// User mentions are generally around 20 or 21 characters long.
-    ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-    ///
-    /// Returns a [`ModelError::TooLarge`] if the content of the message is over the above
-    /// limit, containing the number of unicode code points over the limit.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    </span><span class="kw">pub async fn </span>reply_mention(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, content: <span class="kw">impl </span>Display) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="self">self</span>._reply(http, <span class="macro">format!</span>(<span class="string">"{} {content}"</span>, <span class="self">self</span>.author.mention()), <span class="prelude-val">None</span>).<span class="kw">await
-    </span>}
+    <span class="kw">async fn </span>_reply(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, content: Cow&lt;<span class="lifetime">'_</span>, str&gt;, ping_user: bool) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+        <span class="kw">let </span>default_allowed_mentions = http.default_allowed_mentions.clone();
+        <span class="kw">let </span>allowed_mentions = default_allowed_mentions.unwrap_or_else(|| {
+            CreateAllowedMentions::new().everyone(<span class="bool-val">true</span>).all_users(<span class="bool-val">true</span>).all_roles(<span class="bool-val">true</span>)
+        });
 
-    <span class="doccomment">/// `inlined` decides whether this reply is inlined and whether it pings.
-    </span><span class="kw">async fn </span>_reply(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        http: <span class="kw-2">&amp;</span>Http,
-        content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;,
-        inlined: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>builder = CreateMessage::new().content(content);
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(ping_user) = inlined {
-            <span class="kw">let </span>allowed_mentions = CreateAllowedMentions::new()
-                .replied_user(ping_user)
-                <span class="comment">// By providing allowed_mentions, Discord disabled _all_ pings by default so we
-                // need to re-enable them
-                </span>.everyone(<span class="bool-val">true</span>)
-                .all_users(<span class="bool-val">true</span>)
-                .all_roles(<span class="bool-val">true</span>);
-            builder = builder.reference_message(<span class="self">self</span>).allowed_mentions(allowed_mentions);
-        }
+        <span class="kw">let </span>builder = CreateMessage::new()
+            .content(content)
+            .reference_message(<span class="self">self</span>)
+            .allowed_mentions(allowed_mentions.replied_user(ping_user));
+
         <span class="self">self</span>.channel_id.send_message(http, builder).<span class="kw">await
     </span>}
 
