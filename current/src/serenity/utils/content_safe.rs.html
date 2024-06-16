@@ -607,7 +607,7 @@
 ) -&gt; String {
     <span class="kw">let </span>s = s.as_ref();
     <span class="kw">let </span><span class="kw-2">mut </span>content = String::with_capacity(s.len());
-    <span class="kw">let </span><span class="kw-2">mut </span>brackets = s.match_indices(|c| c == <span class="string">'&lt;' </span>|| c == <span class="string">'&gt;'</span>).peekable();
+    <span class="kw">let </span><span class="kw-2">mut </span>brackets = s.match_indices([<span class="string">'&lt;'</span>, <span class="string">'&gt;'</span>]).peekable();
     <span class="kw">let </span><span class="kw-2">mut </span>progress = <span class="number">0</span>;
     <span class="kw">while let </span><span class="prelude-val">Some</span>((idx1, b1)) = brackets.next() {
         <span class="comment">// Find inner-most pairs of angle brackets
