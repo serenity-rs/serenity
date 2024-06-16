@@ -12,7 +12,7 @@ struct Handler;
 impl EventHandler for Handler {
     async fn message(&self, context: Context, msg: Message) {
         if msg.content == "!ping" {
-            let channel = match msg.channel_id.to_channel(&context).await {
+            let channel = match msg.channel(&context).await {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {why:?}");

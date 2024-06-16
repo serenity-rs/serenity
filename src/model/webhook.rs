@@ -166,23 +166,6 @@ pub struct WebhookChannel {
 }
 
 #[cfg(feature = "model")]
-impl WebhookChannel {
-    /// First attempts to retrieve the channel from the `temp_cache` if enabled, otherwise performs
-    /// a HTTP request.
-    ///
-    /// It is recommended to first check if the channel is accessible via `Cache::guild` and
-    /// `Guild::members`, although this requires a `GuildId`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the channel retrieval request failed.
-    pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
-        let channel = self.id.to_channel(cache_http).await?;
-        channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
-    }
-}
-
-#[cfg(feature = "model")]
 impl Webhook {
     /// Retrieves a webhook given its Id.
     ///
