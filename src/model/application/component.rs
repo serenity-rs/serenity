@@ -105,6 +105,7 @@ impl From<SelectMenu> for ActionRowComponent {
 #[serde(untagged)]
 pub enum ButtonKind {
     Link { url: String },
+    Premium { sku_id: SkuId },
     NonLink { custom_id: String, style: ButtonStyle },
 }
 
@@ -120,6 +121,8 @@ impl Serialize for ButtonKind {
             url: Option<&'a str>,
             #[serde(skip_serializing_if = "Option::is_none")]
             custom_id: Option<&'a str>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            sku_id: Option<SkuId>,
         }
 
         let helper = match self {
@@ -129,6 +132,15 @@ impl Serialize for ButtonKind {
                 style: 5,
                 url: Some(url),
                 custom_id: None,
+                sku_id: None,
+            },
+            ButtonKind::Premium {
+                sku_id,
+            } => Helper {
+                style: 6,
+                url: None,
+                custom_id: None,
+                sku_id: Some(*sku_id),
             },
             ButtonKind::NonLink {
                 custom_id,
@@ -137,6 +149,7 @@ impl Serialize for ButtonKind {
                 style: (*style).into(),
                 url: None,
                 custom_id: Some(custom_id),
+                sku_id: None,
             },
         };
         helper.serialize(serializer)
@@ -322,6 +335,14 @@ mod tests {
         assert_json(
             &button,
             json!({"type": 2, "style": 5, "url": "https://google.com", "label": "a", "disabled": false}),
+        );
+
+        button.data = ButtonKind::Premium {
+            sku_id: 1234965026943668316.into(),
+        };
+        assert_json(
+            &button,
+            json!({"type": 2, "style": 6, "sku_id": "1234965026943668316", "label": "a", "disabled": false}),
         );
     }
 }

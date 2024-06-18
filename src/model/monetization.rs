@@ -20,6 +20,20 @@ pub struct Sku {
     pub flags: SkuFlags,
 }
 
+impl Sku {
+    /// Returns the store url for this SKU. If included in a message, will render as a rich embed.
+    /// See the [Discord docs] for details.
+    ///
+    /// [Discord docs]: https://discord.com/developers/docs/monetization/skus#linking-to-your-skus
+    #[must_use]
+    pub fn url(&self) -> String {
+        format!(
+            "https://discord.com/application-directory/{}/store/{}",
+            self.application_id, self.id
+        )
+    }
+}
+
 enum_number! {
     /// Differentiates between SKU classes.
     ///
@@ -80,6 +94,17 @@ pub struct Entitlement {
     pub ends_at: Option<Timestamp>,
     /// The ID of the guild that is granted access to the SKU.
     pub guild_id: Option<GuildId>,
+}
+
+impl Entitlement {
+    /// Returns a link to the SKU corresponding to this entitlement. See [`Sku::url`] for details.
+    #[must_use]
+    pub fn sku_url(&self) -> String {
+        format!(
+            "https://discord.com/application-directory/{}/store/{}",
+            self.application_id, self.sku_id
+        )
+    }
 }
 
 enum_number! {
