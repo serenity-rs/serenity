@@ -92,8 +92,6 @@ macro_rules! routes {
         }
 
         /// This represents the common identifiers, which are used in rate limit buckets.
-        /// If you are interested in less common identifiers,
-        /// please match the variants you are interested in.
         #[derive(Default, Clone)]
         pub struct RatelimitCause {
             pub user_id: Option<UserId>,
@@ -145,9 +143,6 @@ macro_rules! routes {
                 }))
             }
 
-            /// This returns the common identifiers, which are used in rate limit buckets.
-            /// If you are interested in less common identifiers,
-            /// please match the variants you are interested in.
             #[must_use]
             #[allow(unused_variables)] // prevent compiler from complaining about unused variables
             pub fn get_common_identifiers(&self) -> RatelimitCause {
