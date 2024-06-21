@@ -13,11 +13,9 @@ use crate::error::Result;
 use crate::http::Http;
 use crate::model::id::AttachmentId;
 
-/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
+/// A builder for creating a new attachment from a file path, file data, or URL.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
-///
-/// [`send_files`]: crate::model::id::ChannelId::send_files
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[non_exhaustive]
 #[must_use]
@@ -33,12 +31,7 @@ pub struct CreateAttachment {
 impl CreateAttachment {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
     pub fn bytes(data: impl Into<Vec<u8>>, filename: impl Into<String>) -> CreateAttachment {
-        CreateAttachment {
-            data: data.into(),
-            filename: filename.into(),
-            description: None,
-            id: 0,
-        }
+        CreateAttachment { data: data.into(), filename: filename.into(), description: None, id: 0 }
     }
 
     /// Builds an [`CreateAttachment`] by reading a local file.
@@ -212,11 +205,7 @@ impl EditAttachments {
             new_and_existing_attachments: msg
                 .attachments
                 .iter()
-                .map(|a| {
-                    NewOrExisting::Existing(ExistingAttachment {
-                        id: a.id,
-                    })
-                })
+                .map(|a| NewOrExisting::Existing(ExistingAttachment { id: a.id }))
                 .collect(),
         }
     }
@@ -226,9 +215,7 @@ impl EditAttachments {
     ///
     /// Opposite of [`Self::remove`].
     pub fn keep(mut self, id: AttachmentId) -> Self {
-        self.new_and_existing_attachments.push(NewOrExisting::Existing(ExistingAttachment {
-            id,
-        }));
+        self.new_and_existing_attachments.push(NewOrExisting::Existing(ExistingAttachment { id }));
         self
     }
 
