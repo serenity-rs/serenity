@@ -13,11 +13,9 @@ use crate::error::Result;
 use crate::http::Http;
 use crate::model::id::AttachmentId;
 
-/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
+/// A builder for creating a new attachment from a file path, file data, or URL.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
-///
-/// [`send_files`]: crate::model::id::ChannelId::send_files
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[non_exhaustive]
 #[must_use]
