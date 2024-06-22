@@ -1,7 +1,5 @@
 use std::borrow::Cow;
 
-use to_arraystring::ToArrayString;
-
 use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
