@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
 use arrayvec::ArrayVec;
-use to_arraystring::ToArrayString;
 use url::Url;
 
 #[cfg(feature = "http")]

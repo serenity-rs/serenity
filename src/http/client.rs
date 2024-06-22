@@ -220,7 +220,7 @@ fn parse_token(token: &str) -> Arc<str> {
     if token.starts_with("Bot ") || token.starts_with("Bearer ") {
         Arc::from(token)
     } else {
-        Arc::from(format!("Bot {token}"))
+        Arc::from(aformat!("Bot {}", CapStr::<128>(token)).as_str())
     }
 }
 
