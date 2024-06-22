@@ -109,19 +109,20 @@ impl<K: Eq + Hash, V, T> std::ops::Deref for CacheRef<'_, K, V, T> {
     }
 }
 
+type Never = std::convert::Infallible;
 type MappedGuildRef<'a, T> = CacheRef<'a, GuildId, T, Guild>;
 
-pub type UserRef<'a> = CacheRef<'a, UserId, User>;
 pub type MemberRef<'a> = MappedGuildRef<'a, Member>;
-pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
 pub type GuildRoleRef<'a> = MappedGuildRef<'a, Role>;
-pub type SettingsRef<'a> = CacheRef<'a, (), Settings>;
-pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
+pub type UserRef<'a> = CacheRef<'a, UserId, User, Never>;
+pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild, Never>;
+pub type SettingsRef<'a> = CacheRef<'a, Never, Settings, Never>;
 pub type GuildChannelRef<'a> = MappedGuildRef<'a, GuildChannel>;
+pub type CurrentUserRef<'a> = CacheRef<'a, Never, CurrentUser, Never>;
 pub type GuildRolesRef<'a> = MappedGuildRef<'a, HashMap<RoleId, Role>>;
 pub type GuildChannelsRef<'a> = MappedGuildRef<'a, HashMap<ChannelId, GuildChannel>>;
-pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
 pub type MessageRef<'a> = CacheRef<'a, ChannelId, Message, HashMap<MessageId, Message>>;
+pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>, Never>;
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
