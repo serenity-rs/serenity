@@ -22,7 +22,7 @@ pub use role::*;
 mod emoji;
 pub use emoji::*;
 
-use super::DOMAINS;
+use super::{DOMAINS, MAX_DOMAIN_LEN};
 use crate::model::prelude::*;
 use crate::prelude::*;
 
@@ -124,8 +124,11 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 /// ```
 #[must_use]
 pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
+    use aformat::{aformat, CapStr};
+
     for domain in DOMAINS {
-        if let Some(parts) = s.strip_prefix(&format!("https://{domain}/channels/")) {
+        let prefix = aformat!("https://{}/channels/", CapStr::<MAX_DOMAIN_LEN>(domain));
+        if let Some(parts) = s.strip_prefix(prefix.as_str()) {
             let mut parts = parts.splitn(3, '/');
 
             let guild_id = parts.next()?.parse().ok()?;
