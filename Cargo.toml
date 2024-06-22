@@ -24,7 +24,7 @@ repository = "https://github.com/serenity-rs/serenity.git"
 keywords = ["discord", "api"]
 license = "ISC"
 edition = "2021"
-rust-version = "1.74"
+rust-version = "1.79"
 
 [dependencies]
 # Required dependencies
@@ -46,8 +46,9 @@ small-fixed-array = { version = "0.4", features = ["serde"] }
 bool_to_bitflags = { version = "0.1.2" }
 nonmax = { version = "0.5.5", features = ["serde"] }
 strum = { version = "0.26", features = ["derive"] }
-to-arraystring = "0.1.0"
+to-arraystring = "0.2.0"
 extract_map = { version = "0.1.0", features = ["serde", "iter_mut"] }
+aformat = "0.1.3"
 # Optional dependencies
 fxhash = { version = "0.2.1", optional = true }
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"], optional = true }
