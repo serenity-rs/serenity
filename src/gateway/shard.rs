@@ -751,10 +751,9 @@ impl Shard {
 }
 
 async fn connect(base_url: &str) -> Result<WsClient> {
-    let url =
-        Url::parse(&format!("{base_url}?v={}", constants::GATEWAY_VERSION)).map_err(|why| {
-            warn!("Error building gateway URL with base `{}`: {:?}", base_url, why);
-
+    let url = Url::parse(&aformat!("{}?v={}", CapStr::<64>(base_url), constants::GATEWAY_VERSION))
+        .map_err(|why| {
+            warn!("Error building gateway URL with base `{base_url}`: {why:?}");
             Error::Gateway(GatewayError::BuildingUrl)
         })?;
 
