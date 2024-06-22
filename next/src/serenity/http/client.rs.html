@@ -4274,7 +4274,6 @@
 <a href="#4274" id="4274">4274</a>
 <a href="#4275" id="4275">4275</a>
 <a href="#4276" id="4276">4276</a>
-<a href="#4277" id="4277">4277</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4291,7 +4290,6 @@
 <span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde_json::{from_value, json, to_string, to_vec};
-<span class="kw">use </span>to_arraystring::ToArrayString <span class="kw">as _</span>;
 <span class="kw">use </span>tracing::{debug, trace};
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::{Multipart, MultipartUpload};
@@ -4496,7 +4494,7 @@
     <span class="kw">if </span>token.starts_with(<span class="string">"Bot "</span>) || token.starts_with(<span class="string">"Bearer "</span>) {
         Arc::from(token)
     } <span class="kw">else </span>{
-        Arc::from(<span class="macro">format!</span>(<span class="string">"Bot {token}"</span>))
+        Arc::from(<span class="macro">aformat!</span>(<span class="string">"Bot {}"</span>, CapStr::&lt;<span class="number">128</span>&gt;(token)).as_str())
     }
 }
 

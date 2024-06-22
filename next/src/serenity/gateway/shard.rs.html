@@ -778,7 +778,6 @@
 <a href="#778" id="778">778</a>
 <a href="#779" id="779">779</a>
 <a href="#780" id="780">780</a>
-<a href="#781" id="781">781</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
@@ -1551,10 +1550,9 @@
 }
 
 <span class="kw">async fn </span>connect(base_url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;WsClient&gt; {
-    <span class="kw">let </span>url =
-        Url::parse(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{base_url}?v={}"</span>, constants::GATEWAY_VERSION)).map_err(|why| {
-            <span class="macro">warn!</span>(<span class="string">"Error building gateway URL with base `{}`: {:?}"</span>, base_url, why);
-
+    <span class="kw">let </span>url = Url::parse(<span class="kw-2">&amp;</span><span class="macro">aformat!</span>(<span class="string">"{}?v={}"</span>, CapStr::&lt;<span class="number">64</span>&gt;(base_url), constants::GATEWAY_VERSION))
+        .map_err(|why| {
+            <span class="macro">warn!</span>(<span class="string">"Error building gateway URL with base `{base_url}`: {why:?}"</span>);
             Error::Gateway(GatewayError::BuildingUrl)
         })<span class="question-mark">?</span>;
 

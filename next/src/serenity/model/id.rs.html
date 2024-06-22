@@ -464,14 +464,16 @@
 <a href="#464" id="464">464</a>
 <a href="#465" id="465">465</a>
 <a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.
 
 </span><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>nonmax::NonMaxU64;
-<span class="kw">use </span>to_arraystring::ToArrayString;
 
 <span class="kw">use </span><span class="kw">super</span>::Timestamp;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
 <span class="macro">macro_rules!</span> newtype_display_impl {
     (<span class="macro-nonterminal">$name</span>:ident) =&gt; {
@@ -582,6 +584,8 @@
 
             <span class="kw">impl </span>ToArrayString <span class="kw">for </span><span class="macro-nonterminal">$name </span>{
                 <span class="kw">type </span>ArrayString = &lt;u64 <span class="kw">as </span>ToArrayString&gt;::ArrayString;
+                <span class="kw">const </span>MAX_LENGTH: usize = &lt;u64 <span class="kw">as </span>ToArrayString&gt;::MAX_LENGTH;
+
                 <span class="kw">fn </span>to_arraystring(<span class="self">self</span>) -&gt; <span class="self">Self</span>::ArrayString {
                     <span class="self">self</span>.get().to_arraystring()
                 }

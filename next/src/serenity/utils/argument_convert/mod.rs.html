@@ -136,6 +136,9 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>member;
 <span class="kw">pub use </span>member::<span class="kw-2">*</span>;
 
@@ -160,7 +163,7 @@
 <span class="kw">mod </span>emoji;
 <span class="kw">pub use </span>emoji::<span class="kw-2">*</span>;
 
-<span class="kw">use </span><span class="kw">super</span>::DOMAINS;
+<span class="kw">use super</span>::{DOMAINS, MAX_DOMAIN_LEN};
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
 
@@ -262,8 +265,11 @@
 /// ```
 </span><span class="attr">#[must_use]
 </span><span class="kw">pub fn </span>parse_message_url(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;(GuildId, ChannelId, MessageId)&gt; {
+    <span class="kw">use </span>aformat::{aformat, CapStr};
+
     <span class="kw">for </span>domain <span class="kw">in </span>DOMAINS {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(parts) = s.strip_prefix(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"https://{domain}/channels/"</span>)) {
+        <span class="kw">let </span>prefix = <span class="macro">aformat!</span>(<span class="string">"https://{}/channels/"</span>, CapStr::&lt;MAX_DOMAIN_LEN&gt;(domain));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(parts) = s.strip_prefix(prefix.as_str()) {
             <span class="kw">let </span><span class="kw-2">mut </span>parts = parts.splitn(<span class="number">3</span>, <span class="string">'/'</span>);
 
             <span class="kw">let </span>guild_id = parts.next()<span class="question-mark">?</span>.parse().ok()<span class="question-mark">?</span>;

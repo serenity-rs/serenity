@@ -241,11 +241,40 @@
 <a href="#241" id="241">241</a>
 <a href="#242" id="242">242</a>
 <a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::str::FromStr;
 
+<span class="kw">use </span>aformat::{ArrayString, ToArrayString};
+
 <span class="kw">use </span><span class="kw">crate</span>::all::Timestamp;
+<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Represents a combination of a timestamp and a style for formatting time in messages.
 ///
@@ -324,17 +353,33 @@
     }
 }
 
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FormattedTimestamp {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="kw">match </span><span class="self">self</span>.style {
-            <span class="prelude-val">Some</span>(style) =&gt; <span class="macro">write!</span>(f, <span class="string">"&lt;t:{}:{}&gt;"</span>, <span class="self">self</span>.timestamp, style),
-            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">"&lt;t:{}&gt;"</span>, <span class="self">self</span>.timestamp),
+<span class="kw">impl </span>ToArrayString <span class="kw">for </span>FormattedTimestamp {
+    <span class="kw">const </span>MAX_LENGTH: usize = <span class="number">27</span>;
+    <span class="kw">type </span>ArrayString = ArrayString&lt;<span class="number">27</span>&gt;;
+
+    <span class="kw">fn </span>to_arraystring(<span class="self">self</span>) -&gt; <span class="self">Self</span>::ArrayString {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">Self</span>::ArrayString::new();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(style) = <span class="self">self</span>.style {
+            <span class="macro">aformat_into!</span>(out, <span class="string">"&lt;t:{}:{}&gt;"</span>, <span class="self">self</span>.timestamp, style);
+        } <span class="kw">else </span>{
+            <span class="macro">aformat_into!</span>(out, <span class="string">"&lt;t:{}&gt;"</span>, <span class="self">self</span>.timestamp);
         }
+
+        out
     }
 }
 
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FormattedTimestampStyle {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FormattedTimestamp {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.to_arraystring())
+    }
+}
+
+<span class="kw">impl </span>ToArrayString <span class="kw">for </span>FormattedTimestampStyle {
+    <span class="kw">const </span>MAX_LENGTH: usize = <span class="number">1</span>;
+    <span class="kw">type </span>ArrayString = ArrayString&lt;<span class="number">1</span>&gt;;
+
+    <span class="kw">fn </span>to_arraystring(<span class="self">self</span>) -&gt; <span class="self">Self</span>::ArrayString {
         <span class="kw">let </span>style = <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::ShortTime =&gt; <span class="string">"t"</span>,
             <span class="self">Self</span>::LongTime =&gt; <span class="string">"T"</span>,
@@ -344,7 +389,15 @@
             <span class="self">Self</span>::LongDateTime =&gt; <span class="string">"F"</span>,
             <span class="self">Self</span>::RelativeTime =&gt; <span class="string">"R"</span>,
         };
-        f.write_str(style)
+
+        ArrayString::from(style)
+            .expect(<span class="string">"One ASCII character should fit into an ArrayString of one capacity"</span>)
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FormattedTimestampStyle {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.to_arraystring())
     }
 }
 
@@ -418,12 +471,11 @@
         <span class="kw">let </span>timestamp = Timestamp::now();
 
         <span class="kw">let </span>time = FormattedTimestamp::new(timestamp, <span class="prelude-val">Some</span>(FormattedTimestampStyle::ShortDateTime));
-
-        <span class="kw">let </span>time_str = time.to_string();
+        <span class="kw">let </span>time_str = time.to_arraystring();
 
         <span class="macro">assert_eq!</span>(
             time_str,
-            <span class="macro">format!</span>(
+            <span class="macro">aformat!</span>(
                 <span class="string">"&lt;t:{}:{}&gt;"</span>,
                 timestamp.unix_timestamp(),
                 FormattedTimestampStyle::ShortDateTime
@@ -432,20 +484,20 @@
 
         <span class="kw">let </span>unstyled = FormattedTimestamp::new(timestamp, <span class="prelude-val">None</span>);
 
-        <span class="kw">let </span>unstyled_str = unstyled.to_string();
+        <span class="kw">let </span>unstyled_str = unstyled.to_arraystring();
 
-        <span class="macro">assert_eq!</span>(unstyled_str, <span class="macro">format!</span>(<span class="string">"&lt;t:{}&gt;"</span>, timestamp.unix_timestamp()));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>unstyled_str, <span class="kw-2">&amp;*</span><span class="macro">aformat!</span>(<span class="string">"&lt;t:{}&gt;"</span>, timestamp.unix_timestamp()));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_message_time_style() {
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortTime.to_string(), <span class="string">"t"</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongTime.to_string(), <span class="string">"T"</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortDate.to_string(), <span class="string">"d"</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongDate.to_string(), <span class="string">"D"</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::ShortDateTime.to_string(), <span class="string">"f"</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::LongDateTime.to_string(), <span class="string">"F"</span>);
-        <span class="macro">assert_eq!</span>(FormattedTimestampStyle::RelativeTime.to_string(), <span class="string">"R"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>FormattedTimestampStyle::ShortTime.to_arraystring(), <span class="string">"t"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>FormattedTimestampStyle::LongTime.to_arraystring(), <span class="string">"T"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>FormattedTimestampStyle::ShortDate.to_arraystring(), <span class="string">"d"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>FormattedTimestampStyle::LongDate.to_arraystring(), <span class="string">"D"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>FormattedTimestampStyle::ShortDateTime.to_arraystring(), <span class="string">"f"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>FormattedTimestampStyle::LongDateTime.to_arraystring(), <span class="string">"F"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>FormattedTimestampStyle::RelativeTime.to_arraystring(), <span class="string">"R"</span>);
     }
 
     <span class="attr">#[test]
@@ -454,7 +506,7 @@
 
         <span class="kw">let </span>time = FormattedTimestamp::new(timestamp, <span class="prelude-val">Some</span>(FormattedTimestampStyle::ShortDateTime));
 
-        <span class="kw">let </span>time_str = <span class="macro">format!</span>(
+        <span class="kw">let </span>time_str = <span class="macro">aformat!</span>(
             <span class="string">"&lt;t:{}:{}&gt;"</span>,
             timestamp.unix_timestamp(),
             FormattedTimestampStyle::ShortDateTime
@@ -466,7 +518,7 @@
 
         <span class="kw">let </span>unstyled = FormattedTimestamp::new(timestamp, <span class="prelude-val">None</span>);
 
-        <span class="kw">let </span>unstyled_str = <span class="macro">format!</span>(<span class="string">"&lt;t:{}&gt;"</span>, timestamp.unix_timestamp());
+        <span class="kw">let </span>unstyled_str = <span class="macro">aformat!</span>(<span class="string">"&lt;t:{}&gt;"</span>, timestamp.unix_timestamp());
 
         <span class="kw">let </span>unstyled_parsed = unstyled_str.parse::&lt;FormattedTimestamp&gt;().unwrap();
 
