@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 env:
-  rust_min: 1.74.0
+  rust_min: 1.79.0
   rust_nightly: nightly-2025-06-24
 
 jobs:
@@ -139,7 +139,7 @@ jobs:
 
     # We only run this job on the current branch as keeping MSRV the same is not important on next.
     if: (github.event_name == 'push' && github.ref_name == 'current') ||
-        (github.event_name == 'pull_request' && github.base_ref == 'current') 
+        (github.event_name == 'pull_request' && github.base_ref == 'current')
 
     steps:
       - name: Checkout sources

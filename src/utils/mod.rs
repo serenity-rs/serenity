@@ -367,7 +367,7 @@ pub fn parse_quotes(s: &str) -> Vec<String> {
 }
 
 /// Discord's official domains. This is used in [`parse_webhook`] and in its corresponding test.
-const DOMAINS: &[&str] = &[
+const DOMAINS: [&str; 6] = [
     "discord.com",
     "canary.discord.com",
     "ptb.discord.com",
@@ -375,6 +375,22 @@ const DOMAINS: &[&str] = &[
     "canary.discordapp.com",
     "ptb.discordapp.com",
 ];
+
+const MAX_DOMAIN_LEN: usize = {
+    let mut max_len = 0;
+    let mut i = 0;
+
+    while i < DOMAINS.len() {
+        let cur_len = DOMAINS[i].len();
+        if cur_len > max_len {
+            max_len = cur_len;
+        }
+
+        i += 1;
+    }
+
+    max_len
+};
 
 /// Parses the id and token from a webhook url. Expects a [`url::Url`] rather than a [`&str`].
 ///
