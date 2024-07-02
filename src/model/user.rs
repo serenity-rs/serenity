@@ -445,6 +445,17 @@ impl User {
         self.id.direct_message(cache_http, builder).await
     }
 
+    /// Calculates the user's display name.
+    ///
+    /// The global name takes priority over the user's username if it exists.
+    ///
+    /// Note: Guild specific information is not included as this is only available on the [Member].
+    #[inline]
+    #[must_use]
+    pub fn display_name(&self) -> &str {
+        self.global_name.as_deref().unwrap_or(&self.name)
+    }
+
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
