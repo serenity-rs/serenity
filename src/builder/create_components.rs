@@ -114,6 +114,12 @@ impl CreateButton {
     }
 }
 
+impl From<Button> for CreateButton {
+    fn from(button: Button) -> Self {
+        Self(button)
+    }
+}
+
 struct CreateSelectMenuDefault(Mention);
 
 impl Serialize for CreateSelectMenuDefault {
