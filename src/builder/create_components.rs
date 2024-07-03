@@ -125,6 +125,29 @@ impl<'a> CreateButton<'a> {
     }
 }
 
+impl<'a> From<Button> for CreateButton<'a> {
+    fn from(button: Button) -> Self {
+        let (url, custom_id, style) = match button.data {
+            ButtonKind::Link { url } => {
+                (Some(url.into_string().into()), None, ButtonStyle::Unknown(5))
+            },
+            ButtonKind::NonLink { custom_id, style } => {
+                (None, Some(custom_id.into_string().into()), style)
+            },
+        };
+
+        Self {
+            kind: ComponentType::Button,
+            style,
+            url,
+            label: button.label.map(FixedString::into_string).map(Into::into),
+            custom_id,
+            emoji: button.emoji,
+            disabled: button.disabled,
+        }
+    }
+}
+
 struct CreateSelectMenuDefault(Mention);
 
 impl Serialize for CreateSelectMenuDefault {
