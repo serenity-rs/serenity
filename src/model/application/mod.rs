@@ -82,6 +82,17 @@ pub struct CurrentApplicationInfo {
         std::collections::HashMap<InstallationContext, InstallationContextConfig>,
 }
 
+impl CurrentApplicationInfo {
+    /// Returns the store url for the application. If included in a message, will render as a rich
+    /// embed. See the [Discord docs] for details.
+    ///
+    /// [Discord docs]: https://discord.com/developers/docs/monetization/managing-your-store#linking-to-your-store
+    #[must_use]
+    pub fn store_url(&self) -> String {
+        format!("https://discord.com/application-directory/{}/store", self.id)
+    }
+}
+
 #[cfg(feature = "unstable_discord_api")]
 enum_number! {
     /// An enum representing the [installation contexts].
