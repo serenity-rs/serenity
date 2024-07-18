@@ -10,6 +10,7 @@ use crate::gateway::ActivityData;
 #[cfg(feature = "gateway")]
 use crate::gateway::{ShardMessenger, ShardRunner};
 use crate::http::Http;
+use crate::json::json;
 use crate::model::prelude::*;
 
 /// The context is a general utility struct provided on event dispatches, which helps with dealing
@@ -307,6 +308,61 @@ impl Context {
     #[inline]
     pub fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
+    }
+
+    /// Gets all emojis for the current application.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the Application ID is not known.
+    pub async fn get_application_emojis(&self) -> Result<Vec<Emoji>> {
+        self.http.get_application_emojis().await
+    }
+
+    /// Gets information about an application emoji.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the emoji does not exist.
+    pub async fn get_application_emoji(&self, emoji_id: EmojiId) -> Result<Emoji> {
+        self.http.get_application_emoji(emoji_id).await
+    }
+
+    /// Creates an application emoji with a name and base64-encoded image.
+    ///
+    /// # Errors
+    ///
+    /// See [`Guild::create_emoji`] for information about name and filesize requirements. This
+    /// method will error if said requirements are not met.
+    pub async fn create_application_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
+        let map = json!({
+            "name": name,
+            "image": image,
+        });
+
+        self.http.create_application_emoji(&map).await
+    }
+
+    /// Changes the name of an application emoji.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the emoji does not exist.
+    pub async fn edit_application_emoji(&self, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
+        let map = json!({
+            "name": name,
+        });
+
+        self.http.edit_application_emoji(emoji_id, &map).await
+    }
+
+    /// Deletes an application emoji.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the emoji does not exist.
+    pub async fn delete_application_emoji(&self, emoji_id: EmojiId) -> Result<()> {
+        self.http.delete_application_emoji(emoji_id).await
     }
 }
 
