@@ -1,9 +1,7 @@
 #![allow(clippy::missing_errors_doc)]
 
 use std::borrow::Cow;
-use std::num::NonZeroU64;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::header::{HeaderMap as Headers, HeaderValue};
@@ -141,7 +139,10 @@ impl HttpBuilder {
     /// Use the given configuration to build the `Http` client.
     #[must_use]
     pub fn build(self) -> Http {
-        let application_id = AtomicU64::new(self.application_id.map_or(0, ApplicationId::get));
+        let application_id = match self.application_id {
+            Some(id) => id.into(),
+            None => OnceLock::new(),
+        };
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());
@@ -197,7 +198,7 @@ pub struct Http {
     pub ratelimiter: Option<Ratelimiter>,
     pub proxy: Option<String>,
     token: SecretString,
-    application_id: AtomicU64,
+    application_id: OnceLock<ApplicationId>,
     pub default_allowed_mentions: Option<CreateAllowedMentions>,
 }
 
@@ -208,8 +209,7 @@ impl Http {
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {
-        let application_id = self.application_id.load(Ordering::Relaxed);
-        NonZeroU64::new(application_id).map(ApplicationId::from)
+        self.application_id.get().copied()
     }
 
     fn try_application_id(&self) -> Result<ApplicationId> {
@@ -217,7 +217,9 @@ impl Http {
     }
 
     pub fn set_application_id(&self, application_id: ApplicationId) {
-        self.application_id.store(application_id.get(), Ordering::Relaxed);
+        if let Err(existing) = self.application_id.set(application_id) {
+            assert_eq!(existing, application_id, "received conflicting Application IDs");
+        }
     }
 
     pub fn token(&self) -> &str {
