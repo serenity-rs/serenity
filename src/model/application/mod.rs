@@ -124,7 +124,7 @@ enum_number! {
 #[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InstallationContextConfig {
-    pub oauth2_install_params: InstallParams,
+    pub oauth2_install_params: Option<InstallParams>,
 }
 
 /// Information about the Team group of the application.
