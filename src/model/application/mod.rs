@@ -124,8 +124,7 @@ enum_number! {
 #[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InstallationContextConfig {
-    #[serde(default)]
-    pub oauth2_install_params: InstallParams, // TODO: Replace with an option instead of #[serde(default)]
+    pub oauth2_install_params: Option<InstallParams>,
 }
 
 /// Information about the Team group of the application.
@@ -266,14 +265,7 @@ pub struct InstallParams {
     pub scopes: Vec<Scope>,
     pub permissions: Permissions,
 }
-impl Default for InstallParams {
-    fn default() -> Self {
-        Self {
-            scopes: Vec::new(),
-            permissions: Permissions::empty(),
-        }
-    }
-}
+
 #[cfg(test)]
 mod team_role_ordering {
     use super::TeamMemberRole;
