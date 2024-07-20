@@ -926,7 +926,7 @@ fn flatten_group_to_string(
         writeln!(group_text)?;
     }
 
-    let mut joined_commands = group.command_names.join(&format!("\n{}", &repeated_indent_str));
+    let mut joined_commands = group.command_names.join(&format!("\n{repeated_indent_str}"));
 
     if !group.command_names.is_empty() {
         joined_commands.insert_str(0, &repeated_indent_str);
