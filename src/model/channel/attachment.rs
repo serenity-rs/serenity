@@ -136,7 +136,7 @@ impl Attachment {
     ///
     ///             let _ = message
     ///                 .channel_id
-    ///                 .say(&context, &format!("Saved {:?}", attachment.filename))
+    ///                 .say(&context, format!("Saved {:?}", attachment.filename))
     ///                 .await;
     ///         }
     ///     }

@@ -189,12 +189,11 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         score += 1;
         let _ = msg.reply(ctx, "Great! You edited 5 out of 5").await;
     } else {
-        let _ = msg.reply(ctx, &format!("You only edited {} out of 5", edited.len())).await;
+        let _ = msg.reply(ctx, format!("You only edited {} out of 5", edited.len())).await;
     }
 
-    let _ = msg
-        .reply(ctx, &format!("TIME'S UP! You completed {score} out of 4 tasks correctly!"))
-        .await;
+    let _ =
+        msg.reply(ctx, format!("TIME'S UP! You completed {score} out of 4 tasks correctly!")).await;
 
     Ok(())
 }

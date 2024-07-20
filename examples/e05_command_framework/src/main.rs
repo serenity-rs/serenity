@@ -182,7 +182,7 @@ async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError, _com
         if info.is_first_try {
             let _ = msg
                 .channel_id
-                .say(&ctx.http, &format!("Try this again in {} seconds.", info.as_secs()))
+                .say(&ctx.http, format!("Try this again in {} seconds.", info.as_secs()))
                 .await;
         }
     }
@@ -203,7 +203,7 @@ fn _dispatch_error_no_macro<'fut>(
             if info.is_first_try {
                 let _ = msg
                     .channel_id
-                    .say(&ctx.http, &format!("Try this again in {} seconds.", info.as_secs()))
+                    .say(&ctx.http, format!("Try this again in {} seconds.", info.as_secs()))
                     .await;
             }
         };
@@ -405,7 +405,7 @@ async fn owner_check(
 
 #[command]
 async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())).await?;
+    msg.channel_id.say(&ctx.http, format!("Arguments: {:?}", args.rest())).await?;
 
     Ok(())
 }
@@ -476,7 +476,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    msg.reply(ctx, &format!("The shard latency is {:?}", runner.latency)).await?;
+    msg.reply(ctx, format!("The shard latency is {:?}", runner.latency)).await?;
 
     Ok(())
 }
