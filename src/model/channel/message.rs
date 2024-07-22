@@ -150,7 +150,9 @@ pub struct Message {
     ///
     /// Only present in [`MessageCreateEvent`].
     pub poll: Option<Box<Poll>>,
-    #[serde(default)]
+
+
+    
     pub message_snapshots: Vec<MessageSnapshot>,
 }
 
@@ -1065,6 +1067,20 @@ enum_number! {
 }
 
 enum_number! {
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-types).
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum MessageReferenceType {
+        #[default]
+        Default = 0,
+        Forward = 1,
+        _ => Unknown(u8),
+    }
+}
+
+enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -1129,6 +1145,11 @@ pub struct MessageReference {
     /// When sending, whether to error if the referenced message doesn't exist instead of sending
     /// as a normal (non-reply) message, default true.
     pub fail_if_not_exists: Option<bool>,
+
+
+    
+    #[serde(rename = "type")]
+    pub kind: MessageReferenceType,
 }
 
 impl From<&Message> for MessageReference {
