@@ -150,6 +150,33 @@ pub struct Message {
     ///
     /// Only present in [`MessageCreateEvent`].
     pub poll: Option<Box<Poll>>,
+    #[serde(default)]
+    pub message_snapshots: Vec<MessageSnapshot>,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessageSnapshot {
+    pub message: PartialMessage,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PartialMessage {
+    #[serde(rename = "type")]
+    pub kind: MessageType,
+    pub content: String,
+    pub mentions: Vec<User>,
+    pub mention_roles: Vec<RoleId>,
+    pub attachments: Vec<Attachment>,
+    pub embeds: Vec<Embed>,
+    pub timestamp: Timestamp,
+    pub edited_timestamp: Option<Timestamp>,
+    pub flags: Option<MessageFlags>,
+    #[serde(default)]
+    pub components: Vec<ActionRow>,
 }
 
 #[cfg(feature = "model")]
