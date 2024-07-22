@@ -10,7 +10,6 @@ use crate::gateway::ActivityData;
 #[cfg(feature = "gateway")]
 use crate::gateway::{ShardMessenger, ShardRunner};
 use crate::http::Http;
-use crate::json::json;
 use crate::model::prelude::*;
 
 /// The context is a general utility struct provided on event dispatches, which helps with dealing
@@ -335,12 +334,18 @@ impl Context {
     /// See [`Guild::create_emoji`] for information about name and filesize requirements. This
     /// method will error if said requirements are not met.
     pub async fn create_application_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
-        let map = json!({
-            "name": name,
-            "image": image,
-        });
+        #[derive(serde::Serialize)]
+        struct CreateEmoji<'a> {
+            name: &'a str,
+            image: &'a str,
+        }
 
-        self.http.create_application_emoji(&map).await
+        let body = CreateEmoji {
+            name,
+            image,
+        };
+
+        self.http.create_application_emoji(&body).await
     }
 
     /// Changes the name of an application emoji.
@@ -349,11 +354,16 @@ impl Context {
     ///
     /// Returns an error if the emoji does not exist.
     pub async fn edit_application_emoji(&self, emoji_id: EmojiId, name: &str) -> Result<Emoji> {
-        let map = json!({
-            "name": name,
-        });
+        #[derive(serde::Serialize)]
+        struct EditEmoji<'a> {
+            name: &'a str,
+        }
 
-        self.http.edit_application_emoji(emoji_id, &map).await
+        let body = EditEmoji {
+            name,
+        };
+
+        self.http.edit_application_emoji(emoji_id, &body).await
     }
 
     /// Deletes an application emoji.
