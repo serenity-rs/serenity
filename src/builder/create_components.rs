@@ -53,6 +53,21 @@ impl CreateButton {
         })
     }
 
+    /// Creates a new premium button associated with the given SKU.
+    ///
+    /// Clicking this button _will not_ trigger an interaction event in your bot.
+    pub fn new_premium(sku_id: impl Into<SkuId>) -> Self {
+        Self(Button {
+            kind: ComponentType::Button,
+            data: ButtonKind::Premium {
+                sku_id: sku_id.into(),
+            },
+            label: None,
+            emoji: None,
+            disabled: false,
+        })
+    }
+
     /// Creates a normal button with the given custom ID. You must also set [`Self::label`] and/or
     /// [`Self::emoji`] after this.
     pub fn new(custom_id: impl Into<String>) -> Self {
@@ -71,7 +86,7 @@ impl CreateButton {
     /// Sets the custom id of the button, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
     ///
-    /// Has no effect on link buttons.
+    /// Has no effect on link buttons and premium buttons.
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
         if let ButtonKind::NonLink {
             custom_id, ..
@@ -84,7 +99,7 @@ impl CreateButton {
 
     /// Sets the style of this button.
     ///
-    /// Has no effect on link buttons.
+    /// Has no effect on link buttons and premium buttons.
     pub fn style(mut self, new_style: ButtonStyle) -> Self {
         if let ButtonKind::NonLink {
             style, ..

@@ -63,6 +63,7 @@ pub enum CreateInteractionResponse {
     /// Responds to the interaction with an upgrade button.
     ///
     /// Corresponds to Discord's `PREMIUM_REQUIRED'.
+    #[deprecated = "use premium button components via `CreateButton::new_premium` instead"]
     PremiumRequired,
 }
 
@@ -70,6 +71,7 @@ impl serde::Serialize for CreateInteractionResponse {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         use serde::ser::Error as _;
 
+        #[allow(deprecated)]
         #[allow(clippy::match_same_arms)] // hurts readability
         json!({
             "type": match self {
