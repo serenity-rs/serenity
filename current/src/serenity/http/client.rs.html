@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c5d6553a23f1e5a6.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (9057c3ffe 2024-07-19)" data-channel="nightly" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-5ca6ca2a1f83705a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (c1a6199e9 2024-07-24)" data-channel="nightly" data-search-js="search-d234aafac6c221dd.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-d2fab2bf619172d3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4820,6 +4820,105 @@
 <a href="#4820" id="4820">4820</a>
 <a href="#4821" id="4821">4821</a>
 <a href="#4822" id="4822">4822</a>
+<a href="#4823" id="4823">4823</a>
+<a href="#4824" id="4824">4824</a>
+<a href="#4825" id="4825">4825</a>
+<a href="#4826" id="4826">4826</a>
+<a href="#4827" id="4827">4827</a>
+<a href="#4828" id="4828">4828</a>
+<a href="#4829" id="4829">4829</a>
+<a href="#4830" id="4830">4830</a>
+<a href="#4831" id="4831">4831</a>
+<a href="#4832" id="4832">4832</a>
+<a href="#4833" id="4833">4833</a>
+<a href="#4834" id="4834">4834</a>
+<a href="#4835" id="4835">4835</a>
+<a href="#4836" id="4836">4836</a>
+<a href="#4837" id="4837">4837</a>
+<a href="#4838" id="4838">4838</a>
+<a href="#4839" id="4839">4839</a>
+<a href="#4840" id="4840">4840</a>
+<a href="#4841" id="4841">4841</a>
+<a href="#4842" id="4842">4842</a>
+<a href="#4843" id="4843">4843</a>
+<a href="#4844" id="4844">4844</a>
+<a href="#4845" id="4845">4845</a>
+<a href="#4846" id="4846">4846</a>
+<a href="#4847" id="4847">4847</a>
+<a href="#4848" id="4848">4848</a>
+<a href="#4849" id="4849">4849</a>
+<a href="#4850" id="4850">4850</a>
+<a href="#4851" id="4851">4851</a>
+<a href="#4852" id="4852">4852</a>
+<a href="#4853" id="4853">4853</a>
+<a href="#4854" id="4854">4854</a>
+<a href="#4855" id="4855">4855</a>
+<a href="#4856" id="4856">4856</a>
+<a href="#4857" id="4857">4857</a>
+<a href="#4858" id="4858">4858</a>
+<a href="#4859" id="4859">4859</a>
+<a href="#4860" id="4860">4860</a>
+<a href="#4861" id="4861">4861</a>
+<a href="#4862" id="4862">4862</a>
+<a href="#4863" id="4863">4863</a>
+<a href="#4864" id="4864">4864</a>
+<a href="#4865" id="4865">4865</a>
+<a href="#4866" id="4866">4866</a>
+<a href="#4867" id="4867">4867</a>
+<a href="#4868" id="4868">4868</a>
+<a href="#4869" id="4869">4869</a>
+<a href="#4870" id="4870">4870</a>
+<a href="#4871" id="4871">4871</a>
+<a href="#4872" id="4872">4872</a>
+<a href="#4873" id="4873">4873</a>
+<a href="#4874" id="4874">4874</a>
+<a href="#4875" id="4875">4875</a>
+<a href="#4876" id="4876">4876</a>
+<a href="#4877" id="4877">4877</a>
+<a href="#4878" id="4878">4878</a>
+<a href="#4879" id="4879">4879</a>
+<a href="#4880" id="4880">4880</a>
+<a href="#4881" id="4881">4881</a>
+<a href="#4882" id="4882">4882</a>
+<a href="#4883" id="4883">4883</a>
+<a href="#4884" id="4884">4884</a>
+<a href="#4885" id="4885">4885</a>
+<a href="#4886" id="4886">4886</a>
+<a href="#4887" id="4887">4887</a>
+<a href="#4888" id="4888">4888</a>
+<a href="#4889" id="4889">4889</a>
+<a href="#4890" id="4890">4890</a>
+<a href="#4891" id="4891">4891</a>
+<a href="#4892" id="4892">4892</a>
+<a href="#4893" id="4893">4893</a>
+<a href="#4894" id="4894">4894</a>
+<a href="#4895" id="4895">4895</a>
+<a href="#4896" id="4896">4896</a>
+<a href="#4897" id="4897">4897</a>
+<a href="#4898" id="4898">4898</a>
+<a href="#4899" id="4899">4899</a>
+<a href="#4900" id="4900">4900</a>
+<a href="#4901" id="4901">4901</a>
+<a href="#4902" id="4902">4902</a>
+<a href="#4903" id="4903">4903</a>
+<a href="#4904" id="4904">4904</a>
+<a href="#4905" id="4905">4905</a>
+<a href="#4906" id="4906">4906</a>
+<a href="#4907" id="4907">4907</a>
+<a href="#4908" id="4908">4908</a>
+<a href="#4909" id="4909">4909</a>
+<a href="#4910" id="4910">4910</a>
+<a href="#4911" id="4911">4911</a>
+<a href="#4912" id="4912">4912</a>
+<a href="#4913" id="4913">4913</a>
+<a href="#4914" id="4914">4914</a>
+<a href="#4915" id="4915">4915</a>
+<a href="#4916" id="4916">4916</a>
+<a href="#4917" id="4917">4917</a>
+<a href="#4918" id="4918">4918</a>
+<a href="#4919" id="4919">4919</a>
+<a href="#4920" id="4920">4920</a>
+<a href="#4921" id="4921">4921</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -5309,7 +5408,7 @@
 
     <span class="doccomment">/// Creates an emoji in the given [`Guild`] with the given data.
     ///
-    /// View the source code for [`Guild::create_emoji`] method to see what fields this requires.
+    /// See [`Guild::create_emoji`] for required fields.
     ///
     /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
@@ -5327,6 +5426,25 @@
             method: LightMethod::Post,
             route: Route::GuildEmojis {
                 guild_id,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Creates an application emoji with the given data.
+    ///
+    /// See [`Context::create_application_emoji`] for required fields.
+    ///
+    /// [`Context::create_application_emoji`]: crate::client::Context::create_application_emoji
+    </span><span class="kw">pub async fn </span>create_application_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Post,
+            route: Route::Emojis {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
             },
             params: <span class="prelude-val">None</span>,
         })
@@ -5877,9 +5995,9 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Deletes an emoji from a server.
+    <span class="doccomment">/// Deletes an emoji from a guild.
     ///
-    /// See [`GuildId::edit_emoji`] for permissions requirements.
+    /// See [`GuildId::delete_emoji`] for permissions requirements.
     </span><span class="kw">pub async fn </span>delete_emoji(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
@@ -5893,6 +6011,22 @@
             method: LightMethod::Delete,
             route: Route::GuildEmoji {
                 guild_id,
+                emoji_id,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Deletes an application emoji.
+    </span><span class="kw">pub async fn </span>delete_application_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+            body: <span class="prelude-val">None</span>,
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Delete,
+            route: Route::Emoji {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 emoji_id,
             },
             params: <span class="prelude-val">None</span>,
@@ -6405,7 +6539,7 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Changes emoji information.
+    <span class="doccomment">/// Changes guild emoji information.
     ///
     /// See [`GuildId::edit_emoji`] for permissions requirements.
     </span><span class="kw">pub async fn </span>edit_emoji(
@@ -6424,6 +6558,30 @@
             method: LightMethod::Patch,
             route: Route::GuildEmoji {
                 guild_id,
+                emoji_id,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Changes application emoji information.
+    ///
+    /// See [`Context::edit_application_emoji`] for required fields.
+    ///
+    /// [`Context::edit_application_emoji`]: crate::client::Context::edit_application_emoji
+    </span><span class="kw">pub async fn </span>edit_application_emoji(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        emoji_id: EmojiId,
+        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">Some</span>(to_vec(map)<span class="question-mark">?</span>),
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Patch,
+            route: Route::Emoji {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 emoji_id,
             },
             params: <span class="prelude-val">None</span>,
@@ -8078,6 +8236,46 @@
             method: LightMethod::Get,
             route: Route::GuildEmoji {
                 guild_id,
+                emoji_id,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Gets all emojis for the current application.
+    </span><span class="kw">pub async fn </span>get_application_emojis(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Emoji&gt;&gt; {
+        <span class="comment">// Why, discord...
+        </span><span class="attr">#[derive(Deserialize)]
+        </span><span class="kw">struct </span>ApplicationEmojis {
+            items: Vec&lt;Emoji&gt;,
+        }
+
+        <span class="kw">let </span>result: ApplicationEmojis = <span class="self">self
+            </span>.fire(Request {
+                body: <span class="prelude-val">None</span>,
+                multipart: <span class="prelude-val">None</span>,
+                headers: <span class="prelude-val">None</span>,
+                method: LightMethod::Get,
+                route: Route::Emojis {
+                    application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
+                },
+                params: <span class="prelude-val">None</span>,
+            })
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(result.items)
+    }
+
+    <span class="doccomment">/// Gets information about an application emoji.
+    </span><span class="kw">pub async fn </span>get_application_emoji(<span class="kw-2">&amp;</span><span class="self">self</span>, emoji_id: EmojiId) -&gt; <span class="prelude-ty">Result</span>&lt;Emoji&gt; {
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">None</span>,
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Get,
+            route: Route::Emoji {
+                application_id: <span class="self">self</span>.try_application_id()<span class="question-mark">?</span>,
                 emoji_id,
             },
             params: <span class="prelude-val">None</span>,
