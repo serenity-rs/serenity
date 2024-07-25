@@ -470,6 +470,14 @@ routes! ('a, {
     api!("/applications/{}/skus", application_id),
     Some(RatelimitingKind::PathAndId(application_id.into()));
 
+    Emoji { application_id: ApplicationId, emoji_id: EmojiId },
+    api!("/applications/{}/emojis/{}", application_id, emoji_id),
+    Some(RatelimitingKind::PathAndId(application_id.into()));
+
+    Emojis { application_id: ApplicationId },
+    api!("/applications/{}/emojis", application_id),
+    Some(RatelimitingKind::PathAndId(application_id.into()));
+
     Entitlement { application_id: ApplicationId, entitlement_id: EntitlementId },
     api!("/applications/{}/entitlements/{}", application_id, entitlement_id),
     Some(RatelimitingKind::PathAndId(application_id.into()));

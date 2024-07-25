@@ -487,7 +487,7 @@ impl Http {
 
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
-    /// View the source code for [`Guild::create_emoji`] method to see what fields this requires.
+    /// See [`Guild::create_emoji`] for required fields.
     ///
     /// **Note**: Requires the [Create Guild Expressions] permission.
     ///
@@ -505,6 +505,25 @@ impl Http {
             method: LightMethod::Post,
             route: Route::GuildEmojis {
                 guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Creates an application emoji with the given data.
+    ///
+    /// See [`Context::create_application_emoji`] for required fields.
+    ///
+    /// [`Context::create_application_emoji`]: crate::client::Context::create_application_emoji
+    pub async fn create_application_emoji(&self, map: &impl serde::Serialize) -> Result<Emoji> {
+        self.fire(Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Post,
+            route: Route::Emojis {
+                application_id: self.try_application_id()?,
             },
             params: None,
         })
@@ -1055,9 +1074,9 @@ impl Http {
         .await
     }
 
-    /// Deletes an emoji from a server.
+    /// Deletes an emoji from a guild.
     ///
-    /// See [`GuildId::edit_emoji`] for permissions requirements.
+    /// See [`GuildId::delete_emoji`] for permissions requirements.
     pub async fn delete_emoji(
         &self,
         guild_id: GuildId,
@@ -1071,6 +1090,22 @@ impl Http {
             method: LightMethod::Delete,
             route: Route::GuildEmoji {
                 guild_id,
+                emoji_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Deletes an application emoji.
+    pub async fn delete_application_emoji(&self, emoji_id: EmojiId) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Delete,
+            route: Route::Emoji {
+                application_id: self.try_application_id()?,
                 emoji_id,
             },
             params: None,
@@ -1583,7 +1618,7 @@ impl Http {
         .await
     }
 
-    /// Changes emoji information.
+    /// Changes guild emoji information.
     ///
     /// See [`GuildId::edit_emoji`] for permissions requirements.
     pub async fn edit_emoji(
@@ -1602,6 +1637,30 @@ impl Http {
             method: LightMethod::Patch,
             route: Route::GuildEmoji {
                 guild_id,
+                emoji_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Changes application emoji information.
+    ///
+    /// See [`Context::edit_application_emoji`] for required fields.
+    ///
+    /// [`Context::edit_application_emoji`]: crate::client::Context::edit_application_emoji
+    pub async fn edit_application_emoji(
+        &self,
+        emoji_id: EmojiId,
+        map: &impl serde::Serialize,
+    ) -> Result<Emoji> {
+        self.fire(Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Patch,
+            route: Route::Emoji {
+                application_id: self.try_application_id()?,
                 emoji_id,
             },
             params: None,
@@ -3256,6 +3315,46 @@ impl Http {
             method: LightMethod::Get,
             route: Route::GuildEmoji {
                 guild_id,
+                emoji_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Gets all emojis for the current application.
+    pub async fn get_application_emojis(&self) -> Result<Vec<Emoji>> {
+        // Why, discord...
+        #[derive(Deserialize)]
+        struct ApplicationEmojis {
+            items: Vec<Emoji>,
+        }
+
+        let result: ApplicationEmojis = self
+            .fire(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::Emojis {
+                    application_id: self.try_application_id()?,
+                },
+                params: None,
+            })
+            .await?;
+
+        Ok(result.items)
+    }
+
+    /// Gets information about an application emoji.
+    pub async fn get_application_emoji(&self, emoji_id: EmojiId) -> Result<Emoji> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::Emoji {
+                application_id: self.try_application_id()?,
                 emoji_id,
             },
             params: None,
