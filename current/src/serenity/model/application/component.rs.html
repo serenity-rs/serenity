@@ -325,6 +325,27 @@
 <a href="#325" id="325">325</a>
 <a href="#326" id="326">326</a>
 <a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
 <span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
@@ -432,6 +453,7 @@
 #[serde(untagged)]
 </span><span class="kw">pub enum </span>ButtonKind {
     Link { url: String },
+    Premium { sku_id: SkuId },
     NonLink { custom_id: String, style: ButtonStyle },
 }
 
@@ -447,6 +469,8 @@
             </span>url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
             <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
             </span>custom_id: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+            <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+            </span>sku_id: <span class="prelude-ty">Option</span>&lt;SkuId&gt;,
         }
 
         <span class="kw">let </span>helper = <span class="kw">match </span><span class="self">self </span>{
@@ -456,6 +480,15 @@
                 style: <span class="number">5</span>,
                 url: <span class="prelude-val">Some</span>(url),
                 custom_id: <span class="prelude-val">None</span>,
+                sku_id: <span class="prelude-val">None</span>,
+            },
+            ButtonKind::Premium {
+                sku_id,
+            } =&gt; Helper {
+                style: <span class="number">6</span>,
+                url: <span class="prelude-val">None</span>,
+                custom_id: <span class="prelude-val">None</span>,
+                sku_id: <span class="prelude-val">Some</span>(<span class="kw-2">*</span>sku_id),
             },
             ButtonKind::NonLink {
                 custom_id,
@@ -464,6 +497,7 @@
                 style: (<span class="kw-2">*</span>style).into(),
                 url: <span class="prelude-val">None</span>,
                 custom_id: <span class="prelude-val">Some</span>(custom_id),
+                sku_id: <span class="prelude-val">None</span>,
             },
         };
         helper.serialize(serializer)
@@ -649,6 +683,14 @@
         assert_json(
             <span class="kw-2">&amp;</span>button,
             <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="number">2</span>, <span class="string">"style"</span>: <span class="number">5</span>, <span class="string">"url"</span>: <span class="string">"https://google.com"</span>, <span class="string">"label"</span>: <span class="string">"a"</span>, <span class="string">"disabled"</span>: <span class="bool-val">false</span>}),
+        );
+
+        button.data = ButtonKind::Premium {
+            sku_id: <span class="number">1234965026943668316</span>.into(),
+        };
+        assert_json(
+            <span class="kw-2">&amp;</span>button,
+            <span class="macro">json!</span>({<span class="string">"type"</span>: <span class="number">2</span>, <span class="string">"style"</span>: <span class="number">6</span>, <span class="string">"sku_id"</span>: <span class="string">"1234965026943668316"</span>, <span class="string">"label"</span>: <span class="string">"a"</span>, <span class="string">"disabled"</span>: <span class="bool-val">false</span>}),
         );
     }
 }

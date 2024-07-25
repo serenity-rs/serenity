@@ -432,6 +432,8 @@
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 </span><span class="kw">use super</span>::{check_overflow, Builder};
 <span class="kw">use super</span>::{
@@ -497,6 +499,7 @@
     /// Responds to the interaction with an upgrade button.
     ///
     /// Corresponds to Discord's `PREMIUM_REQUIRED'.
+    </span><span class="attr">#[deprecated = <span class="string">"use premium button components via `CreateButton::new_premium` instead"</span>]
     </span>PremiumRequired,
 }
 
@@ -504,7 +507,8 @@
     <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
         <span class="kw">use </span>serde::ser::Error <span class="kw">as _</span>;
 
-        <span class="attr">#[allow(clippy::match_same_arms)] </span><span class="comment">// hurts readability
+        <span class="attr">#[allow(deprecated)]
+        #[allow(clippy::match_same_arms)] </span><span class="comment">// hurts readability
         </span><span class="macro">json!</span>({
             <span class="string">"type"</span>: <span class="kw">match </span><span class="self">self </span>{
                 <span class="self">Self</span>::Pong =&gt; <span class="number">1</span>,

@@ -300,6 +300,17 @@
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.
 
 </span><span class="kw">mod </span>command;
@@ -382,6 +393,17 @@
     #[serde(default)]
     </span><span class="kw">pub </span>integration_types_config:
         std::collections::HashMap&lt;InstallationContext, InstallationContextConfig&gt;,
+}
+
+<span class="kw">impl </span>CurrentApplicationInfo {
+    <span class="doccomment">/// Returns the store url for the application. If included in a message, will render as a rich
+    /// embed. See the [Discord docs] for details.
+    ///
+    /// [Discord docs]: https://discord.com/developers/docs/monetization/managing-your-store#linking-to-your-store
+    </span><span class="attr">#[must_use]
+    </span><span class="kw">pub fn </span>store_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">"https://discord.com/application-directory/{}/store"</span>, <span class="self">self</span>.id)
+    }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">"unstable_discord_api"</span>)]
