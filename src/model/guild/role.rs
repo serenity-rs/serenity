@@ -126,6 +126,17 @@ impl Role {
             self.permissions.contains(permissions)
         }
     }
+
+    #[inline]
+    #[must_use]
+    /// Generates a URL to the Role icon's image.
+    pub fn icon_url(&self) -> Option<String> {
+        self.icon.map(|icon| {
+            let ext = if icon.is_animated() { "gif" } else { "webp" };
+
+            cdn!("/role-icons/{}/{}.{}", self.id, icon, ext)
+        })
+    }
 }
 
 impl fmt::Display for Role {
