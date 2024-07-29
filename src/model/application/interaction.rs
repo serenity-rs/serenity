@@ -318,7 +318,7 @@ pub enum AuthorizingIntegrationOwner {
 #[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Default)]
 #[repr(transparent)]
-pub struct AuthorizingIntegrationOwners(Vec<AuthorizingIntegrationOwner>);
+pub struct AuthorizingIntegrationOwners(pub Vec<AuthorizingIntegrationOwner>);
 
 #[cfg(feature = "unstable_discord_api")]
 impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
