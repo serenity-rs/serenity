@@ -56,21 +56,12 @@ pub enum CreateInteractionResponse<'a> {
     ///
     /// Corresponds to Discord's `MODAL`.
     Modal(CreateModal<'a>),
-    /// Not valid for autocomplete and Ping interactions. Only available for applications with
-    /// monetization enabled.
-    ///
-    /// Responds to the interaction with an upgrade button.
-    ///
-    /// Corresponds to Discord's `PREMIUM_REQUIRED'.
-    #[deprecated = "use premium button components via `CreateButton::new_premium` instead"]
-    PremiumRequired,
 }
 
 impl serde::Serialize for CreateInteractionResponse<'_> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         use serde::ser::Error as _;
 
-        #[allow(deprecated)]
         #[allow(clippy::match_same_arms)] // hurts readability
         json!({
             "type": match self {
@@ -81,7 +72,6 @@ impl serde::Serialize for CreateInteractionResponse<'_> {
                 Self::UpdateMessage(_) => 7,
                 Self::Autocomplete(_) => 8,
                 Self::Modal(_) => 9,
-                Self::PremiumRequired => 10,
             },
             "data": match self {
                 Self::Pong => Value::Null,
@@ -91,7 +81,6 @@ impl serde::Serialize for CreateInteractionResponse<'_> {
                 Self::UpdateMessage(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
                 Self::Autocomplete(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
                 Self::Modal(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::PremiumRequired => Value::Null,
             }
         })
         .serialize(serializer)
