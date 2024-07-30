@@ -365,6 +365,7 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
+    #[cfg_attr(not(feature = "cache"), allow(unused_variables))]
     pub async fn to_channel(
         self,
         cache_http: impl CacheHttp,
