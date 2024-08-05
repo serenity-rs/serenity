@@ -56,14 +56,6 @@ pub enum CreateInteractionResponse<'a> {
     ///
     /// Corresponds to Discord's `MODAL`.
     Modal(CreateModal<'a>),
-    /// Not valid for autocomplete and Ping interactions. Only available for applications with
-    /// monetization enabled.
-    ///
-    /// Responds to the interaction with an upgrade button.
-    ///
-    /// Corresponds to Discord's `PREMIUM_REQUIRED'.
-    #[deprecated = "use premium button components via `CreateButton::new_premium` instead"]
-    PremiumRequired,
 }
 
 impl serde::Serialize for CreateInteractionResponse<'_> {
@@ -79,7 +71,6 @@ impl serde::Serialize for CreateInteractionResponse<'_> {
             Self::UpdateMessage(_) => 7,
             Self::Autocomplete(_) => 8,
             Self::Modal(_) => 9,
-            Self::PremiumRequired => 10,
         })?;
 
         match self {
@@ -90,7 +81,6 @@ impl serde::Serialize for CreateInteractionResponse<'_> {
             Self::UpdateMessage(x) => map.serialize_entry("data", &x)?,
             Self::Autocomplete(x) => map.serialize_entry("data", &x)?,
             Self::Modal(x) => map.serialize_entry("data", &x)?,
-            Self::PremiumRequired => map.serialize_entry("data", &None::<()>)?,
         }
 
         map.end()
