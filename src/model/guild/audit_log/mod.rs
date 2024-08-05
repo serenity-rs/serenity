@@ -344,6 +344,8 @@ pub struct AuditLogEntry {
     pub action: Action,
     /// What was the reasoning by doing an action on a target? If there was one.
     pub reason: Option<String>,
+    // FIXME: Remove this attribute and change the type to `Option<UserId>` on `next`.
+    #[serde(default)]
     /// The user that did this action on a target.
     pub user_id: UserId,
     /// What changes were made.
