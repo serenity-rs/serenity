@@ -2978,7 +2978,7 @@ impl Http {
             multipart: None,
             headers: None,
             method: LightMethod::Get,
-            route: Route::Oauth2ApplicationCurrent,
+            route: Route::OAuth2ApplicationCurrent,
             params: None,
         })
         .await
