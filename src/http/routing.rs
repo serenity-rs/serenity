@@ -365,8 +365,20 @@ routes! ('a, {
     api!("/invites/{}", code),
     Some(RatelimitingKind::Path);
 
-    Oauth2ApplicationCurrent,
+    OAuth2Token,
+    api!("/oauth2/token"),
+    None;
+
+    OAuth2TokenRevocation,
+    api!("/oauth2/token/revoke"),
+    None;
+
+    OAuth2ApplicationCurrent,
     api!("/oauth2/applications/@me"),
+    None;
+
+    OAuth2AuthorizationCurrent,
+    api!("/oauth2/@me"),
     None;
 
     StatusIncidentsUnresolved,
