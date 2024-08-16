@@ -513,7 +513,7 @@ event_handler! {
 #[async_trait]
 pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
-    async fn raw_event(&self, _ctx: Context, _ev: Event) {}
+    async fn raw_event(&self, _ctx: Context, _ev: &Event) {}
 
     /// Checks if the `event` should be dispatched (`true`) or ignored (`false`).
     ///
@@ -540,4 +540,5 @@ pub trait RawEventHandler: Send + Sync {
 pub enum InternalEventHandler {
     Raw(Arc<dyn RawEventHandler>),
     Normal(Arc<dyn EventHandler>),
+    Both { raw: Arc<dyn RawEventHandler>, normal: Arc<dyn EventHandler> },
 }
