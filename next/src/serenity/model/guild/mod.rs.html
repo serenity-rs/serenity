@@ -2512,7 +2512,6 @@
 <a href="#2512" id="2512">2512</a>
 <a href="#2513" id="2513">2513</a>
 <a href="#2514" id="2514">2514</a>
-<a href="#2515" id="2515">2515</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -4218,8 +4217,7 @@
     }
 
     <span class="doccomment">/// Calculate a [`Member`]'s permissions in the guild.
-    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
         <span class="self">Self</span>::_user_permissions_in(
             <span class="prelude-val">None</span>,

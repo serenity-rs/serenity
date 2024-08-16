@@ -1431,7 +1431,6 @@
 <a href="#1431" id="1431">1431</a>
 <a href="#1432" id="1432">1432</a>
 <a href="#1433" id="1433">1433</a>
-<a href="#1434" id="1434">1434</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>nonmax::{NonMaxU16, NonMaxU64, NonMaxU8};
 <span class="kw">use </span>serde::Serialize;
 
@@ -2355,8 +2354,7 @@
     </span>}
 
     <span class="doccomment">/// Calculate a [`Member`]'s permissions in the guild.
-    </span><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-    #[must_use]
+    </span><span class="attr">#[must_use]
     </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
         Guild::_user_permissions_in(
             <span class="prelude-val">None</span>,
