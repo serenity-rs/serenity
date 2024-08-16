@@ -17,6 +17,7 @@ pub use oauth::*;
 mod ping_interaction;
 pub use ping_interaction::*;
 
+use super::guild::PartialGuild;
 use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
 use super::misc::ImageHash;
 use super::user::User;
@@ -80,6 +81,11 @@ pub struct CurrentApplicationInfo {
     #[serde(default)]
     pub integration_types_config:
         std::collections::HashMap<InstallationContext, InstallationContextConfig>,
+    pub approximate_guild_count: Option<u32>,
+    pub approximate_user_install_count: Option<u32>,
+    pub guild: Option<PartialGuild>,
+    pub redirect_uris: Option<Vec<String>>,
+    pub interactions_endpoint_url: Option<String>,
 }
 
 impl CurrentApplicationInfo {
