@@ -178,6 +178,12 @@ impl ShardRunner {
                     Some(InternalEventHandler::Raw(handler)) => {
                         handler.filter_event(&context, &event)
                     },
+                    Some(InternalEventHandler::Both {
+                        raw,
+                        normal,
+                    }) => {
+                        raw.filter_event(&context, &event) && normal.filter_event(&context, &event)
+                    },
                     None => true,
                 };
 
