@@ -1906,7 +1906,6 @@ impl Guild {
 
     /// Calculate a [`Member`]'s permissions in the guild.
     #[inline]
-    #[cfg(feature = "cache")]
     #[must_use]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
         Self::_user_permissions_in(
