@@ -298,7 +298,10 @@ impl IntoFuture for ClientBuilder {
         let http = self.http;
 
         let event_handler = match (self.event_handler, self.raw_event_handler) {
-            (Some(_), Some(_)) => panic!("Cannot provide both a normal and raw event handlers"),
+            (Some(normal), Some(raw)) => Some(InternalEventHandler::Both {
+                normal,
+                raw,
+            }),
             (Some(h), None) => Some(InternalEventHandler::Normal(h)),
             (None, Some(h)) => Some(InternalEventHandler::Raw(h)),
             (None, None) => None,
