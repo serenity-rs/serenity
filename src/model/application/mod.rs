@@ -80,8 +80,8 @@ pub struct CurrentApplicationInfo {
     #[serde(default)]
     pub integration_types_config:
         std::collections::HashMap<InstallationContext, InstallationContextConfig>,
-    pub approximate_guild_count: Option<u64>,
-    pub approximate_user_install_count: Option<u64>,
+    pub approximate_guild_count: Option<u32>,
+    pub approximate_user_install_count: Option<u32>,
 }
 
 impl CurrentApplicationInfo {
