@@ -50,13 +50,18 @@ pub(crate) async fn dispatch_model(
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
     event_handler: Option<InternalEventHandler>,
 ) {
-    let handler = match event_handler {
-        Some(InternalEventHandler::Normal(handler)) => Some(handler),
-        Some(InternalEventHandler::Raw(raw_handler)) => {
-            return raw_handler.raw_event(context, event).await;
-        },
-        None => None,
+    let (handler, raw_handler) = match event_handler {
+        Some(InternalEventHandler::Normal(handler)) => (Some(handler), None),
+        Some(InternalEventHandler::Both {
+            raw,
+            normal,
+        }) => (Some(normal), Some(raw)),
+        Some(InternalEventHandler::Raw(raw_handler)) => (None, Some(raw_handler)),
+        None => (None, None),
     };
+    if let Some(raw_handler) = raw_handler {
+        raw_handler.raw_event(context.clone(), &event).await;
+    }
 
     let (full_event, extra_event) = update_cache_with_event(
         #[cfg(feature = "cache")]
