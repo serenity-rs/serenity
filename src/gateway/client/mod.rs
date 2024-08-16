@@ -1,24 +1,11 @@
-//! The Client contains information about a single bot's token, as well as event handlers.
-//! Dispatching events to configured handlers and starting the shards' connections are handled
-//! directly via the client. In addition, the `http` module and `Cache` are also automatically
-//! handled by the Client module for you.
+//! The [`Client`] contains information about a bot's token, as well as event handlers. Dispatching
+//! events to handlers and starting sharded gateway connections is handled directly by the client.
+//! In addition, the client automatically handles caching via the [`Cache`] struct.
 //!
-//! A [`Context`] is provided for every handler.
-//!
-//! The `http` module is the lower-level method of interacting with the Discord REST API.
-//! Realistically, there should be little reason to use this yourself, as the Context will do this
-//! for you. A possible use case of using the `http` module is if you do not have a Cache, for
-//! purposes such as low memory requirements.
-//!
-//! Click [here][Client examples] for an example on how to use a `Client`.
-//!
-//! [Client examples]: Client#examples
+//! Click [here][Client#examples] for an example on how to use a [`Client`].
 
 mod context;
-#[cfg(feature = "gateway")]
 pub(crate) mod dispatch;
-mod error;
-#[cfg(feature = "gateway")]
 mod event_handler;
 
 use std::future::IntoFuture;
@@ -34,26 +21,19 @@ use futures::StreamExt as _;
 use tracing::debug;
 
 pub use self::context::Context;
-pub use self::error::Error as ClientError;
-#[cfg(feature = "gateway")]
 pub use self::event_handler::{EventHandler, FullEvent, InternalEventHandler, RawEventHandler};
-#[cfg(feature = "gateway")]
-use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
-pub use crate::cache::Cache;
+use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::cache::Settings as CacheSettings;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
-use crate::gateway::{ActivityData, PresenceData};
-#[cfg(feature = "gateway")]
-use crate::gateway::{ShardManager, ShardManagerOptions};
+use crate::gateway::{ActivityData, GatewayError, PresenceData, ShardManager, ShardManagerOptions};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-#[cfg(feature = "gateway")]
 use crate::model::gateway::GatewayIntents;
 use crate::model::id::ApplicationId;
 #[cfg(feature = "voice")]
@@ -62,7 +42,6 @@ use crate::model::user::OnlineStatus;
 use crate::utils::check_shard_total;
 
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
-#[cfg(feature = "gateway")]
 #[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
     data: Option<Arc<dyn std::any::Any + Send + Sync>>,
@@ -79,7 +58,6 @@ pub struct ClientBuilder {
     presence: PresenceData,
 }
 
-#[cfg(feature = "gateway")]
 impl ClientBuilder {
     /// Construct a new builder to call methods on for the client construction. The `token` will
     /// automatically be prefixed "Bot " if not already.
@@ -280,7 +258,6 @@ impl ClientBuilder {
     }
 }
 
-#[cfg(feature = "gateway")]
 impl IntoFuture for ClientBuilder {
     type Output = Result<Client>;
 
@@ -423,7 +400,6 @@ impl IntoFuture for ClientBuilder {
 /// [`Shard`]: crate::gateway::Shard
 /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 /// [sharding docs]: crate::gateway#sharding
-#[cfg(feature = "gateway")]
 pub struct Client {
     data: Arc<dyn std::any::Any + Send + Sync>,
     /// A HashMap of all shards instantiated by the Client.

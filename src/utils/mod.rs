@@ -1,7 +1,7 @@
 //! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
-#[cfg(feature = "client")]
+#[cfg(feature = "gateway")]
 mod argument_convert;
 #[cfg(feature = "cache")]
 mod content_safe;
@@ -15,7 +15,7 @@ pub mod token;
 
 use std::num::NonZeroU16;
 
-#[cfg(feature = "client")]
+#[cfg(feature = "gateway")]
 pub use argument_convert::*;
 #[cfg(feature = "cache")]
 pub use content_safe::*;

@@ -23,10 +23,15 @@ use super::{
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::InternalEventHandler;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
+use crate::gateway::{
+    ConnectionStage,
+    InternalEventHandler,
+    PresenceData,
+    Shard,
+    ShardRunnerMessage,
+};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -45,8 +50,8 @@ pub struct ShardQueuer {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
     /// A reference to [`EventHandler`] or [`RawEventHandler`].
     ///
-    /// [`EventHandler`]: crate::client::EventHandler
-    /// [`RawEventHandler`]: crate::client::RawEventHandler
+    /// [`EventHandler`]: crate::gateway::EventHandler
+    /// [`RawEventHandler`]: crate::gateway::RawEventHandler
     pub event_handler: Option<InternalEventHandler>,
     /// A copy of the framework
     #[cfg(feature = "framework")]

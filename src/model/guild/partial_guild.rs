@@ -1310,8 +1310,8 @@ impl PartialGuild {
     /// # use serenity::prelude::*;
     /// # struct Handler;
     ///
+    /// # #[cfg(all(feature = "cache", feature = "gateway"))]
     /// #[serenity::async_trait]
-    /// #[cfg(all(feature = "cache", feature = "client"))]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {

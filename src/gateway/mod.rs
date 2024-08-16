@@ -40,6 +40,7 @@
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
 mod bridge;
+pub mod client;
 mod error;
 mod shard;
 mod ws;
@@ -51,6 +52,7 @@ use reqwest::IntoUrl;
 use reqwest::Url;
 
 pub use self::bridge::*;
+pub use self::client::*;
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws::WsClient;

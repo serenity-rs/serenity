@@ -16,10 +16,9 @@ use super::VoiceGatewayManager;
 use super::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::InternalEventHandler;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
+use crate::gateway::{ConnectionStage, GatewayError, InternalEventHandler, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -49,8 +48,13 @@ use crate::model::gateway::GatewayIntents;
 /// use std::env;
 /// use std::sync::{Arc, OnceLock};
 ///
-/// use serenity::client::{EventHandler, InternalEventHandler, RawEventHandler};
-/// use serenity::gateway::{ShardManager, ShardManagerOptions};
+/// use serenity::gateway::{
+///     EventHandler,
+///     InternalEventHandler,
+///     RawEventHandler,
+///     ShardManager,
+///     ShardManagerOptions,
+/// };
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;

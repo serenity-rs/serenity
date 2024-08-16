@@ -15,11 +15,17 @@ use super::VoiceGatewayManager;
 use super::{ShardId, ShardManager, ShardRunnerMessage};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::dispatch::dispatch_model;
-use crate::client::{Context, InternalEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{GatewayError, ReconnectType, Shard, ShardAction};
+use crate::gateway::dispatch::dispatch_model;
+use crate::gateway::{
+    Context,
+    GatewayError,
+    InternalEventHandler,
+    ReconnectType,
+    Shard,
+    ShardAction,
+};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
