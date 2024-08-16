@@ -311,6 +311,12 @@
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.
 
 </span><span class="kw">mod </span>command;
@@ -330,6 +336,7 @@
 <span class="kw">mod </span>ping_interaction;
 <span class="kw">pub use </span>ping_interaction::<span class="kw-2">*</span>;
 
+<span class="kw">use </span><span class="kw">super</span>::guild::PartialGuild;
 <span class="kw">use </span><span class="kw">super</span>::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
 <span class="kw">use </span><span class="kw">super</span>::misc::ImageHash;
 <span class="kw">use </span><span class="kw">super</span>::user::User;
@@ -393,6 +400,11 @@
     #[serde(default)]
     </span><span class="kw">pub </span>integration_types_config:
         std::collections::HashMap&lt;InstallationContext, InstallationContextConfig&gt;,
+    <span class="kw">pub </span>approximate_guild_count: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub </span>approximate_user_install_count: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub </span>guild: <span class="prelude-ty">Option</span>&lt;PartialGuild&gt;,
+    <span class="kw">pub </span>redirect_uris: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+    <span class="kw">pub </span>interactions_endpoint_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="kw">impl </span>CurrentApplicationInfo {
