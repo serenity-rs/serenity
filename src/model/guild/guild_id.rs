@@ -899,6 +899,16 @@ impl GuildId {
         builder.execute(cache_http, self).await
     }
 
+    /// Gets a specific role in the guild, by Id.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not in the guild, or if the role does not
+    /// exist.
+    pub async fn role(self, http: impl AsRef<Http>, role_id: RoleId) -> Result<Role> {
+        http.as_ref().get_guild_role(self, role_id).await
+    }
+
     /// Gets all of the guild's roles over the REST API.
     ///
     /// # Errors
