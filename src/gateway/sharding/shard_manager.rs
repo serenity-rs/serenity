@@ -11,13 +11,13 @@ use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tracing::{info, warn};
 
-#[cfg(feature = "voice")]
-use super::VoiceGatewayManager;
 use super::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+#[cfg(feature = "voice")]
+use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ConnectionStage, GatewayError, InternalEventHandler, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
