@@ -42,10 +42,6 @@ impl Token {
     pub fn new(inner: Arc<str>) -> Secret<Self> {
         Secret::new(Self(inner))
     }
-
-    pub fn get_inner(&self) -> &Arc<str> {
-        &self.0
-    }
 }
 
 impl std::ops::Deref for Token {
@@ -297,8 +293,9 @@ impl Http {
         self.application_id.store(application_id.get(), Ordering::Relaxed);
     }
 
+    #[cfg(feature = "gateway")]
     pub(crate) fn token(&self) -> &Arc<str> {
-        self.token.expose_secret().get_inner()
+        &self.token.expose_secret().0
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
