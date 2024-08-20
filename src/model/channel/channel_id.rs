@@ -1,3 +1,4 @@
+#[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::sync::Arc;
@@ -28,7 +29,6 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]

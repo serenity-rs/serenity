@@ -1,5 +1,6 @@
 //! Models relating to Discord channels.
 
+#[cfg(feature = "model")]
 use std::borrow::Cow;
 
 use nonmax::NonMaxU64;

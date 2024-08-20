@@ -1,3 +1,4 @@
+#[cfg(feature = "model")]
 use std::borrow::Cow;
 use std::fmt;
 #[cfg(feature = "model")]

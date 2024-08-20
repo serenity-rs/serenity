@@ -15,6 +15,7 @@ use serde::de::{Error as DeError, Unexpected};
 use serde_json::from_value;
 
 pub use self::attachment::*;
+#[cfg(feature = "model")]
 pub use self::channel_id::*;
 pub use self::embed::*;
 pub use self::guild_channel::*;

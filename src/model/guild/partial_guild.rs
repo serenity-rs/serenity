@@ -1,4 +1,6 @@
-use nonmax::{NonMaxU16, NonMaxU64, NonMaxU8};
+use nonmax::NonMaxU64;
+#[cfg(feature = "model")]
+use nonmax::{NonMaxU16, NonMaxU8};
 use serde::Serialize;
 
 #[cfg(feature = "model")]

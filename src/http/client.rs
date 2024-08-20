@@ -5,6 +5,7 @@ use std::cell::Cell;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
+use aformat::{aformat, CapStr};
 use arrayvec::ArrayVec;
 use nonmax::{NonMaxU16, NonMaxU8};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};

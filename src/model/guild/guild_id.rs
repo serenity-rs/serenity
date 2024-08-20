@@ -2,6 +2,7 @@ use std::fmt;
 
 #[cfg(feature = "model")]
 use futures::stream::Stream;
+#[cfg(feature = "model")]
 use nonmax::{NonMaxU16, NonMaxU8};
 
 #[cfg(feature = "model")]
@@ -31,6 +32,7 @@ use crate::gateway::ShardMessenger;
 use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+#[cfg(feature = "model")]
 use crate::model::error::Maximum;
 use crate::model::prelude::*;
 
