@@ -42,7 +42,7 @@ pub use self::typing::*;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "gateway")]
-use crate::gateway::Context;
+use crate::gateway::client::Context;
 use crate::model::prelude::*;
 
 /// This trait will be required by functions that need [`Http`] and can optionally use a [`Cache`]

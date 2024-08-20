@@ -8,6 +8,8 @@
 //! connection to Discord. The client will handle shard management automatically for you, so you
 //! should only care about using it directly if you really need to. See the [`sharding`] module for
 //! details and documentation.
+//!
+//! [`Client`]: client::Client
 
 pub mod client;
 mod error;
@@ -20,7 +22,6 @@ mod ws;
 use reqwest::IntoUrl;
 use reqwest::Url;
 
-pub use self::client::*;
 pub use self::error::Error as GatewayError;
 pub use self::sharding::*;
 #[cfg(feature = "voice")]

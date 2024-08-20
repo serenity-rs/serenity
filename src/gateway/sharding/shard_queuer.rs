@@ -22,15 +22,10 @@ use super::{
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::gateway::client::InternalEventHandler;
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
-use crate::gateway::{
-    ConnectionStage,
-    InternalEventHandler,
-    PresenceData,
-    Shard,
-    ShardRunnerMessage,
-};
+use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -49,8 +44,8 @@ pub struct ShardQueuer {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
     /// A reference to [`EventHandler`] or [`RawEventHandler`].
     ///
-    /// [`EventHandler`]: crate::gateway::EventHandler
-    /// [`RawEventHandler`]: crate::gateway::RawEventHandler
+    /// [`EventHandler`]: crate::gateway::client::EventHandler
+    /// [`RawEventHandler`]: crate::gateway::client::RawEventHandler
     pub event_handler: Option<InternalEventHandler>,
     /// A copy of the framework
     #[cfg(feature = "framework")]

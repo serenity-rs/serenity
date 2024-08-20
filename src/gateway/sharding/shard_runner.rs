@@ -15,10 +15,11 @@ use super::{ReconnectType, Shard, ShardAction, ShardId, ShardManager, ShardStage
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::dispatch::dispatch_model;
+use crate::gateway::client::dispatch::dispatch_model;
+use crate::gateway::client::{Context, InternalEventHandler};
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
-use crate::gateway::{ActivityData, ChunkGuildFilter, Context, GatewayError, InternalEventHandler};
+use crate::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;

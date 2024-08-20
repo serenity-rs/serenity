@@ -530,7 +530,7 @@ impl Http {
     ///
     /// See [`Context::create_application_emoji`] for required fields.
     ///
-    /// [`Context::create_application_emoji`]: crate::gateway::Context::create_application_emoji
+    /// [`Context::create_application_emoji`]: crate::gateway::client::Context::create_application_emoji
     pub async fn create_application_emoji(&self, map: &impl serde::Serialize) -> Result<Emoji> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -1506,7 +1506,7 @@ impl Http {
     ///
     /// See [`Context::edit_application_emoji`] for required fields.
     ///
-    /// [`Context::edit_application_emoji`]: crate::gateway::Context::edit_application_emoji
+    /// [`Context::edit_application_emoji`]: crate::gateway::client::Context::edit_application_emoji
     pub async fn edit_application_emoji(
         &self,
         emoji_id: EmojiId,

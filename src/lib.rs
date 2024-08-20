@@ -37,8 +37,8 @@
 //! ```
 //!
 //! [`Cache`]: crate::cache::Cache
-//! [`Context`]: crate::gateway::Context
-//! [`EventHandler::message`]: crate::gateway::EventHandler::message
+//! [`Context`]: crate::gateway::client::Context
+//! [`EventHandler::message`]: crate::gateway::client::EventHandler::message
 //! [`Event`]: crate::model::event::Event
 //! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 //! [`Shard`]: crate::gateway::Shard
@@ -108,7 +108,7 @@ mod error;
 
 pub use crate::error::{Error, Result};
 #[cfg(feature = "gateway")]
-pub use crate::gateway::Client;
+pub use crate::gateway::client::Client;
 
 /// Special module that re-exports most public items from this crate.
 ///
@@ -130,7 +130,7 @@ pub mod all {
     pub use crate::framework::*;
     #[cfg(feature = "gateway")]
     #[doc(no_inline)]
-    pub use crate::gateway::*;
+    pub use crate::gateway::{client::*, *};
     #[cfg(feature = "http")]
     #[doc(no_inline)]
     pub use crate::http::*;

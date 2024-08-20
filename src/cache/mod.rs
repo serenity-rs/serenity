@@ -318,7 +318,7 @@ impl Cache {
     /// }
     /// ```
     ///
-    /// [`Context`]: crate::gateway::Context
+    /// [`Context`]: crate::gateway::client::Context
     /// [`Shard`]: crate::gateway::Shard
     pub fn guilds(&self) -> Vec<GuildId> {
         let unavailable_guilds = self.unavailable_guilds();
@@ -404,7 +404,7 @@ impl Cache {
     /// # }
     /// ```
     ///
-    /// [`EventHandler::message`]: crate::gateway::EventHandler::message
+    /// [`EventHandler::message`]: crate::gateway::client::EventHandler::message
     pub fn message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
         #[cfg(feature = "temp_cache")]
         if let Some(message) = self.temp_messages.get(&message_id) {
