@@ -10,5 +10,5 @@ tracing-subscriber = "0.3"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 
 [dependencies.serenity]
-features = ["client", "rustls_backend"]
+features = ["gateway", "rustls_backend"]
 path = "../../"

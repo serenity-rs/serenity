@@ -78,15 +78,9 @@ default_native_tls = ["default_no_backend", "native_tls_backend"]
 
 # Serenity requires a backend, this picks all default features without a backend.
 default_no_backend = [
-    "builder",
     "cache",
     "chrono",
-    "client",
     "framework",
-    "gateway",
-    "model",
-    "http",
-    "utils",
 ]
 
 # Enables builder structs to configure Discord HTTP requests. Without this feature, you have to
@@ -97,14 +91,11 @@ builder = ["tokio/fs"]
 cache = ["fxhash", "dashmap"]
 # Enables collectors, a utility feature that lets you await interaction events in code with
 # zero setup, without needing to setup an InteractionCreate event listener.
-collector = ["gateway", "model"]
-# Wraps the gateway and http functionality into a single interface
-# TODO: should this require "gateway"?
-client = ["http"]
+collector = ["gateway"]
 # Enables the Framework trait which is an abstraction for old-style text commands.
-framework = ["client", "model", "utils"]
+framework = ["gateway"]
 # Enables gateway support, which allows bots to listen for Discord events.
-gateway = ["flate2"]
+gateway = ["model", "flate2"]
 # Enables HTTP, which enables bots to execute actions on Discord.
 http = ["dashmap", "mime_guess", "percent-encoding"]
 # Enables wrapper methods around HTTP requests on model types.
@@ -118,7 +109,7 @@ voice_model = ["serenity-voice-model"]
 unstable = []
 # Enables some utility functions that can be useful for bot creators.
 utils = []
-voice = ["client", "model"]
+voice = ["gateway"]
 # Enables unstable tokio features to give explicit names to internally spawned tokio tasks
 tokio_task_builder = ["tokio/tracing"]
 interactions_endpoint = ["ed25519-dalek"]

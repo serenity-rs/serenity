@@ -10,22 +10,21 @@ use tokio::sync::Mutex;
 use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, warn};
 
-#[cfg(feature = "voice")]
-use super::VoiceGatewayManager;
 use super::{
     ShardId,
     ShardManager,
     ShardMessenger,
-    ShardQueuerMessage,
     ShardRunner,
     ShardRunnerInfo,
     ShardRunnerOptions,
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::InternalEventHandler;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::gateway::client::InternalEventHandler;
+#[cfg(feature = "voice")]
+use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -45,8 +44,8 @@ pub struct ShardQueuer {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
     /// A reference to [`EventHandler`] or [`RawEventHandler`].
     ///
-    /// [`EventHandler`]: crate::client::EventHandler
-    /// [`RawEventHandler`]: crate::client::RawEventHandler
+    /// [`EventHandler`]: crate::gateway::client::EventHandler
+    /// [`RawEventHandler`]: crate::gateway::client::RawEventHandler
     pub event_handler: Option<InternalEventHandler>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
@@ -336,4 +335,17 @@ impl ShardQueue {
     pub fn buckets_filled(&self) -> bool {
         self.buckets.iter().all(|b| !b.is_empty())
     }
+}
+
+/// A message to be sent to the [`ShardQueuer`].
+#[derive(Clone, Debug)]
+pub enum ShardQueuerMessage {
+    /// Message to set the shard total.
+    SetShardTotal(NonZeroU16),
+    /// Message to start a shard.
+    Start { shard_id: ShardId, concurrent: bool },
+    /// Message to shutdown the shard queuer.
+    Shutdown,
+    /// Message to dequeue/shutdown a shard.
+    ShutdownShard { shard_id: ShardId, code: u16 },
 }

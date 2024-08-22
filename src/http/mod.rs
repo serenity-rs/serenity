@@ -41,8 +41,8 @@ pub use self::routing::*;
 pub use self::typing::*;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-#[cfg(feature = "client")]
-use crate::client::Context;
+#[cfg(feature = "gateway")]
+use crate::gateway::client::Context;
 use crate::model::prelude::*;
 
 /// This trait will be required by functions that need [`Http`] and can optionally use a [`Cache`]
@@ -94,7 +94,7 @@ where
     }
 }
 
-#[cfg(feature = "client")]
+#[cfg(feature = "gateway")]
 impl CacheHttp for Context {
     fn http(&self) -> &Http {
         &self.http
