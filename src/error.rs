@@ -7,8 +7,6 @@ use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
 #[cfg(feature = "gateway")]
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 
-#[cfg(feature = "client")]
-use crate::client::ClientError;
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
@@ -24,9 +22,6 @@ use crate::model::ModelError;
 pub type Result<T, E = Error> = StdResult<T, E>;
 
 /// A common error enum returned by most of the library's functionality within a custom [`Result`].
-///
-/// The most common error types, the [`ClientError`] and [`GatewayError`] enums, are both wrapped
-/// around this in the form of the [`Self::Client`] and [`Self::Gateway`] variants.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -38,11 +33,6 @@ pub enum Error {
     ///
     /// [`model`]: crate::model
     Model(ModelError),
-    /// A [client] error.
-    ///
-    /// [client]: crate::client
-    #[cfg(feature = "client")]
-    Client(ClientError),
     /// An error from the [`gateway`] module.
     ///
     /// [`gateway`]: crate::gateway
@@ -117,8 +107,6 @@ impl fmt::Display for Error {
             Self::Io(inner) => fmt::Display::fmt(&inner, f),
             Self::Json(inner) => fmt::Display::fmt(&inner, f),
             Self::Model(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "client")]
-            Self::Client(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Self::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
@@ -136,8 +124,6 @@ impl StdError for Error {
             Self::Io(inner) => Some(inner),
             Self::Json(inner) => Some(inner),
             Self::Model(inner) => Some(inner),
-            #[cfg(feature = "client")]
-            Self::Client(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Self::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
