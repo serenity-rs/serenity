@@ -268,7 +268,6 @@ impl Cache {
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// # #[cfg(feature = "client")]
     /// impl EventHandler for Handler {
     ///     async fn cache_ready(&self, ctx: Context, _: Vec<GuildId>) {
     ///         println!("{} unknown members", ctx.cache.unknown_members());
@@ -319,7 +318,7 @@ impl Cache {
     /// }
     /// ```
     ///
-    /// [`Context`]: crate::client::Context
+    /// [`Context`]: crate::gateway::client::Context
     /// [`Shard`]: crate::gateway::Shard
     pub fn guilds(&self) -> Vec<GuildId> {
         let unavailable_guilds = self.unavailable_guilds();
@@ -405,7 +404,7 @@ impl Cache {
     /// # }
     /// ```
     ///
-    /// [`EventHandler::message`]: crate::client::EventHandler::message
+    /// [`EventHandler::message`]: crate::gateway::client::EventHandler::message
     pub fn message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
         #[cfg(feature = "temp_cache")]
         if let Some(message) = self.temp_messages.get(&message_id) {

@@ -5,25 +5,27 @@ use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSende
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
+use tokio_tungstenite::tungstenite::Message;
 use tracing::{debug, error, info, trace, warn};
 
-use super::event::ShardStageUpdateEvent;
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-#[cfg(feature = "voice")]
-use super::VoiceGatewayManager;
-use super::{ShardId, ShardManager, ShardRunnerMessage};
+use super::{ReconnectType, Shard, ShardAction, ShardId, ShardManager, ShardStageUpdateEvent};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::dispatch::dispatch_model;
-use crate::client::{Context, InternalEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{GatewayError, ReconnectType, Shard, ShardAction};
+use crate::gateway::client::dispatch::dispatch_model;
+use crate::gateway::client::{Context, InternalEventHandler};
+#[cfg(feature = "voice")]
+use crate::gateway::VoiceGatewayManager;
+use crate::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::event::{Event, GatewayEvent};
+use crate::model::id::GuildId;
+use crate::model::user::OnlineStatus;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
@@ -517,4 +519,51 @@ pub struct ShardRunnerOptions {
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
+}
+
+/// A message to send from a shard over a WebSocket.
+#[derive(Debug)]
+pub enum ShardRunnerMessage {
+    /// Indicator that a shard should be restarted.
+    Restart(ShardId),
+    /// Indicator that a shard should be fully shutdown without bringing it
+    /// back up.
+    Shutdown(ShardId, u16),
+    /// Indicates that the client is to send a member chunk message.
+    ChunkGuild {
+        /// The IDs of the [`Guild`] to chunk.
+        ///
+        /// [`Guild`]: crate::model::guild::Guild
+        guild_id: GuildId,
+        /// The maximum number of members to receive [`GuildMembersChunkEvent`]s for.
+        ///
+        /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
+        limit: Option<u16>,
+        /// Used to specify if we want the presences of the matched members.
+        ///
+        /// Requires [`crate::model::gateway::GatewayIntents::GUILD_PRESENCES`].
+        presences: bool,
+        /// A filter to apply to the returned members.
+        filter: ChunkGuildFilter,
+        /// Optional nonce to identify [`GuildMembersChunkEvent`] responses.
+        ///
+        /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
+        nonce: Option<String>,
+    },
+    /// Indicates that the client is to close with the given status code and reason.
+    ///
+    /// You should rarely - if _ever_ - need this, but the option is available. Prefer to use the
+    /// [`ShardManager`] to shutdown WebSocket clients if you are intending to send a 1000 close
+    /// code.
+    ///
+    /// [`ShardManager`]: super::ShardManager
+    Close(u16, Option<String>),
+    /// Indicates that the client is to send a custom WebSocket message.
+    Message(Message),
+    /// Indicates that the client is to update the shard's presence's activity.
+    SetActivity(Option<ActivityData>),
+    /// Indicates that the client is to update the shard's presence in its entirety.
+    SetPresence(Option<ActivityData>, OnlineStatus),
+    /// Indicates that the client is to update the shard's presence's status.
+    SetStatus(OnlineStatus),
 }

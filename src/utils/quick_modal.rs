@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 
 use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
-use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
+use crate::gateway::client::Context;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 

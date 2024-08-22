@@ -3,9 +3,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
-use crate::gateway::ActivityData;
-#[cfg(feature = "gateway")]
-use crate::gateway::{ShardMessenger, ShardRunner};
+use crate::gateway::{ActivityData, ShardMessenger, ShardRunner};
 use crate::http::Http;
 use crate::model::prelude::*;
 
@@ -51,7 +49,6 @@ impl fmt::Debug for Context {
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    #[cfg(feature = "gateway")]
     pub(crate) fn new(
         data: Arc<dyn std::any::Any + Send + Sync>,
         runner: &ShardRunner,
@@ -66,19 +63,6 @@ impl Context {
             http,
             #[cfg(feature = "cache")]
             cache,
-        }
-    }
-
-    #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
-    pub fn easy(
-        data: Arc<dyn std::any::Any + Send + Sync>,
-        shard_id: ShardId,
-        http: Arc<Http>,
-    ) -> Context {
-        Context {
-            shard_id,
-            data,
-            http,
         }
     }
 
@@ -123,7 +107,6 @@ impl Context {
     /// ```
     ///
     /// [`Online`]: OnlineStatus::Online
-    #[cfg(feature = "gateway")]
     pub fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
     }
@@ -151,7 +134,6 @@ impl Context {
     /// ```
     ///
     /// [`Idle`]: OnlineStatus::Idle
-    #[cfg(feature = "gateway")]
     pub fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
     }
@@ -179,7 +161,6 @@ impl Context {
     /// ```
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
-    #[cfg(feature = "gateway")]
     pub fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
     }
@@ -207,7 +188,6 @@ impl Context {
     /// ```
     ///
     /// [`Invisible`]: OnlineStatus::Invisible
-    #[cfg(feature = "gateway")]
     pub fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
     }
@@ -239,7 +219,6 @@ impl Context {
     ///
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
-    #[cfg(feature = "gateway")]
     pub fn reset_presence(&self) {
         self.shard.set_presence(None, OnlineStatus::Online);
     }
@@ -268,7 +247,6 @@ impl Context {
     ///     }
     /// }
     /// ```
-    #[cfg(feature = "gateway")]
     pub fn set_activity(&self, activity: Option<ActivityData>) {
         self.shard.set_activity(activity);
     }
@@ -317,7 +295,6 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Idle`]: OnlineStatus::Idle
-    #[cfg(feature = "gateway")]
     pub fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
     }
