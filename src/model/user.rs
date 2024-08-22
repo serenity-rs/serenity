@@ -622,7 +622,7 @@ impl User {
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// # #[cfg(feature = "client")]
+    /// # #[cfg(feature = "gateway")]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
@@ -756,7 +756,7 @@ impl UserId {
     /// use serenity::builder::CreateMessage;
     ///
     /// #[serenity::async_trait]
-    /// # #[cfg(feature = "client")]
+    /// # #[cfg(feature = "gateway")]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {

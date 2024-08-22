@@ -2,18 +2,18 @@
 //!
 //! This is used in combination with [`ClientBuilder::framework`].
 //!
-//! [`ClientBuilder::framework`]: crate::client::ClientBuilder::framework
+//! [`ClientBuilder::framework`]: crate::gateway::client::ClientBuilder::framework
 
 use async_trait::async_trait;
 
-use crate::client::{Client, Context, FullEvent};
+use crate::gateway::client::{Client, Context, FullEvent};
 
 /// A trait for defining your own framework for serenity to use.
 ///
 /// Should you implement this trait, or define a `message` handler, depends on you. However, using
 /// this will benefit you by abstracting the [`EventHandler`] away.
 ///
-/// [`EventHandler`]: crate::client::EventHandler
+/// [`EventHandler`]: crate::gateway::client::EventHandler
 #[async_trait]
 pub trait Framework: Send + Sync {
     /// Called directly after the `Client` is created.
