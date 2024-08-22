@@ -3772,6 +3772,29 @@ impl Http {
         .await
     }
 
+    /// Retrieves a specific role in a [`Guild`].
+    pub async fn get_guild_role(&self, guild_id: GuildId, role_id: RoleId) -> Result<Role> {
+        let mut value: Value = self
+            .fire(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::GuildRole {
+                    guild_id,
+                    role_id,
+                },
+                params: None,
+            })
+            .await?;
+
+        if let Some(map) = value.as_object_mut() {
+            map.insert("guild_id".to_string(), guild_id.get().into());
+        }
+
+        from_value(value).map_err(From::from)
+    }
+
     /// Retrieves a list of roles in a [`Guild`].
     pub async fn get_guild_roles(&self, guild_id: GuildId) -> Result<Vec<Role>> {
         let mut value: Value = self
