@@ -1,3 +1,46 @@
+//! Module containing types for gateway sharding.
+//!
+//! Sharding is a method for load-balancing bots across separate threads or processes. Sharding is
+//! enforced on bots by Discord once they reach a certain number of guilds (2500). Once this
+//! threshold is reached, a but must be sharded such that at most 2500 guilds are allocated per
+//! shard.
+//!
+//! The "recommended" number of guilds per shard is _around_ 1000. Sharding allows for bots to be
+//! distributed by handing shards off to separate processes or even separate machines in a
+//! distributed network (e.g. cloud workers). However, sometimes you may wish for all shards to
+//! share some global state. Serenity accomodates both of these usecases.
+//!
+//! See [Discord's documentation][docs] for more information.
+//!
+//! This module also provides some lower-level facilities for performing sharding manually:
+//!
+//! ### [`ShardManager`]
+//!
+//! The shard manager provides a clean interface for communicating with shard runners either
+//! individually or collectively, with functions such as [`ShardManager::shutdown`] and
+//! [`ShardManager::restart`] to manage shards in a fine-grained way.
+//!
+//! For most use cases, the [`ShardManager`] will fit all your low-level sharding needs.
+//!
+//! ### [`ShardQueuer`]
+//!
+//! A light wrapper around an mpsc receiver that receives [`ShardQueuerMessage`]s. It should be run
+//! in its own thread so it can receive messages to start shards concurrently in a queue.
+//!
+//! ### [`ShardRunner`]
+//!
+//! The shard runner is responsible for directly running a single shard and communicating with the
+//! gateway through its respective WebSocket client. It performs actions such as identifying,
+//! reconnecting, resuming, and sending presence updates to the gateway.
+//!
+//! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
+
+mod shard_manager;
+mod shard_messenger;
+mod shard_queuer;
+mod shard_runner;
+
+use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
@@ -7,42 +50,35 @@ use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
 use url::Url;
 
-use super::{
-    ActivityData,
-    ChunkGuildFilter,
-    ConnectionStage,
-    GatewayError,
-    PresenceData,
-    ReconnectType,
-    ShardAction,
-    WsClient,
-};
+pub use self::shard_manager::{ShardManager, ShardManagerOptions};
+pub use self::shard_messenger::ShardMessenger;
+pub use self::shard_queuer::{ShardQueue, ShardQueuer, ShardQueuerMessage};
+pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
+use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, close_codes};
 use crate::http::Token;
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
-use crate::model::id::{ApplicationId, GuildId};
+use crate::model::id::{ApplicationId, GuildId, ShardId};
 use crate::model::user::OnlineStatus;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's gateway.
 ///
-/// The shard allows for sending and receiving messages over the websocket, such as setting the
-/// active activity, reconnecting, syncing guilds, and more.
+/// The shard allows for sending and receiving messages over the websocket,
+/// such as setting the active activity, reconnecting, syncing guilds, and more.
 ///
 /// Refer to the [module-level documentation][module docs] for information on effectively using
 /// multiple shards, if you need to.
 ///
 /// Note that there are additional methods available if you are manually managing a shard yourself,
-/// although they are hidden from the documentation since there are few use cases for doing such.
+/// although they are hidden from the documentation since there are few use cases for doing so.
 ///
 /// # Stand-alone shards
 ///
-/// You may instantiate a shard yourself - decoupled from the [`Client`] - if you need to. For most
-/// use cases, you will not need to do this, and you can leave the client to do it.
-///
-/// This can be done by passing in the required parameters to [`Self::new`]. You can then manually
-/// handle the shard yourself.
+/// You may instantiate a shard yourself - decoupled from the [`Client`] - by calling
+/// [`Shard::new`]. Most use cases will not necessitate this, and unless you're doing something
+/// really weird you can just let the client do it for you.
 ///
 /// **Note**: You _really_ do not need to do this. Just call one of the appropriate methods on the
 /// [`Client`].
@@ -758,4 +794,142 @@ async fn connect(base_url: &str) -> Result<WsClient> {
         })?;
 
     WsClient::connect(url).await
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum ShardAction {
+    Heartbeat,
+    Identify,
+    Reconnect(ReconnectType),
+}
+
+/// Information about a [`ShardRunner`].
+///
+/// The [`ShardId`] is not included because, as it stands, you probably already know the Id if you
+/// obtained this.
+#[derive(Debug)]
+pub struct ShardRunnerInfo {
+    /// The latency between when a heartbeat was sent and when the acknowledgement was received.
+    pub latency: Option<StdDuration>,
+    /// The channel used to communicate with the shard runner, telling it what to do with regards
+    /// to its status.
+    pub runner_tx: ShardMessenger,
+    /// The current connection stage of the shard.
+    pub stage: ConnectionStage,
+}
+
+/// An event denoting that a shard's connection stage was changed.
+///
+/// # Examples
+///
+/// This might happen when a shard changes from [`ConnectionStage::Identifying`] to
+/// [`ConnectionStage::Connected`].
+#[derive(Clone, Debug)]
+pub struct ShardStageUpdateEvent {
+    /// The new connection stage.
+    pub new: ConnectionStage,
+    /// The old connection stage.
+    pub old: ConnectionStage,
+    /// The ID of the shard that had its connection stage change.
+    pub shard_id: ShardId,
+}
+
+/// Indicates the current connection stage of a [`Shard`].
+///
+/// This can be useful for knowing which shards are currently "down"/"up".
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[non_exhaustive]
+pub enum ConnectionStage {
+    /// Indicator that the [`Shard`] is normally connected and is not in, e.g., a resume phase.
+    Connected,
+    /// Indicator that the [`Shard`] is connecting and is in, e.g., a resume phase.
+    Connecting,
+    /// Indicator that the [`Shard`] is fully disconnected and is not in a reconnecting phase.
+    Disconnected,
+    /// Indicator that the [`Shard`] is currently initiating a handshake.
+    Handshake,
+    /// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting a READY packet.
+    Identifying,
+    /// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a RESUMED packet.
+    Resuming,
+}
+
+impl ConnectionStage {
+    /// Whether the stage is a form of connecting.
+    ///
+    /// This will return `true` on:
+    /// - [`Connecting`][`ConnectionStage::Connecting`]
+    /// - [`Handshake`][`ConnectionStage::Handshake`]
+    /// - [`Identifying`][`ConnectionStage::Identifying`]
+    /// - [`Resuming`][`ConnectionStage::Resuming`]
+    ///
+    /// All other variants will return `false`.
+    ///
+    /// # Examples
+    ///
+    /// Assert that [`ConnectionStage::Identifying`] is a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(ConnectionStage::Identifying.is_connecting());
+    /// ```
+    ///
+    /// Assert that [`ConnectionStage::Connected`] is _not_ a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(!ConnectionStage::Connected.is_connecting());
+    /// ```
+    #[must_use]
+    pub fn is_connecting(self) -> bool {
+        use self::ConnectionStage::{Connecting, Handshake, Identifying, Resuming};
+        matches!(self, Connecting | Handshake | Identifying | Resuming)
+    }
+}
+
+impl fmt::Display for ConnectionStage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match *self {
+            Self::Connected => "connected",
+            Self::Connecting => "connecting",
+            Self::Disconnected => "disconnected",
+            Self::Handshake => "handshaking",
+            Self::Identifying => "identifying",
+            Self::Resuming => "resuming",
+        })
+    }
+}
+
+/// The type of reconnection that should be performed.
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum ReconnectType {
+    /// Indicator that a new connection should be made by sending an IDENTIFY.
+    Reidentify,
+    /// Indicator that a new connection should be made by sending a RESUME.
+    Resume,
+}
+
+/// Newtype around a callback that will be called on every incoming request. As long as this
+/// collector should still receive events, it should return `true`. Once it returns `false`, it is
+/// removed.
+#[cfg(feature = "collector")]
+#[derive(Clone)]
+pub struct CollectorCallback(pub Arc<dyn Fn(&Event) -> bool + Send + Sync>);
+
+#[cfg(feature = "collector")]
+impl fmt::Debug for CollectorCallback {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("CollectorCallback").finish()
+    }
+}
+
+#[cfg(feature = "collector")]
+impl PartialEq for CollectorCallback {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
 }
