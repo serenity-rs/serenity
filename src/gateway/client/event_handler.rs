@@ -45,9 +45,9 @@ macro_rules! event_handler {
             /// complexity of the filter code low to avoid unnecessarily blocking
             /// your bot.
             fn filter_event(&self, context: &Context, event: &Event) -> bool {
-                    // Suppress unused argument warnings
-                    #[allow(dropping_references, dropping_copy_types)]
-                    drop(( context, event ));
+                // Suppress unused argument warnings
+                #[allow(dropping_references, dropping_copy_types)]
+                drop((context, event));
                 true
             }
         }
@@ -71,7 +71,7 @@ macro_rules! event_handler {
             /// Returns the name of this event as a snake case string
             ///
             /// ```rust,no_run
-            /// # use serenity::client::{Context, FullEvent};
+            /// # use serenity::gateway::client::{Context, FullEvent};
             /// # fn foo_(ctx: Context, event: FullEvent) {
             /// if let FullEvent::Message { .. } = &event {
             ///     assert_eq!(event.snake_case_name(), "message");
