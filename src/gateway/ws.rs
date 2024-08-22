@@ -1,41 +1,24 @@
 use std::env::consts;
-#[cfg(feature = "client")]
 use std::io::Read;
 use std::time::SystemTime;
 
-#[cfg(feature = "client")]
 use flate2::read::ZlibDecoder;
-use futures::SinkExt;
-#[cfg(feature = "client")]
-use futures::StreamExt;
-#[cfg(feature = "client")]
+use futures::{SinkExt, StreamExt};
 use small_fixed_array::FixedString;
 use tokio::net::TcpStream;
-#[cfg(feature = "client")]
 use tokio::time::{timeout, Duration};
-#[cfg(feature = "client")]
-use tokio_tungstenite::tungstenite::protocol::CloseFrame;
-use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
-#[cfg(feature = "client")]
-use tokio_tungstenite::tungstenite::Error as WsError;
-use tokio_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
+use tokio_tungstenite::tungstenite::{Error as WsError, Message};
 use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
-#[cfg(feature = "client")]
-use tracing::warn;
-use tracing::{debug, trace};
+use tracing::{debug, trace, warn};
 use url::Url;
 
-use super::{ActivityData, ChunkGuildFilter, PresenceData};
+use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData};
 use crate::constants::{self, Opcode};
-#[cfg(feature = "client")]
-use crate::gateway::GatewayError;
-#[cfg(feature = "client")]
 use crate::model::event::GatewayEvent;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::{GuildId, UserId};
-#[cfg(feature = "client")]
-use crate::Error;
-use crate::Result;
+use crate::{Error, Result};
 
 #[derive(Serialize)]
 struct IdentifyProperties {
@@ -94,9 +77,7 @@ struct WebSocketMessage<'a> {
 
 pub struct WsClient(WebSocketStream<MaybeTlsStream<TcpStream>>);
 
-#[cfg(feature = "client")]
 const TIMEOUT: Duration = Duration::from_millis(500);
-#[cfg(feature = "client")]
 const DECOMPRESSION_MULTIPLIER: usize = 3;
 
 impl WsClient {
@@ -111,7 +92,6 @@ impl WsClient {
         Ok(Self(stream))
     }
 
-    #[cfg(feature = "client")]
     pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
         let message = match timeout(TIMEOUT, self.0.next()).await {
             Ok(Some(Ok(msg))) => msg,
@@ -166,20 +146,17 @@ impl WsClient {
     }
 
     /// Delegate to `StreamExt::next`
-    #[cfg(feature = "client")]
     pub(crate) async fn next(&mut self) -> Option<std::result::Result<Message, WsError>> {
         self.0.next().await
     }
 
     /// Delegate to `SinkExt::send`
-    #[cfg(feature = "client")]
     pub(crate) async fn send(&mut self, message: Message) -> Result<()> {
         self.0.send(message).await?;
         Ok(())
     }
 
     /// Delegate to `WebSocketStream::close`
-    #[cfg(feature = "client")]
     pub(crate) async fn close(&mut self, msg: Option<CloseFrame<'_>>) -> Result<()> {
         self.0.close(msg).await?;
         Ok(())

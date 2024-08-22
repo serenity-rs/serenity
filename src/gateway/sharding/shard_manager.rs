@@ -11,14 +11,14 @@ use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tracing::{info, warn};
 
-#[cfg(feature = "voice")]
-use super::VoiceGatewayManager;
 use super::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::client::InternalEventHandler;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::gateway::client::InternalEventHandler;
+#[cfg(feature = "voice")]
+use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -49,7 +49,7 @@ use crate::model::gateway::GatewayIntents;
 /// use std::env;
 /// use std::sync::{Arc, OnceLock};
 ///
-/// use serenity::client::{EventHandler, InternalEventHandler, RawEventHandler};
+/// use serenity::gateway::client::{EventHandler, InternalEventHandler, RawEventHandler};
 /// use serenity::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;

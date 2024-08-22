@@ -9,7 +9,7 @@ use crate::builder::{
     EditInteractionResponse,
 };
 #[cfg(feature = "collector")]
-use crate::client::Context;
+use crate::gateway::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
