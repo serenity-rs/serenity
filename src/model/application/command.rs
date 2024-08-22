@@ -154,7 +154,7 @@ impl Command {
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
     ///
-    /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
+    /// [`InteractionCreate`]: crate::gateway::client::EventHandler::interaction_create
     pub async fn create_global_command(http: &Http, builder: CreateCommand<'_>) -> Result<Command> {
         builder.execute(http, None, None).await
     }

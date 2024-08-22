@@ -37,14 +37,14 @@
 //! ```
 //!
 //! [`Cache`]: crate::cache::Cache
-//! [`Context`]: crate::client::Context
-//! [`EventHandler::message`]: crate::client::EventHandler::message
+//! [`Context`]: crate::gateway::client::Context
+//! [`EventHandler::message`]: crate::gateway::client::EventHandler::message
 //! [`Event`]: crate::model::event::Event
 //! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 //! [`Shard`]: crate::gateway::Shard
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 //! [cache docs]: crate::cache
-//! [client's module-level documentation]: crate::client
+//! [client's module-level documentation]: crate::gateway::client
 //! [docs]: https://discord.com/developers/docs/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: crate::gateway
@@ -91,8 +91,6 @@ pub mod prelude;
 pub mod builder;
 #[cfg(feature = "cache")]
 pub mod cache;
-#[cfg(feature = "client")]
-pub mod client;
 #[cfg(feature = "collector")]
 pub mod collector;
 #[cfg(feature = "framework")]
@@ -108,9 +106,9 @@ pub mod utils;
 
 mod error;
 
-#[cfg(all(feature = "client", feature = "gateway"))]
-pub use crate::client::Client;
 pub use crate::error::{Error, Result};
+#[cfg(feature = "gateway")]
+pub use crate::gateway::client::Client;
 
 /// Special module that re-exports most public items from this crate.
 ///
@@ -122,9 +120,6 @@ pub mod all {
     #[cfg(feature = "cache")]
     #[doc(no_inline)]
     pub use crate::cache::*;
-    #[cfg(feature = "client")]
-    #[doc(no_inline)]
-    pub use crate::client::*;
     #[cfg(feature = "collector")]
     #[doc(no_inline)]
     pub use crate::collector::*;
@@ -135,7 +130,7 @@ pub mod all {
     pub use crate::framework::*;
     #[cfg(feature = "gateway")]
     #[doc(no_inline)]
-    pub use crate::gateway::*;
+    pub use crate::gateway::{client::*, *};
     #[cfg(feature = "http")]
     #[doc(no_inline)]
     pub use crate::http::*;
