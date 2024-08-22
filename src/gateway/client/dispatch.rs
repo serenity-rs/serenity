@@ -1,6 +1,6 @@
+#[cfg(feature = "framework")]
 use std::sync::Arc;
 
-#[cfg(feature = "gateway")]
 use super::event_handler::InternalEventHandler;
 use super::{Context, FullEvent};
 #[cfg(feature = "cache")]

@@ -1136,7 +1136,7 @@ pub enum Event {
     /// Fires the [`EventHandler::command_permissions_update`] event.
     ///
     /// [`Command`]: crate::model::application::Command
-    /// [`EventHandler::command_permissions_update`]: crate::client::EventHandler::command_permissions_update
+    /// [`EventHandler::command_permissions_update`]: crate::gateway::client::EventHandler::command_permissions_update
     #[serde(rename = "APPLICATION_COMMAND_PERMISSIONS_UPDATE")]
     CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
     /// A [`Rule`] was created.
@@ -1144,7 +1144,7 @@ pub enum Event {
     /// Fires the [`EventHandler::auto_moderation_rule_create`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_create`]:
-    /// crate::client::EventHandler::auto_moderation_rule_create
+    /// crate::gateway::client::EventHandler::auto_moderation_rule_create
     #[serde(rename = "AUTO_MODERATION_RULE_CREATE")]
     AutoModRuleCreate(AutoModRuleCreateEvent),
     /// A [`Rule`] has been updated.
@@ -1152,7 +1152,7 @@ pub enum Event {
     /// Fires the [`EventHandler::auto_moderation_rule_update`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_update`]:
-    /// crate::client::EventHandler::auto_moderation_rule_update
+    /// crate::gateway::client::EventHandler::auto_moderation_rule_update
     #[serde(rename = "AUTO_MODERATION_RULE_UPDATE")]
     AutoModRuleUpdate(AutoModRuleUpdateEvent),
     /// A [`Rule`] was deleted.
@@ -1160,7 +1160,7 @@ pub enum Event {
     /// Fires the [`EventHandler::auto_moderation_rule_delete`] event.
     ///
     /// [`EventHandler::auto_moderation_rule_delete`]:
-    /// crate::client::EventHandler::auto_moderation_rule_delete
+    /// crate::gateway::client::EventHandler::auto_moderation_rule_delete
     #[serde(rename = "AUTO_MODERATION_RULE_DELETE")]
     AutoModRuleDelete(AutoModRuleDeleteEvent),
     /// A [`Rule`] was triggered and an action was executed.
@@ -1168,32 +1168,32 @@ pub enum Event {
     /// Fires the [`EventHandler::auto_moderation_action_execution`] event.
     ///
     /// [`EventHandler::auto_moderation_action_execution`]:
-    /// crate::client::EventHandler::auto_moderation_action_execution
+    /// crate::gateway::client::EventHandler::auto_moderation_action_execution
     #[serde(rename = "AUTO_MODERATION_ACTION_EXECUTION")]
     AutoModActionExecution(AutoModActionExecutionEvent),
     /// A [`Channel`] was created.
     ///
     /// Fires the [`EventHandler::channel_create`] event.
     ///
-    /// [`EventHandler::channel_create`]: crate::client::EventHandler::channel_create
+    /// [`EventHandler::channel_create`]: crate::gateway::client::EventHandler::channel_create
     ChannelCreate(ChannelCreateEvent),
     /// A [`Channel`] has been deleted.
     ///
     /// Fires the [`EventHandler::channel_delete`] event.
     ///
-    /// [`EventHandler::channel_delete`]: crate::client::EventHandler::channel_delete
+    /// [`EventHandler::channel_delete`]: crate::gateway::client::EventHandler::channel_delete
     ChannelDelete(ChannelDeleteEvent),
     /// The pins for a [`Channel`] have been updated.
     ///
     /// Fires the [`EventHandler::channel_pins_update`] event.
     ///
-    /// [`EventHandler::channel_pins_update`]: crate::client::EventHandler::channel_pins_update
+    /// [`EventHandler::channel_pins_update`]: crate::gateway::client::EventHandler::channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`Channel`] has been updated.
     ///
     /// Fires the [`EventHandler::channel_update`] event.
     ///
-    /// [`EventHandler::channel_update`]: crate::client::EventHandler::channel_update
+    /// [`EventHandler::channel_update`]: crate::gateway::client::EventHandler::channel_update
     ChannelUpdate(ChannelUpdateEvent),
     GuildAuditLogEntryCreate(GuildAuditLogEntryCreateEvent),
     GuildBanAdd(GuildBanAddEvent),
@@ -1217,13 +1217,13 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::invite_create`] event handler.
     ///
-    /// [`EventHandler::invite_create`]: crate::client::EventHandler::invite_create
+    /// [`EventHandler::invite_create`]: crate::gateway::client::EventHandler::invite_create
     InviteCreate(InviteCreateEvent),
     /// An [`Invite`] was deleted.
     ///
     /// Fires the [`EventHandler::invite_delete`] event handler.
     ///
-    /// [`EventHandler::invite_delete`]: crate::client::EventHandler::invite_delete
+    /// [`EventHandler::invite_delete`]: crate::gateway::client::EventHandler::invite_delete
     InviteDelete(InviteDeleteEvent),
     MessageCreate(MessageCreateEvent),
     MessageDelete(MessageDeleteEvent),
@@ -1236,28 +1236,28 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::reaction_add`] event handler.
     ///
-    /// [`EventHandler::reaction_add`]: crate::client::EventHandler::reaction_add
+    /// [`EventHandler::reaction_add`]: crate::gateway::client::EventHandler::reaction_add
     #[serde(rename = "MESSAGE_REACTION_ADD")]
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
     /// Fires the [`EventHandler::reaction_remove`] event handler.
     ///
-    /// [`EventHandler::reaction_remove`]: crate::client::EventHandler::reaction_remove
+    /// [`EventHandler::reaction_remove`]: crate::gateway::client::EventHandler::reaction_remove
     #[serde(rename = "MESSAGE_REACTION_REMOVE")]
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
     /// Fires the [`EventHandler::reaction_remove_all`] event handler.
     ///
-    /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
+    /// [`EventHandler::reaction_remove_all`]: crate::gateway::client::EventHandler::reaction_remove_all
     #[serde(rename = "MESSAGE_REACTION_REMOVE_ALL")]
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// Sent when a bot removes all instances of a given emoji from the reactions of a message.
     ///
     /// Fires the [`EventHandler::reaction_remove_emoji`] event handler.
     ///
-    /// [`EventHandler::reaction_remove_emoji`]: crate::client::EventHandler::reaction_remove_emoji
+    /// [`EventHandler::reaction_remove_emoji`]: crate::gateway::client::EventHandler::reaction_remove_emoji
     #[serde(rename = "MESSAGE_REACTION_REMOVE_EMOJI")]
     ReactionRemoveEmoji(ReactionRemoveEmojiEvent),
     /// The first event in a connection, containing the initial ready cache.
