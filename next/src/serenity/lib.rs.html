@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b25d77b18a16a9a4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (2c93fabd9 2024-08-15)" data-channel="nightly" data-search-js="search-ef54e092fea9c776.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-cb0df477c2d67d00.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b25d77b18a16a9a4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (a32d4a0e8 2024-08-21)" data-channel="nightly" data-search-js="search-ef54e092fea9c776.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-cb0df477c2d67d00.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -157,11 +157,6 @@
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.
 //!
 //! View the [examples] on how to make and structure a bot.
@@ -201,14 +196,14 @@
 //! ```
 //!
 //! [`Cache`]: crate::cache::Cache
-//! [`Context`]: crate::client::Context
-//! [`EventHandler::message`]: crate::client::EventHandler::message
+//! [`Context`]: crate::gateway::client::Context
+//! [`EventHandler::message`]: crate::gateway::client::EventHandler::message
 //! [`Event`]: crate::model::event::Event
 //! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 //! [`Shard`]: crate::gateway::Shard
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 //! [cache docs]: crate::cache
-//! [client's module-level documentation]: crate::client
+//! [client's module-level documentation]: crate::gateway::client
 //! [docs]: https://discord.com/developers/docs/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: crate::gateway
@@ -255,8 +250,6 @@
 </span><span class="kw">pub mod </span>builder;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">pub mod </span>cache;
-<span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
-</span><span class="kw">pub mod </span>client;
 <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
 </span><span class="kw">pub mod </span>collector;
 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
@@ -272,9 +265,9 @@
 
 <span class="kw">mod </span>error;
 
-<span class="attr">#[cfg(all(feature = <span class="string">"client"</span>, feature = <span class="string">"gateway"</span>))]
-</span><span class="kw">pub use </span><span class="kw">crate</span>::client::Client;
 <span class="kw">pub use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::gateway::client::Client;
 
 <span class="doccomment">/// Special module that re-exports most public items from this crate.
 ///
@@ -286,9 +279,6 @@
     <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::cache::<span class="kw-2">*</span>;
-    <span class="attr">#[cfg(feature = <span class="string">"client"</span>)]
-    #[doc(no_inline)]
-    </span><span class="kw">pub use </span><span class="kw">crate</span>::client::<span class="kw-2">*</span>;
     <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::collector::<span class="kw-2">*</span>;
@@ -299,7 +289,7 @@
     </span><span class="kw">pub use </span><span class="kw">crate</span>::framework::<span class="kw-2">*</span>;
     <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
     #[doc(no_inline)]
-    </span><span class="kw">pub use </span><span class="kw">crate</span>::gateway::<span class="kw-2">*</span>;
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::gateway::{client::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
     <span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
     #[doc(no_inline)]
     </span><span class="kw">pub use </span><span class="kw">crate</span>::http::<span class="kw-2">*</span>;

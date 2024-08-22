@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":["async_trait"],"enum":["Error"],"mod":["all","builder","cache","client","collector","constants","framework","gateway","http","interactions_endpoint","model","prelude","utils"],"type":["Result"]};
+window.SIDEBAR_ITEMS = {"attr":["async_trait"],"enum":["Error"],"mod":["all","builder","cache","collector","constants","framework","gateway","http","interactions_endpoint","model","prelude","utils"],"type":["Result"]};

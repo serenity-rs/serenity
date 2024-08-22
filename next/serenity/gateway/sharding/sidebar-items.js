@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ConnectionStage","ReconnectType","ShardAction","ShardQueuerMessage","ShardRunnerMessage"],"struct":["CollectorCallback","Shard","ShardManager","ShardManagerOptions","ShardMessenger","ShardQueue","ShardQueuer","ShardRunner","ShardRunnerInfo","ShardRunnerOptions","ShardStageUpdateEvent"]};
