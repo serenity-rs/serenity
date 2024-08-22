@@ -103,7 +103,7 @@ impl Attachment {
     /// # struct Handler;
     ///
     /// #[serenity::async_trait]
-    /// # #[cfg(feature = "client")]
+    /// # #[cfg(feature = "gateway")]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, message: Message) {
     ///         for attachment in message.attachments {

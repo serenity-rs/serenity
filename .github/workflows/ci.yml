@@ -37,9 +37,9 @@ jobs:
           - name: no default features
             features: " "
           - name: no cache
-            features: builder client framework gateway model http utils rustls_backend
+            features: framework rustls_backend
           - name: no gateway
-            features: model http rustls_backend
+            features: model rustls_backend
           - name: chrono
             features: chrono
           - name: unstable API + typesize
@@ -204,7 +204,7 @@ jobs:
 
       - name: Build docs
         run: |
-          cargo doc --no-deps --features collector,voice,unstable
+          cargo doc --no-deps --features full,unstable
         env:
           RUSTDOCFLAGS: -D rustdoc::broken_intra_doc_links
 

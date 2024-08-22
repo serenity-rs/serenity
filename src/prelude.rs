@@ -15,11 +15,9 @@
 
 pub use tokio::sync::{Mutex, RwLock};
 
-#[cfg(feature = "client")]
-pub use crate::client::Context;
-#[cfg(all(feature = "client", feature = "gateway"))]
-pub use crate::client::{Client, ClientError, EventHandler, RawEventHandler};
 pub use crate::error::Error as SerenityError;
+#[cfg(feature = "gateway")]
+pub use crate::gateway::client::{Client, Context, EventHandler, RawEventHandler};
 #[cfg(feature = "gateway")]
 pub use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
