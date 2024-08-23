@@ -839,15 +839,12 @@ impl GuildId {
             Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
 
-        let map = roles
-            .into_iter()
-            .map(|(id, position)| EditRole {
-                id,
-                position,
-            })
-            .collect::<Vec<_>>();
+        let iter = roles.into_iter().map(|(id, position)| EditRole {
+            id,
+            position,
+        });
 
-        http.edit_role_positions(self, &map, reason).await
+        http.edit_role_positions(self, &SerializeIter::new(iter), reason).await
     }
 
     /// Edits the guild's welcome screen.
