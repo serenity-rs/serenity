@@ -1997,8 +1997,8 @@ impl Http {
         from_value(value)
     }
 
-    /// Changes the position of a role in a guild.
-    pub async fn edit_role_position(
+    /// Changes the positions of roles in a guild.
+    pub async fn edit_role_positions(
         &self,
         guild_id: GuildId,
         map: &impl serde::Serialize,
