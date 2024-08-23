@@ -794,15 +794,28 @@ impl GuildId {
         builder.execute(http, self, sticker_id).await
     }
 
-    /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
+    /// Edits the position of [`Role`]s relative to all others in the [`Guild`].
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// use serenity::model::{GuildId, RoleId};
-    /// GuildId::new(7).edit_role_position(&context, RoleId::new(8), 2);
+    /// ```rust,no_run
+    /// # use std::collections::HashMap;
+    /// # use serenity::http::Http;
+    /// use serenity::model::id::{GuildId, RoleId};
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// let roles = HashMap::from([
+    ///     (RoleId::new(8), 2),
+    ///     (RoleId::new(10), 3),
+    ///     (RoleId::new(11), 4),
+    ///     (RoleId::new(25), 7),
+    /// ]);
+    /// GuildId::new(7).edit_role_positions(&http, roles, None);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -810,11 +823,10 @@ impl GuildId {
     /// Returns an [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit_role_position(
+    pub async fn edit_role_positions(
         self,
         http: &Http,
-        role_id: RoleId,
-        position: i16,
+        roles: impl IntoIterator<Item = (RoleId, i16)>,
         reason: Option<&str>,
     ) -> Result<Vec<Role>> {
         #[derive(serde::Serialize)]
@@ -827,12 +839,12 @@ impl GuildId {
             Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
 
-        let map = EditRole {
-            id: role_id,
+        let iter = roles.into_iter().map(|(id, position)| EditRole {
+            id,
             position,
-        };
+        });
 
-        http.edit_role_position(self, &map, reason).await
+        http.edit_role_positions(self, &SerializeIter::new(iter), reason).await
     }
 
     /// Edits the guild's welcome screen.
