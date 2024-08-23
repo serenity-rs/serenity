@@ -811,9 +811,24 @@ impl PartialGuild {
     ///
     /// Change the order of a role:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use std::collections::HashMap;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::PartialGuild;
     /// use serenity::model::id::RoleId;
-    /// partial_guild.edit_role_position(&context, RoleId::new(8), 2);
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// # let partial_guild: PartialGuild = unimplemented!();
+    /// let roles = HashMap::from([
+    ///     (RoleId::new(8), 2),
+    ///     (RoleId::new(10), 3),
+    ///     (RoleId::new(11), 4),
+    ///     (RoleId::new(25), 7),
+    /// ]);
+    /// partial_guild.edit_role_positions(&http, roles, None);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -821,14 +836,13 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit_role_position(
+    pub async fn edit_role_positions(
         &self,
         http: &Http,
-        role_id: RoleId,
-        position: i16,
+        roles: impl IntoIterator<Item = (RoleId, i16)>,
         audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
-        self.id.edit_role_position(http, role_id, position, audit_log_reason).await
+        self.id.edit_role_positions(http, roles, audit_log_reason).await
     }
 
     /// Edits a sticker.
