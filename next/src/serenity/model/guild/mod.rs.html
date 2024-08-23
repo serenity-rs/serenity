@@ -2512,6 +2512,20 @@
 <a href="#2512" id="2512">2512</a>
 <a href="#2513" id="2513">2513</a>
 <a href="#2514" id="2514">2514</a>
+<a href="#2515" id="2515">2515</a>
+<a href="#2516" id="2516">2516</a>
+<a href="#2517" id="2517">2517</a>
+<a href="#2518" id="2518">2518</a>
+<a href="#2519" id="2519">2519</a>
+<a href="#2520" id="2520">2520</a>
+<a href="#2521" id="2521">2521</a>
+<a href="#2522" id="2522">2522</a>
+<a href="#2523" id="2523">2523</a>
+<a href="#2524" id="2524">2524</a>
+<a href="#2525" id="2525">2525</a>
+<a href="#2526" id="2526">2526</a>
+<a href="#2527" id="2527">2527</a>
+<a href="#2528" id="2528">2528</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.
 
 </span><span class="kw">pub mod </span>audit_log;
@@ -3604,9 +3618,24 @@
     ///
     /// Change the order of a role:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use std::collections::HashMap;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::Guild;
     /// use serenity::model::id::RoleId;
-    /// guild.edit_role_position(&amp;context, RoleId::new(8), 2);
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let http: Http = unimplemented!();
+    /// # let guild: Guild = unimplemented!();
+    /// let roles = HashMap::from([
+    ///     (RoleId::new(8), 2),
+    ///     (RoleId::new(10), 3),
+    ///     (RoleId::new(11), 4),
+    ///     (RoleId::new(25), 7),
+    /// ]);
+    /// guild.edit_role_positions(&amp;http, roles, None);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -3614,14 +3643,13 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>edit_role_position(
+    </span><span class="kw">pub async fn </span>edit_role_positions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw-2">&amp;</span>Http,
-        role_id: RoleId,
-        position: i16,
+        roles: <span class="kw">impl </span>IntoIterator&lt;Item = (RoleId, i16)&gt;,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
-        <span class="self">self</span>.id.edit_role_position(http, role_id, position, audit_log_reason).<span class="kw">await
+        <span class="self">self</span>.id.edit_role_positions(http, roles, audit_log_reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Modifies a scheduled event in the guild with the data set, if any.

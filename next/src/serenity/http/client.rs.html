@@ -6381,8 +6381,8 @@
         from_value(value).map_err(From::from)
     }
 
-    <span class="doccomment">/// Changes the position of a role in a guild.
-    </span><span class="kw">pub async fn </span>edit_role_position(
+    <span class="doccomment">/// Changes the positions of roles in a guild.
+    </span><span class="kw">pub async fn </span>edit_role_positions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
         map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,

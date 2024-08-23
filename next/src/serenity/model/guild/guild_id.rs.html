@@ -1743,6 +1743,18 @@
 <a href="#1743" id="1743">1743</a>
 <a href="#1744" id="1744">1744</a>
 <a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
@@ -2539,15 +2551,28 @@
         builder.execute(http, <span class="self">self</span>, sticker_id).<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Edit the position of a [`Role`] relative to all others in the [`Guild`].
+    <span class="doccomment">/// Edits the position of [`Role`]s relative to all others in the [`Guild`].
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// use serenity::model::{GuildId, RoleId};
-    /// GuildId::new(7).edit_role_position(&amp;context, RoleId::new(8), 2);
+    /// ```rust,no_run
+    /// # use std::collections::HashMap;
+    /// # use serenity::http::Http;
+    /// use serenity::model::id::{GuildId, RoleId};
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let http: Http = unimplemented!();
+    /// let roles = HashMap::from([
+    ///     (RoleId::new(8), 2),
+    ///     (RoleId::new(10), 3),
+    ///     (RoleId::new(11), 4),
+    ///     (RoleId::new(25), 7),
+    /// ]);
+    /// GuildId::new(7).edit_role_positions(&amp;http, roles, None);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -2555,11 +2580,10 @@
     /// Returns an [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>edit_role_position(
+    </span><span class="kw">pub async fn </span>edit_role_positions(
         <span class="self">self</span>,
         http: <span class="kw-2">&amp;</span>Http,
-        role_id: RoleId,
-        position: i16,
+        roles: <span class="kw">impl </span>IntoIterator&lt;Item = (RoleId, i16)&gt;,
         reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
         <span class="attr">#[derive(serde::Serialize)]
@@ -2572,12 +2596,12 @@
             Maximum::AuditLogReason.check_overflow(reason.len())<span class="question-mark">?</span>;
         }
 
-        <span class="kw">let </span>map = EditRole {
-            id: role_id,
+        <span class="kw">let </span>iter = roles.into_iter().map(|(id, position)| EditRole {
+            id,
             position,
-        };
+        });
 
-        http.edit_role_position(<span class="self">self</span>, <span class="kw-2">&amp;</span>map, reason).<span class="kw">await
+        http.edit_role_positions(<span class="self">self</span>, <span class="kw-2">&amp;</span>SerializeIter::new(iter), reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits the guild's welcome screen.

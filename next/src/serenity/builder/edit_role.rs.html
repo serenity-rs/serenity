@@ -177,6 +177,8 @@
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span><span class="kw">super</span>::CreateAttachment;
@@ -351,7 +353,9 @@
         };
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(position) = <span class="self">self</span>.position {
-            guild_id.edit_role_position(http, role.id, position, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span><span class="question-mark">?</span>;
+            guild_id
+                .edit_role_positions(http, [(role.id, position)], <span class="self">self</span>.audit_log_reason)
+                .<span class="kw">await</span><span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(role)
     }

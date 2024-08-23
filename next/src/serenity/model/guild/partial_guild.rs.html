@@ -1431,6 +1431,20 @@
 <a href="#1431" id="1431">1431</a>
 <a href="#1432" id="1432">1432</a>
 <a href="#1433" id="1433">1433</a>
+<a href="#1434" id="1434">1434</a>
+<a href="#1435" id="1435">1435</a>
+<a href="#1436" id="1436">1436</a>
+<a href="#1437" id="1437">1437</a>
+<a href="#1438" id="1438">1438</a>
+<a href="#1439" id="1439">1439</a>
+<a href="#1440" id="1440">1440</a>
+<a href="#1441" id="1441">1441</a>
+<a href="#1442" id="1442">1442</a>
+<a href="#1443" id="1443">1443</a>
+<a href="#1444" id="1444">1444</a>
+<a href="#1445" id="1445">1445</a>
+<a href="#1446" id="1446">1446</a>
+<a href="#1447" id="1447">1447</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>nonmax::{NonMaxU16, NonMaxU64, NonMaxU8};
 <span class="kw">use </span>serde::Serialize;
 
@@ -2248,9 +2262,24 @@
     ///
     /// Change the order of a role:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use std::collections::HashMap;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::PartialGuild;
     /// use serenity::model::id::RoleId;
-    /// partial_guild.edit_role_position(&amp;context, RoleId::new(8), 2);
+    ///
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let http: Http = unimplemented!();
+    /// # let partial_guild: PartialGuild = unimplemented!();
+    /// let roles = HashMap::from([
+    ///     (RoleId::new(8), 2),
+    ///     (RoleId::new(10), 3),
+    ///     (RoleId::new(11), 4),
+    ///     (RoleId::new(25), 7),
+    /// ]);
+    /// partial_guild.edit_role_positions(&amp;http, roles, None);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -2258,14 +2287,13 @@
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    </span><span class="kw">pub async fn </span>edit_role_position(
+    </span><span class="kw">pub async fn </span>edit_role_positions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         http: <span class="kw-2">&amp;</span>Http,
-        role_id: RoleId,
-        position: i16,
+        roles: <span class="kw">impl </span>IntoIterator&lt;Item = (RoleId, i16)&gt;,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
-        <span class="self">self</span>.id.edit_role_position(http, role_id, position, audit_log_reason).<span class="kw">await
+        <span class="self">self</span>.id.edit_role_positions(http, roles, audit_log_reason).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Edits a sticker.
