@@ -172,7 +172,9 @@ impl<'a> EditRole<'a> {
         };
 
         if let Some(position) = self.position {
-            guild_id.edit_role_position(http, role.id, position, self.audit_log_reason).await?;
+            guild_id
+                .edit_role_positions(http, [(role.id, position)], self.audit_log_reason)
+                .await?;
         }
         Ok(role)
     }
