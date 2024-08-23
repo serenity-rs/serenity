@@ -54,7 +54,6 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::GatewayIntents;
-use crate::model::id::ApplicationId;
 #[cfg(feature = "voice")]
 use crate::model::id::UserId;
 use crate::model::user::OnlineStatus;
@@ -109,26 +108,6 @@ impl ClientBuilder {
             raw_event_handler: None,
             presence: PresenceData::default(),
         }
-    }
-
-    /// Gets the current token used for the [`Http`] client.
-    #[must_use]
-    pub fn get_token(&self) -> &str {
-        self.http.token()
-    }
-
-    /// Sets the application id.
-    pub fn application_id(self, application_id: ApplicationId) -> Self {
-        self.http.set_application_id(application_id);
-
-        self
-    }
-
-    /// Gets the application ID, if already initialized. See [`Self::application_id`] for more
-    /// info.
-    #[must_use]
-    pub fn get_application_id(&self) -> Option<ApplicationId> {
-        self.http.application_id()
     }
 
     /// Sets the global data type that can be accessed from [`Context::data`].
