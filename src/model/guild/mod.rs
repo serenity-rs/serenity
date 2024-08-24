@@ -430,11 +430,11 @@ impl Guild {
     pub async fn bulk_ban(
         &self,
         http: &Http,
-        users: impl IntoIterator<Item = UserId>,
+        user_ids: &[UserId],
         delete_message_seconds: u32,
         reason: Option<&str>,
     ) -> Result<BulkBanResponse> {
-        self.id.bulk_ban(http, users, delete_message_seconds, reason).await
+        self.id.bulk_ban(http, user_ids, delete_message_seconds, reason).await
     }
 
     /// Returns the formatted URL of the guild's banner image, if one exists.
