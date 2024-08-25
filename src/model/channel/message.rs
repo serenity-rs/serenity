@@ -1033,6 +1033,7 @@ enum_number! {
         GuildIncidentAlertModeDisabled = 37,
         GuildIncidentReportRaid = 38,
         GuildIncidentReportFalseAlarm = 39,
+        PurchaseNotification = 44,
         _ => Unknown(u8),
     }
 }
