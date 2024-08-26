@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (eff09483c 2024-08-22)" data-channel="nightly" data-search-js="search-ef54e092fea9c776.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-cb0df477c2d67d00.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (c6db1ca3c 2024-08-25)" data-channel="nightly" data-search-js="search-acd2e111c9cb27e3.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-cb0df477c2d67d00.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4373,9 +4373,37 @@
 <a href="#4373" id="4373">4373</a>
 <a href="#4374" id="4374">4374</a>
 <a href="#4375" id="4375">4375</a>
+<a href="#4376" id="4376">4376</a>
+<a href="#4377" id="4377">4377</a>
+<a href="#4378" id="4378">4378</a>
+<a href="#4379" id="4379">4379</a>
+<a href="#4380" id="4380">4380</a>
+<a href="#4381" id="4381">4381</a>
+<a href="#4382" id="4382">4382</a>
+<a href="#4383" id="4383">4383</a>
+<a href="#4384" id="4384">4384</a>
+<a href="#4385" id="4385">4385</a>
+<a href="#4386" id="4386">4386</a>
+<a href="#4387" id="4387">4387</a>
+<a href="#4388" id="4388">4388</a>
+<a href="#4389" id="4389">4389</a>
+<a href="#4390" id="4390">4390</a>
+<a href="#4391" id="4391">4391</a>
+<a href="#4392" id="4392">4392</a>
+<a href="#4393" id="4393">4393</a>
+<a href="#4394" id="4394">4394</a>
+<a href="#4395" id="4395">4395</a>
+<a href="#4396" id="4396">4396</a>
+<a href="#4397" id="4397">4397</a>
+<a href="#4398" id="4398">4398</a>
+<a href="#4399" id="4399">4399</a>
+<a href="#4400" id="4400">4400</a>
+<a href="#4401" id="4401">4401</a>
+<a href="#4402" id="4402">4402</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::cell::Cell;
 <span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 <span class="kw">use </span>std::sync::Arc;
 
@@ -4388,6 +4416,7 @@
 <span class="kw">use </span>reqwest::{Client, ClientBuilder, Response <span class="kw">as </span>ReqwestResponse, StatusCode};
 <span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>serde::de::DeserializeOwned;
+<span class="kw">use </span>serde::ser::SerializeSeq <span class="kw">as _</span>;
 <span class="kw">use </span>serde_json::{from_value, json, to_string, to_vec};
 <span class="kw">use </span>tracing::{debug, trace};
 
@@ -4439,6 +4468,29 @@
 
 <span class="kw">impl </span>secrecy::CloneableSecret <span class="kw">for </span>Token {}
 <span class="kw">impl </span>secrecy::DebugSecret <span class="kw">for </span>Token {}
+
+<span class="comment">// NOTE: This cannot be passed in from outside, due to `Cell` being !Send.
+</span><span class="kw">struct </span>SerializeIter&lt;I&gt;(Cell&lt;<span class="prelude-ty">Option</span>&lt;I&gt;&gt;);
+
+<span class="kw">impl</span>&lt;I&gt; SerializeIter&lt;I&gt; {
+    <span class="kw">pub fn </span>new(iter: I) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(Cell::new(<span class="prelude-val">Some</span>(iter)))
+    }
+}
+
+<span class="kw">impl</span>&lt;Iter, Item&gt; serde::Serialize <span class="kw">for </span>SerializeIter&lt;Iter&gt;
+<span class="kw">where
+    </span>Iter: Iterator&lt;Item = Item&gt;,
+    Item: serde::Serialize,
+{
+    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(iter) = <span class="self">self</span>.<span class="number">0</span>.take() <span class="kw">else </span>{
+            <span class="kw">return </span>serializer.serialize_seq(<span class="prelude-val">Some</span>(<span class="number">0</span>))<span class="question-mark">?</span>.end();
+        };
+
+        serializer.collect_seq(iter)
+    }
+}
 
 <span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API. If
 /// you do not need to use a proxy or do not need to disable the rate limiter, you can use
@@ -6046,9 +6098,9 @@
     </span><span class="kw">pub async fn </span>edit_guild_channel_positions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
-        value: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+        value: <span class="kw">impl </span>Iterator&lt;Item: serde::Serialize&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="kw">let </span>body = to_vec(value)<span class="question-mark">?</span>;
+        <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>SerializeIter::new(value))<span class="question-mark">?</span>;
 
         <span class="self">self</span>.wind(<span class="number">204</span>, Request {
             body: <span class="prelude-val">Some</span>(body),
@@ -6385,12 +6437,14 @@
     </span><span class="kw">pub async fn </span>edit_role_positions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         guild_id: GuildId,
-        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+        positions: <span class="kw">impl </span>Iterator&lt;Item: serde::Serialize&gt;,
         audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Role&gt;&gt; {
+        <span class="kw">let </span>body = to_vec(<span class="kw-2">&amp;</span>SerializeIter::new(positions))<span class="question-mark">?</span>;
+
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
             </span>.fire(Request {
-                body: <span class="prelude-val">Some</span>(to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>),
+                body: <span class="prelude-val">Some</span>(body),
                 multipart: <span class="prelude-val">None</span>,
                 headers: audit_log_reason.map(reason_into_header),
                 method: LightMethod::Patch,
