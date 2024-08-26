@@ -16,7 +16,7 @@ use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::client::dispatch::dispatch_model;
-use crate::gateway::client::{Context, InternalEventHandler};
+use crate::gateway::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
@@ -30,7 +30,8 @@ use crate::model::user::OnlineStatus;
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
     data: Arc<dyn std::any::Any + Send + Sync>,
-    event_handler: Option<InternalEventHandler>,
+    event_handler: Option<Arc<dyn EventHandler>>,
+    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework>>,
     manager: Arc<ShardManager>,
@@ -58,6 +59,7 @@ impl ShardRunner {
             runner_tx: tx,
             data: opt.data,
             event_handler: opt.event_handler,
+            raw_event_handler: opt.raw_event_handler,
             #[cfg(feature = "framework")]
             framework: opt.framework,
             manager: opt.manager,
@@ -120,7 +122,7 @@ impl ShardRunner {
             if post != pre {
                 self.update_manager().await;
 
-                if let Some(InternalEventHandler::Normal(event_handler)) = &self.event_handler {
+                if let Some(event_handler) = &self.event_handler {
                     let event_handler = Arc::clone(event_handler);
                     let context = self.make_context();
                     let event = ShardStageUpdateEvent {
@@ -173,21 +175,14 @@ impl ShardRunner {
 
             if let Some(event) = event {
                 let context = self.make_context();
-                let can_dispatch = match &self.event_handler {
-                    Some(InternalEventHandler::Normal(handler)) => {
-                        handler.filter_event(&context, &event)
-                    },
-                    Some(InternalEventHandler::Raw(handler)) => {
-                        handler.filter_event(&context, &event)
-                    },
-                    Some(InternalEventHandler::Both {
-                        raw,
-                        normal,
-                    }) => {
-                        raw.filter_event(&context, &event) && normal.filter_event(&context, &event)
-                    },
-                    None => true,
-                };
+                let can_dispatch = self
+                    .event_handler
+                    .as_ref()
+                    .map_or(true, |handler| handler.filter_event(&context, &event))
+                    && self
+                        .raw_event_handler
+                        .as_ref()
+                        .map_or(true, |handler| handler.filter_event(&context, &event));
 
                 if can_dispatch {
                     #[cfg(feature = "collector")]
@@ -214,6 +209,7 @@ impl ShardRunner {
                             #[cfg(feature = "framework")]
                             self.framework.clone(),
                             self.event_handler.clone(),
+                            self.raw_event_handler.clone(),
                         ),
                     );
                 }
@@ -509,7 +505,8 @@ impl ShardRunner {
 /// Options to be passed to [`ShardRunner::new`].
 pub struct ShardRunnerOptions {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
-    pub event_handler: Option<InternalEventHandler>,
+    pub event_handler: Option<Arc<dyn EventHandler>>,
+    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework>>,
     pub manager: Arc<ShardManager>,

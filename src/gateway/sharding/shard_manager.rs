@@ -16,7 +16,7 @@ use super::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInf
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::client::InternalEventHandler;
+use crate::gateway::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
 use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
@@ -49,7 +49,7 @@ use crate::model::gateway::GatewayIntents;
 /// use std::env;
 /// use std::sync::{Arc, OnceLock};
 ///
-/// use serenity::gateway::client::{EventHandler, InternalEventHandler, RawEventHandler};
+/// use serenity::gateway::client::EventHandler;
 /// use serenity::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
@@ -66,12 +66,13 @@ use crate::model::gateway::GatewayIntents;
 /// let data = Arc::new(());
 /// let shard_total = gateway_info.shards;
 /// let ws_url = Arc::from(gateway_info.url);
-/// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
+/// let event_handler = Arc::new(Handler);
 /// let max_concurrency = std::num::NonZeroU16::MIN;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data,
-///     event_handler: Some(InternalEventHandler::Normal(event_handler)),
+///     event_handler: Some(event_handler),
+///     raw_event_handler: None,
 ///     framework: Arc::new(OnceLock::new()),
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
@@ -128,6 +129,7 @@ impl ShardManager {
         let mut shard_queuer = ShardQueuer {
             data: opt.data,
             event_handler: opt.event_handler,
+            raw_event_handler: opt.raw_event_handler,
             #[cfg(feature = "framework")]
             framework: opt.framework,
             last_start: None,
@@ -356,7 +358,8 @@ impl Drop for ShardManager {
 
 pub struct ShardManagerOptions {
     pub data: Arc<dyn std::any::Any + Send + Sync>,
-    pub event_handler: Option<InternalEventHandler>,
+    pub event_handler: Option<Arc<dyn EventHandler>>,
+    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
     #[cfg(feature = "voice")]
