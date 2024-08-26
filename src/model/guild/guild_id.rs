@@ -32,7 +32,6 @@ use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::error::Maximum;
-use crate::model::guild::SerializeIter;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
@@ -844,7 +843,7 @@ impl GuildId {
             position,
         });
 
-        http.edit_role_positions(self, &SerializeIter::new(iter), reason).await
+        http.edit_role_positions(self, iter, reason).await
     }
 
     /// Edits the guild's welcome screen.
@@ -1208,7 +1207,7 @@ impl GuildId {
             position,
         });
 
-        http.edit_guild_channel_positions(self, &SerializeIter::new(iter)).await
+        http.edit_guild_channel_positions(self, iter).await
     }
 
     /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a
