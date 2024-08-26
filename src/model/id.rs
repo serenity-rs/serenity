@@ -343,7 +343,8 @@ mod snowflake {
     use serde::{Deserializer, Serializer};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NonZeroU64, D::Error> {
-        deserializer.deserialize_any(SnowflakeVisitor)
+        // Deserialize_str also works on integers, so we can use it here to allow for deserializing the various forms snowflakes can take
+        deserializer.deserialize_str(SnowflakeVisitor)
     }
 
     #[allow(clippy::trivially_copy_pass_by_ref)]
