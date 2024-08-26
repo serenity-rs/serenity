@@ -2,7 +2,6 @@ use std::fmt;
 
 use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
-use serde::ser::SerializeSeq;
 use serde_cow::CowStr;
 use small_fixed_array::FixedString;
 
