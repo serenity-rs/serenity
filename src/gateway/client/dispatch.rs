@@ -1,7 +1,6 @@
-#[cfg(feature = "framework")]
 use std::sync::Arc;
 
-use super::event_handler::InternalEventHandler;
+use super::event_handler::{EventHandler, RawEventHandler};
 use super::{Context, FullEvent};
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
@@ -48,18 +47,10 @@ pub(crate) async fn dispatch_model(
     event: Event,
     context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
-    event_handler: Option<InternalEventHandler>,
+    event_handler: Option<Arc<dyn EventHandler>>,
+    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
 ) {
-    let (handler, raw_handler) = match event_handler {
-        Some(InternalEventHandler::Normal(handler)) => (Some(handler), None),
-        Some(InternalEventHandler::Both {
-            raw,
-            normal,
-        }) => (Some(normal), Some(raw)),
-        Some(InternalEventHandler::Raw(raw_handler)) => (None, Some(raw_handler)),
-        None => (None, None),
-    };
-    if let Some(raw_handler) = raw_handler {
+    if let Some(raw_handler) = raw_event_handler {
         raw_handler.raw_event(context.clone(), &event).await;
     }
 
@@ -78,7 +69,7 @@ pub(crate) async fn dispatch_model(
         framework.dispatch(&context, &full_event).await;
     }
 
-    if let Some(handler) = handler {
+    if let Some(handler) = event_handler {
         if let Some(extra_event) = extra_event {
             extra_event.dispatch(context.clone(), &*handler).await;
         }

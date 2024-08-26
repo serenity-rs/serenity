@@ -1,7 +1,6 @@
 use std::collections::VecDeque;
 #[cfg(feature = "cache")]
 use std::num::NonZeroU16;
-use std::sync::Arc;
 
 use async_trait::async_trait;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
@@ -534,11 +533,4 @@ pub trait RawEventHandler: Send + Sync {
         drop((context, event));
         true
     }
-}
-
-#[derive(Clone)]
-pub enum InternalEventHandler {
-    Raw(Arc<dyn RawEventHandler>),
-    Normal(Arc<dyn EventHandler>),
-    Both { raw: Arc<dyn RawEventHandler>, normal: Arc<dyn EventHandler> },
 }
