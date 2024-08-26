@@ -439,6 +439,18 @@ impl Cache {
     ///
     /// By default, no messages will be cached.
     pub fn set_max_messages(&self, max: usize) {
+        // Check to see if cache has to be truncated
+        if max < self.settings.read().max_messages {
+            for mut entry in self.messages.iter_mut() {
+                let message_queue = entry.value_mut();
+                let queue_len = message_queue.len();
+
+                if queue_len > max {
+                    message_queue.drain(..queue_len - max);
+                }
+            }
+        }
+
         self.settings.write().max_messages = max;
     }
 
