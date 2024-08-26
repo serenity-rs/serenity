@@ -40,7 +40,7 @@ use futures::StreamExt as _;
 use tracing::debug;
 
 pub use self::context::Context;
-pub use self::event_handler::{EventHandler, FullEvent, InternalEventHandler, RawEventHandler};
+pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
@@ -270,18 +270,8 @@ impl IntoFuture for ClientBuilder {
         let presence = self.presence;
         let http = self.http;
 
-        let event_handler = match (self.event_handler, self.raw_event_handler) {
-            (Some(normal), Some(raw)) => Some(InternalEventHandler::Both {
-                normal,
-                raw,
-            }),
-            (Some(h), None) => Some(InternalEventHandler::Normal(h)),
-            (None, Some(h)) => Some(InternalEventHandler::Raw(h)),
-            (None, None) => None,
-        };
-
         if let Some(ratelimiter) = &http.ratelimiter {
-            if let Some(InternalEventHandler::Normal(event_handler)) = &event_handler {
+            if let Some(event_handler) = &self.event_handler {
                 let event_handler = Arc::clone(event_handler);
                 ratelimiter.set_ratelimit_callback(Box::new(move |info| {
                     let event_handler = Arc::clone(&event_handler);
@@ -315,7 +305,8 @@ impl IntoFuture for ClientBuilder {
             let framework_cell = Arc::new(OnceLock::new());
             let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(&data),
-                event_handler,
+                event_handler: self.event_handler,
+                raw_event_handler: self.raw_event_handler,
                 #[cfg(feature = "framework")]
                 framework: Arc::clone(&framework_cell),
                 #[cfg(feature = "voice")]
