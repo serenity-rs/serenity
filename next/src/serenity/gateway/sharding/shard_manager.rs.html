@@ -370,6 +370,9 @@
 <a href="#370" id="370">370</a>
 <a href="#371" id="371">371</a>
 <a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::num::NonZeroU16;
 <span class="kw">use </span>std::sync::Arc;
@@ -388,7 +391,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::client::InternalEventHandler;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::client::{EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::VoiceGatewayManager;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, GatewayError, PresenceData};
@@ -421,7 +424,7 @@
 /// use std::env;
 /// use std::sync::{Arc, OnceLock};
 ///
-/// use serenity::gateway::client::{EventHandler, InternalEventHandler, RawEventHandler};
+/// use serenity::gateway::client::EventHandler;
 /// use serenity::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
@@ -438,12 +441,13 @@
 /// let data = Arc::new(());
 /// let shard_total = gateway_info.shards;
 /// let ws_url = Arc::from(gateway_info.url);
-/// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;
+/// let event_handler = Arc::new(Handler);
 /// let max_concurrency = std::num::NonZeroU16::MIN;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data,
-///     event_handler: Some(InternalEventHandler::Normal(event_handler)),
+///     event_handler: Some(event_handler),
+///     raw_event_handler: None,
 ///     framework: Arc::new(OnceLock::new()),
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
@@ -500,6 +504,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>shard_queuer = ShardQueuer {
             data: opt.data,
             event_handler: opt.event_handler,
+            raw_event_handler: opt.raw_event_handler,
             <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span>framework: opt.framework,
             last_start: <span class="prelude-val">None</span>,
@@ -728,7 +733,8 @@
 
 <span class="kw">pub struct </span>ShardManagerOptions {
     <span class="kw">pub </span>data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;,
-    <span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;InternalEventHandler&gt;,
+    <span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    <span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span><span class="kw">pub </span>framework: Arc&lt;OnceLock&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]

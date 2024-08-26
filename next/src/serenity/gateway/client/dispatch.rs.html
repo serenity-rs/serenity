@@ -480,19 +480,9 @@
 <a href="#480" id="480">480</a>
 <a href="#481" id="481">481</a>
 <a href="#482" id="482">482</a>
-<a href="#483" id="483">483</a>
-<a href="#484" id="484">484</a>
-<a href="#485" id="485">485</a>
-<a href="#486" id="486">486</a>
-<a href="#487" id="487">487</a>
-<a href="#488" id="488">488</a>
-<a href="#489" id="489">489</a>
-<a href="#490" id="490">490</a>
-<a href="#491" id="491">491</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
-</span><span class="kw">use </span>std::sync::Arc;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span><span class="kw">super</span>::event_handler::InternalEventHandler;
+<span class="kw">use </span><span class="kw">super</span>::event_handler::{EventHandler, RawEventHandler};
 <span class="kw">use super</span>::{Context, FullEvent};
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, CacheUpdate};
@@ -539,18 +529,10 @@
     event: Event,
     context: Context,
     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)] </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
-    event_handler: <span class="prelude-ty">Option</span>&lt;InternalEventHandler&gt;,
+    event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
 ) {
-    <span class="kw">let </span>(handler, raw_handler) = <span class="kw">match </span>event_handler {
-        <span class="prelude-val">Some</span>(InternalEventHandler::Normal(handler)) =&gt; (<span class="prelude-val">Some</span>(handler), <span class="prelude-val">None</span>),
-        <span class="prelude-val">Some</span>(InternalEventHandler::Both {
-            raw,
-            normal,
-        }) =&gt; (<span class="prelude-val">Some</span>(normal), <span class="prelude-val">Some</span>(raw)),
-        <span class="prelude-val">Some</span>(InternalEventHandler::Raw(raw_handler)) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(raw_handler)),
-        <span class="prelude-val">None </span>=&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-    };
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(raw_handler) = raw_handler {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(raw_handler) = raw_event_handler {
         raw_handler.raw_event(context.clone(), <span class="kw-2">&amp;</span>event).<span class="kw">await</span>;
     }
 
@@ -569,7 +551,7 @@
         framework.dispatch(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>full_event).<span class="kw">await</span>;
     }
 
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = handler {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(handler) = event_handler {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(extra_event) = extra_event {
             extra_event.dispatch(context.clone(), <span class="kw-2">&amp;*</span>handler).<span class="kw">await</span>;
         }

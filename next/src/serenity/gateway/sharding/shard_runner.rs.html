@@ -564,9 +564,6 @@
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::Arc;
 
@@ -585,7 +582,7 @@
 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::client::dispatch::dispatch_model;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::client::{Context, InternalEventHandler};
+<span class="kw">use </span><span class="kw">crate</span>::gateway::client::{Context, EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::VoiceGatewayManager;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
@@ -599,7 +596,8 @@
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.
 </span><span class="kw">pub struct </span>ShardRunner {
     data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;,
-    event_handler: <span class="prelude-ty">Option</span>&lt;InternalEventHandler&gt;,
+    event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     manager: Arc&lt;ShardManager&gt;,
@@ -627,6 +625,7 @@
             runner_tx: tx,
             data: opt.data,
             event_handler: opt.event_handler,
+            raw_event_handler: opt.raw_event_handler,
             <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span>framework: opt.framework,
             manager: opt.manager,
@@ -689,7 +688,7 @@
             <span class="kw">if </span>post != pre {
                 <span class="self">self</span>.update_manager().<span class="kw">await</span>;
 
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(InternalEventHandler::Normal(event_handler)) = <span class="kw-2">&amp;</span><span class="self">self</span>.event_handler {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(event_handler) = <span class="kw-2">&amp;</span><span class="self">self</span>.event_handler {
                     <span class="kw">let </span>event_handler = Arc::clone(event_handler);
                     <span class="kw">let </span>context = <span class="self">self</span>.make_context();
                     <span class="kw">let </span>event = ShardStageUpdateEvent {
@@ -742,21 +741,14 @@
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = event {
                 <span class="kw">let </span>context = <span class="self">self</span>.make_context();
-                <span class="kw">let </span>can_dispatch = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.event_handler {
-                    <span class="prelude-val">Some</span>(InternalEventHandler::Normal(handler)) =&gt; {
-                        handler.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event)
-                    },
-                    <span class="prelude-val">Some</span>(InternalEventHandler::Raw(handler)) =&gt; {
-                        handler.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event)
-                    },
-                    <span class="prelude-val">Some</span>(InternalEventHandler::Both {
-                        raw,
-                        normal,
-                    }) =&gt; {
-                        raw.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event) &amp;&amp; normal.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event)
-                    },
-                    <span class="prelude-val">None </span>=&gt; <span class="bool-val">true</span>,
-                };
+                <span class="kw">let </span>can_dispatch = <span class="self">self
+                    </span>.event_handler
+                    .as_ref()
+                    .map_or(<span class="bool-val">true</span>, |handler| handler.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event))
+                    &amp;&amp; <span class="self">self
+                        </span>.raw_event_handler
+                        .as_ref()
+                        .map_or(<span class="bool-val">true</span>, |handler| handler.filter_event(<span class="kw-2">&amp;</span>context, <span class="kw-2">&amp;</span>event));
 
                 <span class="kw">if </span>can_dispatch {
                     <span class="attr">#[cfg(feature = <span class="string">"collector"</span>)]
@@ -783,6 +775,7 @@
                             <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
                             </span><span class="self">self</span>.framework.clone(),
                             <span class="self">self</span>.event_handler.clone(),
+                            <span class="self">self</span>.raw_event_handler.clone(),
                         ),
                     );
                 }
@@ -1078,7 +1071,8 @@
 <span class="doccomment">/// Options to be passed to [`ShardRunner::new`].
 </span><span class="kw">pub struct </span>ShardRunnerOptions {
     <span class="kw">pub </span>data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;,
-    <span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;InternalEventHandler&gt;,
+    <span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    <span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span><span class="kw">pub </span>framework: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;,
     <span class="kw">pub </span>manager: Arc&lt;ShardManager&gt;,

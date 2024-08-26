@@ -762,15 +762,6 @@
 <a href="#762" id="762">762</a>
 <a href="#763" id="763">763</a>
 <a href="#764" id="764">764</a>
-<a href="#765" id="765">765</a>
-<a href="#766" id="766">766</a>
-<a href="#767" id="767">767</a>
-<a href="#768" id="768">768</a>
-<a href="#769" id="769">769</a>
-<a href="#770" id="770">770</a>
-<a href="#771" id="771">771</a>
-<a href="#772" id="772">772</a>
-<a href="#773" id="773">773</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The [`Client`] contains information about a bot's token, as well as event handlers. Dispatching
 //! events to handlers and starting sharded gateway connections is handled directly by the client.
 //! In addition, the client automatically handles caching via the [`Cache`] struct.
@@ -811,7 +802,7 @@
 <span class="kw">use </span>tracing::debug;
 
 <span class="kw">pub use </span><span class="self">self</span>::context::Context;
-<span class="kw">pub use </span><span class="self">self</span>::event_handler::{EventHandler, FullEvent, InternalEventHandler, RawEventHandler};
+<span class="kw">pub use </span><span class="self">self</span>::event_handler::{EventHandler, FullEvent, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
@@ -1041,18 +1032,8 @@
         <span class="kw">let </span>presence = <span class="self">self</span>.presence;
         <span class="kw">let </span>http = <span class="self">self</span>.http;
 
-        <span class="kw">let </span>event_handler = <span class="kw">match </span>(<span class="self">self</span>.event_handler, <span class="self">self</span>.raw_event_handler) {
-            (<span class="prelude-val">Some</span>(normal), <span class="prelude-val">Some</span>(raw)) =&gt; <span class="prelude-val">Some</span>(InternalEventHandler::Both {
-                normal,
-                raw,
-            }),
-            (<span class="prelude-val">Some</span>(h), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(InternalEventHandler::Normal(h)),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(h)) =&gt; <span class="prelude-val">Some</span>(InternalEventHandler::Raw(h)),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
-        };
-
         <span class="kw">if let </span><span class="prelude-val">Some</span>(ratelimiter) = <span class="kw-2">&amp;</span>http.ratelimiter {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(InternalEventHandler::Normal(event_handler)) = <span class="kw-2">&amp;</span>event_handler {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event_handler) = <span class="kw-2">&amp;</span><span class="self">self</span>.event_handler {
                 <span class="kw">let </span>event_handler = Arc::clone(event_handler);
                 ratelimiter.set_ratelimit_callback(Box::new(<span class="kw">move </span>|info| {
                     <span class="kw">let </span>event_handler = Arc::clone(<span class="kw-2">&amp;</span>event_handler);
@@ -1086,7 +1067,8 @@
             </span><span class="kw">let </span>framework_cell = Arc::new(OnceLock::new());
             <span class="kw">let </span>(shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
                 data: Arc::clone(<span class="kw-2">&amp;</span>data),
-                event_handler,
+                event_handler: <span class="self">self</span>.event_handler,
+                raw_event_handler: <span class="self">self</span>.raw_event_handler,
                 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
                 </span>framework: Arc::clone(<span class="kw-2">&amp;</span>framework_cell),
                 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]

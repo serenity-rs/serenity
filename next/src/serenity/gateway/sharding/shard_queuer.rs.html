@@ -373,7 +373,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::framework::Framework;
-<span class="kw">use </span><span class="kw">crate</span>::gateway::client::InternalEventHandler;
+<span class="kw">use </span><span class="kw">crate</span>::gateway::client::{EventHandler, RawEventHandler};
 <span class="attr">#[cfg(feature = <span class="string">"voice"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::gateway::VoiceGatewayManager;
 <span class="kw">use </span><span class="kw">crate</span>::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
@@ -393,11 +393,10 @@
     ///
     /// [`Client::data`]: crate::Client::data
     </span><span class="kw">pub </span>data: Arc&lt;<span class="kw">dyn </span>std::any::Any + Send + Sync&gt;,
-    <span class="doccomment">/// A reference to [`EventHandler`] or [`RawEventHandler`].
-    ///
-    /// [`EventHandler`]: crate::gateway::client::EventHandler
-    /// [`RawEventHandler`]: crate::gateway::client::RawEventHandler
-    </span><span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;InternalEventHandler&gt;,
+    <span class="doccomment">/// A reference to an [`EventHandler`].
+    </span><span class="kw">pub </span>event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>EventHandler&gt;&gt;,
+    <span class="doccomment">/// A reference to a [`RawEventHandler`].
+    </span><span class="kw">pub </span>raw_event_handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;&gt;,
     <span class="doccomment">/// A copy of the framework
     </span><span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
     </span><span class="kw">pub </span>framework: Arc&lt;OnceLock&lt;Arc&lt;<span class="kw">dyn </span>Framework&gt;&gt;&gt;,
@@ -574,6 +573,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.data),
             event_handler: <span class="self">self</span>.event_handler.clone(),
+            raw_event_handler: <span class="self">self</span>.raw_event_handler.clone(),
             <span class="attr">#[cfg(feature = <span class="string">"framework"</span>)]
             </span>framework: <span class="self">self</span>.framework.get().cloned(),
             manager: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.manager),

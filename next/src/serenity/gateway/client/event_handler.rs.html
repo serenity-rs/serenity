@@ -534,18 +534,9 @@
 <a href="#534" id="534">534</a>
 <a href="#535" id="535">535</a>
 <a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::num::NonZeroU16;
-<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>strum::{EnumCount, IntoStaticStr, VariantNames};
@@ -1078,12 +1069,5 @@
         </span>drop((context, event));
         <span class="bool-val">true
     </span>}
-}
-
-<span class="attr">#[derive(Clone)]
-</span><span class="kw">pub enum </span>InternalEventHandler {
-    Raw(Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;),
-    Normal(Arc&lt;<span class="kw">dyn </span>EventHandler&gt;),
-    Both { raw: Arc&lt;<span class="kw">dyn </span>RawEventHandler&gt;, normal: Arc&lt;<span class="kw">dyn </span>EventHandler&gt; },
 }
 </code></pre></div></section></main></body></html>
