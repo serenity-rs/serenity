@@ -856,15 +856,12 @@ impl GuildId {
             Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
 
-        let items = roles
-            .into_iter()
-            .map(|(id, position)| EditRole {
-                id,
-                position,
-            })
-            .collect::<Vec<_>>();
+        let iter = roles.into_iter().map(|(id, position)| EditRole {
+            id,
+            position,
+        });
 
-        http.edit_role_positions(self, &items, reason).await
+        http.edit_role_positions(self, iter, reason).await
     }
 
     /// Edits the guild's welcome screen.
@@ -1232,15 +1229,12 @@ impl GuildId {
             position: u64,
         }
 
-        let items = channels
-            .into_iter()
-            .map(|(id, position)| ChannelPosEdit {
-                id,
-                position,
-            })
-            .collect::<Vec<_>>();
+        let iter = channels.into_iter().map(|(id, position)| ChannelPosEdit {
+            id,
+            position,
+        });
 
-        http.edit_guild_channel_positions(self, &items).await
+        http.edit_guild_channel_positions(self, iter).await
     }
 
     /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname starts with a

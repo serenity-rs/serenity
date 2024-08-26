@@ -2,6 +2,7 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::cell::Cell;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
@@ -14,6 +15,7 @@ use reqwest::Url;
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret as _, Secret};
 use serde::de::DeserializeOwned;
+use serde::ser::SerializeSeq as _;
 use serde_json::{from_value, json, to_string, to_vec};
 use to_arraystring::ToArrayString as _;
 use tracing::{debug, warn};
@@ -66,6 +68,29 @@ impl secrecy::Zeroize for Token {
 
 impl secrecy::CloneableSecret for Token {}
 impl secrecy::DebugSecret for Token {}
+
+// NOTE: This cannot be passed in from outside, due to `Cell` being !Send.
+struct SerializeIter<I>(Cell<Option<I>>);
+
+impl<I> SerializeIter<I> {
+    pub fn new(iter: I) -> Self {
+        Self(Cell::new(Some(iter)))
+    }
+}
+
+impl<Iter, Item> serde::Serialize for SerializeIter<Iter>
+where
+    Iter: Iterator<Item = Item>,
+    Item: serde::Serialize,
+{
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let Some(iter) = self.0.take() else {
+            return serializer.serialize_seq(Some(0))?.end();
+        };
+
+        serializer.collect_seq(iter)
+    }
+}
 
 /// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API
 ///
@@ -1664,9 +1689,9 @@ impl Http {
     pub async fn edit_guild_channel_positions(
         &self,
         guild_id: GuildId,
-        value: &impl serde::Serialize,
+        value: impl Iterator<Item: serde::Serialize>,
     ) -> Result<()> {
-        let body = to_vec(value)?;
+        let body = to_vec(&SerializeIter::new(value))?;
 
         self.wind(204, Request {
             body: Some(body),
@@ -2003,12 +2028,14 @@ impl Http {
     pub async fn edit_role_positions(
         &self,
         guild_id: GuildId,
-        map: &impl serde::Serialize,
+        positions: impl Iterator<Item: serde::Serialize>,
         audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
+        let body = to_vec(&SerializeIter::new(positions))?;
+
         let mut value: Value = self
             .fire(Request {
-                body: Some(to_vec(&map)?),
+                body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 method: LightMethod::Patch,
