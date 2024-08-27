@@ -101,6 +101,9 @@ impl CreateEmbed {
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
+    ///
+    /// Refer [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files)
+    /// for rules on naming local attachments.
     #[inline]
     pub fn image(mut self, url: impl Into<String>) -> Self {
         self.0.image = Some(EmbedImage {
@@ -162,6 +165,8 @@ impl CreateEmbed {
     ///
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
     /// with the provided filename. Or else this won't work.
+    ///
+    /// Refer [`Self::image`] for rules on naming local attachments.
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
     #[inline]
@@ -300,6 +305,8 @@ impl CreateEmbedFooter {
     }
 
     /// Set the icon URL's value. This only supports HTTP(S).
+    ///
+    /// Refer [`CreateEmbed::image`] for rules on naming local attachments.
     pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
         self.0.icon_url = Some(icon_url.into());
         self
