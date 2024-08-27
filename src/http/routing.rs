@@ -382,6 +382,10 @@ routes! ('a, {
     api!("/sticker-packs"),
     Some(RatelimitingKind::Path);
 
+    StickerPack { sticker_pack_id: StickerPackId },
+    api!("/sticker-packs/{}", sticker_pack_id),
+    Some(RatelimitingKind::Path);
+
     User { user_id: UserId },
     api!("/users/{}", user_id),
     Some(RatelimitingKind::Path);

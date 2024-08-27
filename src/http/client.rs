@@ -4228,6 +4228,21 @@ impl Http {
         .await
     }
 
+    /// Retrieves a specific [`StickerPack`] from it's [`StickerPackId`]
+    pub async fn get_sticker_pack(&self, sticker_pack_id: StickerPackId) -> Result<StickerPack> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::StickerPack {
+                sticker_pack_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Retrieves a list of all nitro sticker packs.
     pub async fn get_nitro_stickers(&self) -> Result<Vec<StickerPack>> {
         #[derive(Deserialize)]

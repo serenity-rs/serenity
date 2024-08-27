@@ -8,6 +8,19 @@ use crate::model::prelude::*;
 use crate::model::utils::comma_separated_string;
 
 #[cfg(feature = "model")]
+impl StickerPackId {
+    /// Gets the [`StickerPack`] object.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a [`StickerPack`] with that [`StickerPackId`] does not exist, or
+    /// is otherwise unavailable.
+    pub async fn to_sticker_pack(self, http: impl AsRef<Http>) -> Result<StickerPack> {
+        http.as_ref().get_sticker_pack(self).await
+    }
+}
+
+#[cfg(feature = "model")]
 impl StickerId {
     /// Delete a guild sticker.
     ///
