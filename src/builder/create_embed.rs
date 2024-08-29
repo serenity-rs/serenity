@@ -100,7 +100,7 @@ impl CreateEmbed {
         self
     }
 
-    /// Set the image associated with the embed. This only supports HTTP(S).
+    /// Set the image associated with the embed.
     ///
     /// Refer [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files)
     /// for rules on naming local attachments.
@@ -115,7 +115,7 @@ impl CreateEmbed {
         self
     }
 
-    /// Set the thumbnail of the embed. This only supports HTTP(S).
+    /// Set the thumbnail of the embed.
     #[inline]
     pub fn thumbnail(mut self, url: impl Into<String>) -> Self {
         self.0.thumbnail = Some(EmbedThumbnail {
@@ -304,7 +304,7 @@ impl CreateEmbedFooter {
         self
     }
 
-    /// Set the icon URL's value. This only supports HTTP(S).
+    /// Set the icon URL's value.
     ///
     /// Refer [`CreateEmbed::image`] for rules on naming local attachments.
     pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
