@@ -81,6 +81,17 @@ bitflags! {
         const BYPASSES_VERIFICATION = 1 << 2;
         /// Member has started onboarding. Not editable
         const STARTED_ONBOARDING = 1 << 3;
+        /// Member is a guest and can only access the voice channel they were invited to. Not
+        /// editable
+        const IS_GUEST = 1 << 4;
+        /// Member has started Server Guide new member actions. Not editable
+        const STARTED_HOME_ACTIONS = 1 << 5;
+        /// Member has completed Server Guide new member actions. Not editable
+        const COMPLETED_HOME_ACTIONS = 1 << 6;
+        /// Member's username, display name, or nickname is blocked by AutoMod. Not editable
+        const AUTOMOD_QUARANTINED_USERNAME = 1 << 7;
+        /// Member has dismissed the DM settings upsell. Not editable
+        const DM_SETTINGS_UPSELL_ACKNOWLEDGED = 1 << 9;
     }
 }
 
