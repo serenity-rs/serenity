@@ -320,6 +320,8 @@ pub struct CreateCommand {
     #[serde(skip_serializing_if = "Option::is_none")]
     contexts: Option<Vec<InteractionContext>>,
     nsfw: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    handler: Option<EntryPointHandlerType>,
 }
 
 impl CreateCommand {
@@ -342,6 +344,7 @@ impl CreateCommand {
 
             options: Vec::new(),
             nsfw: false,
+            handler: None,
         }
     }
 
@@ -461,6 +464,15 @@ impl CreateCommand {
     /// Whether this command is marked NSFW (age-restricted)
     pub fn nsfw(mut self, nsfw: bool) -> Self {
         self.nsfw = nsfw;
+        self
+    }
+
+    /// Sets the command's entry point handler type. Only valid for commands of type
+    /// [`PrimaryEntryPoint`].
+    ///
+    /// [`PrimaryEntryPoint`]: CommandType::PrimaryEntryPoint
+    pub fn handler(mut self, handler: EntryPointHandlerType) -> Self {
+        self.handler = Some(handler);
         self
     }
 }

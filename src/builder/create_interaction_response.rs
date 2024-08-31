@@ -64,6 +64,13 @@ pub enum CreateInteractionResponse {
     /// Corresponds to Discord's `PREMIUM_REQUIRED'.
     #[deprecated = "use premium button components via `CreateButton::new_premium` instead"]
     PremiumRequired,
+    /// Not valid for autocomplete and Ping interactions. Only available for applications with
+    /// Activities enabled.
+    ///
+    /// Responds to the interaction by launching the Activity associated with the app.
+    ///
+    /// Corresponds to Discord's `LAUNCH_ACTIVITY`.
+    LaunchActivity,
 }
 
 impl serde::Serialize for CreateInteractionResponse {
@@ -81,6 +88,7 @@ impl serde::Serialize for CreateInteractionResponse {
             Self::Autocomplete(_) => 8,
             Self::Modal(_) => 9,
             Self::PremiumRequired => 10,
+            Self::LaunchActivity => 12,
         })?;
 
         match self {
@@ -92,6 +100,7 @@ impl serde::Serialize for CreateInteractionResponse {
             Self::Autocomplete(x) => map.serialize_entry("data", &x)?,
             Self::Modal(x) => map.serialize_entry("data", &x)?,
             Self::PremiumRequired => map.serialize_entry("data", &None::<()>)?,
+            Self::LaunchActivity => map.serialize_entry("data", &None::<()>)?,
         }
 
         map.end()
