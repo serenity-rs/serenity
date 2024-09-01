@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (0d634185d 2024-08-29)" data-channel="nightly" data-search-js="search-acd2e111c9cb27e3.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-cb0df477c2d67d00.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (a7399ba69 2024-08-31)" data-channel="nightly" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4957,6 +4957,11 @@
 <a href="#4957" id="4957">4957</a>
 <a href="#4958" id="4958">4958</a>
 <a href="#4959" id="4959">4959</a>
+<a href="#4960" id="4960">4960</a>
+<a href="#4961" id="4961">4961</a>
+<a href="#4962" id="4962">4962</a>
+<a href="#4963" id="4963">4963</a>
+<a href="#4964" id="4964">4964</a>
 </pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
@@ -4971,7 +4976,7 @@
 <span class="kw">use </span>reqwest::{Client, ClientBuilder, Response <span class="kw">as </span>ReqwestResponse, StatusCode};
 <span class="kw">use </span>secrecy::{ExposeSecret, SecretString};
 <span class="kw">use </span>serde::de::DeserializeOwned;
-<span class="kw">use </span>tracing::{debug, instrument, trace};
+<span class="kw">use </span>tracing::{debug, instrument, warn};
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::{Multipart, MultipartUpload};
 <span class="kw">use </span><span class="kw">super</span>::ratelimiting::Ratelimiter;
@@ -9885,16 +9890,21 @@
     /// This is a function that performs a light amount of work and returns an empty tuple, so it's
     /// called "self.wind" to denote that it's lightweight.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>wind(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: u16, req: Request&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>route = req.route;
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="self">self</span>.request(req).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if </span>response.status().as_u16() == expected {
+        <span class="kw">if </span>response.status().is_success() {
+            <span class="kw">let </span>response_status = response.status().as_u16();
+            <span class="kw">if </span>response_status != expected {
+                <span class="kw">let </span>route = route.path();
+                <span class="macro">warn!</span>(<span class="string">"Mismatched successful response status from {route}! Expected {expected} but got {response_status}"</span>);
+            }
+
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="macro">debug!</span>(<span class="string">"Expected {}, got {}"</span>, expected, response.status());
-        <span class="macro">trace!</span>(<span class="string">"Unsuccessful response: {:?}"</span>, response);
-
+        <span class="macro">debug!</span>(<span class="string">"Unsuccessful response: {response:?}"</span>);
         <span class="prelude-val">Err</span>(Error::Http(HttpError::UnsuccessfulRequest(
             ErrorResponse::from_response(response, method).<span class="kw">await</span>,
         )))
