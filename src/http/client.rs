@@ -12,7 +12,7 @@ use reqwest::Url;
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret, SecretString};
 use serde::de::DeserializeOwned;
-use tracing::{debug, instrument, trace};
+use tracing::{debug, instrument, warn};
 
 use super::multipart::{Multipart, MultipartUpload};
 use super::ratelimiting::Ratelimiter;
@@ -4926,16 +4926,21 @@ impl Http {
     /// This is a function that performs a light amount of work and returns an empty tuple, so it's
     /// called "self.wind" to denote that it's lightweight.
     pub(super) async fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
+        let route = req.route;
         let method = req.method.reqwest_method();
         let response = self.request(req).await?;
 
-        if response.status().as_u16() == expected {
+        if response.status().is_success() {
+            let response_status = response.status().as_u16();
+            if response_status != expected {
+                let route = route.path();
+                warn!("Mismatched successful response status from {route}! Expected {expected} but got {response_status}");
+            }
+
             return Ok(());
         }
 
-        debug!("Expected {}, got {}", expected, response.status());
-        trace!("Unsuccessful response: {:?}", response);
-
+        debug!("Unsuccessful response: {response:?}");
         Err(Error::Http(HttpError::UnsuccessfulRequest(
             ErrorResponse::from_response(response, method).await,
         )))
