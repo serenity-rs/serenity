@@ -56,8 +56,8 @@ struct NotSend;
 enum CacheRefInner<'a, K, V, T> {
     #[cfg(feature = "temp_cache")]
     Arc(Arc<V>),
-    DashRef(Ref<'a, K, V, BuildHasher>),
-    DashMappedRef(MappedRef<'a, K, T, V, BuildHasher>),
+    DashRef(Ref<'a, K, V>),
+    DashMappedRef(MappedRef<'a, K, T, V>),
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
@@ -79,11 +79,11 @@ impl<'a, K, V, T> CacheRef<'a, K, V, T> {
         Self::new(CacheRefInner::Arc(inner.get_inner()))
     }
 
-    fn from_ref(inner: Ref<'a, K, V, BuildHasher>) -> Self {
+    fn from_ref(inner: Ref<'a, K, V>) -> Self {
         Self::new(CacheRefInner::DashRef(inner))
     }
 
-    fn from_mapped_ref(inner: MappedRef<'a, K, T, V, BuildHasher>) -> Self {
+    fn from_mapped_ref(inner: MappedRef<'a, K, T, V>) -> Self {
         Self::new(CacheRefInner::DashMappedRef(inner))
     }
 
