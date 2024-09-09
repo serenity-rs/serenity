@@ -59,10 +59,10 @@ bytes = { version = "1.5.0", optional = true }
 percent-encoding = { version = "2.3.0", optional = true }
 mini-moka = { version = "0.10.2", optional = true }
 mime_guess = { version = "2.0.4", optional = true }
-dashmap = { version = "5.5.3", features = ["serde"], optional = true }
+dashmap = { version = "6.1.0", features = ["serde"], optional = true }
 parking_lot = { version = "0.12.1"}
 ed25519-dalek = { version = "2.0.0", optional = true }
-typesize = { version = "0.1.6", optional = true, features = ["url", "time", "serde_json", "secrecy", "dashmap", "parking_lot", "nonmax", "extract_map_01", "details"] }
+typesize = { version = "0.1.6", optional = true, features = ["url", "time", "serde_json", "secrecy", "parking_lot", "nonmax", "extract_map_01"] }
 # serde feature only allows for serialisation,
 # Serenity workspace crates
 serenity-voice-model = { version = "0.2.0", path = "./voice-model", optional = true }
@@ -125,7 +125,7 @@ full = ["default", "collector", "voice", "voice_model", "interactions_endpoint"]
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka", "typesize?/mini_moka"]
 
-typesize = ["dep:typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize"]
+typesize = ["dep:typesize", "dashmap/typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize"]
 
 # Enables compile-time heavy instrument macros from tracing
 tracing_instrument = ["tracing/attributes"]

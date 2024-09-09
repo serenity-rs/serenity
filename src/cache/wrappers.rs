@@ -14,15 +14,15 @@ use typesize::TypeSize;
 /// A wrapper around Option<DashMap<K, V>> to ease disabling specific cache fields.
 pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(crate) Option<DashMap<K, V, BuildHasher>>);
 impl<K: Eq + Hash, V> MaybeMap<K, V> {
-    pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V, BuildHasher>> {
+    pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V>> {
         Option::iter(&self.0).flat_map(DashMap::iter)
     }
 
-    pub fn get(&self, k: &K) -> Option<Ref<'_, K, V, BuildHasher>> {
+    pub fn get(&self, k: &K) -> Option<Ref<'_, K, V>> {
         self.0.as_ref()?.get(k)
     }
 
-    pub fn get_mut(&self, k: &K) -> Option<RefMut<'_, K, V, BuildHasher>> {
+    pub fn get_mut(&self, k: &K) -> Option<RefMut<'_, K, V>> {
         self.0.as_ref()?.get_mut(k)
     }
 
@@ -59,8 +59,10 @@ impl<K: Eq + Hash + TypeSize, V: TypeSize> TypeSize for MaybeMap<K, V> {
         self.0.as_ref().map(DashMap::extra_size).unwrap_or_default()
     }
 
-    fn get_collection_item_count(&self) -> Option<usize> {
-        self.0.as_ref().and_then(DashMap::get_collection_item_count)
+    typesize::if_typesize_details! {
+        fn get_collection_item_count(&self) -> Option<usize> {
+            self.0.as_ref().and_then(DashMap::get_collection_item_count)
+        }
     }
 }
 
@@ -69,11 +71,11 @@ impl<K: Eq + Hash + TypeSize, V: TypeSize> TypeSize for MaybeMap<K, V> {
 /// map without allowing mutation of internal cache fields, which could cause issues.
 pub struct ReadOnlyMapRef<'a, K: Eq + Hash, V>(Option<&'a DashMap<K, V, BuildHasher>>);
 impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
-    pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V, BuildHasher>> {
+    pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V>> {
         self.0.into_iter().flat_map(DashMap::iter)
     }
 
-    pub fn get(&self, k: &K) -> Option<Ref<'_, K, V, BuildHasher>> {
+    pub fn get(&self, k: &K) -> Option<Ref<'_, K, V>> {
         self.0?.get(k)
     }
 
@@ -91,6 +93,10 @@ impl std::hash::Hasher for Hasher {
         self.0.write(bytes);
     }
 }
+
+#[cfg(feature = "typesize")]
+impl typesize::TypeSize for Hasher {}
+
 #[derive(Clone, Default)]
 pub struct BuildHasher(fxhash::FxBuildHasher);
 impl std::hash::BuildHasher for BuildHasher {
@@ -100,6 +106,9 @@ impl std::hash::BuildHasher for BuildHasher {
         Hasher(self.0.build_hasher())
     }
 }
+
+#[cfg(feature = "typesize")]
+impl typesize::TypeSize for BuildHasher {}
 
 /// Wrapper around `SizableArc<T, Owned>`` with support for disabling typesize.
 ///
