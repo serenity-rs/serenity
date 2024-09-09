@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/wrappers.rs`."><title>wrappers.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-492a78a4a87dcc01.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.82.0-nightly (a7399ba69 2024-08-31)" data-channel="nightly" data-search-js="search-a99f1315e7cc5121.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-921df33f47b8780c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-3b12f09e550e0385.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/wrappers.rs`."><title>wrappers.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-405f8b29f52305f8.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (adf8d168a 2024-09-08)" data-channel="nightly" data-search-js="search-0cfde64e8ad3a7fe.js" data-settings-js="settings-7e3bb6c46e92e77c.js" ><script src="../../../static.files/storage-29b1d5a9048d38fe.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-14659ec02b58af51.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-40f72c9259523cb3.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -153,7 +154,15 @@
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
 <a href="#155" id="155">155</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Wrappers around library types for easier use.
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a></pre></div><pre class="rust"><code><span class="doccomment">//! Wrappers around library types for easier use.
 
 </span><span class="kw">use </span>std::hash::Hash;
 <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
@@ -169,15 +178,15 @@
 </span><span class="doccomment">/// A wrapper around Option&lt;DashMap&lt;K, V&gt;&gt; to ease disabling specific cache fields.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MaybeMap&lt;K: Eq + Hash, V&gt;(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="prelude-ty">Option</span>&lt;DashMap&lt;K, V, BuildHasher&gt;&gt;);
 <span class="kw">impl</span>&lt;K: Eq + Hash, V&gt; MaybeMap&lt;K, V&gt; {
-    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">'_</span>, K, V&gt;&gt; {
         Option::iter(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).flat_map(DashMap::iter)
     }
 
-    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">'_</span>, K, V&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.get(k)
     }
 
-    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;RefMut&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;RefMut&lt;<span class="lifetime">'_</span>, K, V&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span>.as_ref()<span class="question-mark">?</span>.get_mut(k)
     }
 
@@ -214,8 +223,10 @@
         <span class="self">self</span>.<span class="number">0</span>.as_ref().map(DashMap::extra_size).unwrap_or_default()
     }
 
-    <span class="kw">fn </span>get_collection_item_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
-        <span class="self">self</span>.<span class="number">0</span>.as_ref().and_then(DashMap::get_collection_item_count)
+    <span class="macro">typesize::if_typesize_details!</span> {
+        <span class="kw">fn </span>get_collection_item_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+            <span class="self">self</span>.<span class="number">0</span>.as_ref().and_then(DashMap::get_collection_item_count)
+        }
     }
 }
 
@@ -224,11 +235,11 @@
 /// map without allowing mutation of internal cache fields, which could cause issues.
 </span><span class="kw">pub struct </span>ReadOnlyMapRef&lt;<span class="lifetime">'a</span>, K: Eq + Hash, V&gt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>DashMap&lt;K, V, BuildHasher&gt;&gt;);
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, K: Eq + Hash, V&gt; ReadOnlyMapRef&lt;<span class="lifetime">'a</span>, K, V&gt; {
-    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RefMulti&lt;<span class="lifetime">'_</span>, K, V&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span>.into_iter().flat_map(DashMap::iter)
     }
 
-    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">'_</span>, K, V, BuildHasher&gt;&gt; {
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, k: <span class="kw-2">&amp;</span>K) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">'_</span>, K, V&gt;&gt; {
         <span class="self">self</span>.<span class="number">0</span><span class="question-mark">?</span>.get(k)
     }
 
@@ -246,6 +257,10 @@
         <span class="self">self</span>.<span class="number">0</span>.write(bytes);
     }
 }
+
+<span class="attr">#[cfg(feature = <span class="string">"typesize"</span>)]
+</span><span class="kw">impl </span>typesize::TypeSize <span class="kw">for </span>Hasher {}
+
 <span class="attr">#[derive(Clone, Default)]
 </span><span class="kw">pub struct </span>BuildHasher(fxhash::FxBuildHasher);
 <span class="kw">impl </span>std::hash::BuildHasher <span class="kw">for </span>BuildHasher {
@@ -255,6 +270,9 @@
         Hasher(<span class="self">self</span>.<span class="number">0</span>.build_hasher())
     }
 }
+
+<span class="attr">#[cfg(feature = <span class="string">"typesize"</span>)]
+</span><span class="kw">impl </span>typesize::TypeSize <span class="kw">for </span>BuildHasher {}
 
 <span class="doccomment">/// Wrapper around `SizableArc&lt;T, Owned&gt;`` with support for disabling typesize.
 ///
