@@ -364,6 +364,8 @@ bitflags::bitflags! {
         const SET_VOICE_CHANNEL_STATUS = 1 << 48;
         /// Allows attaching polls to message sends.
         const SEND_POLLS = 1 << 49;
+        /// Allows user-installed apps to send public responses.
+        const USE_EXTERNAL_APPS = 1 << 50;
     }
 }
 
@@ -809,6 +811,14 @@ impl Permissions {
     #[must_use]
     pub const fn send_polls(self) -> bool {
         self.contains(Self::SEND_POLLS)
+    }
+    /// Shorthand for checking that the set of permissions contains the [Use External Apps]
+    /// permission.
+    ///
+    /// [Use External Apps]: Self::USE_EXTERNAL_APPS
+    #[must_use]
+    pub const fn use_external_apps(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_APPS)
     }
 }
 
