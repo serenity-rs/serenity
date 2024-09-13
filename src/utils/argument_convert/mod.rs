@@ -22,7 +22,7 @@ pub use role::*;
 mod emoji;
 pub use emoji::*;
 
-use super::{DOMAINS, MAX_DOMAIN_LEN};
+use super::DOMAINS;
 use crate::model::prelude::*;
 use crate::prelude::*;
 
@@ -139,3 +139,19 @@ pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
     }
     None
 }
+
+const MAX_DOMAIN_LEN: usize = {
+    let mut max_len = 0;
+    let mut i = 0;
+
+    while i < DOMAINS.len() {
+        let cur_len = DOMAINS[i].len();
+        if cur_len > max_len {
+            max_len = cur_len;
+        }
+
+        i += 1;
+    }
+
+    max_len
+};

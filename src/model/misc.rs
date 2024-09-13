@@ -8,8 +8,9 @@ use std::fmt::Write;
 use std::result::Result as StdResult;
 use std::str::FromStr;
 
+use aformat::ArrayString;
+
 use super::prelude::*;
-use crate::internal::prelude::*;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use crate::utils;
 

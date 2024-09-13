@@ -1,5 +1,4 @@
 use std::collections::{HashSet, VecDeque};
-use std::num::NonZeroU16;
 
 use super::{Cache, CacheUpdate};
 use crate::internal::prelude::*;
@@ -32,9 +31,8 @@ use crate::model::event::{
     VoiceChannelStatusUpdateEvent,
     VoiceStateUpdateEvent,
 };
-use crate::model::gateway::{Presence, ShardInfo};
+use crate::model::gateway::Presence;
 use crate::model::guild::{Guild, GuildMemberFlags, Member, MemberGeneratedFlags, Role};
-use crate::model::id::ShardId;
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 
@@ -449,8 +447,7 @@ impl CacheUpdate for ReadyEvent {
         let mut guilds_to_remove = vec![];
         let ready_guilds_hashset =
             self.ready.guilds.iter().map(|status| status.id).collect::<HashSet<_>>();
-        let shard_data =
-            self.ready.shard.unwrap_or_else(|| ShardInfo::new(ShardId(1), NonZeroU16::MIN));
+        let shard_data = self.ready.shard.unwrap_or_default();
 
         for guild_entry in cache.guilds.iter() {
             let guild = guild_entry.key();

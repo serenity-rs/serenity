@@ -44,6 +44,7 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
+use aformat::{aformat, CapStr};
 use secrecy::{ExposeSecret as _, Secret};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
