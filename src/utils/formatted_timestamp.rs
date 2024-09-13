@@ -2,10 +2,9 @@ use std::error::Error as StdError;
 use std::fmt;
 use std::str::FromStr;
 
-use aformat::{ArrayString, ToArrayString};
+use aformat::{aformat_into, ArrayString, ToArrayString};
 
-use crate::all::Timestamp;
-use crate::internal::prelude::*;
+use crate::model::Timestamp;
 
 /// Represents a combination of a timestamp and a style for formatting time in messages.
 ///
@@ -195,6 +194,8 @@ impl FromStr for FormattedTimestampStyle {
 
 #[cfg(test)]
 mod tests {
+    use aformat::aformat;
+
     use super::*;
 
     #[test]

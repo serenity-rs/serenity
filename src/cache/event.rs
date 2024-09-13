@@ -1,5 +1,4 @@
 use std::collections::VecDeque;
-use std::num::NonZeroU16;
 
 use super::{Cache, CacheUpdate};
 use crate::internal::prelude::*;
@@ -32,9 +31,8 @@ use crate::model::event::{
     VoiceChannelStatusUpdateEvent,
     VoiceStateUpdateEvent,
 };
-use crate::model::gateway::{Presence, ShardInfo};
+use crate::model::gateway::Presence;
 use crate::model::guild::{Guild, GuildMemberFlags, Member, MemberGeneratedFlags, Role};
-use crate::model::id::ShardId;
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 
@@ -461,8 +459,7 @@ impl CacheUpdate for ReadyEvent {
             cache.unavailable_guilds.insert(unavailable.id, ());
         }
 
-        let shard_data =
-            self.ready.shard.unwrap_or_else(|| ShardInfo::new(ShardId(1), NonZeroU16::MIN));
+        let shard_data = self.ready.shard.unwrap_or_default();
 
         {
             let mut cached_shard_data = cache.shard_data.write();

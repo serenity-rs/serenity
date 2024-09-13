@@ -1,21 +1,7 @@
 use nonmax::NonMaxU16;
 
-use crate::internal::prelude::*;
-use crate::model::channel::PermissionOverwrite;
-use crate::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
-use crate::model::guild::{
-    AfkTimeout,
-    DefaultMessageNotificationLevel,
-    ExplicitContentFilter,
-    MfaLevel,
-    SystemChannelFlags,
-    VerificationLevel,
-};
-use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, UserId};
-use crate::model::misc::ImageHash;
-use crate::model::sticker::StickerFormatType;
+use crate::model::prelude::*;
 use crate::model::utils::StrOrInt;
-use crate::model::{Permissions, Timestamp};
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
@@ -165,7 +151,7 @@ generate_change! {
     "enable_emoticons" => EnableEmoticons(bool),
     /// Entity type of guild scheduled event was changed.
     "entity_type" => EntityType(u64),
-    "event_type" => EventType(EventType),
+    "event_type" => EventType(AutomodEventType),
     "exempt_channels" => ExemptChannels(FixedArray<ChannelId>),
     "exempt_roles" => ExemptRoles(FixedArray<RoleId>),
     /// Behavior of the expiration of an integration was changed.
