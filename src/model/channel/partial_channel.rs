@@ -1,7 +1,4 @@
-use crate::internal::prelude::*;
-use crate::model::channel::{ChannelType, ThreadMetadata};
-use crate::model::id::{ChannelId, WebhookId};
-use crate::model::Permissions;
+use crate::model::prelude::*;
 
 /// A container for any partial channel.
 ///

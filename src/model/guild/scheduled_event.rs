@@ -1,6 +1,5 @@
 use nonmax::NonMaxU64;
 
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Information about a guild scheduled event.

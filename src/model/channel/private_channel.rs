@@ -1,3 +1,4 @@
+#[cfg(feature = "model")]
 use std::borrow::Cow;
 use std::fmt;
 #[cfg(feature = "model")]
@@ -9,7 +10,6 @@ use crate::builder::{CreateAttachment, CreateMessage, EditMessage, GetMessages};
 use crate::http::CacheHttp;
 #[cfg(feature = "model")]
 use crate::http::{Http, Typing};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::single_recipient;
 

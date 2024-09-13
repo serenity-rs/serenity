@@ -19,12 +19,7 @@ pub use oauth::*;
 mod ping_interaction;
 pub use ping_interaction::*;
 
-use super::guild::PartialGuild;
-use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
-use super::misc::ImageHash;
-use super::user::User;
-use super::Permissions;
-use crate::internal::prelude::*;
+use super::prelude::*;
 
 /// Partial information about the given application.
 ///
