@@ -25,7 +25,6 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 

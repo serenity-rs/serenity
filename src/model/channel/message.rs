@@ -21,7 +21,6 @@ use crate::constants;
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::{discord_colours, StrOrInt};
 

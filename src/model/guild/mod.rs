@@ -59,7 +59,6 @@ use crate::constants::LARGE_THRESHOLD;
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::*;

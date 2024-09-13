@@ -2,7 +2,6 @@ use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
 use serde_json::from_value;
 
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::{default_true, deserialize_val};
 

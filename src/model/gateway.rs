@@ -7,7 +7,6 @@ use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
-use crate::internal::prelude::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///

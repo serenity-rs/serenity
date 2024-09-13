@@ -13,7 +13,6 @@ use strum::{EnumCount, IntoStaticStr, VariantNames};
 use tracing::{debug, warn};
 
 use crate::constants::Opcode;
-use crate::internal::prelude::*;
 use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
 use crate::model::utils::deserialize_val;

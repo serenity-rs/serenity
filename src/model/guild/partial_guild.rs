@@ -23,7 +23,6 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
-use crate::internal::prelude::*;
 use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]

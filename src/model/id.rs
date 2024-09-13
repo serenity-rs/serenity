@@ -4,8 +4,7 @@ use std::fmt;
 
 use nonmax::NonMaxU64;
 
-use super::Timestamp;
-use crate::internal::prelude::*;
+use super::prelude::*;
 
 macro_rules! newtype_display_impl {
     ($name:ident) => {

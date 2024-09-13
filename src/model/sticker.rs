@@ -2,7 +2,6 @@
 use crate::builder::EditSticker;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::comma_separated_string;
 

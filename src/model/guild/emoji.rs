@@ -1,8 +1,6 @@
 use std::fmt;
 
-use crate::internal::prelude::*;
-use crate::model::id::{EmojiId, RoleId};
-use crate::model::user::User;
+use crate::model::prelude::*;
 use crate::model::utils::default_true;
 
 /// Represents a custom guild emoji, which can either be created using the API, or via an

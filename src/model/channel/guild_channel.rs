@@ -30,7 +30,6 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Represents a guild's text, news, or voice channel. Some methods are available only for voice

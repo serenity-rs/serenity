@@ -17,7 +17,6 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::avatar_url;
 

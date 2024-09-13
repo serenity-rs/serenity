@@ -15,7 +15,6 @@ use tracing::warn;
 
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::discord_colours_opt;
 
