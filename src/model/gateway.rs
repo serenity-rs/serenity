@@ -7,7 +7,6 @@ use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
-use crate::internal::prelude::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -372,12 +371,11 @@ pub struct ShardInfo {
     pub total: NonZeroU16,
 }
 
-impl ShardInfo {
-    #[must_use]
-    pub(crate) fn new(id: ShardId, total: NonZeroU16) -> Self {
+impl Default for ShardInfo {
+    fn default() -> Self {
         Self {
-            id,
-            total,
+            id: ShardId(1),
+            total: NonZeroU16::MIN,
         }
     }
 }

@@ -37,7 +37,7 @@ use std::sync::OnceLock;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
-use tracing::debug;
+use tracing::{debug, warn};
 
 pub use self::context::Context;
 pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
@@ -57,7 +57,6 @@ use crate::model::gateway::GatewayIntents;
 #[cfg(feature = "voice")]
 use crate::model::id::UserId;
 use crate::model::user::OnlineStatus;
-use crate::utils::check_shard_total;
 
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[must_use = "Builders do nothing unless they are awaited"]
@@ -765,4 +764,11 @@ impl Client {
 
         Ok(())
     }
+}
+
+fn check_shard_total(total_shards: u16) -> NonZeroU16 {
+    NonZeroU16::new(total_shards).unwrap_or_else(|| {
+        warn!("Invalid shard total provided ({total_shards}), defaulting to 1");
+        NonZeroU16::MIN
+    })
 }

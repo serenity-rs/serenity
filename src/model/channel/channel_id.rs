@@ -1,3 +1,4 @@
+#[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::sync::Arc;
@@ -28,7 +29,6 @@ use crate::collector::{MessageCollector, ReactionCollector};
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
@@ -366,6 +366,7 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
+    #[cfg_attr(not(feature = "cache"), allow(unused_variables))]
     pub async fn to_channel(
         self,
         cache_http: impl CacheHttp,

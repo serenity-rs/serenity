@@ -207,10 +207,14 @@ impl ShardQueuer {
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn start(&mut self, shard_id: ShardId) -> Result<()> {
+        let shard_info = ShardInfo {
+            id: shard_id,
+            total: self.shard_total,
+        };
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
             Arc::clone(self.http.token()),
-            ShardInfo::new(shard_id, self.shard_total),
+            shard_info,
             self.intents,
             self.presence.clone(),
         )

@@ -4,8 +4,7 @@ use std::fmt;
 
 use nonmax::NonMaxU64;
 
-use super::Timestamp;
-use crate::internal::prelude::*;
+use super::prelude::*;
 
 macro_rules! newtype_display_impl {
     ($name:ident) => {
@@ -204,7 +203,7 @@ pub struct ScheduledEventId(#[serde(with = "snowflake")] NonMaxU64);
 )]
 pub struct UserId(#[serde(with = "snowflake")] NonMaxU64);
 
-/// An identifier for a [`Webhook`][super::webhook::Webhook]
+/// An identifier for a [`Webhook`]
 #[repr(packed)]
 #[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
@@ -340,7 +339,7 @@ id_u64! {
 /// This identifier is special, it simply models internal IDs for type safety,
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct ShardId(pub u16);
 
 impl ShardId {
