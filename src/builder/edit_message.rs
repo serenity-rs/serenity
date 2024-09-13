@@ -201,6 +201,7 @@ impl<'a> EditMessage<'a> {
         self
     }
 
+    #[cfg(feature = "cache")]
     fn is_only_suppress_embeds(&self) -> bool {
         self.flags == Some(MessageFlags::SUPPRESS_EMBEDS)
             && self.content.is_none()
@@ -234,6 +235,7 @@ impl<'a> EditMessage<'a> {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [`From<Embed>`]: CreateEmbed#impl-From<Embed>
     #[cfg(feature = "http")]
+    #[cfg_attr(not(feature = "cache"), allow(unused_variables))]
     pub async fn execute(
         mut self,
         cache_http: impl CacheHttp,

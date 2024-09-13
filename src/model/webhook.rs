@@ -11,7 +11,6 @@ use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 enum_number! {

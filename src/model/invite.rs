@@ -7,7 +7,6 @@ use super::prelude::*;
 use crate::builder::CreateInvite;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 
 /// Information about an invite code.
 ///

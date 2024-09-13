@@ -7,8 +7,6 @@ use serde::de::Error;
 use to_arraystring::ToArrayString;
 
 use super::prelude::*;
-use super::Timestamp;
-use crate::internal::prelude::*;
 
 macro_rules! newtype_display_impl {
     ($name:ident, |$this:ident| $inner:expr) => {
@@ -211,7 +209,7 @@ id_u64! {
 /// This identifier is special, it simply models internal IDs for type safety,
 /// and therefore cannot be [`Serialize`]d or [`Deserialize`]d.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct ShardId(pub u16);
 
 impl ShardId {

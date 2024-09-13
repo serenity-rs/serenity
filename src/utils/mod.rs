@@ -22,7 +22,6 @@ pub use content_safe::*;
 pub use formatted_timestamp::*;
 #[cfg(feature = "collector")]
 pub use quick_modal::*;
-use tracing::warn;
 use url::Url;
 
 pub use self::custom_message::CustomMessage;
@@ -376,22 +375,6 @@ const DOMAINS: [&str; 6] = [
     "ptb.discordapp.com",
 ];
 
-const MAX_DOMAIN_LEN: usize = {
-    let mut max_len = 0;
-    let mut i = 0;
-
-    while i < DOMAINS.len() {
-        let cur_len = DOMAINS[i].len();
-        if cur_len > max_len {
-            max_len = cur_len;
-        }
-
-        i += 1;
-    }
-
-    max_len
-};
-
 /// Parses the id and token from a webhook url. Expects a [`url::Url`] rather than a [`&str`].
 ///
 /// # Examples
@@ -438,13 +421,6 @@ pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
 #[must_use]
 pub fn shard_id(guild_id: GuildId, shard_count: NonZeroU16) -> u16 {
     ((guild_id.get() >> 22) % u64::from(shard_count.get())) as u16
-}
-
-pub(crate) fn check_shard_total(total_shards: u16) -> NonZeroU16 {
-    NonZeroU16::new(total_shards).unwrap_or_else(|| {
-        warn!("Invalid shard total provided ({total_shards}), defaulting to 1");
-        NonZeroU16::MIN
-    })
 }
 
 #[cfg(test)]
