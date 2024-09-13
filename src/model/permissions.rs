@@ -812,7 +812,8 @@ impl Permissions {
     pub const fn send_polls(self) -> bool {
         self.contains(Self::SEND_POLLS)
     }
-    /// Shorthand for checking that the set of permissions contains the [Use External Apps] permission.
+    /// Shorthand for checking that the set of permissions contains the [Use External Apps]
+    /// permission.
     ///
     /// [Use External Apps]: Self::USE_EXTERNAL_APPS
     #[must_use]
