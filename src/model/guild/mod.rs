@@ -17,7 +17,9 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 
-use nonmax::{NonMaxU16, NonMaxU64, NonMaxU8};
+use nonmax::NonMaxU64;
+#[cfg(feature = "model")]
+use nonmax::{NonMaxU16, NonMaxU8};
 #[cfg(feature = "model")]
 use tracing::{error, warn};
 
@@ -57,8 +59,8 @@ use crate::constants::LARGE_THRESHOLD;
 use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
+#[cfg(feature = "model")]
 use crate::model::utils::*;
 
 /// A representation of a banning of a user.

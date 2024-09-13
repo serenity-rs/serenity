@@ -7,16 +7,15 @@
 #![allow(clippy::option_option)]
 
 use nonmax::NonMaxU64;
-use serde::de::Error as DeError;
 use serde::Serialize;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
+#[cfg(feature = "gateway")]
 use tracing::{debug, warn};
 
 use crate::constants::Opcode;
-use crate::internal::prelude::*;
 use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
-use crate::model::utils::{deserialize_val, remove_from_map, remove_from_map_opt};
+use crate::model::utils::deserialize_val;
 
 /// Requires no gateway intents.
 ///
@@ -1094,19 +1093,29 @@ pub enum GatewayEvent {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        use serde::de::{DeserializeOwned, Error};
+
+        fn remove_from_map<T: DeserializeOwned, E: Error>(
+            map: &mut JsonMap,
+            key: &'static str,
+        ) -> StdResult<T, E> {
+            map.remove(key)
+                .ok_or_else(|| serde::de::Error::missing_field(key))
+                .and_then(deserialize_val)
+        }
+
         let mut map = JsonMap::deserialize(deserializer)?;
-        let seq = remove_from_map_opt(&mut map, "s")?.flatten();
 
         Ok(match remove_from_map(&mut map, "op")? {
             Opcode::Dispatch => {
                 Self::Dispatch {
-                    seq: seq.ok_or_else(|| DeError::missing_field("s"))?,
+                    seq: remove_from_map(&mut map, "s")?,
                     // Filled in in recv_event
                     original_str: FixedString::new(),
                     data: map,
                 }
             },
-            Opcode::Heartbeat => Self::Heartbeat(seq.ok_or_else(|| DeError::missing_field("s"))?),
+            Opcode::Heartbeat => Self::Heartbeat(remove_from_map(&mut map, "s")?),
             Opcode::InvalidSession => Self::InvalidateSession(remove_from_map(&mut map, "d")?),
             Opcode::Hello => {
                 #[derive(Deserialize)]
@@ -1119,7 +1128,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
             },
             Opcode::Reconnect => Self::Reconnect,
             Opcode::HeartbeatAck => Self::HeartbeatAck,
-            _ => return Err(DeError::custom("invalid opcode")),
+            _ => return Err(Error::custom("invalid opcode")),
         })
     }
 }
@@ -1338,30 +1347,19 @@ impl Event {
         self.into()
     }
 
+    #[cfg(feature = "gateway")]
     pub(crate) fn deserialize_and_log(map: JsonMap, original_str: &str) -> Result<Self> {
-        deserialize_val(Value::Object(map))
-            .map_err(|err| log_deserialisation_err(original_str, err))
+        deserialize_val(Value::Object(map)).map_err(|err| {
+            let err_dbg = format!("{err:?}");
+            if let Some((variant_name, _)) =
+                err_dbg.strip_prefix(r#"Error("unknown variant `"#).and_then(|s| s.split_once('`'))
+            {
+                debug!("Unknown event: {variant_name}");
+            } else {
+                warn!("Err deserializing text: {err_dbg}");
+            }
+            debug!("Failing text: {original_str}");
+            Error::Json(err)
+        })
     }
-}
-
-fn filter_unknown_variant(json_err_dbg: &str) -> bool {
-    if let Some(msg) = json_err_dbg.strip_prefix("Error(\"unknown variant `") {
-        if let Some((variant_name, _)) = msg.split_once('`') {
-            debug!("Unknown event: {variant_name}");
-            return true;
-        }
-    }
-
-    false
-}
-
-#[cold]
-fn log_deserialisation_err(json_str: &str, err: serde_json::Error) -> Error {
-    let json_err_dbg = format!("{err:?}");
-    if !filter_unknown_variant(&json_err_dbg) {
-        warn!("Err deserializing text: {json_err_dbg}");
-    }
-
-    debug!("Failing text: {json_str}");
-    Error::Json(err)
 }

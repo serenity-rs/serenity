@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::HashMap;
 
 #[cfg(feature = "http")]
 use crate::http::Http;

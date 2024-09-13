@@ -16,6 +16,7 @@ pub enum Maximum {
     BulkDeleteAmount,
 }
 
+#[cfg(feature = "http")]
 impl Maximum {
     pub(crate) fn check_overflow(self, value: usize) -> Result<(), Error> {
         let max = self.value();
@@ -64,6 +65,7 @@ pub enum Minimum {
     BulkDeleteAmount,
 }
 
+#[cfg(feature = "http")]
 impl Minimum {
     pub(crate) fn check_underflow(self, value: usize) -> Result<(), Error> {
         let min = self.value();
