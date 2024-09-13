@@ -5,6 +5,7 @@ use std::cell::Cell;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
+use aformat::{aformat, CapStr};
 use arrayvec::ArrayVec;
 use nonmax::{NonMaxU16, NonMaxU8};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
@@ -42,10 +43,6 @@ pub(crate) struct Token(Arc<str>);
 impl Token {
     pub fn new(inner: Arc<str>) -> Secret<Self> {
         Secret::new(Self(inner))
-    }
-
-    pub fn get_inner(&self) -> &Arc<str> {
-        &self.0
     }
 }
 
@@ -299,8 +296,9 @@ impl Http {
         self.application_id.store(application_id.get(), Ordering::Relaxed);
     }
 
+    #[cfg(feature = "gateway")]
     pub(crate) fn token(&self) -> &Arc<str> {
-        self.token.expose_secret().get_inner()
+        &self.token.expose_secret().0
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.

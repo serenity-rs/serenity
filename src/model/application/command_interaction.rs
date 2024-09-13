@@ -16,27 +16,8 @@ use crate::builder::{
 use crate::gateway::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::internal::utils::lending_for_each;
-use crate::model::application::{CommandOptionType, CommandType};
-use crate::model::channel::{Attachment, Message, PartialChannel};
-use crate::model::guild::{Member, PartialMember, Role};
-use crate::model::id::{
-    ApplicationId,
-    AttachmentId,
-    ChannelId,
-    CommandId,
-    GenericId,
-    GuildId,
-    InteractionId,
-    MessageId,
-    RoleId,
-    TargetId,
-    UserId,
-};
-use crate::model::monetization::Entitlement;
-use crate::model::user::User;
-use crate::model::Permissions;
+use crate::model::prelude::*;
 #[cfg(all(feature = "collector", feature = "utils"))]
 use crate::utils::{CreateQuickModal, QuickModalResponse};
 

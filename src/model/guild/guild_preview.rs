@@ -1,8 +1,4 @@
-use crate::internal::prelude::*;
-use crate::model::guild::Emoji;
-use crate::model::id::GuildId;
-use crate::model::misc::ImageHash;
-use crate::model::sticker::Sticker;
+use crate::model::prelude::*;
 
 /// Preview [`Guild`] information.
 ///
