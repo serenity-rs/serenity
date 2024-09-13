@@ -7,18 +7,7 @@ use super::{InstallationContext, InteractionContext};
 use crate::builder::CreateCommand;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
-use crate::model::channel::ChannelType;
-use crate::model::id::{
-    ApplicationId,
-    CommandId,
-    CommandPermissionId,
-    CommandVersionId,
-    GuildId,
-    RoleId,
-    UserId,
-};
-use crate::model::Permissions;
+use crate::model::prelude::*;
 
 /// The base command model that belongs to an application.
 ///

@@ -9,7 +9,6 @@ mod utils;
 pub use change::{AffectedRole, Change, EntityType};
 use utils::optional_string;
 
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.

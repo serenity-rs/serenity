@@ -8,7 +8,6 @@ use crate::builder::EditMember;
 use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::avatar_url;

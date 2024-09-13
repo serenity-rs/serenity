@@ -6,7 +6,6 @@ use serde_cow::CowStr;
 use small_fixed_array::FixedString;
 
 use super::prelude::*;
-use crate::internal::prelude::*;
 
 pub fn default_true() -> bool {
     true
@@ -52,20 +51,12 @@ where
     T::deserialize(val).map_err(serde::de::Error::custom)
 }
 
-pub fn remove_from_map_opt<T, E>(map: &mut JsonMap, key: &str) -> StdResult<Option<T>, E>
-where
-    T: serde::de::DeserializeOwned,
-    E: serde::de::Error,
-{
-    map.remove(key).map(deserialize_val).transpose()
-}
-
 pub fn remove_from_map<T, E>(map: &mut JsonMap, key: &'static str) -> StdResult<T, E>
 where
     T: serde::de::DeserializeOwned,
     E: serde::de::Error,
 {
-    remove_from_map_opt(map, key)?.ok_or_else(|| serde::de::Error::missing_field(key))
+    map.remove(key).ok_or_else(|| serde::de::Error::missing_field(key)).and_then(deserialize_val)
 }
 
 pub(super) enum StrOrInt<'de> {
