@@ -3,7 +3,6 @@ use std::borrow::Cow;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
