@@ -1,7 +1,6 @@
 use nonmax::NonMaxU32;
 
-use crate::internal::prelude::*;
-use crate::model::{Colour, Timestamp};
+use crate::model::prelude::*;
 
 /// Represents a rich embed which allows using richer markdown, multiple fields and more. This was
 /// heavily inspired by [slack's attachments].

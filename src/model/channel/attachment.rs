@@ -3,7 +3,6 @@ use nonmax::NonMaxU32;
 use reqwest::Client as ReqwestClient;
 use serde_cow::CowStr;
 
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 

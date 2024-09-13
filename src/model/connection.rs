@@ -1,7 +1,6 @@
 //! Models for user connections.
 
 use super::prelude::*;
-use crate::internal::prelude::*;
 
 /// Information about a connection between the current user and a third party service.
 ///

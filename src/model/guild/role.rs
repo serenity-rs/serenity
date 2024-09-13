@@ -5,7 +5,6 @@ use std::fmt;
 use crate::builder::EditRole;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 

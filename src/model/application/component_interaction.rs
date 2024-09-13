@@ -13,7 +13,6 @@ use crate::builder::{
 use crate::gateway::client::Context;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(all(feature = "collector", feature = "utils"))]
 use crate::utils::{CreateQuickModal, QuickModalResponse};

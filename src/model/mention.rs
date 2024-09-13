@@ -4,8 +4,9 @@ use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
 
+use aformat::{aformat_into, ArrayString, ToArrayString};
+
 use super::prelude::*;
-use crate::internal::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils;
 
@@ -113,7 +114,7 @@ impl fmt::Display for Mention {
 
 impl ToArrayString for Mention {
     const MAX_LENGTH: usize = 20 + 4;
-    type ArrayString = ArrayString<{ 20 + 4 }>;
+    type ArrayString = ArrayString<{ Self::MAX_LENGTH }>;
 
     fn to_arraystring(self) -> Self::ArrayString {
         let mut out = Self::ArrayString::new();

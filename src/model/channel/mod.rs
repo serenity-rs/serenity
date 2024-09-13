@@ -16,6 +16,7 @@ use serde::ser::SerializeMap as _;
 use serde_json::from_value;
 
 pub use self::attachment::*;
+#[cfg(feature = "model")]
 pub use self::channel_id::*;
 pub use self::embed::*;
 pub use self::guild_channel::*;
@@ -25,7 +26,6 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 

@@ -4,6 +4,7 @@ use std::fmt::Display as _;
 use std::fmt::{self, Write as _};
 use std::str::FromStr;
 
+#[cfg(feature = "model")]
 use nonmax::NonMaxU8;
 #[cfg(feature = "http")]
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
@@ -14,7 +15,6 @@ use tracing::warn;
 
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::discord_colours_opt;
 

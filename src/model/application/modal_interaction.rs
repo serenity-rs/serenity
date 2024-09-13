@@ -9,7 +9,6 @@ use crate::builder::{
 };
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// An interaction triggered by a modal submit.
