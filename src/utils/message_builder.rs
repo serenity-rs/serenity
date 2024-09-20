@@ -183,7 +183,7 @@ impl MessageBuilder {
     ///
     /// Pushing a Rust codeblock:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// use serenity::utils::MessageBuilder;
     ///
     /// let code = r#"
