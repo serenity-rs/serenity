@@ -136,9 +136,9 @@ impl ShardMessenger {
     ///
     /// Set the current user as playing `"Heroes of the Storm"` and being online:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// # use serenity::gateway::Shard;
-    /// # async fn run(shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn run(mut shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::gateway::ActivityData;
     /// use serenity::model::user::OnlineStatus;
     ///

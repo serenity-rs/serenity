@@ -232,9 +232,18 @@ impl GuildChannel {
     ///
     /// Create an invite that can only be used 5 times:
     ///
-    /// ```rust,ignore
-    /// let builder = CreateBuilder::default().max_uses(5);
-    /// let invite = channel.create_invite(&context, builder).await;
+    /// ```rust,no_run
+    /// # use serenity::builder::CreateInvite;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::channel::GuildChannel;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let channel: GuildChannel = unimplemented!();
+    /// # let http: Http = unimplemented!();
+    ///
+    /// let builder = CreateInvite::new().max_uses(5);
+    /// let invite = channel.create_invite(&http, builder).await;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
