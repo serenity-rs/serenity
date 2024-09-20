@@ -41,7 +41,7 @@ docs.
 
 A basic ping-pong bot looks like:
 
-```rust,ignore
+```rust
 use std::env;
 
 use serenity::async_trait;
