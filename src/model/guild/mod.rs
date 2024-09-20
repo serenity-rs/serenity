@@ -406,9 +406,18 @@ impl Guild {
     ///
     /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
-    /// ```rust,ignore
-    /// // assumes a `user` and `guild` have already been bound
-    /// let _ = guild.ban(user, 4, None);
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::Guild;
+    /// # use serenity::model::id::UserId;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// # let guild: Guild = unimplemented!();
+    /// # let user_id: UserId = unimplemented!();
+    /// // assumes a `user_id` and `guild` have already been bound
+    /// guild.ban(&http, user_id, 4, None).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -529,10 +538,14 @@ impl Guild {
     ///
     /// Create a guild called `"test"` in the [US West region] with no icon:
     ///
-    /// ```rust,ignore
-    /// use serenity::model::Guild;
-    ///
-    /// let _guild = Guild::create_guild(&http, "test", None).await;
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// use serenity::model::guild::Guild;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// let guild = Guild::create(&http, "test", None).await;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
