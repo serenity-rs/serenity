@@ -271,17 +271,18 @@ impl Member {
     ///
     /// # Examples
     ///
-    /// Kick a member from its guild:
+    /// Kick a member from the guild:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::Member;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// # let member: Member = unimplemented!();
     /// // assuming a `member` has already been bound
-    /// match member.kick(None).await {
-    ///     Ok(()) => println!("Successfully kicked member"),
-    ///     Err(Error::Model(ModelError::GuildNotFound)) => {
-    ///         println!("Couldn't determine guild of member");
-    ///     },
-    ///     _ => {},
-    /// }
+    /// member.kick(&http, None).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -325,14 +326,6 @@ impl Member {
     }
 
     /// Returns the guild-level permissions for the member.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// // assuming there's a `member` variable gotten from anything.
-    /// println!("The permission bits for the member are: {}",
-    /// member.permissions(&cache).expect("permissions").bits());
-    /// ```
     ///
     /// # Errors
     ///
@@ -444,13 +437,6 @@ impl Member {
 
 impl fmt::Display for Member {
     /// Mentions the user so that they receive a notification.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// // assumes a `member` has already been bound
-    /// println!("{} is a member!", member);
-    /// ```
     ///
     /// This is in the format of `<@USER_ID>`.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

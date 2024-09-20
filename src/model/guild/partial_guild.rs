@@ -270,9 +270,18 @@ impl PartialGuild {
     ///
     /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
-    /// ```rust,ignore
-    /// // assumes a `user` and `guild` have already been bound
-    /// let _ = guild.ban(user, 4);
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::PartialGuild;
+    /// # use serenity::model::id::UserId;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// # let guild: PartialGuild = unimplemented!();
+    /// # let user_id: UserId = unimplemented!();
+    /// // assumes a `user_id` and `guild` have already been bound
+    /// guild.ban(&http, user_id, 4, None).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
