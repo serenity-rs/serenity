@@ -470,10 +470,6 @@ impl Webhook {
 
     /// Returns the url of the webhook.
     ///
-    /// ```rust,ignore
-    /// assert_eq!(hook.url(), "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV")
-    /// ```
-    ///
     /// # Errors
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
