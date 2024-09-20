@@ -27,6 +27,8 @@ use crate::model::utils::avatar_url;
 /// ```rust,ignore
 /// use std::num::NonZeroU16;
 ///
+/// use serde::{Deserialize, Serialize};
+///
 /// #[derive(Deserialize, Serialize)]
 /// struct A {
 ///     #[serde(with = "discriminator")]
@@ -456,15 +458,6 @@ impl User {
 
     /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from the [`Cache`] if it
     /// is available, and then check if that guild has the given [`Role`].
-    ///
-    /// # Examples
-    ///
-    /// Check if a guild has a [`Role`] by Id:
-    ///
-    /// ```rust,ignore
-    /// // Assumes a 'guild_id' and `role_id` have already been bound
-    /// let _ = message.author.has_role(guild_id, role_id);
-    /// ```
     ///
     /// [`Cache`]: crate::cache::Cache
     ///
