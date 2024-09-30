@@ -163,9 +163,10 @@ impl ChannelId {
         http.as_ref().delete_message(self, message_id.into(), None).await
     }
 
-    /// Deletes all messages by Ids from the given vector in the given channel.
+    /// Deletes messages by Ids from the given vector in the given channel.
     ///
-    /// The minimum amount of messages is 2 and the maximum amount is 100.
+    /// The Discord API supports deleting between 2 and 100 messages at once. This function
+    /// also handles the case of a single message by calling `delete_message` internally.
     ///
     /// Requires the [Manage Messages] permission.
     ///
@@ -173,7 +174,7 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
+    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete 0 or more
     /// than 100 messages.
     ///
     /// Also will return [`Error::Http`] if the current user lacks permission to delete messages.
