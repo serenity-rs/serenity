@@ -2412,7 +2412,7 @@ impl Http {
         .await
     }
 
-    /// Changes a voice channel's state.
+    /// Changes a voice channel's status.
     pub async fn edit_voice_status(
         &self,
         channel_id: ChannelId,

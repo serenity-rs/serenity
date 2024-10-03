@@ -142,7 +142,6 @@ impl<'a> EditChannel<'a> {
         self
     }
 
-
     /// The status of the voice channel. Can be empty.
     ///
     /// Must be between 0 and 1024 characters long.
@@ -339,7 +338,10 @@ impl<'a> Builder for EditChannel<'a> {
         }
 
         if let Some(ref status) = self.status {
-            cache_http.http().edit_voice_status(ctx, &json!({ "status": status }), self.audit_log_reason.clone()).await?;
+            cache_http
+                .http()
+                .edit_voice_status(ctx, &json!({ "status": status }), self.audit_log_reason)
+                .await?;
         }
 
         cache_http.http().edit_channel(ctx, &self, self.audit_log_reason).await
