@@ -5,6 +5,7 @@ use super::CreateForumTag;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
+use crate::json::*;
 use crate::model::prelude::*;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`].
@@ -138,6 +139,19 @@ impl<'a> EditChannel<'a> {
     /// [text]: ChannelType::Text
     pub fn topic(mut self, topic: impl Into<String>) -> Self {
         self.topic = Some(topic.into());
+        self
+    }
+
+
+    /// The status of the voice channel. Can be empty.
+    ///
+    /// Must be between 0 and 1024 characters long.
+    ///
+    /// This is for [voice] channels only.
+    ///
+    /// [voice]: ChannelType::Voice
+    pub fn status(mut self, status: impl Into<String>) -> Self {
+        self.status = Some(status.into());
         self
     }
 
@@ -322,6 +336,10 @@ impl<'a> Builder for EditChannel<'a> {
                     crate::utils::user_has_perms_cache(cache, ctx, Permissions::MANAGE_ROLES)?;
                 }
             }
+        }
+
+        if let Some(ref status) = self.status {
+            cache_http.http().edit_voice_status(ctx, &json!({ "status": status }), self.audit_log_reason.clone()).await?;
         }
 
         cache_http.http().edit_channel(ctx, &self, self.audit_log_reason).await
