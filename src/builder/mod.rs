@@ -128,12 +128,12 @@ macro_rules! button_and_select_menu_convenience_methods {
         pub fn button(mut $self, button: super::CreateButton<'a>) -> Self {
             let rows = $self$(.$components_path)+.get_or_insert_with(Cow::default).to_mut();
             let row_with_space_left = rows.last_mut().and_then(|row| match row {
-                super::CreateActionRow::Buttons(buttons) if buttons.len() < 5 => Some(buttons),
+                super::CreateActionRow::Buttons(buttons) if buttons.len() < 5 => Some(buttons.to_mut()),
                 _ => None,
             });
             match row_with_space_left {
                 Some(row) => row.push(button),
-                None => rows.push(super::CreateActionRow::Buttons(vec![button])),
+                None => rows.push(super::CreateActionRow::buttons(vec![button])),
             }
             $self
         }
