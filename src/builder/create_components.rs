@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
 use serde::Serialize;
-use serde_json::json;
 
 use crate::model::prelude::*;
 

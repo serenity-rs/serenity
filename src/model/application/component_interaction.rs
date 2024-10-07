@@ -1,5 +1,6 @@
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeMap as _};
+use serde_json::from_value;
 
 #[cfg(feature = "model")]
 use crate::builder::{
