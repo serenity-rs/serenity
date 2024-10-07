@@ -1,8 +1,6 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
-use serde_json::json;
-
 use super::{
     CreateActionRow,
     CreateAllowedMentions,
@@ -61,30 +59,30 @@ pub enum CreateInteractionResponse<'a> {
 
 impl serde::Serialize for CreateInteractionResponse<'_> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        use serde::ser::Error as _;
+        use serde::ser::SerializeMap as _;
 
-        #[allow(clippy::match_same_arms)] // hurts readability
-        json!({
-            "type": match self {
-                Self::Pong => 1,
-                Self::Message(_) => 4,
-                Self::Defer(_) => 5,
-                Self::Acknowledge => 6,
-                Self::UpdateMessage(_) => 7,
-                Self::Autocomplete(_) => 8,
-                Self::Modal(_) => 9,
-            },
-            "data": match self {
-                Self::Pong => Value::Null,
-                Self::Message(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Defer(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Acknowledge => Value::Null,
-                Self::UpdateMessage(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Autocomplete(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::Modal(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-            }
-        })
-        .serialize(serializer)
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_entry("type", &match self {
+            Self::Pong => 1,
+            Self::Message(_) => 4,
+            Self::Defer(_) => 5,
+            Self::Acknowledge => 6,
+            Self::UpdateMessage(_) => 7,
+            Self::Autocomplete(_) => 8,
+            Self::Modal(_) => 9,
+        })?;
+
+        match self {
+            Self::Pong => map.serialize_entry("data", &None::<()>)?,
+            Self::Message(x) => map.serialize_entry("data", &x)?,
+            Self::Defer(x) => map.serialize_entry("data", &x)?,
+            Self::Acknowledge => map.serialize_entry("data", &None::<()>)?,
+            Self::UpdateMessage(x) => map.serialize_entry("data", &x)?,
+            Self::Autocomplete(x) => map.serialize_entry("data", &x)?,
+            Self::Modal(x) => map.serialize_entry("data", &x)?,
+        }
+
+        map.end()
     }
 }
 

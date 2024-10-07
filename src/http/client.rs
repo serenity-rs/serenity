@@ -16,7 +16,7 @@ use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret as _, Secret};
 use serde::de::DeserializeOwned;
 use serde::ser::SerializeSeq as _;
-use serde_json::{from_value, json, to_string, to_vec};
+use serde_json::{from_value, to_string, to_vec};
 use tracing::{debug, trace};
 
 use super::multipart::{Multipart, MultipartUpload};
@@ -937,15 +937,24 @@ impl Http {
         sku_id: SkuId,
         owner: EntitlementOwner,
     ) -> Result<Entitlement> {
+        #[derive(serde::Serialize)]
+        struct TestEntitlement {
+            sku_id: SkuId,
+            owner_id: u64,
+            owner_type: u8,
+        }
+
         let (owner_id, owner_type) = match owner {
             EntitlementOwner::Guild(id) => (id.get(), 1),
             EntitlementOwner::User(id) => (id.get(), 2),
         };
-        let map = json!({
-            "sku_id": sku_id,
-            "owner_id": owner_id,
-            "owner_type": owner_type
-        });
+
+        let map = TestEntitlement {
+            sku_id,
+            owner_id,
+            owner_type,
+        };
+
         self.fire(Request {
             body: Some(to_vec(&map)?),
             multipart: None,

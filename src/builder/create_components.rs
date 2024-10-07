@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
 use serde::Serialize;
-use serde_json::json;
 
 use crate::model::prelude::*;
 
@@ -31,19 +30,20 @@ impl<'a> CreateActionRow<'a> {
     }
 }
 
-impl<'a> serde::Serialize for CreateActionRow<'a> {
+impl serde::Serialize for CreateActionRow<'_> {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        use serde::ser::Error as _;
+        use serde::ser::SerializeMap as _;
 
-        json!({
-            "type": 1,
-            "components": match self {
-                Self::Buttons(x) => serde_json::to_value(x).map_err(S::Error::custom)?,
-                Self::SelectMenu(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
-                Self::InputText(x) => serde_json::to_value(vec![x]).map_err(S::Error::custom)?,
-            }
-        })
-        .serialize(serializer)
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_entry("type", &1_u8)?;
+
+        match self {
+            CreateActionRow::Buttons(buttons) => map.serialize_entry("components", &buttons)?,
+            CreateActionRow::SelectMenu(select) => map.serialize_entry("components", &[select])?,
+            CreateActionRow::InputText(input) => map.serialize_entry("components", &[input])?,
+        }
+
+        map.end()
     }
 }
 
@@ -191,12 +191,18 @@ struct CreateSelectMenuDefault(Mention);
 
 impl Serialize for CreateSelectMenuDefault {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeMap as _;
+
         let (id, kind) = match self.0 {
             Mention::Channel(c) => (c.get(), "channel"),
             Mention::Role(r) => (r.get(), "role"),
             Mention::User(u) => (u.get(), "user"),
         };
-        json!({"id": id, "type": kind}).serialize(serializer)
+
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_entry("id", &id)?;
+        map.serialize_entry("type", kind)?;
+        map.end()
     }
 }
 

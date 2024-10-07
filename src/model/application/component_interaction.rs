@@ -1,6 +1,6 @@
 use serde::de::Error as DeError;
-use serde::ser::{Error as _, Serialize};
-use serde_json::{from_value, json};
+use serde::ser::{Serialize, SerializeMap as _};
+use serde_json::from_value;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -297,27 +297,29 @@ impl<'de> Deserialize<'de> for ComponentInteractionDataKind {
 }
 
 impl Serialize for ComponentInteractionDataKind {
+    #[rustfmt::skip] // Remove this for horror.
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        json!({
-            "component_type": match self {
-                Self::Button { .. } => 2,
-                Self::StringSelect { .. } => 3,
-                Self::UserSelect { .. } => 5,
-                Self::RoleSelect { .. } => 6,
-                Self::MentionableSelect { .. } => 7,
-                Self::ChannelSelect { .. } => 8,
-                Self::Unknown(x) => *x,
-            },
-            "values": match self {
-                Self::StringSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
-                Self::UserSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
-                Self::RoleSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
-                Self::MentionableSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
-                Self::ChannelSelect { values } => serde_json::to_value(values).map_err(S::Error::custom)?,
-                Self::Button | Self::Unknown(_) => Value::Null,
-            },
-        })
-        .serialize(serializer)
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_entry("component_type", &match self {
+            Self::Button { .. } => 2,
+            Self::StringSelect { .. } => 3,
+            Self::UserSelect { .. } => 5,
+            Self::RoleSelect { .. } => 6,
+            Self::MentionableSelect { .. } => 7,
+            Self::ChannelSelect { .. } => 8,
+            Self::Unknown(x) => *x,
+        })?;
+
+        match self {
+            Self::StringSelect { values } => map.serialize_entry("values", values)?,
+            Self::UserSelect { values } => map.serialize_entry("values", values)?,
+            Self::RoleSelect { values } => map.serialize_entry("values", values)?,
+            Self::MentionableSelect { values } => map.serialize_entry("values", values)?,
+            Self::ChannelSelect { values } => map.serialize_entry("values", values)?,
+            Self::Button | Self::Unknown(_) => map.serialize_entry("values", &None::<()>)?,
+        };
+
+        map.end()
     }
 }
 
