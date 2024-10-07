@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-405f8b29f52305f8.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (adf8d168a 2024-09-08)" data-channel="nightly" data-search-js="search-0cfde64e8ad3a7fe.js" data-settings-js="settings-7e3bb6c46e92e77c.js" ><script src="../../../static.files/storage-29b1d5a9048d38fe.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-14659ec02b58af51.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-40f72c9259523cb3.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><title>event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d8951b3ccd3cbca.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (55a22d2a6 2024-10-06)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/model/</div>event.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1363,9 +1363,7 @@
 <a href="#1362" id="1362">1362</a>
 <a href="#1363" id="1363">1363</a>
 <a href="#1364" id="1364">1364</a>
-<a href="#1365" id="1365">1365</a>
-<a href="#1366" id="1366">1366</a>
-<a href="#1367" id="1367">1367</a></pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
+<a href="#1365" id="1365">1365</a></pre></div><pre class="rust"><code><span class="doccomment">//! All the events this library handles.
 //!
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
@@ -1374,16 +1372,15 @@
 </span><span class="attr">#![allow(clippy::option_option)]
 
 </span><span class="kw">use </span>nonmax::NonMaxU64;
-<span class="kw">use </span>serde::de::Error <span class="kw">as </span>DeError;
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>strum::{EnumCount, IntoStaticStr, VariantNames};
-<span class="kw">use </span>tracing::{debug, warn};
+<span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
+</span><span class="kw">use </span>tracing::{debug, warn};
 
 <span class="kw">use </span><span class="kw">crate</span>::constants::Opcode;
-<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::internal::utils::lending_for_each;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::model::utils::{deserialize_val, remove_from_map, remove_from_map_opt};
+<span class="kw">use </span><span class="kw">crate</span>::model::utils::deserialize_val;
 
 <span class="doccomment">/// Requires no gateway intents.
 ///
@@ -2461,19 +2458,29 @@
 <span class="comment">// Manual impl needed to emulate integer enum tags
 </span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>GatewayEvent {
     <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+        <span class="kw">use </span>serde::de::{DeserializeOwned, Error};
+
+        <span class="kw">fn </span>remove_from_map&lt;T: DeserializeOwned, E: Error&gt;(
+            map: <span class="kw-2">&amp;mut </span>JsonMap,
+            key: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str,
+        ) -&gt; StdResult&lt;T, E&gt; {
+            map.remove(key)
+                .ok_or_else(|| serde::de::Error::missing_field(key))
+                .and_then(deserialize_val)
+        }
+
         <span class="kw">let </span><span class="kw-2">mut </span>map = JsonMap::deserialize(deserializer)<span class="question-mark">?</span>;
-        <span class="kw">let </span>seq = remove_from_map_opt(<span class="kw-2">&amp;mut </span>map, <span class="string">"s"</span>)<span class="question-mark">?</span>.flatten();
 
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"op"</span>)<span class="question-mark">? </span>{
             Opcode::Dispatch =&gt; {
                 <span class="self">Self</span>::Dispatch {
-                    seq: seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>,
+                    seq: remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"s"</span>)<span class="question-mark">?</span>,
                     <span class="comment">// Filled in in recv_event
                     </span>original_str: FixedString::new(),
                     data: map,
                 }
             },
-            Opcode::Heartbeat =&gt; <span class="self">Self</span>::Heartbeat(seq.ok_or_else(|| DeError::missing_field(<span class="string">"s"</span>))<span class="question-mark">?</span>),
+            Opcode::Heartbeat =&gt; <span class="self">Self</span>::Heartbeat(remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"s"</span>)<span class="question-mark">?</span>),
             Opcode::InvalidSession =&gt; <span class="self">Self</span>::InvalidateSession(remove_from_map(<span class="kw-2">&amp;mut </span>map, <span class="string">"d"</span>)<span class="question-mark">?</span>),
             Opcode::Hello =&gt; {
                 <span class="attr">#[derive(Deserialize)]
@@ -2486,7 +2493,7 @@
             },
             Opcode::Reconnect =&gt; <span class="self">Self</span>::Reconnect,
             Opcode::HeartbeatAck =&gt; <span class="self">Self</span>::HeartbeatAck,
-            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(DeError::custom(<span class="string">"invalid opcode"</span>)),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::custom(<span class="string">"invalid opcode"</span>)),
         })
     }
 }
@@ -2705,31 +2712,20 @@
         <span class="self">self</span>.into()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_and_log(map: JsonMap, original_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-        deserialize_val(Value::Object(map))
-            .map_err(|err| log_deserialisation_err(original_str, err))
+    <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_and_log(map: JsonMap, original_str: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        deserialize_val(Value::Object(map)).map_err(|err| {
+            <span class="kw">let </span>err_dbg = <span class="macro">format!</span>(<span class="string">"{err:?}"</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((variant_name, <span class="kw">_</span>)) =
+                err_dbg.strip_prefix(<span class="string">r#"Error("unknown variant `"#</span>).and_then(|s| s.split_once(<span class="string">'`'</span>))
+            {
+                <span class="macro">debug!</span>(<span class="string">"Unknown event: {variant_name}"</span>);
+            } <span class="kw">else </span>{
+                <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {err_dbg}"</span>);
+            }
+            <span class="macro">debug!</span>(<span class="string">"Failing text: {original_str}"</span>);
+            Error::Json(err)
+        })
     }
-}
-
-<span class="kw">fn </span>filter_unknown_variant(json_err_dbg: <span class="kw-2">&amp;</span>str) -&gt; bool {
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(msg) = json_err_dbg.strip_prefix(<span class="string">"Error(\"unknown variant `"</span>) {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((variant_name, <span class="kw">_</span>)) = msg.split_once(<span class="string">'`'</span>) {
-            <span class="macro">debug!</span>(<span class="string">"Unknown event: {variant_name}"</span>);
-            <span class="kw">return </span><span class="bool-val">true</span>;
-        }
-    }
-
-    <span class="bool-val">false
-</span>}
-
-<span class="attr">#[cold]
-</span><span class="kw">fn </span>log_deserialisation_err(json_str: <span class="kw-2">&amp;</span>str, err: serde_json::Error) -&gt; Error {
-    <span class="kw">let </span>json_err_dbg = <span class="macro">format!</span>(<span class="string">"{err:?}"</span>);
-    <span class="kw">if </span>!filter_unknown_variant(<span class="kw-2">&amp;</span>json_err_dbg) {
-        <span class="macro">warn!</span>(<span class="string">"Err deserializing text: {json_err_dbg}"</span>);
-    }
-
-    <span class="macro">debug!</span>(<span class="string">"Failing text: {json_str}"</span>);
-    Error::Json(err)
 }
 </code></pre></div></section></main></body></html>

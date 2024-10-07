@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-405f8b29f52305f8.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (adf8d168a 2024-09-08)" data-channel="nightly" data-search-js="search-0cfde64e8ad3a7fe.js" data-settings-js="settings-7e3bb6c46e92e77c.js" ><script src="../../../static.files/storage-29b1d5a9048d38fe.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-14659ec02b58af51.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-40f72c9259523cb3.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d8951b3ccd3cbca.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (55a22d2a6 2024-10-06)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>client.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -4400,13 +4400,65 @@
 <a href="#4399" id="4399">4399</a>
 <a href="#4400" id="4400">4400</a>
 <a href="#4401" id="4401">4401</a>
-<a href="#4402" id="4402">4402</a></pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
+<a href="#4402" id="4402">4402</a>
+<a href="#4403" id="4403">4403</a>
+<a href="#4404" id="4404">4404</a>
+<a href="#4405" id="4405">4405</a>
+<a href="#4406" id="4406">4406</a>
+<a href="#4407" id="4407">4407</a>
+<a href="#4408" id="4408">4408</a>
+<a href="#4409" id="4409">4409</a>
+<a href="#4410" id="4410">4410</a>
+<a href="#4411" id="4411">4411</a>
+<a href="#4412" id="4412">4412</a>
+<a href="#4413" id="4413">4413</a>
+<a href="#4414" id="4414">4414</a>
+<a href="#4415" id="4415">4415</a>
+<a href="#4416" id="4416">4416</a>
+<a href="#4417" id="4417">4417</a>
+<a href="#4418" id="4418">4418</a>
+<a href="#4419" id="4419">4419</a>
+<a href="#4420" id="4420">4420</a>
+<a href="#4421" id="4421">4421</a>
+<a href="#4422" id="4422">4422</a>
+<a href="#4423" id="4423">4423</a>
+<a href="#4424" id="4424">4424</a>
+<a href="#4425" id="4425">4425</a>
+<a href="#4426" id="4426">4426</a>
+<a href="#4427" id="4427">4427</a>
+<a href="#4428" id="4428">4428</a>
+<a href="#4429" id="4429">4429</a>
+<a href="#4430" id="4430">4430</a>
+<a href="#4431" id="4431">4431</a>
+<a href="#4432" id="4432">4432</a>
+<a href="#4433" id="4433">4433</a>
+<a href="#4434" id="4434">4434</a>
+<a href="#4435" id="4435">4435</a>
+<a href="#4436" id="4436">4436</a>
+<a href="#4437" id="4437">4437</a>
+<a href="#4438" id="4438">4438</a>
+<a href="#4439" id="4439">4439</a>
+<a href="#4440" id="4440">4440</a>
+<a href="#4441" id="4441">4441</a>
+<a href="#4442" id="4442">4442</a>
+<a href="#4443" id="4443">4443</a>
+<a href="#4444" id="4444">4444</a>
+<a href="#4445" id="4445">4445</a>
+<a href="#4446" id="4446">4446</a>
+<a href="#4447" id="4447">4447</a>
+<a href="#4448" id="4448">4448</a>
+<a href="#4449" id="4449">4449</a>
+<a href="#4450" id="4450">4450</a>
+<a href="#4451" id="4451">4451</a>
+<a href="#4452" id="4452">4452</a>
+<a href="#4453" id="4453">4453</a></pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::cell::Cell;
 <span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 <span class="kw">use </span>std::sync::Arc;
 
+<span class="kw">use </span>aformat::{aformat, CapStr};
 <span class="kw">use </span>arrayvec::ArrayVec;
 <span class="kw">use </span>nonmax::{NonMaxU16, NonMaxU8};
 <span class="kw">use </span>percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
@@ -4417,8 +4469,9 @@
 <span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde::ser::SerializeSeq <span class="kw">as _</span>;
-<span class="kw">use </span>serde_json::{from_value, json, to_string, to_vec};
-<span class="kw">use </span>tracing::{debug, trace};
+<span class="kw">use </span>serde_json::{from_value, to_string, to_vec};
+<span class="kw">use </span>to_arraystring::ToArrayString <span class="kw">as _</span>;
+<span class="kw">use </span>tracing::{debug, warn};
 
 <span class="kw">use </span><span class="kw">super</span>::multipart::{Multipart, MultipartUpload};
 <span class="kw">use </span><span class="kw">super</span>::ratelimiting::Ratelimiter;
@@ -4444,10 +4497,6 @@
     <span class="kw">pub fn </span>new(inner: Arc&lt;str&gt;) -&gt; Secret&lt;<span class="self">Self</span>&gt; {
         Secret::new(<span class="self">Self</span>(inner))
     }
-
-    <span class="kw">pub fn </span>get_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;str&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
-    </span>}
 }
 
 <span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>Token {
@@ -4699,9 +4748,10 @@
         <span class="self">self</span>.application_id.store(application_id.get(), Ordering::Relaxed);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;str&gt; {
-        <span class="self">self</span>.token.expose_secret().get_inner()
-    }
+    <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;str&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.token.expose_secret().<span class="number">0
+    </span>}
 
     <span class="doccomment">/// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
     ///
@@ -5341,15 +5391,24 @@
         sku_id: SkuId,
         owner: EntitlementOwner,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Entitlement&gt; {
+        <span class="attr">#[derive(serde::Serialize)]
+        </span><span class="kw">struct </span>TestEntitlement {
+            sku_id: SkuId,
+            owner_id: u64,
+            owner_type: u8,
+        }
+
         <span class="kw">let </span>(owner_id, owner_type) = <span class="kw">match </span>owner {
             EntitlementOwner::Guild(id) =&gt; (id.get(), <span class="number">1</span>),
             EntitlementOwner::User(id) =&gt; (id.get(), <span class="number">2</span>),
         };
-        <span class="kw">let </span>map = <span class="macro">json!</span>({
-            <span class="string">"sku_id"</span>: sku_id,
-            <span class="string">"owner_id"</span>: owner_id,
-            <span class="string">"owner_type"</span>: owner_type
-        });
+
+        <span class="kw">let </span>map = TestEntitlement {
+            sku_id,
+            owner_id,
+            owner_type,
+        };
+
         <span class="self">self</span>.fire(Request {
             body: <span class="prelude-val">Some</span>(to_vec(<span class="kw-2">&amp;</span>map)<span class="question-mark">?</span>),
             multipart: <span class="prelude-val">None</span>,
@@ -7468,7 +7527,7 @@
     </span><span class="kw">pub async fn </span>get_entitlements(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
-        sku_ids: <span class="prelude-ty">Option</span>&lt;Vec&lt;SkuId&gt;&gt;,
+        sku_ids: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[SkuId]&gt;,
         before: <span class="prelude-ty">Option</span>&lt;EntitlementId&gt;,
         after: <span class="prelude-ty">Option</span>&lt;EntitlementId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
@@ -7879,6 +7938,29 @@
         .<span class="kw">await
     </span>}
 
+    <span class="doccomment">/// Retrieves a specific role in a [`Guild`].
+    </span><span class="kw">pub async fn </span>get_guild_role(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, role_id: RoleId) -&gt; <span class="prelude-ty">Result</span>&lt;Role&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
+            </span>.fire(Request {
+                body: <span class="prelude-val">None</span>,
+                multipart: <span class="prelude-val">None</span>,
+                headers: <span class="prelude-val">None</span>,
+                method: LightMethod::Get,
+                route: Route::GuildRole {
+                    guild_id,
+                    role_id,
+                },
+                params: <span class="prelude-val">None</span>,
+            })
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(map) = value.as_object_mut() {
+            map.insert(<span class="string">"guild_id"</span>.to_string(), guild_id.get().into());
+        }
+
+        from_value(value).map_err(From::from)
+    }
+
     <span class="doccomment">/// Retrieves a list of roles in a [`Guild`].
     </span><span class="kw">pub async fn </span>get_guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Result</span>&lt;ExtractMap&lt;RoleId, Role&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>value: Value = <span class="self">self
@@ -8234,6 +8316,21 @@
                 channel_id,
             },
             params: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params),
+        })
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Retrieves a specific [`StickerPack`] from it's [`StickerPackId`]
+    </span><span class="kw">pub async fn </span>get_sticker_pack(<span class="kw-2">&amp;</span><span class="self">self</span>, sticker_pack_id: StickerPackId) -&gt; <span class="prelude-ty">Result</span>&lt;StickerPack&gt; {
+        <span class="self">self</span>.fire(Request {
+            body: <span class="prelude-val">None</span>,
+            multipart: <span class="prelude-val">None</span>,
+            headers: <span class="prelude-val">None</span>,
+            method: LightMethod::Get,
+            route: Route::StickerPack {
+                sticker_pack_id,
+            },
+            params: <span class="prelude-val">None</span>,
         })
         .<span class="kw">await
     </span>}
@@ -8777,16 +8874,21 @@
     /// This is a function that performs a light amount of work and returns an empty tuple, so it's
     /// called "self.wind" to denote that it's lightweight.
     </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>wind(<span class="kw-2">&amp;</span><span class="self">self</span>, expected: u16, req: Request&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>route = req.route;
         <span class="kw">let </span>method = req.method.reqwest_method();
         <span class="kw">let </span>response = <span class="self">self</span>.request(req).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if </span>response.status().as_u16() == expected {
+        <span class="kw">if </span>response.status().is_success() {
+            <span class="kw">let </span>response_status = response.status().as_u16();
+            <span class="kw">if </span>response_status != expected {
+                <span class="kw">let </span>route = route.path();
+                <span class="macro">warn!</span>(<span class="string">"Mismatched successful response status from {route}! Expected {expected} but got {response_status}"</span>);
+            }
+
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="macro">debug!</span>(<span class="string">"Expected {}, got {}"</span>, expected, response.status());
-        <span class="macro">trace!</span>(<span class="string">"Unsuccessful response: {:?}"</span>, response);
-
+        <span class="macro">debug!</span>(<span class="string">"Unsuccessful response: {response:?}"</span>);
         <span class="prelude-val">Err</span>(Error::Http(HttpError::UnsuccessfulRequest(
             ErrorResponse::from_response(response, method).<span class="kw">await</span>,
         )))

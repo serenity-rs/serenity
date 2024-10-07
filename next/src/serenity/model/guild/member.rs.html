@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/member.rs`."><title>member.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-405f8b29f52305f8.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (adf8d168a 2024-09-08)" data-channel="nightly" data-search-js="search-0cfde64e8ad3a7fe.js" data-settings-js="settings-7e3bb6c46e92e77c.js" ><script src="../../../../static.files/storage-29b1d5a9048d38fe.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-14659ec02b58af51.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-40f72c9259523cb3.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/member.rs`."><title>member.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-6d8951b3ccd3cbca.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (55a22d2a6 2024-10-06)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/model/guild/</div>member.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -596,11 +596,7 @@
 <a href="#595" id="595">595</a>
 <a href="#596" id="596">596</a>
 <a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a></pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+<a href="#598" id="598">598</a></pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
 </span><span class="kw">use </span>std::cmp::Reverse;
 <span class="kw">use </span>std::fmt;
 
@@ -610,7 +606,6 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
-<span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::model::utils::avatar_url;
@@ -683,6 +678,17 @@
         </span><span class="kw">const </span>BYPASSES_VERIFICATION = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
         <span class="doccomment">/// Member has started onboarding. Not editable
         </span><span class="kw">const </span>STARTED_ONBOARDING = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+        <span class="doccomment">/// Member is a guest and can only access the voice channel they were invited to. Not
+        /// editable
+        </span><span class="kw">const </span>IS_GUEST = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+        <span class="doccomment">/// Member has started Server Guide new member actions. Not editable
+        </span><span class="kw">const </span>STARTED_HOME_ACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+        <span class="doccomment">/// Member has completed Server Guide new member actions. Not editable
+        </span><span class="kw">const </span>COMPLETED_HOME_ACTIONS = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="doccomment">/// Member's username, display name, or nickname is blocked by AutoMod. Not editable
+        </span><span class="kw">const </span>AUTOMOD_QUARANTINED_USERNAME = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+        <span class="doccomment">/// Member has dismissed the DM settings upsell. Not editable
+        </span><span class="kw">const </span>DM_SETTINGS_UPSELL_ACKNOWLEDGED = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
     }
 }
 
@@ -862,17 +868,18 @@
     ///
     /// # Examples
     ///
-    /// Kick a member from its guild:
+    /// Kick a member from the guild:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::Member;
+    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let http: Http = unimplemented!();
+    /// # let member: Member = unimplemented!();
     /// // assuming a `member` has already been bound
-    /// match member.kick(None).await {
-    ///     Ok(()) =&gt; println!("Successfully kicked member"),
-    ///     Err(Error::Model(ModelError::GuildNotFound)) =&gt; {
-    ///         println!("Couldn't determine guild of member");
-    ///     },
-    ///     _ =&gt; {},
-    /// }
+    /// member.kick(&amp;http, None).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -916,14 +923,6 @@
     </span>}
 
     <span class="doccomment">/// Returns the guild-level permissions for the member.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// // assuming there's a `member` variable gotten from anything.
-    /// println!("The permission bits for the member are: {}",
-    /// member.permissions(&amp;cache).expect("permissions").bits());
-    /// ```
     ///
     /// # Errors
     ///
@@ -1032,13 +1031,6 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Member {
     <span class="doccomment">/// Mentions the user so that they receive a notification.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// // assumes a `member` has already been bound
-    /// println!("{} is a member!", member);
-    /// ```
     ///
     /// This is in the format of `&lt;@USER_ID&gt;`.
     </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
