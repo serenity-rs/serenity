@@ -1,8 +1,6 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
-use serde_json::json;
-
 use super::create_poll::Ready;
 use super::{
     CreateActionRow,
