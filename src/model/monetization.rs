@@ -1,3 +1,5 @@
+use crate::builder::{Builder as _, GetEntitlements};
+use crate::http::CacheHttp;
 use crate::model::prelude::*;
 
 /// A premium offering that can be made available to an application's users and guilds.
@@ -104,6 +106,18 @@ impl Entitlement {
             "https://discord.com/application-directory/{}/store/{}",
             self.application_id, self.sku_id
         )
+    }
+
+    /// Returns all entitlements for the current application, active and expired.
+    ///
+    /// # Errors
+    ///
+    /// May error due to an invalid response from discord, or network error.
+    pub async fn list(
+        cache_http: impl CacheHttp,
+        builder: GetEntitlements,
+    ) -> Result<Vec<Entitlement>> {
+        builder.execute(cache_http, ()).await
     }
 }
 

@@ -75,6 +75,7 @@ mod edit_voice_state;
 mod edit_webhook;
 mod edit_webhook_message;
 mod execute_webhook;
+mod get_entitlements;
 mod get_messages;
 
 pub use add_member::*;
@@ -116,6 +117,7 @@ pub use edit_voice_state::*;
 pub use edit_webhook::*;
 pub use edit_webhook_message::*;
 pub use execute_webhook::*;
+pub use get_entitlements::*;
 pub use get_messages::*;
 
 macro_rules! button_and_select_menu_convenience_methods {
