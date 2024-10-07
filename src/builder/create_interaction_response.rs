@@ -12,7 +12,6 @@ use crate::constants;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
-use crate::json::{self, json};
 use crate::model::prelude::*;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
@@ -68,34 +67,34 @@ pub enum CreateInteractionResponse {
 }
 
 impl serde::Serialize for CreateInteractionResponse {
+    #[allow(deprecated)] // We have to cover deprecated variants
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        use serde::ser::Error as _;
+        use serde::ser::SerializeMap as _;
 
-        #[allow(deprecated)]
-        #[allow(clippy::match_same_arms)] // hurts readability
-        json!({
-            "type": match self {
-                Self::Pong => 1,
-                Self::Message(_) => 4,
-                Self::Defer(_) => 5,
-                Self::Acknowledge => 6,
-                Self::UpdateMessage(_) => 7,
-                Self::Autocomplete(_) => 8,
-                Self::Modal(_) => 9,
-                Self::PremiumRequired => 10,
-            },
-            "data": match self {
-                Self::Pong => json::NULL,
-                Self::Message(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Defer(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Acknowledge => json::NULL,
-                Self::UpdateMessage(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Autocomplete(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::Modal(x) => json::to_value(x).map_err(S::Error::custom)?,
-                Self::PremiumRequired => json::NULL,
-            }
-        })
-        .serialize(serializer)
+        let mut map = serializer.serialize_map(Some(2))?;
+        map.serialize_entry("type", &match self {
+            Self::Pong => 1,
+            Self::Message(_) => 4,
+            Self::Defer(_) => 5,
+            Self::Acknowledge => 6,
+            Self::UpdateMessage(_) => 7,
+            Self::Autocomplete(_) => 8,
+            Self::Modal(_) => 9,
+            Self::PremiumRequired => 10,
+        })?;
+
+        match self {
+            Self::Pong => map.serialize_entry("data", &None::<()>)?,
+            Self::Message(x) => map.serialize_entry("data", &x)?,
+            Self::Defer(x) => map.serialize_entry("data", &x)?,
+            Self::Acknowledge => map.serialize_entry("data", &None::<()>)?,
+            Self::UpdateMessage(x) => map.serialize_entry("data", &x)?,
+            Self::Autocomplete(x) => map.serialize_entry("data", &x)?,
+            Self::Modal(x) => map.serialize_entry("data", &x)?,
+            Self::PremiumRequired => map.serialize_entry("data", &None::<()>)?,
+        }
+
+        map.end()
     }
 }
 
