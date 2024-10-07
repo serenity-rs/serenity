@@ -1,4 +1,6 @@
+#[cfg(feature = "model")]
 use crate::builder::{Builder as _, GetEntitlements};
+#[cfg(feature = "model")]
 use crate::http::CacheHttp;
 use crate::model::prelude::*;
 
@@ -113,6 +115,7 @@ impl Entitlement {
     /// # Errors
     ///
     /// May error due to an invalid response from discord, or network error.
+    #[cfg(feature = "model")]
     pub async fn list(
         cache_http: impl CacheHttp,
         builder: GetEntitlements,
