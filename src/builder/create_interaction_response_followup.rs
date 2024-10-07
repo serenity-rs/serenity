@@ -25,7 +25,7 @@ pub struct CreateInteractionResponseFollowup<'a> {
     // [Omitting avatar_url: not supported in interaction followups]
     #[serde(skip_serializing_if = "Option::is_none")]
     tts: Option<bool>,
-    embeds: Cow<'a, [CreateEmbed<'a>]>,
+    embeds: Option<Cow<'a, [CreateEmbed<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,7 +45,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
 
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<(), ModelError> {
-        super::check_lengths(self.content.as_deref(), Some(&self.embeds), 0)
+        super::check_lengths(self.content.as_deref(), self.embeds.as_deref(), 0)
     }
 
     /// Set the content of the message.
@@ -91,13 +91,13 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
 
     /// Adds an embed to the message.
     pub fn add_embed(mut self, embed: CreateEmbed<'a>) -> Self {
-        self.embeds.to_mut().push(embed);
+        self.embeds.get_or_insert_with(Cow::default).to_mut().push(embed);
         self
     }
 
     /// Adds multiple embeds to the message.
     pub fn add_embeds(mut self, embeds: impl IntoIterator<Item = CreateEmbed<'a>>) -> Self {
-        self.embeds.to_mut().extend(embeds);
+        self.embeds.get_or_insert_with(Cow::default).to_mut().extend(embeds);
         self
     }
 
@@ -114,7 +114,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Calling this multiple times will overwrite the embed list. To append embeds, call
     /// [`Self::add_embeds`] instead.
     pub fn embeds(mut self, embeds: impl Into<Cow<'a, [CreateEmbed<'a>]>>) -> Self {
-        self.embeds = embeds.into();
+        self.embeds = Some(embeds.into());
         self
     }
 
