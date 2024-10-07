@@ -10,10 +10,24 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug)]
 #[must_use]
 pub enum CreateActionRow<'a> {
-    Buttons(Vec<CreateButton<'a>>),
+    Buttons(Cow<'a, [CreateButton<'a>]>),
     SelectMenu(CreateSelectMenu<'a>),
     /// Only valid in modals!
     InputText(CreateInputText<'a>),
+}
+
+impl<'a> CreateActionRow<'a> {
+    pub fn buttons(buttons: impl Into<Cow<'a, [CreateButton<'a>]>>) -> Self {
+        Self::Buttons(buttons.into())
+    }
+
+    pub fn select_menu(select_menu: impl Into<CreateSelectMenu<'a>>) -> Self {
+        Self::SelectMenu(select_menu.into())
+    }
+
+    pub fn input_text(input_text: impl Into<CreateInputText<'a>>) -> Self {
+        Self::InputText(input_text.into())
+    }
 }
 
 impl serde::Serialize for CreateActionRow<'_> {
