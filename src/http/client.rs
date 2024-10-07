@@ -16,7 +16,7 @@ use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use secrecy::{ExposeSecret as _, Secret};
 use serde::de::DeserializeOwned;
 use serde::ser::SerializeSeq as _;
-use serde_json::{from_value, json, to_string, to_vec};
+use serde_json::{from_value, to_string, to_vec};
 use to_arraystring::ToArrayString as _;
 use tracing::{debug, warn};
 
