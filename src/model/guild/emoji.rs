@@ -210,7 +210,7 @@ impl From<Emoji> for EmojiId {
     }
 }
 
-impl<'a> From<&'a Emoji> for EmojiId {
+impl From<&Emoji> for EmojiId {
     /// Gets the Id of an [`Emoji`].
     fn from(emoji: &Emoji) -> EmojiId {
         emoji.id

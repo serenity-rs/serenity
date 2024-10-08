@@ -375,10 +375,10 @@ impl Cache {
     #[inline]
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannelRef<'_>> {
-        self._channel(id.into())
+        self.channel_(id.into())
     }
 
-    fn _channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
+    fn channel_(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
         let guild_id = *self.channels.get(&id)?;
         let guild_ref = self.guilds.get(&guild_id)?;
         let channel = guild_ref.try_map(|g| g.channels.get(&id)).ok();
@@ -433,10 +433,10 @@ impl Cache {
     /// ```
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<GuildRef<'_>> {
-        self._guild(id.into())
+        self.guild_(id.into())
     }
 
-    fn _guild(&self, id: GuildId) -> Option<GuildRef<'_>> {
+    fn guild_(&self, id: GuildId) -> Option<GuildRef<'_>> {
         self.guilds.get(&id).map(CacheRef::from_ref)
     }
 
@@ -495,10 +495,10 @@ impl Cache {
         guild_id: impl Into<GuildId>,
         user_id: impl Into<UserId>,
     ) -> Option<MemberRef<'_>> {
-        self._member(guild_id.into(), user_id.into())
+        self.member_(guild_id.into(), user_id.into())
     }
 
-    fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
+    fn member_(&self, guild_id: GuildId, user_id: UserId) -> Option<MemberRef<'_>> {
         let member = self.guilds.get(&guild_id)?.try_map(|g| g.members.get(&user_id)).ok()?;
         Some(CacheRef::from_mapped_ref(member))
     }
@@ -506,10 +506,10 @@ impl Cache {
     #[inline]
     #[deprecated = "Use Cache::guild and Guild::roles instead"]
     pub fn guild_roles(&self, guild_id: impl Into<GuildId>) -> Option<GuildRolesRef<'_>> {
-        self._guild_roles(guild_id.into())
+        self.guild_roles_(guild_id.into())
     }
 
-    fn _guild_roles(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
+    fn guild_roles_(&self, guild_id: GuildId) -> Option<GuildRolesRef<'_>> {
         let roles = self.guilds.get(&guild_id)?.map(|g| &g.roles);
         Some(CacheRef::from_mapped_ref(roles))
     }
@@ -524,10 +524,10 @@ impl Cache {
     #[inline]
     #[deprecated = "Use Cache::guild and Guild::channels instead"]
     pub fn guild_channels(&self, guild_id: impl Into<GuildId>) -> Option<GuildChannelsRef<'_>> {
-        self._guild_channels(guild_id.into())
+        self.guild_channels_(guild_id.into())
     }
 
-    fn _guild_channels(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
+    fn guild_channels_(&self, guild_id: GuildId) -> Option<GuildChannelsRef<'_>> {
         let channels = self.guilds.get(&guild_id)?.map(|g| &g.channels);
         Some(CacheRef::from_mapped_ref(channels))
     }
@@ -572,10 +572,10 @@ impl Cache {
         C: Into<ChannelId>,
         M: Into<MessageId>,
     {
-        self._message(channel_id.into(), message_id.into())
+        self.message_(channel_id.into(), message_id.into())
     }
 
-    fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
+    fn message_(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
         #[cfg(feature = "temp_cache")]
         if let Some(message) = self.temp_messages.get(&message_id) {
             return Some(CacheRef::from_arc(message));
@@ -614,10 +614,10 @@ impl Cache {
         G: Into<GuildId>,
         R: Into<RoleId>,
     {
-        self._role(guild_id.into(), role_id.into())
+        self.role_(guild_id.into(), role_id.into())
     }
 
-    fn _role(&self, guild_id: GuildId, role_id: RoleId) -> Option<GuildRoleRef<'_>> {
+    fn role_(&self, guild_id: GuildId, role_id: RoleId) -> Option<GuildRoleRef<'_>> {
         let role = self.guilds.get(&guild_id)?.try_map(|g| g.roles.get(&role_id)).ok()?;
         Some(CacheRef::from_mapped_ref(role))
     }
@@ -668,11 +668,11 @@ impl Cache {
     /// ```
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<UserRef<'_>> {
-        self._user(user_id.into())
+        self.user_(user_id.into())
     }
 
     #[cfg(feature = "temp_cache")]
-    fn _user(&self, user_id: UserId) -> Option<UserRef<'_>> {
+    fn user_(&self, user_id: UserId) -> Option<UserRef<'_>> {
         if let Some(user) = self.users.get(&user_id) {
             Some(CacheRef::from_ref(user))
         } else {
@@ -681,7 +681,7 @@ impl Cache {
     }
 
     #[cfg(not(feature = "temp_cache"))]
-    fn _user(&self, user_id: UserId) -> Option<UserRef<'_>> {
+    fn user_(&self, user_id: UserId) -> Option<UserRef<'_>> {
         self.users.get(&user_id).map(CacheRef::from_ref)
     }
 

@@ -918,7 +918,7 @@ pub struct Iter<'a, T: FromStr> {
 }
 
 #[allow(clippy::missing_errors_doc)]
-impl<'a, T: FromStr> Iter<'a, T> {
+impl<T: FromStr> Iter<'_, T> {
     /// Retrieve the current argument.
     pub fn current(&mut self) -> Option<&str> {
         self.args.state = self.state;
@@ -956,7 +956,7 @@ impl<'a, T: FromStr> Iter<'a, T> {
     }
 }
 
-impl<'a, T: FromStr> Iterator for Iter<'a, T> {
+impl<T: FromStr> Iterator for Iter<'_, T> {
     type Item = Result<T, T::Err>;
 
     fn next(&mut self) -> Option<Self::Item> {

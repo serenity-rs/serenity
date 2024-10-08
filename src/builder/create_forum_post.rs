@@ -96,7 +96,7 @@ impl<'a> CreateForumPost<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for CreateForumPost<'a> {
+impl Builder for CreateForumPost<'_> {
     type Context<'ctx> = ChannelId;
     type Built = GuildChannel;
 

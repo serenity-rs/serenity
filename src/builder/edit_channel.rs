@@ -293,7 +293,7 @@ impl<'a> EditChannel<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditChannel<'a> {
+impl Builder for EditChannel<'_> {
     type Context<'ctx> = ChannelId;
     type Built = GuildChannel;
 

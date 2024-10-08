@@ -53,7 +53,7 @@ impl<'a> CreateWebhook<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for CreateWebhook<'a> {
+impl Builder for CreateWebhook<'_> {
     type Context<'ctx> = ChannelId;
     type Built = Webhook;
 

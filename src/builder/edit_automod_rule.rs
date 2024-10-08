@@ -99,7 +99,7 @@ impl<'a> EditAutoModRule<'a> {
     }
 }
 
-impl<'a> Default for EditAutoModRule<'a> {
+impl Default for EditAutoModRule<'_> {
     fn default() -> Self {
         Self {
             name: None,
@@ -116,7 +116,7 @@ impl<'a> Default for EditAutoModRule<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditAutoModRule<'a> {
+impl Builder for EditAutoModRule<'_> {
     type Context<'ctx> = (GuildId, Option<RuleId>);
     type Built = Rule;
 

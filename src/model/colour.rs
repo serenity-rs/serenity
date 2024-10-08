@@ -1,9 +1,10 @@
 // Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.
 #![allow(clippy::unreadable_literal)]
 
-/// A utility struct to help with working with the basic representation of a colour. This is
-/// particularly useful when working with a [`Role`]'s colour, as the API works with an integer
-/// value instead of an RGB value.
+/// A utility struct to help with working with the basic representation of a colour.
+///
+/// This is particularly useful when working with a [`Role`]'s colour, as the API works with an
+/// integer value instead of an RGB value.
 ///
 /// Instances can be created by using the struct's associated functions. These produce presets
 /// equivalent to those found in the official client's colour picker.

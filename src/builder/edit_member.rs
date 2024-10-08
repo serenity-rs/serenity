@@ -150,7 +150,7 @@ impl<'a> EditMember<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditMember<'a> {
+impl Builder for EditMember<'_> {
     type Context<'ctx> = (GuildId, UserId);
     type Built = Member;
 

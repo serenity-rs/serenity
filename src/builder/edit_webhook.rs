@@ -63,7 +63,7 @@ impl<'a> EditWebhook<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditWebhook<'a> {
+impl Builder for EditWebhook<'_> {
     type Context<'ctx> = (WebhookId, Option<&'ctx str>);
     type Built = Webhook;
 

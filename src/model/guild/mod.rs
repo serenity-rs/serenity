@@ -485,7 +485,7 @@ impl Guild {
         user: impl Into<UserId>,
         dmd: u8,
     ) -> Result<()> {
-        self._ban_with_reason(cache_http, user.into(), dmd, "").await
+        self.ban_with_reason_(cache_http, user.into(), dmd, "").await
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further
@@ -503,10 +503,10 @@ impl Guild {
         dmd: u8,
         reason: impl AsRef<str>,
     ) -> Result<()> {
-        self._ban_with_reason(cache_http, user.into(), dmd, reason.as_ref()).await
+        self.ban_with_reason_(cache_http, user.into(), dmd, reason.as_ref()).await
     }
 
-    async fn _ban_with_reason(
+    async fn ban_with_reason_(
         &self,
         cache_http: impl CacheHttp,
         user: UserId,
@@ -1433,11 +1433,11 @@ impl Guild {
         lhs_id: impl Into<UserId>,
         rhs_id: impl Into<UserId>,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(lhs_id.into(), rhs_id.into())
+        self.greater_member_hierarchy_(lhs_id.into(), rhs_id.into())
     }
 
     #[cfg(feature = "cache")]
-    fn _greater_member_hierarchy(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
+    fn greater_member_hierarchy_(&self, lhs_id: UserId, rhs_id: UserId) -> Option<UserId> {
         // Check that the IDs are the same. If they are, neither is greater.
         if lhs_id == rhs_id {
             return None;
@@ -1908,7 +1908,7 @@ impl Guild {
     #[inline]
     #[must_use]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
-        Self::_user_permissions_in(
+        Self::user_permissions_in_(
             None,
             member.user.id,
             &member.roles,
@@ -1942,7 +1942,7 @@ impl Guild {
     #[inline]
     #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
-        Self::_user_permissions_in(
+        Self::user_permissions_in_(
             Some(channel),
             member.user.id,
             &member.roles,
@@ -1968,7 +1968,7 @@ impl Guild {
             assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
         }
 
-        Self::_user_permissions_in(
+        Self::user_permissions_in_(
             Some(channel),
             member_id,
             &member.roles,
@@ -1979,7 +1979,7 @@ impl Guild {
     }
 
     /// Helper function that can also be used from [`PartialGuild`].
-    pub(crate) fn _user_permissions_in(
+    pub(crate) fn user_permissions_in_(
         channel: Option<&GuildChannel>,
         member_user_id: UserId,
         member_roles: &[RoleId],
@@ -2056,11 +2056,11 @@ impl Guild {
     #[inline]
     #[deprecated = "this function ignores other roles the user may have as well as user-specific permissions; use user_permissions_in instead"]
     pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
-        Self::_role_permissions_in(channel, role, self.id)
+        Self::role_permissions_in_(channel, role, self.id)
     }
 
     /// Helper function that can also be used from [`PartialGuild`].
-    pub(crate) fn _role_permissions_in(
+    pub(crate) fn role_permissions_in_(
         channel: &GuildChannel,
         role: &Role,
         guild_id: GuildId,

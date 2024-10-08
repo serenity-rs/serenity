@@ -253,10 +253,10 @@ impl Reaction {
         R: Into<ReactionType>,
         U: Into<UserId>,
     {
-        self._users(http, &reaction_type.into(), limit, after.map(Into::into)).await
+        self.users_(http, &reaction_type.into(), limit, after.map(Into::into)).await
     }
 
-    async fn _users(
+    async fn users_(
         &self,
         http: impl AsRef<Http>,
         reaction_type: &ReactionType,
@@ -485,7 +485,7 @@ impl TryFrom<String> for ReactionType {
     }
 }
 
-impl<'a> TryFrom<&'a str> for ReactionType {
+impl TryFrom<&str> for ReactionType {
     /// Creates a [`ReactionType`] from a string slice.
     ///
     /// # Examples
@@ -524,7 +524,6 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     ///
     /// assert_eq!(reaction, reaction2);
     /// ```
-
     type Error = ReactionConversionError;
 
     fn try_from(emoji_str: &str) -> std::result::Result<Self, Self::Error> {

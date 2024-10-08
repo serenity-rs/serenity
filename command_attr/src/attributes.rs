@@ -120,7 +120,7 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
 #[derive(Debug, Clone)]
 struct DisplaySlice<'a, T>(&'a [T]);
 
-impl<'a, T: fmt::Display> fmt::Display for DisplaySlice<'a, T> {
+impl<T: fmt::Display> fmt::Display for DisplaySlice<'_, T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut iter = self.0.iter().enumerate();
 

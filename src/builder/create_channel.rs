@@ -256,7 +256,7 @@ impl<'a> CreateChannel<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for CreateChannel<'a> {
+impl Builder for CreateChannel<'_> {
     type Context<'ctx> = GuildId;
     type Built = GuildChannel;
 

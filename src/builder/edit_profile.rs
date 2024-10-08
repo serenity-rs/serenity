@@ -40,7 +40,7 @@ impl EditProfile {
     /// # use serenity::http::Http;
     /// #
     /// # #[cfg(feature = "http")]
-    /// # async fn _foo(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
+    /// # async fn foo_(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
     /// let avatar = CreateAttachment::path("./my_image.jpg").await.expect("Failed to read image.");
     /// current_user.edit(http, EditProfile::new().avatar(&avatar)).await?;
     /// # Ok(())
