@@ -510,6 +510,10 @@ routes! ('a, {
     api!("/applications/{}/entitlements/{}", application_id, entitlement_id),
     Some(RatelimitingKind::PathAndId(application_id.into()));
 
+    ConsumeEntitlement { application_id: ApplicationId, entitlement_id: EntitlementId },
+    api!("/applications/{}/entitlements/{}/consume", application_id, entitlement_id),
+    Some(RatelimitingKind::PathAndId(application_id.into()));
+
     Entitlements { application_id: ApplicationId },
     api!("/applications/{}/entitlements", application_id),
     Some(RatelimitingKind::PathAndId(application_id.into()));

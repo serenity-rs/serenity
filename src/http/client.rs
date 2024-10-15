@@ -3445,6 +3445,28 @@ impl Http {
         .await
     }
 
+    /// For a one-time purchase consumable SKU (of kind [`Consumable`]), marks the entitlement as
+    /// consumed.
+    ///
+    /// The entitlement will have its `consumed` field set to `true` when fetched using
+    /// [`Self::get_entitlements`].
+    ///
+    /// [`Consumable`]: SkuKind::Consumable
+    pub async fn consume_entitlement(&self, entitlement_id: EntitlementId) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Post,
+            route: Route::ConsumeEntitlement {
+                application_id: self.try_application_id()?,
+                entitlement_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     #[allow(clippy::too_many_arguments)]
     /// Gets all entitlements for the current app, active and expired.
     pub async fn get_entitlements(
