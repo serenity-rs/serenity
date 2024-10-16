@@ -141,6 +141,18 @@ impl<'a> EditChannel<'a> {
         self
     }
 
+    /// The status of the voice channel. Can be empty.
+    ///
+    /// Must be between 0 and 1024 characters long.
+    ///
+    /// This is for [voice] channels only.
+    ///
+    /// [voice]: ChannelType::Voice
+    pub fn status(mut self, status: impl Into<String>) -> Self {
+        self.status = Some(status.into());
+        self
+    }
+
     /// Is the channel inappropriate for work?
     ///
     /// This is for [text] channels only.
@@ -322,6 +334,24 @@ impl<'a> Builder for EditChannel<'a> {
                     crate::utils::user_has_perms_cache(cache, ctx, Permissions::MANAGE_ROLES)?;
                 }
             }
+        }
+
+        if let Some(status) = &self.status {
+            #[derive(Serialize)]
+            struct EditVoiceStatusBody<'a> {
+                status: &'a str,
+            }
+
+            cache_http
+                .http()
+                .edit_voice_status(
+                    ctx,
+                    &EditVoiceStatusBody {
+                        status: status.as_str(),
+                    },
+                    self.audit_log_reason,
+                )
+                .await?;
         }
 
         cache_http.http().edit_channel(ctx, &self, self.audit_log_reason).await

@@ -194,6 +194,10 @@ routes! ('a, {
     api!("/channels/{}/polls/{}/expire", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(channel_id.into()));
 
+    ChannelVoiceStatus { channel_id: ChannelId },
+    api!("/channels/{}/voice-status", channel_id),
+    Some(RatelimitingKind::PathAndId(channel_id.into()));
+
     Gateway,
     api!("/gateway"),
     Some(RatelimitingKind::Path);

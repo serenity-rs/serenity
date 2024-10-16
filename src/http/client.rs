@@ -2412,6 +2412,28 @@ impl Http {
         .await
     }
 
+    /// Changes a voice channel's status.
+    pub async fn edit_voice_status(
+        &self,
+        channel_id: ChannelId,
+        map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        let body = to_vec(map)?;
+
+        self.wind(204, Request {
+            body: Some(body),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Put,
+            route: Route::ChannelVoiceStatus {
+                channel_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Edits a the webhook with the given data.
     ///
     /// The Value is a map with optional values of:
