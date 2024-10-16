@@ -5,7 +5,6 @@ use super::CreateForumTag;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-use crate::json::*;
 use crate::model::prelude::*;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`].
@@ -337,10 +336,21 @@ impl<'a> Builder for EditChannel<'a> {
             }
         }
 
-        if let Some(ref status) = self.status {
+        if let Some(status) = &self.status {
+            #[derive(Serialize)]
+            struct EditVoiceStatusBody<'a> {
+                status: &'a str,
+            }
+
             cache_http
                 .http()
-                .edit_voice_status(ctx, &json!({ "status": status }), self.audit_log_reason)
+                .edit_voice_status(
+                    ctx,
+                    &EditVoiceStatusBody {
+                        status: status.as_str(),
+                    },
+                    self.audit_log_reason,
+                )
                 .await?;
         }
 
