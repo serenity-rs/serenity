@@ -12,6 +12,7 @@ mod reaction;
 use std::fmt;
 
 use serde::de::{Error as DeError, Unexpected};
+use serde::ser::SerializeMap as _;
 
 pub use self::attachment::*;
 pub use self::channel_id::*;
@@ -497,7 +498,7 @@ pub enum ForumEmoji {
     Name(String),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 struct RawForumEmoji {
     emoji_id: Option<EmojiId>,
     emoji_name: Option<String>,
@@ -505,17 +506,19 @@ struct RawForumEmoji {
 
 impl serde::Serialize for ForumEmoji {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut map = serializer.serialize_map(Some(2))?;
         match self {
-            Self::Id(id) => RawForumEmoji {
-                emoji_id: Some(*id),
-                emoji_name: None,
+            Self::Id(id) => {
+                map.serialize_entry("emoji_id", id)?;
+                map.serialize_entry("emoji_name", &None::<()>)?;
             },
-            Self::Name(name) => RawForumEmoji {
-                emoji_id: None,
-                emoji_name: Some(name.clone()),
+            Self::Name(name) => {
+                map.serialize_entry("emoji_id", &None::<()>)?;
+                map.serialize_entry("emoji_name", name)?;
             },
-        }
-        .serialize(serializer)
+        };
+
+        map.end()
     }
 }
 
