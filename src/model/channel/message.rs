@@ -11,7 +11,9 @@ use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage}
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
 use crate::collector::{
-    ComponentInteractionCollector, ModalInteractionCollector, ReactionCollector,
+    ComponentInteractionCollector,
+    ModalInteractionCollector,
+    ReactionCollector,
 };
 #[cfg(feature = "model")]
 use crate::constants;
@@ -1122,12 +1124,19 @@ pub struct MessageReference {
 }
 
 impl MessageReference {
+    #[must_use]
     pub fn new(
         kind: MessageReferenceKind,
         channel_id: ChannelId,
         message_id: Option<MessageId>,
     ) -> Self {
-        Self { kind, message_id, channel_id, guild_id: None, fail_if_not_exists: None }
+        Self {
+            kind,
+            message_id,
+            channel_id,
+            guild_id: None,
+            fail_if_not_exists: None,
+        }
     }
 }
 
