@@ -1152,9 +1152,8 @@ impl From<&Message> for MessageReference {
     }
 }
 
-#[allow(useless_deprecated)]
-#[deprecated = "Will be removed in the future"]
 impl From<(ChannelId, MessageId)> for MessageReference {
+    // TODO(next): Remove this
     fn from(pair: (ChannelId, MessageId)) -> Self {
         Self {
             kind: MessageReferenceKind::default(),
