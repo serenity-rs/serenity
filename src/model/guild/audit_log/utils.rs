@@ -51,6 +51,7 @@ pub mod optional_string {
         deserializer.deserialize_option(OptionalStringVisitor)
     }
 
+    #[allow(clippy::ref_option)]
     pub fn serialize<S: Serializer>(value: &Option<u64>, serializer: S) -> Result<S::Ok, S::Error> {
         match value {
             Some(value) => serializer.serialize_some(&value.to_string()),

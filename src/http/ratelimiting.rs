@@ -111,10 +111,10 @@ impl Ratelimiter {
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not prefix it.
     #[must_use]
     pub fn new(client: Client, token: impl Into<String>) -> Self {
-        Self::_new(client, token.into())
+        Self::new_(client, token.into())
     }
 
-    fn _new(client: Client, token: String) -> Self {
+    fn new_(client: Client, token: String) -> Self {
         Self {
             client,
             global: Arc::default(),

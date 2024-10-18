@@ -198,7 +198,7 @@ impl<'a> CreateInvite<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for CreateInvite<'a> {
+impl Builder for CreateInvite<'_> {
     type Context<'ctx> = ChannelId;
     type Built = RichInvite;
 

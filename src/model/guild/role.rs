@@ -12,11 +12,12 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 
-/// Information about a role within a guild. A role represents a set of permissions, and can be
-/// attached to one or multiple users. A role has various miscellaneous configurations, such as
-/// being assigned a colour. Roles are unique per guild and do not cross over to other guilds in
-/// any way, and can have channel-specific permission overrides in addition to guild-level
-/// permissions.
+/// Information about a role within a guild.
+///
+/// A role represents a set of permissions, and can be attached to one or multiple users. A role has
+/// various miscellaneous configurations, such as being assigned a colour. Roles are unique per
+/// guild and do not cross over to other guilds in any way, and can have channel-specific permission
+/// overrides in addition to guild-level permissions.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -200,7 +201,7 @@ impl From<Role> for RoleId {
     }
 }
 
-impl<'a> From<&'a Role> for RoleId {
+impl From<&Role> for RoleId {
     /// Gets the Id of a role.
     fn from(role: &Role) -> RoleId {
         role.id
@@ -249,7 +250,7 @@ mod bool_as_option_unit {
 
     struct NullValueVisitor;
 
-    impl<'de> Visitor<'de> for NullValueVisitor {
+    impl Visitor<'_> for NullValueVisitor {
         type Value = bool;
 
         fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

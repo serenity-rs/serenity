@@ -17,7 +17,7 @@ use crate::model::prelude::*;
 /// # use serenity::model::prelude::Event;
 /// # use serenity::gateway::ShardMessenger;
 /// # use serenity::collector::collect;
-/// # async fn _example(shard: &ShardMessenger) {
+/// # async fn example_(shard: &ShardMessenger) {
 /// let stream = collect(shard, |event| match event {
 ///     Event::ReactionRemove(event) => Some(event.reaction.clone()),
 ///     _ => None,

@@ -266,9 +266,10 @@ impl InviteGuild {
     }
 }
 
-/// Detailed information about an invite. This information can only be retrieved by anyone with the
-/// [Manage Guild] permission. Otherwise, a minimal amount of information can be retrieved via the
-/// [`Invite`] struct.
+/// Detailed information about an invite.
+///
+/// This information can only be retrieved by anyone with the [Manage Guild] permission. Otherwise,
+/// a minimal amount of information can be retrieved via the [`Invite`] struct.
 ///
 /// [Manage Guild]: Permissions::MANAGE_GUILD
 ///

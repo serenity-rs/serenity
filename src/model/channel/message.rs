@@ -539,7 +539,7 @@ impl Message {
         cache_http: impl CacheHttp,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<Reaction> {
-        self._react(cache_http, reaction_type.into(), false).await
+        self.react_(cache_http, reaction_type.into(), false).await
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.
@@ -560,10 +560,10 @@ impl Message {
         cache_http: impl CacheHttp,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<Reaction> {
-        self._react(cache_http, reaction_type.into(), true).await
+        self.react_(cache_http, reaction_type.into(), true).await
     }
 
-    async fn _react(
+    async fn react_(
         &self,
         cache_http: impl CacheHttp,
         reaction_type: ReactionType,
@@ -643,7 +643,7 @@ impl Message {
         cache_http: impl CacheHttp,
         content: impl Into<String>,
     ) -> Result<Message> {
-        self._reply(cache_http, content, Some(false)).await
+        self.reply_(cache_http, content, Some(false)).await
     }
 
     /// Uses Discord's inline reply to a user with a ping.
@@ -667,7 +667,7 @@ impl Message {
         cache_http: impl CacheHttp,
         content: impl Into<String>,
     ) -> Result<Message> {
-        self._reply(cache_http, content, Some(true)).await
+        self.reply_(cache_http, content, Some(true)).await
     }
 
     /// Replies to the user, mentioning them prior to the content in the form of: `@<USER_ID>
@@ -694,11 +694,11 @@ impl Message {
         cache_http: impl CacheHttp,
         content: impl Display,
     ) -> Result<Message> {
-        self._reply(cache_http, format!("{} {content}", self.author.mention()), None).await
+        self.reply_(cache_http, format!("{} {content}", self.author.mention()), None).await
     }
 
     /// `inlined` decides whether this reply is inlined and whether it pings.
-    async fn _reply(
+    async fn reply_(
         &self,
         cache_http: impl CacheHttp,
         content: impl Into<String>,
@@ -917,7 +917,7 @@ impl From<Message> for MessageId {
     }
 }
 
-impl<'a> From<&'a Message> for MessageId {
+impl From<&Message> for MessageId {
     /// Gets the Id of a [`Message`].
     fn from(message: &Message) -> MessageId {
         message.id

@@ -234,9 +234,10 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[rustfmt::skip]
-/// A brother macro to [`command`], but for the help command. An interface for simple browsing of
-/// all the available commands the bot provides, and reading through specific information regarding
-/// a command.
+/// A brother macro to [`command`], but for the help command.
+///
+/// An interface for simple browsing of all the available commands the bot provides,
+/// and reading through specific information regarding a command.
 ///
 /// As such, the options here will pertain in the help command's **layout** than its functionality.
 ///
@@ -609,7 +610,6 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// the macro. For example: `#[group("Banana Phone")]`.
 ///
 /// [`command`]: macro@command
-
 #[proc_macro_attribute]
 pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     let group = parse_macro_input!(input as GroupStruct);

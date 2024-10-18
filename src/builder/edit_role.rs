@@ -152,7 +152,7 @@ impl<'a> EditRole<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditRole<'a> {
+impl Builder for EditRole<'_> {
     type Context<'ctx> = (GuildId, Option<RoleId>);
     type Built = Role;
 

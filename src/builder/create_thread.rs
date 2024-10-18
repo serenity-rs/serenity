@@ -96,7 +96,7 @@ impl<'a> CreateThread<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for CreateThread<'a> {
+impl Builder for CreateThread<'_> {
     type Context<'ctx> = (ChannelId, Option<MessageId>);
     type Built = GuildChannel;
 

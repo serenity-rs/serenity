@@ -314,7 +314,7 @@ impl<'a> EditGuild<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditGuild<'a> {
+impl Builder for EditGuild<'_> {
     type Context<'ctx> = GuildId;
     type Built = PartialGuild;
 

@@ -56,7 +56,7 @@ impl<'a> CreateStageInstance<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for CreateStageInstance<'a> {
+impl Builder for CreateStageInstance<'_> {
     type Context<'ctx> = ChannelId;
     type Built = StageInstance;
 

@@ -362,6 +362,7 @@ pub mod secret {
         Option::<S>::deserialize(deserializer).map(|s| s.map(Secret::new))
     }
 
+    #[allow(clippy::ref_option)]
     pub fn serialize<S: Serialize + Zeroize, Sr: Serializer>(
         secret: &Option<Secret<S>>,
         serializer: Sr,

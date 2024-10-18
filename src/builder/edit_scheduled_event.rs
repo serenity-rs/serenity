@@ -168,7 +168,7 @@ impl<'a> EditScheduledEvent<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditScheduledEvent<'a> {
+impl Builder for EditScheduledEvent<'_> {
     type Context<'ctx> = (GuildId, ScheduledEventId);
     type Built = ScheduledEvent;
 

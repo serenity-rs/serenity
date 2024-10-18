@@ -178,6 +178,7 @@ impl Serialize for CreateSelectMenuKind {
             default_values: Vec<CreateSelectMenuDefault>,
         }
 
+        #[allow(clippy::ref_option)]
         fn map<I: Into<Mention> + Copy>(
             values: &Option<Vec<I>>,
         ) -> impl Iterator<Item = CreateSelectMenuDefault> + '_ {

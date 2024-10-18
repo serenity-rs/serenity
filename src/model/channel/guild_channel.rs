@@ -31,9 +31,11 @@ use crate::http::{CacheHttp, Http, Typing};
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// Represents a guild's text, news, or voice channel. Some methods are available only for voice
-/// channels and some are only available for text channels. News channels are a subset of text
-/// channels and lack slow mode hence [`Self::rate_limit_per_user`] will be [`None`].
+/// Represents a guild's text, news, or voice channel.
+///
+/// Some methods are available only for voice channels and some are only available for text
+/// channels. News channels are a subset of text channels and lack slow mode hence
+/// [`Self::rate_limit_per_user`] will be [`None`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]

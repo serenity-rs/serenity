@@ -68,7 +68,7 @@ impl<K: Eq + Hash + TypeSize, V: TypeSize> TypeSize for MaybeMap<K, V> {
 /// A wrapper around a reference to a MaybeMap, allowing for public inspection of the underlying
 /// map without allowing mutation of internal cache fields, which could cause issues.
 pub struct ReadOnlyMapRef<'a, K: Eq + Hash, V>(Option<&'a DashMap<K, V, BuildHasher>>);
-impl<'a, K: Eq + Hash, V> ReadOnlyMapRef<'a, K, V> {
+impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
     pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V, BuildHasher>> {
         self.0.into_iter().flat_map(DashMap::iter)
     }

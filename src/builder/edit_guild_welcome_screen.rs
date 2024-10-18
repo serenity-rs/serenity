@@ -61,7 +61,7 @@ impl<'a> EditGuildWelcomeScreen<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditGuildWelcomeScreen<'a> {
+impl Builder for EditGuildWelcomeScreen<'_> {
     type Context<'ctx> = GuildId;
     type Built = GuildWelcomeScreen;
 

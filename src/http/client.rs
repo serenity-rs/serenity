@@ -33,8 +33,9 @@ use crate::internal::prelude::*;
 use crate::json::*;
 use crate::model::prelude::*;
 
-/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API. If
-/// you do not need to use a proxy or do not need to disable the rate limiter, you can use
+/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API
+///
+/// If you do not need to use a proxy or do not need to disable the rate limiter, you can use
 /// [`Http::new`] instead.
 ///
 /// ## Example
@@ -834,7 +835,7 @@ impl Http {
         .await
     }
 
-    async fn _create_reaction(
+    async fn create_reaction_(
         &self,
         channel_id: ChannelId,
         message_id: MessageId,
@@ -863,7 +864,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self._create_reaction(channel_id, message_id, reaction_type, false).await
+        self.create_reaction_(channel_id, message_id, reaction_type, false).await
     }
 
     /// Super reacts to a message.
@@ -873,7 +874,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self._create_reaction(channel_id, message_id, reaction_type, true).await
+        self.create_reaction_(channel_id, message_id, reaction_type, true).await
     }
 
     /// Creates a role.
