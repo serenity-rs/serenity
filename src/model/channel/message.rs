@@ -1086,6 +1086,22 @@ pub struct MessageActivity {
     pub party_id: Option<String>,
 }
 
+enum_number! {
+    /// Message Reference Type information
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/message#message-reference-types)
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum MessageReferenceKind {
+        #[default]
+        Default = 0,
+        Forward = 1,
+        _ => Unknown(u8),
+    }
+}
+
 /// Reference data sent with crossposted messages.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).
@@ -1093,6 +1109,9 @@ pub struct MessageActivity {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageReference {
+    /// The Type of Message Reference
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    pub kind: Option<MessageReferenceKind>,
     /// ID of the originating message.
     pub message_id: Option<MessageId>,
     /// ID of the originating message's channel.
@@ -1107,6 +1126,7 @@ pub struct MessageReference {
 impl From<&Message> for MessageReference {
     fn from(m: &Message) -> Self {
         Self {
+            kind: None,
             message_id: Some(m.id),
             channel_id: m.channel_id,
             guild_id: m.guild_id,
@@ -1118,8 +1138,21 @@ impl From<&Message> for MessageReference {
 impl From<(ChannelId, MessageId)> for MessageReference {
     fn from(pair: (ChannelId, MessageId)) -> Self {
         Self {
+            kind: None,
             message_id: Some(pair.1),
             channel_id: pair.0,
+            guild_id: None,
+            fail_if_not_exists: None,
+        }
+    }
+}
+
+impl From<(MessageReferenceKind, ChannelId, MessageId)> for MessageReference {
+    fn from(tuple: (MessageReferenceKind, ChannelId, MessageId)) -> Self {
+        Self {
+            kind: Some(tuple.0),
+            message_id: Some(tuple.2),
+            channel_id: tuple.1,
             guild_id: None,
             fail_if_not_exists: None,
         }
