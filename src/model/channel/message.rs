@@ -11,9 +11,7 @@ use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage}
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
 use crate::collector::{
-    ComponentInteractionCollector,
-    ModalInteractionCollector,
-    ReactionCollector,
+    ComponentInteractionCollector, ModalInteractionCollector, ReactionCollector,
 };
 #[cfg(feature = "model")]
 use crate::constants;
@@ -1110,8 +1108,8 @@ enum_number! {
 #[non_exhaustive]
 pub struct MessageReference {
     /// The Type of Message Reference
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    pub kind: Option<MessageReferenceKind>,
+    #[serde(rename = "type", default = "MessageReferenceKind::default")]
+    pub kind: MessageReferenceKind,
     /// ID of the originating message.
     pub message_id: Option<MessageId>,
     /// ID of the originating message's channel.
@@ -1123,10 +1121,20 @@ pub struct MessageReference {
     pub fail_if_not_exists: Option<bool>,
 }
 
+impl MessageReference {
+    pub fn new(
+        kind: MessageReferenceKind,
+        channel_id: ChannelId,
+        message_id: Option<MessageId>,
+    ) -> Self {
+        Self { kind, message_id, channel_id, guild_id: None, fail_if_not_exists: None }
+    }
+}
+
 impl From<&Message> for MessageReference {
     fn from(m: &Message) -> Self {
         Self {
-            kind: None,
+            kind: MessageReferenceKind::default(),
             message_id: Some(m.id),
             channel_id: m.channel_id,
             guild_id: m.guild_id,
@@ -1135,24 +1143,14 @@ impl From<&Message> for MessageReference {
     }
 }
 
+#[allow(useless_deprecated)]
+#[deprecated = "Will be removed in the future"]
 impl From<(ChannelId, MessageId)> for MessageReference {
     fn from(pair: (ChannelId, MessageId)) -> Self {
         Self {
-            kind: None,
+            kind: MessageReferenceKind::default(),
             message_id: Some(pair.1),
             channel_id: pair.0,
-            guild_id: None,
-            fail_if_not_exists: None,
-        }
-    }
-}
-
-impl From<(MessageReferenceKind, ChannelId, MessageId)> for MessageReference {
-    fn from(tuple: (MessageReferenceKind, ChannelId, MessageId)) -> Self {
-        Self {
-            kind: Some(tuple.0),
-            message_id: Some(tuple.2),
-            channel_id: tuple.1,
             guild_id: None,
             fail_if_not_exists: None,
         }
