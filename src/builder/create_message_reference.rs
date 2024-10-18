@@ -33,11 +33,13 @@ impl CreateMessageReference {
         }
     }
 
+    #[must_use]
     pub fn channel(mut self, channel_id: ChannelId) -> Self {
         self.channel_id = Some(channel_id);
         self
     }
 
+    #[must_use]
     pub fn fail_if_not_exists(mut self, fail_if_not_exists: bool) -> Self {
         self.fail_if_not_exists = Some(fail_if_not_exists);
         self
