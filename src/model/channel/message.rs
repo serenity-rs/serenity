@@ -1123,23 +1123,6 @@ pub struct MessageReference {
     pub fail_if_not_exists: Option<bool>,
 }
 
-impl MessageReference {
-    #[must_use]
-    pub fn new(
-        kind: MessageReferenceKind,
-        channel_id: ChannelId,
-        message_id: Option<MessageId>,
-    ) -> Self {
-        Self {
-            kind,
-            message_id,
-            channel_id,
-            guild_id: None,
-            fail_if_not_exists: None,
-        }
-    }
-}
-
 impl From<&Message> for MessageReference {
     fn from(m: &Message) -> Self {
         Self {
