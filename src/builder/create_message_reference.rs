@@ -11,7 +11,7 @@ pub struct CreateMessageReference {
     #[serde(rename = "type", default = "MessageReferenceKind::default")]
     pub kind: MessageReferenceKind,
     /// The ID of the originating messages's channel.
-    pub channel_id: Option<ChannelId>,
+    pub channel_id: ChannelId,
     /// The ID of the originating message.
     pub message_id: Option<MessageId>,
     /// The ID of the originating messages's guild.
@@ -23,10 +23,10 @@ pub struct CreateMessageReference {
 
 impl CreateMessageReference {
     #[must_use]
-    pub fn new(kind: MessageReferenceKind, message_id: MessageId) -> Self {
+    pub fn new(kind: MessageReferenceKind, message_id: MessageId, channel_id: ChannelId) -> Self {
         Self {
             kind,
-            channel_id: None,
+            channel_id,
             message_id: Some(message_id),
             guild_id: None,
             fail_if_not_exists: None,
@@ -34,8 +34,8 @@ impl CreateMessageReference {
     }
 
     #[must_use]
-    pub fn channel(mut self, channel_id: ChannelId) -> Self {
-        self.channel_id = Some(channel_id);
+    pub fn guild(mut self, guild: GuildId) -> Self {
+        self.guild_id = Some(guild);
         self
     }
 
@@ -50,7 +50,7 @@ impl From<MessageReference> for CreateMessageReference {
     fn from(value: MessageReference) -> Self {
         Self {
             kind: value.kind,
-            channel_id: Some(value.channel_id),
+            channel_id: value.channel_id,
             message_id: value.message_id,
             guild_id: value.guild_id,
             fail_if_not_exists: value.fail_if_not_exists,
@@ -62,7 +62,7 @@ impl From<&Message> for CreateMessageReference {
     fn from(value: &Message) -> Self {
         Self {
             kind: MessageReferenceKind::default(),
-            channel_id: Some(value.channel_id),
+            channel_id: value.channel_id,
             message_id: Some(value.id),
             guild_id: value.guild_id,
             fail_if_not_exists: None,

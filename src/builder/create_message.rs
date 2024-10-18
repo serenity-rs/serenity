@@ -6,7 +6,6 @@ use super::{
     CreateAllowedMentions,
     CreateAttachment,
     CreateEmbed,
-    CreateMessageReference,
     CreatePoll,
     EditAttachments,
 };
@@ -64,7 +63,7 @@ pub struct CreateMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    message_reference: Option<CreateMessageReference>,
+    message_reference: Option<MessageReference>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
     sticker_ids: Vec<StickerId>,
@@ -209,8 +208,8 @@ impl CreateMessage {
         self
     }
 
-    /// Set the reference message this message is a reply to.
-    pub fn reference_message(mut self, reference: impl Into<CreateMessageReference>) -> Self {
+    /// Set the message this reply or forward is referring to.
+    pub fn reference_message(mut self, reference: impl Into<MessageReference>) -> Self {
         self.message_reference = Some(reference.into());
         self
     }

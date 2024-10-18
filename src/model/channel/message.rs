@@ -5,6 +5,7 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
+use crate::all::CreateMessageReference;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -1131,6 +1132,18 @@ impl From<&Message> for MessageReference {
             channel_id: m.channel_id,
             guild_id: m.guild_id,
             fail_if_not_exists: None,
+        }
+    }
+}
+
+impl From<CreateMessageReference> for MessageReference {
+    fn from(value: CreateMessageReference) -> Self {
+        Self {
+            kind: value.kind,
+            message_id: value.message_id,
+            channel_id: value.channel_id,
+            guild_id: value.guild_id,
+            fail_if_not_exists: value.fail_if_not_exists,
         }
     }
 }
