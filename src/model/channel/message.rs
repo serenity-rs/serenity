@@ -5,7 +5,7 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
-use crate::all::CreateMessageReference;
+use crate::builder::CreateMessageReference;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
