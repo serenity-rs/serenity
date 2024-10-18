@@ -5,7 +5,7 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
-#[cfg(all(feature = "builder"))]
+#[cfg(feature = "builder")]
 use crate::builder::CreateMessageReference;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
@@ -1137,7 +1137,7 @@ impl From<&Message> for MessageReference {
     }
 }
 
-#[cfg(all(feature = "builder"))]
+#[cfg(feature = "builder")]
 impl From<CreateMessageReference> for MessageReference {
     fn from(value: CreateMessageReference) -> Self {
         Self {
