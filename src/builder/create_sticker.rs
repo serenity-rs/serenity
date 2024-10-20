@@ -74,7 +74,7 @@ impl<'a> CreateSticker<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for CreateSticker<'a> {
+impl Builder for CreateSticker<'_> {
     type Context<'ctx> = GuildId;
     type Built = Sticker;
 

@@ -19,7 +19,7 @@ pub struct QuickModalResponse {
 ///
 /// ```rust
 /// # use serenity::{builder::*, model::prelude::*, prelude::*, utils::CreateQuickModal, Result};
-/// # async fn _foo(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
+/// # async fn foo_(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
 /// let modal = CreateQuickModal::new("About you")
 ///     .timeout(std::time::Duration::from_secs(600))
 ///     .short_field("First name")

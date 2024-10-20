@@ -115,11 +115,11 @@ impl MessageBuilder {
     /// [Display implementation]: ChannelId#impl-Display
     #[inline]
     pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
-        self._channel(channel.into())
+        self.channel_(channel.into())
     }
 
-    fn _channel(&mut self, channel: ChannelId) -> &mut Self {
-        self._push(&channel.mention());
+    fn channel_(&mut self, channel: ChannelId) -> &mut Self {
+        self.push_(&channel.mention());
         self
     }
 
@@ -149,13 +149,13 @@ impl MessageBuilder {
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
-        self._push(&emoji);
+        self.push_(&emoji);
         self
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
     pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
-        self._push(&item.mention());
+        self.push_(&item.mention());
         self
     }
 
@@ -182,11 +182,11 @@ impl MessageBuilder {
     /// ```
     #[inline]
     pub fn push(&mut self, content: impl Into<Content>) -> &mut Self {
-        self._push(&content.into())
+        self.push_(&content.into())
     }
 
     #[inline]
-    fn _push<C: std::fmt::Display + ?Sized>(&mut self, content: &C) -> &mut Self {
+    fn push_<C: std::fmt::Display + ?Sized>(&mut self, content: &C) -> &mut Self {
         write!(self.0, "{content}").unwrap();
 
         self
@@ -242,7 +242,7 @@ impl MessageBuilder {
         }
 
         self.0.push('\n');
-        self._push(&content.into());
+        self.push_(&content.into());
         self.0.push_str("\n```");
 
         self
@@ -274,7 +274,7 @@ impl MessageBuilder {
     /// ```
     pub fn push_mono(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push('`');
-        self._push(&content.into());
+        self.push_(&content.into());
         self.0.push('`');
 
         self
@@ -303,7 +303,7 @@ impl MessageBuilder {
     /// ```
     pub fn push_italic(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push('_');
-        self._push(&content.into());
+        self.push_(&content.into());
         self.0.push('_');
 
         self
@@ -312,7 +312,7 @@ impl MessageBuilder {
     /// Pushes an inline bold text to the content.
     pub fn push_bold(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("**");
-        self._push(&content.into());
+        self.push_(&content.into());
         self.0.push_str("**");
 
         self
@@ -321,7 +321,7 @@ impl MessageBuilder {
     /// Pushes an underlined inline text to the content.
     pub fn push_underline(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("__");
-        self._push(&content.into());
+        self.push_(&content.into());
         self.0.push_str("__");
 
         self
@@ -330,7 +330,7 @@ impl MessageBuilder {
     /// Pushes a strikethrough inline text to the content.
     pub fn push_strike(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("~~");
-        self._push(&content.into());
+        self.push_(&content.into());
         self.0.push_str("~~");
 
         self
@@ -339,7 +339,7 @@ impl MessageBuilder {
     /// Pushes a spoiler'd inline text to the content.
     pub fn push_spoiler(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("||");
-        self._push(&content.into());
+        self.push_(&content.into());
         self.0.push_str("||");
 
         self
@@ -348,7 +348,7 @@ impl MessageBuilder {
     /// Pushes a quoted inline text to the content
     pub fn push_quote(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("> ");
-        self._push(&content.into());
+        self.push_(&content.into());
 
         self
     }
@@ -521,7 +521,7 @@ impl MessageBuilder {
             c.inner =
                 normalize(&c.inner).replace('*', "\\*").replace('`', "\\`").replace('_', "\\_");
 
-            self._push(&c);
+            self.push_(&c);
         }
 
         self
@@ -543,7 +543,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("```", " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push_str("\n```");
 
@@ -556,7 +556,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace('`', "'");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push('`');
 
@@ -569,7 +569,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace('_', " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push('_');
 
@@ -582,7 +582,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("**", " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push_str("**");
 
@@ -595,7 +595,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("__", " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push_str("__");
 
@@ -608,7 +608,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("~~", " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push_str("~~");
 
@@ -621,7 +621,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("||", " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push_str("||");
 
@@ -634,7 +634,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("> ", " ");
-            self._push(&c);
+            self.push_(&c);
         }
 
         self
@@ -828,7 +828,7 @@ impl MessageBuilder {
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
-        self._push(&role.into().mention());
+        self.push_(&role.into().mention());
         self
     }
 
@@ -843,7 +843,7 @@ impl MessageBuilder {
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
-        self._push(&user.into().mention());
+        self.push_(&user.into().mention());
         self
     }
 }
@@ -945,13 +945,13 @@ impl EmbedMessageBuilding for MessageBuilder {
         {
             let mut c = name.into();
             c.inner = normalize(&c.inner).replace(']', " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push_str("](");
         {
             let mut c = url.into();
             c.inner = normalize(&c.inner).replace(')', " ");
-            self._push(&c);
+            self.push_(&c);
         }
         self.0.push(')');
 

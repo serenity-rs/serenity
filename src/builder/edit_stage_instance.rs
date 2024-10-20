@@ -48,7 +48,7 @@ impl<'a> EditStageInstance<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditStageInstance<'a> {
+impl Builder for EditStageInstance<'_> {
     type Context<'ctx> = ChannelId;
     type Built = StageInstance;
 

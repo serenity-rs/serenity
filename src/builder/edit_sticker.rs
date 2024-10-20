@@ -70,7 +70,7 @@ impl<'a> EditSticker<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditSticker<'a> {
+impl Builder for EditSticker<'_> {
     type Context<'ctx> = (GuildId, StickerId);
     type Built = Sticker;
 

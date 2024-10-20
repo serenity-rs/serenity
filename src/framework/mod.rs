@@ -119,7 +119,7 @@ where
 }
 
 #[async_trait]
-impl<'a, F> Framework for &'a mut F
+impl<F> Framework for &mut F
 where
     F: Framework + ?Sized,
 {

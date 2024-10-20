@@ -1,8 +1,9 @@
 use crate::model::prelude::*;
 
-/// A builder for constructing a personal [`Message`] instance. This can be useful for emitting a
-/// manual [`dispatch`] to the framework, but you don't have a message in hand, or just have a
-/// fragment of its data.
+/// A builder for constructing a personal [`Message`] instance.
+///
+/// This can be useful for emitting a manual [`dispatch`] to the framework, but you don't have a
+/// message in hand, or just have a fragment of its data.
 ///
 /// [`dispatch`]: crate::framework::Framework::dispatch
 #[derive(Clone, Default, Debug)]

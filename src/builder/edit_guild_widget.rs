@@ -48,7 +48,7 @@ impl<'a> EditGuildWidget<'a> {
 
 #[cfg(feature = "http")]
 #[async_trait::async_trait]
-impl<'a> Builder for EditGuildWidget<'a> {
+impl Builder for EditGuildWidget<'_> {
     type Context<'ctx> = GuildId;
     type Built = GuildWidget;
 

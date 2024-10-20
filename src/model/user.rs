@@ -58,7 +58,7 @@ pub(crate) mod discriminator {
 
     struct DiscriminatorVisitor;
 
-    impl<'de> Visitor<'de> for DiscriminatorVisitor {
+    impl Visitor<'_> for DiscriminatorVisitor {
         type Value = u16;
 
         fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -84,7 +84,7 @@ pub(crate) mod discriminator {
         deserializer.deserialize_option(OptionalDiscriminatorVisitor)
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref)]
+    #[allow(clippy::trivially_copy_pass_by_ref, clippy::ref_option)]
     pub fn serialize<S: Serializer>(
         value: &Option<NonZeroU16>,
         serializer: S,
@@ -776,7 +776,7 @@ impl From<Member> for UserId {
     }
 }
 
-impl<'a> From<&'a Member> for UserId {
+impl From<&Member> for UserId {
     /// Gets the Id of a [`Member`].
     fn from(member: &Member) -> UserId {
         member.user.id
@@ -790,7 +790,7 @@ impl From<User> for UserId {
     }
 }
 
-impl<'a> From<&'a User> for UserId {
+impl From<&User> for UserId {
     /// Gets the Id of a [`User`].
     fn from(user: &User) -> UserId {
         user.id
