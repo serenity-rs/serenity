@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (3ed6e3cc6 2024-10-17)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/cache/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/cache/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (da935398d 2024-10-19)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/cache/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1235,10 +1235,10 @@
     </span><span class="attr">#[inline]
     #[deprecated = <span class="string">"Use Cache::guild and Guild::channels instead"</span>]
     </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: C) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._channel(id.into())
+        <span class="self">self</span>.channel_(id.into())
     }
 
-    <span class="kw">fn </span>_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">fn </span>channel_(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ChannelId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>guild_id = <span class="kw-2">*</span><span class="self">self</span>.channels.get(<span class="kw-2">&amp;</span>id)<span class="question-mark">?</span>;
         <span class="kw">let </span>guild_ref = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>;
         <span class="kw">let </span>channel = guild_ref.try_map(|g| g.channels.get(<span class="kw-2">&amp;</span>id)).ok();
@@ -1293,10 +1293,10 @@
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>guild&lt;G: Into&lt;GuildId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: G) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._guild(id.into())
+        <span class="self">self</span>.guild_(id.into())
     }
 
-    <span class="kw">fn </span>_guild(<span class="kw-2">&amp;</span><span class="self">self</span>, id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">fn </span>guild_(<span class="kw-2">&amp;</span><span class="self">self</span>, id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>id).map(CacheRef::from_ref)
     }
 
@@ -1355,10 +1355,10 @@
         guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;,
         user_id: <span class="kw">impl </span>Into&lt;UserId&gt;,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;MemberRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._member(guild_id.into(), user_id.into())
+        <span class="self">self</span>.member_(guild_id.into(), user_id.into())
     }
 
-    <span class="kw">fn </span>_member(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;MemberRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">fn </span>member_(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;MemberRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>member = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.try_map(|g| g.members.get(<span class="kw-2">&amp;</span>user_id)).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(member))
     }
@@ -1366,10 +1366,10 @@
     <span class="attr">#[inline]
     #[deprecated = <span class="string">"Use Cache::guild and Guild::roles instead"</span>]
     </span><span class="kw">pub fn </span>guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._guild_roles(guild_id.into())
+        <span class="self">self</span>.guild_roles_(guild_id.into())
     }
 
-    <span class="kw">fn </span>_guild_roles(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">fn </span>guild_roles_(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRolesRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>roles = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.map(|g| <span class="kw-2">&amp;</span>g.roles);
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(roles))
     }
@@ -1384,10 +1384,10 @@
     </span><span class="attr">#[inline]
     #[deprecated = <span class="string">"Use Cache::guild and Guild::channels instead"</span>]
     </span><span class="kw">pub fn </span>guild_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: <span class="kw">impl </span>Into&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._guild_channels(guild_id.into())
+        <span class="self">self</span>.guild_channels_(guild_id.into())
     }
 
-    <span class="kw">fn </span>_guild_channels(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">fn </span>guild_channels_(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildChannelsRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>channels = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.map(|g| <span class="kw-2">&amp;</span>g.channels);
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(channels))
     }
@@ -1432,10 +1432,10 @@
         </span>C: Into&lt;ChannelId&gt;,
         M: Into&lt;MessageId&gt;,
     {
-        <span class="self">self</span>._message(channel_id.into(), message_id.into())
+        <span class="self">self</span>.message_(channel_id.into(), message_id.into())
     }
 
-    <span class="kw">fn </span>_message(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId, message_id: MessageId) -&gt; <span class="prelude-ty">Option</span>&lt;MessageRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">fn </span>message_(<span class="kw-2">&amp;</span><span class="self">self</span>, channel_id: ChannelId, message_id: MessageId) -&gt; <span class="prelude-ty">Option</span>&lt;MessageRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.temp_messages.get(<span class="kw-2">&amp;</span>message_id) {
             <span class="kw">return </span><span class="prelude-val">Some</span>(CacheRef::from_arc(message));
@@ -1474,10 +1474,10 @@
         </span>G: Into&lt;GuildId&gt;,
         R: Into&lt;RoleId&gt;,
     {
-        <span class="self">self</span>._role(guild_id.into(), role_id.into())
+        <span class="self">self</span>.role_(guild_id.into(), role_id.into())
     }
 
-    <span class="kw">fn </span>_role(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, role_id: RoleId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRoleRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    <span class="kw">fn </span>role_(<span class="kw-2">&amp;</span><span class="self">self</span>, guild_id: GuildId, role_id: RoleId) -&gt; <span class="prelude-ty">Option</span>&lt;GuildRoleRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">let </span>role = <span class="self">self</span>.guilds.get(<span class="kw-2">&amp;</span>guild_id)<span class="question-mark">?</span>.try_map(|g| g.roles.get(<span class="kw-2">&amp;</span>role_id)).ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(CacheRef::from_mapped_ref(role))
     }
@@ -1528,11 +1528,11 @@
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>user&lt;U: Into&lt;UserId&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, user_id: U) -&gt; <span class="prelude-ty">Option</span>&lt;UserRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
-        <span class="self">self</span>._user(user_id.into())
+        <span class="self">self</span>.user_(user_id.into())
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
-    </span><span class="kw">fn </span>_user(<span class="kw-2">&amp;</span><span class="self">self</span>, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;UserRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    </span><span class="kw">fn </span>user_(<span class="kw-2">&amp;</span><span class="self">self</span>, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;UserRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="self">self</span>.users.get(<span class="kw-2">&amp;</span>user_id) {
             <span class="prelude-val">Some</span>(CacheRef::from_ref(user))
         } <span class="kw">else </span>{
@@ -1541,7 +1541,7 @@
     }
 
     <span class="attr">#[cfg(not(feature = <span class="string">"temp_cache"</span>))]
-    </span><span class="kw">fn </span>_user(<span class="kw-2">&amp;</span><span class="self">self</span>, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;UserRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
+    </span><span class="kw">fn </span>user_(<span class="kw-2">&amp;</span><span class="self">self</span>, user_id: UserId) -&gt; <span class="prelude-ty">Option</span>&lt;UserRef&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="self">self</span>.users.get(<span class="kw-2">&amp;</span>user_id).map(CacheRef::from_ref)
     }
 

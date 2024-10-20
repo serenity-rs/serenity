@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/message_builder.rs`."><title>message_builder.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (3ed6e3cc6 2024-10-17)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/utils/</div>message_builder.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/message_builder.rs`."><title>message_builder.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (da935398d 2024-10-19)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/utils/</div>message_builder.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1563,11 +1563,11 @@
     /// [Display implementation]: ChannelId#impl-Display
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>channel&lt;C: Into&lt;ChannelId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._channel(channel.into())
+        <span class="self">self</span>.channel_(channel.into())
     }
 
-    <span class="kw">fn </span>_channel(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: ChannelId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>channel.mention());
+    <span class="kw">fn </span>channel_(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel: ChannelId) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>channel.mention());
         <span class="self">self
     </span>}
 
@@ -1597,13 +1597,13 @@
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     </span><span class="kw">pub fn </span>emoji(<span class="kw-2">&amp;mut </span><span class="self">self</span>, emoji: <span class="kw-2">&amp;</span>Emoji) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>emoji);
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>emoji);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Mentions something that implements the [`Mentionable`] trait.
     </span><span class="kw">pub fn </span>mention&lt;M: Mentionable&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>M) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>item.mention());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>item.mention());
         <span class="self">self
     </span>}
 
@@ -1630,11 +1630,11 @@
     /// ```
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into())
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into())
     }
 
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>_push&lt;C: std::fmt::Display + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw-2">&amp;</span>C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+    </span><span class="kw">fn </span>push_&lt;C: std::fmt::Display + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw-2">&amp;</span>C) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">"{content}"</span>).unwrap();
 
         <span class="self">self
@@ -1690,7 +1690,7 @@
         }
 
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'\n'</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"\n```"</span>);
 
         <span class="self">self
@@ -1722,7 +1722,7 @@
     /// ```
     </span><span class="kw">pub fn </span>push_mono(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'`'</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'`'</span>);
 
         <span class="self">self
@@ -1751,7 +1751,7 @@
     /// ```
     </span><span class="kw">pub fn </span>push_italic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'_'</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'_'</span>);
 
         <span class="self">self
@@ -1760,7 +1760,7 @@
     <span class="doccomment">/// Pushes an inline bold text to the content.
     </span><span class="kw">pub fn </span>push_bold(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"**"</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"**"</span>);
 
         <span class="self">self
@@ -1769,7 +1769,7 @@
     <span class="doccomment">/// Pushes an underlined inline text to the content.
     </span><span class="kw">pub fn </span>push_underline(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"__"</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"__"</span>);
 
         <span class="self">self
@@ -1778,7 +1778,7 @@
     <span class="doccomment">/// Pushes a strikethrough inline text to the content.
     </span><span class="kw">pub fn </span>push_strike(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"~~"</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"~~"</span>);
 
         <span class="self">self
@@ -1787,7 +1787,7 @@
     <span class="doccomment">/// Pushes a spoiler'd inline text to the content.
     </span><span class="kw">pub fn </span>push_spoiler(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"||"</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"||"</span>);
 
         <span class="self">self
@@ -1796,7 +1796,7 @@
     <span class="doccomment">/// Pushes a quoted inline text to the content
     </span><span class="kw">pub fn </span>push_quote(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: <span class="kw">impl </span>Into&lt;Content&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"&gt; "</span>);
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>content.into());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>content.into());
 
         <span class="self">self
     </span>}
@@ -1969,7 +1969,7 @@
             c.inner =
                 normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">'*'</span>, <span class="string">"\\*"</span>).replace(<span class="string">'`'</span>, <span class="string">"\\`"</span>).replace(<span class="string">'_'</span>, <span class="string">"\\_"</span>);
 
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
 
         <span class="self">self
@@ -1991,7 +1991,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"```"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"\n```"</span>);
 
@@ -2004,7 +2004,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">'`'</span>, <span class="string">"'"</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'`'</span>);
 
@@ -2017,7 +2017,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">'_'</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">'_'</span>);
 
@@ -2030,7 +2030,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"**"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"**"</span>);
 
@@ -2043,7 +2043,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"__"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"__"</span>);
 
@@ -2056,7 +2056,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"~~"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"~~"</span>);
 
@@ -2069,7 +2069,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"||"</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"||"</span>);
 
@@ -2082,7 +2082,7 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = content.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">"&gt; "</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
 
         <span class="self">self
@@ -2276,7 +2276,7 @@
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
     </span><span class="kw">pub fn </span>role&lt;R: Into&lt;RoleId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, role: R) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>role.into().mention());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>role.into().mention());
         <span class="self">self
     </span>}
 
@@ -2291,7 +2291,7 @@
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
     </span><span class="kw">pub fn </span>user&lt;U: Into&lt;UserId&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: U) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="self">self</span>._push(<span class="kw-2">&amp;</span>user.into().mention());
+        <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>user.into().mention());
         <span class="self">self
     </span>}
 }
@@ -2393,13 +2393,13 @@
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = name.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">']'</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push_str(<span class="string">"]("</span>);
         {
             <span class="kw">let </span><span class="kw-2">mut </span>c = url.into();
             c.inner = normalize(<span class="kw-2">&amp;</span>c.inner).replace(<span class="string">')'</span>, <span class="string">" "</span>);
-            <span class="self">self</span>._push(<span class="kw-2">&amp;</span>c);
+            <span class="self">self</span>.push_(<span class="kw-2">&amp;</span>c);
         }
         <span class="self">self</span>.<span class="number">0</span>.push(<span class="string">')'</span>);
 
