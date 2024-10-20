@@ -101,6 +101,7 @@ pub mod gateway;
 pub mod http;
 #[cfg(feature = "interactions_endpoint")]
 pub mod interactions_endpoint;
+pub mod secret_string;
 #[cfg(feature = "utils")]
 pub mod utils;
 

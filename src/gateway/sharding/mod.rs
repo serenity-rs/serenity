@@ -45,7 +45,6 @@ use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
 use aformat::{aformat, CapStr};
-use secrecy::{ExposeSecret as _, Secret};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
@@ -57,7 +56,6 @@ pub use self::shard_queuer::{ShardQueue, ShardQueuer, ShardQueuerMessage};
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, close_codes};
-use crate::http::Token;
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
@@ -111,7 +109,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason - not started within
     // a decent amount of time.
     pub started: Instant,
-    token: Secret<Token>,
+    token: SecretString,
     ws_url: Arc<str>,
     resume_ws_url: Option<FixedString>,
     pub intents: GatewayIntents,
@@ -133,13 +131,14 @@ impl Shard {
     /// use serenity::gateway::Shard;
     /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// use serenity::model::id::ShardId;
+    /// use serenity::secret_string::SecretString;
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
-    /// let token = Arc::from(std::env::var("DISCORD_BOT_TOKEN")?);
+    /// let token = SecretString::new(Arc::from(std::env::var("DISCORD_BOT_TOKEN")?));
     /// let shard_info = ShardInfo {
     ///     id: ShardId(0),
     ///     total: NonZeroU16::MIN,
@@ -161,7 +160,7 @@ impl Shard {
     /// TLS error.
     pub async fn new(
         ws_url: Arc<str>,
-        token: Arc<str>,
+        token: SecretString,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
@@ -188,7 +187,7 @@ impl Shard {
             seq,
             stage,
             started: Instant::now(),
-            token: Token::new(token),
+            token,
             session_id,
             shard_info,
             ws_url,
