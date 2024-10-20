@@ -5,6 +5,8 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
+#[cfg(feature = "builder")]
+use crate::builder::CreateMessageReference;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -1086,6 +1088,22 @@ pub struct MessageActivity {
     pub party_id: Option<String>,
 }
 
+enum_number! {
+    /// Message Reference Type information
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/message#message-reference-types)
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum MessageReferenceKind {
+        #[default]
+        Default = 0,
+        Forward = 1,
+        _ => Unknown(u8),
+    }
+}
+
 /// Reference data sent with crossposted messages.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).
@@ -1093,6 +1111,9 @@ pub struct MessageActivity {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageReference {
+    /// The Type of Message Reference
+    #[serde(rename = "type", default = "MessageReferenceKind::default")]
+    pub kind: MessageReferenceKind,
     /// ID of the originating message.
     pub message_id: Option<MessageId>,
     /// ID of the originating message's channel.
@@ -1107,6 +1128,7 @@ pub struct MessageReference {
 impl From<&Message> for MessageReference {
     fn from(m: &Message) -> Self {
         Self {
+            kind: MessageReferenceKind::default(),
             message_id: Some(m.id),
             channel_id: m.channel_id,
             guild_id: m.guild_id,
@@ -1115,9 +1137,24 @@ impl From<&Message> for MessageReference {
     }
 }
 
+#[cfg(feature = "builder")]
+impl From<CreateMessageReference> for MessageReference {
+    fn from(value: CreateMessageReference) -> Self {
+        Self {
+            kind: value.kind,
+            message_id: value.message_id,
+            channel_id: value.channel_id,
+            guild_id: value.guild_id,
+            fail_if_not_exists: value.fail_if_not_exists,
+        }
+    }
+}
+
 impl From<(ChannelId, MessageId)> for MessageReference {
+    // TODO(next): Remove this
     fn from(pair: (ChannelId, MessageId)) -> Self {
         Self {
+            kind: MessageReferenceKind::default(),
             message_id: Some(pair.1),
             channel_id: pair.0,
             guild_id: None,
