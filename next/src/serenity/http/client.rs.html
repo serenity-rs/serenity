@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d8951b3ccd3cbca.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (55a22d2a6 2024-10-06)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>client.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (da935398d 2024-10-19)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>client.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -4451,7 +4451,29 @@
 <a href="#4450" id="4450">4450</a>
 <a href="#4451" id="4451">4451</a>
 <a href="#4452" id="4452">4452</a>
-<a href="#4453" id="4453">4453</a></pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
+<a href="#4453" id="4453">4453</a>
+<a href="#4454" id="4454">4454</a>
+<a href="#4455" id="4455">4455</a>
+<a href="#4456" id="4456">4456</a>
+<a href="#4457" id="4457">4457</a>
+<a href="#4458" id="4458">4458</a>
+<a href="#4459" id="4459">4459</a>
+<a href="#4460" id="4460">4460</a>
+<a href="#4461" id="4461">4461</a>
+<a href="#4462" id="4462">4462</a>
+<a href="#4463" id="4463">4463</a>
+<a href="#4464" id="4464">4464</a>
+<a href="#4465" id="4465">4465</a>
+<a href="#4466" id="4466">4466</a>
+<a href="#4467" id="4467">4467</a>
+<a href="#4468" id="4468">4468</a>
+<a href="#4469" id="4469">4469</a>
+<a href="#4470" id="4470">4470</a>
+<a href="#4471" id="4471">4471</a>
+<a href="#4472" id="4472">4472</a>
+<a href="#4473" id="4473">4473</a>
+<a href="#4474" id="4474">4474</a>
+<a href="#4475" id="4475">4475</a></pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::cell::Cell;
@@ -4541,8 +4563,9 @@
     }
 }
 
-<span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API. If
-/// you do not need to use a proxy or do not need to disable the rate limiter, you can use
+<span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API
+///
+/// If you do not need to use a proxy or do not need to disable the rate limiter, you can use
 /// [`Http::new`] instead.
 ///
 /// ## Example
@@ -5268,7 +5291,7 @@
         .<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>_create_reaction(
+    <span class="kw">async fn </span>create_reaction_(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         channel_id: ChannelId,
         message_id: MessageId,
@@ -5297,7 +5320,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>._create_reaction(channel_id, message_id, reaction_type, <span class="bool-val">false</span>).<span class="kw">await
+        <span class="self">self</span>.create_reaction_(channel_id, message_id, reaction_type, <span class="bool-val">false</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Super reacts to a message.
@@ -5307,7 +5330,7 @@
         message_id: MessageId,
         reaction_type: <span class="kw-2">&amp;</span>ReactionType,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="self">self</span>._create_reaction(channel_id, message_id, reaction_type, <span class="bool-val">true</span>).<span class="kw">await
+        <span class="self">self</span>.create_reaction_(channel_id, message_id, reaction_type, <span class="bool-val">true</span>).<span class="kw">await
     </span>}
 
     <span class="doccomment">/// Creates a role.
@@ -6645,6 +6668,28 @@
         .<span class="kw">await
     </span>}
 
+    <span class="doccomment">/// Changes a voice channel's status.
+    </span><span class="kw">pub async fn </span>edit_voice_status(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        channel_id: ChannelId,
+        map: <span class="kw-2">&amp;</span><span class="kw">impl </span>serde::Serialize,
+        audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>body = to_vec(map)<span class="question-mark">?</span>;
+
+        <span class="self">self</span>.wind(<span class="number">204</span>, Request {
+            body: <span class="prelude-val">Some</span>(body),
+            multipart: <span class="prelude-val">None</span>,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Put,
+            route: Route::ChannelVoiceStatus {
+                channel_id,
+            },
+            params: <span class="prelude-val">None</span>,
+        })
+        .<span class="kw">await
+    </span>}
+
     <span class="doccomment">/// Edits a the webhook with the given data.
     </span><span class="kw">pub async fn </span>edit_webhook(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -7369,13 +7414,13 @@
         after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
         limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
-        <span class="attr">#[derive(serde::Deserialize)]
+        <span class="attr">#[derive(Deserialize)]
         </span><span class="kw">struct </span>VotersResponse {
             users: Vec&lt;User&gt;,
         }
 
         <span class="kw">let </span>(after_str, limit_str);
-        <span class="kw">let </span><span class="kw-2">mut </span>params = Vec::with_capacity(<span class="number">2</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">2</span>&gt;::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(after) = after {
             after_str = after.to_arraystring();
             params.push((<span class="string">"after"</span>, after_str.as_str()));
@@ -7536,7 +7581,6 @@
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Entitlement&gt;&gt; {
         <span class="kw">let </span>(user_id_str, sku_ids_str, before_str, after_str, limit_str, guild_id_str, exclude_str);
         <span class="kw">let </span><span class="kw-2">mut </span>params = ArrayVec::&lt;<span class="kw">_</span>, <span class="number">7</span>&gt;::new();
-
         <span class="kw">if let </span><span class="prelude-val">Some</span>(user_id) = user_id {
             user_id_str = user_id.to_arraystring();
             params.push((<span class="string">"user_id"</span>, user_id_str.as_str()));
