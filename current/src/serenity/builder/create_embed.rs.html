@@ -311,7 +311,14 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a></pre></div><pre class="rust"><code><span class="doccomment">//! Developer note:
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a></pre></div><pre class="rust"><code><span class="doccomment">//! Developer note:
 //!
 //! This is a set of embed builders for rich embeds.
 //!
@@ -413,7 +420,10 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Set the image associated with the embed. This only supports HTTP(S).
+    <span class="doccomment">/// Set the image associated with the embed.
+    ///
+    /// Refer [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files)
+    /// for rules on naming local attachments.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>image(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.image = <span class="prelude-val">Some</span>(EmbedImage {
@@ -425,7 +435,7 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Set the thumbnail of the embed. This only supports HTTP(S).
+    <span class="doccomment">/// Set the thumbnail of the embed.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>thumbnail(<span class="kw-2">mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.thumbnail = <span class="prelude-val">Some</span>(EmbedThumbnail {
@@ -475,6 +485,8 @@
     ///
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
     /// with the provided filename. Or else this won't work.
+    ///
+    /// Refer [`Self::image`] for rules on naming local attachments.
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
     </span><span class="attr">#[inline]
@@ -612,7 +624,9 @@
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Set the icon URL's value. This only supports HTTP(S).
+    <span class="doccomment">/// Set the icon URL's value.
+    ///
+    /// Refer [`CreateEmbed::image`] for rules on naming local attachments.
     </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">mut </span><span class="self">self</span>, icon_url: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.icon_url = <span class="prelude-val">Some</span>(icon_url.into());
         <span class="self">self
