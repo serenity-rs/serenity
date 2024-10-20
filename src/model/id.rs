@@ -343,12 +343,20 @@ mod snowflake {
     use serde::{Deserializer, Serializer};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NonZeroU64, D::Error> {
-        deserializer.deserialize_any(SnowflakeVisitor)
+        if deserializer.is_human_readable() {
+            deserializer.deserialize_any(SnowflakeVisitor)
+        } else {
+            deserializer.deserialize_u64(SnowflakeVisitor)
+        }
     }
 
     #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S: Serializer>(id: &NonZeroU64, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.collect_str(&id.get())
+        if serializer.is_human_readable() {
+            serializer.collect_str(&id.get())
+        } else {
+            serializer.serialize_u64(id.get())
+        }
     }
 
     struct SnowflakeVisitor;
