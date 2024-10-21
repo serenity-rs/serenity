@@ -26,7 +26,6 @@ macro_rules! event_handler {
                 $( #[deprecated = $deprecated] )?
                 async fn $method_name(&self, $($context: Context,)? $( $arg_name: $arg_type ),*) {
                     // Suppress unused argument warnings
-                    #[allow(dropping_references, dropping_copy_types)]
                     drop(( $($context,)? $($arg_name),* ))
                 }
             )*
@@ -43,10 +42,7 @@ macro_rules! event_handler {
             /// in a timely manner. It is recommended to keep the runtime
             /// complexity of the filter code low to avoid unnecessarily blocking
             /// your bot.
-            fn filter_event(&self, context: &Context, event: &Event) -> bool {
-                // Suppress unused argument warnings
-                #[allow(dropping_references, dropping_copy_types)]
-                drop((context, event));
+            fn filter_event(&self, _context: &Context, _event: &Event) -> bool {
                 true
             }
         }
@@ -79,7 +75,6 @@ macro_rules! event_handler {
             /// ```
             #[must_use]
             pub fn snake_case_name(&self) -> &'static str {
-                #[allow(deprecated)]
                 match self {
                     $(
                         $( #[cfg(feature = $feature)] )?
@@ -90,7 +85,6 @@ macro_rules! event_handler {
 
             /// Runs the given [`EventHandler`]'s code for this event.
             pub async fn dispatch(self, ctx: Context, handler: &dyn EventHandler) {
-                #[allow(deprecated)]
                 match self {
                     $(
                         $( #[cfg(feature = $feature)] )?
@@ -527,10 +521,8 @@ pub trait RawEventHandler: Send + Sync {
     /// in a timely manner. It is recommended to keep the runtime
     /// complexity of the filter code low to avoid unnecessarily blocking
     /// your bot.
-    fn filter_event(&self, context: &Context, event: &Event) -> bool {
+    fn filter_event(&self, _context: &Context, _event: &Event) -> bool {
         // Suppress unused argument warnings
-        #[allow(dropping_references, dropping_copy_types)]
-        drop((context, event));
         true
     }
 }

@@ -119,8 +119,8 @@ impl<'a> Request<'a> {
     }
 
     #[must_use]
-    pub fn headers_ref(&self) -> &Option<Headers> {
-        &self.headers
+    pub fn headers_ref(&self) -> Option<&Headers> {
+        self.headers.as_ref()
     }
 
     #[must_use]
