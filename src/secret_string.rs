@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 /// A cheaply clonable, zeroed on drop, String.
 ///
-/// This is a simple newtype of `Arc<str>` that uses [`zeroize::Zeroize`] on on last drop to avoid
+/// This is a simple newtype of `Arc<str>` that uses [`zeroize::Zeroize`] on last drop to avoid
 /// keeping it around in memory.
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct SecretString(Arc<str>);
