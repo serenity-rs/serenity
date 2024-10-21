@@ -214,6 +214,10 @@ routes! ('a, {
     api!("/guilds/{}/audit-logs", guild_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));
 
+    GuildOnboarding { guild_id: GuildId },
+    api!("/guilds/{}/onboarding", guild_id),
+    Some(RatelimitingKind::PathAndId(guild_id.into()));
+
     GuildAutomodRule { guild_id: GuildId, rule_id: RuleId },
     api!("/guilds/{}/auto-moderation/rules/{}", guild_id, rule_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));
