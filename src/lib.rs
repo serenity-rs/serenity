@@ -60,6 +60,7 @@
     clippy::fallible_impl_from,
     clippy::let_underscore_must_use,
     clippy::format_push_string,
+    clippy::allow_attributes,
     clippy::pedantic
 )]
 #![allow(
