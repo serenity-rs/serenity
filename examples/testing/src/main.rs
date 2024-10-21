@@ -389,8 +389,7 @@ impl EventHandler for Handler {
                 i.create_response(
                     &ctx.http,
                     CreateInteractionResponse::Autocomplete(
-                        CreateAutocompleteResponse::new()
-                            .add_string_choice("suggestion", "suggestion"),
+                        CreateAutocompleteResponse::new().add_choice("suggestion"),
                     ),
                 )
                 .await
