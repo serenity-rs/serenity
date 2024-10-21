@@ -289,19 +289,59 @@ impl<'a> CreateInteractionResponseMessage<'a> {
     super::button_and_select_menu_convenience_methods!(self.components);
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+#[non_exhaustive]
+#[must_use]
+pub enum AutocompleteValue<'a> {
+    String(Cow<'a, str>),
+    Integer(u64),
+    Float(f64),
+}
+
+impl<'a> From<Cow<'a, str>> for AutocompleteValue<'a> {
+    fn from(value: Cow<'a, str>) -> Self {
+        Self::String(value)
+    }
+}
+
+impl From<String> for AutocompleteValue<'static> {
+    fn from(value: String) -> Self {
+        Self::String(Cow::Owned(value))
+    }
+}
+
+impl<'a> From<&'a str> for AutocompleteValue<'a> {
+    fn from(value: &'a str) -> Self {
+        Self::String(Cow::Borrowed(value))
+    }
+}
+
+impl From<u64> for AutocompleteValue<'static> {
+    fn from(value: u64) -> Self {
+        Self::Integer(value)
+    }
+}
+
+impl From<f64> for AutocompleteValue<'static> {
+    fn from(value: f64) -> Self {
+        Self::Float(value)
+    }
+}
+
 // Same as CommandOptionChoice according to Discord, see
 // [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 #[must_use]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct AutocompleteChoice<'a> {
     pub name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
-    pub value: Value,
+    pub value: AutocompleteValue<'a>,
 }
 
 impl<'a> AutocompleteChoice<'a> {
-    pub fn new(name: impl Into<Cow<'a, str>>, value: impl Into<Value>) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>, value: impl Into<AutocompleteValue<'a>>) -> Self {
         Self {
             name: name.into(),
             name_localizations: None,
@@ -352,36 +392,14 @@ impl<'a> CreateAutocompleteResponse<'a> {
         self
     }
 
-    /// Add an int autocomplete choice.
+    /// Add an autocomplete choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
-    /// characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice(self, name: impl Into<Cow<'a, str>>, value: i64) -> Self {
-        self.add_choice(AutocompleteChoice::new(name, value))
-    }
-
-    /// Adds a string autocomplete choice.
-    ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
-    /// characters. Value must be up to 100 characters.
-    pub fn add_string_choice(
-        self,
-        name: impl Into<Cow<'a, str>>,
-        value: impl Into<Cow<'a, str>>,
-    ) -> Self {
-        self.add_choice(AutocompleteChoice::new(name, value.into()))
-    }
-
-    /// Adds a number autocomplete choice.
-    ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
-    /// characters. Value must be between -2^53 and 2^53.
-    pub fn add_number_choice(self, name: impl Into<Cow<'a, str>>, value: f64) -> Self {
-        self.add_choice(AutocompleteChoice::new(name, value))
-    }
-
-    fn add_choice(mut self, value: AutocompleteChoice<'a>) -> Self {
-        self.choices.to_mut().push(value);
+    /// # Limitations
+    /// - There can be no more than 25 choices set.
+    /// - Name must be between 1 and 100 characters.
+    /// - If value is an integer/float must be between -2^53 and 2^53.
+    pub fn add_choice(mut self, value: impl Into<AutocompleteChoice<'a>>) -> Self {
+        self.choices.to_mut().push(value.into());
         self
     }
 
