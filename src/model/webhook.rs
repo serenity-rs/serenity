@@ -121,7 +121,7 @@ impl WebhookGuild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    pub async fn to_partial_guild(self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
+    pub async fn to_partial_guild(&self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -142,7 +142,7 @@ impl WebhookGuild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
-    pub async fn to_partial_guild_with_counts(self, http: &Http) -> Result<PartialGuild> {
+    pub async fn to_partial_guild_with_counts(&self, http: &Http) -> Result<PartialGuild> {
         http.get_guild_with_counts(self.id).await
     }
 }

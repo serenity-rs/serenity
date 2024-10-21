@@ -133,18 +133,20 @@ impl Timestamp {
     }
 
     #[must_use]
-    pub fn to_rfc3339(&self) -> Option<String> {
+    pub fn to_rfc3339(self) -> String {
         #[cfg(feature = "chrono")]
-        let x = self.0.to_rfc3339_opts(SecondsFormat::Millis, true);
+        return self.0.to_rfc3339_opts(SecondsFormat::Millis, true);
         #[cfg(not(feature = "chrono"))]
-        let x = self.0.format(&Rfc3339).ok()?;
-        Some(x)
+        return self
+            .0
+            .format(&Rfc3339)
+            .expect("as the OffsetDateTime is always parsed from rfc3339, this should never fail");
     }
 }
 
 impl std::fmt::Display for Timestamp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.to_rfc3339().ok_or(std::fmt::Error)?)
+        f.write_str(&self.to_rfc3339())
     }
 }
 
