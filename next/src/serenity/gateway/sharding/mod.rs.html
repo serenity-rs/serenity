@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/sharding/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (da935398d 2024-10-19)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/gateway/sharding/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/gateway/sharding/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (662180b34 2024-10-20)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../../static.files/storage-59e33391.js"></script><script defer src="../../../../static.files/src-script-56102188.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/gateway/sharding/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -953,8 +953,7 @@
 <a href="#952" id="952">952</a>
 <a href="#953" id="953">953</a>
 <a href="#954" id="954">954</a>
-<a href="#955" id="955">955</a>
-<a href="#956" id="956">956</a></pre></div><pre class="rust"><code><span class="doccomment">//! Module containing types for gateway sharding.
+<a href="#955" id="955">955</a></pre></div><pre class="rust"><code><span class="doccomment">//! Module containing types for gateway sharding.
 //!
 //! Sharding is a method for load-balancing bots across separate threads or processes. Sharding is
 //! enforced on bots by Discord once they reach a certain number of guilds (2500). Once this
@@ -1001,7 +1000,6 @@
 <span class="kw">use </span>std::time::{Duration <span class="kw">as </span>StdDuration, Instant};
 
 <span class="kw">use </span>aformat::{aformat, CapStr};
-<span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>tokio_tungstenite::tungstenite::error::Error <span class="kw">as </span>TungsteniteError;
 <span class="kw">use </span>tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 <span class="kw">use </span>tracing::{debug, error, info, trace, warn};
@@ -1013,7 +1011,6 @@
 <span class="kw">pub use </span><span class="self">self</span>::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
 <span class="kw">use super</span>::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 <span class="kw">use </span><span class="kw">crate</span>::constants::{<span class="self">self</span>, close_codes};
-<span class="kw">use </span><span class="kw">crate</span>::http::Token;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::event::{Event, GatewayEvent};
 <span class="kw">use </span><span class="kw">crate</span>::model::gateway::{GatewayIntents, ShardInfo};
@@ -1067,7 +1064,7 @@
     </span><span class="comment">// This acts as a timeout to determine if the shard has - for some reason - not started within
     // a decent amount of time.
     </span><span class="kw">pub </span>started: Instant,
-    token: Secret&lt;Token&gt;,
+    token: SecretString,
     ws_url: Arc&lt;str&gt;,
     resume_ws_url: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
     <span class="kw">pub </span>intents: GatewayIntents,
@@ -1089,13 +1086,14 @@
     /// use serenity::gateway::Shard;
     /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// use serenity::model::id::ShardId;
+    /// use serenity::secret_string::SecretString;
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
     /// # let http: Arc&lt;Http&gt; = unimplemented!();
-    /// let token = Arc::from(std::env::var("DISCORD_BOT_TOKEN")?);
+    /// let token = SecretString::new(Arc::from(std::env::var("DISCORD_BOT_TOKEN")?));
     /// let shard_info = ShardInfo {
     ///     id: ShardId(0),
     ///     total: NonZeroU16::MIN,
@@ -1117,7 +1115,7 @@
     /// TLS error.
     </span><span class="kw">pub async fn </span>new(
         ws_url: Arc&lt;str&gt;,
-        token: Arc&lt;str&gt;,
+        token: SecretString,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: <span class="prelude-ty">Option</span>&lt;PresenceData&gt;,
@@ -1144,7 +1142,7 @@
             seq,
             stage,
             started: Instant::now(),
-            token: Token::new(token),
+            token,
             session_id,
             shard_info,
             ws_url,

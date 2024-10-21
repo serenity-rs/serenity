@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (da935398d 2024-10-19)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>client.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/client.rs`."><title>client.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (662180b34 2024-10-20)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>client.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -4444,36 +4444,7 @@
 <a href="#4443" id="4443">4443</a>
 <a href="#4444" id="4444">4444</a>
 <a href="#4445" id="4445">4445</a>
-<a href="#4446" id="4446">4446</a>
-<a href="#4447" id="4447">4447</a>
-<a href="#4448" id="4448">4448</a>
-<a href="#4449" id="4449">4449</a>
-<a href="#4450" id="4450">4450</a>
-<a href="#4451" id="4451">4451</a>
-<a href="#4452" id="4452">4452</a>
-<a href="#4453" id="4453">4453</a>
-<a href="#4454" id="4454">4454</a>
-<a href="#4455" id="4455">4455</a>
-<a href="#4456" id="4456">4456</a>
-<a href="#4457" id="4457">4457</a>
-<a href="#4458" id="4458">4458</a>
-<a href="#4459" id="4459">4459</a>
-<a href="#4460" id="4460">4460</a>
-<a href="#4461" id="4461">4461</a>
-<a href="#4462" id="4462">4462</a>
-<a href="#4463" id="4463">4463</a>
-<a href="#4464" id="4464">4464</a>
-<a href="#4465" id="4465">4465</a>
-<a href="#4466" id="4466">4466</a>
-<a href="#4467" id="4467">4467</a>
-<a href="#4468" id="4468">4468</a>
-<a href="#4469" id="4469">4469</a>
-<a href="#4470" id="4470">4470</a>
-<a href="#4471" id="4471">4471</a>
-<a href="#4472" id="4472">4472</a>
-<a href="#4473" id="4473">4473</a>
-<a href="#4474" id="4474">4474</a>
-<a href="#4475" id="4475">4475</a></pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
+<a href="#4446" id="4446">4446</a></pre></div><pre class="rust"><code><span class="attr">#![allow(clippy::missing_errors_doc)]
 
 </span><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::cell::Cell;
@@ -4488,7 +4459,6 @@
 <span class="attr">#[cfg(feature = <span class="string">"utils"</span>)]
 </span><span class="kw">use </span>reqwest::Url;
 <span class="kw">use </span>reqwest::{Client, ClientBuilder, Response <span class="kw">as </span>ReqwestResponse, StatusCode};
-<span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>serde::de::DeserializeOwned;
 <span class="kw">use </span>serde::ser::SerializeSeq <span class="kw">as _</span>;
 <span class="kw">use </span>serde_json::{from_value, to_string, to_vec};
@@ -4511,34 +4481,6 @@
 <span class="kw">use </span><span class="kw">crate</span>::constants;
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-
-<span class="attr">#[derive(Clone)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Token(Arc&lt;str&gt;);
-
-<span class="kw">impl </span>Token {
-    <span class="kw">pub fn </span>new(inner: Arc&lt;str&gt;) -&gt; Secret&lt;<span class="self">Self</span>&gt; {
-        Secret::new(<span class="self">Self</span>(inner))
-    }
-}
-
-<span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>Token {
-    <span class="kw">type </span>Target = str;
-
-    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
-    </span>}
-}
-
-<span class="kw">impl </span>secrecy::Zeroize <span class="kw">for </span>Token {
-    <span class="kw">fn </span>zeroize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(string) = Arc::get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>) {
-            string.zeroize();
-        }
-    }
-}
-
-<span class="kw">impl </span>secrecy::CloneableSecret <span class="kw">for </span>Token {}
-<span class="kw">impl </span>secrecy::DebugSecret <span class="kw">for </span>Token {}
 
 <span class="comment">// NOTE: This cannot be passed in from outside, due to `Cell` being !Send.
 </span><span class="kw">struct </span>SerializeIter&lt;I&gt;(Cell&lt;<span class="prelude-ty">Option</span>&lt;I&gt;&gt;);
@@ -4704,7 +4646,7 @@
             client,
             ratelimiter,
             proxy: <span class="self">self</span>.proxy,
-            token: Token::new(<span class="self">self</span>.token),
+            token: SecretString::new(<span class="self">self</span>.token),
             application_id,
             default_allowed_mentions: <span class="self">self</span>.default_allowed_mentions,
         }
@@ -4743,7 +4685,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) client: Client,
     <span class="kw">pub </span>ratelimiter: <span class="prelude-ty">Option</span>&lt;Ratelimiter&gt;,
     <span class="kw">pub </span>proxy: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u16&gt;&gt;,
-    token: Secret&lt;Token&gt;,
+    token: SecretString,
     application_id: AtomicU64,
     <span class="kw">pub </span>default_allowed_mentions: <span class="prelude-ty">Option</span>&lt;CreateAllowedMentions&lt;<span class="lifetime">'static</span>&gt;&gt;,
 }
@@ -4772,9 +4714,9 @@
     }
 
     <span class="attr">#[cfg(feature = <span class="string">"gateway"</span>)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;str&gt; {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.token.expose_secret().<span class="number">0
-    </span>}
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SecretString {
+        <span class="self">self</span>.token.clone()
+    }
 
     <span class="doccomment">/// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
     ///

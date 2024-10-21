@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/ratelimiting.rs`."><title>ratelimiting.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (da935398d 2024-10-19)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>ratelimiting.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/ratelimiting.rs`."><title>ratelimiting.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-a5dc3bae.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-nightly (662180b34 2024-10-20)" data-channel="nightly" data-search-js="search-c5a66128.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>ratelimiting.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -499,8 +499,7 @@
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
 <a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
-<a href="#502" id="502">502</a></pre></div><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
+<a href="#501" id="501">501</a></pre></div><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the different _types_ of
 //! routes - such as getting the current user's channels - for the most part, with the exception
 //! being major parameters.
 //!
@@ -546,13 +545,12 @@
 <span class="kw">use </span>dashmap::DashMap;
 <span class="kw">use </span>reqwest::header::HeaderMap;
 <span class="kw">use </span>reqwest::{Client, Response, StatusCode};
-<span class="kw">use </span>secrecy::{ExposeSecret <span class="kw">as _</span>, Secret};
 <span class="kw">use </span>tokio::sync::Mutex;
 <span class="kw">use </span>tokio::time::{sleep, Duration};
 <span class="kw">use </span>tracing::debug;
 
 <span class="kw">pub use </span><span class="kw">super</span>::routing::RatelimitingBucket;
-<span class="kw">use super</span>::{HttpError, LightMethod, Request, Token};
+<span class="kw">use super</span>::{HttpError, LightMethod, Request};
 <span class="kw">use </span><span class="kw">crate</span>::internal::prelude::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
@@ -588,7 +586,7 @@
     client: Client,
     global: Mutex&lt;()&gt;,
     routes: DashMap&lt;RatelimitingBucket, Ratelimit&gt;,
-    token: Secret&lt;Token&gt;,
+    token: SecretString,
     absolute_ratelimits: bool,
     ratelimit_callback: parking_lot::RwLock&lt;Box&lt;<span class="kw">dyn </span>Fn(RatelimitInfo) + Send + Sync&gt;&gt;,
 }
@@ -614,7 +612,7 @@
     </span><span class="kw">pub fn </span>new(client: Client, token: Arc&lt;str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             client,
-            token: Token::new(token),
+            token: SecretString::new(token),
             global: Mutex::default(),
             routes: DashMap::new(),
             absolute_ratelimits: <span class="bool-val">false</span>,
