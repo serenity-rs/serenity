@@ -211,25 +211,6 @@ pub mod single_recipient {
     }
 }
 
-pub mod secret {
-    use secrecy::{ExposeSecret, Secret, Zeroize};
-    use serde::{Deserialize, Deserializer, Serialize, Serializer};
-
-    pub fn deserialize<'de, S: Deserialize<'de> + Zeroize, D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> Result<Option<Secret<S>>, D::Error> {
-        Option::<S>::deserialize(deserializer).map(|s| s.map(Secret::new))
-    }
-
-    #[allow(clippy::ref_option)]
-    pub fn serialize<S: Serialize + Zeroize, Sr: Serializer>(
-        secret: &Option<Secret<S>>,
-        serializer: Sr,
-    ) -> Result<Sr::Ok, Sr::Error> {
-        secret.as_ref().map(ExposeSecret::expose_secret).serialize(serializer)
-    }
-}
-
 pub fn discord_colours_opt<'de, D>(deserializer: D) -> Result<Option<Vec<Colour>>, D::Error>
 where
     D: Deserializer<'de>,
