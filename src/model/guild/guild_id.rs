@@ -902,7 +902,7 @@ impl GuildId {
 
     /// Gets the default permission role (@everyone) from the guild.
     #[must_use]
-    pub fn everyone_role(&self) -> RoleId {
+    pub fn everyone_role(self) -> RoleId {
         RoleId::from(self.get())
     }
 
@@ -1410,7 +1410,7 @@ impl GuildId {
 
     /// Same as [`Self::await_reply`].
     #[cfg(feature = "collector")]
-    pub fn await_replies(&self, shard_messenger: ShardMessenger) -> MessageCollector {
+    pub fn await_replies(self, shard_messenger: ShardMessenger) -> MessageCollector {
         self.await_reply(shard_messenger)
     }
 
@@ -1423,7 +1423,7 @@ impl GuildId {
 
     /// Same as [`Self::await_reaction`].
     #[cfg(feature = "collector")]
-    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
+    pub fn await_reactions(self, shard_messenger: ShardMessenger) -> ReactionCollector {
         self.await_reaction(shard_messenger)
     }
 

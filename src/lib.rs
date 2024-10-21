@@ -74,6 +74,7 @@
     clippy::doc_markdown,
     clippy::missing_panics_doc,
     clippy::doc_link_with_quotes,
+    clippy::struct_field_names
 )]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 
