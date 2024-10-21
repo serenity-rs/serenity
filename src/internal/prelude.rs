@@ -13,5 +13,6 @@ pub use super::utils::join_to_string;
 #[cfg(feature = "http")]
 pub use crate::error::Error;
 pub use crate::error::Result;
+pub use crate::secret_string::SecretString;
 
 pub type JsonMap = serde_json::Map<String, Value>;
