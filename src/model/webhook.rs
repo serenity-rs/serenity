@@ -1,11 +1,6 @@
 //! Webhook model and implementations.
 
 #[cfg(feature = "model")]
-use secrecy::ExposeSecret;
-use secrecy::SecretString;
-
-use super::utils::secret;
-#[cfg(feature = "model")]
 use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, GuildRef};
@@ -76,7 +71,6 @@ pub struct Webhook {
     /// This can be temporarily overridden via [`ExecuteWebhook::avatar_url`].
     pub avatar: Option<ImageHash>,
     /// The webhook's secure token.
-    #[serde(with = "secret", default)]
     pub token: Option<SecretString>,
     /// The bot/OAuth2 application that created this webhook.
     pub application_id: Option<ApplicationId>,
@@ -87,7 +81,6 @@ pub struct Webhook {
     /// [`WebhookType::ChannelFollower`]).
     pub source_channel: Option<WebhookChannel>,
     /// The url used for executing the webhook (returned by the webhooks OAuth2 flow).
-    #[serde(with = "secret", default)]
     pub url: Option<SecretString>,
 }
 
@@ -314,7 +307,7 @@ impl Webhook {
     ///
     /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
     pub async fn edit(&mut self, http: &Http, builder: EditWebhook<'_>) -> Result<()> {
-        let token = self.token.as_ref().map(ExposeSecret::expose_secret).map(String::as_str);
+        let token = self.token.as_ref().map(SecretString::expose_secret);
         *self = builder.execute(http, self.id, token).await?;
         Ok(())
     }
