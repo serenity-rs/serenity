@@ -13,7 +13,6 @@ use reqwest::header::{HeaderMap as Headers, HeaderValue};
 #[cfg(feature = "utils")]
 use reqwest::Url;
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
-use secrecy::{ExposeSecret as _, Secret};
 use serde::de::DeserializeOwned;
 use serde::ser::SerializeSeq as _;
 use serde_json::{from_value, to_string, to_vec};
@@ -36,34 +35,6 @@ use crate::builder::{CreateAllowedMentions, CreateAttachment};
 use crate::constants;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-
-#[derive(Clone)]
-pub(crate) struct Token(Arc<str>);
-
-impl Token {
-    pub fn new(inner: Arc<str>) -> Secret<Self> {
-        Secret::new(Self(inner))
-    }
-}
-
-impl std::ops::Deref for Token {
-    type Target = str;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl secrecy::Zeroize for Token {
-    fn zeroize(&mut self) {
-        if let Some(string) = Arc::get_mut(&mut self.0) {
-            string.zeroize();
-        }
-    }
-}
-
-impl secrecy::CloneableSecret for Token {}
-impl secrecy::DebugSecret for Token {}
 
 // NOTE: This cannot be passed in from outside, due to `Cell` being !Send.
 struct SerializeIter<I>(Cell<Option<I>>);
@@ -229,7 +200,7 @@ impl HttpBuilder {
             client,
             ratelimiter,
             proxy: self.proxy,
-            token: Token::new(self.token),
+            token: SecretString::new(self.token),
             application_id,
             default_allowed_mentions: self.default_allowed_mentions,
         }
@@ -268,7 +239,7 @@ pub struct Http {
     pub(crate) client: Client,
     pub ratelimiter: Option<Ratelimiter>,
     pub proxy: Option<FixedString<u16>>,
-    token: Secret<Token>,
+    token: SecretString,
     application_id: AtomicU64,
     pub default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
@@ -297,8 +268,8 @@ impl Http {
     }
 
     #[cfg(feature = "gateway")]
-    pub(crate) fn token(&self) -> &Arc<str> {
-        &self.token.expose_secret().0
+    pub(crate) fn token(&self) -> SecretString {
+        self.token.clone()
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
