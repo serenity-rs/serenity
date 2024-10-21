@@ -44,13 +44,12 @@ use std::time::SystemTime;
 use dashmap::DashMap;
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
-use secrecy::{ExposeSecret as _, Secret};
 use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
 use tracing::debug;
 
 pub use super::routing::RatelimitingBucket;
-use super::{HttpError, LightMethod, Request, Token};
+use super::{HttpError, LightMethod, Request};
 use crate::internal::prelude::*;
 
 /// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
@@ -86,7 +85,7 @@ pub struct Ratelimiter {
     client: Client,
     global: Mutex<()>,
     routes: DashMap<RatelimitingBucket, Ratelimit>,
-    token: Secret<Token>,
+    token: SecretString,
     absolute_ratelimits: bool,
     ratelimit_callback: parking_lot::RwLock<Box<dyn Fn(RatelimitInfo) + Send + Sync>>,
 }
@@ -112,7 +111,7 @@ impl Ratelimiter {
     pub fn new(client: Client, token: Arc<str>) -> Self {
         Self {
             client,
-            token: Token::new(token),
+            token: SecretString::new(token),
             global: Mutex::default(),
             routes: DashMap::new(),
             absolute_ratelimits: false,
