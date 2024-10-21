@@ -60,6 +60,7 @@
     clippy::fallible_impl_from,
     clippy::let_underscore_must_use,
     clippy::format_push_string,
+    clippy::allow_attributes,
     clippy::pedantic
 )]
 #![allow(
@@ -74,6 +75,7 @@
     clippy::doc_markdown,
     clippy::missing_panics_doc,
     clippy::doc_link_with_quotes,
+    clippy::struct_field_names
 )]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 
