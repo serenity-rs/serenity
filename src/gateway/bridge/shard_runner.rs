@@ -108,7 +108,8 @@ impl ShardRunner {
             if !self.shard.do_heartbeat().await {
                 warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
 
-                return self.request_restart().await;
+                self.request_restart().await;
+                return Ok(());
             }
 
             let pre = self.shard.stage();
@@ -133,7 +134,8 @@ impl ShardRunner {
 
             match action {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
-                    return self.request_restart().await;
+                    self.request_restart().await;
+                    return Ok(());
                 },
                 Some(other) => {
                     if let Err(e) = self.action(&other).await {
@@ -144,7 +146,10 @@ impl ShardRunner {
                             e
                         );
                         match self.shard.reconnection_type() {
-                            ReconnectType::Reidentify => return self.request_restart().await,
+                            ReconnectType::Reidentify => {
+                                self.request_restart().await;
+                                return Ok(());
+                            },
                             ReconnectType::Resume => {
                                 if let Err(why) = self.shard.resume().await {
                                     warn!(
@@ -153,7 +158,8 @@ impl ShardRunner {
                                         why
                                     );
 
-                                    return self.request_restart().await;
+                                    self.request_restart().await;
+                                    return Ok(());
                                 }
                             },
                         };
@@ -177,7 +183,8 @@ impl ShardRunner {
             }
 
             if !successful && !self.shard.stage().is_connecting() {
-                return self.request_restart().await;
+                self.request_restart().await;
+                return Ok(());
             }
             trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
         }
@@ -199,7 +206,10 @@ impl ShardRunner {
     #[instrument(skip(self, action))]
     async fn action(&mut self, action: &ShardAction) -> Result<()> {
         match *action {
-            ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart().await,
+            ShardAction::Reconnect(ReconnectType::Reidentify) => {
+                self.request_restart().await;
+                Ok(())
+            },
             ShardAction::Reconnect(ReconnectType::Resume) => self.shard.resume().await,
             ShardAction::Heartbeat => self.shard.heartbeat().await,
             ShardAction::Identify => self.shard.identify().await,
@@ -356,7 +366,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
 
-                    drop(self.request_restart().await);
+                    self.request_restart().await;
                     return Ok(false);
                 },
                 Err(_) => break,
@@ -443,7 +453,7 @@ impl ShardRunner {
     }
 
     #[instrument(skip(self))]
-    async fn request_restart(&mut self) -> Result<()> {
+    async fn request_restart(&mut self) {
         debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
 
         self.update_manager().await;
@@ -455,8 +465,6 @@ impl ShardRunner {
         if let Some(voice_manager) = &self.voice_manager {
             voice_manager.deregister_shard(shard_id.0).await;
         }
-
-        Ok(())
     }
 
     #[instrument(skip(self))]
