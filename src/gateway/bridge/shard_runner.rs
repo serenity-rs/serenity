@@ -100,7 +100,7 @@ impl ShardRunner {
 
         loop {
             trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
-            if !self.recv().await? {
+            if !self.recv().await {
                 return Ok(());
             }
 
@@ -352,12 +352,12 @@ impl ShardRunner {
     // happen, as the sending half is kept on the runner.
     // Returns whether the shard runner is in a state that can continue.
     #[instrument(skip(self))]
-    async fn recv(&mut self) -> Result<bool> {
+    async fn recv(&mut self) -> bool {
         loop {
             match self.runner_rx.try_next() {
                 Ok(Some(value)) => {
                     if !self.handle_rx_value(value).await {
-                        return Ok(false);
+                        return false;
                     }
                 },
                 Ok(None) => {
@@ -367,7 +367,7 @@ impl ShardRunner {
                     );
 
                     self.request_restart().await;
-                    return Ok(false);
+                    return false;
                 },
                 Err(_) => break,
             }
@@ -375,7 +375,7 @@ impl ShardRunner {
 
         // There are no longer any values available.
 
-        Ok(true)
+        true
     }
 
     /// Returns a received event, as well as whether reading the potentially present event was
