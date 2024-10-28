@@ -33,7 +33,6 @@ use crate::http::{CacheHttp, Http, UserPagination};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
-use crate::model::guild::SerializeIter;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
@@ -263,18 +262,18 @@ impl GuildId {
     pub async fn bulk_ban(
         self,
         http: &Http,
-        users: impl IntoIterator<Item = UserId>,
+        user_ids: &[UserId],
         delete_message_seconds: u32,
         reason: Option<&str>,
     ) -> Result<BulkBanResponse> {
         #[derive(serde::Serialize)]
-        struct BulkBan<I> {
-            user_ids: I,
+        struct BulkBan<'a> {
+            user_ids: &'a [UserId],
             delete_message_seconds: u32,
         }
 
         let map = BulkBan {
-            user_ids: SerializeIter::new(users.into_iter()),
+            user_ids,
             delete_message_seconds,
         };
 

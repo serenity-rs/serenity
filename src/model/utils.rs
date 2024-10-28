@@ -1,4 +1,3 @@
-use std::cell::Cell;
 use std::fmt;
 use std::hash::Hash;
 use std::marker::PhantomData;
@@ -82,28 +81,6 @@ where
         Ok(NonZeroU64::new(val).map(Id::from))
     } else {
         Ok(None)
-    }
-}
-
-pub(super) struct SerializeIter<I>(Cell<Option<I>>);
-
-impl<I> SerializeIter<I> {
-    pub fn new(iter: I) -> Self {
-        Self(Cell::new(Some(iter)))
-    }
-}
-
-impl<Iter, Item> serde::Serialize for SerializeIter<Iter>
-where
-    Iter: Iterator<Item = Item>,
-    Item: serde::Serialize,
-{
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let Some(iter) = self.0.take() else {
-            return serializer.serialize_seq(Some(0))?.end();
-        };
-
-        serializer.collect_seq(iter)
     }
 }
 
