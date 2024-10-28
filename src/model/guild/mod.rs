@@ -77,7 +77,7 @@ pub struct Ban {
 
 /// The response from [`GuildId::bulk_ban`].
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/6720).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#bulk-guild-ban).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct BulkBanResponse {
