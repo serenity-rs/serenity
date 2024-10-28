@@ -82,9 +82,9 @@ pub struct Ban {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct BulkBanResponse {
     /// The users that were successfully banned.
-    banned_users: Vec<UserId>,
+    pub banned_users: Vec<UserId>,
     /// The users that were not successfully banned.
-    failed_users: Vec<UserId>,
+    pub failed_users: Vec<UserId>,
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
