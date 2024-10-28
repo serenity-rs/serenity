@@ -80,6 +80,7 @@ pub struct Ban {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#bulk-guild-ban).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct BulkBanResponse {
     /// The users that were successfully banned.
     pub banned_users: Vec<UserId>,

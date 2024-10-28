@@ -318,7 +318,8 @@ impl Http {
 
     /// Bans multiple users from a [`Guild`], optionally removing their messages.
     ///
-    /// See the [Discord Docs](https://github.com/discord/discord-api-docs/pull/6720) for more information.
+    /// See the [Discord docs](https://discord.com/developers/docs/resources/guild#bulk-guild-ban)
+    /// for more information.
     pub async fn bulk_ban_users(
         &self,
         guild_id: GuildId,
