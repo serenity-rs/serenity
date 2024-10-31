@@ -825,7 +825,7 @@ pub struct ShardRunnerInfo {
 ///
 /// This might happen when a shard changes from [`ConnectionStage::Identifying`] to
 /// [`ConnectionStage::Connected`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct ShardStageUpdateEvent {
     /// The new connection stage.
     pub new: ConnectionStage,
@@ -838,7 +838,7 @@ pub struct ShardStageUpdateEvent {
 /// Indicates the current connection stage of a [`Shard`].
 ///
 /// This can be useful for knowing which shards are currently "down"/"up".
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[non_exhaustive]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g., a resume phase.
