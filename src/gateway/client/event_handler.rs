@@ -49,7 +49,7 @@ macro_rules! event_handler {
 
         /// This enum stores every possible event that an [`EventHandler`] can receive.
         #[cfg_attr(not(feature = "unstable"), non_exhaustive)]
-        #[derive(Clone, Debug, VariantNames, IntoStaticStr, EnumCount)]
+        #[derive(Clone, Debug, VariantNames, IntoStaticStr, EnumCount, Serialize)]
         #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
         pub enum FullEvent {
             $(
