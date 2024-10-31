@@ -54,7 +54,7 @@ use crate::internal::prelude::*;
 
 /// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
 /// is initialized to call the `EventHandler::ratelimit()` method.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct RatelimitInfo {
     pub timeout: std::time::Duration,
