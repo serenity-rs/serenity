@@ -125,7 +125,7 @@ impl CacheHttp for Http {
 /// An method used for ratelimiting special routes.
 ///
 /// This is needed because [`reqwest`]'s [`Method`] enum does not derive Copy.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize)]
 pub enum LightMethod {
     /// Indicates that a route is for the `DELETE` method only.
     Delete,
