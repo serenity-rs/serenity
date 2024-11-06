@@ -12,7 +12,7 @@ pub fn default_true() -> bool {
 }
 
 /// Helper function for `#[serde(skip_serializing_if = "is_false")]`
-#[allow(clippy::trivially_copy_pass_by_ref)]
+#[expect(clippy::trivially_copy_pass_by_ref)]
 pub fn is_false(v: &bool) -> bool {
     !v
 }
