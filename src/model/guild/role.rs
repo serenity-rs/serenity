@@ -212,7 +212,7 @@ mod bool_as_option_unit {
         deserializer.deserialize_option(NullValueVisitor)
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref)]
+    #[expect(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S: Serializer>(_: &bool, serializer: S) -> Result<S::Ok, S::Error> {
         serializer.serialize_none()
     }

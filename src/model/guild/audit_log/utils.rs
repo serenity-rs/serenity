@@ -48,7 +48,7 @@ pub mod optional_string {
         deserializer.deserialize_option(OptionalStringVisitor::<T>(PhantomData))
     }
 
-    #[allow(clippy::ref_option)]
+    #[expect(clippy::ref_option)]
     pub fn serialize<S: Serializer>(
         value: &Option<impl ToString>,
         serializer: S,

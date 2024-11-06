@@ -43,7 +43,7 @@ impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
     ///
     /// See [ChannelId::broadcast_typing] for more details.
-    #[allow(clippy::missing_errors_doc)]
+    #[expect(clippy::missing_errors_doc)]
     pub async fn broadcast_typing(&self, http: &Http) -> Result<()> {
         self.id.broadcast_typing(http).await
     }
@@ -67,7 +67,7 @@ impl PrivateChannel {
 
     /// Deletes the channel. This does not delete the contents of the channel, and is equivalent to
     /// closing a private channel on the client, which can be re-opened.
-    #[allow(clippy::missing_errors_doc)]
+    #[expect(clippy::missing_errors_doc)]
     pub async fn delete(&self, http: &Http) -> Result<PrivateChannel> {
         let resp = self.id.delete(http, None).await?;
         resp.private().ok_or(Error::Model(ModelError::InvalidChannelType))
@@ -96,7 +96,7 @@ impl PrivateChannel {
     /// **Note**: Requires the [Manage Channel] permission.
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
-    #[allow(clippy::missing_errors_doc)]
+    #[expect(clippy::missing_errors_doc)]
     pub async fn delete_permission(
         &self,
         http: &Http,
@@ -207,7 +207,7 @@ impl PrivateChannel {
     }
 
     /// Retrieves the list of messages that have been pinned in the private channel.
-    #[allow(clippy::missing_errors_doc)]
+    #[expect(clippy::missing_errors_doc)]
     pub async fn pins(&self, http: &Http) -> Result<Vec<Message>> {
         self.id.pins(http).await
     }
