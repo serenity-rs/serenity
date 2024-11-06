@@ -389,7 +389,7 @@ mod snowflake {
         deserializer.deserialize_any(SnowflakeVisitor)
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref)]
+    #[expect(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S: Serializer>(id: &NonMaxU64, serializer: S) -> Result<S::Ok, S::Error> {
         serializer.collect_str(&id.get())
     }
