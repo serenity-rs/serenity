@@ -687,12 +687,12 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
 
 /// Fetch groups with their commands.
 #[cfg(feature = "cache")]
-async fn create_command_group_commands_pair_from_groups<'a>(
+async fn create_command_group_commands_pair_from_groups(
     ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
     owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
-    help_options: &'a HelpOptions,
+    help_options: &HelpOptions,
 ) -> Vec<GroupCommandsPair> {
     let mut listed_groups: Vec<GroupCommandsPair> = Vec::default();
 

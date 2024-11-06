@@ -948,10 +948,10 @@ impl Guild {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-    pub async fn create_sticker<'a>(
+    pub async fn create_sticker(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateSticker<'a>,
+        builder: CreateSticker<'_>,
     ) -> Result<Sticker> {
         self.id.create_sticker(cache_http.http(), builder).await
     }
