@@ -64,7 +64,6 @@ impl Action {
     }
 
     #[must_use]
-    #[allow(unknown_lints, clippy::missing_transmute_annotations)]
     pub fn from_value(value: u8) -> Action {
         match value {
             1 => Action::GuildUpdate,

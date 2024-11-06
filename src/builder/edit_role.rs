@@ -197,7 +197,7 @@ impl<'a> EditRole<'a> {
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-colors-object).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-#[allow(clippy::struct_field_names)]
+#[expect(clippy::struct_field_names)]
 pub struct CreateRoleColours {
     primary_color: Colour,
     #[serde(skip_serializing_if = "Option::is_none")]

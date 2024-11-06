@@ -541,7 +541,7 @@ pub struct MessageUpdateEvent {
 }
 
 impl MessageUpdateEvent {
-    #[allow(clippy::clone_on_copy)] // For consistency between fields
+    #[expect(clippy::clone_on_copy)] // For consistency between fields
     #[rustfmt::skip]
     /// Writes the updated data in this message update event into the given [`Message`].
     pub fn apply_to_message(&self, message: &mut Message) {
@@ -1132,7 +1132,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 /// Event received over a websocket connection
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#receive-events).
-#[allow(clippy::large_enum_variant)]
+#[expect(clippy::large_enum_variant)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, EnumCount, VariantNames, IntoStaticStr)]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]

@@ -419,7 +419,7 @@ impl StdError for HttpError {
     }
 }
 
-#[allow(clippy::missing_errors_doc)]
+#[expect(clippy::missing_errors_doc)]
 pub fn deserialize_errors<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<FixedArray<DiscordJsonSingleError>, D::Error> {
