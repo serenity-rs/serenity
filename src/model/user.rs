@@ -80,7 +80,7 @@ pub(crate) mod discriminator {
         deserializer.deserialize_option(OptionalDiscriminatorVisitor)
     }
 
-    #[allow(clippy::trivially_copy_pass_by_ref, clippy::ref_option)]
+    #[expect(clippy::trivially_copy_pass_by_ref, clippy::ref_option)]
     pub fn serialize<S: Serializer>(
         value: &Option<NonZeroU16>,
         serializer: S,
@@ -432,7 +432,7 @@ impl User {
     }
 
     /// This is an alias of [`Self::direct_message`].
-    #[allow(clippy::missing_errors_doc)]
+    #[expect(clippy::missing_errors_doc)]
     pub async fn dm(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
         self.direct_message(http, builder).await
     }
@@ -676,7 +676,7 @@ impl UserId {
     }
 
     /// This is an alias of [`Self::direct_message`].
-    #[allow(clippy::missing_errors_doc)]
+    #[expect(clippy::missing_errors_doc)]
     pub async fn dm(self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
         self.direct_message(http, builder).await
     }

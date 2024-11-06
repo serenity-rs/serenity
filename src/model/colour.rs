@@ -122,7 +122,6 @@ impl Colour {
     /// ```
     // Clippy wants to use `u32::from` instead `as`-casts,
     // but this not doable as `u32::from` is not a const fn.
-    #[allow(clippy::cast_lossless)]
     #[must_use]
     pub const fn from_rgb(red: u8, green: u8, blue: u8) -> Colour {
         Colour(((red as u32) << 16) | ((green as u32) << 8) | blue as u32)

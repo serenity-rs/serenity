@@ -64,7 +64,7 @@ macro_rules! routes {
 
             #[must_use]
             pub fn ratelimiting_bucket(&self) -> RatelimitingBucket {
-                #[allow(unused_variables)]
+                #[expect(unused_variables)]
                 let ratelimiting_kind = match *self {
                     $(
                         Self::$name $({ $($field_name),* })? => $ratelimiting_kind,
