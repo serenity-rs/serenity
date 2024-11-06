@@ -795,7 +795,6 @@ impl GuildChannel {
     /// typing.stop();
     /// # }
     /// ```
-    #[allow(clippy::missing_errors_doc)]
     pub fn start_typing(&self, http: Arc<Http>) -> Typing {
         self.id.start_typing(http)
     }
