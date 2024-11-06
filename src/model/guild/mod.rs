@@ -562,7 +562,7 @@ impl Guild {
             icon,
         };
 
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         http.create_guild(&body).await
     }
 

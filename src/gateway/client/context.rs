@@ -85,6 +85,18 @@ impl Context {
             .expect("Type provided to Context should be the same as ClientBuilder::data.")
     }
 
+    /// A version of [`Self::data`] which returns a reference to the Data.
+    ///
+    /// This is useful if you need to borrow `Data` with the lifetime of `Context`, but otherwise
+    /// [`Self::data`] should be used.
+    #[must_use]
+    #[expect(clippy::needless_lifetimes, reason = "Easier to understand when explicitly written")]
+    pub fn data_ref<'a, Data: Send + Sync + 'static>(&'a self) -> &'a Data {
+        self.data
+            .downcast_ref()
+            .expect("Type provided to Context should be the same as ClientBuilder::data.")
+    }
+
     /// Sets the current user as being [`Online`]. This maintains the current activity.
     ///
     /// # Examples

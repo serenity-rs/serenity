@@ -23,7 +23,7 @@ use crate::model::Permissions;
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 // breaking to change this on current, not sure if worth on next
-#[allow(clippy::large_enum_variant)]
+#[expect(clippy::large_enum_variant)]
 pub enum Interaction {
     Ping(PingInteraction),
     Command(CommandInteraction),
@@ -484,7 +484,7 @@ pub struct MessageModalSubmitInteractionMetadata {
 
 /// Metadata about the interaction, including the source of the interaction relevant server and
 /// user IDs.
-#[allow(clippy::large_enum_variant)]
+#[expect(clippy::large_enum_variant)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]

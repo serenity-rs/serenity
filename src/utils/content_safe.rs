@@ -196,7 +196,7 @@ fn clean_mention(
     }
 }
 
-#[allow(clippy::non_ascii_literal)]
+#[expect(clippy::non_ascii_literal)]
 #[cfg(test)]
 mod tests {
     use small_fixed_array::FixedString;
