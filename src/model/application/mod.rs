@@ -1,5 +1,7 @@
 //! Models about OAuth2 applications.
 
+use std::collections::HashMap;
+
 mod command;
 pub use command::*;
 mod command_interaction;
@@ -77,10 +79,8 @@ pub struct CurrentApplicationInfo {
     /// The application's role connection verification entry point, which when configured will
     /// render the app as a verification method in the guild role verification configuration.
     pub role_connections_verification_url: Option<String>,
-    #[cfg(feature = "unstable_discord_api")]
     #[serde(default)]
-    pub integration_types_config:
-        std::collections::HashMap<InstallationContext, InstallationContextConfig>,
+    pub integration_types_config: HashMap<InstallationContext, InstallationContextConfig>,
     pub approximate_guild_count: Option<u32>,
     pub approximate_user_install_count: Option<u32>,
     pub guild: Option<PartialGuild>,
@@ -99,7 +99,6 @@ impl CurrentApplicationInfo {
     }
 }
 
-#[cfg(feature = "unstable_discord_api")]
 enum_number! {
     /// An enum representing the [installation contexts].
     ///
@@ -115,7 +114,6 @@ enum_number! {
     }
 }
 
-#[cfg(feature = "unstable_discord_api")]
 enum_number! {
     /// An enum representing the different [interaction contexts].
     ///
@@ -138,7 +136,6 @@ enum_number! {
 /// Information about how the [`CurrentApplicationInfo`] is installed.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-integration-types).
-#[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InstallationContextConfig {
     pub oauth2_install_params: Option<InstallParams>,

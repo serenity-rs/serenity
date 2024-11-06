@@ -4,7 +4,6 @@ use serde::de::{Deserializer, Error as DeError};
 use serde::ser::{Error as _, Serializer};
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "unstable_discord_api")]
 use super::{AuthorizingIntegrationOwners, InteractionContext};
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -86,10 +85,8 @@ pub struct CommandInteraction {
     pub entitlements: Vec<Entitlement>,
     /// The owners of the applications that authorized the interaction, such as a guild or user.
     #[serde(default)]
-    #[cfg(feature = "unstable_discord_api")]
     pub authorizing_integration_owners: AuthorizingIntegrationOwners,
     /// The context where the interaction was triggered from.
-    #[cfg(feature = "unstable_discord_api")]
     pub context: Option<InteractionContext>,
 }
 

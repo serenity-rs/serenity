@@ -525,13 +525,9 @@ pub struct MessageUpdateEvent {
     pub flags: Option<Option<MessageFlags>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub referenced_message: Option<Option<Box<Message>>>,
-    #[cfg_attr(
-        all(not(ignore_serenity_deprecated), feature = "unstable_discord_api"),
-        deprecated = "Use interaction_metadata"
-    )]
+    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Use interaction_metadata")]
     #[serde(default, deserialize_with = "deserialize_some")]
     pub interaction: Option<Option<Box<MessageInteraction>>>,
-    #[cfg(feature = "unstable_discord_api")]
     pub interaction_metadata: Option<Option<Box<MessageInteractionMetadata>>>,
     #[serde(default, deserialize_with = "deserialize_some")]
     pub thread: Option<Option<GuildChannel>>,
@@ -576,7 +572,6 @@ impl MessageUpdateEvent {
             flags,
             referenced_message,
             interaction,
-            #[cfg(feature = "unstable_discord_api")]
             interaction_metadata,
             thread,
             components,
@@ -615,7 +610,6 @@ impl MessageUpdateEvent {
         if let Some(x) = flags { message.flags.clone_from(x) }
         if let Some(x) = referenced_message { message.referenced_message.clone_from(x) }
         if let Some(x) = interaction { message.interaction.clone_from(x) }
-        #[cfg(feature = "unstable_discord_api")]
         if let Some(x) = interaction_metadata { message.interaction_metadata.clone_from(x) }
         if let Some(x) = thread { message.thread.clone_from(x) }
         if let Some(x) = components { message.components.clone_from(x) }

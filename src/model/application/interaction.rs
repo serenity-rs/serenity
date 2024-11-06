@@ -1,20 +1,20 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
-#[cfg(feature = "unstable_discord_api")]
-use super::InstallationContext;
-use super::{CommandInteraction, ComponentInteraction, ModalInteraction, PingInteraction};
+use super::{
+    CommandInteraction,
+    ComponentInteraction,
+    InstallationContext,
+    ModalInteraction,
+    PingInteraction,
+};
 use crate::internal::prelude::*;
 use crate::json::from_value;
 use crate::model::guild::PartialMember;
-use crate::model::id::{ApplicationId, InteractionId};
-#[cfg(feature = "unstable_discord_api")]
-use crate::model::id::{GuildId, MessageId, UserId};
+use crate::model::id::{ApplicationId, GuildId, InteractionId, MessageId, UserId};
 use crate::model::monetization::Entitlement;
 use crate::model::user::User;
-use crate::model::utils::deserialize_val;
-#[cfg(feature = "unstable_discord_api")]
-use crate::model::utils::StrOrInt;
+use crate::model::utils::{deserialize_val, remove_from_map, StrOrInt};
 use crate::model::Permissions;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
@@ -299,7 +299,6 @@ bitflags! {
 ///
 /// [Discord Docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum AuthorizingIntegrationOwner {
@@ -315,12 +314,10 @@ pub enum AuthorizingIntegrationOwner {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Default)]
 #[repr(transparent)]
 pub struct AuthorizingIntegrationOwners(pub Vec<AuthorizingIntegrationOwner>);
 
-#[cfg(feature = "unstable_discord_api")]
 impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         struct Visitor;
@@ -366,7 +363,6 @@ impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
     }
 }
 
-#[cfg(feature = "unstable_discord_api")]
 impl serde::Serialize for AuthorizingIntegrationOwners {
     fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         use serde::ser::SerializeMap;
@@ -419,28 +415,121 @@ pub struct MessageInteraction {
     pub member: Option<PartialMember>,
 }
 
-/// Metadata about the interaction, including the source of the interaction relevant server and
-/// user IDs.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[cfg(feature = "unstable_discord_api")]
-pub struct MessageInteractionMetadata {
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[non_exhaustive]
+pub struct MessageCommandInteractionMetadata {
     /// The ID of the interaction
     pub id: InteractionId,
-    /// The type of interaction
-    #[serde(rename = "type")]
-    pub kind: InteractionType,
-    /// The ID of the user who triggered the interaction
+    /// The user who triggered the interaction
     pub user: User,
     /// The IDs for installation context(s) related to an interaction.
-    #[serde(default)]
     pub authorizing_integration_owners: AuthorizingIntegrationOwners,
     /// The ID of the original response message, present only on follow-up messages.
     pub original_response_message_id: Option<MessageId>,
-    /// ID of the message that contained interactive component, present only on messages created
-    /// from component interactions.
-    pub interacted_message_id: Option<MessageId>,
-    /// Metadata for the interaction that was used to open the modal, present only on modal submit
-    /// interactions
-    pub triggering_interaction_metadata: Option<Box<MessageInteractionMetadata>>,
+    /// The user the command was run on, present only on user command interactions
+    pub target_user: Option<User>,
+    /// The ID of the message the command was run on, present only on message command
+    /// interactions.
+    pub target_message_id: Option<MessageId>,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[non_exhaustive]
+pub struct MessageComponentInteractionMetadata {
+    /// The ID of the interaction
+    pub id: InteractionId,
+    /// The user who triggered the interaction
+    pub user: User,
+    /// The IDs for installation context(s) related to an interaction.
+    pub authorizing_integration_owners: AuthorizingIntegrationOwners,
+    /// The ID of the original response message, present only on follow-up messages.
+    pub original_response_message_id: Option<MessageId>,
+    /// The ID of the message that contained the interactive component
+    pub interacted_message_id: MessageId,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[non_exhaustive]
+pub struct MessageModalSubmitInteractionMetadata {
+    /// The ID of the interaction
+    pub id: InteractionId,
+    /// The user who triggered the interaction
+    pub user: User,
+    /// The IDs for installation context(s) related to an interaction.
+    pub authorizing_integration_owners: AuthorizingIntegrationOwners,
+    /// The ID of the original response message, present only on follow-up messages.
+    pub original_response_message_id: Option<MessageId>,
+    /// Metadata for the interaction that was used to open the modal
+    pub triggering_interaction_metadata: Box<MessageInteractionMetadata>,
+}
+
+/// Metadata about the interaction, including the source of the interaction relevant server and
+/// user IDs.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub enum MessageInteractionMetadata {
+    Command(MessageCommandInteractionMetadata),
+    Component(MessageComponentInteractionMetadata),
+    ModalSubmit(MessageModalSubmitInteractionMetadata),
+    Unknown(InteractionType),
+}
+
+impl<'de> serde::Deserialize<'de> for MessageInteractionMetadata {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut data = JsonMap::deserialize(deserializer)?;
+        let kind: InteractionType = remove_from_map(&mut data, "type")?;
+
+        match kind {
+            InteractionType::Command => deserialize_val(Value::from(data)).map(Self::Command),
+            InteractionType::Component => deserialize_val(Value::from(data)).map(Self::Component),
+            InteractionType::Modal => deserialize_val(Value::from(data)).map(Self::ModalSubmit),
+
+            unknown => Ok(Self::Unknown(unknown)),
+        }
+    }
+}
+
+impl serde::Serialize for MessageInteractionMetadata {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        #[derive(serde::Serialize)]
+        struct WithType<T> {
+            #[serde(rename = "type")]
+            kind: InteractionType,
+            #[serde(flatten)]
+            val: T,
+        }
+
+        fn serialize_with_type<S: Serializer, T: serde::Serialize>(
+            serializer: S,
+            val: T,
+            kind: InteractionType,
+        ) -> StdResult<S::Ok, S::Error> {
+            let wrapper = WithType {
+                kind,
+                val,
+            };
+
+            wrapper.serialize(serializer)
+        }
+
+        match self {
+            MessageInteractionMetadata::Command(val) => {
+                serialize_with_type(serializer, val, InteractionType::Command)
+            },
+            MessageInteractionMetadata::Component(val) => {
+                serialize_with_type(serializer, val, InteractionType::Component)
+            },
+            MessageInteractionMetadata::ModalSubmit(val) => {
+                serialize_with_type(serializer, val, InteractionType::Modal)
+            },
+            &MessageInteractionMetadata::Unknown(kind) => {
+                tracing::warn!("Tried to serialize MessageInteractionMetadata::Unknown({}), serialising null instead", u8::from(kind));
+                serializer.serialize_none()
+            },
+        }
+    }
 }

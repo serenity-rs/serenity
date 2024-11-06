@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use serde::Serialize;
 
-#[cfg(feature = "unstable_discord_api")]
 use super::{InstallationContext, InteractionContext};
 #[cfg(feature = "model")]
 use crate::builder::{Builder, CreateCommand};
@@ -86,14 +85,12 @@ pub struct Command {
     pub nsfw: bool,
     /// Installation context(s) where the command is available, only for globally-scoped commands.
     ///
-    /// Defaults to [`InstallationContext::Guild`]
-    #[cfg(feature = "unstable_discord_api")]
+    /// Defaults to [`InstallationContext::Guild`] and [`InstallationContext::User`].
     #[serde(default)]
     pub integration_types: Vec<InstallationContext>,
     /// Interaction context(s) where the command can be used, only for globally-scoped commands.
     ///
     /// By default, all interaction context types are included.
-    #[cfg(feature = "unstable_discord_api")]
     pub contexts: Option<Vec<InteractionContext>>,
     /// An autoincremented version identifier updated during substantial record changes.
     pub version: CommandVersionId,
