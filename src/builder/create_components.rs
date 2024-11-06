@@ -242,7 +242,7 @@ impl Serialize for CreateSelectMenuKind<'_> {
             default_values: &'a [CreateSelectMenuDefault],
         }
 
-        #[allow(clippy::ref_option)]
+        #[expect(clippy::ref_option)]
         fn map<'a>(
             values: &'a Option<Cow<'a, [impl Into<Mention> + Copy]>>,
         ) -> impl Iterator<Item = CreateSelectMenuDefault> + 'a {
