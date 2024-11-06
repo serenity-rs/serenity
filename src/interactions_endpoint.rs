@@ -83,7 +83,7 @@ impl Verifier {
     /// Verifies a Discord request for authenticity, given the `X-Signature-Ed25519` HTTP header,
     /// `X-Signature-Timestamp` HTTP headers and request body.
     // We just need to differentiate "pass" and "failure". There's deliberately no data besides ().
-    #[allow(clippy::result_unit_err, clippy::missing_errors_doc)]
+    #[expect(clippy::result_unit_err, clippy::missing_errors_doc)]
     pub fn verify(&self, signature: &str, timestamp: &str, body: &[u8]) -> Result<(), ()> {
         use ed25519_dalek::Verifier as _;
 

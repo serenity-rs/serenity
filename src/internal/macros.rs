@@ -108,6 +108,7 @@ macro_rules! enum_number {
         )?
 
         #[allow(non_snake_case, non_upper_case_globals)]
+        #[allow(clippy::allow_attributes, reason = "Does not always trigger due to macro")]
         impl $Enum {
             $(
                 $(#[doc = $doc])*

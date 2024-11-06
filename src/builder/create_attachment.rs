@@ -5,7 +5,7 @@ use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
-#[allow(unused)] // Error is used in docs
+#[expect(unused)] // Error is used in docs
 use crate::error::{Error, Result};
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -232,7 +232,7 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::keep`].
     pub fn remove(mut self, id: AttachmentId) -> Self {
-        #[allow(clippy::match_like_matches_macro)] // `matches!` is less clear here
+        #[expect(clippy::match_like_matches_macro)] // `matches!` is less clear here
         self.new_and_existing_attachments.retain(|a| match a {
             NewOrExisting::Existing(a) if a.id == id => false,
             _ => true,
@@ -241,7 +241,7 @@ impl<'a> EditAttachments<'a> {
     }
 
     /// Adds a new attachment to the attachment list.
-    #[allow(clippy::should_implement_trait)] // Clippy thinks add == std::ops::Add::add
+    #[expect(clippy::should_implement_trait)] // Clippy thinks add == std::ops::Add::add
     pub fn add(mut self, attachment: CreateAttachment<'a>) -> Self {
         self.new_and_existing_attachments.push(NewOrExisting::New(attachment));
         self

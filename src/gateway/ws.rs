@@ -162,7 +162,7 @@ impl WsClient {
         Ok(())
     }
 
-    #[allow(clippy::missing_errors_doc)]
+    #[expect(clippy::missing_errors_doc)]
     pub async fn send_chunk_guild(
         &mut self,
         guild_id: GuildId,

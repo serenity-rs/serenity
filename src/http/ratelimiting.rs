@@ -474,7 +474,7 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::float_cmp)]
+    #[expect(clippy::float_cmp)]
     fn test_parse_header_good() -> Result<()> {
         let headers = headers();
 
