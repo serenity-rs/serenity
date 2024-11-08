@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.12.3] - 2024-XX-XX
+
+Thanks to the following for their contributions:
+
+- People
+- Who
+- Contributed
+
+### Deprecations
+
+- [#2894](https://github.com/serenity-rs/serenity/pull/2894) `Message(Id)::link_ensured` can be replaced by `Message(Id)::link` if recieved via event, or `MessageId::link` if the message was recieved via a HTTP request.
+- [#2905](https://github.com/serenity-rs/serenity/pull/2905) `CreateInteractionResponse::PremiumRequired` has been deprecated and replaced with Premium Buttons.
+
+### Additions
+
+- [#2891](https://github.com/serenity-rs/serenity/pull/2891) Added Guild Incident message types.
+- [#2913](https://github.com/serenity-rs/serenity/pull/2913) `CreateButton` now implements `From<Button>`.
+- [#2914](https://github.com/serenity-rs/serenity/pull/2914) Added `User::display_name`, as users may have two different names now.
+- [#2920](https://github.com/serenity-rs/serenity/pull/2920) Added support for Application Emojis, getting rid of those "emoji servers" many bots required.
+- [#2905](https://github.com/serenity-rs/serenity/pull/2905) Added support for Premium Buttons, which link to the store page of a chosen SKU.
+- [#2926](https://github.com/serenity-rs/serenity/pull/2926) Added a method to get the role icon URL.
+- [#2939](https://github.com/serenity-rs/serenity/pull/2939) Added some missing fields to `CurrentApplicationInfo`.
+- [#2946](https://github.com/serenity-rs/serenity/pull/2946) Added support for the Get Guild Role endpoint.
+- [#2960](https://github.com/serenity-rs/serenity/pull/2960) Added support for the Get Sticker Pack by Id endpoint.
+- [#2962](https://github.com/serenity-rs/serenity/pull/2962) Added some missing entries in `GuildMemberFlags`.
+- [#2950](https://github.com/serenity-rs/serenity/pull/2950) Added missing `USE_EXTERNAL_APPS` permission.
+- [#2987](https://github.com/serenity-rs/serenity/pull/2987) Added a builder for the Get Entitlements endpoint.
+
+### Deserialisation Fixes
+
+- [#2887](https://github.com/serenity-rs/serenity/pull/2887), [#2893](https://github.com/serenity-rs/serenity/pull/2893) 
+Messages with reactions no longer fail to deserialize due to super reaction changes.
+- [#2917](https://github.com/serenity-rs/serenity/pull/2917) Application no longer fails to deserialize with `unstable_discord_api`
+
+### General fixes
+
+- [#2886](https://github.com/serenity-rs/serenity/pull/2886) A typo has been fixed in `GuildId::members_iter` documentation.
+- [#2906](https://github.com/serenity-rs/serenity/pull/2906) `CreateAttachment` documentation has been updated to be more consistent with other builders.
+- [#2911](https://github.com/serenity-rs/serenity/pull/2911) `CreateEmbedAuthor` documentation can now spell `embed` correctly.
+- [Pushed to Current](https://github.com/serenity-rs/serenity/commit/7b8dbadbc7cf9cd33a65e587f0b5cc237bdb9b88) `AuthorizingIntegrationOwners` is now usable, as the field was previously private.
+- [#2945](https://github.com/serenity-rs/serenity/pull/2945) (`Partial`)`Guild::member_permissions` is now usable without cache.
+- [#2973](https://github.com/serenity-rs/serenity/pull/2973) `ChannelId::delete_messages` documentation has been expanded to document the single item case.
+
+
 ## [0.12.2] - 2024-06-01
 
 Thanks to the following for their contributions:
