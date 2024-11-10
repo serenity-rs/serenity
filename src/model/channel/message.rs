@@ -5,8 +5,6 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
-#[cfg(feature = "builder")]
-use crate::builder::CreateMessageReference;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{Builder, CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -1125,6 +1123,37 @@ pub struct MessageReference {
     pub fail_if_not_exists: Option<bool>,
 }
 
+impl MessageReference {
+    #[must_use]
+    pub fn new(kind: MessageReferenceKind, channel_id: ChannelId) -> Self {
+        Self {
+            kind,
+            channel_id,
+            message_id: None,
+            guild_id: None,
+            fail_if_not_exists: None,
+        }
+    }
+
+    #[must_use]
+    pub fn message_id(mut self, message_id: MessageId) -> Self {
+        self.message_id = Some(message_id);
+        self
+    }
+
+    #[must_use]
+    pub fn guild_id(mut self, guild_id: GuildId) -> Self {
+        self.guild_id = Some(guild_id);
+        self
+    }
+
+    #[must_use]
+    pub fn fail_if_not_exists(mut self, fail_if_not_exists: bool) -> Self {
+        self.fail_if_not_exists = Some(fail_if_not_exists);
+        self
+    }
+}
+
 impl From<&Message> for MessageReference {
     fn from(m: &Message) -> Self {
         Self {
@@ -1133,19 +1162,6 @@ impl From<&Message> for MessageReference {
             channel_id: m.channel_id,
             guild_id: m.guild_id,
             fail_if_not_exists: None,
-        }
-    }
-}
-
-#[cfg(feature = "builder")]
-impl From<CreateMessageReference> for MessageReference {
-    fn from(value: CreateMessageReference) -> Self {
-        Self {
-            kind: value.kind,
-            message_id: value.message_id,
-            channel_id: value.channel_id,
-            guild_id: value.guild_id,
-            fail_if_not_exists: value.fail_if_not_exists,
         }
     }
 }
