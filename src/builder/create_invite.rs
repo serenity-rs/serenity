@@ -4,7 +4,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
+/// A builder to create a [`RichInvite`] for use via [`ChannelId::create_invite`].
 ///
 /// This is a structured and cleaner way of creating an invite, as all parameters are optional.
 ///

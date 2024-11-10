@@ -77,10 +77,8 @@ impl ChannelId {
         builder.execute(http, self).await
     }
 
-    /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
-    /// [`Role`] within the channel.
-    ///
-    /// Refer to the documentation for [`GuildChannel::create_permission`] for more information.
+    /// Creates a [permission overwrite] for either a single [`Member`] or [`Role`] within the
+    /// channel.
     ///
     /// Requires the [Manage Channels] permission.
     ///
@@ -89,6 +87,7 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission, or if an invalid value is
     /// set.
     ///
+    /// [permission overwrite]: PermissionOverwrite
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_permission(
         self,

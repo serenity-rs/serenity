@@ -580,7 +580,7 @@ impl Guild {
     /// - **username and discriminator**: "zey#5479"
     ///
     /// **Note**: This will only search members that are cached. If you want to search all members
-    /// in the guild via the Http API, use [`Self::search_members`].
+    /// in the guild via the Http API, use [`GuildId::search_members`].
     #[must_use]
     pub fn member_named(&self, name: &str) -> Option<&Member> {
         let (username, discrim) = match crate::utils::parse_user_tag(name) {
@@ -611,7 +611,7 @@ impl Guild {
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
     /// **Note**: This will only search members that are cached. If you want to search all members
-    /// in the guild via the Http API, use [`Self::search_members`].
+    /// in the guild via the Http API, use [`GuildId::search_members`].
     #[must_use]
     pub fn members_starting_with(
         &self,
@@ -676,7 +676,7 @@ impl Guild {
     /// again for sorting.
     ///
     /// **Note**: This will only search members that are cached. If you want to search all members
-    /// in the guild via the Http API, use [`Self::search_members`].
+    /// in the guild via the Http API, use [`GuildId::search_members`].
     #[must_use]
     pub fn members_containing(
         &self,
@@ -728,7 +728,7 @@ impl Guild {
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
     /// **Note**: This will only search members that are cached. If you want to search all members
-    /// in the guild via the Http API, use [`Self::search_members`].
+    /// in the guild via the Http API, use [`GuildId::search_members`].
     #[must_use]
     pub fn members_username_containing(
         &self,
@@ -773,7 +773,7 @@ impl Guild {
     /// used (this should never happen).
     ///
     /// **Note**: This will only search members that are cached. If you want to search all members
-    /// in the guild via the Http API, use [`Self::search_members`].
+    /// in the guild via the Http API, use [`GuildId::search_members`].
     #[must_use]
     pub fn members_nick_containing(
         &self,
