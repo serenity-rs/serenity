@@ -120,6 +120,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 )
                 .await?;
             let button_press = msg
+                .id
                 .await_component_interaction(ctx.shard.clone())
                 .timeout(std::time::Duration::from_secs(10))
                 .await;
@@ -193,7 +194,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             .flags(MessageFlags::IS_VOICE_MESSAGE)
             .add_file(CreateAttachment::url(&ctx.http, audio_url, "testing.ogg").await?);
 
-        msg.author.dm(&ctx.http, builder).await?;
+        msg.author.id.dm(&ctx.http, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
         let mut channel = {
             let channel_id = channel.trim().parse::<ChannelId>().unwrap();

@@ -11,8 +11,6 @@ use crate::model::prelude::*;
 ///
 /// These are:
 ///
-/// - [`Guild::edit_sticker`]
-/// - [`PartialGuild::edit_sticker`]
 /// - [`GuildId::edit_sticker`]
 /// - [`Sticker::edit`]
 ///
