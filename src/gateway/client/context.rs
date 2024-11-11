@@ -334,7 +334,7 @@ impl Context {
     ///
     /// # Errors
     ///
-    /// See [`Guild::create_emoji`] for information about name and filesize requirements. This
+    /// See [`GuildId::create_emoji`] for information about name and filesize requirements. This
     /// method will error if said requirements are not met.
     pub async fn create_application_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
         #[derive(serde::Serialize)]

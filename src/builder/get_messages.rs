@@ -21,7 +21,7 @@ use crate::model::prelude::*;
 /// The other parameter specifies the number of messages to retrieve. This is _optional_, and
 /// defaults to 50 if not specified.
 ///
-/// See [`GuildChannel::messages`] for more examples.
+/// See [`ChannelId::messages`] for more examples.
 ///
 /// # Examples
 ///
