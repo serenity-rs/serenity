@@ -393,32 +393,12 @@ impl User {
         self.id.create_dm_channel(cache_http).await
     }
 
-    /// Retrieves the time that this user was created at.
-    #[must_use]
-    pub fn created_at(&self) -> Timestamp {
-        self.id.created_at()
-    }
-
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
     #[must_use]
     pub fn default_avatar_url(&self) -> String {
         default_avatar_url(self)
-    }
-
-    /// Sends a message to a user through a direct message channel. This is a channel that can only
-    /// be accessed by you and the recipient.
-    ///
-    /// # Examples
-    ///
-    /// See [`UserId::direct_message`] for examples.
-    ///
-    /// # Errors
-    ///
-    /// See [`UserId::direct_message`] for errors.
-    pub async fn direct_message(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
-        self.id.direct_message(http, builder).await
     }
 
     /// Calculates the user's display name.
@@ -429,12 +409,6 @@ impl User {
     #[must_use]
     pub fn display_name(&self) -> &str {
         self.global_name.as_deref().unwrap_or(&self.name)
-    }
-
-    /// This is an alias of [`Self::direct_message`].
-    #[expect(clippy::missing_errors_doc)]
-    pub async fn dm(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
-        self.direct_message(http, builder).await
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default avatar if needed.
@@ -551,32 +525,6 @@ impl User {
             .and_then(|member| member.nick)
             .map(Into::into)
     }
-
-    /// Returns a builder which can be awaited to obtain a message or stream of messages sent by
-    /// this user.
-    #[cfg(feature = "collector")]
-    pub fn await_reply(&self, shard_messenger: ShardMessenger) -> MessageCollector {
-        MessageCollector::new(shard_messenger).author_id(self.id)
-    }
-
-    /// Same as [`Self::await_reply`].
-    #[cfg(feature = "collector")]
-    pub fn await_replies(&self, shard_messenger: ShardMessenger) -> MessageCollector {
-        self.await_reply(shard_messenger)
-    }
-
-    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by
-    /// this user.
-    #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
-        ReactionCollector::new(shard_messenger).author_id(self.id)
-    }
-
-    /// Same as [`Self::await_reaction`].
-    #[cfg(feature = "collector")]
-    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
-        self.await_reaction(shard_messenger)
-    }
 }
 
 impl fmt::Display for User {
@@ -672,7 +620,7 @@ impl UserId {
         cache_http: impl CacheHttp,
         builder: CreateMessage<'_>,
     ) -> Result<Message> {
-        self.create_dm_channel(&cache_http).await?.send_message(cache_http.http(), builder).await
+        self.create_dm_channel(&cache_http).await?.id.send_message(cache_http.http(), builder).await
     }
 
     /// This is an alias of [`Self::direct_message`].
@@ -713,6 +661,32 @@ impl UserId {
         }
 
         Ok(user)
+    }
+
+    /// Returns a builder which can be awaited to obtain a message or stream of messages sent by
+    /// this user.
+    #[cfg(feature = "collector")]
+    pub fn await_reply(self, shard_messenger: ShardMessenger) -> MessageCollector {
+        MessageCollector::new(shard_messenger).author_id(self)
+    }
+
+    /// Same as [`Self::await_reply`].
+    #[cfg(feature = "collector")]
+    pub fn await_replies(self, shard_messenger: ShardMessenger) -> MessageCollector {
+        self.await_reply(shard_messenger)
+    }
+
+    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by
+    /// this user.
+    #[cfg(feature = "collector")]
+    pub fn await_reaction(self, shard_messenger: ShardMessenger) -> ReactionCollector {
+        ReactionCollector::new(shard_messenger).author_id(self)
+    }
+
+    /// Same as [`Self::await_reaction`].
+    #[cfg(feature = "collector")]
+    pub fn await_reactions(self, shard_messenger: ShardMessenger) -> ReactionCollector {
+        self.await_reaction(shard_messenger)
     }
 }
 

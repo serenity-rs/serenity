@@ -84,14 +84,15 @@ pub struct CurrentApplicationInfo {
     pub interactions_endpoint_url: Option<String>,
 }
 
-impl CurrentApplicationInfo {
-    /// Returns the store url for the application. If included in a message, will render as a rich
-    /// embed. See the [Discord docs] for details.
+impl ApplicationId {
+    /// Returns the store url for the application.
+    ///
+    /// If included in a message, will render as a rich embed. See the [Discord docs] for details.
     ///
     /// [Discord docs]: https://discord.com/developers/docs/monetization/managing-your-store#linking-to-your-store
     #[must_use]
-    pub fn store_url(&self) -> String {
-        format!("https://discord.com/application-directory/{}/store", self.id)
+    pub fn store_url(self) -> String {
+        format!("https://discord.com/application-directory/{self}/store")
     }
 }
 

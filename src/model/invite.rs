@@ -205,18 +205,6 @@ pub struct InviteGuild {
     pub premium_subscription_count: Option<NonMaxU64>,
 }
 
-#[cfg(feature = "model")]
-impl InviteGuild {
-    /// Returns the Id of the shard associated with the guild.
-    ///
-    /// See the documentation for [`GuildId::shard_id`].
-    #[must_use]
-    #[cfg(feature = "utils")]
-    pub fn shard_id(&self, shard_total: std::num::NonZeroU16) -> u16 {
-        self.id.shard_id(shard_total)
-    }
-}
-
 /// Detailed information about an invite.
 ///
 /// This information can only be retrieved by anyone with the [Manage Guild] permission. Otherwise,

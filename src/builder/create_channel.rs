@@ -169,12 +169,12 @@ impl<'a> CreateChannel<'a> {
     /// Inheriting permissions from an existing channel:
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::Http, model::guild::Guild};
+    /// # use serenity::{http::Http, model::id::GuildId};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
-    /// # let mut guild: Guild = unimplemented!();
+    /// # let mut guild_id: GuildId = unimplemented!();
     /// use serenity::builder::CreateChannel;
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
@@ -188,7 +188,7 @@ impl<'a> CreateChannel<'a> {
     /// }];
     ///
     /// let builder = CreateChannel::new("my_new_cool_channel").permissions(permissions);
-    /// guild.create_channel(&http, builder).await?;
+    /// guild_id.create_channel(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```

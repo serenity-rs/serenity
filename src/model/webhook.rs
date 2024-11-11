@@ -2,10 +2,8 @@
 
 #[cfg(feature = "model")]
 use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
-#[cfg(feature = "cache")]
-use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 enum_number! {
@@ -103,48 +101,6 @@ pub struct WebhookGuild {
     ///
     /// In the client, this appears on the guild list on the left-hand side.
     pub icon: Option<ImageHash>,
-}
-
-#[cfg(feature = "model")]
-impl WebhookGuild {
-    /// Tries to find the [`Guild`] by its Id in the cache.
-    #[cfg(feature = "cache")]
-    pub fn to_guild_cached<'a>(&self, cache: &'a Cache) -> Option<GuildRef<'a>> {
-        cache.guild(self.id)
-    }
-
-    /// Requests [`PartialGuild`] over REST API.
-    ///
-    /// **Note**: This will not be a [`Guild`], as the REST API does not send
-    /// all data with a guild retrieval.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the current user is not in the guild.
-    pub async fn to_partial_guild(&self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guild(self.id) {
-                    return Ok(guild.clone().into());
-                }
-            }
-        }
-
-        cache_http.http().get_guild(self.id).await
-    }
-
-    /// Requests [`PartialGuild`] over REST API with counts.
-    ///
-    /// **Note**: This will not be a [`Guild`], as the REST API does not send all data with a guild
-    /// retrieval.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the current user is not in the guild.
-    pub async fn to_partial_guild_with_counts(&self, http: &Http) -> Result<PartialGuild> {
-        http.get_guild_with_counts(self.id).await
-    }
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
