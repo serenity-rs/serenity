@@ -3,34 +3,39 @@
 use std::fmt;
 use std::num::{NonZeroI64, NonZeroU64};
 
-use super::Timestamp;
+use serde::de::Error;
+
+use super::prelude::*;
 
 macro_rules! newtype_display_impl {
-    ($name:ident) => {
+    ($name:ident, |$this:ident| $inner:expr) => {
         impl fmt::Display for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                let inner = self.0;
-                fmt::Display::fmt(&inner, f)
+                fmt::Display::fmt(&(|$this: $name| $inner)(*self), f)
             }
         }
     };
 }
 
 macro_rules! forward_fromstr_impl {
-    ($name:ident) => {
+    ($name:ident, $wrapper:path) => {
         impl std::str::FromStr for $name {
             type Err = <u64 as std::str::FromStr>::Err;
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
-                Ok(Self(s.parse()?))
+                Ok(Self($wrapper(s.parse()?)))
             }
         }
     };
 }
 
 macro_rules! id_u64 {
-    ($($name:ident;)*) => {
+    ($($name:ident: $doc:literal;)*) => {
         $(
+            #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+            #[doc = $doc]
+            pub struct $name(InnerId);
+
             impl $name {
                 #[doc = concat!("Creates a new ", stringify!($name), " from a u64.")]
                 /// # Panics
@@ -40,7 +45,7 @@ macro_rules! id_u64 {
                 #[track_caller]
                 pub const fn new(id: u64) -> Self {
                     match NonZeroU64::new(id) {
-                        Some(inner) => Self(inner),
+                        Some(inner) => Self(InnerId(inner)),
                         None => panic!(concat!("Attempted to call ", stringify!($name), "::new with invalid (0) value"))
                     }
                 }
@@ -49,7 +54,7 @@ macro_rules! id_u64 {
                 #[inline]
                 #[must_use]
                 pub const fn get(self) -> u64 {
-                    self.0.get()
+                    self.0.0.get()
                 }
 
                 #[doc = concat!("Retrieves the time that the ", stringify!($name), " was created.")]
@@ -59,12 +64,9 @@ macro_rules! id_u64 {
                 }
             }
 
-            newtype_display_impl!($name);
-            forward_fromstr_impl!($name);
-
             impl Default for $name {
                 fn default() -> Self {
-                    Self(NonZeroU64::MIN)
+                    Self(InnerId(NonZeroU64::MIN))
                 }
             }
 
@@ -91,7 +93,7 @@ macro_rules! id_u64 {
 
             impl From<NonZeroU64> for $name {
                 fn from(id: NonZeroU64) -> $name {
-                    $name(id)
+                    $name(InnerId(id))
                 }
             }
 
@@ -103,7 +105,7 @@ macro_rules! id_u64 {
 
             impl From<$name> for NonZeroU64 {
                 fn from(id: $name) -> NonZeroU64 {
-                    id.0
+                    id.0.0
                 }
             }
 
@@ -125,170 +127,84 @@ macro_rules! id_u64 {
                 }
             }
 
+            newtype_display_impl!($name, |this| this.0.0);
+            forward_fromstr_impl!($name, InnerId);
+
             #[cfg(feature = "typesize")]
             impl typesize::TypeSize for $name {}
         )*
     }
 }
 
-/// An identifier for an Application.
+/// The inner storage of an ID.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct ApplicationId(#[serde(with = "snowflake")] NonZeroU64);
+pub(crate) struct InnerId(NonZeroU64);
 
-/// An identifier for a Channel
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct ChannelId(#[serde(with = "snowflake")] NonZeroU64);
+struct SnowflakeVisitor;
 
-/// An identifier for an Emoji
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct EmojiId(#[serde(with = "snowflake")] NonZeroU64);
+impl serde::de::Visitor<'_> for SnowflakeVisitor {
+    type Value = InnerId;
 
-/// An identifier for an unspecific entity.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct GenericId(#[serde(with = "snowflake")] NonZeroU64);
+    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("a string or integer snowflake that is not u64::MAX")
+    }
 
-/// An identifier for a Guild
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct GuildId(#[serde(with = "snowflake")] NonZeroU64);
+    // Called by formats like TOML.
+    fn visit_i64<E: Error>(self, value: i64) -> Result<Self::Value, E> {
+        self.visit_u64(u64::try_from(value).map_err(Error::custom)?)
+    }
 
-/// An identifier for an Integration
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct IntegrationId(#[serde(with = "snowflake")] NonZeroU64);
+    fn visit_u64<E: Error>(self, value: u64) -> Result<Self::Value, E> {
+        NonZeroU64::new(value)
+            .map(InnerId)
+            .ok_or_else(|| Error::custom("invalid value, expected non-max"))
+    }
 
-/// An identifier for a Message
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct MessageId(#[serde(with = "snowflake")] NonZeroU64);
+    fn visit_str<E: Error>(self, value: &str) -> Result<Self::Value, E> {
+        value.parse().map(InnerId).map_err(Error::custom)
+    }
+}
 
-/// An identifier for a Role
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct RoleId(#[serde(with = "snowflake")] NonZeroU64);
+impl<'de> serde::Deserialize<'de> for InnerId {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<InnerId, D::Error> {
+        deserializer.deserialize_any(SnowflakeVisitor)
+    }
+}
 
-/// An identifier for an auto moderation rule
-#[repr(packed)]
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-pub struct RuleId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a Scheduled Event
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct ScheduledEventId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a User
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct UserId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a [`Webhook`][super::webhook::Webhook]
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct WebhookId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for an audit log entry.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct AuditLogEntryId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for an attachment.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct AttachmentId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a sticker.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StickerId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a sticker pack.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StickerPackId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a sticker pack banner.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StickerPackBannerId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a SKU.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct SkuId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for an interaction.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct InteractionId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a slash command.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct CommandId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a slash command permission Id. Can contain
-/// a [`RoleId`] or [`UserId`].
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct CommandPermissionId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a slash command version Id.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct CommandVersionId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a slash command target Id. Can contain
-/// a [`UserId`] or [`MessageId`].
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct TargetId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a stage channel instance.
-#[repr(packed)]
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-pub struct StageInstanceId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for a forum tag.
-#[repr(packed)]
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-pub struct ForumTagId(#[serde(with = "snowflake")] NonZeroU64);
-
-/// An identifier for an entitlement.
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-pub struct EntitlementId(#[serde(with = "snowflake")] pub NonZeroU64);
+impl serde::Serialize for InnerId {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.collect_str(&{ self.0 })
+    }
+}
 
 id_u64! {
-    AttachmentId;
-    ApplicationId;
-    ChannelId;
-    EmojiId;
-    GenericId;
-    GuildId;
-    IntegrationId;
-    MessageId;
-    RoleId;
-    ScheduledEventId;
-    StickerId;
-    StickerPackId;
-    StickerPackBannerId;
-    SkuId;
-    UserId;
-    WebhookId;
-    AuditLogEntryId;
-    InteractionId;
-    CommandId;
-    CommandPermissionId;
-    CommandVersionId;
-    TargetId;
-    StageInstanceId;
-    RuleId;
-    ForumTagId;
-    EntitlementId;
+    AttachmentId: "An identifier for an attachment.";
+    ApplicationId: "An identifier for an Application.";
+    ChannelId: "An identifier for a Channel";
+    EmojiId: "An identifier for an Emoji";
+    GenericId: "An identifier for an unspecific entity.";
+    GuildId: "An identifier for a Guild";
+    IntegrationId: "An identifier for an Integration";
+    MessageId: "An identifier for a Message";
+    RoleId: "An identifier for a Role";
+    ScheduledEventId: "An identifier for a Scheduled Event";
+    StickerId: "An identifier for a sticker.";
+    StickerPackId: "An identifier for a sticker pack.";
+    StickerPackBannerId: "An identifier for a sticker pack banner.";
+    SkuId: "An identifier for a SKU.";
+    UserId: "An identifier for a User";
+    WebhookId: "An identifier for a [`Webhook`]";
+    AuditLogEntryId: "An identifier for an audit log entry.";
+    InteractionId: "An identifier for an interaction.";
+    CommandId: "An identifier for a slash command.";
+    CommandPermissionId: "An identifier for a slash command permission Id.";
+    CommandVersionId: "An identifier for a slash command version Id.";
+    TargetId: "An identifier for a slash command target Id.";
+    StageInstanceId: "An identifier for a stage channel instance.";
+    RuleId: "An identifier for an auto moderation rule";
+    ForumTagId: "An identifier for a forum tag.";
+    EntitlementId: "An identifier for an entitlement.";
 }
 
 /// An identifier for a Shard.
@@ -310,7 +226,7 @@ impl ShardId {
     }
 }
 
-newtype_display_impl!(ShardId);
+newtype_display_impl!(ShardId, |this| this.0);
 
 /// An identifier for a [`Poll Answer`](super::channel::PollAnswer).
 ///
@@ -332,54 +248,14 @@ impl AnswerId {
     }
 }
 
-newtype_display_impl!(AnswerId);
-forward_fromstr_impl!(AnswerId);
-
-mod snowflake {
-    use std::fmt;
-    use std::num::NonZeroU64;
-
-    use serde::de::{Error, Visitor};
-    use serde::{Deserializer, Serializer};
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NonZeroU64, D::Error> {
-        deserializer.deserialize_any(SnowflakeVisitor)
-    }
-
-    #[allow(clippy::trivially_copy_pass_by_ref)]
-    pub fn serialize<S: Serializer>(id: &NonZeroU64, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.collect_str(&id.get())
-    }
-
-    struct SnowflakeVisitor;
-
-    impl Visitor<'_> for SnowflakeVisitor {
-        type Value = NonZeroU64;
-
-        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-            formatter.write_str("a non-zero string or integer snowflake")
-        }
-
-        // Called by formats like TOML.
-        fn visit_i64<E: Error>(self, value: i64) -> Result<Self::Value, E> {
-            self.visit_u64(u64::try_from(value).map_err(Error::custom)?)
-        }
-
-        fn visit_u64<E: Error>(self, value: u64) -> Result<Self::Value, E> {
-            NonZeroU64::new(value).ok_or_else(|| Error::custom("invalid value, expected non-zero"))
-        }
-
-        fn visit_str<E: Error>(self, value: &str) -> Result<Self::Value, E> {
-            value.parse().map_err(Error::custom)
-        }
-    }
-}
+newtype_display_impl!(AnswerId, |this| this.0);
+forward_fromstr_impl!(AnswerId, std::convert::identity);
 
 #[cfg(test)]
 mod tests {
     use std::num::NonZeroU64;
 
-    use super::GuildId;
+    use super::{GuildId, InnerId};
 
     #[test]
     fn test_created_at() {
@@ -393,13 +269,11 @@ mod tests {
     fn test_id_serde() {
         use serde::{Deserialize, Serialize};
 
-        use super::snowflake;
         use crate::json::{assert_json, json};
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct S {
-            #[serde(with = "snowflake")]
-            id: NonZeroU64,
+            id: InnerId,
         }
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
@@ -411,7 +285,7 @@ mod tests {
         assert_json(&id, json!("175928847299117063"));
 
         let s = S {
-            id: NonZeroU64::new(17_5928_8472_9911_7063).unwrap(),
+            id: InnerId(NonZeroU64::new(17_5928_8472_9911_7063).unwrap()),
         };
         assert_json(&s, json!({"id": "175928847299117063"}));
 
