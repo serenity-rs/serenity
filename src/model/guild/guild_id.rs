@@ -167,8 +167,6 @@ impl GuildId {
     /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
     /// the range 0 and 7.
     ///
-    /// Refer to the documentation for [`Guild::ban`] for more information.
-    ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
     /// # Examples
@@ -324,7 +322,8 @@ impl GuildId {
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
     ///
-    /// Refer to the documentation for [`Guild::create_emoji`] for more information.
+    /// The name of the emoji must be at least 2 characters long and can only contain alphanumeric
+    /// characters and underscores.
     ///
     /// Requires the [Create Guild Expressions] permission.
     ///
@@ -395,7 +394,7 @@ impl GuildId {
 
     /// Creates a new role in the guild with the data set, if any.
     ///
-    /// See the documentation for [`Guild::create_role`] on how to use this.
+    /// See the documentation for [`EditRole`] on how to use this.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///

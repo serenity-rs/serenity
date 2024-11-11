@@ -9,10 +9,6 @@ use crate::model::prelude::*;
 ///
 /// These are:
 ///
-/// - [`PartialGuild::create_role`]
-/// - [`PartialGuild::edit_role`]
-/// - [`Guild::create_role`]
-/// - [`Guild::edit_role`]
 /// - [`GuildId::create_role`]
 /// - [`GuildId::edit_role`]
 /// - [`Role::edit`]
