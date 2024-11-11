@@ -4,7 +4,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
+/// A builder to create a [`RichInvite`] for use via [`ChannelId::create_invite`].
 ///
 /// This is a structured and cleaner way of creating an invite, as all parameters are optional.
 ///
@@ -16,9 +16,9 @@ use crate::model::prelude::*;
 /// # use serenity::{prelude::*, model::prelude::*};
 /// use serenity::builder::CreateInvite;
 /// use serenity::http::Http;
-/// # async fn run(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
+/// # async fn run(http: &Http, channel_id: ChannelId) -> Result<(), Box<dyn std::error::Error>> {
 /// let builder = CreateInvite::new().max_age(3600).max_uses(10);
-/// let creation = channel.create_invite(http, builder).await?;
+/// let creation = channel_id.create_invite(http, builder).await?;
 /// # Ok(())
 /// # }
 /// ```
@@ -57,22 +57,6 @@ impl<'a> CreateInvite<'a> {
     /// Set to `0` for an invite which does not expire after an amount of time.
     ///
     /// Defaults to `86400`, or 24 hours.
-    ///
-    /// # Examples
-    ///
-    /// Create an invite with a max age of `3600` seconds, or 1 hour:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn example(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
-    /// let builder = CreateInvite::new().max_age(3600);
-    /// let invite = channel.create_invite(http, builder).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub fn max_age(mut self, max_age: u32) -> Self {
         self.max_age = Some(max_age);
         self
@@ -83,24 +67,6 @@ impl<'a> CreateInvite<'a> {
     /// Set to `0` for an invite which does not expire after a number of uses.
     ///
     /// Defaults to `0`.
-    ///
-    /// # Examples
-    ///
-    /// Create an invite with a max use limit of `5`:
-    ///
-    /// Create an invite with a max age of `3600` seconds, or 1 hour:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn example(http:  &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
-    /// let builder = CreateInvite::new().max_uses(5);
-    /// let invite = channel.create_invite(http, builder).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub fn max_uses(mut self, max_uses: u8) -> Self {
         self.max_uses = Some(max_uses);
         self
@@ -109,22 +75,6 @@ impl<'a> CreateInvite<'a> {
     /// Whether an invite grants a temporary membership.
     ///
     /// Defaults to `false`.
-    ///
-    /// # Examples
-    ///
-    /// Create an invite which is temporary:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn example(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
-    /// let builder = CreateInvite::new().temporary(true);
-    /// let invite = channel.create_invite(http, builder).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub fn temporary(mut self, temporary: bool) -> Self {
         self.temporary = Some(temporary);
         self
@@ -133,22 +83,6 @@ impl<'a> CreateInvite<'a> {
     /// Whether or not to try to reuse a similar invite.
     ///
     /// Defaults to `false`.
-    ///
-    /// # Examples
-    ///
-    /// Create an invite which is unique:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn example(http: &Http, channel: GuildChannel) -> Result<(), Box<dyn std::error::Error>> {
-    /// let builder = CreateInvite::new().unique(true);
-    /// let invite = channel.create_invite(&http, builder).await?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub fn unique(mut self, unique: bool) -> Self {
         self.unique = Some(unique);
         self
