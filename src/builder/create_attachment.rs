@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::path::Path;
 
+use bytes::Bytes;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
@@ -21,15 +22,12 @@ use crate::model::id::AttachmentId;
 pub struct CreateAttachment<'a> {
     pub filename: Cow<'static, str>,
     pub description: Option<Cow<'a, str>>,
-    pub data: Cow<'static, [u8]>,
+    pub data: Bytes,
 }
 
 impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
-    pub fn bytes(
-        data: impl Into<Cow<'static, [u8]>>,
-        filename: impl Into<Cow<'static, str>>,
-    ) -> Self {
+    pub fn bytes(data: impl Into<Bytes>, filename: impl Into<Cow<'static, str>>) -> Self {
         CreateAttachment {
             data: data.into(),
             filename: filename.into(),
@@ -85,7 +83,7 @@ impl<'a> CreateAttachment<'a> {
         filename: impl Into<Cow<'static, str>>,
     ) -> Result<Self> {
         let response = http.client.get(url).send().await?;
-        let data = response.bytes().await?.to_vec();
+        let data = response.bytes().await?;
 
         Ok(CreateAttachment::bytes(data, filename))
     }
