@@ -202,7 +202,13 @@ impl GuildChannel {
     pub fn is_text_based(&self) -> bool {
         matches!(
             self.kind,
-            ChannelType::Text | ChannelType::News | ChannelType::Voice | ChannelType::Stage
+            ChannelType::Text
+                | ChannelType::News
+                | ChannelType::Voice
+                | ChannelType::Stage
+                | ChannelType::PublicThread
+                | ChannelType::PrivateThread
+                | ChannelType::NewsThread
         )
     }
 
