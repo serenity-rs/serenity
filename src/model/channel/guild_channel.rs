@@ -1,35 +1,21 @@
-#[cfg(feature = "model")]
-use std::borrow::Cow;
 use std::fmt;
-#[cfg(feature = "model")]
-use std::sync::Arc;
 
 use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8};
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    CreateAttachment,
-    CreateForumPost,
-    CreateInvite,
     CreateMessage,
     CreateStageInstance,
-    CreateThread,
     CreateWebhook,
     EditChannel,
-    EditMessage,
     EditStageInstance,
     EditThread,
     EditVoiceState,
-    GetMessages,
 };
 #[cfg(feature = "cache")]
 use crate::cache::{self, Cache};
-#[cfg(feature = "collector")]
-use crate::collector::{MessageCollector, ReactionCollector};
-#[cfg(feature = "collector")]
-use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http, Typing};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 /// Represents a guild's text, news, or voice channel.
@@ -209,74 +195,6 @@ impl GuildChannel {
         )
     }
 
-    /// Broadcasts to the channel that the current user is typing.
-    ///
-    /// For bots, this is a good indicator for long-running commands.
-    ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user does not have the required permissions.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn broadcast_typing(&self, http: &Http) -> Result<()> {
-        self.id.broadcast_typing(http).await
-    }
-
-    /// Creates an invite for the given channel.
-    ///
-    /// **Note**: Requires the [Create Instant Invite] permission.
-    ///
-    /// # Examples
-    ///
-    /// Create an invite that can only be used 5 times:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::builder::CreateInvite;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::channel::GuildChannel;
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let channel: GuildChannel = unimplemented!();
-    /// # let http: Http = unimplemented!();
-    ///
-    /// let builder = CreateInvite::new().max_uses(5);
-    /// let invite = channel.create_invite(&http, builder).await;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-    ///
-    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    #[cfg(feature = "utils")]
-    pub async fn create_invite(
-        &self,
-        http: &Http,
-        builder: CreateInvite<'_>,
-    ) -> Result<RichInvite> {
-        builder.execute(http, self.id).await
-    }
-
-    /// Creates a [permission overwrite][`PermissionOverwrite`] for either a single [`Member`] or
-    /// [`Role`] within a [`Channel`].
-    ///
-    /// See [`ChannelId::create_permission`] for more detailed documentation.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_permission(
-        &self,
-        http: &Http,
-        target: PermissionOverwrite,
-        reason: Option<&str>,
-    ) -> Result<()> {
-        self.id.create_permission(http, target, reason).await
-    }
-
     /// Deletes this channel, returning the channel on a successful deletion.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
@@ -289,81 +207,6 @@ impl GuildChannel {
     pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<GuildChannel> {
         let channel = self.id.delete(http, reason).await?;
         channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
-    }
-
-    /// Deletes all messages by Ids from the given vector in the channel.
-    ///
-    /// The minimum amount of messages is 2 and the maximum amount is 100.
-    ///
-    /// Requires the [Manage Messages] permission.
-    ///
-    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`ModelError::TooSmall`] or [`ModelError::TooLarge`] if an attempt was made to
-    /// delete either 0 or more than 100 messages.
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_messages(
-        &self,
-        http: &Http,
-        message_ids: &[MessageId],
-        reason: Option<&str>,
-    ) -> Result<()> {
-        self.id.delete_messages(http, message_ids, reason).await
-    }
-
-    /// Deletes all permission overrides in the channel from a member or role.
-    ///
-    /// **Note**: Requires the [Manage Channel] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
-    pub async fn delete_permission(
-        &self,
-        http: &Http,
-        permission_type: PermissionOverwriteType,
-        reason: Option<&str>,
-    ) -> Result<()> {
-        self.id.delete_permission(http, permission_type, reason).await
-    }
-
-    /// Deletes the given [`Reaction`] from the channel.
-    ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
-    /// the reaction.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission. [Manage Messages]:
-    /// Permissions::MANAGE_MESSAGES
-    pub async fn delete_reaction(
-        &self,
-        http: &Http,
-        message_id: MessageId,
-        user_id: Option<UserId>,
-        reaction_type: impl Into<ReactionType>,
-    ) -> Result<()> {
-        self.id.delete_reaction(http, message_id, user_id, reaction_type).await
-    }
-
-    /// Deletes all of the [`Reaction`]s associated with the provided message id.
-    ///
-    /// **Note**: Requires the [Manage Messages] permission.
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_reactions(&self, http: &Http, message_id: MessageId) -> Result<()> {
-        self.id.delete_reactions(http, message_id).await
     }
 
     /// Edits the channel's settings.
@@ -399,29 +242,6 @@ impl GuildChannel {
         let channel = builder.execute(http, self.id).await?;
         *self = channel;
         Ok(())
-    }
-
-    /// Edits a [`Message`] in the channel given its Id.
-    ///
-    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
-    /// attachments.
-    ///
-    /// **Note**: In most cases requires that the current user be the author of the message.
-    ///
-    /// Refer to the documentation for [`EditMessage`] for information regarding content
-    /// restrictions and requirements.
-    ///
-    /// # Errors
-    ///
-    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
-    /// reasons.
-    pub async fn edit_message(
-        &self,
-        http: &Http,
-        message_id: MessageId,
-        builder: EditMessage<'_>,
-    ) -> Result<Message> {
-        self.id.edit_message(http, message_id, builder).await
     }
 
     /// Edits a thread.
@@ -538,73 +358,10 @@ impl GuildChannel {
         builder.execute(http, self.guild_id, self.id, None).await
     }
 
-    /// Follows the News Channel
-    ///
-    /// Requires [Manage Webhook] permissions on the target channel.
-    ///
-    /// **Note**: Only available on news channels.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn follow(
-        &self,
-        http: &Http,
-        target_channel_id: ChannelId,
-    ) -> Result<FollowedChannel> {
-        self.id.follow(http, target_channel_id).await
-    }
-
     /// Attempts to find this channel's guild in the Cache.
     #[cfg(feature = "cache")]
     pub fn guild<'a>(&self, cache: &'a Cache) -> Option<cache::GuildRef<'a>> {
         cache.guild(self.guild_id)
-    }
-
-    /// Gets all of the channel's invites.
-    ///
-    /// Requires the [Manage Channels] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn invites(&self, http: &Http) -> Result<Vec<RichInvite>> {
-        self.id.invites(http).await
-    }
-
-    /// Gets a message from the channel.
-    ///
-    /// Requires the [Read Message History] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if a message with the
-    /// given Id does not exist in the channel.
-    ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn message(
-        &self,
-        cache_http: impl CacheHttp,
-        message_id: MessageId,
-    ) -> Result<Message> {
-        self.id.message(cache_http, message_id).await
-    }
-
-    /// Gets messages from the channel.
-    ///
-    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
-    /// [`Vec`].
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn messages(&self, http: &Http, builder: GetMessages) -> Result<Vec<Message>> {
-        self.id.messages(http, builder).await
     }
 
     /// Calculates the permissions of a member.
@@ -653,99 +410,6 @@ impl GuildChannel {
         Ok(guild.user_permissions_in(self, member))
     }
 
-    /// Pins a [`Message`] to the channel.
-    ///
-    /// **Note**: Requires the [Manage Messages] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel already has
-    /// too many pinned messages.
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(
-        &self,
-        http: &Http,
-        message_id: MessageId,
-        reason: Option<&str>,
-    ) -> Result<()> {
-        self.id.pin(http, message_id, reason).await
-    }
-
-    /// Gets all channel's pins.
-    ///
-    /// **Note**: If the current user lacks the [Read Message History] permission an empty [`Vec`]
-    /// will be returned.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
-    ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn pins(&self, http: &Http) -> Result<Vec<Message>> {
-        self.id.pins(http).await
-    }
-
-    /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
-    ///
-    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
-    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
-    /// then it is automatically reduced.
-    ///
-    /// The optional `after` attribute is to retrieve the users after a certain user. This is
-    /// useful for pagination.
-    ///
-    /// **Note**: Requires the [Read Message History] permission.
-    ///
-    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name.
-    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
-    /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn reaction_users(
-        &self,
-        http: &Http,
-        message_id: MessageId,
-        reaction_type: impl Into<ReactionType>,
-        limit: Option<u8>,
-        after: Option<UserId>,
-    ) -> Result<Vec<User>> {
-        self.id.reaction_users(http, message_id, reaction_type, limit, after).await
-    }
-
-    /// Sends a message with just the given message content in the channel.
-    ///
-    /// **Note**: Message content must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
-    /// [`CreateMessage::execute`] for more details.
-    pub async fn say(&self, http: &Http, content: impl Into<Cow<'_, str>>) -> Result<Message> {
-        self.id.say(http, content).await
-    }
-
-    /// Sends file(s) along with optional message contents.
-    ///
-    /// Refer to [`ChannelId::send_files`] for examples and more information.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
-    /// reasons.
-    pub async fn send_files<'a>(
-        self,
-        http: &Http,
-        files: impl IntoIterator<Item = CreateAttachment<'a>>,
-        builder: CreateMessage<'a>,
-    ) -> Result<Message> {
-        self.send_message(http, builder.files(files)).await
-    }
-
     /// Sends a message to the channel.
     ///
     /// Refer to the documentation for [`CreateMessage`] for information regarding content
@@ -757,77 +421,6 @@ impl GuildChannel {
     /// reasons.
     pub async fn send_message(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
         builder.execute(http, self.id, Some(self.guild_id)).await
-    }
-
-    /// Starts typing in the channel for an indefinite period of time.
-    ///
-    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
-    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
-    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
-    /// dropped.
-    ///
-    /// If a message is sent while typing is triggered, the user will stop typing for a brief
-    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
-    /// is dropped.
-    ///
-    /// This should rarely be used for bots, although it is a good indicator that a long-running
-    /// command is still being processed.
-    ///
-    /// ## Examples
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, http::Http, model::channel::GuildChannel, Result};
-    /// # use std::sync::Arc;
-    /// #
-    /// # fn long_process() {}
-    /// # let http: Arc<Http> = unimplemented!();
-    /// # let cache = Cache::default();
-    /// # let channel: GuildChannel = unimplemented!();
-    /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
-    /// let typing = channel.start_typing(http);
-    ///
-    /// // Run some long-running process
-    /// long_process();
-    ///
-    /// // Stop typing
-    /// typing.stop();
-    /// # }
-    /// ```
-    pub fn start_typing(&self, http: Arc<Http>) -> Typing {
-        self.id.start_typing(http)
-    }
-
-    /// Unpins a [`Message`] in the channel given by its Id.
-    ///
-    /// Requires the [Manage Messages] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(
-        &self,
-        http: &Http,
-        message_id: MessageId,
-        reason: Option<&str>,
-    ) -> Result<()> {
-        self.id.unpin(http, message_id, reason).await
-    }
-
-    /// Retrieves the channel's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    pub async fn webhooks(&self, http: &Http) -> Result<Vec<Webhook>> {
-        self.id.webhooks(http).await
     }
 
     /// Retrieves [`Member`]s from the current channel.
@@ -869,32 +462,6 @@ impl GuildChannel {
                 .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
-    }
-
-    /// Returns a builder which can be awaited to obtain a message or stream of messages sent in
-    /// this guild channel.
-    #[cfg(feature = "collector")]
-    pub fn await_reply(&self, shard_messenger: ShardMessenger) -> MessageCollector {
-        MessageCollector::new(shard_messenger).channel_id(self.id)
-    }
-
-    /// Same as [`Self::await_reply`].
-    #[cfg(feature = "collector")]
-    pub fn await_replies(&self, shard_messenger: ShardMessenger) -> MessageCollector {
-        self.await_reply(shard_messenger)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions
-    /// sent by this guild channel.
-    #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
-        ReactionCollector::new(shard_messenger).channel_id(self.id)
-    }
-
-    /// Same as [`Self::await_reaction`].
-    #[cfg(feature = "collector")]
-    pub fn await_reactions(&self, shard_messenger: ShardMessenger) -> ReactionCollector {
-        self.await_reaction(shard_messenger)
     }
 
     /// Creates a webhook in the channel.
@@ -983,46 +550,6 @@ impl GuildChannel {
         }
 
         self.id.delete_stage_instance(http, reason).await
-    }
-
-    /// Creates a public thread that is connected to a message.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_thread_from_message(
-        &self,
-        http: &Http,
-        message_id: MessageId,
-        builder: CreateThread<'_>,
-    ) -> Result<GuildChannel> {
-        self.id.create_thread_from_message(http, message_id, builder).await
-    }
-
-    /// Creates a thread that is not connected to a message.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_thread(
-        &self,
-        http: &Http,
-        builder: CreateThread<'_>,
-    ) -> Result<GuildChannel> {
-        self.id.create_thread(http, builder).await
-    }
-
-    /// Creates a post in a forum channel.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_forum_post(
-        &self,
-        http: &Http,
-        builder: CreateForumPost<'_>,
-    ) -> Result<GuildChannel> {
-        self.id.create_forum_post(http, builder).await
     }
 }
 
