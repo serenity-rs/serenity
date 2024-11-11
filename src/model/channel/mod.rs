@@ -254,7 +254,7 @@ enum_number! {
         /// An indicator that the channel is a forum [`GuildChannel`].
         Forum = 15,
         _ => Unknown(u8),
-    }
+    } // Make sure to update [`GuildChannel::is_text_based`].
 }
 
 impl ChannelType {
