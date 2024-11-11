@@ -7,7 +7,7 @@ use crate::internal::prelude::*;
 
 impl CreateAttachment<'_> {
     fn into_part(self) -> Result<Part> {
-        let mut part = Part::bytes(self.data);
+        let mut part = Part::stream(self.data);
         part = guess_mime_str(part, &self.filename)?;
         part = part.file_name(self.filename);
         Ok(part)
