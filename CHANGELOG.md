@@ -29,7 +29,13 @@ Thanks to the following for their contributions:
 - [#2960](https://github.com/serenity-rs/serenity/pull/2960) Added support for the Get Sticker Pack by Id endpoint.
 - [#2962](https://github.com/serenity-rs/serenity/pull/2962) Added some missing entries in `GuildMemberFlags`.
 - [#2950](https://github.com/serenity-rs/serenity/pull/2950) Added missing `USE_EXTERNAL_APPS` permission.
+- [#2982](https://github.com/serenity-rs/serenity/pull/2982) Added support for setting voice channel status
 - [#2987](https://github.com/serenity-rs/serenity/pull/2987) Added a builder for the Get Entitlements endpoint.
+- [#2996](https://github.com/serenity-rs/serenity/pull/2996) Added `MessageReferenceKind` as the first step towards supporting message forwarding.
+- [#3001](https://github.com/serenity-rs/serenity/pull/3001) Added `{PartialGuild, Guild}::partial_member_permissions` for checking the permissions of a `PartialMember` without needing to fetch the full `Member`.
+- [#3013](https://github.com/serenity-rs/serenity/pull/3013) Added poll support in interaction responses.
+- [#3018](https://github.com/serenity-rs/serenity/pull/3018) Stablise User Apps.
+- [#3021](https://github.com/serenity-rs/serenity/pull/3021) Added support for Entry Point Commands.
 
 ### Deserialisation Fixes
 
@@ -45,6 +51,10 @@ Messages with reactions no longer fail to deserialize due to super reaction chan
 - [Pushed to Current](https://github.com/serenity-rs/serenity/commit/7b8dbadbc7cf9cd33a65e587f0b5cc237bdb9b88) `AuthorizingIntegrationOwners` is now usable, as the field was previously private.
 - [#2945](https://github.com/serenity-rs/serenity/pull/2945) (`Partial`)`Guild::member_permissions` is now usable without cache.
 - [#2973](https://github.com/serenity-rs/serenity/pull/2973) `ChannelId::delete_messages` documentation has been expanded to document the single item case.
+- [#2959](https://github.com/serenity-rs/serenity/pull/2959) Document rule for attachment names for local attachments in embeds.
+- [#3005](https://github.com/serenity-rs/serenity/pull/3005) Make accidentally private fields on `BulkBanResponse` public.
+- [#3006](https://github.com/serenity-rs/serenity/pull/3006) Fix model functions using `SerializeIter`, fixing a problem making the bulk ban endpoint unusable.
+
 
 
 ## [0.12.2] - 2024-06-01
