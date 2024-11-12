@@ -12,6 +12,10 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 
+fn minus1_as_0<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<u16, D::Error> {
+    i16::deserialize(deserializer).map(|val| if val == -1 { 0 } else { val as u16 })
+}
+
 /// Information about a role within a guild.
 ///
 /// A role represents a set of permissions, and can be attached to one or multiple users. A role has
@@ -57,6 +61,7 @@ pub struct Role {
     /// position is higher.
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
+    #[serde(deserialize_with = "minus1_as_0")]
     pub position: u16,
     /// The tags this role has. It can be used to determine if this role is a special role in this
     /// guild such as guild subscriber role, or if the role is linked to an [`Integration`] or a
