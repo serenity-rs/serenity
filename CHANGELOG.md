@@ -57,6 +57,7 @@ Thanks to the following for their contributions:
 - [#2887](https://github.com/serenity-rs/serenity/pull/2887), [#2893](https://github.com/serenity-rs/serenity/pull/2893) 
 Messages with reactions no longer fail to deserialize due to super reaction changes.
 - [#2917](https://github.com/serenity-rs/serenity/pull/2917) Application no longer fails to deserialize with `unstable_discord_api`
+- [#3032](https://github.com/serenity-rs/serenity/pull/3032) Guilds with an @everyone role at position `-1` no longer fail to deserialise.
 
 ### General fixes
 
