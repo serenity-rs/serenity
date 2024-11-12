@@ -216,6 +216,26 @@ impl Message {
         self.author.id == cache.as_ref().current_user().id
     }
 
+    /// Calculates the permissions of the message author in the current channel.
+    ///
+    /// This may return `None` if:
+    /// - The [`Cache`] does not have the current [`Guild`]
+    /// - This message is not from [`MessageCreateEvent`] and the author's [`Member`] cannot be
+    ///   found in [`Guild#structfield.members`].
+    #[cfg(feature = "cache")]
+    pub fn author_permissions(&self, cache: impl AsRef<Cache>) -> Option<Permissions> {
+        let Some(guild_id) = self.guild_id else {
+            return Some(Permissions::dm_permissions());
+        };
+
+        let guild = cache.as_ref().guild(guild_id)?;
+        if let Some(member) = &self.member {
+            Some(guild.partial_member_permissions(self.author.id, member))
+        } else {
+            Some(guild.member_permissions(guild.members.get(&self.author.id)?))
+        }
+    }
+
     /// Deletes the message.
     ///
     /// **Note**: The logged in user must either be the author of the message or have the [Manage

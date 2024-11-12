@@ -420,6 +420,28 @@ generate_get_permission_names! {
 /// TODO: use a macro to shorten this entire file lol
 #[cfg(feature = "model")]
 impl Permissions {
+    #[must_use]
+    pub fn dm_permissions() -> Self {
+        Self::ADD_REACTIONS
+            | Self::STREAM
+            | Self::VIEW_CHANNEL
+            | Self::SEND_MESSAGES
+            | Self::SEND_TTS_MESSAGES
+            | Self::EMBED_LINKS
+            | Self::ATTACH_FILES
+            | Self::READ_MESSAGE_HISTORY
+            | Self::MENTION_EVERYONE
+            | Self::USE_EXTERNAL_EMOJIS
+            | Self::CONNECT
+            | Self::SPEAK
+            | Self::USE_VAD
+            | Self::USE_APPLICATION_COMMANDS
+            | Self::USE_EXTERNAL_STICKERS
+            | Self::SEND_VOICE_MESSAGES
+            | Self::SEND_POLLS
+            | Self::USE_EXTERNAL_APPS
+    }
+
     /// Shorthand for checking that the set of permissions contains the [Add Reactions] permission.
     ///
     /// [Add Reactions]: Self::ADD_REACTIONS
