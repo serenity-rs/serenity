@@ -15,27 +15,28 @@ Thanks to the following for their contributions:
 
 - [#2894](https://github.com/serenity-rs/serenity/pull/2894) `Message(Id)::link_ensured` can be replaced by `Message(Id)::link` if recieved via event, or `MessageId::link` if the message was recieved via a HTTP request.
 - [#2905](https://github.com/serenity-rs/serenity/pull/2905) `CreateInteractionResponse::PremiumRequired` has been deprecated and replaced with Premium Buttons.
+- [#3030](https://github.com/serenity-rs/serenity/pull/3030) `GuildChannel::permissions_for_user` has been deprecated, use the new `Message::author_permissions` helper or `Guild::user_permissions_in`.
 
 ### Additions
 
-- [#2891](https://github.com/serenity-rs/serenity/pull/2891) Added Guild Incident message types.
+- [#2891](https://github.com/serenity-rs/serenity/pull/2891) Guild Incident message types have been added to MessageType.
 - [#2913](https://github.com/serenity-rs/serenity/pull/2913) `CreateButton` now implements `From<Button>`.
-- [#2914](https://github.com/serenity-rs/serenity/pull/2914) Added `User::display_name`, as users may have two different names now.
-- [#2920](https://github.com/serenity-rs/serenity/pull/2920) Added support for Application Emojis, getting rid of those "emoji servers" many bots required.
-- [#2905](https://github.com/serenity-rs/serenity/pull/2905) Added support for Premium Buttons, which link to the store page of a chosen SKU.
-- [#2926](https://github.com/serenity-rs/serenity/pull/2926) Added a method to get the role icon URL.
-- [#2939](https://github.com/serenity-rs/serenity/pull/2939) Added some missing fields to `CurrentApplicationInfo`.
-- [#2946](https://github.com/serenity-rs/serenity/pull/2946) Added support for the Get Guild Role endpoint.
-- [#2960](https://github.com/serenity-rs/serenity/pull/2960) Added support for the Get Sticker Pack by Id endpoint.
-- [#2962](https://github.com/serenity-rs/serenity/pull/2962) Added some missing entries in `GuildMemberFlags`.
-- [#2950](https://github.com/serenity-rs/serenity/pull/2950) Added missing `USE_EXTERNAL_APPS` permission.
-- [#2982](https://github.com/serenity-rs/serenity/pull/2982) Added support for setting voice channel status
-- [#2987](https://github.com/serenity-rs/serenity/pull/2987) Added a builder for the Get Entitlements endpoint.
-- [#2996](https://github.com/serenity-rs/serenity/pull/2996) Added `MessageReferenceKind` as the first step towards supporting message forwarding.
-- [#3001](https://github.com/serenity-rs/serenity/pull/3001) Added `{PartialGuild, Guild}::partial_member_permissions` for checking the permissions of a `PartialMember` without needing to fetch the full `Member`.
-- [#3013](https://github.com/serenity-rs/serenity/pull/3013) Added poll support in interaction responses.
-- [#3018](https://github.com/serenity-rs/serenity/pull/3018) Stablise User Apps.
-- [#3021](https://github.com/serenity-rs/serenity/pull/3021) Added support for Entry Point Commands.
+- [#2914](https://github.com/serenity-rs/serenity/pull/2914) `User::display_name` has been added, as users may have two different names now.
+- [#2920](https://github.com/serenity-rs/serenity/pull/2920) Support for Application Emojis has been added, getting rid of those "emoji servers" many bots required.
+- [#2905](https://github.com/serenity-rs/serenity/pull/2905) Support for Premium Buttons has been added, which link to the store page of a chosen SKU.
+- [#2926](https://github.com/serenity-rs/serenity/pull/2926) A method to get the role icon URL has been added.
+- [#2939](https://github.com/serenity-rs/serenity/pull/2939) Some missing fields have been added to to `CurrentApplicationInfo`.
+- [#2946](https://github.com/serenity-rs/serenity/pull/2946) Support for the Get Guild Role endpoint has been added.
+- [#2960](https://github.com/serenity-rs/serenity/pull/2960) Support for the Get Sticker Pack by Id endpoint has been added.
+- [#2962](https://github.com/serenity-rs/serenity/pull/2962) Some missing entries in `GuildMemberFlags` have been added.
+- [#2950](https://github.com/serenity-rs/serenity/pull/2950) The missing `USE_EXTERNAL_APPS` permission has been added.
+- [#2987](https://github.com/serenity-rs/serenity/pull/2987) A builder for the Get Entitlements endpoint has been added.
+- [#2996](https://github.com/serenity-rs/serenity/pull/2996) `MessageReferenceKind` has been added to start supporting forwarding.
+- [#3001](https://github.com/serenity-rs/serenity/pull/3001) `{PartialGuild, Guild}::partial_member_permissions` has been added for more efficent permissions checking
+- [#3013](https://github.com/serenity-rs/serenity/pull/3013) Interaction responses can now send polls.
+- [#3018](https://github.com/serenity-rs/serenity/pull/3018) User App support has been stablised, usable without `unstable_discord_api`.
+- [#3021](https://github.com/serenity-rs/serenity/pull/3021) Support for Entry Point Commands has been added.
+- [#3030](https://github.com/serenity-rs/serenity/pull/3030) A `Message::author_permissions` helper has been added, alongside `Permissions::dm_permissions`. 
 
 ### Deserialisation Fixes
 
@@ -51,10 +52,9 @@ Messages with reactions no longer fail to deserialize due to super reaction chan
 - [Pushed to Current](https://github.com/serenity-rs/serenity/commit/7b8dbadbc7cf9cd33a65e587f0b5cc237bdb9b88) `AuthorizingIntegrationOwners` is now usable, as the field was previously private.
 - [#2945](https://github.com/serenity-rs/serenity/pull/2945) (`Partial`)`Guild::member_permissions` is now usable without cache.
 - [#2973](https://github.com/serenity-rs/serenity/pull/2973) `ChannelId::delete_messages` documentation has been expanded to document the single item case.
-- [#2959](https://github.com/serenity-rs/serenity/pull/2959) Document rule for attachment names for local attachments in embeds.
-- [#3005](https://github.com/serenity-rs/serenity/pull/3005) Make accidentally private fields on `BulkBanResponse` public.
-- [#3006](https://github.com/serenity-rs/serenity/pull/3006) Fix model functions using `SerializeIter`, fixing a problem making the bulk ban endpoint unusable.
-
+- [#2959](https://github.com/serenity-rs/serenity/pull/2959) The rules for attachment names for local attachments in embeds have now been documented.
+- [#3005](https://github.com/serenity-rs/serenity/pull/3005) The fields of `BulkBanResponse` have been made public.
+- [#3006](https://github.com/serenity-rs/serenity/pull/3006) The `bulk_ban` endpoint is now usable, previously unusable due to `Send` issues.
 
 
 ## [0.12.2] - 2024-06-01
