@@ -761,6 +761,7 @@ impl GuildChannel {
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "cache")]
+    #[deprecated = "Use `Guild::user_permissions_in`"]
     #[inline]
     pub fn permissions_for_user(
         &self,
@@ -1022,13 +1023,11 @@ impl GuildChannel {
                 .collect()),
             ChannelType::News | ChannelType::Text => Ok(guild
                 .members
-                .iter()
-                .filter(|e| {
-                    self.permissions_for_user(cache, e.0)
-                        .map(|p| p.contains(Permissions::VIEW_CHANNEL))
-                        .unwrap_or(false)
+                .values()
+                .filter(|member| {
+                    guild.user_permissions_in(self, member).contains(Permissions::VIEW_CHANNEL)
                 })
-                .map(|e| e.1.clone())
+                .cloned()
                 .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
