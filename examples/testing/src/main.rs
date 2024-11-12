@@ -196,12 +196,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         channel.edit(ctx, EditChannel::new().category(None)).await?;
         channel.edit(ctx, EditChannel::new().category(Some(parent_id))).await?;
     } else if msg.content == "channelperms" {
-        let guild = guild_id.to_guild_cached(ctx).unwrap().clone();
-        let perms = guild.user_permissions_in(
-            &channel_id.to_channel(ctx).await?.guild().unwrap(),
-            &*guild.member(ctx, msg.author.id).await?,
-        );
-        channel_id.say(ctx, format!("{:?}", perms)).await?;
+        channel_id.say(ctx, format!("{:?}", msg.author_permissions(ctx))).await?;
     } else if let Some(forum_channel_id) = msg.content.strip_prefix("createforumpostin ") {
         forum_channel_id
             .parse::<ChannelId>()

@@ -857,13 +857,10 @@ pub(crate) fn has_correct_permissions(
 ) -> bool {
     if options.required_permissions().is_empty() {
         true
+    } else if let Some(permissions) = message.author_permissions(cache) {
+        permissions.contains(*options.required_permissions())
     } else {
-        message.guild(cache.as_ref()).is_some_and(|guild| {
-            let Some(channel) = guild.channels.get(&message.channel_id) else { return false };
-            let Some(member) = guild.members.get(&message.author.id) else { return false };
-
-            guild.user_permissions_in(channel, member).contains(*options.required_permissions())
-        })
+        false
     }
 }
 
