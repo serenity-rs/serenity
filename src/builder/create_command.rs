@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
+use crate::builder::EditCommand;
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder for creating a new [`CommandOption`].
@@ -320,37 +320,22 @@ impl<'a> CreateCommandOption<'a> {
 
 /// A builder for creating a new [`Command`].
 ///
-/// [`Self::name`] and [`Self::description`] are required fields.
-///
 /// [`Command`]: crate::model::application::Command
 ///
 /// Discord docs:
-/// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params)
-/// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command-json-params)
+/// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command)
+/// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateCommand<'a> {
-    name: Cow<'a, str>,
-    name_localizations: HashMap<Cow<'a, str>, Cow<'a, str>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<Cow<'a, str>>,
-    description_localizations: HashMap<Cow<'a, str>, Cow<'a, str>>,
-    options: Cow<'a, [CreateCommandOption<'a>]>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    default_member_permissions: Option<Permissions>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[cfg(not(feature = "unstable"))]
-    dm_permission: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<CommandType>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    integration_types: Option<Vec<InstallationContext>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    contexts: Option<Vec<InteractionContext>>,
-    nsfw: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
     handler: Option<EntryPointHandlerType>,
+
+    #[serde(flatten)]
+    fields: EditCommand<'a>,
 }
 
 impl<'a> CreateCommand<'a> {
@@ -358,21 +343,9 @@ impl<'a> CreateCommand<'a> {
     pub fn new(name: impl Into<Cow<'a, str>>) -> Self {
         Self {
             kind: None,
-
-            name: name.into(),
-            name_localizations: HashMap::new(),
-            description: None,
-            description_localizations: HashMap::new(),
-            default_member_permissions: None,
-            #[cfg(not(feature = "unstable"))]
-            dm_permission: None,
-
-            integration_types: None,
-            contexts: None,
-
-            options: Cow::default(),
-            nsfw: false,
             handler: None,
+
+            fields: EditCommand::new().name(name),
         }
     }
 
@@ -383,15 +356,14 @@ impl<'a> CreateCommand<'a> {
     /// global commands of the same app cannot have the same name. Two guild-specific commands of
     /// the same app cannot have the same name.
     pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
-        self.name = name.into();
+        self.fields = self.fields.name(name);
         self
     }
 
     /// Specifies a localized name of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateCommand::new("")
-    /// .name("birthday")
+    /// # serenity::builder::CreateCommand::new("birthday")
     /// .name_localized("zh-CN", "生日")
     /// .name_localized("el", "γενέθλια")
     /// # ;
@@ -401,7 +373,7 @@ impl<'a> CreateCommand<'a> {
         locale: impl Into<Cow<'a, str>>,
         name: impl Into<Cow<'a, str>>,
     ) -> Self {
-        self.name_localizations.insert(locale.into(), name.into());
+        self.fields = self.fields.name_localized(locale, name);
         self
     }
 
@@ -413,14 +385,14 @@ impl<'a> CreateCommand<'a> {
 
     /// Specifies the default permissions required to execute the command.
     pub fn default_member_permissions(mut self, permissions: Permissions) -> Self {
-        self.default_member_permissions = Some(permissions);
+        self.fields = self.fields.default_member_permissions(permissions);
         self
     }
 
     /// Specifies if the command is available in DMs.
     #[cfg(not(feature = "unstable"))]
     pub fn dm_permission(mut self, enabled: bool) -> Self {
-        self.dm_permission = Some(enabled);
+        self.fields = self.fields.dm_permission(enabled);
         self
     }
 
@@ -428,14 +400,14 @@ impl<'a> CreateCommand<'a> {
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
-        self.description = Some(description.into());
+        self.fields = self.fields.description(description);
         self
     }
 
     /// Specifies a localized description of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateCommand::new("")
+    /// # serenity::builder::CreateCommand::new("birthday")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
@@ -445,7 +417,7 @@ impl<'a> CreateCommand<'a> {
         locale: impl Into<Cow<'a, str>>,
         description: impl Into<Cow<'a, str>>,
     ) -> Self {
-        self.description_localizations.insert(locale.into(), description.into());
+        self.fields = self.fields.description_localized(locale, description);
         self
     }
 
@@ -453,7 +425,7 @@ impl<'a> CreateCommand<'a> {
     ///
     /// **Note**: Application commands can have up to 25 options.
     pub fn add_option(mut self, option: CreateCommandOption<'a>) -> Self {
-        self.options.to_mut().push(option);
+        self.fields = self.fields.add_option(option);
         self
     }
 
@@ -461,37 +433,37 @@ impl<'a> CreateCommand<'a> {
     ///
     /// **Note**: Application commands can have up to 25 options.
     pub fn set_options(mut self, options: impl Into<Cow<'a, [CreateCommandOption<'a>]>>) -> Self {
-        self.options = options.into();
+        self.fields = self.fields.set_options(options);
         self
     }
 
     /// Adds an installation context that this application command can be used in.
     pub fn add_integration_type(mut self, integration_type: InstallationContext) -> Self {
-        self.integration_types.get_or_insert_with(Vec::default).push(integration_type);
+        self.fields = self.fields.add_integration_type(integration_type);
         self
     }
 
     /// Sets the installation contexts that this application command can be used in.
     pub fn integration_types(mut self, integration_types: Vec<InstallationContext>) -> Self {
-        self.integration_types = Some(integration_types);
+        self.fields = self.fields.integration_types(integration_types);
         self
     }
 
     /// Adds an interaction context that this application command can be used in.
     pub fn add_context(mut self, context: InteractionContext) -> Self {
-        self.contexts.get_or_insert_with(Vec::default).push(context);
+        self.fields = self.fields.add_context(context);
         self
     }
 
     /// Sets the interaction contexts that this application command can be used in.
     pub fn contexts(mut self, contexts: Vec<InteractionContext>) -> Self {
-        self.contexts = Some(contexts);
+        self.fields = self.fields.contexts(contexts);
         self
     }
 
     /// Whether this command is marked NSFW (age-restricted)
     pub fn nsfw(mut self, nsfw: bool) -> Self {
-        self.nsfw = nsfw;
+        self.fields = self.fields.nsfw(nsfw);
         self
     }
 
@@ -504,12 +476,10 @@ impl<'a> CreateCommand<'a> {
         self
     }
 
-    /// Create a [`Command`], overriding an existing one with the same name if it exists.
+    /// Create a [`Command`], overwriting an existing one with the same name if it exists.
     ///
     /// Providing a [`GuildId`] will create a command in the corresponding [`Guild`]. Otherwise, a
     /// global command will be created.
-    ///
-    /// Providing a [`CommandId`] will edit the corresponding command.
     ///
     /// # Errors
     ///
@@ -519,19 +489,10 @@ impl<'a> CreateCommand<'a> {
     ///
     /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
     #[cfg(feature = "http")]
-    pub async fn execute(
-        self,
-        http: &Http,
-        guild_id: Option<GuildId>,
-        command_id: Option<CommandId>,
-    ) -> Result<Command> {
-        match (guild_id, command_id) {
-            (Some(guild_id), Some(cmd_id)) => {
-                http.edit_guild_command(guild_id, cmd_id, &self).await
-            },
-            (Some(guild_id), None) => http.create_guild_command(guild_id, &self).await,
-            (None, Some(cmd_id)) => http.edit_global_command(cmd_id, &self).await,
-            (None, None) => http.create_global_command(&self).await,
+    pub async fn execute(self, http: &Http, guild_id: Option<GuildId>) -> Result<Command> {
+        match guild_id {
+            Some(guild_id) => http.create_guild_command(guild_id, &self).await,
+            None => http.create_global_command(&self).await,
         }
     }
 }

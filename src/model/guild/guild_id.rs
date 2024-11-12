@@ -14,6 +14,7 @@ use crate::builder::{
     CreateSoundboard,
     CreateSticker,
     EditAutoModRule,
+    EditCommand,
     EditCommandPermissions,
     EditGuild,
     EditGuildIncidentActions,
@@ -1461,7 +1462,7 @@ impl GuildId {
     ///
     /// See [`CreateCommand::execute`] for a list of possible errors.
     pub async fn create_command(self, http: &Http, builder: CreateCommand<'_>) -> Result<Command> {
-        builder.execute(http, Some(self), None).await
+        builder.execute(http, Some(self)).await
     }
 
     /// Override all guild application commands.
@@ -1529,9 +1530,9 @@ impl GuildId {
         self,
         http: &Http,
         command_id: CommandId,
-        builder: CreateCommand<'_>,
+        builder: EditCommand<'_>,
     ) -> Result<Command> {
-        builder.execute(http, Some(self), Some(command_id)).await
+        builder.execute(http, command_id, Some(self)).await
     }
 
     /// Delete guild application command by its Id.
