@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use super::{InstallationContext, InteractionContext};
 #[cfg(feature = "model")]
-use crate::builder::CreateCommand;
+use crate::builder::{CreateCommand, EditCommand};
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::prelude::*;
@@ -145,7 +145,7 @@ impl Command {
     ///
     /// [`InteractionCreate`]: crate::gateway::client::EventHandler::interaction_create
     pub async fn create_global_command(http: &Http, builder: CreateCommand<'_>) -> Result<Command> {
-        builder.execute(http, None, None).await
+        builder.execute(http, None).await
     }
 
     /// Override all global application commands.
@@ -168,9 +168,9 @@ impl Command {
     pub async fn edit_global_command(
         http: &Http,
         command_id: CommandId,
-        builder: CreateCommand<'_>,
+        builder: EditCommand<'_>,
     ) -> Result<Command> {
-        builder.execute(http, None, Some(command_id)).await
+        builder.execute(http, command_id, None).await
     }
 
     /// Gets all global commands.
