@@ -10,10 +10,10 @@ use crate::model::utils::is_false;
 
 /// Information about a role within a guild.
 ///
-/// A role represents a set of permissions, and can be attached to one or multiple users. A role has
-/// various miscellaneous configurations, such as being assigned a colour. Roles are unique per
-/// guild and do not cross over to other guilds in any way, and can have channel-specific permission
-/// overrides in addition to guild-level permissions.
+/// A role represents a set of permissions, and can be attached to one or multiple users. A role
+/// has various miscellaneous configurations, such as being assigned a colour. Roles are unique per
+/// guild and do not cross over to other guilds in any way, and can have channel-specific
+/// permission overrides in addition to guild-level permissions.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
 #[bool_to_bitflags::bool_to_bitflags]
