@@ -31,8 +31,6 @@ use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 
-const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
-
 /// The shard queuer is a simple loop that runs indefinitely to manage the startup of shards.
 ///
 /// A shard queuer instance _should_ be run in its own thread, due to the blocking nature of the
@@ -68,6 +66,8 @@ pub struct ShardQueuer {
     pub ws_url: Arc<str>,
     /// The total amount of shards to start.
     pub shard_total: NonZeroU16,
+    /// Number of seconds to wait between each start
+    pub wait_time_between_shard_start: Duration,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
@@ -94,14 +94,14 @@ impl ShardQueuer {
     /// **Note**: This should be run in its own thread due to the blocking nature of the loop.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn run(&mut self) {
-        // We read from the Rx channel in a loop, and use a timeout of 5 seconds so that we don't
+        // We read from the Rx channel in a loop, and use a timeout of
+        // {self.WAIT_TIME_BETWEEN_SHARD_START} (5 seconds normally) seconds so that we don't
         // hang forever. When we receive a command to start a shard, we append it to our queue. The
         // queue is popped in batches of shards, which are started in parallel. A batch is fired
-        // every 5 seconds at minimum in order to avoid being ratelimited.
-        const TIMEOUT: Duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
+        // every WAIT_TIME_BETWEEN_SHARD_START at minimum in order to avoid being ratelimited.
 
         loop {
-            if let Ok(msg) = timeout(TIMEOUT, self.rx.next()).await {
+            if let Ok(msg) = timeout(self.wait_time_between_shard_start, self.rx.next()).await {
                 match msg {
                     Some(ShardQueuerMessage::SetShardTotal(shard_total)) => {
                         self.shard_total = shard_total;
@@ -157,14 +157,13 @@ impl ShardQueuer {
         let Some(instant) = self.last_start else { return };
 
         // We must wait 5 seconds between IDENTIFYs to avoid session invalidations.
-        let duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
         let elapsed = instant.elapsed();
 
-        if elapsed >= duration {
+        if elapsed >= self.wait_time_between_shard_start {
             return;
         }
 
-        let to_sleep = duration - elapsed;
+        let to_sleep = self.wait_time_between_shard_start - elapsed;
 
         sleep(to_sleep).await;
     }

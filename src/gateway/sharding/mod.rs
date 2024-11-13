@@ -50,7 +50,11 @@ use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
 use url::Url;
 
-pub use self::shard_manager::{ShardManager, ShardManagerOptions};
+pub use self::shard_manager::{
+    ShardManager,
+    ShardManagerOptions,
+    DEFAULT_WAIT_BETWEEN_SHARD_START,
+};
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::{ShardQueue, ShardQueuer, ShardQueuerMessage};
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
