@@ -343,11 +343,11 @@ impl IntoFuture for ClientBuilder {
     }
 }
 
-/// A wrapper for HTTP and gateway connections.
+/// A high-level client that abstracts over the REST API as well as Discord's gateway.
 ///
-/// The Client is the way to be able to start sending authenticated requests over the REST API, as
-/// well as initializing a WebSocket connection through [`Shard`]s. Refer to the [documentation on
-/// using sharding][super::sharding] for more information.
+/// It enables the user to start sending authenticated HTTP requests, plus also initialize a
+/// WebSocket connection to the gateway through [`Shard`]s. Refer to the [documentation on using
+/// sharding][super::sharding] for more information.
 ///
 /// # Event Handlers
 ///
