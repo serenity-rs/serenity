@@ -388,15 +388,14 @@ pub struct AuditLogEntry {
     /// The id of this entry.
     pub id: AuditLogEntryId,
     /// Some optional data associated with this entry.
-    pub options: Option<Options>,
+    pub options: Option<AuditLogEntryOptions>,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
-// TODO: should be renamed to a less ambiguous name
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
-pub struct Options {
+pub struct AuditLogEntryOptions {
     /// Name of the Auto Moderation rule that was triggered.
     pub auto_moderation_rule_name: Option<FixedString>,
     /// Trigger type of the Auto Moderation rule that was triggered.

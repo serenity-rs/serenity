@@ -130,7 +130,7 @@ pub fn print_ranking() {
         ("MessageUpdateEvent", std::mem::size_of::<MessageUpdateEvent>()),
         ("ModalInteraction", std::mem::size_of::<ModalInteraction>()),
         ("ModalInteractionData", std::mem::size_of::<ModalInteractionData>()),
-        ("Options", std::mem::size_of::<Options>()),
+        ("AuditLogEntryOptions", std::mem::size_of::<AuditLogEntryOptions>()),
         ("PartialChannel", std::mem::size_of::<PartialChannel>()),
         ("PartialCurrentApplicationInfo", std::mem::size_of::<PartialCurrentApplicationInfo>()),
         ("PartialGuild", std::mem::size_of::<PartialGuild>()),
