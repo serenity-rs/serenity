@@ -51,7 +51,7 @@ pub struct ModalInteraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<Box<Message>>,
     /// Permissions the app or bot has within the channel the interaction was sent from.
-    pub app_permissions: Option<Permissions>,
+    pub app_permissions: Permissions,
     /// The selected language of the invoking user.
     pub locale: FixedString,
     /// The guild's preferred locale.
