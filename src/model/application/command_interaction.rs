@@ -55,8 +55,7 @@ pub struct CommandInteraction {
     /// Always `1`.
     pub version: u8,
     /// Permissions the app or bot has within the channel the interaction was sent from.
-    // TODO(next): This is now always serialized.
-    pub app_permissions: Option<Permissions>,
+    pub app_permissions: Permissions,
     /// The selected language of the invoking user.
     pub locale: FixedString,
     /// The guild's preferred locale.

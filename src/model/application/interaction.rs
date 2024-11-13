@@ -56,9 +56,9 @@ impl Interaction {
 
     /// Permissions the app or bot has within the channel the interaction was sent from.
     #[must_use]
-    pub fn app_permissions(&self) -> Option<Permissions> {
+    pub fn app_permissions(&self) -> Permissions {
         match self {
-            Self::Ping(_) => None,
+            Self::Ping(i) => i.app_permissions,
             Self::Command(i) | Self::Autocomplete(i) => i.app_permissions,
             Self::Component(i) => i.app_permissions,
             Self::Modal(i) => i.app_permissions,
