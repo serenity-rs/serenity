@@ -593,8 +593,10 @@ pub struct PartialThreadMember {
 
 /// A model representing a user in a Guild Thread.
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/channel#thread-member-object),
-/// [extra fields](https://docs.discord.com/developers/events/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
+/// [Discord docs], [extra fields].
+///
+/// [Discord docs]: https://docs.discord.com/developers/resources/channel#thread-member-object
+/// [extra fields]: https://docs.discord.com/developers/events/gateway-events#thread-member-update-thread-member-update-event-extra-fields
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
