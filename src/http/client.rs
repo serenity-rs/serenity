@@ -59,7 +59,7 @@ where
     }
 }
 
-/// A builder for the underlying [`Http`] client that performs requests to Discord's HTTP API
+/// A builder for the underlying [`Http`] client.
 ///
 /// If you do not need to use a proxy or do not need to disable the rate limiter, you can use
 /// [`Http::new`] instead.
@@ -232,6 +232,8 @@ fn reason_into_header(reason: &str) -> Headers {
     headers
 }
 
+/// A low-level client for sending requests to Discord's HTTP REST API.
+///
 /// **Note**: For all member functions that return a [`Result`], the Error kind will be either
 /// [`Error::Http`] or [`Error::Json`].
 #[derive(Debug)]

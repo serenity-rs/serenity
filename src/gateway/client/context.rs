@@ -7,11 +7,11 @@ use crate::gateway::{ActivityData, ShardMessenger, ShardRunner};
 use crate::http::Http;
 use crate::model::prelude::*;
 
-/// The context is a general utility struct provided on event dispatches.
+/// A general utility struct provided on event dispatches.
 ///
-/// The Context helps with dealing with the current "context" of the event dispatch. The context
-/// also acts as a general high-level interface over the associated [`Shard`] which received
-/// the event, or the low-level [`http`] module.
+/// The [`Context`] helps with dealing with the current "context" of the event dispatch. It also
+/// acts as a general high-level interface over the low-level [`http`] module, plus the associated
+/// [`Shard`] which received the event.
 ///
 /// The context contains "shortcuts", like for interacting with the shard. Methods like
 /// [`Self::set_activity`] will unlock the shard and perform an update for you to save a bit of

@@ -1,4 +1,4 @@
-//! Module containing types for gateway sharding.
+//! Mechanisms for configuring and managing sharded gateway connections.
 //!
 //! Sharding is a method for load-balancing bots across separate threads or processes. Sharding is
 //! enforced on bots by Discord once they reach a certain number of guilds (2500). Once this
@@ -62,16 +62,16 @@ use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::{ApplicationId, GuildId, ShardId};
 use crate::model::user::OnlineStatus;
 
-/// A Shard is a higher-level handler for a websocket connection to Discord's gateway.
+/// An abstract handler for a websocket connection to Discord's gateway.
 ///
-/// The shard allows for sending and receiving messages over the websocket,
-/// such as setting the active activity, reconnecting, syncing guilds, and more.
+/// Allows a user to send and receive messages over said websocket, including:
+///   * setting the current activity
+///   * setting the current online status
+///   * receiving gateway events
+///   * connection management via heartbeating
 ///
-/// Refer to the [module-level documentation][module docs] for information on effectively using
-/// multiple shards, if you need to.
-///
-/// Note that there are additional methods available if you are manually managing a shard yourself,
-/// although they are hidden from the documentation since there are few use cases for doing so.
+/// Shard management (including starting, restarting, heartbeating), is performed by the [`Client`]
+/// automatically on the user's behalf.
 ///
 /// # Stand-alone shards
 ///
@@ -79,17 +79,14 @@ use crate::model::user::OnlineStatus;
 /// [`Shard::new`]. Most use cases will not necessitate this, and unless you're doing something
 /// really weird you can just let the client do it for you.
 ///
-/// **Note**: You _really_ do not need to do this. Just call one of the appropriate methods on the
-/// [`Client`].
+/// **Note**: You _really_ do not need to do this, especially if using multiple shards. Just call
+/// one of the appropriate methods on the [`Client`].
 ///
 /// # Examples
 ///
 /// See the documentation for [`Self::new`] on how to use this.
 ///
 /// [`Client`]: crate::Client
-/// [`receive`]: #method.receive
-/// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
-/// [module docs]: crate::gateway#sharding
 pub struct Shard {
     pub client: WsClient,
     presence: PresenceData,

@@ -30,9 +30,10 @@ macro_rules! event_handler {
                 }
             )*
 
-            /// Checks if the `event` should be dispatched (`true`) or ignored (`false`).
+            /// Checks if the `event` should be dispatched or ignored. Returns `true` by default.
             ///
-            /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and this `EventHandler` trait.
+            /// Returning `false` will drop an event and prevent it being dispatched by any
+            /// frameworks and will exclude it from any collectors.
             ///
             /// ## Warning
             ///
@@ -508,10 +509,10 @@ pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
     async fn raw_event(&self, _ctx: Context, _ev: &Event) {}
 
-    /// Checks if the `event` should be dispatched (`true`) or ignored (`false`).
+    /// Checks if the `event` should be dispatched or ignored. Returns `true` by default.
     ///
-    /// This affects [`crate::collector::collect`], [`crate::framework::Framework::dispatch`] and
-    /// this `EventHandler` trait.
+    /// Returning `false` will drop an event and prevent it being dispatched by any frameworks and
+    /// will exclude it from any collectors.
     ///
     /// ## Warning
     ///
