@@ -17,4 +17,6 @@ pub struct PingInteraction {
     pub token: FixedString,
     /// Always `1`.
     pub version: u8,
+    /// Permissions the app or bot has within the channel the interaction was sent from.
+    pub app_permissions: Permissions,
 }
