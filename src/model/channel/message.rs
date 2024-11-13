@@ -130,10 +130,6 @@ pub struct Message {
     /// The Id of the [`Guild`] that the message was sent in. This value will only be present if
     /// this message was received over the gateway, therefore **do not use this to check if message
     /// is in DMs**, it is not a reliable method.
-    // TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store
-    // `Option<MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just
-    // not know because HTTP retrieved Messages don't have guild ID?), we'd set
-    // Some(MessageLocation::Dm) in gateway and None in HTTP.
     pub guild_id: Option<GuildId>,
     /// A partial amount of data about the user's member data
     ///
