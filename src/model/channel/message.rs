@@ -870,19 +870,6 @@ impl From<&Message> for MessageReference {
     }
 }
 
-impl From<(ChannelId, MessageId)> for MessageReference {
-    // TODO(next): Remove this
-    fn from(pair: (ChannelId, MessageId)) -> Self {
-        Self {
-            kind: MessageReferenceKind::default(),
-            message_id: Some(pair.1),
-            channel_id: pair.0,
-            guild_id: None,
-            fail_if_not_exists: None,
-        }
-    }
-}
-
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
