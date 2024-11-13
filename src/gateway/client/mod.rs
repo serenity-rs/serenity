@@ -33,6 +33,7 @@ use std::ops::Range;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
 use std::sync::OnceLock;
+use std::time::Duration;
 
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
@@ -49,7 +50,14 @@ use crate::cache::Settings as CacheSettings;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
-use crate::gateway::{ActivityData, GatewayError, PresenceData, ShardManager, ShardManagerOptions};
+use crate::gateway::{
+    ActivityData,
+    GatewayError,
+    PresenceData,
+    ShardManager,
+    ShardManagerOptions,
+    DEFAULT_WAIT_BETWEEN_SHARD_START,
+};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -73,6 +81,7 @@ pub struct ClientBuilder {
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     presence: PresenceData,
+    wait_time_between_shard_start: Duration,
 }
 
 impl ClientBuilder {
@@ -106,6 +115,7 @@ impl ClientBuilder {
             event_handler: None,
             raw_event_handler: None,
             presence: PresenceData::default(),
+            wait_time_between_shard_start: DEFAULT_WAIT_BETWEEN_SHARD_START,
         }
     }
 
@@ -151,6 +161,19 @@ impl ClientBuilder {
     #[must_use]
     pub fn get_framework(&self) -> Option<&dyn Framework> {
         self.framework.as_deref()
+    }
+
+    /// Sets the time to wait between starting shards.
+    ///
+    /// This should only be used when using a gateway proxy, such as [Sandwich] or [Twilight Gateway
+    /// Proxy], as otherwise this will lead to gateway disconnects if the shard start rate limit is
+    /// not respected.
+    ///
+    /// [Sandwich]:  https://github.com/WelcomerTeam/Sandwich-Daemon
+    /// [Twilight Gateway Proxy]: https://github.com/Gelbpunkt/gateway-proxy
+    pub fn wait_time_between_shard_start(mut self, wait_time: Duration) -> Self {
+        self.wait_time_between_shard_start = wait_time;
+        self
     }
 
     /// Sets the voice gateway handler to be used. It will receive voice events sent over the
@@ -318,6 +341,7 @@ impl IntoFuture for ClientBuilder {
                 intents,
                 presence: Some(presence),
                 max_concurrency,
+                wait_time_between_shard_start: self.wait_time_between_shard_start,
             });
 
             let client = Client {
