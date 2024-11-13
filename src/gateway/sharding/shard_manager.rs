@@ -25,6 +25,9 @@ use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::GatewayIntents;
 
+/// The default time to wait between starting each shard or set of shards.
+pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
+
 /// A manager for handling the status of shards by starting them, restarting them, and stopping
 /// them when required.
 ///
@@ -50,7 +53,7 @@ use crate::model::gateway::GatewayIntents;
 /// use std::sync::{Arc, OnceLock};
 ///
 /// use serenity::gateway::client::EventHandler;
-/// use serenity::gateway::{ShardManager, ShardManagerOptions};
+/// use serenity::gateway::{ShardManager, ShardManagerOptions, DEFAULT_WAIT_BETWEEN_SHARD_START};
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
@@ -84,6 +87,7 @@ use crate::model::gateway::GatewayIntents;
 ///     intents: GatewayIntents::non_privileged(),
 ///     presence: None,
 ///     max_concurrency,
+///     wait_time_between_shard_start: DEFAULT_WAIT_BETWEEN_SHARD_START,
 /// });
 /// # Ok(())
 /// # }
@@ -146,6 +150,7 @@ impl ShardManager {
             http: opt.http,
             intents: opt.intents,
             presence: opt.presence,
+            wait_time_between_shard_start: opt.wait_time_between_shard_start,
         };
 
         spawn_named("shard_queuer::run", async move {
@@ -372,4 +377,6 @@ pub struct ShardManagerOptions {
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
     pub max_concurrency: NonZeroU16,
+    /// Number of seconds to wait between starting each shard/set of shards start
+    pub wait_time_between_shard_start: Duration,
 }
