@@ -335,7 +335,7 @@ pub struct AuditLogs {
     #[serde(rename = "audit_log_entries")]
     pub entries: FixedArray<AuditLogEntry>,
     /// List of auto moderation rules referenced in the audit log.
-    pub auto_moderation_rules: FixedArray<Rule>,
+    pub auto_moderation_rules: FixedArray<AutoModRule>,
     /// List of application commands referenced in the audit log.
     pub application_commands: FixedArray<Command>,
     /// List of guild scheduled events referenced in the audit log.

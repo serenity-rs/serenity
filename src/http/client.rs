@@ -2500,7 +2500,7 @@ impl Http {
     }
 
     /// Retrieves all auto moderation rules in a guild.
-    pub async fn get_automod_rules(&self, guild_id: GuildId) -> Result<Vec<Rule>> {
+    pub async fn get_automod_rules(&self, guild_id: GuildId) -> Result<Vec<AutoModRule>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2515,7 +2515,11 @@ impl Http {
     }
 
     /// Retrieves an auto moderation rule in a guild.
-    pub async fn get_automod_rule(&self, guild_id: GuildId, rule_id: RuleId) -> Result<Rule> {
+    pub async fn get_automod_rule(
+        &self,
+        guild_id: GuildId,
+        rule_id: RuleId,
+    ) -> Result<AutoModRule> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2536,7 +2540,7 @@ impl Http {
         guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<Rule> {
+    ) -> Result<AutoModRule> {
         let body = to_vec(map)?;
 
         self.fire(Request {
@@ -2559,7 +2563,7 @@ impl Http {
         rule_id: RuleId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<Rule> {
+    ) -> Result<AutoModRule> {
         let body = to_vec(map)?;
 
         self.fire(Request {

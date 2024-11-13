@@ -156,7 +156,7 @@ pub fn print_ranking() {
         ("Role", std::mem::size_of::<Role>()),
         ("RoleId", std::mem::size_of::<RoleId>()),
         ("RoleTags", std::mem::size_of::<RoleTags>()),
-        ("Rule", std::mem::size_of::<Rule>()),
+        ("AutoModRule", std::mem::size_of::<AutoModRule>()),
         ("RuleId", std::mem::size_of::<RuleId>()),
         ("ScheduledEvent", std::mem::size_of::<ScheduledEvent>()),
         ("ScheduledEventId", std::mem::size_of::<ScheduledEventId>()),
