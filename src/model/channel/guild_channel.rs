@@ -364,52 +364,6 @@ impl GuildChannel {
         cache.guild(self.guild_id)
     }
 
-    /// Calculates the permissions of a member.
-    ///
-    /// The Id of the argument must be a [`Member`] of the [`Guild`] that the channel is in.
-    ///
-    /// # Examples
-    ///
-    /// Calculate the permissions of a [`User`] who posted a [`Message`] in a channel:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: Context, msg: Message) {
-    ///         let Some(guild) = msg.guild(&context.cache) else {
-    ///             return;
-    ///         };
-    ///
-    ///         let Some(channel) = guild.channels.get(&msg.channel_id) else {
-    ///             return;
-    ///         };
-    ///
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, msg.author.id) {
-    ///             println!("The user's permissions: {:?}", permissions);
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could not be found in the
-    /// [`Cache`].
-    ///
-    /// [Attach Files]: Permissions::ATTACH_FILES
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use `Guild::user_permissions_in`"]
-    pub fn permissions_for_user(&self, cache: &Cache, user_id: UserId) -> Result<Permissions> {
-        let guild = self.guild(cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
-        let member = guild.members.get(&user_id).ok_or(Error::Model(ModelError::MemberNotFound))?;
-        Ok(guild.user_permissions_in(self, member))
-    }
-
     /// Sends a message to the channel.
     ///
     /// Refer to the documentation for [`CreateMessage`] for information regarding content
