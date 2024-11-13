@@ -53,7 +53,7 @@ pub struct ComponentInteraction {
     /// The message this interaction was triggered by, if it is a component.
     pub message: Box<Message>,
     /// Permissions the app or bot has within the channel the interaction was sent from.
-    pub app_permissions: Option<Permissions>,
+    pub app_permissions: Permissions,
     /// The selected language of the invoking user.
     pub locale: FixedString,
     /// The guild's preferred locale.
