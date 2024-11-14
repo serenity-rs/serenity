@@ -220,6 +220,7 @@ impl Message {
     ///
     /// This may return `None` if:
     /// - The [`Cache`] does not have the current [`Guild`]
+    /// - The [`Guild`] does not have the current channel cached (should never happen).
     /// - This message is not from [`MessageCreateEvent`] and the author's [`Member`] cannot be
     ///   found in [`Guild#structfield.members`].
     #[cfg(feature = "cache")]
@@ -229,10 +230,18 @@ impl Message {
         };
 
         let guild = cache.as_ref().guild(guild_id)?;
-        if let Some(member) = &self.member {
-            Some(guild.partial_member_permissions(self.author.id, member))
+        let channel = if let Some(channel) = guild.channels.get(&self.channel_id) {
+            channel
+        } else if let Some(thread) = guild.threads.iter().find(|th| th.id == self.channel_id) {
+            thread
         } else {
-            Some(guild.member_permissions(guild.members.get(&self.author.id)?))
+            return None;
+        };
+
+        if let Some(member) = &self.member {
+            Some(guild.partial_member_permissions_in(channel, self.author.id, member))
+        } else {
+            Some(guild.user_permissions_in(channel, guild.members.get(&self.author.id)?))
         }
     }
 
