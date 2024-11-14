@@ -428,6 +428,8 @@ impl Guild {
         required_permissions: Permissions,
     ) -> Result<(), Error> {
         if let Some(member) = self.members.get(&cache.current_user().id) {
+            // This isn't used for any channel-specific permissions, but sucks still.
+            #[allow(deprecated)]
             let bot_permissions = self.member_permissions(member);
             if !bot_permissions.contains(required_permissions) {
                 return Err(Error::Model(ModelError::InvalidPermissions {

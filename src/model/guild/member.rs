@@ -438,6 +438,8 @@ impl Member {
     #[deprecated = "Use Guild::member_permissions_in, as this doesn't consider permission overwrites"]
     pub fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
         let guild = cache.as_ref().guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
+
+        #[allow(deprecated)]
         Ok(guild.member_permissions(self))
     }
 
