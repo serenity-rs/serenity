@@ -435,6 +435,7 @@ impl Member {
     /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
     /// found.
     #[cfg(feature = "cache")]
+    #[deprecated = "Use Guild::member_permissions_in, as this doesn't consider permission overwrites"]
     pub fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
         let guild = cache.as_ref().guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
         Ok(guild.member_permissions(self))
