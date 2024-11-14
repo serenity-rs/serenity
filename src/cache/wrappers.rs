@@ -12,7 +12,7 @@ use typesize::TypeSize;
 
 #[derive(Debug)]
 /// A wrapper around Option<DashMap<K, V>> to ease disabling specific cache fields.
-pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(super) Option<DashMap<K, V, BuildHasher>>);
+pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(crate) Option<DashMap<K, V, BuildHasher>>);
 impl<K: Eq + Hash, V> MaybeMap<K, V> {
     pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V, BuildHasher>> {
         Option::iter(&self.0).flat_map(DashMap::iter)

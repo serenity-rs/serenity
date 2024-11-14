@@ -46,7 +46,7 @@ use crate::model::prelude::*;
 mod cache_update;
 mod event;
 mod settings;
-mod wrappers;
+pub(crate) mod wrappers;
 
 #[cfg(feature = "temp_cache")]
 pub(crate) use wrappers::MaybeOwnedArc;
