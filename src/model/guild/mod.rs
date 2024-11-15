@@ -273,6 +273,10 @@ pub struct Guild {
     #[serde(deserialize_with = "deserialize_guild_channels")]
     pub channels: HashMap<ChannelId, GuildChannel>,
     /// All active threads in this guild that current user has permission to view.
+    ///
+    /// A thread is guaranteed (for errors, not for panics) to be cached if a `MESSAGE_CREATE`
+    /// event is fired in said thread, however an `INTERACTION_CREATE` may not have a private
+    /// thread in cache.
     pub threads: Vec<GuildChannel>,
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
