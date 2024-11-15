@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.12.4] - 2024-11-15
+
+This is a hotfix release to fix broken behaviour of `Message::author_permissions` before it is relied on.
+
+Thanks to the following for their contributions:
+- [@GnomedDev]
+- [@jamesbt365]
+
+### Deprecations
+
+- [#3037](https://github.com/serenity-rs/serenity/pull/3037) Permission methods which do not respect channel permission overrides are now deprecated, use the `_in` variants.
+
+### Additions
+
+- [#3008](https://github.com/serenity-rs/serenity/pull/3008) `From<&User>` has been added to `CreateEmbedAuthor`, to avoid consuming the user.
+
+### Fixes
+
+- [#3037](https://github.com/serenity-rs/serenity/pull/3037) `Message::author_permissions` now respects permission overrides, as it is documented to.
+- [#3039](https://github.com/serenity-rs/serenity/pull/3039) `Message::author_permissions` now respects `SEND_MESSAGES_IN_THREADS` when used in threads.
+
+### Documentation improvements
+
+- [#3038](https://github.com/serenity-rs/serenity/pull/3038) Documentation for `Guild::threads` has been expanded.
+
 ## [0.12.3] - 2024-11-13
 
 Thanks to the following for their contributions:
