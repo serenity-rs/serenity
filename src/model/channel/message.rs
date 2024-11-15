@@ -218,6 +218,9 @@ impl Message {
 
     /// Calculates the permissions of the message author in the current channel.
     ///
+    /// This handles the [`Permissions::SEND_MESSAGES_IN_THREADS`] permission for threads, setting
+    /// [`Permissions::SEND_MESSAGES`] accordingly if this message was sent in a thread.
+    ///
     /// This may return `None` if:
     /// - The [`Cache`] does not have the current [`Guild`]
     /// - The [`Guild`] does not have the current channel cached (should never happen).
@@ -230,19 +233,25 @@ impl Message {
         };
 
         let guild = cache.as_ref().guild(guild_id)?;
-        let channel = if let Some(channel) = guild.channels.get(&self.channel_id) {
-            channel
+        let (channel, is_thread) = if let Some(channel) = guild.channels.get(&self.channel_id) {
+            (channel, false)
         } else if let Some(thread) = guild.threads.iter().find(|th| th.id == self.channel_id) {
-            thread
+            (thread, true)
         } else {
             return None;
         };
 
-        if let Some(member) = &self.member {
-            Some(guild.partial_member_permissions_in(channel, self.author.id, member))
+        let mut permissions = if let Some(member) = &self.member {
+            guild.partial_member_permissions_in(channel, self.author.id, member)
         } else {
-            Some(guild.user_permissions_in(channel, guild.members.get(&self.author.id)?))
+            guild.user_permissions_in(channel, guild.members.get(&self.author.id)?)
+        };
+
+        if is_thread {
+            permissions.set(Permissions::SEND_MESSAGES, permissions.send_messages_in_threads());
         }
+
+        Some(permissions)
     }
 
     /// Deletes the message.
