@@ -6,8 +6,9 @@ use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
-#[expect(unused)] // Error is used in docs
-use crate::error::{Error, Result};
+#[cfg(doc)]
+use crate::error::Error;
+use crate::error::Result;
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::channel::Message;
