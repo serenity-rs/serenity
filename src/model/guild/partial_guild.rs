@@ -183,46 +183,6 @@ impl PartialGuild {
         guild_id.to_partial_guild(cache_http).await
     }
 
-    /// Calculate a [`Member`]'s permissions in the guild.
-    #[must_use]
-    #[deprecated = "Use PartialGuild::user_permissions_in, as this doesn't consider permission overwrites"]
-    pub fn member_permissions(&self, member: &Member) -> Permissions {
-        Guild::user_permissions_in_(
-            None,
-            member.user.id,
-            &member.roles,
-            self.id,
-            &self.roles,
-            self.owner_id,
-        )
-    }
-
-    /// Calculate a [`PartialMember`]'s permissions in the guild.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
-    #[must_use]
-    #[deprecated = "Use PartialGuild::partial_member_permissions_in, as this doesn't consider permission overwrites"]
-    pub fn partial_member_permissions(
-        &self,
-        member_id: UserId,
-        member: &PartialMember,
-    ) -> Permissions {
-        if let Some(user) = &member.user {
-            assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
-        }
-
-        Guild::user_permissions_in_(
-            None,
-            member_id,
-            &member.roles,
-            self.id,
-            &self.roles,
-            self.owner_id,
-        )
-    }
-
     /// Gets the highest role a [`Member`] of this Guild has.
     ///
     /// Returns None if the member has no roles or the member from this guild.
@@ -266,7 +226,7 @@ impl PartialGuild {
         }
 
         Guild::user_permissions_in_(
-            Some(channel),
+            channel,
             member_id,
             &member.roles,
             self.id,
@@ -291,7 +251,7 @@ impl PartialGuild {
     #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
         Guild::user_permissions_in_(
-            Some(channel),
+            channel,
             member.user.id,
             &member.roles,
             self.id,

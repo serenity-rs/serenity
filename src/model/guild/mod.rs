@@ -802,51 +802,11 @@ impl Guild {
         members
     }
 
-    /// Calculate a [`Member`]'s permissions in the guild.
-    #[must_use]
-    #[deprecated = "Use Guild::user_permissions_in, as this doesn't consider permission overwrites"]
-    pub fn member_permissions(&self, member: &Member) -> Permissions {
-        Self::user_permissions_in_(
-            None,
-            member.user.id,
-            &member.roles,
-            self.id,
-            &self.roles,
-            self.owner_id,
-        )
-    }
-
-    /// Calculate a [`PartialMember`]'s permissions in the guild.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
-    #[must_use]
-    #[deprecated = "Use Guild::partial_member_permissions_in, as this doesn't consider permission overwrites"]
-    pub fn partial_member_permissions(
-        &self,
-        member_id: UserId,
-        member: &PartialMember,
-    ) -> Permissions {
-        if let Some(user) = &member.user {
-            assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
-        }
-
-        Self::user_permissions_in_(
-            None,
-            member_id,
-            &member.roles,
-            self.id,
-            &self.roles,
-            self.owner_id,
-        )
-    }
-
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
     #[must_use]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
         Self::user_permissions_in_(
-            Some(channel),
+            channel,
             member.user.id,
             &member.roles,
             self.id,
@@ -872,7 +832,7 @@ impl Guild {
         }
 
         Self::user_permissions_in_(
-            Some(channel),
+            channel,
             member_id,
             &member.roles,
             self.id,
@@ -883,7 +843,7 @@ impl Guild {
 
     /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn user_permissions_in_(
-        channel: Option<&GuildChannel>,
+        channel: &GuildChannel,
         member_user_id: UserId,
         member_roles: &[RoleId],
         guild_id: GuildId,
@@ -897,25 +857,23 @@ impl Guild {
         let mut member_allow_overwrites = Permissions::empty();
         let mut member_deny_overwrites = Permissions::empty();
 
-        if let Some(channel) = channel {
-            for overwrite in &channel.permission_overwrites {
-                match overwrite.kind {
-                    PermissionOverwriteType::Member(user_id) => {
-                        if member_user_id == user_id {
-                            member_allow_overwrites = overwrite.allow;
-                            member_deny_overwrites = overwrite.deny;
-                        }
-                    },
-                    PermissionOverwriteType::Role(role_id) => {
-                        if role_id.get() == guild_id.get() {
-                            everyone_allow_overwrites = overwrite.allow;
-                            everyone_deny_overwrites = overwrite.deny;
-                        } else if member_roles.contains(&role_id) {
-                            roles_allow_overwrites.push(overwrite.allow);
-                            roles_deny_overwrites.push(overwrite.deny);
-                        }
-                    },
-                }
+        for overwrite in &channel.permission_overwrites {
+            match overwrite.kind {
+                PermissionOverwriteType::Member(user_id) => {
+                    if member_user_id == user_id {
+                        member_allow_overwrites = overwrite.allow;
+                        member_deny_overwrites = overwrite.deny;
+                    }
+                },
+                PermissionOverwriteType::Role(role_id) => {
+                    if role_id.get() == guild_id.get() {
+                        everyone_allow_overwrites = overwrite.allow;
+                        everyone_deny_overwrites = overwrite.deny;
+                    } else if member_roles.contains(&role_id) {
+                        roles_allow_overwrites.push(overwrite.allow);
+                        roles_deny_overwrites.push(overwrite.deny);
+                    }
+                },
             }
         }
 

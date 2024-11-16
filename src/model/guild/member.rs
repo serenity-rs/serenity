@@ -325,24 +325,6 @@ impl Member {
         self.guild_id.disconnect_member(http, self.user.id).await
     }
 
-    /// Returns the guild-level permissions for the member.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
-    /// found in the cache.
-    ///
-    /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
-    /// found.
-    #[cfg(feature = "cache")]
-    #[deprecated = "Use Guild::user_permissions_in, as this doesn't consider permission overwrites"]
-    pub fn permissions(&self, cache: &Cache) -> Result<Permissions> {
-        let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
-
-        #[expect(deprecated)]
-        Ok(guild.member_permissions(self))
-    }
-
     /// Removes a [`Role`] from the member.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
