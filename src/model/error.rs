@@ -106,32 +106,33 @@ impl fmt::Display for Minimum {
 /// [`GuildId::ban`] method, which in this example is used to re-ban all members.
 ///
 /// ```rust,no_run
+/// # use serenity::http::Http;
 /// use serenity::model::prelude::*;
 /// use serenity::model::ModelError;
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///
-/// # struct Handler;
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let http: Http = unimplemented!();
+/// # let guild_id: GuildId = unimplemented!();
+/// # let user: User = unimplemented!();
 ///
-/// # #[cfg(feature = "gateway")]
-/// #[serenity::async_trait]
-/// impl EventHandler for Handler {
-///     async fn guild_ban_removal(&self, ctx: Context, guild_id: GuildId, user: User) {
-///         match guild_id.ban(&ctx.http, user.id, 8, Some("No unbanning people!")).await {
-///             Ok(()) => {
-///                 // Ban successful.
-///             },
-///             Err(Error::Model(ModelError::TooLarge {
-///                 value, ..
-///             })) => {
-///                 println!("Failed deleting {value} days' worth of messages");
-///             },
-///             Err(why) => {
-///                 println!("Unexpected error: {why:?}");
-///             },
-///         }
-///     }
+/// match guild_id.ban(&http, user.id, 8, Some("No unbanning people!")).await {
+///     Ok(()) => {
+///         // Ban successful.
+///     },
+///     Err(Error::Model(ModelError::TooLarge {
+///         value, ..
+///     })) => {
+///         println!("Failed deleting {value} days' worth of messages");
+///     },
+///     Err(why) => {
+///         println!("Unexpected error: {why:?}");
+///     },
 /// }
+///
+/// # Ok(())
+/// # }
 /// ```
 ///
 /// [`Error`]: crate::Error

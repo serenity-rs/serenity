@@ -59,7 +59,7 @@ use crate::gateway::{
     ShardManagerOptions,
     DEFAULT_WAIT_BETWEEN_SHARD_START,
 };
-use crate::http::Http;
+use crate::http::{parse_token, Http};
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::GatewayIntents;
@@ -70,6 +70,7 @@ use crate::model::user::OnlineStatus;
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
+    token: SecretString,
     data: Option<Arc<dyn std::any::Any + Send + Sync>>,
     http: Arc<Http>,
     intents: GatewayIntents,
@@ -94,7 +95,7 @@ impl ClientBuilder {
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
     pub fn new(token: &str, intents: GatewayIntents) -> Self {
-        Self::new_with_http(Arc::new(Http::new(token)), intents)
+        Self::new_with_http(token, Arc::new(Http::new(token)), intents)
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on for the client
@@ -103,8 +104,9 @@ impl ClientBuilder {
     /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
-    pub fn new_with_http(http: Arc<Http>, intents: GatewayIntents) -> Self {
+    pub fn new_with_http(token: &str, http: Arc<Http>, intents: GatewayIntents) -> Self {
         Self {
+            token: SecretString::new(parse_token(token)),
             http,
             intents,
             data: None,
@@ -335,6 +337,7 @@ impl IntoFuture for ClientBuilder {
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceLock::new());
             let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
+                token: self.token,
                 data: Arc::clone(&data),
                 event_handler: self.event_handler,
                 raw_event_handler: self.raw_event_handler,

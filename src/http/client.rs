@@ -207,7 +207,7 @@ impl HttpBuilder {
     }
 }
 
-fn parse_token(token: &str) -> Arc<str> {
+pub fn parse_token(token: &str) -> Arc<str> {
     let token = token.trim();
 
     if token.starts_with("Bot ") || token.starts_with("Bearer ") {
@@ -267,11 +267,6 @@ impl Http {
 
     pub fn set_application_id(&self, application_id: ApplicationId) {
         self.application_id.store(application_id.get(), Ordering::Relaxed);
-    }
-
-    #[cfg(feature = "gateway")]
-    pub(crate) fn token(&self) -> SecretString {
-        self.token.clone()
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.

@@ -47,6 +47,7 @@ use std::time::{Duration as StdDuration, Instant};
 #[cfg(feature = "transport_compression_zlib")]
 use aformat::aformat_into;
 use aformat::{aformat, ArrayString, CapStr};
+use serde::Deserialize;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
@@ -330,7 +331,7 @@ impl Shard {
         }
 
         self.seq = seq;
-        let event = Event::deserialize_and_log(event, original_str)?;
+        let event = deserialize_and_log_event(event, original_str)?;
 
         match &event {
             Event::Ready(ready) => {
@@ -833,6 +834,22 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
     })?;
 
     WsClient::connect(url, compression).await
+}
+
+fn deserialize_and_log_event(map: JsonMap, original_str: &str) -> Result<Event> {
+    Event::deserialize(Value::Object(map)).map_err(|err| {
+        let err = serde::de::Error::custom(err);
+        let err_dbg = format!("{err:?}");
+        if let Some((variant_name, _)) =
+            err_dbg.strip_prefix(r#"Error("unknown variant `"#).and_then(|s| s.split_once('`'))
+        {
+            debug!("Unknown event: {variant_name}");
+        } else {
+            warn!("Err deserializing text: {err_dbg}");
+        }
+        debug!("Failing text: {original_str}");
+        Error::Json(err)
+    })
 }
 
 #[derive(Debug)]
