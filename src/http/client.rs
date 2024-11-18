@@ -1878,16 +1878,14 @@ impl Http {
         .await
     }
 
-    /// Edits the current user's nickname for the provided [`Guild`] via its Id.
-    ///
-    /// Pass [`None`] to reset the nickname.
-    pub async fn edit_nickname(
+    /// Edits the current member for the provided [`Guild`] via its Id.
+    pub async fn edit_current_member(
         &self,
         guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<()> {
-        self.wind(200, Request {
+    ) -> Result<Member> {
+        self.fire(Request {
             body: Some(to_vec(&map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
