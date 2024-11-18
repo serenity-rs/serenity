@@ -315,7 +315,7 @@ impl Http {
         role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -344,7 +344,7 @@ impl Http {
     ) -> Result<()> {
         let delete_message_seconds = u32::from(delete_message_days) * 86400;
 
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: reason.map(reason_into_header),
@@ -383,7 +383,7 @@ impl Http {
 
     /// Broadcasts that the current user is typing in the given [`Channel`].
     pub async fn broadcast_typing(&self, channel_id: ChannelId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -681,7 +681,7 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -725,7 +725,7 @@ impl Http {
             });
         }
 
-        self.wind(204, request).await
+        self.wind(request).await
     }
 
     /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
@@ -760,7 +760,7 @@ impl Http {
     ) -> Result<()> {
         let body = to_vec(map)?;
 
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -799,7 +799,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -972,7 +972,7 @@ impl Http {
         channel_id: ChannelId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -992,7 +992,7 @@ impl Http {
         emoji_id: EmojiId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1008,7 +1008,7 @@ impl Http {
 
     /// Deletes an application emoji.
     pub async fn delete_application_emoji(&self, emoji_id: EmojiId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1028,7 +1028,7 @@ impl Http {
         interaction_token: &str,
         message_id: MessageId,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1045,7 +1045,7 @@ impl Http {
 
     /// Deletes a global command.
     pub async fn delete_global_command(&self, command_id: CommandId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1061,7 +1061,7 @@ impl Http {
 
     /// Deletes a guild, only if connected account owns it.
     pub async fn delete_guild(&self, guild_id: GuildId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1080,7 +1080,7 @@ impl Http {
         guild_id: GuildId,
         command_id: CommandId,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1102,7 +1102,7 @@ impl Http {
         integration_id: IntegrationId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1142,7 +1142,7 @@ impl Http {
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1163,7 +1163,7 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1182,7 +1182,7 @@ impl Http {
         channel_id: ChannelId,
         message_id: MessageId,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1203,7 +1203,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1223,7 +1223,7 @@ impl Http {
         &self,
         interaction_token: &str,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1244,7 +1244,7 @@ impl Http {
         target_id: TargetId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1266,7 +1266,7 @@ impl Http {
         user_id: UserId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1289,7 +1289,7 @@ impl Http {
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1311,7 +1311,7 @@ impl Http {
         role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1331,7 +1331,7 @@ impl Http {
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1352,7 +1352,7 @@ impl Http {
         sticker_id: StickerId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1369,7 +1369,7 @@ impl Http {
     /// Deletes a currently active test entitlement. Discord will act as though the corresponding
     /// user/guild *no longer has* an entitlement to the corresponding SKU.
     pub async fn delete_test_entitlement(&self, entitlement_id: EntitlementId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -1389,7 +1389,7 @@ impl Http {
         webhook_id: WebhookId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1411,7 +1411,7 @@ impl Http {
         token: &str,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -1664,7 +1664,7 @@ impl Http {
     ) -> Result<()> {
         let body = to_vec(&SerializeIter::new(value))?;
 
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(body),
             multipart: None,
             headers: None,
@@ -1859,16 +1859,14 @@ impl Http {
         .await
     }
 
-    /// Edits the current user's nickname for the provided [`Guild`] via its Id.
-    ///
-    /// Pass [`None`] to reset the nickname.
-    pub async fn edit_nickname(
+    /// Edits the current member for the provided [`Guild`] via its Id.
+    pub async fn edit_current_member(
         &self,
         guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<()> {
-        self.wind(200, Request {
+    ) -> Result<Member> {
+        self.fire(Request {
             body: Some(to_vec(&map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2115,7 +2113,7 @@ impl Http {
         user_id: UserId,
         map: &impl serde::Serialize,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -2135,7 +2133,7 @@ impl Http {
         guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -2157,7 +2155,7 @@ impl Http {
     ) -> Result<()> {
         let body = to_vec(map)?;
 
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2389,7 +2387,7 @@ impl Http {
             params = Some([("thread_id", thread_id_str.as_str())]);
         }
 
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2639,7 +2637,7 @@ impl Http {
         rule_id: RuleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -2809,7 +2807,7 @@ impl Http {
 
     /// Joins a thread channel.
     pub async fn join_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2824,7 +2822,7 @@ impl Http {
 
     /// Leaves a thread channel.
     pub async fn leave_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2843,7 +2841,7 @@ impl Http {
         channel_id: ChannelId,
         user_id: UserId,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -2863,7 +2861,7 @@ impl Http {
         channel_id: ChannelId,
         user_id: UserId,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4274,7 +4272,7 @@ impl Http {
         user_id: UserId,
         reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: reason.map(reason_into_header),
@@ -4290,7 +4288,7 @@ impl Http {
 
     /// Leaves a guild.
     pub async fn leave_guild(&self, guild_id: GuildId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4341,7 +4339,7 @@ impl Http {
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4362,7 +4360,7 @@ impl Http {
         user_id: UserId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4384,7 +4382,7 @@ impl Http {
         role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4459,7 +4457,7 @@ impl Http {
         guild_id: GuildId,
         integration_id: IntegrationId,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -4503,7 +4501,7 @@ impl Http {
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4523,7 +4521,7 @@ impl Http {
         channel_id: ChannelId,
         map: &impl serde::Serialize,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
@@ -4641,7 +4639,7 @@ impl Http {
         sound_id: SoundId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
@@ -4694,21 +4692,20 @@ impl Http {
         }
     }
 
-    /// Performs a request and then verifies that the response status code is equal to the expected
-    /// value.
+    /// Performs a request and verifies that Discord responds with [`StatusCode::NO_CONTENT`].
     ///
-    /// This is a function that performs a light amount of work and returns an empty tuple, so it's
+    /// This is a function that performs a light amount of work and returns the unit type, so it's
     /// called "self.wind" to denote that it's lightweight.
-    pub(super) async fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
+    pub(super) async fn wind(&self, req: Request<'_>) -> Result<()> {
         let route = req.route;
         let method = req.method.reqwest_method();
         let response = self.request(req).await?;
 
-        if response.status().is_success() {
-            let response_status = response.status().as_u16();
-            if response_status != expected {
+        let status = response.status();
+        if status.is_success() {
+            if status != StatusCode::NO_CONTENT {
                 let route = route.path();
-                warn!("Mismatched successful response status from {route}! Expected {expected} but got {response_status}");
+                warn!("Mismatched successful response status from {route}! Expected 'No Content' but got {status}");
             }
 
             return Ok(());
