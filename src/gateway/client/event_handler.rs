@@ -109,17 +109,17 @@ event_handler! {
     /// Dispatched when an auto moderation rule was created.
     ///
     /// Provides said rule's data.
-    AutoModRuleCreate { rule: Rule } => async fn auto_moderation_rule_create(&self, ctx: Context);
+    AutoModRuleCreate { rule: AutoModRule } => async fn auto_moderation_rule_create(&self, ctx: Context);
 
     /// Dispatched when an auto moderation rule was updated.
     ///
     /// Provides said rule's data.
-    AutoModRuleUpdate { rule: Rule } => async fn auto_moderation_rule_update(&self, ctx: Context);
+    AutoModRuleUpdate { rule: AutoModRule } => async fn auto_moderation_rule_update(&self, ctx: Context);
 
     /// Dispatched when an auto moderation rule was deleted.
     ///
     /// Provides said rule's data.
-    AutoModRuleDelete { rule: Rule } => async fn auto_moderation_rule_delete(&self, ctx: Context);
+    AutoModRuleDelete { rule: AutoModRule } => async fn auto_moderation_rule_delete(&self, ctx: Context);
 
     /// Dispatched when an auto moderation rule was triggered and an action was executed.
     ///
