@@ -13,7 +13,6 @@ pub enum Maximum {
     WebhookName,
     AuditLogReason,
     DeleteMessageDays,
-    DeleteMessageSeconds,
     BulkDeleteAmount,
 }
 
@@ -40,7 +39,6 @@ impl Maximum {
             Self::WebhookName | Self::BulkDeleteAmount => 100,
             Self::AuditLogReason => 512,
             Self::DeleteMessageDays => 7,
-            Self::DeleteMessageSeconds => 604800,
         }
     }
 }
@@ -55,7 +53,6 @@ impl fmt::Display for Maximum {
             Self::WebhookName => f.write_str("Webhook name"),
             Self::AuditLogReason => f.write_str("Audit log reason"),
             Self::DeleteMessageDays => f.write_str("Delete message days"),
-            Self::DeleteMessageSeconds => f.write_str("Delete message seconds"),
             Self::BulkDeleteAmount => f.write_str("Message bulk delete count"),
         }
     }
@@ -114,13 +111,16 @@ impl fmt::Display for Minimum {
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///
+/// const BAN_DURATION: u32 = 691200;
+///
 /// # struct Handler;
 ///
 /// # #[cfg(feature = "gateway")]
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
 ///     async fn guild_ban_removal(&self, ctx: Context, guild_id: GuildId, user: User) {
-///         match guild_id.ban(&ctx.http, user.id, 691200, Some("No unbanning people!")).await {
+///         match guild_id.ban(&ctx.http, user.id, BAN_DURATION, Some("No unbanning people!")).await
+///         {
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },

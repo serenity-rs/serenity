@@ -177,7 +177,7 @@ impl GuildId {
     /// ```rust,no_run
     /// use serenity::model::id::{GuildId, UserId};
     ///
-    /// # const FOUR_DAYS_IN_SECONDS: u32 = 4 * 60 * 60 * 24;
+    /// const FOUR_DAYS_IN_SECONDS: u32 = 4 * 60 * 60 * 24;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
     /// # let http: Http = unimplemented!();
@@ -190,9 +190,6 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
-    /// to delete is over the maximum.
-    ///
     /// Also can return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
@@ -203,23 +200,6 @@ impl GuildId {
         delete_message_seconds: u32,
         reason: Option<&str>,
     ) -> Result<()> {
-        // Check that we are not above the max of 7 days for this field
-        //
-        // This is done manually to avoid casts
-        const SEVEN_DAYS_MAXIMUM: u32 = 7 * 24 * 60 * 60;
-
-        if delete_message_seconds > SEVEN_DAYS_MAXIMUM {
-            #[cfg(target_pointer_width = "16")]
-            const {
-                panic!("Serenity is not supported on 16 bit platforms.")
-            };
-
-            return Err(Error::Model(ModelError::TooLarge {
-                maximum: Maximum::DeleteMessageSeconds,
-                value: SEVEN_DAYS_MAXIMUM as usize,
-            }));
-        }
-
         if let Some(reason) = reason {
             Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
