@@ -42,6 +42,7 @@ use tracing::{debug, warn};
 
 pub use self::context::Context;
 pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
+use super::TransportCompression;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
@@ -82,6 +83,7 @@ pub struct ClientBuilder {
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     presence: PresenceData,
     wait_time_between_shard_start: Duration,
+    compression: TransportCompression,
 }
 
 impl ClientBuilder {
@@ -116,6 +118,7 @@ impl ClientBuilder {
             raw_event_handler: None,
             presence: PresenceData::default(),
             wait_time_between_shard_start: DEFAULT_WAIT_BETWEEN_SHARD_START,
+            compression: TransportCompression::None,
         }
     }
 
@@ -173,6 +176,12 @@ impl ClientBuilder {
     /// [Twilight Gateway Proxy]: https://github.com/Gelbpunkt/gateway-proxy
     pub fn wait_time_between_shard_start(mut self, wait_time: Duration) -> Self {
         self.wait_time_between_shard_start = wait_time;
+        self
+    }
+
+    /// Sets the compression method to be used when receiving data from the gateway.
+    pub fn compression(mut self, compression: TransportCompression) -> Self {
+        self.compression = compression;
         self
     }
 
@@ -342,6 +351,7 @@ impl IntoFuture for ClientBuilder {
                 presence: Some(presence),
                 max_concurrency,
                 wait_time_between_shard_start: self.wait_time_between_shard_start,
+                compression: self.compression,
             });
 
             let client = Client {
