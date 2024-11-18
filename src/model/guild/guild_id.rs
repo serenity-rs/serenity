@@ -203,7 +203,9 @@ impl GuildId {
         delete_message_seconds: u32,
         reason: Option<&str>,
     ) -> Result<()> {
-        // Convert to usize for check overflow
+        // Check that we are not above the max of 7 days for this field
+        //
+        // This is done manually to avoid casts
         const SEVEN_DAYS_MAXIMUM: u32 = 7 * 24 * 60 * 60;
 
         if delete_message_seconds > SEVEN_DAYS_MAXIMUM {
