@@ -177,12 +177,13 @@ impl GuildId {
     /// ```rust,no_run
     /// use serenity::model::id::{GuildId, UserId};
     ///
+    /// # const FOUR_DAYS_IN_SECONDS: u32 = 4 * 60 * 60 * 24;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
     /// # let http: Http = unimplemented!();
     /// # let user = UserId::new(1);
     /// // assuming a `user` has already been bound
-    /// let _ = GuildId::new(81384788765712384).ban(&http, user, 345600, None).await;
+    /// let _ = GuildId::new(81384788765712384).ban(&http, user, FOUR_DAYS_IN_SECONDS, None).await;
     /// # Ok(())
     /// # }
     /// ```
@@ -203,14 +204,20 @@ impl GuildId {
         reason: Option<&str>,
     ) -> Result<()> {
         // Convert to usize for check overflow
-        let delete_message_seconds_usize =
-            usize::try_from(delete_message_seconds).map_err(|_| {
-                Error::Model(ModelError::TooLarge {
-                    maximum: Maximum::DeleteMessageSeconds,
-                    value: usize::MAX,
-                })
-            })?;
-        Maximum::DeleteMessageSeconds.check_overflow(delete_message_seconds_usize)?;
+        const SEVEN_DAYS_MAXIMUM: u32 = 7 * 24 * 60 * 60;
+
+        if delete_message_seconds > SEVEN_DAYS_MAXIMUM {
+            #[cfg(target_pointer_width = "16")]
+            const {
+                panic!("Serenity is not supported on 16 bit platforms.")
+            };
+
+            return Err(Error::Model(ModelError::TooLarge {
+                maximum: Maximum::DeleteMessageSeconds,
+                value: SEVEN_DAYS_MAXIMUM as usize,
+            }));
+        }
+
         if let Some(reason) = reason {
             Maximum::AuditLogReason.check_overflow(reason.len())?;
         }
