@@ -17,7 +17,7 @@ use crate::model::prelude::*;
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct Rule {
+pub struct AutoModRule {
     /// ID of the rule.
     pub id: RuleId,
     /// ID of the guild this rule belongs to.

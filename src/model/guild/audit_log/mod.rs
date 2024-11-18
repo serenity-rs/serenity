@@ -337,7 +337,7 @@ pub struct AuditLogs {
     #[serde(rename = "audit_log_entries")]
     pub entries: FixedArray<AuditLogEntry>,
     /// List of auto moderation rules referenced in the audit log.
-    pub auto_moderation_rules: FixedArray<Rule>,
+    pub auto_moderation_rules: FixedArray<AutoModRule>,
     /// List of application commands referenced in the audit log.
     pub application_commands: FixedArray<Command>,
     /// List of guild scheduled events referenced in the audit log.
@@ -390,7 +390,7 @@ pub struct AuditLogEntry {
     /// The id of this entry.
     pub id: AuditLogEntryId,
     /// Some optional data associated with this entry.
-    pub options: Option<Options>,
+    pub options: Option<AuditLogEntryOptions>,
 }
 
 /// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
@@ -398,7 +398,7 @@ pub struct AuditLogEntry {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
-pub struct Options {
+pub struct AuditLogEntryOptions {
     /// Name of the Auto Moderation rule that was triggered.
     pub auto_moderation_rule_name: Option<FixedString>,
     /// Trigger type of the Auto Moderation rule that was triggered.
