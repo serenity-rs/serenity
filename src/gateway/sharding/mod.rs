@@ -44,7 +44,9 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
-use aformat::{aformat, CapStr};
+#[cfg(feature = "transport_compression_zlib")]
+use aformat::aformat_into;
+use aformat::{aformat, ArrayString, CapStr};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
@@ -113,6 +115,7 @@ pub struct Shard {
     token: SecretString,
     ws_url: Arc<str>,
     resume_ws_url: Option<FixedString>,
+    compression: TransportCompression,
     pub intents: GatewayIntents,
 }
 
@@ -129,7 +132,7 @@ impl Shard {
     /// use std::num::NonZeroU16;
     /// use std::sync::Arc;
     ///
-    /// use serenity::gateway::Shard;
+    /// use serenity::gateway::{Shard, TransportCompression};
     /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// use serenity::model::id::ShardId;
     /// use serenity::secret_string::SecretString;
@@ -147,7 +150,15 @@ impl Shard {
     ///
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::from(http.get_gateway().await?.url);
-    /// let shard = Shard::new(gateway, token, shard_info, GatewayIntents::all(), None).await?;
+    /// let shard = Shard::new(
+    ///     gateway,
+    ///     token,
+    ///     shard_info,
+    ///     GatewayIntents::all(),
+    ///     None,
+    ///     TransportCompression::None,
+    /// )
+    /// .await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -165,8 +176,9 @@ impl Shard {
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
+        compression: TransportCompression,
     ) -> Result<Shard> {
-        let client = connect(&ws_url).await?;
+        let client = connect(&ws_url, compression).await?;
 
         let presence = presence.unwrap_or_default();
         let last_heartbeat_sent = None;
@@ -193,6 +205,7 @@ impl Shard {
             shard_info,
             ws_url,
             resume_ws_url: None,
+            compression,
             intents,
         })
     }
@@ -728,7 +741,7 @@ impl Shard {
         // Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
-        let client = connect(ws_url).await?;
+        let client = connect(ws_url, self.compression).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)
@@ -787,14 +800,19 @@ impl Shard {
     }
 }
 
-async fn connect(base_url: &str) -> Result<WsClient> {
-    let url = Url::parse(&aformat!("{}?v={}", CapStr::<64>(base_url), constants::GATEWAY_VERSION))
-        .map_err(|why| {
-            warn!("Error building gateway URL with base `{base_url}`: {why:?}");
-            Error::Gateway(GatewayError::BuildingUrl)
-        })?;
+async fn connect(base_url: &str, compression: TransportCompression) -> Result<WsClient> {
+    let url = Url::parse(&aformat!(
+        "{}?v={}{}",
+        CapStr::<64>(base_url),
+        constants::GATEWAY_VERSION,
+        compression.query_param()
+    ))
+    .map_err(|why| {
+        warn!("Error building gateway URL with base `{base_url}`: {why:?}");
+        Error::Gateway(GatewayError::BuildingUrl)
+    })?;
 
-    WsClient::connect(url).await
+    WsClient::connect(url, compression).await
 }
 
 #[derive(Debug)]
@@ -932,5 +950,43 @@ impl fmt::Debug for CollectorCallback {
 impl PartialEq for CollectorCallback {
     fn eq(&self, other: &Self) -> bool {
         Arc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+/// The transport compression method to use.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum TransportCompression {
+    /// No transport compression. Payload compression will be used instead.
+    None,
+
+    #[cfg(feature = "transport_compression_zlib")]
+    /// Use zlib-stream transport compression.
+    Zlib,
+
+    #[cfg(feature = "transport_compression_zstd")]
+    /// Use zstd-stream transport compression.
+    Zstd,
+}
+
+impl TransportCompression {
+    fn query_param(self) -> ArrayString<21> {
+        #[cfg_attr(
+            not(any(
+                feature = "transport_compression_zlib",
+                feature = "transport_compression_zstd"
+            )),
+            expect(unused_mut)
+        )]
+        let mut res = ArrayString::new();
+        match self {
+            Self::None => {},
+            #[cfg(feature = "transport_compression_zlib")]
+            Self::Zlib => aformat_into!(res, "&compress=zlib-stream"),
+            #[cfg(feature = "transport_compression_zstd")]
+            Self::Zstd => aformat_into!(res, "&compress=zstd-stream"),
+        }
+
+        res
     }
 }

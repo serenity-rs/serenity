@@ -17,6 +17,7 @@ use super::{
     ShardRunner,
     ShardRunnerInfo,
     ShardRunnerOptions,
+    TransportCompression,
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
@@ -64,6 +65,8 @@ pub struct ShardQueuer {
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<str>,
+    /// The compression method to use for the WebSocket connection.
+    pub compression: TransportCompression,
     /// The total amount of shards to start.
     pub shard_total: NonZeroU16,
     /// Number of seconds to wait between each start
@@ -216,6 +219,7 @@ impl ShardQueuer {
             shard_info,
             self.intents,
             self.presence.clone(),
+            self.compression,
         )
         .await?;
 

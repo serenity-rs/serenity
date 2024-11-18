@@ -451,7 +451,16 @@ impl ShardRunner {
             )) => {
                 error!("Shard handler received fatal err: {why:?}");
 
-                self.manager.return_with_value(Err(why.clone())).await;
+                let why_clone = match why {
+                    GatewayError::InvalidAuthentication => GatewayError::InvalidAuthentication,
+                    GatewayError::InvalidGatewayIntents => GatewayError::InvalidGatewayIntents,
+                    GatewayError::DisallowedGatewayIntents => {
+                        GatewayError::DisallowedGatewayIntents
+                    },
+                    _ => unreachable!(),
+                };
+
+                self.manager.return_with_value(Err(why_clone)).await;
                 return Err(Error::Gateway(why));
             },
             Err(Error::Json(_)) => return Ok((None, None, true)),
