@@ -11,7 +11,14 @@ use tokio::sync::Mutex;
 use tokio::time::timeout;
 use tracing::{info, warn};
 
-use super::{ShardId, ShardQueue, ShardQueuer, ShardQueuerMessage, ShardRunnerInfo};
+use super::{
+    ShardId,
+    ShardQueue,
+    ShardQueuer,
+    ShardQueuerMessage,
+    ShardRunnerInfo,
+    TransportCompression,
+};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
@@ -53,7 +60,12 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 /// use std::sync::{Arc, OnceLock};
 ///
 /// use serenity::gateway::client::EventHandler;
-/// use serenity::gateway::{ShardManager, ShardManagerOptions, DEFAULT_WAIT_BETWEEN_SHARD_START};
+/// use serenity::gateway::{
+///     ShardManager,
+///     ShardManagerOptions,
+///     TransportCompression,
+///     DEFAULT_WAIT_BETWEEN_SHARD_START,
+/// };
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
@@ -88,6 +100,7 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 ///     presence: None,
 ///     max_concurrency,
 ///     wait_time_between_shard_start: DEFAULT_WAIT_BETWEEN_SHARD_START,
+///     compression: TransportCompression::None,
 /// });
 /// # Ok(())
 /// # }
@@ -144,6 +157,7 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
+            compression: opt.compression,
             shard_total: opt.shard_total,
             #[cfg(feature = "cache")]
             cache: opt.cache,
@@ -379,4 +393,5 @@ pub struct ShardManagerOptions {
     pub max_concurrency: NonZeroU16,
     /// Number of seconds to wait between starting each shard/set of shards start
     pub wait_time_between_shard_start: Duration,
+    pub compression: TransportCompression,
 }
