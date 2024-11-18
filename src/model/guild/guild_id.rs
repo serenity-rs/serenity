@@ -666,7 +666,7 @@ impl GuildId {
         http.edit_guild_mfa_level(self, &map, reason).await
     }
 
-    /// Edits the current user's nickname for the guild.
+    /// Edits the current member's nickname for the guild.
     ///
     /// Pass [`None`] to reset the nickname.
     ///
@@ -682,17 +682,17 @@ impl GuildId {
         http: &Http,
         new_nickname: Option<&str>,
         reason: Option<&str>,
-    ) -> Result<()> {
+    ) -> Result<Member> {
         #[derive(serde::Serialize)]
-        struct EditNickname<'a> {
+        struct EditMember<'a> {
             nick: Option<&'a str>,
         }
 
-        let map = EditNickname {
+        let map = EditMember {
             nick: new_nickname,
         };
 
-        http.edit_nickname(self, &map, reason).await
+        http.edit_current_member(self, &map, reason).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
