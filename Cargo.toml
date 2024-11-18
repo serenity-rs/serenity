@@ -53,6 +53,7 @@ bytes = "1.5.0"
 fxhash = { version = "0.2.1", optional = true }
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"], optional = true }
 flate2 = { version = "1.0.28", optional = true }
+zstd-safe = { version = "7.2.1", optional = true }
 reqwest = { version = "0.12.2", default-features = false, features = ["multipart", "stream", "json"], optional = true }
 tokio-tungstenite = { version = "0.24.0", features = ["url"], optional = true }
 percent-encoding = { version = "2.3.0", optional = true }
@@ -80,6 +81,8 @@ default_no_backend = [
     "cache",
     "chrono",
     "framework",
+    "transport_compression_zlib",
+    "transport_compression_zstd",
 ]
 
 # Enables builder structs to configure Discord HTTP requests. Without this feature, you have to
@@ -103,6 +106,10 @@ http = ["dashmap", "mime_guess", "percent-encoding"]
 # TODO: remove dependeny on utils feature
 model = ["builder", "http", "utils"]
 voice_model = ["serenity-voice-model"]
+# Enables zlib-stream transport compression of incoming gateway events.
+transport_compression_zlib = ["flate2", "gateway"]
+# Enables zstd-stream transport compression of incoming gateway events.
+transport_compression_zstd = ["zstd-safe", "gateway"]
 # Enables support for Discord API functionality that's not stable yet, as well as serenity APIs that
 # are allowed to change even in semver non-breaking updates.
 unstable = []
