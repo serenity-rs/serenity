@@ -43,51 +43,94 @@ use serde::ser::{Serialize, Serializer};
 
 use super::utils::StrOrInt;
 
-/// This macro generates the [`Permissions::get_permission_names`] method.
+/// This macro generates the `Permissions` type and methods.
 ///
 /// It is invoked by passing the names of all methods used to check for permissions along with
-/// their names displayed inside Discord.
+/// their names displayed inside Discord, and their value.
 ///
 /// ## Examples
 ///
 /// Using this macro
 ///
 /// ```ignore
-/// generate_get_permission_names! {
-///     add_reactions: "Add Reactions",
-///     administrator: "Administrator"
+/// generate_permissions! {
+///     /// Allows adding reactions to messages in channels.
+///     ADD_REACTIONS, add_reaction, "Add Reactions" = 1 << 6;
 /// };
 /// ```
 ///
 /// Generates this implementation:
 ///
 /// ```ignore
+/// bitflags::bitflags!(
+///     impl Permissions: u64 {
+///         /// Allows adding reactions to messages in channels.
+///         const ADD_REACTIONS = 1 << 6;
+///     }
+/// )
+///
 /// impl Permissions {
+///     fn add_reactions(self) -> bool {
+///         self.contains(Self::ADD_REACTIONS);
+///     }
+///
 ///     fn get_permission_names(self) -> Vec<&'static str> {
 ///         let mut names = Vec::new();
 ///
 ///         if self.add_reactions() {
 ///             names.push("Add Reactions");
 ///         }
-///         if self.administrator() {
-///             names.push("Administrator");
-///         }
 ///
 ///         names
 ///     }
 /// }
 /// ```
-#[cfg(feature = "model")]
-macro_rules! generate_get_permission_names {
-    {$ ($perm:ident: $name:expr),*} => {
+macro_rules! generate_permissions {
+    {$ (
+        $(#[doc = $doc:literal])*
+        $(#[deprecated = $deprecated:literal])?
+        $perm_upper:ident, $perm_lower:ident, $name:literal = $value:expr
+    );*} => {
+        bitflags::bitflags! {
+            impl Permissions: u64 {
+                $(
+                    $(#[doc = $doc])*
+                    $(#[deprecated = $deprecated])*
+                    const $perm_upper = $value;
+                )*
+            }
+        }
+
         impl Permissions {
+            $(
+                #[doc = concat!("Shorthand for checking that the set of permissions contains the [", $name, "] permission.")]
+                #[doc = ""]
+                #[doc = concat!("[", $name, "]: Self::", stringify!($perm_upper))]
+                #[must_use]
+                $(
+                    #[deprecated = $deprecated]
+                    #[allow(deprecated)]
+                )*
+                pub fn $perm_lower(self) -> bool {
+                    self.contains(Self::$perm_upper)
+                }
+            )*
+
             /// Returns a list of names of all contained permissions.
             #[must_use]
+            #[cfg(feature = "model")]
+            #[allow(deprecated, unused_mut, unused_assignments)]
             pub fn get_permission_names(self) -> Vec<&'static str> {
                 let mut names = Vec::new();
 
                 $(
-                    if self.$perm() {
+                    let mut is_deprecated = false;
+                    $(
+                        let _ = $deprecated;
+                        is_deprecated = true;
+                    )*
+
+                    if !is_deprecated && self.$perm_lower() {
                         names.push($name);
                     }
                 )*
@@ -225,199 +268,148 @@ pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
 #[repr(packed)]
 pub struct Permissions(u64);
 
-bitflags::bitflags! {
-    impl Permissions: u64 {
+generate_permissions! {
         /// Allows for the creation of [`RichInvite`]s.
         ///
         /// [`RichInvite`]: super::invite::RichInvite
-        const CREATE_INSTANT_INVITE = 1 << 0;
+        CREATE_INSTANT_INVITE, create_instant_invite, "Create Invites" = 1 << 0;
         /// Allows for the kicking of guild [member]s.
         ///
         /// [member]: super::guild::Member
-        const KICK_MEMBERS = 1 << 1;
+        KICK_MEMBERS, kick_members, "Kick Members" = 1 << 1;
         /// Allows the banning of guild [member]s.
         ///
         /// [member]: super::guild::Member
-        const BAN_MEMBERS = 1 << 2;
+        BAN_MEMBERS, ban_members, "Ban Members" = 1 << 2;
         /// Allows all permissions, bypassing channel [permission overwrite]s.
         ///
         /// [permission overwrite]: super::channel::PermissionOverwrite
-        const ADMINISTRATOR = 1 << 3;
+        ADMINISTRATOR, administrator, "Administrator" = 1 << 3;
         /// Allows management and editing of guild [channel]s.
         ///
         /// [channel]: super::channel::GuildChannel
-        const MANAGE_CHANNELS = 1 << 4;
+        MANAGE_CHANNELS, manage_channels, "Manage Channels" = 1 << 4;
         /// Allows management and editing of the [guild].
         ///
         /// [guild]: super::guild::Guild
-        const MANAGE_GUILD = 1 << 5;
+        MANAGE_GUILD, manage_guild, "Manage Guild" = 1 << 5;
         /// [`Member`]s with this permission can add new [`Reaction`]s to a [`Message`]. Members
         /// can still react using reactions already added to messages without this permission.
         ///
         /// [`Member`]: super::guild::Member
         /// [`Message`]: super::channel::Message
         /// [`Reaction`]: super::channel::Reaction
-        const ADD_REACTIONS = 1 << 6;
+        ADD_REACTIONS, add_reactions, "Add Reactions" = 1 << 6;
         /// Allows viewing a guild's audit logs.
-        const VIEW_AUDIT_LOG = 1 << 7;
+        VIEW_AUDIT_LOG, view_audit_log, "View Audit Log" = 1 << 7;
         /// Allows the use of priority speaking in voice channels.
-        const PRIORITY_SPEAKER = 1 << 8;
+        PRIORITY_SPEAKER, priority_speaker, "Priority Speaker" = 1 << 8;
         /// Allows the user to go live.
-        const STREAM = 1 << 9;
+        STREAM, stream, "Stream" = 1 << 9;
         /// Allows guild members to view a channel, which includes reading messages in text
         /// channels and joining voice channels.
-        const VIEW_CHANNEL = 1 << 10;
+        VIEW_CHANNEL, view_channel, "View Channel" = 1 << 10;
         /// Allows sending messages in a guild channel.
-        const SEND_MESSAGES = 1 << 11;
+        SEND_MESSAGES, send_messages, "Send Messages" = 1 << 11;
         /// Allows the sending of text-to-speech messages in a channel.
-        const SEND_TTS_MESSAGES = 1 << 12;
+        SEND_TTS_MESSAGES, send_tts_messages, "Send TTS Messages" = 1 << 12;
         /// Allows the deleting of other messages in a guild channel.
         ///
         /// **Note**: This does not allow the editing of other messages.
-        const MANAGE_MESSAGES = 1 << 13;
+        MANAGE_MESSAGES, manage_messages, "Manage Messages" = 1 << 13;
         /// Allows links from this user - or users of this role - to be embedded, with potential
         /// data such as a thumbnail, description, and page name.
-        const EMBED_LINKS = 1 << 14;
+        EMBED_LINKS, embed_links, "Embed Links" = 1 << 14;
         /// Allows uploading of files.
-        const ATTACH_FILES = 1 << 15;
+        ATTACH_FILES, attach_files, "Attach Files" = 1 << 15;
         /// Allows the reading of a channel's message history.
-        const READ_MESSAGE_HISTORY = 1 << 16;
+        READ_MESSAGE_HISTORY, read_message_history, "Read Message History" = 1 << 16;
         /// Allows the usage of the `@everyone` mention, which will notify all users in a channel.
         /// The `@here` mention will also be available, and can be used to mention all non-offline
         /// users.
         ///
         /// **Note**: You probably want this to be disabled for most roles and users.
-        const MENTION_EVERYONE = 1 << 17;
+        MENTION_EVERYONE, mention_everyone, "Mention @everyone, @here, and All Roles" = 1 << 17;
         /// Allows the usage of custom emojis from other guilds.
         ///
         /// This does not dictate whether custom emojis in this guild can be used in other guilds.
-        const USE_EXTERNAL_EMOJIS = 1 << 18;
+        USE_EXTERNAL_EMOJIS, use_external_emojis, "Use External Emojis" = 1 << 18;
         /// Allows for viewing guild insights.
-        const VIEW_GUILD_INSIGHTS = 1 << 19;
+        VIEW_GUILD_INSIGHTS, view_guild_insights, "View Guild Insights" = 1 << 19;
         /// Allows the joining of a voice channel.
-        const CONNECT = 1 << 20;
+        CONNECT, connect, "Connect" = 1 << 20;
         /// Allows the user to speak in a voice channel.
-        const SPEAK = 1 << 21;
+        SPEAK, speak, "Speak" = 1 << 21;
         /// Allows the muting of members in a voice channel.
-        const MUTE_MEMBERS = 1 << 22;
+        MUTE_MEMBERS, mute_members, "Mute Members" = 1 << 22;
         /// Allows the deafening of members in a voice channel.
-        const DEAFEN_MEMBERS = 1 << 23;
+        DEAFEN_MEMBERS, deafen_members, "Deafen Members" = 1 << 23;
         /// Allows the moving of members from one voice channel to another.
-        const MOVE_MEMBERS = 1 << 24;
+        MOVE_MEMBERS, move_members, "Move Members" = 1 << 24;
         /// Allows the usage of voice-activity-detection in a [voice] channel.
         ///
         /// If this is disabled, then [`Member`]s must use push-to-talk.
         ///
         /// [`Member`]: super::guild::Member
         /// [voice]: super::channel::ChannelType::Voice
-        const USE_VAD = 1 << 25;
+        USE_VAD, use_vad, "Use Voice Activity" = 1 << 25;
         /// Allows members to change their own nickname in the guild.
-        const CHANGE_NICKNAME = 1 << 26;
+        CHANGE_NICKNAME, change_nickname, "Change Nickname" = 1 << 26;
         /// Allows members to change other members' nicknames.
-        const MANAGE_NICKNAMES = 1 << 27;
+        MANAGE_NICKNAMES, manage_nicknames, "Manage Nicknames" = 1 << 27;
         /// Allows management and editing of roles below their own.
-        const MANAGE_ROLES = 1 << 28;
+        MANAGE_ROLES, manage_roles, "Manage Roles" = 1 << 28;
         /// Allows management of webhooks.
-        const MANAGE_WEBHOOKS = 1 << 29;
+        MANAGE_WEBHOOKS, manage_webhooks, "Manage Webhooks" = 1 << 29;
         /// Allows for editing and deleting emojis, stickers, and soundboard sounds created by all
         /// users.
-        const MANAGE_GUILD_EXPRESSIONS = 1 << 30;
+        MANAGE_GUILD_EXPRESSIONS, manage_guild_expressions, "Manage Guild Expressions" = 1 << 30;
         #[deprecated = "use `Permissions::MANAGE_GUILD_EXPRESSIONS` instead"]
-        const MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
+        MANAGE_EMOJIS_AND_STICKERS, manage_emojis_and_stickers, "Manage Emojis and Stickers" = 1 << 30;
         /// Allows members to use application commands, including slash commands and context menu
         /// commands.
-        const USE_APPLICATION_COMMANDS = 1 << 31;
+        USE_APPLICATION_COMMANDS, use_application_commands, "Use Application Commands" = 1 << 31;
         /// Allows for requesting to speak in stage channels.
-        const REQUEST_TO_SPEAK = 1 << 32;
+        REQUEST_TO_SPEAK, request_to_speak, "Request to Speak" = 1 << 32;
         /// Allows for editing, and deleting scheduled events created by all users.
-        const MANAGE_EVENTS = 1 << 33;
+        MANAGE_EVENTS, manage_events, "Manage Events" = 1 << 33;
         /// Allows for deleting and archiving threads, and viewing all private threads.
-        const MANAGE_THREADS = 1 << 34;
+        MANAGE_THREADS, manage_threads, "Manage Threads" = 1 << 34;
         /// Allows for creating threads.
-        const CREATE_PUBLIC_THREADS = 1 << 35;
+        CREATE_PUBLIC_THREADS, create_public_threads, "Create Public Threads" = 1 << 35;
         /// Allows for creating private threads.
-        const CREATE_PRIVATE_THREADS = 1 << 36;
+        CREATE_PRIVATE_THREADS, create_private_threads, "Create Private Threads" = 1 << 36;
         /// Allows the usage of custom stickers from other servers.
-        const USE_EXTERNAL_STICKERS = 1 << 37;
+        USE_EXTERNAL_STICKERS, use_external_stickers, "Use External Stickers" = 1 << 37;
         /// Allows for sending messages in threads
-        const SEND_MESSAGES_IN_THREADS = 1 << 38;
+        SEND_MESSAGES_IN_THREADS, send_messages_in_threads, "Send Messages in Threads" = 1 << 38;
         /// Allows for launching activities in a voice channel
-        const USE_EMBEDDED_ACTIVITIES = 1 << 39;
+        USE_EMBEDDED_ACTIVITIES, use_embedded_activities, "Use Embedded Activities" = 1 << 39;
         /// Allows for timing out users to prevent them from sending or reacting to messages in
         /// chat and threads, and from speaking in voice and stage channels.
-        const MODERATE_MEMBERS = 1 << 40;
+        MODERATE_MEMBERS, moderate_members, "Moderate Members" = 1 << 40;
         /// Allows for viewing role subscription insights.
-        const VIEW_CREATOR_MONETIZATION_ANALYTICS = 1 << 41;
+        VIEW_CREATOR_MONETIZATION_ANALYTICS, view_creator_monetization_analytics, "View Creator Monetization Analytics" = 1 << 41;
         /// Allows for using soundboard in a voice channel.
-        const USE_SOUNDBOARD = 1 << 42;
+        USE_SOUNDBOARD, use_soundboard, "Use Soundboard" = 1 << 42;
         /// Allows for creating emojis, stickers, and soundboard sounds, and editing and deleting
         /// those created by the current user.
-        const CREATE_GUILD_EXPRESSIONS = 1 << 43;
+        CREATE_GUILD_EXPRESSIONS, create_guild_expressions, "Create Guild Expressions" = 1 << 43;
         /// Allows for creating scheduled events, and editing and deleting those created by the
         /// current user.
-        const CREATE_EVENTS = 1 << 44;
+        CREATE_EVENTS, create_events, "Create Events" = 1 << 44;
         /// Allows the usage of custom soundboard sounds from other servers.
-        const USE_EXTERNAL_SOUNDS = 1 << 45;
+        USE_EXTERNAL_SOUNDS, use_external_sounds, "Use External Sounds" = 1 << 45;
         /// Allows sending voice messages.
-        const SEND_VOICE_MESSAGES = 1 << 46;
+        SEND_VOICE_MESSAGES, send_voice_messages, "Send Voice Messages" = 1 << 46;
         /// Allows setting the status of a voice channel.
-        const SET_VOICE_CHANNEL_STATUS = 1 << 48;
+        SET_VOICE_CHANNEL_STATUS, set_voice_channel_status, "Set Voice Channel status" = 1 << 48;
         /// Allows attaching polls to message sends.
-        const SEND_POLLS = 1 << 49;
+        SEND_POLLS, send_polls, "Send Polls" = 1 << 49;
         /// Allows user-installed apps to send public responses.
-        const USE_EXTERNAL_APPS = 1 << 50;
-    }
+        USE_EXTERNAL_APPS, use_external_apps, "Use External Apps" = 1 << 50
 }
 
-#[cfg(feature = "model")]
-generate_get_permission_names! {
-    add_reactions: "Add Reactions",
-    administrator: "Administrator",
-    attach_files: "Attach Files",
-    ban_members: "Ban Members",
-    change_nickname: "Change Nickname",
-    connect: "Connect",
-    create_events: "Create Events",
-    create_guild_expressions: "Create Guild Expressions",
-    create_instant_invite: "Create Instant Invite",
-    create_private_threads: "Create Private Threads",
-    create_public_threads: "Create Public Threads",
-    deafen_members: "Deafen Members",
-    embed_links: "Embed Links",
-    external_emojis: "Use External Emojis",
-    kick_members: "Kick Members",
-    manage_channels: "Manage Channels",
-    manage_events: "Manage Events",
-    manage_guild: "Manage Guilds",
-    manage_guild_expressions: "Manage Guild Expressions",
-    manage_messages: "Manage Messages",
-    manage_nicknames: "Manage Nicknames",
-    manage_roles: "Manage Roles",
-    manage_threads: "Manage Threads",
-    manage_webhooks: "Manage Webhooks",
-    mention_everyone: "Mention Everyone",
-    moderate_members: "Moderate Members",
-    move_members: "Move Members",
-    mute_members: "Mute Members",
-    priority_speaker: "Priority Speaker",
-    read_message_history: "Read Message History",
-    request_to_speak: "Request To Speak",
-    send_messages: "Send Messages",
-    send_messages_in_threads: "Send Messages in Threads",
-    send_tts_messages: "Send TTS Messages",
-    speak: "Speak",
-    stream: "Stream",
-    use_commands: "Use Application Commands",
-    use_embedded_activities: "Use Embedded Activities",
-    use_external_emojis: "Use External Emojis",
-    use_external_stickers: "Use External Stickers",
-    use_vad: "Use Voice Activity",
-    view_audit_log: "View Audit Log",
-    view_channel: "View Channel",
-    view_guild_insights: "View Guild Insights"
-}
-
-/// TODO: use a macro to shorten this entire file lol
 #[cfg(feature = "model")]
 impl Permissions {
     #[must_use]
@@ -440,407 +432,6 @@ impl Permissions {
             | Self::SEND_VOICE_MESSAGES
             | Self::SEND_POLLS
             | Self::USE_EXTERNAL_APPS
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Add Reactions] permission.
-    ///
-    /// [Add Reactions]: Self::ADD_REACTIONS
-    #[must_use]
-    pub const fn add_reactions(self) -> bool {
-        self.contains(Self::ADD_REACTIONS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Administrator] permission.
-    ///
-    /// [Administrator]: Self::ADMINISTRATOR
-    #[must_use]
-    pub const fn administrator(self) -> bool {
-        self.contains(Self::ADMINISTRATOR)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Attach Files] permission.
-    ///
-    /// [Attach Files]: Self::ATTACH_FILES
-    #[must_use]
-    pub const fn attach_files(self) -> bool {
-        self.contains(Self::ATTACH_FILES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Ban Members] permission.
-    ///
-    /// [Ban Members]: Self::BAN_MEMBERS
-    #[must_use]
-    pub const fn ban_members(self) -> bool {
-        self.contains(Self::BAN_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Change Nickname]
-    /// permission.
-    ///
-    /// [Change Nickname]: Self::CHANGE_NICKNAME
-    #[must_use]
-    pub const fn change_nickname(self) -> bool {
-        self.contains(Self::CHANGE_NICKNAME)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Connect] permission.
-    ///
-    /// [Connect]: Self::CONNECT
-    #[must_use]
-    pub const fn connect(self) -> bool {
-        self.contains(Self::CONNECT)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Create Events] permission.
-    ///
-    /// [Create Events]: Self::CREATE_EVENTS
-    #[must_use]
-    pub const fn create_events(self) -> bool {
-        self.contains(Self::CREATE_EVENTS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Create Guild Expressions]
-    /// permission.
-    ///
-    /// [Create Guild Expressions]: Self::CREATE_GUILD_EXPRESSIONS
-    #[must_use]
-    pub const fn create_guild_expressions(self) -> bool {
-        self.contains(Self::CREATE_GUILD_EXPRESSIONS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [View Audit Log]
-    /// permission.
-    ///
-    /// [View Audit Log]: Self::VIEW_AUDIT_LOG
-    #[must_use]
-    pub const fn view_audit_log(self) -> bool {
-        self.contains(Self::VIEW_AUDIT_LOG)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [View Channel] permission.
-    ///
-    /// [View Channel]: Self::VIEW_CHANNEL
-    #[must_use]
-    pub const fn view_channel(self) -> bool {
-        self.contains(Self::VIEW_CHANNEL)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [View Guild Insights]
-    /// permission.
-    ///
-    /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
-    #[must_use]
-    pub const fn view_guild_insights(self) -> bool {
-        self.contains(Self::VIEW_GUILD_INSIGHTS)
-    }
-
-    /// Shorthand for checking that the set of permission contains the [Priority Speaker]
-    /// permission.
-    ///
-    /// [Priority Speaker]: Self::PRIORITY_SPEAKER
-    #[must_use]
-    pub const fn priority_speaker(self) -> bool {
-        self.contains(Self::PRIORITY_SPEAKER)
-    }
-
-    /// Shorthand for checking that the set of permission contains the [Stream] permission.
-    ///
-    /// [Stream]: Self::STREAM
-    #[must_use]
-    pub const fn stream(self) -> bool {
-        self.contains(Self::STREAM)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Create Instant Invite]
-    /// permission.
-    ///
-    /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
-    #[must_use]
-    pub const fn create_instant_invite(self) -> bool {
-        self.contains(Self::CREATE_INSTANT_INVITE)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Create Private Threads]
-    /// permission.
-    ///
-    /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
-    #[must_use]
-    pub const fn create_private_threads(self) -> bool {
-        self.contains(Self::CREATE_PRIVATE_THREADS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Create Public Threads]
-    /// permission.
-    ///
-    /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
-    #[must_use]
-    pub const fn create_public_threads(self) -> bool {
-        self.contains(Self::CREATE_PUBLIC_THREADS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Deafen Members]
-    /// permission.
-    ///
-    /// [Deafen Members]: Self::DEAFEN_MEMBERS
-    #[must_use]
-    pub const fn deafen_members(self) -> bool {
-        self.contains(Self::DEAFEN_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Embed Links] permission.
-    ///
-    /// [Embed Links]: Self::EMBED_LINKS
-    #[must_use]
-    pub const fn embed_links(self) -> bool {
-        self.contains(Self::EMBED_LINKS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Use External Emojis]
-    /// permission.
-    ///
-    /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
-    #[must_use]
-    pub const fn external_emojis(self) -> bool {
-        self.contains(Self::USE_EXTERNAL_EMOJIS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Kick Members] permission.
-    ///
-    /// [Kick Members]: Self::KICK_MEMBERS
-    #[must_use]
-    pub const fn kick_members(self) -> bool {
-        self.contains(Self::KICK_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Channels]
-    /// permission.
-    ///
-    /// [Manage Channels]: Self::MANAGE_CHANNELS
-    #[must_use]
-    pub const fn manage_channels(self) -> bool {
-        self.contains(Self::MANAGE_CHANNELS)
-    }
-
-    #[deprecated = "use `manage_guild_expressions` instead"]
-    #[must_use]
-    pub const fn manage_emojis_and_stickers(self) -> bool {
-        #[allow(deprecated)]
-        self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Events] permission.
-    ///
-    /// [Manage Events]: Self::MANAGE_EVENTS
-    #[must_use]
-    pub fn manage_events(self) -> bool {
-        self.contains(Self::MANAGE_EVENTS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Guild] permission.
-    ///
-    /// [Manage Guild]: Self::MANAGE_GUILD
-    #[must_use]
-    pub const fn manage_guild(self) -> bool {
-        self.contains(Self::MANAGE_GUILD)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Guild Expressions]
-    /// permission.
-    ///
-    /// [Manage Guild Expressions]: Self::MANAGE_GUILD_EXPRESSIONS
-    #[must_use]
-    pub const fn manage_guild_expressions(self) -> bool {
-        self.contains(Self::MANAGE_GUILD_EXPRESSIONS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Messages]
-    /// permission.
-    ///
-    /// [Manage Messages]: Self::MANAGE_MESSAGES
-    #[must_use]
-    pub const fn manage_messages(self) -> bool {
-        self.contains(Self::MANAGE_MESSAGES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Nicknames]
-    /// permission.
-    ///
-    /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
-    #[must_use]
-    pub const fn manage_nicknames(self) -> bool {
-        self.contains(Self::MANAGE_NICKNAMES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Roles] permission.
-    ///
-    /// [Manage Roles]: Self::MANAGE_ROLES
-    #[must_use]
-    pub const fn manage_roles(self) -> bool {
-        self.contains(Self::MANAGE_ROLES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Threads]
-    /// permission.
-    ///
-    /// [Manage Threads]: Self::MANAGE_THREADS
-    #[must_use]
-    pub const fn manage_threads(self) -> bool {
-        self.contains(Self::MANAGE_THREADS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Manage Webhooks]
-    /// permission.
-    ///
-    /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
-    #[must_use]
-    pub const fn manage_webhooks(self) -> bool {
-        self.contains(Self::MANAGE_WEBHOOKS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Mention Everyone]
-    /// permission.
-    ///
-    /// [Mention Everyone]: Self::MENTION_EVERYONE
-    #[must_use]
-    pub const fn mention_everyone(self) -> bool {
-        self.contains(Self::MENTION_EVERYONE)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Moderate Members]
-    /// permission.
-    ///
-    /// [Moderate Members]: Self::MODERATE_MEMBERS
-    #[must_use]
-    pub const fn moderate_members(self) -> bool {
-        self.contains(Self::MODERATE_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Move Members] permission.
-    ///
-    /// [Move Members]: Self::MOVE_MEMBERS
-    #[must_use]
-    pub const fn move_members(self) -> bool {
-        self.contains(Self::MOVE_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Mute Members] permission.
-    ///
-    /// [Mute Members]: Self::MUTE_MEMBERS
-    #[must_use]
-    pub const fn mute_members(self) -> bool {
-        self.contains(Self::MUTE_MEMBERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Read Message History]
-    /// permission.
-    ///
-    /// [Read Message History]: Self::READ_MESSAGE_HISTORY
-    #[must_use]
-    pub const fn read_message_history(self) -> bool {
-        self.contains(Self::READ_MESSAGE_HISTORY)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Send Messages] permission.
-    ///
-    /// [Send Messages]: Self::SEND_MESSAGES
-    #[must_use]
-    pub const fn send_messages(self) -> bool {
-        self.contains(Self::SEND_MESSAGES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Send Messages in Threads]
-    /// permission.
-    ///
-    /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
-    #[must_use]
-    pub const fn send_messages_in_threads(self) -> bool {
-        self.contains(Self::SEND_MESSAGES_IN_THREADS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Send TTS Messages]
-    /// permission.
-    ///
-    /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
-    #[must_use]
-    pub const fn send_tts_messages(self) -> bool {
-        self.contains(Self::SEND_TTS_MESSAGES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Speak] permission.
-    ///
-    /// [Speak]: Self::SPEAK
-    #[must_use]
-    pub const fn speak(self) -> bool {
-        self.contains(Self::SPEAK)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Request To Speak]
-    /// permission.
-    ///
-    /// [Request To Speak]: Self::REQUEST_TO_SPEAK
-    #[must_use]
-    pub const fn request_to_speak(self) -> bool {
-        self.contains(Self::REQUEST_TO_SPEAK)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Use Embedded Activities]
-    /// permission.
-    ///
-    /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
-    #[must_use]
-    pub const fn use_embedded_activities(self) -> bool {
-        self.contains(Self::USE_EMBEDDED_ACTIVITIES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Use External Emojis]
-    /// permission.
-    ///
-    /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
-    #[must_use]
-    pub const fn use_external_emojis(self) -> bool {
-        self.contains(Self::USE_EXTERNAL_EMOJIS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Use External Stickers]
-    /// permission.
-    ///
-    /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
-    #[must_use]
-    pub const fn use_external_stickers(self) -> bool {
-        self.contains(Self::USE_EXTERNAL_STICKERS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Use Application Commands]
-    /// permission.
-    ///
-    /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
-    #[must_use]
-    pub const fn use_commands(self) -> bool {
-        self.contains(Self::USE_APPLICATION_COMMANDS)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Use VAD] permission.
-    ///
-    /// [Use VAD]: Self::USE_VAD
-    #[must_use]
-    pub const fn use_vad(self) -> bool {
-        self.contains(Self::USE_VAD)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the [Send Polls] permission.
-    ///
-    /// [Send Polls]: Self::SEND_POLLS
-    #[must_use]
-    pub const fn send_polls(self) -> bool {
-        self.contains(Self::SEND_POLLS)
-    }
-    /// Shorthand for checking that the set of permissions contains the [Use External Apps]
-    /// permission.
-    ///
-    /// [Use External Apps]: Self::USE_EXTERNAL_APPS
-    #[must_use]
-    pub const fn use_external_apps(self) -> bool {
-        self.contains(Self::USE_EXTERNAL_APPS)
     }
 }
 
