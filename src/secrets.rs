@@ -52,6 +52,13 @@ impl typesize::TypeSize for SecretString {
 pub struct Token(SecretString);
 
 impl Token {
+    /// Fetch and parses the token out of the given environment variable.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TokenError::Env`] if fetching the variable fails (see [`std::env::var`] for
+    /// details). May also return [`TokenError::InvalidToken`] if the token is in an invalid
+    /// format (see [`Token::from_str`]).
     pub fn from_env<K: AsRef<OsStr>>(key: K) -> Result<Self, TokenError> {
         env::var(key).map_err(TokenError::Env).and_then(|token| token.parse())
     }
