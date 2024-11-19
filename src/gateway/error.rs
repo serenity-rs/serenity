@@ -7,7 +7,7 @@ use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 ///
 /// Note that - from a user standpoint - there should be no situation in which you manually handle
 /// these.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
     /// There was an error building a URL.
@@ -50,6 +50,17 @@ pub enum Error {
     /// If an connection has been established but privileged gateway intents were provided without
     /// enabling them prior.
     DisallowedGatewayIntents,
+    #[cfg(feature = "transport_compression_zlib")]
+    /// A decompression error from the `flate2` crate.
+    DecompressZlib(flate2::DecompressError),
+    #[cfg(feature = "transport_compression_zstd")]
+    /// A decompression error from zstd.
+    DecompressZstd(usize),
+    /// When zstd decompression fails due to corrupted data.
+    #[cfg(feature = "transport_compression_zstd")]
+    DecompressZstdCorrupted,
+    /// When decompressed gateway data is not valid UTF-8.
+    DecompressUtf8(std::string::FromUtf8Error),
 }
 
 impl fmt::Display for Error {
@@ -70,6 +81,15 @@ impl fmt::Display for Error {
             Self::DisallowedGatewayIntents => {
                 f.write_str("Disallowed gateway intents were provided")
             },
+            #[cfg(feature = "transport_compression_zlib")]
+            Self::DecompressZlib(inner) => fmt::Display::fmt(&inner, f),
+            #[cfg(feature = "transport_compression_zstd")]
+            Self::DecompressZstd(code) => write!(f, "Zstd decompression error: {code}"),
+            #[cfg(feature = "transport_compression_zstd")]
+            Self::DecompressZstdCorrupted => {
+                f.write_str("Zstd decompression error: corrupted data")
+            },
+            Self::DecompressUtf8(inner) => fmt::Display::fmt(&inner, f),
         }
     }
 }

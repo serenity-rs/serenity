@@ -95,8 +95,10 @@ impl<'a> EditAutoModRule<'a> {
         self
     }
 
-    /// Creates or edits an AutoMod [`Rule`] in a guild. Providing a [`RuleId`] will edit that
-    /// corresponding rule, otherwise a new rule will be created.
+    /// Creates or edits an [`AutoModRule`] in a guild.
+    ///
+    /// Providing a [`RuleId`] will edit that corresponding rule, otherwise a new rule will be
+    /// created.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -111,7 +113,7 @@ impl<'a> EditAutoModRule<'a> {
         http: &Http,
         guild_id: GuildId,
         rule_id: Option<RuleId>,
-    ) -> Result<Rule> {
+    ) -> Result<AutoModRule> {
         match rule_id {
             Some(id) => http.edit_automod_rule(guild_id, id, &self, self.audit_log_reason).await,
             // Automod Rule creation has required fields, whereas modifying a rule does not.

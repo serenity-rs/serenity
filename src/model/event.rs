@@ -37,7 +37,7 @@ pub struct CommandPermissionsUpdateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct AutoModRuleCreateEvent {
-    pub rule: Rule,
+    pub rule: AutoModRule,
 }
 
 /// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
@@ -48,7 +48,7 @@ pub struct AutoModRuleCreateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct AutoModRuleUpdateEvent {
-    pub rule: Rule,
+    pub rule: AutoModRule,
 }
 
 /// Requires [`GatewayIntents::AUTO_MODERATION_CONFIGURATION`].
@@ -59,7 +59,7 @@ pub struct AutoModRuleUpdateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct AutoModRuleDeleteEvent {
-    pub rule: Rule,
+    pub rule: AutoModRule,
 }
 
 /// Requires [`GatewayIntents::AUTO_MODERATION_EXECUTION`].
@@ -1138,7 +1138,7 @@ pub enum Event {
     /// [`EventHandler::command_permissions_update`]: crate::gateway::client::EventHandler::command_permissions_update
     #[serde(rename = "APPLICATION_COMMAND_PERMISSIONS_UPDATE")]
     CommandPermissionsUpdate(CommandPermissionsUpdateEvent),
-    /// A [`Rule`] was created.
+    /// A [`AutoModRule`] was created.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_create`] event.
     ///
@@ -1146,7 +1146,7 @@ pub enum Event {
     /// crate::gateway::client::EventHandler::auto_moderation_rule_create
     #[serde(rename = "AUTO_MODERATION_RULE_CREATE")]
     AutoModRuleCreate(AutoModRuleCreateEvent),
-    /// A [`Rule`] has been updated.
+    /// A [`AutoModRule`] has been updated.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_update`] event.
     ///
@@ -1154,7 +1154,7 @@ pub enum Event {
     /// crate::gateway::client::EventHandler::auto_moderation_rule_update
     #[serde(rename = "AUTO_MODERATION_RULE_UPDATE")]
     AutoModRuleUpdate(AutoModRuleUpdateEvent),
-    /// A [`Rule`] was deleted.
+    /// A [`AutoModRule`] was deleted.
     ///
     /// Fires the [`EventHandler::auto_moderation_rule_delete`] event.
     ///
@@ -1162,7 +1162,7 @@ pub enum Event {
     /// crate::gateway::client::EventHandler::auto_moderation_rule_delete
     #[serde(rename = "AUTO_MODERATION_RULE_DELETE")]
     AutoModRuleDelete(AutoModRuleDeleteEvent),
-    /// A [`Rule`] was triggered and an action was executed.
+    /// A [`AutoModRule`] was triggered and an action was executed.
     ///
     /// Fires the [`EventHandler::auto_moderation_action_execution`] event.
     ///

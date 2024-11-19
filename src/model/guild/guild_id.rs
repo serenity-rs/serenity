@@ -37,7 +37,7 @@ use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl GuildId {
-    /// Gets all auto moderation [`Rule`]s of this guild via HTTP.
+    /// Gets all [`AutoModRule`]s of this guild via HTTP.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -46,11 +46,11 @@ impl GuildId {
     /// Returns an [`Error::Http`] if the guild is unavailable.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rules(self, http: &Http) -> Result<Vec<Rule>> {
+    pub async fn automod_rules(self, http: &Http) -> Result<Vec<AutoModRule>> {
         http.get_automod_rules(self).await
     }
 
-    /// Gets an auto moderation [`Rule`] of this guild by its ID via HTTP.
+    /// Gets an [`AutoModRule`] of this guild by its ID via HTTP.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -59,11 +59,11 @@ impl GuildId {
     /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn automod_rule(self, http: &Http, rule_id: RuleId) -> Result<Rule> {
+    pub async fn automod_rule(self, http: &Http, rule_id: RuleId) -> Result<AutoModRule> {
         http.get_automod_rule(self, rule_id).await
     }
 
-    /// Creates an auto moderation [`Rule`] in the guild.
+    /// Creates an [`AutoModRule`] in the guild.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -107,11 +107,11 @@ impl GuildId {
         self,
         http: &Http,
         builder: EditAutoModRule<'_>,
-    ) -> Result<Rule> {
+    ) -> Result<AutoModRule> {
         builder.execute(http, self, None).await
     }
 
-    /// Edit an auto moderation [`Rule`], given its Id.
+    /// Edit an [`AutoModRule`], given its Id.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -125,11 +125,11 @@ impl GuildId {
         http: &Http,
         rule_id: RuleId,
         builder: EditAutoModRule<'_>,
-    ) -> Result<Rule> {
+    ) -> Result<AutoModRule> {
         builder.execute(http, self, Some(rule_id)).await
     }
 
-    /// Deletes an auto moderation [`Rule`] from the guild.
+    /// Deletes an [`AutoModRule`] from the guild.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -669,7 +669,7 @@ impl GuildId {
         http.edit_guild_mfa_level(self, &map, reason).await
     }
 
-    /// Edits the current user's nickname for the guild.
+    /// Edits the current member's nickname for the guild.
     ///
     /// Pass [`None`] to reset the nickname.
     ///
@@ -685,17 +685,17 @@ impl GuildId {
         http: &Http,
         new_nickname: Option<&str>,
         reason: Option<&str>,
-    ) -> Result<()> {
+    ) -> Result<Member> {
         #[derive(serde::Serialize)]
-        struct EditNickname<'a> {
+        struct EditMember<'a> {
             nick: Option<&'a str>,
         }
 
-        let map = EditNickname {
+        let map = EditMember {
             nick: new_nickname,
         };
 
-        http.edit_nickname(self, &map, reason).await
+        http.edit_current_member(self, &map, reason).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
