@@ -111,7 +111,7 @@ impl fmt::Display for Minimum {
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///
-/// const BAN_DURATION: u32 = 691200;
+/// const BAN_DURATION: u32 = 8 * 24 * 60 * 60;
 ///
 /// # struct Handler;
 ///
