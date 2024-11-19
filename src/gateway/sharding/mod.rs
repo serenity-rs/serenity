@@ -113,7 +113,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason - not started within
     // a decent amount of time.
     pub started: Instant,
-    token: SecretString,
+    token: Token,
     ws_url: Arc<str>,
     resume_ws_url: Option<FixedString>,
     compression: TransportCompression,
@@ -136,14 +136,13 @@ impl Shard {
     /// use serenity::gateway::{Shard, TransportCompression};
     /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// use serenity::model::id::ShardId;
-    /// use serenity::secret_string::SecretString;
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
-    /// let token = SecretString::new(Arc::from(std::env::var("DISCORD_BOT_TOKEN")?));
+    /// let token = std::env::var("DISCORD_BOT_TOKEN")?.parse()?;
     /// let shard_info = ShardInfo {
     ///     id: ShardId(0),
     ///     total: NonZeroU16::MIN,
@@ -173,7 +172,7 @@ impl Shard {
     /// TLS error.
     pub async fn new(
         ws_url: Arc<str>,
-        token: SecretString,
+        token: Token,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,

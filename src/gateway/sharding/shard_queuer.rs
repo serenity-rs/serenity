@@ -37,7 +37,7 @@ use crate::model::gateway::{GatewayIntents, ShardInfo};
 /// A shard queuer instance _should_ be run in its own thread, due to the blocking nature of the
 /// loop itself as well as a 5 second thread sleep between shard starts.
 pub struct ShardQueuer {
-    pub(super) token: SecretString,
+    pub(super) token: Token,
     /// A copy of [`Client::data`] to be given to runners for contextual dispatching.
     ///
     /// [`Client::data`]: crate::Client::data

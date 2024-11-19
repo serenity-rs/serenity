@@ -72,7 +72,10 @@ impl EventHandler for Bot {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = std::env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let token = std::env::var("DISCORD_TOKEN")
+        .expect("Expected a token in the environment")
+        .parse()
+        .expect("Invalid token");
 
     // Initiate a connection to the database file, creating the file if required.
     let database = sqlx::sqlite::SqlitePoolOptions::new()
@@ -96,6 +99,6 @@ async fn main() {
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client =
-        Client::builder(&token, intents).event_handler(bot).await.expect("Err creating client");
+        Client::builder(token, intents).event_handler(bot).await.expect("Err creating client");
     client.start().await.unwrap();
 }

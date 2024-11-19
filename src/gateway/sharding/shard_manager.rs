@@ -59,7 +59,6 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 /// use std::env;
 /// use std::sync::{Arc, OnceLock};
 ///
-/// # use serenity::secret_string::SecretString;
 /// use serenity::gateway::client::EventHandler;
 /// use serenity::gateway::{
 ///     ShardManager,
@@ -77,7 +76,6 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 /// impl EventHandler for Handler {}
 ///
 /// # let http: Arc<Http> = unimplemented!();
-/// # let token: SecretString = unimplemented!();
 /// let gateway_info = http.get_bot_gateway().await?;
 ///
 /// let data = Arc::new(());
@@ -85,9 +83,10 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 /// let ws_url = Arc::from(gateway_info.url);
 /// let event_handler = Arc::new(Handler);
 /// let max_concurrency = std::num::NonZeroU16::MIN;
+/// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
 ///
 /// ShardManager::new(ShardManagerOptions {
-///     # token,
+///     token,
 ///     data,
 ///     event_handler: Some(event_handler),
 ///     raw_event_handler: None,
@@ -380,7 +379,7 @@ impl Drop for ShardManager {
 }
 
 pub struct ShardManagerOptions {
-    pub token: SecretString,
+    pub token: Token,
     pub data: Arc<dyn std::any::Any + Send + Sync>,
     pub event_handler: Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,

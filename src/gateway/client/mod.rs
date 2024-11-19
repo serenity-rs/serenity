@@ -59,7 +59,7 @@ use crate::gateway::{
     ShardManagerOptions,
     DEFAULT_WAIT_BETWEEN_SHARD_START,
 };
-use crate::http::{parse_token, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::GatewayIntents;
@@ -70,7 +70,7 @@ use crate::model::user::OnlineStatus;
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
 #[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
-    token: SecretString,
+    token: Token,
     data: Option<Arc<dyn std::any::Any + Send + Sync>>,
     http: Arc<Http>,
     intents: GatewayIntents,
@@ -94,8 +94,8 @@ impl ClientBuilder {
     /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
-    pub fn new(token: &str, intents: GatewayIntents) -> Self {
-        Self::new_with_http(token, Arc::new(Http::new(token)), intents)
+    pub fn new(token: Token, intents: GatewayIntents) -> Self {
+        Self::new_with_http(token.clone(), Arc::new(Http::with_token(token)), intents)
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on for the client
@@ -104,9 +104,9 @@ impl ClientBuilder {
     /// **Panic**: If you have enabled the `framework`-feature (on by default), you must specify a
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
-    pub fn new_with_http(token: &str, http: Arc<Http>, intents: GatewayIntents) -> Self {
+    pub fn new_with_http(token: Token, http: Arc<Http>, intents: GatewayIntents) -> Self {
         Self {
-            token: SecretString::new(parse_token(token)),
+            token,
             http,
             intents,
             data: None,
@@ -416,8 +416,9 @@ impl IntoFuture for ClientBuilder {
 /// }
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
 /// let mut client =
-///     Client::builder("my token here", GatewayIntents::default()).event_handler(Handler).await?;
+///     Client::builder(token, GatewayIntents::default()).event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// # Ok(())
@@ -500,7 +501,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn builder(token: &str, intents: GatewayIntents) -> ClientBuilder {
+    pub fn builder(token: Token, intents: GatewayIntents) -> ClientBuilder {
         ClientBuilder::new(token, intents)
     }
 
@@ -543,8 +544,8 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start().await {
     ///     println!("Err with client: {:?}", why);
@@ -586,8 +587,8 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_autosharded().await {
     ///     println!("Err with client: {:?}", why);
@@ -633,8 +634,8 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(3, 5).await {
     ///     println!("Err with client: {:?}", why);
@@ -652,8 +653,8 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(0, 1).await {
     ///     println!("Err with client: {:?}", why);
@@ -695,8 +696,8 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shards(8).await {
     ///     println!("Err with client: {:?}", why);
@@ -738,8 +739,8 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, GatewayIntents::default()).await?;
+    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard_range(4..7, 10).await {
     ///     println!("Err with client: {:?}", why);

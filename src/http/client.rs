@@ -3,9 +3,7 @@
 use std::borrow::Cow;
 use std::cell::Cell;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Arc;
 
-use aformat::{aformat, CapStr};
 use arrayvec::ArrayVec;
 use nonmax::{NonMaxU16, NonMaxU8};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
@@ -71,34 +69,25 @@ where
 /// ```rust
 /// # use serenity::http::HttpBuilder;
 /// # fn run() {
-/// let http =
-///     HttpBuilder::new("token").proxy("http://127.0.0.1:3000").ratelimiter_disabled(true).build();
+/// let http = HttpBuilder::new().proxy("http://127.0.0.1:3000").ratelimiter_disabled(true).build();
 /// # }
 /// ```
 #[must_use]
+#[derive(Default)]
 pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: bool,
-    token: Arc<str>,
+    token: Option<Token>,
     proxy: Option<FixedString<u16>>,
     application_id: Option<ApplicationId>,
     default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
 
 impl HttpBuilder {
-    /// Construct a new builder to call methods on for the HTTP construction. The `token` will
-    /// automatically be prefixed "Bot " if not already.
-    pub fn new(token: &str) -> Self {
-        Self {
-            client: None,
-            ratelimiter: None,
-            ratelimiter_disabled: false,
-            token: parse_token(token),
-            proxy: None,
-            application_id: None,
-            default_allowed_mentions: None,
-        }
+    /// Construct a new builder.
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// Sets the application_id to use interactions.
@@ -107,10 +96,9 @@ impl HttpBuilder {
         self
     }
 
-    /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
-    /// automatically do so.
-    pub fn token(mut self, token: &str) -> Self {
-        self.token = parse_token(token);
+    /// Sets an authorization token for the bot.
+    pub fn token(mut self, token: Token) -> Self {
+        self.token = Some(token);
         self
     }
 
@@ -192,28 +180,17 @@ impl HttpBuilder {
         });
 
         let ratelimiter = (!self.ratelimiter_disabled).then(|| {
-            self.ratelimiter
-                .unwrap_or_else(|| Ratelimiter::new(client.clone(), Arc::clone(&self.token)))
+            self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), self.token.clone()))
         });
 
         Http {
             client,
             ratelimiter,
             proxy: self.proxy,
-            token: SecretString::new(self.token),
+            token: self.token,
             application_id,
             default_allowed_mentions: self.default_allowed_mentions,
         }
-    }
-}
-
-pub fn parse_token(token: &str) -> Arc<str> {
-    let token = token.trim();
-
-    if token.starts_with("Bot ") || token.starts_with("Bearer ") {
-        Arc::from(token)
-    } else {
-        Arc::from(aformat!("Bot {}", CapStr::<128>(token)).as_str())
     }
 }
 
@@ -241,15 +218,29 @@ pub struct Http {
     pub(crate) client: Client,
     pub ratelimiter: Option<Ratelimiter>,
     pub proxy: Option<FixedString<u16>>,
-    token: SecretString,
+    token: Option<Token>,
     application_id: AtomicU64,
     pub default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
 
+impl Default for Http {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Http {
+    /// Construct an unauthorized HTTP client, with no token. Few things will work, but webhooks
+    /// are one exception.
     #[must_use]
-    pub fn new(token: &str) -> Self {
-        HttpBuilder::new(token).build()
+    pub fn new() -> Self {
+        HttpBuilder::new().build()
+    }
+
+    /// Construct an authorized HTTP client.
+    #[must_use]
+    pub fn with_token(token: Token) -> Self {
+        HttpBuilder::new().token(token).build()
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {
@@ -4392,7 +4383,11 @@ impl Http {
             ratelimiter.perform(req).await?
         } else {
             let request = req
-                .build(&self.client, self.token.expose_secret(), self.proxy.as_deref())?
+                .build(
+                    &self.client,
+                    self.token.as_ref().map(Token::expose_secret),
+                    self.proxy.as_deref(),
+                )?
                 .build()?;
             self.client.execute(request).await?
         };
