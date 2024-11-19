@@ -38,13 +38,14 @@ impl zeroize::Zeroize for SecretString {
 }
 
 #[cfg(feature = "typesize")]
-impl typesize::TypeSize for Token {
+impl typesize::TypeSize for SecretString {
     fn extra_size(&self) -> usize {
         self.0.len() + (size_of::<usize>() * 2)
     }
 }
 
 /// A type for securely storing and passing around a Discord token.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Token(SecretString);
 

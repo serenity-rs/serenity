@@ -106,14 +106,14 @@ impl fmt::Display for Minimum {
 /// [`GuildId::ban`] method, which in this example is used to re-ban all members.
 ///
 /// ```rust,no_run
-/// # use serenity::http::Http;
 /// use serenity::model::prelude::*;
 /// use serenity::model::ModelError;
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///
+/// # #[cfg(feature = "http")]
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http: Http = unimplemented!();
+/// # let http: serenity::http::Http = unimplemented!();
 /// # let guild_id: GuildId = unimplemented!();
 /// # let user: User = unimplemented!();
 ///
