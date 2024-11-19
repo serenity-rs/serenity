@@ -1,5 +1,3 @@
-use std::env;
-
 use serenity::async_trait;
 use serenity::model::event::ResumedEvent;
 use serenity::model::gateway::Ready;
@@ -42,10 +40,8 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment")
-        .parse()
-        .expect("Invalid token");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES

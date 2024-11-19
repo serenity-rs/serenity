@@ -1,7 +1,6 @@
 //! In this example, you will be shown how to share data between events.
 
 use std::borrow::Cow;
-use std::env;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
@@ -61,10 +60,8 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment")
-        .parse()
-        .expect("Invalid token");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
     // We setup the initial value for our user data, which we will use throughout the rest of our
     // program.

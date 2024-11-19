@@ -1,5 +1,3 @@
-use std::env;
-
 use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::{Presence, Ready};
@@ -33,10 +31,8 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment")
-        .parse()
-        .expect("Invalid token");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
     // Intents are a bitflag, bitwise operations can be used to dictate which intents to use
     let intents =

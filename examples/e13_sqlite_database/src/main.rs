@@ -72,10 +72,8 @@ impl EventHandler for Bot {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = std::env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment")
-        .parse()
-        .expect("Invalid token");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
     // Initiate a connection to the database file, creating the file if required.
     let database = sqlx::sqlite::SqlitePoolOptions::new()

@@ -223,24 +223,18 @@ pub struct Http {
     pub default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
 
-impl Default for Http {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Http {
+    /// Construct an authorized HTTP client.
+    #[must_use]
+    pub fn new(token: Token) -> Self {
+        HttpBuilder::new().token(token).build()
+    }
+
     /// Construct an unauthorized HTTP client, with no token. Few things will work, but webhooks
     /// are one exception.
     #[must_use]
-    pub fn new() -> Self {
+    pub fn without_token() -> Self {
         HttpBuilder::new().build()
-    }
-
-    /// Construct an authorized HTTP client.
-    #[must_use]
-    pub fn with_token(token: Token) -> Self {
-        HttpBuilder::new().token(token).build()
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {

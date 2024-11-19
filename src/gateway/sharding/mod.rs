@@ -136,13 +136,14 @@ impl Shard {
     /// use serenity::gateway::{Shard, TransportCompression};
     /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// use serenity::model::id::ShardId;
+    /// use serenity::secrets::Token;
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
-    /// let token = std::env::var("DISCORD_BOT_TOKEN")?.parse()?;
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let shard_info = ShardInfo {
     ///     id: ShardId(0),
     ///     total: NonZeroU16::MIN,

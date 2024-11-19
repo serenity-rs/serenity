@@ -19,7 +19,6 @@
 //!
 //! Note that it may take a minute or more for a latency to be recorded or to update, depending on
 //! how often Discord tells the client to send a heartbeat.
-use std::env;
 use std::time::Duration;
 
 use serenity::async_trait;
@@ -44,10 +43,8 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment")
-        .parse()
-        .expect("Invalid token");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES

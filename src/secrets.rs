@@ -1,3 +1,5 @@
+use std::env::{self, VarError};
+use std::ffi::OsStr;
 use std::fmt;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -50,6 +52,10 @@ impl typesize::TypeSize for SecretString {
 pub struct Token(SecretString);
 
 impl Token {
+    pub fn from_env<K: AsRef<OsStr>>(key: K) -> Result<Self, TokenError> {
+        env::var(key).map_err(TokenError::Env).and_then(|token| token.parse())
+    }
+
     #[must_use]
     pub fn expose_secret(&self) -> &str {
         self.0.expose_secret()
@@ -82,10 +88,10 @@ impl Token {
 ///
 /// # Errors
 ///
-/// Returns a [`InvalidToken`] when one of the above checks fail. The type of failure is not
-/// specified.
+/// Returns a [`TokenError::InvalidToken`] when one of the above checks fail. The type of failure is
+/// not specified.
 impl FromStr for Token {
-    type Err = InvalidToken;
+    type Err = TokenError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let token = s.trim().trim_start_matches("Bot ").trim_start_matches("Bearer ");
@@ -101,19 +107,32 @@ impl FromStr for Token {
                 aformat!("Box {}", CapStr::<128>(token)).as_str(),
             ))))
         } else {
-            Err(InvalidToken)
+            Err(TokenError::InvalidToken)
         }
     }
 }
 
-/// Error that can be returned by [`Token::from_str`].
+/// Error that can be returned by [`Token::from_str`] or [`Token::from_env`].
 #[derive(Debug)]
-pub struct InvalidToken;
+pub enum TokenError {
+    Env(VarError),
+    InvalidToken,
+}
 
-impl std::error::Error for InvalidToken {}
+impl std::error::Error for TokenError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Env(inner) => Some(inner),
+            Self::InvalidToken => None,
+        }
+    }
+}
 
-impl fmt::Display for InvalidToken {
+impl fmt::Display for TokenError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("The provided token was invalid")
+        match self {
+            Self::Env(inner) => fmt::Display::fmt(&inner, f),
+            Self::InvalidToken => f.write_str("The provided token was invalid"),
+        }
     }
 }

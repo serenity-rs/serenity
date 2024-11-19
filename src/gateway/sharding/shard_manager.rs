@@ -83,7 +83,7 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 /// let ws_url = Arc::from(gateway_info.url);
 /// let event_handler = Arc::new(Handler);
 /// let max_concurrency = std::num::NonZeroU16::MIN;
-/// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+/// let token = Token::from_env("DISCORD_TOKEN")?;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     token,

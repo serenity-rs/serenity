@@ -1,5 +1,4 @@
 use std::borrow::Cow;
-use std::env;
 use std::time::Duration;
 
 use dotenv::dotenv;
@@ -140,10 +139,8 @@ impl EventHandler for Handler {
 async fn main() {
     dotenv().ok();
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment")
-        .parse()
-        .expect("Invalid token");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
     // Build our client.
     let intents = GatewayIntents::GUILD_MESSAGES

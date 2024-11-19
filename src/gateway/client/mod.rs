@@ -95,7 +95,7 @@ impl ClientBuilder {
     /// framework via the [`Self::framework`] method, otherwise awaiting the builder will cause a
     /// panic.
     pub fn new(token: Token, intents: GatewayIntents) -> Self {
-        Self::new_with_http(token.clone(), Arc::new(Http::with_token(token)), intents)
+        Self::new_with_http(token.clone(), Arc::new(Http::new(token)), intents)
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on for the client
@@ -416,7 +416,7 @@ impl IntoFuture for ClientBuilder {
 /// }
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+/// let token = Token::from_env("DISCORD_TOKEN")?;
 /// let mut client =
 ///     Client::builder(token, GatewayIntents::default()).event_handler(Handler).await?;
 ///
@@ -544,7 +544,7 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start().await {
@@ -587,7 +587,7 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_autosharded().await {
@@ -634,7 +634,7 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(3, 5).await {
@@ -653,7 +653,7 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard(0, 1).await {
@@ -696,7 +696,7 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shards(8).await {
@@ -739,7 +739,7 @@ impl Client {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?.parse()?;
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(token, GatewayIntents::default()).await?;
     ///
     /// if let Err(why) = client.start_shard_range(4..7, 10).await {
