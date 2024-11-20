@@ -69,11 +69,13 @@ where
 /// ```rust
 /// # use serenity::http::HttpBuilder;
 /// # fn run() {
-/// let http = HttpBuilder::new().proxy("http://127.0.0.1:3000").ratelimiter_disabled(true).build();
+/// let http = HttpBuilder::without_token()
+///     .proxy("http://127.0.0.1:3000")
+///     .ratelimiter_disabled(true)
+///     .build();
 /// # }
 /// ```
 #[must_use]
-#[derive(Default)]
 pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
@@ -86,19 +88,37 @@ pub struct HttpBuilder {
 
 impl HttpBuilder {
     /// Construct a new builder.
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(token: Token) -> Self {
+        Self {
+            client: None,
+            ratelimiter: None,
+            ratelimiter_disabled: false,
+            token: Some(token),
+            proxy: None,
+            application_id: None,
+            default_allowed_mentions: None,
+        }
+    }
+
+    /// Construct a new builder without a token set.
+    ///
+    /// Most Discord functionality requires a logged-in Bot token, but there are some exceptions
+    /// such as webhook endpoints.
+    pub fn without_token() -> Self {
+        Self {
+            client: None,
+            ratelimiter: None,
+            ratelimiter_disabled: false,
+            token: None,
+            proxy: None,
+            application_id: None,
+            default_allowed_mentions: None,
+        }
     }
 
     /// Sets the application_id to use interactions.
     pub fn application_id(mut self, application_id: ApplicationId) -> Self {
         self.application_id = Some(application_id);
-        self
-    }
-
-    /// Sets an authorization token for the bot.
-    pub fn token(mut self, token: Token) -> Self {
-        self.token = Some(token);
         self
     }
 
@@ -227,14 +247,16 @@ impl Http {
     /// Construct an authorized HTTP client.
     #[must_use]
     pub fn new(token: Token) -> Self {
-        HttpBuilder::new().token(token).build()
+        HttpBuilder::new(token).build()
     }
 
-    /// Construct an unauthorized HTTP client, with no token. Few things will work, but webhooks
-    /// are one exception.
+    /// Construct an unauthorized HTTP client, with no token.
+    ///
+    /// Most Discord functionality requires a logged-in Bot token, but there are some exceptions
+    /// such as webhook endpoints.
     #[must_use]
     pub fn without_token() -> Self {
-        HttpBuilder::new().build()
+        HttpBuilder::without_token().build()
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {
