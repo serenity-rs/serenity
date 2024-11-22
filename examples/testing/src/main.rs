@@ -413,9 +413,10 @@ async fn main() {
     }
 
     env_logger::init();
-    let token = std::env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
 
-    let mut client = Client::builder(&token, intents).event_handler(Handler).await.unwrap();
+    let mut client = Client::builder(token, intents).event_handler(Handler).await.unwrap();
     client.start().await.unwrap();
 }

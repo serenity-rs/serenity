@@ -4,9 +4,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::cell::Cell;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Arc;
 
-use aformat::{aformat, CapStr};
 use arrayvec::ArrayVec;
 use nonmax::{NonMaxU16, NonMaxU8};
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
@@ -72,8 +70,10 @@ where
 /// ```rust
 /// # use serenity::http::HttpBuilder;
 /// # fn run() {
-/// let http =
-///     HttpBuilder::new("token").proxy("http://127.0.0.1:3000").ratelimiter_disabled(true).build();
+/// let http = HttpBuilder::without_token()
+///     .proxy("http://127.0.0.1:3000")
+///     .ratelimiter_disabled(true)
+///     .build();
 /// # }
 /// ```
 #[must_use]
@@ -81,21 +81,36 @@ pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: bool,
-    token: Arc<str>,
+    token: Option<Token>,
     proxy: Option<FixedString<u16>>,
     application_id: Option<ApplicationId>,
     default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
 
 impl HttpBuilder {
-    /// Construct a new builder to call methods on for the HTTP construction. The `token` will
-    /// automatically be prefixed "Bot " if not already.
-    pub fn new(token: &str) -> Self {
+    /// Construct a new builder.
+    pub fn new(token: Token) -> Self {
         Self {
             client: None,
             ratelimiter: None,
             ratelimiter_disabled: false,
-            token: parse_token(token),
+            token: Some(token),
+            proxy: None,
+            application_id: None,
+            default_allowed_mentions: None,
+        }
+    }
+
+    /// Construct a new builder without a token set.
+    ///
+    /// Most Discord functionality requires a logged-in Bot token, but there are some exceptions
+    /// such as webhook endpoints.
+    pub fn without_token() -> Self {
+        Self {
+            client: None,
+            ratelimiter: None,
+            ratelimiter_disabled: false,
+            token: None,
             proxy: None,
             application_id: None,
             default_allowed_mentions: None,
@@ -105,13 +120,6 @@ impl HttpBuilder {
     /// Sets the application_id to use interactions.
     pub fn application_id(mut self, application_id: ApplicationId) -> Self {
         self.application_id = Some(application_id);
-        self
-    }
-
-    /// Sets a token for the bot. If the token is not prefixed "Bot ", this method will
-    /// automatically do so.
-    pub fn token(mut self, token: &str) -> Self {
-        self.token = parse_token(token);
         self
     }
 
@@ -193,28 +201,17 @@ impl HttpBuilder {
         });
 
         let ratelimiter = (!self.ratelimiter_disabled).then(|| {
-            self.ratelimiter
-                .unwrap_or_else(|| Ratelimiter::new(client.clone(), Arc::clone(&self.token)))
+            self.ratelimiter.unwrap_or_else(|| Ratelimiter::new(client.clone(), self.token.clone()))
         });
 
         Http {
             client,
             ratelimiter,
             proxy: self.proxy,
-            token: SecretString::new(self.token),
+            token: self.token,
             application_id,
             default_allowed_mentions: self.default_allowed_mentions,
         }
-    }
-}
-
-fn parse_token(token: &str) -> Arc<str> {
-    let token = token.trim();
-
-    if token.starts_with("Bot ") || token.starts_with("Bearer ") {
-        Arc::from(token)
-    } else {
-        Arc::from(aformat!("Bot {}", CapStr::<128>(token)).as_str())
     }
 }
 
@@ -242,15 +239,25 @@ pub struct Http {
     pub(crate) client: Client,
     pub ratelimiter: Option<Ratelimiter>,
     pub proxy: Option<FixedString<u16>>,
-    token: SecretString,
+    token: Option<Token>,
     application_id: AtomicU64,
     pub default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
 
 impl Http {
+    /// Construct an authorized HTTP client.
     #[must_use]
-    pub fn new(token: &str) -> Self {
+    pub fn new(token: Token) -> Self {
         HttpBuilder::new(token).build()
+    }
+
+    /// Construct an unauthorized HTTP client, with no token.
+    ///
+    /// Most Discord functionality requires a logged-in Bot token, but there are some exceptions
+    /// such as webhook endpoints.
+    #[must_use]
+    pub fn without_token() -> Self {
+        HttpBuilder::without_token().build()
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {
@@ -268,11 +275,6 @@ impl Http {
 
     pub fn set_application_id(&self, application_id: ApplicationId) {
         self.application_id.store(application_id.get(), Ordering::Release);
-    }
-
-    #[cfg(feature = "gateway")]
-    pub(crate) fn token(&self) -> SecretString {
-        self.token.clone()
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -4678,7 +4680,11 @@ impl Http {
             ratelimiter.perform(req).await?
         } else {
             let request = req
-                .build(&self.client, self.token.expose_secret(), self.proxy.as_deref())?
+                .build(
+                    &self.client,
+                    self.token.as_ref().map(Token::expose_secret),
+                    self.proxy.as_deref(),
+                )?
                 .build()?;
             self.client.execute(request).await?
         };
