@@ -1,7 +1,10 @@
+mod quick_modal;
+
 use std::sync::Arc;
 
 use futures::future::pending;
 use futures::{Stream, StreamExt as _};
+pub use quick_modal::*;
 
 use crate::gateway::{CollectorCallback, ShardMessenger};
 use crate::internal::prelude::*;
