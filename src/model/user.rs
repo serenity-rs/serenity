@@ -482,18 +482,18 @@ impl User {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
-    /// # struct Handler;
+    /// # use serenity::http::Http;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// # let msg: Message = unimplemented!();
     ///
-    /// #[serenity::async_trait]
-    /// # #[cfg(feature = "gateway")]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: Context, msg: Message) {
-    ///         if msg.content == "!mytag" {
-    ///             let content = format!("Your tag is: {}", msg.author.tag());
-    ///             let _ = msg.channel_id.say(&context.http, &content).await;
-    ///         }
-    ///     }
+    /// if msg.content == "!mytag" {
+    ///     let content = format!("Your tag is: {}", msg.author.tag());
+    ///     let _ = msg.channel_id.say(&http, &content).await;
     /// }
+    ///
+    /// # Ok(())
+    /// # }
     /// ```
     #[must_use]
     pub fn tag(&self) -> String {
@@ -589,23 +589,24 @@ impl UserId {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
-    /// # struct Handler;
+    /// # use serenity::http::Http;
     /// use serenity::builder::CreateMessage;
     ///
-    /// #[serenity::async_trait]
-    /// # #[cfg(feature = "gateway")]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "~help" {
-    ///             let builder = CreateMessage::new().content("Helpful info here.");
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http: Http = unimplemented!();
+    /// # let msg: Message = unimplemented!();
     ///
-    ///             if let Err(why) = msg.author.id.direct_message(&ctx.http, builder).await {
-    ///                 println!("Err sending help: {why:?}");
-    ///                 let _ = msg.reply(&ctx.http, "There was an error DMing you help.").await;
-    ///             };
-    ///         }
-    ///     }
+    /// if msg.content == "~help" {
+    ///     let builder = CreateMessage::new().content("Helpful info here.");
+    ///
+    ///     if let Err(why) = msg.author.id.direct_message(&http, builder).await {
+    ///         println!("Err sending help: {why:?}");
+    ///         let _ = msg.reply(&http, "There was an error DMing you help.").await;
+    ///     };
     /// }
+    ///
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors

@@ -4,7 +4,7 @@ use std::sync::Arc;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 use crate::gateway::{ActivityData, ShardMessenger, ShardRunner};
-use crate::http::Http;
+use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
 
 /// A general utility struct provided on event dispatches.
@@ -45,6 +45,16 @@ impl fmt::Debug for Context {
             .field("shard", &self.shard)
             .field("shard_id", &self.shard_id)
             .finish_non_exhaustive()
+    }
+}
+
+impl CacheHttp for Context {
+    fn http(&self) -> &Http {
+        &self.http
+    }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&Arc<Cache>> {
+        Some(&self.cache)
     }
 }
 

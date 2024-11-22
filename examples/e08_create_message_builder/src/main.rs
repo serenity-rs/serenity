@@ -1,5 +1,3 @@
-use std::env;
-
 use serenity::async_trait;
 use serenity::builder::{CreateAttachment, CreateEmbed, CreateEmbedFooter, CreateMessage};
 use serenity::model::channel::Message;
@@ -51,12 +49,13 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client =
-        Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+        Client::builder(token, intents).event_handler(Handler).await.expect("Err creating client");
 
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");
