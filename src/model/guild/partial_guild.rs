@@ -277,21 +277,22 @@ impl PartialGuild {
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
-    /// # struct Handler;
     ///
-    /// # #[cfg(all(feature = "cache", feature = "gateway"))]
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx.cache) {
-    ///                 if let Some(role) = guild.role_by_name("role_name") {
-    ///                     println!("Obtained role's reference: {:?}", role);
-    ///                 }
-    ///             }
+    /// # #[cfg(feature = "cache")]
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let cache: serenity::cache::Cache = unimplemented!();
+    /// # let msg: Message = unimplemented!();
+    ///
+    /// if let Some(guild_id) = msg.guild_id {
+    ///     if let Some(guild) = guild_id.to_guild_cached(&cache) {
+    ///         if let Some(role) = guild.role_by_name("role_name") {
+    ///             println!("Obtained role's reference: {:?}", role);
     ///         }
     ///     }
     /// }
+    ///
+    /// # Ok(())
+    /// # }
     /// ```
     #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {

@@ -83,8 +83,10 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 /// let ws_url = Arc::from(gateway_info.url);
 /// let event_handler = Arc::new(Handler);
 /// let max_concurrency = std::num::NonZeroU16::MIN;
+/// let token = Token::from_env("DISCORD_TOKEN")?;
 ///
 /// ShardManager::new(ShardManagerOptions {
+///     token,
 ///     data,
 ///     event_handler: Some(event_handler),
 ///     raw_event_handler: None,
@@ -144,6 +146,7 @@ impl ShardManager {
         });
 
         let mut shard_queuer = ShardQueuer {
+            token: opt.token,
             data: opt.data,
             event_handler: opt.event_handler,
             raw_event_handler: opt.raw_event_handler,
@@ -376,6 +379,7 @@ impl Drop for ShardManager {
 }
 
 pub struct ShardManagerOptions {
+    pub token: Token,
     pub data: Arc<dyn std::any::Any + Send + Sync>,
     pub event_handler: Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,

@@ -103,7 +103,7 @@ pub mod gateway;
 pub mod http;
 #[cfg(feature = "interactions_endpoint")]
 pub mod interactions_endpoint;
-pub mod secret_string;
+pub mod secrets;
 #[cfg(feature = "utils")]
 pub mod utils;
 
@@ -140,12 +140,11 @@ pub mod all {
     #[cfg(feature = "interactions_endpoint")]
     #[doc(no_inline)]
     pub use crate::interactions_endpoint::*;
+    #[doc(no_inline)]
+    pub use crate::secrets::*;
     #[cfg(feature = "utils")]
     #[doc(no_inline)]
-    pub use crate::utils::{
-        token::{validate as validate_token, InvalidToken},
-        *,
-    };
+    pub use crate::utils::*;
     // #[doc(no_inline)]
     // pub use crate::*;
     #[doc(no_inline)]

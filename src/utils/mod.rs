@@ -11,8 +11,6 @@ mod message_builder;
 #[cfg(feature = "collector")]
 mod quick_modal;
 
-pub mod token;
-
 use std::num::NonZeroU16;
 
 #[cfg(feature = "gateway")]
@@ -26,8 +24,6 @@ use url::Url;
 
 pub use self::custom_message::CustomMessage;
 pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
-#[doc(inline)]
-pub use self::token::validate as validate_token;
 use crate::model::prelude::*;
 
 /// Retrieves the "code" part of an invite out of a URL.

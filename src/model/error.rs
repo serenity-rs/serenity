@@ -135,6 +135,9 @@ impl fmt::Display for Minimum {
 ///         }
 ///     }
 /// }
+///
+/// # Ok(())
+/// # }
 /// ```
 ///
 /// [`Error`]: crate::Error
