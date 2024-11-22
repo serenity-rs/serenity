@@ -1,7 +1,6 @@
 //! In this example, you will be shown how to share data between events.
 
 use std::borrow::Cow;
-use std::env;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
@@ -61,7 +60,8 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
     // We setup the initial value for our user data, which we will use throughout the rest of our
     // program.
@@ -72,7 +72,7 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client = Client::builder(&token, intents)
+    let mut client = Client::builder(token, intents)
         // Specifying the data type as a type argument here is optional, but if done, you can
         // guarantee that Context::data will not panic if the same type is given, as providing the
         // incorrect type will lead to a compiler error, rather than a runtime panic.
