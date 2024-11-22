@@ -38,7 +38,6 @@
 use std::borrow::Cow;
 use std::fmt;
 use std::str::{self, FromStr};
-use std::sync::Arc;
 use std::time::SystemTime;
 
 use dashmap::DashMap;
@@ -85,7 +84,7 @@ pub struct Ratelimiter {
     client: Client,
     global: Mutex<()>,
     routes: DashMap<RatelimitingBucket, Ratelimit>,
-    token: SecretString,
+    token: Option<Token>,
     absolute_ratelimits: bool,
     ratelimit_callback: parking_lot::RwLock<Box<dyn Fn(RatelimitInfo) + Send + Sync>>,
 }
@@ -105,13 +104,11 @@ impl fmt::Debug for Ratelimiter {
 
 impl Ratelimiter {
     /// Creates a new ratelimiter, with a shared [`reqwest`] client and the bot's token.
-    ///
-    /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not prefix it.
     #[must_use]
-    pub fn new(client: Client, token: Arc<str>) -> Self {
+    pub fn new(client: Client, token: Option<Token>) -> Self {
         Self {
             client,
-            token: SecretString::new(token),
+            token,
             global: Mutex::default(),
             routes: DashMap::new(),
             absolute_ratelimits: false,
@@ -193,7 +190,11 @@ impl Ratelimiter {
                 sleep(delay_time).await;
             }
 
-            let request = req.clone().build(&self.client, self.token.expose_secret(), None)?;
+            let request = req.clone().build(
+                &self.client,
+                self.token.as_ref().map(Token::expose_secret),
+                None,
+            )?;
             let response = self.client.execute(request.build()?).await?;
 
             // Check if the request got ratelimited by checking for status 429, and if so, sleep

@@ -41,23 +41,13 @@ pub use self::routing::*;
 pub use self::typing::*;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-#[cfg(feature = "gateway")]
-use crate::gateway::client::Context;
 use crate::model::prelude::*;
 
 /// This trait will be required by functions that need [`Http`] and can optionally use a [`Cache`]
 /// to potentially avoid REST-requests.
 ///
-/// The types [`Context`] and [`Http`] implement this trait and thus passing these to functions
-/// expecting `impl CacheHttp` is possible. For the full list of implementations, see the
-/// Implementors and Implementations on Foreign Types section in the generated docs.
-///
-/// In a situation where you have the `cache`-feature enabled but you do not pass a cache, the
-/// function will behave as if no `cache`-feature is active.
-///
-/// If you are calling a function that expects `impl CacheHttp` as argument and you wish to utilise
-/// the `cache`-feature but you got no access to a [`Context`], you can pass a tuple of
-/// `(&Arc<Cache>, &Http)`.
+/// If the `cache` feature is enabled, but an implementing type does not have access to a cache,
+/// the [`CacheHttp::cache`] method will simply return `None`.
 pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
 
@@ -91,17 +81,6 @@ where
     #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&Arc<Cache>> {
         (**self).cache()
-    }
-}
-
-#[cfg(feature = "gateway")]
-impl CacheHttp for Context {
-    fn http(&self) -> &Http {
-        &self.http
-    }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&Arc<Cache>> {
-        Some(&self.cache)
     }
 }
 
