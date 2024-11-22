@@ -70,7 +70,7 @@ impl<'a> Request<'a> {
     pub fn build(
         self,
         client: &Client,
-        token: &str,
+        token: Option<&str>,
         proxy: Option<&str>,
     ) -> Result<ReqwestRequestBuilder> {
         let mut path = self.route.path().into_owned();
@@ -91,8 +91,12 @@ impl<'a> Request<'a> {
 
         let mut headers = self.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
-        headers
-            .insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?);
+        if let Some(token) = token {
+            headers.insert(
+                AUTHORIZATION,
+                HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?,
+            );
+        }
 
         if let Some(multipart) = self.multipart {
             // Setting multipart adds the content-length header.

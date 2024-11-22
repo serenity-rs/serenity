@@ -47,6 +47,7 @@ use std::time::{Duration as StdDuration, Instant};
 #[cfg(feature = "transport_compression_zlib")]
 use aformat::aformat_into;
 use aformat::{aformat, ArrayString, CapStr};
+use serde::Deserialize;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, trace, warn};
@@ -112,7 +113,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason - not started within
     // a decent amount of time.
     pub started: Instant,
-    token: SecretString,
+    token: Token,
     ws_url: Arc<str>,
     resume_ws_url: Option<FixedString>,
     compression: TransportCompression,
@@ -135,14 +136,14 @@ impl Shard {
     /// use serenity::gateway::{Shard, TransportCompression};
     /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// use serenity::model::id::ShardId;
-    /// use serenity::secret_string::SecretString;
+    /// use serenity::secrets::Token;
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
-    /// let token = SecretString::new(Arc::from(std::env::var("DISCORD_BOT_TOKEN")?));
+    /// let token = Token::from_env("DISCORD_TOKEN")?;
     /// let shard_info = ShardInfo {
     ///     id: ShardId(0),
     ///     total: NonZeroU16::MIN,
@@ -172,7 +173,7 @@ impl Shard {
     /// TLS error.
     pub async fn new(
         ws_url: Arc<str>,
-        token: SecretString,
+        token: Token,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
@@ -330,7 +331,7 @@ impl Shard {
         }
 
         self.seq = seq;
-        let event = Event::deserialize_and_log(event, original_str)?;
+        let event = deserialize_and_log_event(event, original_str)?;
 
         match &event {
             Event::Ready(ready) => {
@@ -813,6 +814,22 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
     })?;
 
     WsClient::connect(url, compression).await
+}
+
+fn deserialize_and_log_event(map: JsonMap, original_str: &str) -> Result<Event> {
+    Event::deserialize(Value::Object(map)).map_err(|err| {
+        let err = serde::de::Error::custom(err);
+        let err_dbg = format!("{err:?}");
+        if let Some((variant_name, _)) =
+            err_dbg.strip_prefix(r#"Error("unknown variant `"#).and_then(|s| s.split_once('`'))
+        {
+            debug!("Unknown event: {variant_name}");
+        } else {
+            warn!("Err deserializing text: {err_dbg}");
+        }
+        debug!("Failing text: {original_str}");
+        Error::Json(err)
+    })
 }
 
 #[derive(Debug)]
