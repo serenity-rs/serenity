@@ -140,6 +140,8 @@ pub mod all {
     #[cfg(feature = "interactions_endpoint")]
     #[doc(no_inline)]
     pub use crate::interactions_endpoint::*;
+    #[doc(no_inline)]
+    pub use crate::secrets::*;
     #[cfg(feature = "utils")]
     #[doc(no_inline)]
     pub use crate::utils::*;
