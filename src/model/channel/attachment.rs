@@ -94,54 +94,47 @@ impl Attachment {
     /// use std::io::Write;
     /// use std::path::Path;
     ///
+    /// # use serenity::http::Http;
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     /// use tokio::fs::File;
     /// use tokio::io::AsyncWriteExt;
     ///
-    /// # struct Handler;
+    /// # async fn run() {
+    /// # let http: Http = unimplemented!();
+    /// # let message: Message = unimplemented!();
     ///
-    /// #[serenity::async_trait]
-    /// # #[cfg(feature = "gateway")]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: Context, message: Message) {
-    ///         for attachment in message.attachments {
-    ///             let content = match attachment.download().await {
-    ///                 Ok(content) => content,
-    ///                 Err(why) => {
-    ///                     println!("Error downloading attachment: {:?}", why);
-    ///                     let _ = message
-    ///                         .channel_id
-    ///                         .say(&context.http, "Error downloading attachment")
-    ///                         .await;
+    /// for attachment in message.attachments {
+    ///     let content = match attachment.download().await {
+    ///         Ok(content) => content,
+    ///         Err(why) => {
+    ///             println!("Error downloading attachment: {:?}", why);
+    ///             let _ = message.channel_id.say(&http, "Error downloading attachment").await;
     ///
-    ///                     return;
-    ///                 },
-    ///             };
+    ///             return;
+    ///         },
+    ///     };
     ///
-    ///             let mut file = match File::create(&attachment.filename).await {
-    ///                 Ok(file) => file,
-    ///                 Err(why) => {
-    ///                     println!("Error creating file: {:?}", why);
-    ///                     let _ = message.channel_id.say(&context.http, "Error creating file").await;
+    ///     let mut file = match File::create(&attachment.filename).await {
+    ///         Ok(file) => file,
+    ///         Err(why) => {
+    ///             println!("Error creating file: {:?}", why);
+    ///             let _ = message.channel_id.say(&http, "Error creating file").await;
     ///
-    ///                     return;
-    ///                 },
-    ///             };
+    ///             return;
+    ///         },
+    ///     };
     ///
-    ///             if let Err(why) = file.write_all(&content).await {
-    ///                 println!("Error writing to file: {:?}", why);
+    ///     if let Err(why) = file.write_all(&content).await {
+    ///         println!("Error writing to file: {:?}", why);
     ///
-    ///                 return;
-    ///             }
-    ///
-    ///             let _ = message
-    ///                 .channel_id
-    ///                 .say(&context.http, format!("Saved {:?}", attachment.filename))
-    ///                 .await;
-    ///         }
+    ///         return;
     ///     }
+    ///
+    ///     let _ = message.channel_id.say(&http, format!("Saved {:?}", attachment.filename)).await;
     /// }
+    ///
+    /// # }
     /// ```
     ///
     /// # Errors
