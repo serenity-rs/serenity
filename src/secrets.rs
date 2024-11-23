@@ -111,7 +111,7 @@ impl FromStr for Token {
 
         if is_valid {
             Ok(Self(SecretString::new(Arc::from(
-                aformat!("Box {}", CapStr::<128>(token)).as_str(),
+                aformat!("Bot {}", CapStr::<128>(token)).as_str(),
             ))))
         } else {
             Err(TokenError::InvalidToken)
