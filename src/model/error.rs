@@ -113,28 +113,28 @@ impl fmt::Display for Minimum {
 ///
 /// const BAN_DURATION: u32 = 8 * 24 * 60 * 60;
 ///
-/// # struct Handler;
+/// # #[cfg(feature = "http")]
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let http: serenity::http::Http = unimplemented!();
+/// # let guild_id: GuildId = unimplemented!();
+/// # let user: User = unimplemented!();
 ///
-/// # #[cfg(feature = "gateway")]
-/// #[serenity::async_trait]
-/// impl EventHandler for Handler {
-///     async fn guild_ban_removal(&self, ctx: Context, guild_id: GuildId, user: User) {
-///         match guild_id.ban(&ctx.http, user.id, BAN_DURATION, Some("No unbanning people!")).await
-///         {
-///             Ok(()) => {
-///                 // Ban successful.
-///             },
-///             Err(Error::Model(ModelError::TooLarge {
-///                 value, ..
-///             })) => {
-///                 println!("Failed deleting {value} days' worth of messages");
-///             },
-///             Err(why) => {
-///                 println!("Unexpected error: {why:?}");
-///             },
-///         }
-///     }
+/// match guild_id.ban(&http, user.id, BAN_DURATION, Some("No unbanning people!")).await {
+///     Ok(()) => {
+///         // Ban successful.
+///     },
+///     Err(Error::Model(ModelError::TooLarge {
+///         value, ..
+///     })) => {
+///         println!("Failed deleting {value} seconds' worth of messages");
+///     },
+///     Err(why) => {
+///         println!("Unexpected error: {why:?}");
+///     },
 /// }
+///
+/// # Ok(())
+/// # }
 /// ```
 ///
 /// [`Error`]: crate::Error
