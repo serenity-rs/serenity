@@ -111,7 +111,7 @@ impl fmt::Display for Minimum {
 /// use serenity::prelude::*;
 /// use serenity::Error;
 ///
-/// const BAN_DURATION: u32 = 8 * 24 * 60 * 60;
+/// const EIGHT_DAYS_IN_SECONDS: u32 = 8 * 24 * 60 * 60;
 ///
 /// # #[cfg(feature = "http")]
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -119,7 +119,7 @@ impl fmt::Display for Minimum {
 /// # let guild_id: GuildId = unimplemented!();
 /// # let user: User = unimplemented!();
 ///
-/// match guild_id.ban(&http, user.id, BAN_DURATION, Some("No unbanning people!")).await {
+/// match guild_id.ban(&http, user.id, EIGHT_DAYS_IN_SECONDS, Some("No unbanning people!")).await {
 ///     Ok(()) => {
 ///         // Ban successful.
 ///     },
