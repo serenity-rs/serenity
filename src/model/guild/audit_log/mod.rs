@@ -35,36 +35,36 @@ pub enum Action {
     AutoMod(AutoModAction),
     CreatorMonetization(CreatorMonetizationAction),
     VoiceChannelStatus(VoiceChannelStatusAction),
-    Unknown(u8),
+    Unknown(u16),
 }
 
 impl Action {
     #[must_use]
-    pub const fn num(self) -> u8 {
+    pub const fn num(self) -> u16 {
         match self {
             Self::GuildUpdate => 1,
-            Self::Channel(x) => x as u8,
-            Self::ChannelOverwrite(x) => x as u8,
-            Self::Member(x) => x as u8,
-            Self::Role(x) => x as u8,
-            Self::Invite(x) => x as u8,
-            Self::Webhook(x) => x as u8,
-            Self::Emoji(x) => x as u8,
-            Self::Message(x) => x as u8,
-            Self::Integration(x) => x as u8,
-            Self::StageInstance(x) => x as u8,
-            Self::Sticker(x) => x as u8,
-            Self::ScheduledEvent(x) => x as u8,
-            Self::Thread(x) => x as u8,
-            Self::AutoMod(x) => x as u8,
-            Self::CreatorMonetization(x) => x as u8,
-            Self::VoiceChannelStatus(x) => x as u8,
+            Self::Channel(x) => x as u16,
+            Self::ChannelOverwrite(x) => x as u16,
+            Self::Member(x) => x as u16,
+            Self::Role(x) => x as u16,
+            Self::Invite(x) => x as u16,
+            Self::Webhook(x) => x as u16,
+            Self::Emoji(x) => x as u16,
+            Self::Message(x) => x as u16,
+            Self::Integration(x) => x as u16,
+            Self::StageInstance(x) => x as u16,
+            Self::Sticker(x) => x as u16,
+            Self::ScheduledEvent(x) => x as u16,
+            Self::Thread(x) => x as u16,
+            Self::AutoMod(x) => x as u16,
+            Self::CreatorMonetization(x) => x as u16,
+            Self::VoiceChannelStatus(x) => x as u16,
             Self::Unknown(x) => x,
         }
     }
 
     #[must_use]
-    pub fn from_value(value: u8) -> Action {
+    pub fn from_value(value: u16) -> Action {
         match value {
             1 => Action::GuildUpdate,
             10 => Action::Channel(ChannelAction::Create),
@@ -132,14 +132,14 @@ impl Action {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let value = u8::deserialize(deserializer)?;
+        let value = u16::deserialize(deserializer)?;
         Ok(Action::from_value(value))
     }
 }
 
 impl Serialize for Action {
     fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        serializer.serialize_u8(self.num())
+        serializer.serialize_u16(self.num())
     }
 }
 
@@ -147,7 +147,6 @@ impl Serialize for Action {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum ChannelAction {
     Create = 10,
     Update = 11,
@@ -158,7 +157,6 @@ pub enum ChannelAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum ChannelOverwriteAction {
     Create = 13,
     Update = 14,
@@ -169,7 +167,6 @@ pub enum ChannelOverwriteAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum MemberAction {
     Kick = 20,
     Prune = 21,
@@ -186,7 +183,6 @@ pub enum MemberAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum RoleAction {
     Create = 30,
     Update = 31,
@@ -197,7 +193,6 @@ pub enum RoleAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum InviteAction {
     Create = 40,
     Update = 41,
@@ -208,7 +203,6 @@ pub enum InviteAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum WebhookAction {
     Create = 50,
     Update = 51,
@@ -219,7 +213,6 @@ pub enum WebhookAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum EmojiAction {
     Create = 60,
     Update = 61,
@@ -230,7 +223,6 @@ pub enum EmojiAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum MessageAction {
     Delete = 72,
     BulkDelete = 73,
@@ -242,7 +234,6 @@ pub enum MessageAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum IntegrationAction {
     Create = 80,
     Update = 81,
@@ -253,7 +244,6 @@ pub enum IntegrationAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum StageInstanceAction {
     Create = 83,
     Update = 84,
@@ -264,7 +254,6 @@ pub enum StageInstanceAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum StickerAction {
     Create = 90,
     Update = 91,
@@ -275,7 +264,6 @@ pub enum StickerAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum ScheduledEventAction {
     Create = 100,
     Update = 101,
@@ -286,7 +274,6 @@ pub enum ScheduledEventAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum ThreadAction {
     Create = 110,
     Update = 111,
@@ -297,7 +284,6 @@ pub enum ThreadAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum AutoModAction {
     RuleCreate = 140,
     RuleUpdate = 141,
@@ -312,7 +298,6 @@ pub enum AutoModAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum CreatorMonetizationAction {
     RequestCreated = 150,
     TermsAccepted = 151,
@@ -322,7 +307,6 @@ pub enum CreatorMonetizationAction {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum VoiceChannelStatusAction {
     StatusUpdate = 192,
     StatusDelete = 193,
