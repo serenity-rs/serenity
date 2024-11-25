@@ -325,6 +325,7 @@ fn update_cache_with_event(
             removed_reaction: event.reaction,
         },
         Event::ReactionRemoveAll(event) => FullEvent::ReactionRemoveAll {
+            guild_id: event.guild_id,
             channel_id: event.channel_id,
             removed_from_message_id: event.message_id,
         },
