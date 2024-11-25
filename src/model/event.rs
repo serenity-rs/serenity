@@ -3,10 +3,6 @@
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
-// Just for MessageUpdateEvent (for some reason the #[allow] doesn't work when placed directly)
-#![allow(clippy::option_option)]
-
-use nonmax::NonMaxU64;
 use serde::de::Error as DeError;
 use serde::Serialize;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
@@ -467,153 +463,15 @@ pub struct MessageDeleteEvent {
     pub message_id: MessageId,
 }
 
-// Any value that is present is considered Some value, including null.
-// Taken from https://github.com/serde-rs/serde/issues/984#issuecomment-314143738
-fn deserialize_some<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
-where
-    T: Deserialize<'de>,
-    D: Deserializer<'de>,
-{
-    Deserialize::deserialize(deserializer).map(Some)
-}
-
 /// Requires [`GatewayIntents::GUILD_MESSAGES`].
-///
-/// Contains identical fields to [`Message`], except everything but `id` and `channel_id` are
-/// optional. Even fields that cannot change in a message update event are included, because Discord
-/// may include them anyways, independent from whether they have actually changed (like
-/// [`Self::guild_id`])
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageUpdateEvent {
-    pub id: MessageId,
-    pub channel_id: ChannelId,
-    pub author: Option<User>,
-    pub content: Option<FixedString<u16>>,
-    pub timestamp: Option<Timestamp>,
-    pub edited_timestamp: Option<Timestamp>,
-    pub tts: Option<bool>,
-    pub mention_everyone: Option<bool>,
-    pub mentions: Option<FixedArray<User>>,
-    pub mention_roles: Option<FixedArray<RoleId>>,
-    pub mention_channels: Option<FixedArray<ChannelMention>>,
-    pub attachments: Option<FixedArray<Attachment>>,
-    pub embeds: Option<FixedArray<Embed>>,
-    pub reactions: Option<FixedArray<MessageReaction>>,
-    pub pinned: Option<bool>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    pub webhook_id: Option<Option<WebhookId>>,
-    #[serde(rename = "type")]
-    pub kind: Option<MessageType>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    pub activity: Option<Option<MessageActivity>>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    pub application: Option<Option<MessageApplication>>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    pub application_id: Option<Option<ApplicationId>>,
-    pub message_reference: Option<Option<MessageReference>>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    pub flags: Option<Option<MessageFlags>>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    pub referenced_message: Option<Option<Box<Message>>>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    #[cfg(not(feature = "unstable"))]
-    pub interaction: Option<Option<Box<MessageInteraction>>>,
-    pub interaction_metadata: Option<Option<Box<MessageInteractionMetadata>>>,
-    #[serde(default, deserialize_with = "deserialize_some")]
-    pub thread: Option<Option<Box<GuildChannel>>>,
-    pub components: Option<FixedArray<ActionRow>>,
-    pub sticker_items: Option<FixedArray<StickerItem>>,
-    pub position: Option<Option<NonMaxU64>>,
-    pub role_subscription_data: Option<Option<RoleSubscriptionData>>,
-    pub guild_id: Option<GuildId>,
-    pub member: Option<Option<Box<PartialMember>>>,
-}
-
-impl MessageUpdateEvent {
-    #[expect(clippy::clone_on_copy)] // For consistency between fields
-    #[rustfmt::skip]
-    /// Writes the updated data in this message update event into the given [`Message`].
-    pub fn apply_to_message(&self, message: &mut Message) {
-        // Destructure, so we get an `unused` warning when we forget to process one of the fields
-        // in this method
-        let Self {
-            id,
-            channel_id,
-            author,
-            content,
-            timestamp,
-            edited_timestamp,
-            tts,
-            mention_everyone,
-            mentions,
-            mention_roles,
-            mention_channels,
-            attachments,
-            embeds,
-            reactions,
-            pinned,
-            webhook_id,
-            kind,
-            activity,
-            application,
-            application_id,
-            message_reference,
-            flags,
-            referenced_message,
-            #[cfg(not(feature = "unstable"))]
-            interaction,
-            interaction_metadata,
-            thread,
-            components,
-            sticker_items,
-            position,
-            role_subscription_data,
-            guild_id,
-            member,
-        } = self;
-
-        // Discord won't send a MessageUpdateEvent with a different MessageId and ChannelId than we
-        // already have. But let's set the fields anyways, in case the user calls this method with
-        // a self-constructed MessageUpdateEvent that does change these fields.
-        message.id = *id;
-        message.channel_id = *channel_id;
-
-        if let Some(x) = author { message.author = x.clone() }
-        if let Some(x) = content { message.content.clone_from(x) }
-        if let Some(x) = timestamp { message.timestamp = x.clone() }
-        message.edited_timestamp = *edited_timestamp;
-        if let Some(x) = tts { message.set_tts(*x) }
-        if let Some(x) = mention_everyone { message.set_mention_everyone(*x) }
-        if let Some(x) = mentions { message.mentions.clone_from(x) }
-        if let Some(x) = mention_roles { message.mention_roles.clone_from(x) }
-        if let Some(x) = mention_channels { message.mention_channels.clone_from(x) }
-        if let Some(x) = attachments { message.attachments.clone_from(x) }
-        if let Some(x) = embeds { message.embeds.clone_from(x) }
-        if let Some(x) = reactions { message.reactions.clone_from(x) }
-        if let Some(x) = pinned { message.set_pinned(*x) }
-        if let Some(x) = webhook_id { message.webhook_id.clone_from(x) }
-        if let Some(x) = kind { message.kind = x.clone() }
-        if let Some(x) = activity { message.activity.clone_from(x) }
-        if let Some(x) = application { message.application.clone_from(x) }
-        if let Some(x) = application_id { message.application_id.clone_from(x) }
-        if let Some(x) = message_reference { message.message_reference.clone_from(x) }
-        if let Some(x) = flags { message.flags.clone_from(x) }
-        if let Some(x) = referenced_message { message.referenced_message.clone_from(x) }
-        #[cfg(not(feature = "unstable"))]
-        if let Some(x) = interaction { message.interaction.clone_from(x) }
-        if let Some(x) = interaction_metadata { message.interaction_metadata.clone_from(x) }
-        if let Some(x) = thread { message.thread.clone_from(x) }
-        if let Some(x) = components { message.components.clone_from(x) }
-        if let Some(x) = sticker_items { message.sticker_items.clone_from(x) }
-        if let Some(x) = position { message.position.clone_from(x) }
-        if let Some(x) = role_subscription_data { message.role_subscription_data.clone_from(x) }
-        message.guild_id = *guild_id;
-        if let Some(x) = member { message.member.clone_from(x) }
-    }
+    #[serde(flatten)]
+    pub message: Message,
 }
 
 /// Requires [`GatewayIntents::GUILD_PRESENCES`].
