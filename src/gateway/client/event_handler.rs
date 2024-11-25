@@ -315,8 +315,8 @@ event_handler! {
 
     /// Dispatched when all reactions of a message are detached from a message.
     ///
-    /// Provides the channel's id and the message's id.
-    ReactionRemoveAll { channel_id: ChannelId, removed_from_message_id: MessageId } => async fn reaction_remove_all(&self, ctx: Context);
+    /// Provides the channel's id, message's id, and guild's id if in a guild.
+    ReactionRemoveAll { guild_id: Option<GuildId>, channel_id: ChannelId, removed_from_message_id: MessageId } => async fn reaction_remove_all(&self, ctx: Context);
 
     /// Dispatched when all reactions of a message are detached from a message.
     ///
