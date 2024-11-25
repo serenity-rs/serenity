@@ -44,9 +44,11 @@ use crate::model::prelude::*;
 
 mod cache_update;
 mod event;
+mod message_cache;
 mod settings;
 pub(crate) mod wrappers;
 
+use message_cache::MessageCache;
 #[cfg(feature = "temp_cache")]
 pub(crate) use wrappers::MaybeOwnedArc;
 use wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
@@ -181,7 +183,7 @@ pub struct Cache {
 
     // Messages cache:
     // ---
-    pub(crate) messages: DashMap<ChannelId, VecDeque<Message>, BuildHasher>,
+    messages: MessageCache,
 
     // Miscellanous fixed-size data
     // ---
@@ -241,7 +243,7 @@ impl Cache {
             guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
             unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
 
-            messages: DashMap::default(),
+            messages: MessageCache::default(),
 
             shard_data: RwLock::new(CachedShardData {
                 total: NonZeroU16::MIN,
@@ -344,7 +346,7 @@ impl Cache {
     /// }
     /// ```
     pub fn channel_messages(&self, channel_id: ChannelId) -> Option<ChannelMessagesRef<'_>> {
-        self.messages.get(&channel_id).map(CacheRef::from_ref)
+        self.messages.get_messages(channel_id)
     }
 
     /// Gets a reference to a guild from the cache based on the given `id`.
@@ -411,10 +413,7 @@ impl Cache {
             return Some(CacheRef::from_arc(message));
         }
 
-        let messages = self.messages.get(&channel_id)?;
-        let message =
-            messages.try_map(|messages| messages.iter().find(|m| m.id == message_id)).ok()?;
-        Some(CacheRef::from_mapped_ref(message))
+        self.messages.get_message(channel_id, message_id)
     }
 
     /// Returns the settings.
@@ -441,14 +440,7 @@ impl Cache {
     pub fn set_max_messages(&self, max: usize) {
         // Check to see if cache has to be truncated
         if max < self.settings.read().max_messages {
-            for mut entry in self.messages.iter_mut() {
-                let message_queue = entry.value_mut();
-                let queue_len = message_queue.len();
-
-                if queue_len > max {
-                    message_queue.drain(..queue_len - max);
-                }
-            }
+            self.messages.truncate_channels(max);
         }
 
         self.settings.write().max_messages = max;
@@ -479,21 +471,7 @@ impl Cache {
         channel_id: ChannelId,
         new_messages: impl Iterator<Item = Message>,
     ) {
-        let max_messages = self.settings().max_messages;
-        if max_messages == 0 {
-            // Early exit for common case of message cache being disabled.
-            return;
-        }
-
-        let mut channel_messages = self.messages.entry(channel_id).or_default();
-
-        // Fill up the existing cache
-        channel_messages.extend(new_messages.take(max_messages));
-        // Make sure the cache stays sorted to messages
-        channel_messages.make_contiguous().sort_unstable_by_key(|m| m.id);
-        // Get rid of the overflow at the front of the queue.
-        let truncate_end_index = channel_messages.len().saturating_sub(max_messages);
-        channel_messages.drain(..truncate_end_index);
+        self.messages.create_messages(self.settings().max_messages, channel_id, new_messages);
     }
 
     /// Updates the cache with the update implementation for an event or other custom update
@@ -540,26 +518,28 @@ mod test {
             },
         };
 
+        let messages_storage = cache.messages.storage();
+
         // Check that the channel cache doesn't exist.
-        assert!(!cache.messages.contains_key(&event.message.channel_id));
+        assert!(!messages_storage.contains_key(&event.message.channel_id));
         // Add first message, none because message ID 2 doesn't already exist.
         assert!(event.update(&cache).is_none());
         // None, it only returns the oldest message if the cache was already full.
         assert!(event.update(&cache).is_none());
         // Assert there's only 1 message in the channel's message cache.
-        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 1);
+        assert_eq!(messages_storage.get(&event.message.channel_id).unwrap().len(), 1);
 
         // Add a second message, assert that channel message cache length is 2.
         event.message.id = MessageId::new(4);
         assert!(event.update(&cache).is_none());
-        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 2);
+        assert_eq!(messages_storage.get(&event.message.channel_id).unwrap().len(), 2);
 
         // Add a third message, the first should now be removed.
         event.message.id = MessageId::new(5);
         assert!(event.update(&cache).is_some());
 
         {
-            let channel = cache.messages.get(&event.message.channel_id).unwrap();
+            let channel = messages_storage.get(&event.message.channel_id).unwrap();
 
             assert_eq!(channel.len(), 2);
             // Check that the first message is now removed.
@@ -578,7 +558,7 @@ mod test {
             channel: channel.clone(),
         };
         assert!(cache.update(&mut delete).is_some());
-        assert!(!cache.messages.contains_key(&delete.channel.id));
+        assert!(!messages_storage.contains_key(&delete.channel.id));
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
         let mut guild_create = GuildCreateEvent {
@@ -602,6 +582,6 @@ mod test {
         assert!(cache.update(&mut guild_delete).is_some());
 
         // Assert that the channel's message cache no longer exists.
-        assert!(!cache.messages.contains_key(&ChannelId::new(2)));
+        assert!(!messages_storage.contains_key(&ChannelId::new(2)));
     }
 }

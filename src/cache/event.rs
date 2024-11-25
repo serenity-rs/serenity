@@ -53,12 +53,10 @@ impl CacheUpdate for ChannelDeleteEvent {
     type Output = VecDeque<Message>;
 
     fn update(&mut self, cache: &Cache) -> Option<VecDeque<Message>> {
-        let (channel_id, guild_id) = (self.channel.id, self.channel.guild_id);
+        let channel_id = self.channel.id;
 
-        cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
-
-        // Remove the cached messages for the channel.
-        cache.messages.remove(&channel_id).map(|(_, messages)| messages)
+        cache.guilds.get_mut(&self.channel.guild_id).map(|mut g| g.channels.remove(&channel_id));
+        cache.messages.remove_channel(channel_id)
     }
 }
 
@@ -117,7 +115,7 @@ impl CacheUpdate for GuildDeleteEvent {
             Some(guild) => {
                 for channel in &guild.1.channels {
                     // Remove the channel's cached messages.
-                    cache.messages.remove(&channel.id);
+                    cache.messages.remove_channel(channel.id);
                 }
 
                 Some(guild.1)
@@ -339,24 +337,7 @@ impl CacheUpdate for MessageCreateEvent {
         }
 
         // Add the new message to the cache and remove the oldest cached message.
-        let max = cache.settings().max_messages;
-
-        if max == 0 {
-            return None;
-        }
-
-        let mut messages = cache.messages.entry(self.message.channel_id).or_default();
-
-        let mut removed_msg = None;
-        if messages.len() == max {
-            removed_msg = messages.pop_front();
-        }
-
-        if !messages.iter().any(|m| m.id == self.message.id) {
-            messages.push_back(self.message.clone());
-        }
-
-        removed_msg
+        cache.messages.create_message(cache.settings().max_messages, &self.message)
     }
 }
 
@@ -379,15 +360,7 @@ impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        for message in cache.messages.get_mut(&self.message.channel_id)?.iter_mut() {
-            if message.id == self.message.id {
-                let old_message = message.clone();
-                message.clone_from(&self.message);
-                return Some(old_message);
-            }
-        }
-
-        None
+        cache.messages.update_message(cache.settings().max_messages, &self.message, true)
     }
 }
 
