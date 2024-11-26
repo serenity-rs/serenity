@@ -26,6 +26,9 @@ jobs:
           - no cache
           - no gateway
           - unstable Discord API features
+          - zlib compression
+          - zstd compression
+          - zlib and zstd compression
 
         include:
           - name: beta
@@ -51,6 +54,12 @@ jobs:
           - name: unstable Discord API (no default features)
             features: unstable
             dont-test: true
+          - name: zlib compression
+            features: default transport_compression_zlib
+          - name: zstd compression
+            features: default transport_compression_zstd
+          - name: zlib and zstd compression
+            features: default transport_compression_zlib transport_compression_zstd
 
     steps:
       - name: Checkout sources
