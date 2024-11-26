@@ -44,7 +44,7 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
-#[cfg(feature = "transport_compression_zlib")]
+#[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
 use aformat::aformat_into;
 use aformat::{aformat, ArrayString, CapStr};
 use serde::Deserialize;
