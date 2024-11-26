@@ -5,13 +5,10 @@
 
 mod full_event;
 
-use serde::de::Error as DeError;
-use serde::{Serialize, Serializer};
-use serde_json::value::RawValue;
+use serde::Serialize;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 pub use self::full_event::*;
-use crate::constants::Opcode;
 use crate::model::prelude::*;
 use crate::model::utils::deserialize_null_as_default;
 
@@ -1009,109 +1006,6 @@ pub struct ShardStageUpdateEvent {
     pub old: ConnectionStage,
     /// The ID of the shard that had its connection stage change.
     pub shard_id: ShardId,
-}
-
-/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#payload-structure).
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Debug, Clone, Serialize)]
-#[non_exhaustive]
-#[serde(untagged)]
-pub enum GatewayEvent {
-    Dispatch {
-        seq: u64,
-        event: DeserializedEvent,
-    },
-    Heartbeat,
-    Reconnect,
-    /// Whether the session can be resumed.
-    InvalidateSession(bool),
-    Hello(u64),
-    HeartbeatAck,
-}
-
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Serialize)]
-#[non_exhaustive]
-#[serde(untagged)]
-pub enum DeserializedEvent {
-    Success(Box<Event>),
-    Unknown(UnknownEvent),
-}
-
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug)]
-#[non_exhaustive]
-pub struct UnknownEvent {
-    #[cfg_attr(feature = "typesize", typesize(with = raw_value_len))]
-    pub data: Box<RawValue>,
-    pub err: String,
-}
-
-impl Serialize for UnknownEvent {
-    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        self.data.serialize(serializer)
-    }
-}
-
-#[cfg(feature = "typesize")]
-fn raw_value_len(val: &RawValue) -> usize {
-    val.get().len()
-}
-
-// Manual impl needed to emulate integer enum tags
-impl<'de> Deserialize<'de> for GatewayEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Deserialize)]
-        struct GatewayEventRaw<'a> {
-            op: Opcode,
-            #[serde(rename = "s")]
-            seq: Option<u64>,
-            #[serde(rename = "d")]
-            data: &'a RawValue,
-            #[serde(rename = "t")]
-            ty: Option<&'a str>,
-        }
-
-        let raw_data = <&RawValue>::deserialize(deserializer)?;
-
-        let raw = GatewayEventRaw::deserialize(raw_data).map_err(DeError::custom)?;
-
-        Ok(match raw.op {
-            Opcode::Dispatch => {
-                if raw.ty.is_none() {
-                    return Err(DeError::missing_field("t"));
-                }
-
-                Self::Dispatch {
-                    seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
-                    event: match Deserialize::deserialize(raw_data) {
-                        Ok(event) => DeserializedEvent::Success(event),
-                        Err(e) => DeserializedEvent::Unknown(UnknownEvent {
-                            data: Deserialize::deserialize(raw_data).map_err(DeError::custom)?,
-                            err: e.to_string(),
-                        }),
-                    },
-                }
-            },
-            Opcode::Heartbeat => Self::Heartbeat,
-            Opcode::InvalidSession => {
-                Self::InvalidateSession(bool::deserialize(raw.data).map_err(DeError::custom)?)
-            },
-            Opcode::Hello => {
-                #[derive(Deserialize)]
-                struct HelloPayload {
-                    heartbeat_interval: u64,
-                }
-
-                let inner = HelloPayload::deserialize(raw.data).map_err(DeError::custom)?;
-
-                Self::Hello(inner.heartbeat_interval)
-            },
-            Opcode::Reconnect => Self::Reconnect,
-            Opcode::HeartbeatAck => Self::HeartbeatAck,
-            _ => return Err(DeError::custom("invalid opcode")),
-        })
-    }
 }
 
 /// Event received over a websocket connection

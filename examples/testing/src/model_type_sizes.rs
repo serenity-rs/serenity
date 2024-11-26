@@ -1,3 +1,4 @@
+use serenity::gateway::GatewayEvent;
 use serenity::model::prelude::*;
 
 pub fn print_ranking() {

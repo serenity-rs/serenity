@@ -21,14 +21,19 @@ mod ws;
 #[cfg(feature = "http")]
 use reqwest::IntoUrl;
 use reqwest::Url;
-use serde::Serialize;
+use serde::de::{Deserialize, Deserializer, Error as DeError};
+use serde::{Serialize, Serializer};
+use serde_json::value::RawValue;
 
 pub use self::error::Error as GatewayError;
 pub use self::sharding::*;
 #[cfg(feature = "voice")]
 pub use self::voice::VoiceGatewayManager;
 pub use self::ws::WsClient;
+use crate::constants::Opcode;
+use crate::error::CoreError;
 use crate::internal::prelude::*;
+use crate::model::event::Event;
 use crate::model::gateway::{Activity, ActivityType};
 use crate::model::id::UserId;
 use crate::model::user::OnlineStatus;
@@ -79,7 +84,7 @@ impl ActivityData {
             name: name.into().trunc_into(),
             kind: ActivityType::Streaming,
             state: None,
-            url: Some(url.into_url()?),
+            url: Some(url.into_url().map_err(CoreError::from)?),
         })
     }
 
@@ -154,4 +159,107 @@ pub enum ChunkGuildFilter {
     ///
     /// Will return a maximum of 100 members.
     UserIds(Vec<UserId>),
+}
+
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#payload-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Debug, Clone, Serialize)]
+#[non_exhaustive]
+#[serde(untagged)]
+pub enum GatewayEvent {
+    Dispatch {
+        seq: u64,
+        event: DeserializedEvent,
+    },
+    Heartbeat,
+    Reconnect,
+    /// Whether the session can be resumed.
+    InvalidateSession(bool),
+    Hello(u64),
+    HeartbeatAck,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+#[serde(untagged)]
+pub enum DeserializedEvent {
+    Success(Box<Event>),
+    Unknown(UnknownEvent),
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub struct UnknownEvent {
+    #[cfg_attr(feature = "typesize", typesize(with = raw_value_len))]
+    pub data: Box<RawValue>,
+    pub err: String,
+}
+
+impl Serialize for UnknownEvent {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        self.data.serialize(serializer)
+    }
+}
+
+#[cfg(feature = "typesize")]
+fn raw_value_len(val: &RawValue) -> usize {
+    val.get().len()
+}
+
+// Manual impl needed to emulate integer enum tags
+impl<'de> Deserialize<'de> for GatewayEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Debug, Clone, Deserialize)]
+        struct GatewayEventRaw<'a> {
+            op: Opcode,
+            #[serde(rename = "s")]
+            seq: Option<u64>,
+            #[serde(rename = "d")]
+            data: &'a RawValue,
+            #[serde(rename = "t")]
+            ty: Option<&'a str>,
+        }
+
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+
+        let raw = GatewayEventRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        Ok(match raw.op {
+            Opcode::Dispatch => {
+                if raw.ty.is_none() {
+                    return Err(DeError::missing_field("t"));
+                }
+
+                Self::Dispatch {
+                    seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
+                    event: match Deserialize::deserialize(raw_data) {
+                        Ok(event) => DeserializedEvent::Success(event),
+                        Err(e) => DeserializedEvent::Unknown(UnknownEvent {
+                            data: Deserialize::deserialize(raw_data).map_err(DeError::custom)?,
+                            err: e.to_string(),
+                        }),
+                    },
+                }
+            },
+            Opcode::Heartbeat => Self::Heartbeat,
+            Opcode::InvalidSession => {
+                Self::InvalidateSession(bool::deserialize(raw.data).map_err(DeError::custom)?)
+            },
+            Opcode::Hello => {
+                #[derive(Deserialize)]
+                struct HelloPayload {
+                    heartbeat_interval: u64,
+                }
+
+                let inner = HelloPayload::deserialize(raw.data).map_err(DeError::custom)?;
+
+                Self::Hello(inner.heartbeat_interval)
+            },
+            Opcode::Reconnect => Self::Reconnect,
+            Opcode::HeartbeatAck => Self::HeartbeatAck,
+            _ => return Err(DeError::custom("invalid opcode")),
+        })
+    }
 }

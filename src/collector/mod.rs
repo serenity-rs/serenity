@@ -172,7 +172,7 @@ make_specific_collector!(
     CollectComponentInteractions, collect_component_interactions,
     // This defines the extractor pattern, which extracts the data we want to collect from an Event.
     Event::InteractionCreate(InteractionCreateEvent {
-        interaction: Interaction::Component(interaction),
+        interaction: Interaction::Component(interaction), ..
     }) => interaction,
     // All following lines define built-in filters of the collector.
     // Each line consists of:
@@ -189,7 +189,7 @@ make_specific_collector!(
     ModalInteractionCollector, ModalInteraction,
     CollectModalInteractions, collect_modal_interactions,
     Event::InteractionCreate(InteractionCreateEvent {
-        interaction: Interaction::Modal(interaction),
+        interaction: Interaction::Modal(interaction), ..
     }) => interaction,
     author_id: UserId => interaction.user.id == *author_id,
     channel_id: GenericChannelId => interaction.channel_id == *channel_id,
@@ -200,7 +200,7 @@ make_specific_collector!(
 make_specific_collector!(
     ReactionCollector, Reaction,
     CollectReactions, collect_reactions,
-    Event::ReactionAdd(ReactionAddEvent { reaction }) => reaction,
+    Event::ReactionAdd(ReactionAddEvent { reaction, .. }) => reaction,
     author_id: UserId => reaction.user_id.is_none_or(|a| a == *author_id),
     channel_id: GenericChannelId => reaction.channel_id == *channel_id,
     guild_id: GuildId => reaction.guild_id.is_none_or(|g| g == *guild_id),
@@ -209,7 +209,7 @@ make_specific_collector!(
 make_specific_collector!(
     MessageCollector, Message,
     CollectMessages, collect_messages,
-    Event::MessageCreate(MessageCreateEvent { message }) => message,
+    Event::MessageCreate(MessageCreateEvent { message, .. }) => message,
     author_id: UserId => message.author.id == *author_id,
     channel_id: GenericChannelId => message.channel_id == *channel_id,
     guild_id: GuildId => message.guild_id.is_none_or(|g| g == *guild_id),

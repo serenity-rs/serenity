@@ -85,13 +85,13 @@ extern crate serde;
 mod internal;
 
 pub mod constants;
-pub mod model;
+pub use serenity_core::model;
 pub mod prelude;
 
 #[cfg(feature = "builder")]
-pub mod builder;
+pub use serenity_core::builder;
 #[cfg(feature = "cache")]
-pub mod cache;
+pub use serenity_core::cache;
 #[cfg(feature = "collector")]
 pub mod collector;
 #[cfg(feature = "framework")]
@@ -99,12 +99,12 @@ pub mod framework;
 #[cfg(feature = "gateway")]
 pub mod gateway;
 #[cfg(feature = "http")]
-pub mod http;
+pub use serenity_core::http;
 #[cfg(feature = "interactions_endpoint")]
 pub mod interactions_endpoint;
-pub mod secrets;
+pub use serenity_core::secrets;
 #[cfg(feature = "utils")]
-pub mod utils;
+pub use serenity_core::utils;
 
 mod error;
 
@@ -158,5 +158,4 @@ pub mod all {
 // Re-exports of crates used internally which are already publically exposed.
 pub use async_trait::async_trait;
 pub use futures;
-pub use nonmax;
 pub use small_fixed_array;

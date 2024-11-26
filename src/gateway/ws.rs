@@ -18,9 +18,16 @@ use url::Url;
 #[cfg(feature = "transport_compression_zstd")]
 use zstd::stream::write::Decoder as ZstdWriter;
 
-use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, TransportCompression};
+use super::{
+    ActivityData,
+    ChunkGuildFilter,
+    GatewayError,
+    GatewayEvent,
+    PresenceData,
+    TransportCompression,
+};
 use crate::constants::{self, Opcode};
-use crate::model::event::GatewayEvent;
+use crate::error::CoreError;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
 use crate::model::id::ChannelId;
@@ -122,7 +129,7 @@ impl Compression {
 
                 ZlibDecoder::new(slice).read_to_end(decompressed).map_err(|why| {
                     warn!("Err decompressing bytes: {why:?}");
-                    why
+                    CoreError::Io(why)
                 })?;
 
                 Ok(Some(decompressed.as_slice()))
@@ -146,9 +153,9 @@ impl Compression {
                 decoder.get_mut().clear();
                 decoder.write_all(compressed).map_err(|why| {
                     warn!("Err decompressing bytes: {why:?}");
-                    why
+                    CoreError::Io(why)
                 })?;
-                decoder.flush()?;
+                decoder.flush().map_err(CoreError::Io)?;
                 compressed.clear();
 
                 Ok(Some(decoder.get_ref().as_slice()))
@@ -161,9 +168,9 @@ impl Compression {
                 decoder.get_mut().clear();
                 decoder.write_all(slice).map_err(|why| {
                     warn!("Err decompressing bytes: {why:?}");
-                    why
+                    CoreError::Io(why)
                 })?;
-                decoder.flush()?;
+                decoder.flush().map_err(CoreError::Io)?;
 
                 Ok(Some(decoder.get_ref().as_slice()))
             },
@@ -241,13 +248,13 @@ impl WsClient {
             Ok(event) => Ok(Some(event)),
             Err(err) => {
                 debug!("Failing text: {}", String::from_utf8_lossy(json_bytes));
-                Err(Error::Json(err))
+                Err(Error::Core(CoreError::Json(err)))
             },
         }
     }
 
     pub(crate) async fn send_json(&mut self, value: &impl serde::Serialize) -> Result<()> {
-        let message = Message::Text(serde_json::to_string(value)?.into());
+        let message = Message::Text(serde_json::to_string(value).map_err(CoreError::Json)?.into());
 
         self.stream.send(message).await?;
         Ok(())

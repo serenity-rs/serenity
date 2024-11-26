@@ -54,10 +54,18 @@ pub use self::shard_manager::{
 };
 pub use self::shard_queue::ShardQueue;
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage};
-use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
+use super::{
+    ActivityData,
+    ChunkGuildFilter,
+    DeserializedEvent,
+    GatewayError,
+    GatewayEvent,
+    PresenceData,
+    WsClient,
+};
 use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
-use crate::model::event::{DeserializedEvent, Event, GatewayEvent};
+use crate::model::event::Event;
 use crate::model::gateway::{ConnectionStage, GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
 use crate::model::id::ChannelId;

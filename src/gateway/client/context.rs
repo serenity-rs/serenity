@@ -16,6 +16,7 @@ use crate::gateway::{
     ShardRunnerMessage,
 };
 use crate::http::{CacheHttp, Http};
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A general utility struct provided on event dispatches.
@@ -307,7 +308,7 @@ impl Context {
     ///
     /// Returns an error if the Application ID is not known.
     pub async fn get_application_emojis(&self) -> Result<Vec<Emoji>> {
-        self.http.get_application_emojis().await
+        Ok(self.http.get_application_emojis().await?)
     }
 
     /// Gets information about an application emoji.
@@ -316,7 +317,7 @@ impl Context {
     ///
     /// Returns an error if the emoji does not exist.
     pub async fn get_application_emoji(&self, emoji_id: EmojiId) -> Result<Emoji> {
-        self.http.get_application_emoji(emoji_id).await
+        Ok(self.http.get_application_emoji(emoji_id).await?)
     }
 
     /// Creates an application emoji with a name and base64-encoded image.
@@ -337,7 +338,7 @@ impl Context {
             image,
         };
 
-        self.http.create_application_emoji(&body).await
+        Ok(self.http.create_application_emoji(&body).await?)
     }
 
     /// Changes the name of an application emoji.
@@ -355,7 +356,7 @@ impl Context {
             name,
         };
 
-        self.http.edit_application_emoji(emoji_id, &body).await
+        Ok(self.http.edit_application_emoji(emoji_id, &body).await?)
     }
 
     /// Deletes an application emoji.
@@ -364,6 +365,6 @@ impl Context {
     ///
     /// Returns an error if the emoji does not exist.
     pub async fn delete_application_emoji(&self, emoji_id: EmojiId) -> Result<()> {
-        self.http.delete_application_emoji(emoji_id).await
+        Ok(self.http.delete_application_emoji(emoji_id).await?)
     }
 }

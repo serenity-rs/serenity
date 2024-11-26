@@ -1,9 +1,7 @@
 use std::error::Error as StdError;
 use std::fmt;
-use std::io::Error as IoError;
 
-#[cfg(feature = "http")]
-use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
+pub use serenity_core::error::Error as CoreError;
 #[cfg(feature = "gateway")]
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "tracing_instrument")]
@@ -11,99 +9,27 @@ use tracing::instrument;
 
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
-#[cfg(feature = "http")]
-use crate::http::HttpError;
-use crate::internal::prelude::*;
-use crate::model::ModelError;
-use crate::secrets::TokenError;
 
-/// The common result type between most library functions.
-///
-/// The library exposes functions which, for a result type, exposes only one type, rather than the
-/// usual 2 (`Result<T, Error>`). This is because all functions that return a result return
-/// serenity's [`Error`], so this is implied, and a "simpler" result is used.
-pub type Result<T, E = Error> = StdResult<T, E>;
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-/// A common error enum returned by most of the library's functionality within a custom [`Result`].
 #[derive(Debug)]
-#[non_exhaustive]
 pub enum Error {
-    /// An [`std::io`] error.
-    Io(IoError),
-    /// An error from the [`serde_json`] crate.
-    Json(serde_json::Error),
-    /// An error from the [`model`] module.
-    ///
-    /// [`model`]: crate::model
-    Model(ModelError),
     /// An error from the [`gateway`] module.
     ///
     /// [`gateway`]: crate::gateway
     #[cfg(feature = "gateway")]
     Gateway(GatewayError),
-    /// An error from the [`http`] module.
-    ///
-    /// [`http`]: crate::http
-    #[cfg(feature = "http")]
-    Http(HttpError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
     Tungstenite(Box<TungsteniteError>),
-    /// An error from the [`secrets`] module.
-    ///
-    /// [`secrets`]: crate::secrets
-    Token(TokenError),
-    /// When parsing a URL failed due to invalid input.
-    Url(UrlError),
-}
-
-#[derive(Debug)]
-#[non_exhaustive]
-pub enum UrlError {
-    Parsing(url::ParseError),
-    InvalidDataURI,
-}
-
-impl fmt::Display for UrlError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Parsing(inner) => fmt::Display::fmt(&inner, f),
-            Self::InvalidDataURI => f.write_str("Provided string is not a valid data URI"),
-        }
-    }
-}
-
-impl StdError for UrlError {
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        match self {
-            Self::Parsing(inner) => Some(inner),
-            _ => None,
-        }
-    }
+    /// An error from serenity's core.
+    Core(CoreError),
 }
 
 #[cfg(feature = "gateway")]
 impl From<GatewayError> for Error {
     fn from(e: GatewayError) -> Error {
         Error::Gateway(e)
-    }
-}
-
-impl From<IoError> for Error {
-    fn from(e: IoError) -> Error {
-        Error::Io(e)
-    }
-}
-
-impl From<serde_json::Error> for Error {
-    fn from(e: serde_json::Error) -> Error {
-        Error::Json(e)
-    }
-}
-
-impl From<ModelError> for Error {
-    fn from(e: ModelError) -> Error {
-        Error::Model(e)
     }
 }
 
@@ -114,59 +40,20 @@ impl From<TungsteniteError> for Error {
     }
 }
 
-#[cfg(feature = "http")]
-impl From<HttpError> for Error {
-    fn from(e: HttpError) -> Error {
-        Error::Http(e)
-    }
-}
-
-impl From<TokenError> for Error {
-    fn from(e: TokenError) -> Error {
-        Error::Token(e)
-    }
-}
-
-impl From<UrlError> for Error {
-    fn from(e: UrlError) -> Error {
-        Error::Url(e)
-    }
-}
-
-impl From<url::ParseError> for Error {
-    fn from(e: url::ParseError) -> Error {
-        UrlError::Parsing(e).into()
-    }
-}
-
-#[cfg(feature = "http")]
-impl From<InvalidHeaderValue> for Error {
-    fn from(e: InvalidHeaderValue) -> Error {
-        HttpError::InvalidHeader(e).into()
-    }
-}
-
-#[cfg(feature = "http")]
-impl From<ReqwestError> for Error {
-    fn from(e: ReqwestError) -> Error {
-        HttpError::Request(e).into()
+impl From<CoreError> for Error {
+    fn from(e: CoreError) -> Error {
+        Error::Core(e)
     }
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Io(inner) => fmt::Display::fmt(&inner, f),
-            Self::Json(inner) => fmt::Display::fmt(&inner, f),
-            Self::Model(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Self::Gateway(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "http")]
-            Self::Http(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
-            Self::Token(inner) => fmt::Display::fmt(&inner, f),
-            Self::Url(inner) => fmt::Display::fmt(&inner, f),
+            Self::Core(inner) => fmt::Display::fmt(&inner, f),
         }
     }
 }
@@ -175,17 +62,11 @@ impl StdError for Error {
     #[cfg_attr(feature = "tracing_instrument", instrument)]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
-            Self::Io(inner) => Some(inner),
-            Self::Json(inner) => Some(inner),
-            Self::Model(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Self::Gateway(inner) => Some(inner),
-            #[cfg(feature = "http")]
-            Self::Http(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => Some(inner),
-            Self::Token(inner) => Some(inner),
-            Self::Url(inner) => Some(inner),
+            Self::Core(inner) => Some(inner),
         }
     }
 }
