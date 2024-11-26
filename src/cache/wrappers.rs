@@ -26,10 +26,6 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
         self.0.as_ref()?.get_mut(k)
     }
 
-    pub fn contains(&self, k: &K) -> bool {
-        self.0.as_ref().is_some_and(|m| m.contains_key(k))
-    }
-
     pub fn insert(&self, k: K, v: V) -> Option<V> {
         self.0.as_ref()?.insert(k, v)
     }
@@ -81,6 +77,10 @@ impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
 
     pub fn len(&self) -> usize {
         self.0.map_or(0, DashMap::len)
+    }
+
+    pub fn contains(&self, k: &K) -> bool {
+        self.0.is_some_and(|m| m.contains_key(k))
     }
 }
 pub struct Hasher(foldhash::fast::FoldHasher);
