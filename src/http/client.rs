@@ -331,7 +331,7 @@ impl Http {
         .await
     }
 
-    /// Bans a [`User`] from a [`Guild`], optionally deleting all of the user's messages younger 
+    /// Bans a [`User`] from a [`Guild`], optionally deleting all of the user's messages younger
     /// than the provided `delete_message_seconds`.
     ///
     /// When the value of `delete_message_seconds` is `0`, no messages will be deleted. The maximum
