@@ -165,8 +165,8 @@ impl GuildId {
         builder.execute(http, self, user_id).await
     }
 
-    /// Ban a [`User`] from the guild, deleting a number of seconds' worth of messages
-    /// (`delete_message_seconds`) between the range 0 and 604800.
+    /// Ban a [`User`] from the guild, optionally deleting all of the user's messages younger than
+    /// (`delete_message_seconds`), a value between 0 (no messages deleted) and 604800 (7 days).
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
