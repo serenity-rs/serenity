@@ -331,11 +331,11 @@ impl Http {
         .await
     }
 
-    /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last X number of
-    /// days.
+    /// Bans a [`User`] from a [`Guild`], optionally deleting all of the user's messages younger than
+    /// the provided `delete_message_seconds`.
     ///
-    /// Passing a `delete_message_seconds` of `0` is equivalent to not removing any messages. Up to
-    /// `604800 seconds` (or 7 days) worth of messages may be deleted.
+    /// When the value of `delete_message_seconds` is `0`, no messages will be deleted. The maximum
+    /// value is `604800` seconds (7 days).
     pub async fn ban_user(
         &self,
         guild_id: GuildId,
