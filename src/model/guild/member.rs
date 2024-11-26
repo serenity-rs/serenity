@@ -133,15 +133,14 @@ impl Member {
         Ok(())
     }
 
-    /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
-    /// the range 0 and 7.
+    /// Ban a [`User`] from the guild, optionally deleting all of the user's messages younger than
+    /// (`delete_message_seconds`), a value between 0 (no messages deleted) and 604800 (7 days).
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::TooLarge`] if the `dmd` is greater than 7. Can also
-    /// return [`Error::Http`] if the current user lacks permission to ban this member.
+    /// Returns a [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn ban(
