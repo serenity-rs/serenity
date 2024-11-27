@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::future::Future;
 
 use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 use crate::collector::ModalInteractionCollector;
@@ -6,7 +7,6 @@ use crate::gateway::client::Context;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-#[cfg(feature = "collector")]
 pub struct QuickModalResponse {
     pub interaction: ModalInteraction,
     pub inputs: FixedArray<FixedString<u16>>,
@@ -15,7 +15,7 @@ pub struct QuickModalResponse {
 /// Convenience builder to create a modal, wait for the user to submit and parse the response.
 ///
 /// ```rust
-/// # use serenity::{builder::*, model::prelude::*, prelude::*, utils::CreateQuickModal, Result};
+/// # use serenity::{builder::*, model::prelude::*, prelude::*, collector::*, Result};
 /// # async fn foo_(ctx: &Context, interaction: &CommandInteraction) -> Result<()> {
 /// let modal = CreateQuickModal::new("About you")
 ///     .timeout(std::time::Duration::from_secs(600))
@@ -28,7 +28,6 @@ pub struct QuickModalResponse {
 /// # Ok(())
 /// # }
 /// ```
-#[cfg(feature = "collector")]
 #[must_use]
 pub struct CreateQuickModal<'a> {
     title: Cow<'a, str>,
@@ -36,7 +35,6 @@ pub struct CreateQuickModal<'a> {
     input_texts: Vec<CreateInputText<'a>>,
 }
 
-#[cfg(feature = "collector")]
 impl<'a> CreateQuickModal<'a> {
     pub fn new(title: impl Into<Cow<'a, str>>) -> Self {
         Self {
@@ -141,5 +139,33 @@ impl<'a> CreateQuickModal<'a> {
             inputs: FixedArray::from_vec_trunc(inputs),
             interaction: modal_interaction,
         }))
+    }
+}
+
+pub trait QuickModal {
+    fn quick_modal(
+        &self,
+        ctx: &Context,
+        builder: CreateQuickModal<'_>,
+    ) -> impl Future<Output = Result<Option<QuickModalResponse>>>;
+}
+
+impl QuickModal for CommandInteraction {
+    async fn quick_modal(
+        &self,
+        ctx: &Context,
+        builder: CreateQuickModal<'_>,
+    ) -> Result<Option<QuickModalResponse>> {
+        builder.execute(ctx, self.id, &self.token).await
+    }
+}
+
+impl QuickModal for ComponentInteraction {
+    async fn quick_modal(
+        &self,
+        ctx: &Context,
+        builder: CreateQuickModal<'_>,
+    ) -> Result<Option<QuickModalResponse>> {
+        builder.execute(ctx, self.id, &self.token).await
     }
 }
