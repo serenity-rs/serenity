@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use std::time::Duration;
 
 use serenity::async_trait;
-use serenity::collector::MessageCollector;
+use serenity::collector::{CollectMessages, CollectReactions, MessageCollector};
 // Collectors are streams, that means we can use `StreamExt` and `TryStreamExt`.
 use serenity::futures::stream::StreamExt;
 use serenity::model::prelude::*;
@@ -27,7 +27,7 @@ impl EventHandler for Handler {
         // return a builder that can be turned into a Stream, or here, where we can await a
         // single reply
         let collector =
-            msg.author.id.await_reply(ctx.shard.clone()).timeout(Duration::from_secs(10));
+            msg.author.id.collect_messages(ctx.shard.clone()).timeout(Duration::from_secs(10));
         if let Some(answer) = collector.await {
             if answer.content.to_lowercase() == "ferris" {
                 let _ = answer.reply(&ctx.http, "That's correct!").await;
@@ -47,7 +47,7 @@ impl EventHandler for Handler {
         // The message model can also be turned into a Collector to collect reactions on it.
         let collector = react_msg
             .id
-            .await_reaction(ctx.shard.clone())
+            .collect_reactions(ctx.shard.clone())
             .timeout(Duration::from_secs(10))
             .author_id(msg.author.id);
 

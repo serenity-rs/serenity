@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 
 use serenity::builder::*;
+use serenity::collector::CollectComponentInteractions;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
@@ -121,7 +122,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 .await?;
             let button_press = msg
                 .id
-                .await_component_interaction(ctx.shard.clone())
+                .collect_component_interactions(ctx.shard.clone())
                 .timeout(std::time::Duration::from_secs(10))
                 .await;
             match button_press {

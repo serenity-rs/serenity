@@ -12,6 +12,7 @@ use serenity::builder::{
     CreateSelectMenuKind,
     CreateSelectMenuOption,
 };
+use serenity::collector::CollectComponentInteractions;
 use serenity::futures::StreamExt;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -59,7 +60,7 @@ impl EventHandler for Handler {
         // manually in the EventHandler.
         let interaction = match m
             .id
-            .await_component_interaction(ctx.shard.clone())
+            .collect_component_interactions(ctx.shard.clone())
             .timeout(Duration::from_secs(60 * 3))
             .await
         {
@@ -107,7 +108,7 @@ impl EventHandler for Handler {
 
         // Wait for multiple interactions
         let mut interaction_stream =
-            m.id.await_component_interaction(ctx.shard.clone())
+            m.id.collect_component_interactions(ctx.shard.clone())
                 .timeout(Duration::from_secs(60 * 3))
                 .stream();
 
