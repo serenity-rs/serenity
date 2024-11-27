@@ -8,8 +8,6 @@ mod content_safe;
 mod custom_message;
 mod formatted_timestamp;
 mod message_builder;
-#[cfg(feature = "collector")]
-mod quick_modal;
 
 use std::num::NonZeroU16;
 
@@ -18,8 +16,6 @@ pub use argument_convert::*;
 #[cfg(feature = "cache")]
 pub use content_safe::*;
 pub use formatted_timestamp::*;
-#[cfg(feature = "collector")]
-pub use quick_modal::*;
 use url::Url;
 
 pub use self::custom_message::CustomMessage;
