@@ -1,7 +1,10 @@
+mod quick_modal;
+
 use std::sync::Arc;
 
 use futures::future::pending;
 use futures::{Stream, StreamExt as _};
+pub use quick_modal::*;
 
 use crate::gateway::{CollectorCallback, ShardMessenger};
 use crate::internal::prelude::*;
@@ -51,6 +54,7 @@ macro_rules! make_specific_collector {
     (
         $( #[ $($meta:tt)* ] )*
         $collector_type:ident, $item_type:ident,
+        $collector_trait:ident, $method_name:ident,
         $extractor:pat => $extracted_item:ident,
         $( $filter_name:ident: $filter_type:ty => $filter_passes:expr, )*
     ) => {
@@ -100,7 +104,7 @@ macro_rules! make_specific_collector {
                 let filters_pass = move |$extracted_item: &$item_type| {
                     // Check each of the built-in filters (author_id, channel_id, etc.)
                     $( if let Some($filter_name) = &self.$filter_name {
-                        if !$filter_passes {
+                        if !($filter_passes) {
                             return false;
                         }
                     } )*
@@ -142,12 +146,27 @@ macro_rules! make_specific_collector {
                 Box::pin(self.next())
             }
         }
+
+        pub trait $collector_trait {
+            fn $method_name(self, shard_messenger: ShardMessenger) -> $collector_type;
+        }
+
+        $(
+            impl $collector_trait for $filter_type {
+                fn $method_name(self, shard_messenger: ShardMessenger) -> $collector_type {
+                    $collector_type::new(shard_messenger).$filter_name(self)
+                }
+            }
+        )*
     };
 }
 
 make_specific_collector!(
     // First line has name of the collector type, and the type of the collected items.
     ComponentInteractionCollector, ComponentInteraction,
+    // Second line has name of the specific trait and method name that will be
+    // implemented on the filter argument types listed below.
+    CollectComponentInteractions, collect_component_interactions,
     // This defines the extractor pattern, which extracts the data we want to collect from an Event.
     Event::InteractionCreate(InteractionCreateEvent {
         interaction: Interaction::Component(interaction),
@@ -165,6 +184,7 @@ make_specific_collector!(
 );
 make_specific_collector!(
     ModalInteractionCollector, ModalInteraction,
+    CollectModalInteractions, collect_modal_interactions,
     Event::InteractionCreate(InteractionCreateEvent {
         interaction: Interaction::Modal(interaction),
     }) => interaction,
@@ -176,6 +196,7 @@ make_specific_collector!(
 );
 make_specific_collector!(
     ReactionCollector, Reaction,
+    CollectReactions, collect_reactions,
     Event::ReactionAdd(ReactionAddEvent { reaction }) => reaction,
     author_id: UserId => reaction.user_id.map_or(true, |a| a == *author_id),
     channel_id: ChannelId => reaction.channel_id == *channel_id,
@@ -184,6 +205,7 @@ make_specific_collector!(
 );
 make_specific_collector!(
     MessageCollector, Message,
+    CollectMessages, collect_messages,
     Event::MessageCreate(MessageCreateEvent { message }) => message,
     author_id: UserId => message.author.id == *author_id,
     channel_id: ChannelId => message.channel_id == *channel_id,
