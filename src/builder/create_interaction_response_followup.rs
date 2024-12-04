@@ -159,8 +159,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
     super::button_and_select_menu_convenience_methods!(self.components);
 
-    /// Creates or edits a followup response to the response sent. If a [`MessageId`] is provided,
-    /// then the corresponding message will be edited. Otherwise, a new message will be created.
+    /// Creates a followup response to the response sent.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
     /// 6000 code points.
@@ -171,12 +170,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
     /// response.
     #[cfg(feature = "http")]
-    pub async fn execute(
-        mut self,
-        http: &Http,
-        message_id: Option<MessageId>,
-        interaction_token: &str,
-    ) -> Result<Message> {
+    pub async fn execute(mut self, http: &Http, interaction_token: &str) -> Result<Message> {
         self.check_length()?;
 
         let files = self.attachments.take_files();
@@ -185,9 +179,6 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        match message_id {
-            Some(id) => http.edit_followup_message(interaction_token, id, &self, files).await,
-            None => http.create_followup_message(interaction_token, &self, files).await,
-        }
+        http.create_followup_message(interaction_token, &self, files).await
     }
 }

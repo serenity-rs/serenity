@@ -11,6 +11,7 @@ use serenity::builder::{
     CreateSelectMenu,
     CreateSelectMenuKind,
     CreateSelectMenuOption,
+    EditInteractionResponse,
 };
 use serenity::collector::CollectComponentInteractions;
 use serenity::futures::StreamExt;
@@ -85,7 +86,7 @@ impl EventHandler for Handler {
             .create_response(
                 &ctx.http,
                 CreateInteractionResponse::UpdateMessage(
-                    CreateInteractionResponseMessage::default()
+                    EditInteractionResponse::default()
                         .content(format!("You chose: **{animal}**\nNow choose a sound!"))
                         .button(sound_button("meow", "🐈".parse().unwrap()))
                         .button(sound_button("woof", "🐕".parse().unwrap()))

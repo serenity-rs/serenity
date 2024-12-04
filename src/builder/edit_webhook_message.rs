@@ -20,11 +20,11 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditWebhookMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    content: Option<Cow<'a, str>>,
+    pub(crate) content: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    embeds: Option<Cow<'a, [CreateEmbed<'a>]>>,
+    pub(crate) embeds: Option<Cow<'a, [CreateEmbed<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    allowed_mentions: Option<CreateAllowedMentions<'a>>,
+    pub(crate) allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -105,7 +105,7 @@ impl ComponentInteraction {
         http: &Http,
         builder: EditInteractionResponse<'_>,
     ) -> Result<Message> {
-        builder.execute(http, &self.token).await
+        builder.execute(http, None, &self.token).await
     }
 
     /// Deletes the initial interaction response.
@@ -134,7 +134,7 @@ impl ComponentInteraction {
         http: &Http,
         builder: CreateInteractionResponseFollowup<'_>,
     ) -> Result<Message> {
-        builder.execute(http, None, &self.token).await
+        builder.execute(http, &self.token).await
     }
 
     /// Edits a followup response to the response sent.
@@ -150,7 +150,7 @@ impl ComponentInteraction {
         &self,
         http: &Http,
         message_id: MessageId,
-        builder: CreateInteractionResponseFollowup<'_>,
+        builder: EditInteractionResponse<'_>,
     ) -> Result<Message> {
         builder.execute(http, Some(message_id), &self.token).await
     }

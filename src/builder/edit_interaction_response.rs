@@ -17,7 +17,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditInteractionResponse<'a>(EditWebhookMessage<'a>);
+pub struct EditInteractionResponse<'a>(pub(crate) EditWebhookMessage<'a>);
 
 impl<'a> EditInteractionResponse<'a> {
     /// Equivalent to [`Self::default`].
@@ -97,7 +97,8 @@ impl<'a> EditInteractionResponse<'a> {
         Self(self.0.clear_attachments())
     }
 
-    /// Edits the initial interaction response. Does not work for ephemeral messages.
+    /// Edits the initial interaction response. If a `message_id` is specified, instead edits a
+    /// follow-up.
     ///
     /// The `application_id` used will usually be the bot's [`UserId`], except if the bot is very
     /// old.
@@ -111,11 +112,19 @@ impl<'a> EditInteractionResponse<'a> {
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
     #[cfg(feature = "http")]
-    pub async fn execute(mut self, http: &Http, interaction_token: &str) -> Result<Message> {
+    pub async fn execute(
+        mut self,
+        http: &Http,
+        message_id: Option<MessageId>,
+        interaction_token: &str,
+    ) -> Result<Message> {
         self.0.check_length()?;
 
         let files = self.0.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
 
-        http.edit_original_interaction_response(interaction_token, &self, files).await
+        match message_id {
+            Some(id) => http.edit_followup_message(interaction_token, id, &self, files).await,
+            None => http.edit_original_interaction_response(interaction_token, &self, files).await,
+        }
     }
 }

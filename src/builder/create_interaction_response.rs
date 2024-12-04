@@ -9,6 +9,7 @@ use super::{
     CreateEmbed,
     CreatePoll,
     EditAttachments,
+    EditInteractionResponse,
 };
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -44,7 +45,7 @@ pub enum CreateInteractionResponse<'a> {
     /// Edits the message the component was attached to.
     ///
     /// Corresponds to Discord's `UPDATE_MESSAGE`.
-    UpdateMessage(CreateInteractionResponseMessage<'a>),
+    UpdateMessage(EditInteractionResponse<'a>),
     /// Only valid for autocomplete interactions.
     ///
     /// Responds to the autocomplete interaction with suggested choices.
@@ -100,13 +101,14 @@ impl serde::Serialize for CreateInteractionResponse<'_> {
 impl CreateInteractionResponse<'_> {
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<(), ModelError> {
-        if let CreateInteractionResponse::Message(data)
-        | CreateInteractionResponse::Defer(data)
-        | CreateInteractionResponse::UpdateMessage(data) = self
-        {
-            super::check_lengths(data.content.as_deref(), data.embeds.as_deref(), 0)
-        } else {
-            Ok(())
+        match self {
+            CreateInteractionResponse::Message(data) | CreateInteractionResponse::Defer(data) => {
+                super::check_lengths(data.content.as_deref(), data.embeds.as_deref(), 0)
+            },
+            CreateInteractionResponse::UpdateMessage(data) => {
+                super::check_lengths(data.0.content.as_deref(), data.0.embeds.as_deref(), 0)
+            },
+            _ => Ok(()),
         }
     }
 
@@ -129,17 +131,26 @@ impl CreateInteractionResponse<'_> {
     ) -> Result<()> {
         self.check_length()?;
         let files = match &mut self {
-            CreateInteractionResponse::Message(msg)
-            | CreateInteractionResponse::Defer(msg)
-            | CreateInteractionResponse::UpdateMessage(msg) => msg.attachments.take_files(),
+            Self::Message(msg) | Self::Defer(msg) => msg.attachments.take_files(),
+            Self::UpdateMessage(msg) => {
+                msg.0.attachments.as_mut().map_or_else(Vec::new, EditAttachments::take_files)
+            },
             _ => Vec::new(),
         };
 
-        if let Self::Message(msg) | Self::Defer(msg) | Self::UpdateMessage(msg) = &mut self {
-            if msg.allowed_mentions.is_none() {
-                msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
-            }
-        };
+        match &mut self {
+            Self::Message(msg) | Self::Defer(msg) => {
+                if msg.allowed_mentions.is_none() {
+                    msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
+                }
+            },
+            Self::UpdateMessage(msg) => {
+                if msg.0.allowed_mentions.is_none() {
+                    msg.0.allowed_mentions.clone_from(&http.default_allowed_mentions);
+                }
+            },
+            _ => {},
+        }
 
         http.create_interaction_response(interaction_id, interaction_token, &self, files).await
     }
