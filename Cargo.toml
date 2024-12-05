@@ -23,8 +23,8 @@ homepage = "https://github.com/serenity-rs/serenity"
 repository = "https://github.com/serenity-rs/serenity.git"
 keywords = ["discord", "api"]
 license = "ISC"
-edition = "2021"
-rust-version = "1.82"
+edition = "2024"
+rust-version = "1.85"
 
 [dependencies]
 # Required dependencies

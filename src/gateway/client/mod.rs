@@ -27,7 +27,6 @@ mod context;
 pub(crate) mod dispatch;
 mod event_handler;
 
-use std::future::IntoFuture;
 use std::num::NonZeroU16;
 use std::ops::Range;
 use std::sync::Arc;

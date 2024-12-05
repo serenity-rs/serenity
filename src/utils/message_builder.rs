@@ -1102,7 +1102,7 @@ mod test {
     use super::MessageBuilder;
     use crate::model::prelude::*;
 
-    macro_rules! gen {
+    macro_rules! generate {
         ($($fn:ident => [$($text:expr => $expected:expr),+]),+) => ({
             $(
                 $(
@@ -1217,7 +1217,7 @@ mod test {
 
     #[test]
     fn push_safe() {
-        gen! {
+        generate! {
             push_safe => [
                 "" => "",
                 "foo" => "foo",
@@ -1293,7 +1293,7 @@ mod test {
 
     #[test]
     fn push_unsafe() {
-        gen! {
+        generate! {
             push_bold => [
                 "a" => "**a**",
                 "" => "****",
