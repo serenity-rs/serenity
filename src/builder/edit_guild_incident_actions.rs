@@ -7,6 +7,7 @@ use crate::model::prelude::*;
 /// A builder for editing guild incident actions.
 ///
 /// [Discord's docs]: https://github.com/discord/discord-api-docs/pull/6396
+#[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildIncidentActions {
     invites_disabled_until: Option<Timestamp>,
