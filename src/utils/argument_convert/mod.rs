@@ -140,6 +140,44 @@ pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
     None
 }
 
+/// Retrieves guild, and channel ID from a channel URL.
+///
+/// If the URL is malformed, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::model::prelude::*;
+/// use serenity::utils::parse_channel_url;
+///
+/// assert_eq!(
+///     parse_channel_url("https://discord.com/channels/381880193251409931/381880193700069377"),
+///     Some((GuildId::new(381880193251409931), ChannelId::new(381880193700069377),)),
+/// );
+/// assert_eq!(
+///     parse_channel_url(
+///         "https://canary.discord.com/channels/381880193251409931/381880193700069377"
+///     ),
+///     Some((GuildId::new(381880193251409931), ChannelId::new(381880193700069377),)),
+/// );
+/// assert_eq!(parse_channel_url("https://google.com"), None);
+/// ```
+#[must_use]
+pub fn parse_channel_url(s: &str) -> Option<(GuildId, ChannelId)> {
+    use aformat::{aformat, CapStr};
+
+    for domain in DOMAINS {
+        let prefix = aformat!("https://{}/channels/", CapStr::<MAX_DOMAIN_LEN>(domain));
+        if let Some(parts) = s.strip_prefix(prefix.as_str()) {
+            let mut parts = parts.splitn(2, '/');
+
+            let guild_id = parts.next()?.parse().ok()?;
+            let channel_id = parts.next()?.parse().ok()?;
+            return Some((guild_id, channel_id));
+        }
+    }
+    None
+}
+
 const MAX_DOMAIN_LEN: usize = {
     let mut max_len = 0;
     let mut i = 0;
