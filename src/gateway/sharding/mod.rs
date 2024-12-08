@@ -435,7 +435,7 @@ impl Shard {
         }
 
         let resume = num
-            .map_or(true, |x| x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some());
+            .is_none_or(|x| x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some());
 
         Ok(Some(if resume {
             ShardAction::Reconnect(ReconnectType::Resume)

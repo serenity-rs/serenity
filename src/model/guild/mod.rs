@@ -595,7 +595,7 @@ impl Guild {
 
         for member in &self.members {
             if &*member.user.name == username
-                && discrim.map_or(true, |d| member.user.discriminator == d)
+                && discrim.is_none_or(|d| member.user.discriminator == d)
             {
                 return Some(member);
             }
