@@ -178,11 +178,11 @@ impl ShardRunner {
                 let can_dispatch = self
                     .event_handler
                     .as_ref()
-                    .map_or(true, |handler| handler.filter_event(&context, &event))
+                    .is_none_or(|handler| handler.filter_event(&context, &event))
                     && self
                         .raw_event_handler
                         .as_ref()
-                        .map_or(true, |handler| handler.filter_event(&context, &event));
+                        .is_none_or(|handler| handler.filter_event(&context, &event));
 
                 if can_dispatch {
                     #[cfg(feature = "collector")]
