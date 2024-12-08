@@ -15,6 +15,7 @@ use crate::builder::{
     EditAutoModRule,
     EditCommandPermissions,
     EditGuild,
+    EditGuildIncidentActions,
     EditGuildWelcomeScreen,
     EditGuildWidget,
     EditMember,
@@ -1786,6 +1787,24 @@ impl GuildId {
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         http.as_ref().delete_guild_soundboard(self, sound_id, audit_log_reason).await
+    }
+
+    /// Edits the guild incident actions
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [Discord's docs]: https://github.com/discord/discord-api-docs/pull/6396
+    pub async fn edit_guild_incident_actions(
+        self,
+        http: &Http,
+        guild_id: GuildId,
+        builder: EditGuildIncidentActions,
+    ) -> Result<IncidentsData> {
+        builder.execute(http, guild_id).await
     }
 }
 

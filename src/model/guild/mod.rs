@@ -42,6 +42,7 @@ use crate::builder::{
     EditAutoModRule,
     EditCommandPermissions,
     EditGuild,
+    EditGuildIncidentActions,
     EditGuildWelcomeScreen,
     EditGuildWidget,
     EditMember,
@@ -263,6 +264,10 @@ pub struct Guild {
     /// The stage instances in this guild.
     #[serde(rename = "guild_scheduled_events")]
     pub scheduled_events: Vec<ScheduledEvent>,
+    /// the id of the channel where this guild will recieve safety alerts.
+    pub safety_alerts_channel_id: Option<ChannelId>,
+    /// The incidents data for this guild, if any.
+    pub incidents_data: Option<IncidentsData>,
 }
 
 #[cfg(feature = "model")]
@@ -2618,6 +2623,24 @@ impl Guild {
     ) -> Result<()> {
         self.id.delete_soundboard(http, sound_id, audit_log_reason).await
     }
+
+    /// Edits the guild incident actions
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [Discord's docs]: https://github.com/discord/discord-api-docs/pull/6396    
+    pub async fn edit_guild_incident_actions(
+        self,
+        http: &Http,
+        guild_id: GuildId,
+        builder: EditGuildIncidentActions,
+    ) -> Result<IncidentsData> {
+        builder.execute(http, guild_id).await
+    }
 }
 
 #[cfg(feature = "model")]
@@ -2937,6 +2960,23 @@ enum_number! {
         OneHour = 3600,
         _ => Unknown(u16),
     }
+}
+
+/// The [`Guild`]'s incident's data.
+///
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/6396).
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct IncidentsData {
+    /// The time that invites get enabled again.
+    pub invites_disabled_until: Option<Timestamp>,
+    /// The time that dms get enabled again.
+    pub dms_disabled_until: Option<Timestamp>,
+    /// The time when elevated dm activity was triggered.
+    pub dm_spam_detected_at: Option<Timestamp>,
+    /// The time when raid alerts were triggered.
+    pub raid_detected_at: Option<Timestamp>,
 }
 
 #[cfg(test)]

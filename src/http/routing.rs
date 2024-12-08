@@ -354,6 +354,10 @@ routes! ('a, {
     api!("/guilds/{}/threads/active", guild_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));
 
+    GuildIncidentActions { guild_id: GuildId },
+    api!("/guilds/{}/incident-actions", guild_id),
+    Some(RatelimitingKind::PathAndId(guild_id.into()));
+
     Guilds,
     api!("/guilds"),
     Some(RatelimitingKind::Path);

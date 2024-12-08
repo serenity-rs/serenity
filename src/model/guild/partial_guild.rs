@@ -1,5 +1,7 @@
 use serde::Serialize;
 
+#[cfg(feature = "unstable_discord_api")]
+use super::IncidentsData;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateChannel,
@@ -176,6 +178,11 @@ pub struct PartialGuild {
     pub stickers: HashMap<StickerId, Sticker>,
     /// Whether the guild has the boost progress bar enabled
     pub premium_progress_bar_enabled: bool,
+    /// the id of the channel where this guild will recieve safety alerts.
+    pub safety_alerts_channel_id: Option<ChannelId>,
+    /// The incidents data for this guild, if any.
+    #[cfg(feature = "unstable_discord_api")]
+    pub incidents_data: Option<IncidentsData>,
 }
 
 #[cfg(feature = "model")]
@@ -1708,6 +1715,9 @@ impl From<Guild> for PartialGuild {
             preferred_locale: guild.preferred_locale,
             max_stage_video_channel_users: guild.max_stage_video_channel_users,
             premium_progress_bar_enabled: guild.premium_progress_bar_enabled,
+            safety_alerts_channel_id: guild.safety_alerts_channel_id,
+            #[cfg(feature = "unstable_discord_api")]
+            incidents_data: guild.incidents_data,
         }
     }
 }
