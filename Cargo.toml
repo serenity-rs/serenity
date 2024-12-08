@@ -1,20 +1,30 @@
 [package]
+name = "serenity"
+version = "0.12.4"
 authors = ["Alex M. M. <acdenissk69@gmail.com>"]
 description = "A Rust library for the Discord API."
-documentation = "https://docs.rs/serenity"
-homepage = "https://github.com/serenity-rs/serenity"
-keywords = ["discord", "api"]
-license = "ISC"
-name = "serenity"
 readme = "README.md"
-repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.12.4"
-edition = "2021"
-rust-version = "1.74"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
+
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+keywords.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [workspace]
 members = ["examples/*"]
+
+[workspace.package]
+documentation = "https://docs.rs/serenity"
+homepage = "https://github.com/serenity-rs/serenity"
+repository = "https://github.com/serenity-rs/serenity.git"
+keywords = ["discord", "api"]
+license = "ISC"
+edition = "2021"
+rust-version = "1.74"
 
 [dependencies]
 # Required dependencies

@@ -2,9 +2,15 @@
 name = "command_attr"
 version = "0.5.3"
 authors = ["Alex M. M. <acdenissk69@gmail.com>"]
-edition = "2021"
 description = "Procedural macros for command creation for the Serenity library."
-license = "ISC"
+
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+keywords.workspace = true
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 proc-macro = true
