@@ -5,6 +5,7 @@ authors = ["Alex M. M. <acdenissk69@gmail.com>"]
 edition = "2021"
 description = "Procedural macros for command creation for the Serenity library."
 license = "ISC"
+rust-version = "1.74"
 
 [lib]
 proc-macro = true
