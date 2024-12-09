@@ -85,6 +85,7 @@ use super::utils::StrOrInt;
 ///     }
 /// }
 /// ```
+#[expect(unused_macro_rules)] // Remove once at least one variant is deprecated
 macro_rules! generate_permissions {
     {$ (
         $(#[doc = $doc:literal])*
@@ -95,7 +96,7 @@ macro_rules! generate_permissions {
             impl Permissions: u64 {
                 $(
                     $(#[doc = $doc])*
-                    $(#[deprecated = $deprecated])*
+                    $(#[deprecated = $deprecated])?
                     const $perm_upper = $value;
                 )*
             }
@@ -109,8 +110,8 @@ macro_rules! generate_permissions {
                 #[must_use]
                 $(
                     #[deprecated = $deprecated]
-                    #[allow(deprecated)]
-                )*
+                    #[expect(deprecated)]
+                )?
                 pub fn $perm_lower(self) -> bool {
                     self.contains(Self::$perm_upper)
                 }
@@ -119,26 +120,23 @@ macro_rules! generate_permissions {
             /// Returns a list of names of all contained permissions.
             #[must_use]
             #[cfg(feature = "model")]
-            #[allow(deprecated, unused_mut, unused_assignments)]
             pub fn get_permission_names(self) -> Vec<&'static str> {
                 let mut names = Vec::new();
 
                 $(
-                    let mut is_deprecated = false;
-                    $(
-                        let _ = $deprecated;
-                        is_deprecated = true;
-                    )*
-
-                    if !is_deprecated && self.$perm_lower() {
-                        names.push($name);
-                    }
+                    generate_permissions!(@append_name: $($deprecated)? self, names, $perm_lower, $name);
                 )*
 
                 names
             }
         }
-    }
+    };
+    (@append_name: $self:ident, $vec:ident, $perm_lower:ident, $name:literal) => {
+        if $self.$perm_lower() {
+            $vec.push($name);
+        }
+    };
+    (@append_name: $deprecated:literal $self:ident, $vec:ident, $perm_lower:ident, $name:literal) => {};
 }
 
 /// Returns a set of permissions with the original @everyone permissions set to true.
