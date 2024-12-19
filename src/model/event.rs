@@ -862,10 +862,11 @@ pub struct StageInstanceDeleteEvent {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#thread-create).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(transparent)]
 #[non_exhaustive]
 pub struct ThreadCreateEvent {
+    #[serde(flatten)]
     pub thread: GuildChannel,
+    pub newly_created: Option<bool>,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].
