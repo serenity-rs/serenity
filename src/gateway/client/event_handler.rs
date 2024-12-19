@@ -411,8 +411,8 @@ event_handler! {
 
     /// Dispatched when a thread is created or the current user is added to a private thread.
     ///
-    /// Provides the thread.
-    ThreadCreate { thread: GuildChannel } => async fn thread_create(&self, ctx: Context);
+    /// Provides the thread and if the thread was newly created.
+    ThreadCreate { thread: GuildChannel, newly_created: Option<bool> } => async fn thread_create(&self, ctx: Context);
 
     /// Dispatched when a thread is updated.
     ///
