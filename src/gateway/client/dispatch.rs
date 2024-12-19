@@ -420,6 +420,7 @@ fn update_cache_with_event(
 
             FullEvent::ThreadCreate {
                 thread: event.thread,
+                newly_created: event.newly_created,
             }
         },
         Event::ThreadUpdate(mut event) => {
