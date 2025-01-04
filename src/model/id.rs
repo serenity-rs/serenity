@@ -138,7 +138,7 @@ macro_rules! id_u64 {
 
 /// The inner storage of an ID.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[repr(packed)]
+#[repr(Rust, packed)]
 pub(crate) struct InnerId(NonZeroU64);
 
 struct SnowflakeVisitor;
@@ -235,7 +235,7 @@ newtype_display_impl!(ShardId, |this| this.0);
 /// The specific algorithm used is currently just a sequential index but this is subject to change.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-#[repr(packed)]
+#[repr(Rust, packed)]
 pub struct AnswerId(u8);
 
 impl AnswerId {

@@ -265,7 +265,7 @@ pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
 /// [`User`]: super::user::User
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-#[repr(packed)]
+#[repr(Rust, packed)]
 pub struct Permissions(u64);
 
 generate_permissions! {
