@@ -58,6 +58,7 @@ impl ContentSafeOptions {
     /// This option is ignored if the username is a next-gen username, and
     /// therefore does not have a discriminator.
     #[must_use]
+    #[deprecated = "Discriminators are deprecated on the discord side, and this doesn't reflect message rendering behaviour"]
     pub fn show_discriminator(mut self, b: bool) -> Self {
         self.show_discriminator = b;
 
