@@ -49,6 +49,7 @@ impl typesize::TypeSize for SecretString {
 /// A type for securely storing and passing around a Discord token.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(try_from = "&str")]
 pub struct Token(SecretString);
 
 impl Token {
@@ -119,7 +120,29 @@ impl FromStr for Token {
     }
 }
 
-/// Error that can be returned by [`Token::from_str`] or [`Token::from_env`].
+/// Parses a token and validates that is is likely in a valid format.
+///
+/// Refer to the [`Token::from_str`] implementation for details.
+impl TryFrom<&str> for Token {
+    type Error = TokenError;
+
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        s.parse()
+    }
+}
+
+/// Parses a token and validates that is is likely in a valid format.
+///
+/// Refer to the [`Token::from_str`] implementation for details.
+impl TryFrom<String> for Token {
+    type Error = TokenError;
+
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        s.parse()
+    }
+}
+
+/// Error that can be returned by [`Token::from_str`], [`Token::try_from`], or [`Token::from_env`].
 #[derive(Debug)]
 pub enum TokenError {
     Env(VarError),
