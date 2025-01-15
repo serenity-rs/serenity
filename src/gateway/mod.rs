@@ -70,7 +70,7 @@ pub struct PresenceData {
 }
 
 /// Activity data of the current user.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
 pub struct ActivityData {
     /// The name of the activity
     pub name: String,
