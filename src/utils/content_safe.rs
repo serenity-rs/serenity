@@ -29,13 +29,6 @@ pub struct ContentSafeOptions {
     pub clean_here: bool,
     /// If set, [`content_safe`] will replace `@everyone` with a non-pinging alternative.
     pub clean_everyone: bool,
-    /// If set to true, if [`content_safe`] replaces a user mention it will add their four digit
-    /// discriminator with a preceding `#`, turning `@username` to `@username#discriminator`.
-    ///
-    /// This option is ignored if the username is a next-gen username, and
-    /// therefore does not have a discriminator.
-    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Discriminators are deprecated on the discord side, and this doesn't reflect message rendering behaviour")]
-    pub show_discriminator: bool,
 }
 
 impl ContentSafeOptions {
@@ -140,7 +133,7 @@ fn clean_mentions(guild: &Guild, s: &str, options: ContentSafeOptions, users: &[
                         // NOTE: numeric strings that are too large to fit into u64 will not parse
                         // correctly and will be left unchanged.
                         if let Ok(mention) = mention_str.parse() {
-                            content.push_str(&clean_mention(guild, mention, options, users));
+                            content.push_str(&clean_mention(guild, mention, users));
                             cleaned = true;
                         }
                     }
@@ -156,12 +149,7 @@ fn clean_mentions(guild: &Guild, s: &str, options: ContentSafeOptions, users: &[
     content
 }
 
-fn clean_mention(
-    guild: &Guild,
-    mention: Mention,
-    options: ContentSafeOptions,
-    users: &[User],
-) -> Cow<'static, str> {
+fn clean_mention(guild: &Guild, mention: Mention, users: &[User]) -> Cow<'static, str> {
     match mention {
         Mention::Channel(id) => {
             if let Some(channel) = guild.channels.get(&id) {
@@ -176,19 +164,9 @@ fn clean_mention(
             .map_or(Cow::Borrowed("@deleted-role"), |role| format!("@{}", role.name).into()),
         Mention::User(id) => {
             if let Some(member) = guild.members.get(&id) {
-                if options.get_show_discriminator() {
-                    #[expect(deprecated)]
-                    let name = member.distinct();
-                    format!("@{name}").into()
-                } else {
-                    format!("@{}", member.display_name()).into()
-                }
+                format!("@{}", member.display_name()).into()
             } else if let Some(user) = users.iter().find(|u| u.id == id) {
-                if options.get_show_discriminator() {
-                    format!("@{}", user.tag()).into()
-                } else {
-                    format!("@{}", user.name).into()
-                }
+                format!("@{}", user.name).into()
             } else {
                 "@invalid-user".into()
             }
@@ -265,7 +243,6 @@ mod tests {
         );
 
         let mut options = ContentSafeOptions::default();
-        options = options.show_discriminator(false);
         assert_eq!(
             format!("@{}", user.name),
             content_safe(&no_member_guild, "<@!100000000000000000>", options, &[user.clone()])
