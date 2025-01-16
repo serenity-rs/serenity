@@ -837,7 +837,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Creates a Guild Scheduled Event.
@@ -1777,7 +1777,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value::<Member>(value)
+        from_value::<Member>(value).map_err(From::from)
     }
 
     /// Edits a message by Id.
@@ -1990,7 +1990,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Changes the positions of roles in a guild.
@@ -2023,7 +2023,7 @@ impl Http {
             }
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Modifies a scheduled event.
@@ -2083,7 +2083,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Edits a thread channel in the [`GuildChannel`] given its Id.
@@ -3464,7 +3464,7 @@ impl Http {
             }
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Gets the amount of users that can be pruned.
@@ -3519,7 +3519,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Retrieves a list of roles in a [`Guild`].
@@ -3545,7 +3545,7 @@ impl Http {
             }
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Gets a scheduled event by Id.
@@ -3657,7 +3657,7 @@ impl Http {
             }
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Retrieves a single sticker in a [`Guild`].
@@ -3684,7 +3684,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Retrieves the webhooks for the given [`Guild`]'s Id.
@@ -3760,7 +3760,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Gets information about a specific invite.
@@ -3821,7 +3821,7 @@ impl Http {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Gets a message by an Id, bots only.
@@ -4327,7 +4327,7 @@ impl Http {
             }
         }
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Starts removing some members from a guild based on the last time they've been online.
