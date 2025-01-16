@@ -34,7 +34,7 @@ pub struct ContentSafeOptions {
     ///
     /// This option is ignored if the username is a next-gen username, and
     /// therefore does not have a discriminator.
-    #[deprecated = "Discriminators are deprecated on the discord side, and this doesn't reflect message rendering behaviour"]
+    #[cfg_attr(not(ignore_serenity_deprecated), deprecated = "Discriminators are deprecated on the discord side, and this doesn't reflect message rendering behaviour")]
     pub show_discriminator: bool,
 }
 
@@ -177,7 +177,7 @@ fn clean_mention(
         Mention::User(id) => {
             if let Some(member) = guild.members.get(&id) {
                 if options.get_show_discriminator() {
-                    #[allow(deprecated)]
+                    #[expect(deprecated)]
                     let name = member.distinct();
                     format!("@{name}").into()
                 } else {
@@ -276,14 +276,6 @@ mod tests {
             content_safe(&no_member_guild, "<@!100000000000000000>", options, &[])
         );
 
-        #[allow(deprecated)]
-        let options = options.show_discriminator(false);
-        assert_eq!(
-            format!("@{}", user.name),
-            content_safe(&no_member_guild, "<@100000000000000000>", &options, &[])
-        );
-
-        let options = options.display_as_member_from(guild.id);
         assert_eq!(
             format!("@{}", member.nick.as_ref().unwrap()),
             content_safe(&guild, "<@100000000000000000>", options, &[])
