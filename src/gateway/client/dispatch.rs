@@ -302,11 +302,9 @@ fn update_cache_with_event(
         },
         Event::MessageUpdate(mut event) => {
             let before = if_cache!(event.update(cache));
-            let after = if_cache!(cache.message(event.channel_id, event.id).map(|m| m.clone()));
 
             FullEvent::MessageUpdate {
                 old_if_available: before,
-                new: after,
                 event,
             }
         },
