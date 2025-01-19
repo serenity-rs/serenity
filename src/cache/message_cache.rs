@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
 use dashmap::DashMap;
+use replace_with::replace_with_or_default;
 
 use super::wrappers::BuildHasher;
 use super::{CacheRef, ChannelId, ChannelMessagesRef, Message, MessageId, MessageRef};
@@ -36,14 +37,25 @@ impl MessageCache {
         }
 
         let mut channel_messages = self.storage.entry(channel_id).or_default();
+        replace_with_or_default(&mut *channel_messages, |channel_messages| {
+            // Turn the message deque into a normal contiguious Vec
+            let mut contiguous_messages = Vec::from(channel_messages);
 
-        // Fill up the existing cache
-        channel_messages.extend(new_messages.take(max_messages));
-        // Make sure the cache stays sorted to messages
-        channel_messages.make_contiguous().sort_unstable_by_key(|m| m.id);
-        // Get rid of the overflow at the front of the queue.
-        let truncate_end_index = channel_messages.len().saturating_sub(max_messages);
-        channel_messages.drain(..truncate_end_index);
+            // Fill up the existing cache
+            contiguous_messages.extend(new_messages.take(max_messages));
+
+            // Make sure the cache stays sorted to messages
+            contiguous_messages.sort_unstable_by_key(|m| m.id);
+
+            // Make sure the cache doesn't get duplicate messages
+            contiguous_messages.dedup_by_key(|m| m.id);
+
+            // Get rid of the overflow at the front of the queue.
+            let truncate_end_index = contiguous_messages.len().saturating_sub(max_messages);
+            contiguous_messages.drain(..truncate_end_index);
+
+            VecDeque::from(contiguous_messages)
+        });
     }
 
     /// Update a message for a channel.

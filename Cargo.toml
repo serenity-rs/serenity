@@ -62,6 +62,7 @@ mime_guess = { version = "2.0.4", optional = true }
 dashmap = { version = "6.1.0", features = ["serde"], optional = true }
 parking_lot = { version = "0.12.1"}
 ed25519-dalek = { version = "2.0.0", optional = true }
+replace_with = { version = "0.1.7", optional = true }
 typesize = { version = "0.1.6", optional = true, features = ["url", "time", "serde_json", "secrecy", "parking_lot", "nonmax", "extract_map_01"] }
 # serde feature only allows for serialisation,
 # Serenity workspace crates
@@ -90,7 +91,7 @@ default_no_backend = [
 builder = ["tokio/fs"]
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
-cache = ["fxhash", "dashmap"]
+cache = ["fxhash", "dashmap", "replace_with"]
 # Enables collectors, a utility feature that lets you await interaction events in code with
 # zero setup, without needing to setup an InteractionCreate event listener.
 collector = ["gateway"]
