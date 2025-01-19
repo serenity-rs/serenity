@@ -9,6 +9,10 @@ use super::{CacheRef, ChannelId, ChannelMessagesRef, Message, MessageId, Message
 /// A wrapper for implementing high level operations for message cache in a centralised place.
 #[derive(Debug, Default)]
 pub(super) struct MessageCache {
+    // Invariants:
+    // - VecDeque is no larger than the Cache's max_messages setting
+    // - VecDeque is ordered via the Message ID (debug checked in MessageCache::update_message)
+    // - VecDeque does not contain duplicate messages identified by their ID
     storage: DashMap<ChannelId, VecDeque<Message>, BuildHasher>,
 }
 
