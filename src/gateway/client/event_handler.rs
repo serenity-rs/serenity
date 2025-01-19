@@ -299,9 +299,8 @@ event_handler! {
 
     /// Dispatched when a message is updated.
     ///
-    /// Provides the message update data, as well as the actual old and new message if cache
-    /// feature is enabled and the data is available.
-    MessageUpdate { old_if_available: Option<Message>, new: Option<Message>, event: MessageUpdateEvent } => async fn message_update(&self, ctx: Context);
+    /// Provides the message update data, as well as the old message if cache feature is enabled and the data is available.
+    MessageUpdate { old_if_available: Option<Message>, event: MessageUpdateEvent } => async fn message_update(&self, ctx: Context);
 
     /// Dispatched when a new reaction is attached to a message.
     ///

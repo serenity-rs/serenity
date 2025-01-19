@@ -379,10 +379,10 @@ impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        for message in cache.messages.get_mut(&self.channel_id)?.iter_mut() {
-            if message.id == self.id {
+        for message in cache.messages.get_mut(&self.message.channel_id)?.iter_mut() {
+            if message.id == self.message.id {
                 let old_message = message.clone();
-                self.apply_to_message(message);
+                message.clone_from(&self.message);
                 return Some(old_message);
             }
         }
