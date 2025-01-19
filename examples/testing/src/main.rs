@@ -182,7 +182,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
 
         let msg_id = msg.id;
         let mut message_updates = serenity::collector::collect(&ctx.shard, move |ev| match ev {
-            Event::MessageUpdate(x) if x.id == msg_id => Some(()),
+            Event::MessageUpdate(x) if x.message.id == msg_id => Some(()),
             _ => None,
         });
         let _ = tokio::time::timeout(Duration::from_millis(2000), message_updates.next()).await;
