@@ -102,8 +102,10 @@ impl EventHandler for Handler {
         // 5 of them.
         let mut collector = serenity::collector::collect(&ctx.shard, move |event| match event {
             // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
-            Event::MessageUpdate(event) if collected.iter().any(|msg| event.id == msg.id) => {
-                Some(event.id)
+            Event::MessageUpdate(event)
+                if collected.iter().any(|msg| event.message.id == msg.id) =>
+            {
+                Some(event.message.id)
             },
             _ => None,
         })

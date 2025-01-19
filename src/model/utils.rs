@@ -272,18 +272,6 @@ where
         .collect()
 }
 
-// A function used for deserializing components within a MessageUpdateEvent.
-// Due to discord now sending the whole message payload, we don't need to distinguish between None
-// and empty, as such we always return Some.
-pub fn optional_deserialize_components<'de, D>(
-    deserializer: D,
-) -> Result<Option<FixedArray<ActionRow>>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    deserialize_components(deserializer).map(Some)
-}
-
 // Custom deserialize function to deserialize components safely without knocking the whole message
 // out when new components are found but not supported.
 pub fn deserialize_components<'de, D>(deserializer: D) -> Result<FixedArray<ActionRow>, D::Error>
