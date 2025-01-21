@@ -36,11 +36,11 @@ use std::str::FromStr;
 pub use chrono::ParseError as InnerError;
 #[cfg(feature = "chrono")]
 use chrono::{DateTime, SecondsFormat, TimeZone, Utc};
-#[cfg(not(feature = "chrono"))]
-pub use dep_time::error::Parse as InnerError;
-#[cfg(not(feature = "chrono"))]
-use dep_time::{format_description::well_known::Rfc3339, serde::rfc3339, Duration, OffsetDateTime};
 use serde::{Deserialize, Serialize};
+#[cfg(not(feature = "chrono"))]
+pub use time::error::Parse as InnerError;
+#[cfg(not(feature = "chrono"))]
+use time::{format_description::well_known::Rfc3339, serde::rfc3339, Duration, OffsetDateTime};
 
 /// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
 const DISCORD_EPOCH: u64 = 1_420_070_400_000;
