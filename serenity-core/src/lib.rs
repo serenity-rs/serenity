@@ -4,6 +4,7 @@ extern crate serde;
 #[macro_use]
 mod internal;
 
+#[cfg(feature = "http")]
 mod constants;
 pub mod secrets;
 

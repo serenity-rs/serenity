@@ -13,4 +13,6 @@ pub use super::utils::join_to_string;
 #[cfg(feature = "http")]
 pub use crate::error::Error;
 pub use crate::error::Result;
-pub use crate::secrets::{SecretString, Token};
+pub use crate::secrets::SecretString;
+#[cfg(feature = "http")]
+pub use crate::secrets::Token;

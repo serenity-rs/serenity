@@ -18,6 +18,7 @@ use url::Url;
 #[cfg(feature = "transport_compression_zstd")]
 use zstd::stream::write::Decoder as ZstdWriter;
 
+use super::constants::{self, Opcode};
 use super::{
     ActivityData,
     ChunkGuildFilter,
@@ -26,7 +27,6 @@ use super::{
     PresenceData,
     TransportCompression,
 };
-use crate::constants::{self, Opcode};
 use crate::error::CoreError;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]

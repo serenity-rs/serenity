@@ -84,29 +84,28 @@ extern crate serde;
 #[macro_use]
 mod internal;
 
-pub mod constants;
-pub use serenity_core::model;
 pub mod prelude;
 
-#[cfg(feature = "builder")]
-pub use serenity_core::builder;
-#[cfg(feature = "cache")]
-pub use serenity_core::cache;
 #[cfg(feature = "collector")]
 pub mod collector;
 #[cfg(feature = "framework")]
 pub mod framework;
 #[cfg(feature = "gateway")]
 pub mod gateway;
-#[cfg(feature = "http")]
-pub use serenity_core::http;
 #[cfg(feature = "interactions_endpoint")]
 pub mod interactions_endpoint;
-pub use serenity_core::secrets;
-#[cfg(feature = "utils")]
-pub use serenity_core::utils;
 
 mod error;
+
+#[cfg(feature = "builder")]
+pub use serenity_core::builder;
+#[cfg(feature = "cache")]
+pub use serenity_core::cache;
+#[cfg(feature = "http")]
+pub use serenity_core::http;
+#[cfg(feature = "utils")]
+pub use serenity_core::utils;
+pub use serenity_core::{model, secrets};
 
 pub use crate::error::{Error, Result};
 #[cfg(feature = "gateway")]
@@ -125,14 +124,12 @@ pub mod all {
     #[cfg(feature = "collector")]
     #[doc(no_inline)]
     pub use crate::collector::*;
-    #[doc(no_inline)]
-    pub use crate::constants::*;
     #[cfg(feature = "framework")]
     #[doc(no_inline)]
     pub use crate::framework::*;
     #[cfg(feature = "gateway")]
     #[doc(no_inline)]
-    pub use crate::gateway::{client::*, *};
+    pub use crate::gateway::{client::*, constants::*, *};
     #[cfg(feature = "http")]
     #[doc(no_inline)]
     pub use crate::http::*;

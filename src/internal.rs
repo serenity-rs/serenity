@@ -1,11 +1,12 @@
+#[cfg(feature = "gateway")]
 pub mod prelude {
     pub use serenity_core::secrets::Token;
     pub use small_fixed_array::{FixedArray, FixedString, TruncatingInto};
-    pub use to_arraystring::ToArrayString;
 
     pub use crate::error::{Error, Result};
 }
 
+#[cfg(feature = "gateway")]
 pub mod tokio {
     use std::future::Future;
 
@@ -25,6 +26,7 @@ pub mod tokio {
     }
 }
 
+#[cfg(feature = "gateway")]
 #[macro_use]
 pub mod macros {
     macro_rules! enum_number {

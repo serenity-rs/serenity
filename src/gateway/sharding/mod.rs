@@ -54,6 +54,7 @@ pub use self::shard_manager::{
 };
 pub use self::shard_queue::ShardQueue;
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage};
+use super::constants::{self, CloseCode};
 use super::{
     ActivityData,
     ChunkGuildFilter,
@@ -63,7 +64,6 @@ use super::{
     PresenceData,
     WsClient,
 };
-use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
 use crate::model::event::Event;
 use crate::model::gateway::{ConnectionStage, GatewayIntents, ShardInfo};

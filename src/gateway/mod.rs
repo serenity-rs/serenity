@@ -12,6 +12,7 @@
 //! [`Client`]: client::Client
 
 pub mod client;
+pub mod constants;
 mod error;
 pub mod sharding;
 #[cfg(feature = "voice")]
@@ -25,12 +26,12 @@ use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::{Serialize, Serializer};
 use serde_json::value::RawValue;
 
+use self::constants::Opcode;
 pub use self::error::Error as GatewayError;
 pub use self::sharding::*;
 #[cfg(feature = "voice")]
 pub use self::voice::VoiceGatewayManager;
 pub use self::ws::WsClient;
-use crate::constants::Opcode;
 use crate::error::CoreError;
 use crate::internal::prelude::*;
 use crate::model::event::Event;
