@@ -62,7 +62,7 @@ pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::{ShardQueue, ShardQueuer, ShardQueuerMessage};
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
-use crate::constants::{self, close_codes};
+use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
@@ -384,88 +384,71 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn handle_gateway_closed(
-        &mut self,
-        data: Option<&CloseFrame<'static>>,
-    ) -> Result<Option<ShardAction>> {
-        let num = data.map(|d| d.code.into());
-        let clean = num == Some(1000);
+    fn handle_gateway_closed(&mut self, data: Option<&CloseFrame<'static>>) -> Result<()> {
+        if let Some(code) = data.map(|d| d.code) {
+            match CloseCode(code.into()) {
+                CloseCode::UnknownError => warn!("[{:?}] Unknown gateway error.", self.shard_info),
+                CloseCode::UnknownOpcode => warn!("[{:?}] Sent invalid opcode.", self.shard_info),
+                CloseCode::DecodeError => warn!("[{:?}] Sent invalid message.", self.shard_info),
+                CloseCode::NotAuthenticated => {
+                    warn!(
+                        "[{:?}] Sent no authentication, or session invalidated.",
+                        self.shard_info
+                    );
+                    return Err(Error::Gateway(GatewayError::NoAuthentication));
+                },
+                CloseCode::AuthenticationFailed => {
+                    error!(
+                        "[{:?}] Sent invalid authentication, please check the token.",
+                        self.shard_info
+                    );
 
-        match num {
-            Some(close_codes::UNKNOWN_OPCODE) => {
-                warn!("[{:?}] Sent invalid opcode.", self.shard_info);
-            },
-            Some(close_codes::DECODE_ERROR) => {
-                warn!("[{:?}] Sent invalid message.", self.shard_info);
-            },
-            Some(close_codes::NOT_AUTHENTICATED) => {
-                warn!("[{:?}] Sent no authentication.", self.shard_info);
-
-                return Err(Error::Gateway(GatewayError::NoAuthentication));
-            },
-            Some(close_codes::AUTHENTICATION_FAILED) => {
-                error!(
-                    "[{:?}] Sent invalid authentication, please check the token.",
-                    self.shard_info
-                );
-
-                return Err(Error::Gateway(GatewayError::InvalidAuthentication));
-            },
-            Some(close_codes::ALREADY_AUTHENTICATED) => {
-                warn!("[{:?}] Already authenticated.", self.shard_info);
-            },
-            Some(close_codes::INVALID_SEQUENCE) => {
-                warn!("[{:?}] Sent invalid seq: {}.", self.shard_info, self.seq);
-
-                self.seq = 0;
-            },
-            Some(close_codes::RATE_LIMITED) => {
-                warn!("[{:?}] Gateway ratelimited.", self.shard_info);
-            },
-            Some(close_codes::INVALID_SHARD) => {
-                warn!("[{:?}] Sent invalid shard data.", self.shard_info);
-
-                return Err(Error::Gateway(GatewayError::InvalidShardData));
-            },
-            Some(close_codes::SHARDING_REQUIRED) => {
-                error!("[{:?}] Shard has too many guilds.", self.shard_info);
-
-                return Err(Error::Gateway(GatewayError::OverloadedShard));
-            },
-            Some(4006 | close_codes::SESSION_TIMEOUT) => {
-                info!("[{:?}] Invalid session.", self.shard_info);
-
-                self.session_id = None;
-            },
-            Some(close_codes::INVALID_GATEWAY_INTENTS) => {
-                error!("[{:?}] Invalid gateway intents have been provided.", self.shard_info);
-
-                return Err(Error::Gateway(GatewayError::InvalidGatewayIntents));
-            },
-            Some(close_codes::DISALLOWED_GATEWAY_INTENTS) => {
-                error!("[{:?}] Disallowed gateway intents have been provided.", self.shard_info);
-
-                return Err(Error::Gateway(GatewayError::DisallowedGatewayIntents));
-            },
-            Some(other) if !clean => {
-                warn!(
-                    "[{:?}] Unknown unclean close {}: {:?}",
+                    return Err(Error::Gateway(GatewayError::InvalidAuthentication));
+                },
+                CloseCode::AlreadyAuthenticated => {
+                    warn!("[{:?}] Already authenticated.", self.shard_info)
+                },
+                CloseCode::InvalidSequence => {
+                    warn!("[{:?}] Sent invalid seq: {}.", self.shard_info, self.seq);
+                    self.seq = 0;
+                },
+                CloseCode::RateLimited => warn!("[{:?}] Gateway ratelimited.", self.shard_info),
+                CloseCode::SessionTimeout => {
+                    info!("[{:?}] Invalid session.", self.shard_info);
+                    self.session_id = None;
+                },
+                CloseCode::InvalidShard => {
+                    warn!("[{:?}] Sent invalid shard data.", self.shard_info);
+                    return Err(Error::Gateway(GatewayError::InvalidShardData));
+                },
+                CloseCode::ShardingRequired => {
+                    error!("[{:?}] Shard has too many guilds.", self.shard_info);
+                    return Err(Error::Gateway(GatewayError::OverloadedShard));
+                },
+                CloseCode::InvalidApiVersion => {
+                    error!("[{:?}] Invalid gateway API version provided.", self.shard_info);
+                    return Err(Error::Gateway(GatewayError::InvalidApiVersion));
+                },
+                CloseCode::InvalidGatewayIntents => {
+                    error!("[{:?}] Invalid gateway intents have been provided.", self.shard_info);
+                    return Err(Error::Gateway(GatewayError::InvalidGatewayIntents));
+                },
+                CloseCode::DisallowedGatewayIntents => {
+                    error!(
+                        "[{:?}] Disallowed gateway intents have been provided.",
+                        self.shard_info
+                    );
+                    return Err(Error::Gateway(GatewayError::DisallowedGatewayIntents));
+                },
+                _ => warn!(
+                    "[{:?}] Unknown close code {}: {:?}",
                     self.shard_info,
-                    other,
-                    data.map(|d| &d.reason),
-                );
-            },
-            _ => {},
+                    code,
+                    data.map(|d| &d.reason)
+                ),
+            }
         }
-
-        let resume = num
-            .is_none_or(|x| x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some());
-
-        Ok(Some(if resume {
-            ShardAction::Reconnect(ReconnectType::Resume)
-        } else {
-            ShardAction::Reconnect(ReconnectType::Reidentify)
-        }))
+        Ok(())
     }
 
     /// Handles an event from the gateway over the receiver, requiring the receiver to be passed if
@@ -538,7 +521,8 @@ impl Shard {
             },
             Ok(GatewayEvent::Reconnect) => Ok(Some(ShardAction::Reconnect(ReconnectType::Resume))),
             Err(Error::Gateway(GatewayError::Closed(data))) => {
-                self.handle_gateway_closed(data.as_ref())
+                self.handle_gateway_closed(data.as_ref())?;
+                Ok(Some(ShardAction::Reconnect(self.reconnection_type())))
             },
             Err(Error::Tungstenite(why)) => {
                 info!("[{:?}] Websocket error: {:?}", self.shard_info, why);

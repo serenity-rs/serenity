@@ -446,6 +446,7 @@ impl ShardRunner {
             Ok((action, event)) => (action, event),
             Err(Error::Gateway(
                 why @ (GatewayError::InvalidAuthentication
+                | GatewayError::InvalidApiVersion
                 | GatewayError::InvalidGatewayIntents
                 | GatewayError::DisallowedGatewayIntents),
             )) => {
@@ -453,6 +454,7 @@ impl ShardRunner {
 
                 let why_clone = match why {
                     GatewayError::InvalidAuthentication => GatewayError::InvalidAuthentication,
+                    GatewayError::InvalidApiVersion => GatewayError::InvalidApiVersion,
                     GatewayError::InvalidGatewayIntents => GatewayError::InvalidGatewayIntents,
                     GatewayError::DisallowedGatewayIntents => {
                         GatewayError::DisallowedGatewayIntents
