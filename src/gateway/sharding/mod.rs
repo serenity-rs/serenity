@@ -322,7 +322,7 @@ impl Shard {
         seq: u64,
         event: JsonMap,
         original_str: &str,
-    ) -> Result<(Option<ShardAction>, Option<Event>)> {
+    ) -> Result<Event> {
         if seq > self.seq + 1 {
             warn!("[{:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
         }
@@ -355,7 +355,7 @@ impl Shard {
             _ => {},
         }
 
-        Ok((None, Some(event)))
+        Ok(event)
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -471,18 +471,15 @@ impl Shard {
     /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too many guilds
     /// assigned to it.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn handle_event(
-        &mut self,
-        event: Result<GatewayEvent>,
-    ) -> Result<(Option<ShardAction>, Option<Event>)> {
-        let action = match event {
+    pub fn handle_event(&mut self, event: Result<GatewayEvent>) -> Result<Option<ShardAction>> {
+        match event {
             Ok(GatewayEvent::Dispatch {
                 seq,
                 data,
                 original_str,
-            }) => {
-                return self.handle_gateway_dispatch(seq, data, &original_str);
-            },
+            }) => self
+                .handle_gateway_dispatch(seq, data, &original_str)
+                .map(|e| Some(ShardAction::Dispatch(e))),
             Ok(GatewayEvent::Heartbeat(s)) => Ok(Some(self.handle_heartbeat_event(s))),
             Ok(GatewayEvent::HeartbeatAck) => {
                 self.last_heartbeat_ack = Some(Instant::now());
@@ -496,18 +493,18 @@ impl Shard {
                 debug!("[{:?}] Received a Hello; interval: {}", self.shard_info, interval);
 
                 if self.stage == ConnectionStage::Resuming {
-                    return Ok((None, None));
-                }
-
-                self.heartbeat_interval = Some(std::time::Duration::from_millis(interval));
-
-                Ok(Some(if self.stage == ConnectionStage::Handshake {
-                    ShardAction::Identify
+                    Ok(None)
                 } else {
-                    debug!("[{:?}] Received late Hello; autoreconnecting", self.shard_info);
+                    self.heartbeat_interval = Some(std::time::Duration::from_millis(interval));
+                    let action = if self.stage == ConnectionStage::Handshake {
+                        ShardAction::Identify
+                    } else {
+                        debug!("[{:?}] Received late Hello; autoreconnecting", self.shard_info);
+                        ShardAction::Reconnect
+                    };
 
-                    ShardAction::Reconnect
-                }))
+                    Ok(Some(action))
+                }
             },
             Ok(GatewayEvent::InvalidateSession(resumable)) => {
                 info!("[{:?}] Received session invalidation", self.shard_info);
@@ -532,9 +529,7 @@ impl Shard {
                 warn!("[{:?}] Unhandled error: {:?}", self.shard_info, why);
                 Ok(None)
             },
-        };
-
-        action.map(|a| (a, None))
+        }
     }
 
     /// Does a heartbeat if needed. Returns false if something went wrong and the shard should be
@@ -797,6 +792,7 @@ pub enum ShardAction {
     Heartbeat,
     Identify,
     Reconnect,
+    Dispatch(Event),
 }
 
 /// Information about a [`ShardRunner`].

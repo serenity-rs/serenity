@@ -23,7 +23,7 @@ use crate::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::event::{Event, GatewayEvent};
+use crate::model::event::GatewayEvent;
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
 
@@ -116,7 +116,7 @@ impl ShardRunner {
             }
 
             let pre = self.shard.stage();
-            let (event, action) = self.recv_event().await?;
+            let action = self.recv_event().await?;
             let post = self.shard.stage();
 
             if post != pre {
@@ -165,48 +165,47 @@ impl ShardRunner {
                             return Ok(());
                         }
                     },
-                }
-            }
+                    ShardAction::Dispatch(event) => {
+                        let context = self.make_context();
+                        let can_dispatch = self
+                            .event_handler
+                            .as_ref()
+                            .is_none_or(|handler| handler.filter_event(&context, &event))
+                            && self
+                                .raw_event_handler
+                                .as_ref()
+                                .is_none_or(|handler| handler.filter_event(&context, &event));
 
-            if let Some(event) = event {
-                let context = self.make_context();
-                let can_dispatch = self
-                    .event_handler
-                    .as_ref()
-                    .is_none_or(|handler| handler.filter_event(&context, &event))
-                    && self
-                        .raw_event_handler
-                        .as_ref()
-                        .is_none_or(|handler| handler.filter_event(&context, &event));
-
-                if can_dispatch {
-                    #[cfg(feature = "collector")]
-                    {
-                        let read_lock = self.collectors.read();
-                        // search all collectors to be removed and clone the Arcs
-                        let to_remove: Vec<_> = read_lock
-                            .iter()
-                            .filter(|callback| !callback.0(&event))
-                            .cloned()
-                            .collect();
-                        drop(read_lock);
-                        // remove all found arcs from the collection
-                        // this compares the inner pointer of the Arc
-                        if !to_remove.is_empty() {
-                            self.collectors.write().retain(|f| !to_remove.contains(f));
+                        if can_dispatch {
+                            #[cfg(feature = "collector")]
+                            {
+                                let read_lock = self.collectors.read();
+                                // search all collectors to be removed and clone the Arcs
+                                let to_remove: Vec<_> = read_lock
+                                    .iter()
+                                    .filter(|callback| !callback.0(&event))
+                                    .cloned()
+                                    .collect();
+                                drop(read_lock);
+                                // remove all found arcs from the collection
+                                // this compares the inner pointer of the Arc
+                                if !to_remove.is_empty() {
+                                    self.collectors.write().retain(|f| !to_remove.contains(f));
+                                }
+                            }
+                            spawn_named(
+                                "shard_runner::dispatch",
+                                dispatch_model(
+                                    event,
+                                    context,
+                                    #[cfg(feature = "framework")]
+                                    self.framework.clone(),
+                                    self.event_handler.clone(),
+                                    self.raw_event_handler.clone(),
+                                ),
+                            );
                         }
-                    }
-                    spawn_named(
-                        "shard_runner::dispatch",
-                        dispatch_model(
-                            event,
-                            context,
-                            #[cfg(feature = "framework")]
-                            self.framework.clone(),
-                            self.event_handler.clone(),
-                            self.raw_event_handler.clone(),
-                        ),
-                    );
+                    },
                 }
             }
 
@@ -383,24 +382,24 @@ impl ShardRunner {
     /// Returns a received event, as well as whether reading the potentially present event was
     /// successful.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>)> {
+    async fn recv_event(&mut self) -> Result<Option<ShardAction>> {
         let gateway_event = match self.shard.client.recv_json().await {
             Ok(Some(inner)) => Ok(inner),
             Ok(None) => {
-                return Ok((None, None));
+                return Ok(None);
             },
             Err(Error::Tungstenite(tung_err)) if matches!(*tung_err, TungsteniteError::Io(_)) => {
                 debug!("Attempting to auto-reconnect");
                 self.reconnect().await;
 
-                return Ok((None, None));
+                return Ok(None);
             },
             Err(why) => Err(why),
         };
 
         let is_ack = matches!(gateway_event, Ok(GatewayEvent::HeartbeatAck));
-        let (action, event) = match self.shard.handle_event(gateway_event) {
-            Ok((action, event)) => (action, event),
+        let action = match self.shard.handle_event(gateway_event) {
+            Ok(action) => action,
             Err(Error::Gateway(
                 why @ (GatewayError::InvalidAuthentication
                 | GatewayError::InvalidApiVersion
@@ -422,10 +421,10 @@ impl ShardRunner {
                 self.manager.return_with_value(Err(why_clone)).await;
                 return Err(Error::Gateway(why));
             },
-            Err(Error::Json(_)) => return Ok((None, None)),
+            Err(Error::Json(_)) => return Ok(None),
             Err(why) => {
                 error!("Shard handler recieved err: {why:?}");
-                return Ok((None, None));
+                return Ok(None);
             },
         };
 
@@ -440,7 +439,7 @@ impl ShardRunner {
             }
         }
 
-        Ok((event, action))
+        Ok(action)
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
