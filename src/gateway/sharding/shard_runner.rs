@@ -23,6 +23,8 @@ use crate::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
+#[cfg(feature = "voice")]
+use crate::model::event::Event;
 use crate::model::event::GatewayEvent;
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
@@ -166,6 +168,11 @@ impl ShardRunner {
                         }
                     },
                     ShardAction::Dispatch(event) => {
+                        #[cfg(feature = "voice")]
+                        {
+                            self.handle_voice_event(&event).await;
+                        }
+
                         let context = self.make_context();
                         let can_dispatch = self
                             .event_handler
@@ -430,13 +437,6 @@ impl ShardRunner {
 
         if is_ack {
             self.update_manager().await;
-        }
-
-        #[cfg(feature = "voice")]
-        {
-            if let Some(event) = &event {
-                self.handle_voice_event(event).await;
-            }
         }
 
         Ok(action)
