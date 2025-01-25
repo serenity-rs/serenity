@@ -405,7 +405,7 @@ impl Shard {
                     return Err(Error::Gateway(GatewayError::InvalidAuthentication));
                 },
                 CloseCode::AlreadyAuthenticated => {
-                    warn!("[{:?}] Already authenticated.", self.shard_info)
+                    warn!("[{:?}] Already authenticated.", self.shard_info);
                 },
                 CloseCode::InvalidSequence => {
                     warn!("[{:?}] Sent invalid seq: {}.", self.shard_info, self.seq);
@@ -704,8 +704,10 @@ impl Shard {
         debug!("[{:?}] Initializing.", self.shard_info);
 
         // Reconnect to the resume URL if possible, otherwise use the generic URL.
-        let ws_url =
-            self.resume_metadata.as_ref().map(|m| &*m.resume_ws_url).unwrap_or(&self.ws_url);
+        let ws_url = self
+            .resume_metadata
+            .as_ref()
+            .map_or(self.ws_url.as_ref(), |m| m.resume_ws_url.as_ref());
 
         // We need to do two, sort of three things here:
         // - set the stage of the shard as opening the websocket connection
