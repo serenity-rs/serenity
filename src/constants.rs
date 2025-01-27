@@ -36,7 +36,7 @@ pub const USER_AGENT: &str = concat!(
 );
 
 enum_number! {
-    /// An enum representing the [gateway opcodes].
+    /// An enum representing the gateway opcodes.
     ///
     /// [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
@@ -70,53 +70,43 @@ enum_number! {
     }
 }
 
-pub mod close_codes {
-    /// Unknown error; try reconnecting?
+enum_number! {
+    /// An enum representing the gateway close codes.
     ///
-    /// Can reconnect.
-    pub const UNKNOWN_ERROR: u16 = 4000;
-    /// Invalid Gateway OP Code.
-    ///
-    /// Can resume.
-    pub const UNKNOWN_OPCODE: u16 = 4001;
-    /// An invalid payload was sent.
-    ///
-    /// Can resume.
-    pub const DECODE_ERROR: u16 = 4002;
-    /// A payload was sent prior to identifying.
-    ///
-    /// Cannot reconnect.
-    pub const NOT_AUTHENTICATED: u16 = 4003;
-    /// The account token sent with the identify payload was incorrect.
-    ///
-    /// Cannot reconnect.
-    pub const AUTHENTICATION_FAILED: u16 = 4004;
-    /// More than one identify payload was sent.
-    ///
-    /// Can reconnect.
-    pub const ALREADY_AUTHENTICATED: u16 = 4005;
-    /// The sequence sent when resuming the session was invalid.
-    ///
-    /// Can reconnect.
-    pub const INVALID_SEQUENCE: u16 = 4007;
-    /// Payloads were being sent too quickly.
-    ///
-    /// Can resume.
-    pub const RATE_LIMITED: u16 = 4008;
-    /// A session timed out.
-    ///
-    /// Can reconnect.
-    pub const SESSION_TIMEOUT: u16 = 4009;
-    /// An invalid shard when identifying was sent.
-    ///
-    /// Cannot reconnect.
-    pub const INVALID_SHARD: u16 = 4010;
-    /// The session would have handled too many guilds.
-    ///
-    /// Cannot reconnect.
-    pub const SHARDING_REQUIRED: u16 = 4011;
-    /// Undocumented gateway intents have been provided.
-    pub const INVALID_GATEWAY_INTENTS: u16 = 4013;
-    /// Disallowed gateway intents have been provided.
-    pub const DISALLOWED_GATEWAY_INTENTS: u16 = 4014;
+    /// [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes)
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[non_exhaustive]
+    pub enum CloseCode {
+        /// Unknown error; try reconnecting.
+        UnknownError = 4000,
+        /// Invalid gateway opcode.
+        UnknownOpcode = 4001,
+        /// An invalid payload was sent.
+        DecodeError = 4002,
+        /// A payload was sent prior to identifying, or the session was invalidated.
+        NotAuthenticated = 4003,
+        /// The account token sent with the identify payload was incorrect.
+        AuthenticationFailed = 4004,
+        /// More than one identify payload was sent.
+        AlreadyAuthenticated = 4005,
+        /// The sequence sent when resuming the session was invalid.
+        InvalidSequence = 4007,
+        /// Payloads were being sent too quickly.
+        RateLimited = 4008,
+        /// The gateway session timed out, and a new one must be started.
+        SessionTimeout = 4009,
+        /// An invalid shard was sent when identifying.
+        InvalidShard = 4010,
+        /// The session would have handled too many guilds; you must use sharding to connect.
+        ShardingRequired = 4011,
+        /// An invalid gateway API version was sent.
+        InvalidApiVersion = 4012,
+        /// An invalid gateway intent was sent.
+        InvalidGatewayIntents = 4013,
+        /// A disallowed gateway intent was sent; you may have it disabled or may not be approved
+        /// to use it.
+        DisallowedGatewayIntents = 4014,
+
+        _ => Unknown(u16),
+    }
 }

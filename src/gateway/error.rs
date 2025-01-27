@@ -20,6 +20,8 @@ pub enum Error {
     HeartbeatFailed,
     /// When invalid authentication (a bad token) was sent in the IDENTIFY.
     InvalidAuthentication,
+    /// When an invalid API version was sent to the gateway.
+    InvalidApiVersion,
     /// Expected a Ready or an InvalidateSession
     InvalidHandshake,
     /// When invalid sharding data was sent in the IDENTIFY.
@@ -71,6 +73,7 @@ impl fmt::Display for Error {
             Self::ExpectedHello => f.write_str("Expected a Hello"),
             Self::HeartbeatFailed => f.write_str("Failed sending a heartbeat"),
             Self::InvalidAuthentication => f.write_str("Sent invalid authentication"),
+            Self::InvalidApiVersion => f.write_str("Sent invalid API version"),
             Self::InvalidHandshake => f.write_str("Expected a valid Handshake"),
             Self::InvalidShardData => f.write_str("Sent invalid shard data"),
             Self::NoAuthentication => f.write_str("Sent no authentication"),
