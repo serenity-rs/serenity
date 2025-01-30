@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use std::sync::Arc;
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
@@ -245,7 +244,7 @@ impl ShardRunner {
                 .client
                 .close(Some(CloseFrame {
                     code: close_code.into(),
-                    reason: Cow::from(""),
+                    reason: "".into(),
                 }))
                 .await,
         );
@@ -308,7 +307,7 @@ impl ShardRunner {
                 let reason = reason.unwrap_or_default();
                 let close = CloseFrame {
                     code: code.into(),
-                    reason: Cow::from(reason),
+                    reason: reason.into(),
                 };
                 self.shard.client.close(Some(close)).await.is_ok()
             },

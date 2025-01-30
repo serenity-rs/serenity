@@ -55,7 +55,7 @@ chrono = { version = "0.4.31", default-features = false, features = ["clock", "s
 flate2 = { version = "1.0.28", optional = true }
 zstd-safe = { version = "7.2.1", optional = true }
 reqwest = { version = "0.12.2", default-features = false, features = ["multipart", "stream", "json"], optional = true }
-tokio-tungstenite = { version = "0.24.0", features = ["url"], optional = true }
+tokio-tungstenite = { version = "0.26.1", features = ["url"], optional = true }
 percent-encoding = { version = "2.3.0", optional = true }
 mini-moka = { version = "0.10.2", optional = true }
 mime_guess = { version = "2.0.4", optional = true }
