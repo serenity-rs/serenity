@@ -359,7 +359,7 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn handle_gateway_closed(&mut self, data: Option<&CloseFrame<'static>>) -> Result<()> {
+    fn handle_gateway_closed(&mut self, data: Option<&CloseFrame>) -> Result<()> {
         if let Some(code) = data.map(|d| d.code) {
             match CloseCode(code.into()) {
                 CloseCode::UnknownError => warn!("[{:?}] Unknown gateway error.", self.shard_info),
