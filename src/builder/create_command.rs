@@ -344,7 +344,6 @@ impl<'a> CreateCommand<'a> {
         Self {
             kind: None,
             handler: None,
-
             fields: EditCommand::new().name(name),
         }
     }
