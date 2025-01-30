@@ -228,11 +228,14 @@ const TIMEOUT: Duration = Duration::from_millis(500);
 
 impl WsClient {
     pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
-        let config = WebSocketConfig {
-            max_message_size: None,
-            max_frame_size: None,
-            ..Default::default()
+        let config = {
+            let mut config = WebSocketConfig::default();
+            config.max_message_size = None;
+            config.max_frame_size = None;
+
+            config
         };
+
         let (stream, _) = connect_async_with_config(url, Some(config), false).await?;
 
         Ok(Self {
@@ -249,7 +252,7 @@ impl WsClient {
         };
 
         let json_bytes = match message {
-            Message::Text(payload) => Cow::Owned(payload.into_bytes()),
+            Message::Text(payload) => Cow::Owned(payload.as_bytes().to_vec()),
             Message::Binary(bytes) => {
                 let Some(decompressed) = self.compression.inflate(&bytes)? else {
                     return Ok(None);
@@ -284,7 +287,7 @@ impl WsClient {
     }
 
     pub(crate) async fn send_json(&mut self, value: &impl serde::Serialize) -> Result<()> {
-        let message = serde_json::to_string(value).map(Message::Text)?;
+        let message = Message::Text(serde_json::to_string(value)?.into());
 
         self.stream.send(message).await?;
         Ok(())
@@ -302,7 +305,7 @@ impl WsClient {
     }
 
     /// Delegate to `WebSocketStream::close`
-    pub(crate) async fn close(&mut self, msg: Option<CloseFrame<'_>>) -> Result<()> {
+    pub(crate) async fn close(&mut self, msg: Option<CloseFrame>) -> Result<()> {
         self.stream.close(msg).await?;
         Ok(())
     }
