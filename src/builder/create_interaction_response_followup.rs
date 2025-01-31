@@ -138,7 +138,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
             flags |= MessageFlags::EPHEMERAL;
         } else {
             flags &= !MessageFlags::EPHEMERAL;
-        };
+        }
 
         self.flags = Some(flags);
         self

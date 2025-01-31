@@ -297,7 +297,7 @@ impl Serialize for ComponentInteractionDataKind {
             Self::MentionableSelect { values } => map.serialize_entry("values", values)?,
             Self::ChannelSelect { values } => map.serialize_entry("values", values)?,
             Self::Button | Self::Unknown(_) => map.serialize_entry("values", &None::<()>)?,
-        };
+        }
 
         map.end()
     }

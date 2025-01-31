@@ -103,7 +103,7 @@ impl ArgumentConvert for Channel {
             if !channel_belongs_to_guild(&channel, guild_id) {
                 return Err(ChannelParseError::NotFoundOrMalformed);
             }
-        };
+        }
 
         Ok(channel)
     }

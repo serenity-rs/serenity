@@ -122,7 +122,7 @@ impl ToArrayString for Mention {
             Self::Channel(id) => aformat_into!(out, "<#{id}>"),
             Self::Role(id) => aformat_into!(out, "<@&{id}>"),
             Self::User(id) => aformat_into!(out, "<@{id}>"),
-        };
+        }
 
         out
     }

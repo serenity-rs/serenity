@@ -98,7 +98,7 @@ impl<'a> CreateAllowedMentions<'a> {
             (Some(pos), ParseAction::Remove) => drop(self.parse.swap_remove(pos)),
             (None, ParseAction::Insert) => self.parse.push(value),
             _ => {},
-        };
+        }
 
         self
     }

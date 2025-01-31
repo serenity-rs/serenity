@@ -124,7 +124,7 @@ impl<'a> CreateGuildWelcomeChannel<'a> {
                 self.emoji_id = None;
                 self.emoji_name = Some(name.into());
             },
-        };
+        }
 
         self
     }

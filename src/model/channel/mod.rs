@@ -489,7 +489,7 @@ impl serde::Serialize for ForumEmoji {
                 map.serialize_entry("emoji_id", &None::<()>)?;
                 map.serialize_entry("emoji_name", name)?;
             },
-        };
+        }
 
         map.end()
     }

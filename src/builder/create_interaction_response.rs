@@ -139,7 +139,7 @@ impl CreateInteractionResponse<'_> {
             if msg.allowed_mentions.is_none() {
                 msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
             }
-        };
+        }
 
         http.create_interaction_response(interaction_id, interaction_token, &self, files).await
     }
@@ -266,7 +266,7 @@ impl<'a> CreateInteractionResponseMessage<'a> {
             flags |= InteractionResponseFlags::EPHEMERAL;
         } else {
             flags &= !InteractionResponseFlags::EPHEMERAL;
-        };
+        }
 
         self.flags = Some(flags);
         self
