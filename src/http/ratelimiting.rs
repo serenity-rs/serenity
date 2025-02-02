@@ -253,7 +253,7 @@ impl Ratelimiter {
 
                 if let Ok(Some(delay_time)) = delay_time {
                     sleep(delay_time).await;
-                };
+                }
 
                 delay_time.map(|d| d.is_some())
             };
