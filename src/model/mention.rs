@@ -118,11 +118,12 @@ impl ToArrayString for Mention {
 
     fn to_arraystring(self) -> Self::ArrayString {
         let mut out = Self::ArrayString::new();
+
         match self {
             Self::Channel(id) => aformat_into!(out, "<#{id}>"),
             Self::Role(id) => aformat_into!(out, "<@&{id}>"),
             Self::User(id) => aformat_into!(out, "<@{id}>"),
-        };
+        }
 
         out
     }
