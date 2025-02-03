@@ -141,8 +141,9 @@ impl ShardRunner {
             if let Some(action) = action {
                 match action {
                     ShardAction::Reconnect => {
-                        self.reconnect().await;
-                        return Ok(());
+                        if !self.reconnect().await {
+                            return Ok(());
+                        }
                     },
                     ShardAction::Heartbeat => {
                         if let Err(e) = self.shard.heartbeat().await {
@@ -151,8 +152,9 @@ impl ShardRunner {
                             self.shard.shard_info(),
                             e
                         );
-                            self.reconnect().await;
-                            return Ok(());
+                            if !self.reconnect().await {
+                                return Ok(());
+                            }
                         }
                     },
                     ShardAction::Identify => {
@@ -162,8 +164,9 @@ impl ShardRunner {
                             self.shard.shard_info(),
                             e
                         );
-                            self.reconnect().await;
-                            return Ok(());
+                            if !self.reconnect().await {
+                                return Ok(());
+                            }
                         }
                     },
                     ShardAction::Dispatch(event) => {
@@ -442,22 +445,27 @@ impl ShardRunner {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn reconnect(&mut self) {
+    async fn reconnect(&mut self) -> bool {
         if self.shard.session_id().is_some() {
-            if let Err(why) = self.shard.resume().await {
-                warn!(
-                    "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
-                    self.shard.shard_info(),
-                    why,
-                );
+            match self.shard.resume().await {
+                Ok(()) => true,
+                Err(why) => {
+                    warn!(
+                        "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
+                        self.shard.shard_info(),
+                        why,
+                    );
 
-                // Don't spam reattempts on internet connection loss
-                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                    // Don't spam reattempts on internet connection loss
+                    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
-                self.request_restart().await;
+                    self.request_restart().await;
+                    false
+                },
             }
         } else {
             self.request_restart().await;
+            false
         }
     }
 
