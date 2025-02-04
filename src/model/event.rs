@@ -1098,7 +1098,7 @@ pub struct MessagePollVoteRemoveEvent {
 #[serde(untagged)]
 pub enum GatewayEvent {
     Dispatch(u64, Event),
-    Heartbeat(u64),
+    Heartbeat(#[deprecated = "never used"] u64),
     Reconnect,
     /// Whether the session can be resumed.
     InvalidateSession(bool),
@@ -1118,7 +1118,9 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                 deserialize_val(Value::from(map))?,
             ),
             Opcode::Heartbeat => {
-                GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field("s"))?)
+                // Placeholder value. Discord expects the last Dispatch
+                // sequence number and doesn't send it with the heartbeat.
+                GatewayEvent::Heartbeat(0)
             },
             Opcode::InvalidSession => {
                 GatewayEvent::InvalidateSession(remove_from_map(&mut map, "d")?)

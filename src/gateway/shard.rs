@@ -310,25 +310,8 @@ impl Shard {
     }
 
     #[instrument(skip(self))]
-    fn handle_heartbeat_event(&mut self, s: u64) -> ShardAction {
+    fn handle_heartbeat_event(&mut self) -> ShardAction {
         info!("[{:?}] Received shard heartbeat", self.shard_info);
-
-        // Received seq is off -- attempt to resume.
-        if s > self.seq + 1 {
-            info!(
-                "[{:?}] Received off sequence (them: {}; us: {}); resuming",
-                self.shard_info, s, self.seq
-            );
-
-            if self.stage == ConnectionStage::Handshake {
-                self.stage = ConnectionStage::Identifying;
-
-                return ShardAction::Identify;
-            }
-            warn!("[{:?}] Heartbeat during non-Handshake; auto-reconnecting", self.shard_info);
-
-            return ShardAction::Reconnect(self.reconnection_type());
-        }
 
         ShardAction::Heartbeat
     }
@@ -442,7 +425,7 @@ impl Shard {
     pub fn handle_event(&mut self, event: &Result<GatewayEvent>) -> Result<Option<ShardAction>> {
         match event {
             Ok(GatewayEvent::Dispatch(seq, event)) => Ok(self.handle_gateway_dispatch(*seq, event)),
-            Ok(GatewayEvent::Heartbeat(s)) => Ok(Some(self.handle_heartbeat_event(*s))),
+            Ok(GatewayEvent::Heartbeat(..)) => Ok(Some(self.handle_heartbeat_event())),
             Ok(GatewayEvent::HeartbeatAck) => {
                 self.last_heartbeat_ack = Some(Instant::now());
                 self.last_heartbeat_acknowledged = true;
