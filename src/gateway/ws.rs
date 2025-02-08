@@ -392,7 +392,7 @@ impl WsClient {
         presence: &PresenceData,
     ) -> Result<()> {
         let now = SystemTime::now();
-        let activities = presence.activity.as_ref().map(std::slice::from_ref).unwrap_or_default();
+        let activities = presence.activity.as_slice();
 
         debug!("[{:?}] Identifying", shard);
 
@@ -431,7 +431,7 @@ impl WsClient {
         presence: &PresenceData,
     ) -> Result<()> {
         let now = SystemTime::now();
-        let activities = presence.activity.as_ref().map(std::slice::from_ref).unwrap_or_default();
+        let activities = presence.activity.as_slice();
 
         debug!("[{shard_info:?}] Sending presence update");
 
