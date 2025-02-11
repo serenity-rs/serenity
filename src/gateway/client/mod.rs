@@ -38,6 +38,8 @@ use std::time::Duration;
 use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
 use futures::StreamExt as _;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 use tracing::{debug, warn};
 
 pub use self::context::Context;
@@ -294,7 +296,6 @@ impl IntoFuture for ClientBuilder {
 
     type IntoFuture = BoxFuture<'static, Result<Client>>;
 
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn into_future(self) -> Self::IntoFuture {
         let data = self.data.unwrap_or(Arc::new(()));
         #[cfg(feature = "framework")]

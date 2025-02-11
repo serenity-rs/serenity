@@ -15,6 +15,8 @@ use serde::de::DeserializeOwned;
 use serde::ser::SerializeSeq as _;
 use serde_json::{from_value, to_string, to_vec};
 use to_arraystring::ToArrayString as _;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 use tracing::{debug, warn};
 
 use super::multipart::{Multipart, MultipartUpload};
