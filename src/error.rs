@@ -6,6 +6,8 @@ use std::io::Error as IoError;
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
 #[cfg(feature = "gateway")]
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
