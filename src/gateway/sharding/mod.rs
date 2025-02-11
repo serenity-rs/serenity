@@ -50,6 +50,8 @@ use aformat::{aformat, ArrayString, CapStr};
 use serde::Deserialize;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 use tracing::{debug, error, info, trace, warn};
 use url::Url;
 

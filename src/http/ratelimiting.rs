@@ -46,6 +46,8 @@ use reqwest::{Client, Response, StatusCode};
 use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
 use tracing::debug;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 
 pub use super::routing::RatelimitingBucket;
 use super::{HttpError, LightMethod, Request};
