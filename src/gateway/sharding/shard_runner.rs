@@ -5,6 +5,8 @@ use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 use tracing::{debug, error, info, trace, warn};
 
 #[cfg(feature = "collector")]

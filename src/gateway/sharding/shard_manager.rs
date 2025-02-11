@@ -9,6 +9,8 @@ use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSende
 use futures::{SinkExt, StreamExt};
 use tokio::sync::Mutex;
 use tokio::time::timeout;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 use tracing::{info, warn};
 
 use super::{
