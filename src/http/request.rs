@@ -9,6 +9,8 @@ use reqwest::header::{
     USER_AGENT,
 };
 use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 
 use super::multipart::Multipart;
 use super::routing::Route;

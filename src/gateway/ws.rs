@@ -13,6 +13,8 @@ use tokio::time::{timeout, Duration};
 use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
 use tokio_tungstenite::tungstenite::{Error as WsError, Message};
 use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 use tracing::{debug, trace, warn};
 use url::Url;
 #[cfg(feature = "transport_compression_zstd")]

@@ -37,6 +37,8 @@ use dashmap::DashMap;
 #[cfg(feature = "temp_cache")]
 use mini_moka::sync::Cache as MokaCache;
 use parking_lot::RwLock;
+#[cfg(feature = "tracing_instrument")]
+use tracing::instrument;
 
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
