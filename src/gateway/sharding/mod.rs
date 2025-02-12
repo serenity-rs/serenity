@@ -59,6 +59,8 @@ use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
 use crate::model::event::{DeserializedEvent, Event, GatewayEvent, UnknownEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
+#[cfg(feature = "voice")]
+use crate::model::id::ChannelId;
 use crate::model::id::{ApplicationId, GuildId, ShardId};
 use crate::model::user::OnlineStatus;
 
@@ -596,6 +598,25 @@ impl Shard {
 
         self.client
             .send_chunk_guild(guild_id, &self.shard_info, limit, presences, filter, nonce)
+            .await
+    }
+
+    /// Indicates to the gateway that the client wants to join, move, or disconnect from a voice
+    /// channel.
+    ///
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    #[cfg(feature = "voice")]
+    pub async fn update_voice_state(
+        &mut self,
+        guild_id: GuildId,
+        channel_id: Option<ChannelId>,
+        self_mute: bool,
+        self_deaf: bool,
+    ) -> Result<()> {
+        self.client
+            .send_voice_state_update(&self.shard_info, guild_id, channel_id, self_mute, self_deaf)
             .await
     }
 

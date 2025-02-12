@@ -417,6 +417,48 @@ impl Context {
         });
     }
 
+    /// Indicates to the gateway that the client wants to join, move, or disconnect from a voice
+    /// channel.
+    ///
+    /// # Examples
+    ///
+    /// Join a voice channel, while staying muted:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::gateway::Ready;
+    /// # struct Handler;
+    /// #
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&self, context: Context, _: Ready) {
+    ///         use serenity::model::id::{ChannelId, GuildId};
+    ///
+    ///         context.update_voice_state(
+    ///             GuildId::new(81384788765712384),
+    ///             Some(ChannelId::new(111880193700067777)),
+    ///             true,
+    ///             false,
+    ///         )
+    ///     }
+    /// }
+    /// ```
+    #[cfg(feature = "voice")]
+    pub fn update_voice_state(
+        &self,
+        guild_id: GuildId,
+        channel_id: Option<ChannelId>,
+        self_mute: bool,
+        self_deaf: bool,
+    ) {
+        self.send_to_shard(ShardRunnerMessage::UpdateVoiceState {
+            guild_id,
+            channel_id,
+            self_mute,
+            self_deaf,
+        })
+    }
+
     /// Sends a message to the shard.
     fn send_to_shard(&self, msg: ShardRunnerMessage) {
         if let Err(e) = self.shard.unbounded_send(msg) {

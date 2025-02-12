@@ -26,6 +26,8 @@ use crate::internal::tokio::spawn_named;
 #[cfg(feature = "voice")]
 use crate::model::event::Event;
 use crate::model::event::GatewayEvent;
+#[cfg(feature = "voice")]
+use crate::model::id::ChannelId;
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
 
@@ -282,6 +284,17 @@ impl ShardRunner {
                 self.shard.set_status(status);
                 self.shard.update_presence().await.is_ok()
             },
+            #[cfg(feature = "voice")]
+            ShardRunnerMessage::UpdateVoiceState {
+                guild_id,
+                channel_id,
+                self_mute,
+                self_deaf,
+            } => self
+                .shard
+                .update_voice_state(guild_id, channel_id, self_mute, self_deaf)
+                .await
+                .is_ok(),
         }
     }
 
@@ -506,4 +519,12 @@ pub enum ShardRunnerMessage {
     SetPresence(Option<ActivityData>, OnlineStatus),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
+    /// Indicates that the client wants to join, move, or disconnect from a voice channel.
+    #[cfg(feature = "voice")]
+    UpdateVoiceState {
+        guild_id: GuildId,
+        channel_id: Option<ChannelId>,
+        self_mute: bool,
+        self_deaf: bool,
+    },
 }
