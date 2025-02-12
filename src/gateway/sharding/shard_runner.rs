@@ -2,7 +2,6 @@ use std::sync::{Arc, Mutex};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio_tungstenite::tungstenite;
-use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 #[cfg(feature = "tracing_instrument")]
@@ -11,14 +10,7 @@ use tracing::{debug, error, trace, warn};
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{
-    Shard,
-    ShardAction,
-    ShardManagerMessage,
-    ShardMessenger,
-    ShardRunnerInfo,
-    ShardStageUpdateEvent,
-};
+use super::{Shard, ShardAction, ShardManagerMessage, ShardRunnerInfo, ShardStageUpdateEvent};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
@@ -186,32 +178,18 @@ impl ShardRunner {
                         }
 
                         let context = self.make_context();
-                        let can_dispatch = self
+                        if self
                             .event_handler
                             .as_ref()
                             .is_none_or(|handler| handler.filter_event(&context, &event))
                             && self
                                 .raw_event_handler
                                 .as_ref()
-                                .is_none_or(|handler| handler.filter_event(&context, &event));
-
-                        if can_dispatch {
+                                .is_none_or(|handler| handler.filter_event(&context, &event))
+                        {
                             #[cfg(feature = "collector")]
-                            {
-                                let read_lock = self.collectors.read();
-                                // search all collectors to be removed and clone the Arcs
-                                let to_remove: Vec<_> = read_lock
-                                    .iter()
-                                    .filter(|callback| !callback.0(&event))
-                                    .cloned()
-                                    .collect();
-                                drop(read_lock);
-                                // remove all found arcs from the collection
-                                // this compares the inner pointer of the Arc
-                                if !to_remove.is_empty() {
-                                    self.collectors.write().retain(|f| !to_remove.contains(f));
-                                }
-                            }
+                            self.collectors.write().retain(|callback| (callback.0)(&event));
+
                             spawn_named(
                                 "shard_runner::dispatch",
                                 dispatch_model(
@@ -292,15 +270,6 @@ impl ShardRunner {
                 .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
                 .await
                 .is_ok(),
-            ShardRunnerMessage::Close(code, reason) => {
-                let reason = reason.unwrap_or_default();
-                let close = CloseFrame {
-                    code: code.into(),
-                    reason: reason.into(),
-                };
-                self.shard.client.close(Some(close)).await.is_ok()
-            },
-            ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
             ShardRunnerMessage::SetActivity(activity) => {
                 self.shard.set_activity(activity);
                 self.shard.update_presence().await.is_ok()
@@ -350,23 +319,16 @@ impl ShardRunner {
     // Returns whether the shard runner is in a state that can continue.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn recv(&mut self) -> bool {
-        loop {
-            match self.runner_rx.try_next() {
-                Ok(Some(value)) => {
-                    if !self.handle_rx_value(value).await {
-                        return false;
-                    }
-                },
-                Ok(None) => {
-                    warn!(
-                        "[ShardRunner {:?}] Sending half DC; restarting",
-                        self.shard.shard_info(),
-                    );
-
-                    self.restart().await;
+        while let Ok(msg) = self.runner_rx.try_next() {
+            if let Some(value) = msg {
+                if !self.handle_rx_value(value).await {
                     return false;
-                },
-                Err(_) => break,
+                }
+            } else {
+                warn!("[ShardRunner {:?}] Sending half DC; restarting", self.shard.shard_info(),);
+
+                self.restart().await;
+                return false;
             }
         }
 
@@ -470,22 +432,20 @@ impl ShardRunner {
     }
 
     fn make_context(&self) -> Context {
-        Context::new(
-            Arc::clone(&self.data),
-            self.messenger(),
-            self.shard.shard_info().id,
-            Arc::clone(&self.http),
+        Context {
+            data: Arc::clone(&self.data),
+            shard: self.runner_tx(),
+            shard_id: self.shard.shard_info().id,
+            http: Arc::clone(&self.http),
             #[cfg(feature = "cache")]
-            Arc::clone(&self.cache),
-        )
-    }
-
-    pub(super) fn messenger(&self) -> ShardMessenger {
-        ShardMessenger {
-            tx: self.runner_tx.clone(),
+            cache: Arc::clone(&self.cache),
             #[cfg(feature = "collector")]
             collectors: Arc::clone(&self.collectors),
         }
+    }
+
+    pub(super) fn runner_tx(&self) -> Sender<ShardRunnerMessage> {
+        self.runner_tx.clone()
     }
 }
 
@@ -511,8 +471,13 @@ pub struct ShardRunnerOptions {
 pub enum ShardRunnerMessage {
     /// Indicator that a shard should be restarted.
     Restart,
-    /// Indicator that a shard should be fully shutdown without bringing it
-    /// back up.
+    /// Indicator that a shard should be shutdown with a specific WebSocket close code. Sending a
+    /// code of 1000 or 1001 will invalidate the session and show the current user as logged off.
+    /// Any other code will keep the session active until it times out.
+    ///
+    /// See the [Discord docs].
+    ///
+    /// [Discord docs]: https://discord.com/developers/docs/events/gateway#initiating-a-disconnect
     Shutdown(u16),
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {
@@ -535,16 +500,6 @@ pub enum ShardRunnerMessage {
         /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
         nonce: Option<String>,
     },
-    /// Indicates that the client is to close with the given status code and reason.
-    ///
-    /// You should rarely - if _ever_ - need this, but the option is available. Prefer to use the
-    /// [`ShardManager`] to shutdown WebSocket clients if you are intending to send a 1000 close
-    /// code.
-    ///
-    /// [`ShardManager`]: super::ShardManager
-    Close(u16, Option<String>),
-    /// Indicates that the client is to send a custom WebSocket message.
-    Message(Message),
     /// Indicates that the client is to update the shard's presence's activity.
     SetActivity(Option<ActivityData>),
     /// Indicates that the client is to update the shard's presence in its entirety.

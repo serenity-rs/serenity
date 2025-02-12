@@ -29,7 +29,6 @@
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
 mod shard_manager;
-mod shard_messenger;
 mod shard_queue;
 mod shard_runner;
 
@@ -53,7 +52,6 @@ pub use self::shard_manager::{
     ShardManagerMessage,
     ShardManagerOptions,
 };
-pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queue::ShardQueue;
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
@@ -573,66 +571,18 @@ impl Shard {
 
     /// Requests that one or multiple [`Guild`]s be chunked.
     ///
-    /// This will ask the gateway to start sending member chunks for large guilds (250 members+).
-    /// If a guild is over 250 members, then a full member list will not be downloaded, and must
-    /// instead be requested to be sent in "chunks" containing members.
+    /// This will ask the gateway to start sending member chunks for large guilds. If a guild is
+    /// large enough, then a full member list will not be provided upon connection, and must
+    /// instead be requested directly. The full list will be sent in "chunks" until all members
+    /// matching the request have been sent.
     ///
     /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each chunk only contains
     /// a partial amount of the total members.
     ///
-    /// If the `cache` feature is enabled, the cache will automatically be updated with member
-    /// chunks.
-    ///
-    /// # Examples
-    ///
-    /// Chunk a single guild by Id, limiting to 2000 [`Member`]s, and not
-    /// specifying a query parameter:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
-    /// # async fn run(mut shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::model::id::GuildId;
-    ///
-    /// shard
-    ///     .chunk_guild(
-    ///         GuildId::new(81384788765712384),
-    ///         Some(2000),
-    ///         false,
-    ///         ChunkGuildFilter::None,
-    ///         None,
-    ///     )
-    ///     .await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// Chunk a single guild by Id, limiting to 20 members, and specifying a query parameter of
-    /// `"do"` and a nonce of `"request"`:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
-    /// # async fn run(mut shard: Shard) -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::model::id::GuildId;
-    ///
-    /// shard
-    ///     .chunk_guild(
-    ///         GuildId::new(81384788765712384),
-    ///         Some(20),
-    ///         false,
-    ///         ChunkGuildFilter::Query("do".to_owned()),
-    ///         Some("request"),
-    ///     )
-    ///     .await?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
     /// # Errors
     /// Errors if there is a problem with the WS connection.
     ///
-    /// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk
     /// [`Guild`]: crate::model::guild::Guild
-    /// [`Member`]: crate::model::guild::Member
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn chunk_guild(
         &mut self,
@@ -868,13 +818,6 @@ pub struct CollectorCallback(pub Arc<dyn Fn(&Event) -> bool + Send + Sync>);
 impl fmt::Debug for CollectorCallback {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("CollectorCallback").finish()
-    }
-}
-
-#[cfg(feature = "collector")]
-impl PartialEq for CollectorCallback {
-    fn eq(&self, other: &Self) -> bool {
-        Arc::ptr_eq(&self.0, &other.0)
     }
 }
 

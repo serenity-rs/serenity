@@ -284,12 +284,6 @@ impl WsClient {
         self.stream.next().await
     }
 
-    /// Delegate to `SinkExt::send`
-    pub(crate) async fn send(&mut self, message: Message) -> Result<()> {
-        self.stream.send(message).await?;
-        Ok(())
-    }
-
     /// Delegate to `WebSocketStream::close`
     pub(crate) async fn close(&mut self, msg: Option<CloseFrame>) -> Result<()> {
         self.stream.close(msg).await?;
