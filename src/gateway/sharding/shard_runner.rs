@@ -272,16 +272,16 @@ impl ShardRunner {
                 .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
                 .await
                 .is_ok(),
-            ShardRunnerMessage::SetActivity(activity) => {
-                self.shard.set_activity(activity);
-                self.shard.update_presence().await.is_ok()
-            },
-            ShardRunnerMessage::SetPresence(activity, status) => {
-                self.shard.set_presence(activity, status);
-                self.shard.update_presence().await.is_ok()
-            },
-            ShardRunnerMessage::SetStatus(status) => {
-                self.shard.set_status(status);
+            ShardRunnerMessage::SetPresence {
+                activity,
+                status,
+            } => {
+                if let Some(activity) = activity {
+                    self.shard.set_activity(activity);
+                }
+                if let Some(status) = status {
+                    self.shard.set_status(status);
+                }
                 self.shard.update_presence().await.is_ok()
             },
             #[cfg(feature = "voice")]
@@ -513,12 +513,11 @@ pub enum ShardRunnerMessage {
         /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
         nonce: Option<String>,
     },
-    /// Indicates that the client is to update the shard's presence's activity.
-    SetActivity(Option<ActivityData>),
-    /// Indicates that the client is to update the shard's presence in its entirety.
-    SetPresence(Option<ActivityData>, OnlineStatus),
-    /// Indicates that the client is to update the shard's presence's status.
-    SetStatus(OnlineStatus),
+    /// Indicates that the client is to update the shard's presence.
+    ///
+    /// Pass `None` to keep a value unmodified. The `activity` field is nullable, in other words
+    /// passing `Some(None)` will clear the current activity.
+    SetPresence { activity: Option<Option<ActivityData>>, status: Option<OnlineStatus> },
     /// Indicates that the client wants to join, move, or disconnect from a voice channel.
     #[cfg(feature = "voice")]
     UpdateVoiceState {

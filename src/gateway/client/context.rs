@@ -225,7 +225,10 @@ impl Context {
             online_status = OnlineStatus::Invisible;
         }
 
-        self.send_to_shard(ShardRunnerMessage::SetStatus(online_status));
+        self.send_to_shard(ShardRunnerMessage::SetPresence {
+            activity: None,
+            status: Some(online_status),
+        });
     }
 
     /// "Resets" the current user's presence, by setting the activity to [`None`] and the online
@@ -284,7 +287,10 @@ impl Context {
     /// }
     /// ```
     pub fn set_activity(&self, activity: Option<ActivityData>) {
-        self.send_to_shard(ShardRunnerMessage::SetActivity(activity));
+        self.send_to_shard(ShardRunnerMessage::SetPresence {
+            activity: Some(activity),
+            status: None,
+        });
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -336,7 +342,10 @@ impl Context {
             status = OnlineStatus::Invisible;
         }
 
-        self.send_to_shard(ShardRunnerMessage::SetPresence(activity, status));
+        self.send_to_shard(ShardRunnerMessage::SetPresence {
+            activity: Some(activity),
+            status: Some(status),
+        });
     }
 
     /// Requests that one or multiple [`Guild`]s be chunked.

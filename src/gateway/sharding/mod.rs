@@ -284,12 +284,6 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn set_presence(&mut self, activity: Option<ActivityData>, status: OnlineStatus) {
-        self.set_activity(activity);
-        self.set_status(status);
-    }
-
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn set_status(&mut self, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
