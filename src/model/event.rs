@@ -1098,7 +1098,7 @@ pub struct MessagePollVoteRemoveEvent {
 #[serde(untagged)]
 pub enum GatewayEvent {
     Dispatch(u64, Event),
-    Heartbeat(#[deprecated = "never used"] u64),
+    Heartbeat(#[deprecated = "always 0 because it is never provided by the gateway"] u64),
     Reconnect,
     /// Whether the session can be resumed.
     InvalidateSession(bool),
