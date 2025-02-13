@@ -83,7 +83,7 @@ impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
         self.0.map_or(0, DashMap::len)
     }
 }
-pub struct Hasher(fxhash::FxHasher);
+pub struct Hasher(foldhash::fast::FoldHasher);
 impl std::hash::Hasher for Hasher {
     fn finish(&self) -> u64 {
         self.0.finish()
@@ -98,7 +98,7 @@ impl std::hash::Hasher for Hasher {
 impl typesize::TypeSize for Hasher {}
 
 #[derive(Clone, Default)]
-pub struct BuildHasher(fxhash::FxBuildHasher);
+pub struct BuildHasher(foldhash::fast::RandomState);
 impl std::hash::BuildHasher for BuildHasher {
     type Hasher = Hasher;
 

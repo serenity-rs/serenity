@@ -50,7 +50,7 @@ extract_map = { version = "0.1.0", features = ["serde", "iter_mut"] }
 aformat = "0.1.3"
 bytes = "1.5.0"
 # Optional dependencies
-fxhash = { version = "0.2.1", optional = true }
+foldhash = { version = "0.1.4", optional = true }
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"], optional = true }
 flate2 = { version = "1.0.28", optional = true }
 zstd-safe = { version = "7.2.1", optional = true }
@@ -90,7 +90,7 @@ default_no_backend = [
 builder = ["tokio/fs"]
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
-cache = ["fxhash", "dashmap"]
+cache = ["foldhash", "dashmap"]
 # Enables collectors, a utility feature that lets you await interaction events in code with
 # zero setup, without needing to setup an InteractionCreate event listener.
 collector = ["gateway"]
