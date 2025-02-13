@@ -310,13 +310,6 @@ impl Shard {
     }
 
     #[instrument(skip(self))]
-    fn handle_heartbeat_event(&mut self) -> ShardAction {
-        info!("[{:?}] Received shard heartbeat", self.shard_info);
-
-        ShardAction::Heartbeat
-    }
-
-    #[instrument(skip(self))]
     fn handle_gateway_closed(
         &mut self,
         data: Option<&CloseFrame<'static>>,
@@ -425,7 +418,11 @@ impl Shard {
     pub fn handle_event(&mut self, event: &Result<GatewayEvent>) -> Result<Option<ShardAction>> {
         match event {
             Ok(GatewayEvent::Dispatch(seq, event)) => Ok(self.handle_gateway_dispatch(*seq, event)),
-            Ok(GatewayEvent::Heartbeat(..)) => Ok(Some(self.handle_heartbeat_event())),
+            Ok(GatewayEvent::Heartbeat(..)) => {
+                info!("[{:?}] Received shard heartbeat", self.shard_info);
+
+                Ok(Some(ShardAction::Heartbeat))
+            },
             Ok(GatewayEvent::HeartbeatAck) => {
                 self.last_heartbeat_ack = Some(Instant::now());
                 self.last_heartbeat_acknowledged = true;
