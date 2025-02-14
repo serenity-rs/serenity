@@ -133,19 +133,18 @@ impl Member {
         Ok(())
     }
 
-    /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
-    /// the range 0 and 7.
+    /// Ban a [`User`] from the guild, deleting `dms` seconds worth of messages from them.
+    /// `dms` should be between 0 and 604800. To ban someone for X days, multiply X by 86400.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::TooLarge`] if the `dmd` is greater than 7. Can also
-    /// return [`Error::Http`] if the current user lacks permission to ban this member.
+    /// Can return [`Error::Http`] if the current user lacks permission to ban this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(&self, http: &Http, dmd: u8, audit_log_reason: Option<&str>) -> Result<()> {
-        self.guild_id.ban(http, self.user.id, dmd, audit_log_reason).await
+    pub async fn ban(&self, http: &Http, dms: u32, audit_log_reason: Option<&str>) -> Result<()> {
+        self.guild_id.ban(http, self.user.id, dms, audit_log_reason).await
     }
 
     /// Determines the member's colour.
