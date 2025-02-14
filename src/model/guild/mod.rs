@@ -127,9 +127,9 @@ pub struct Guild {
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
     /// A mapping of the guild's roles.
-    pub roles: ExtractMap<RoleId, Role>,
+    pub roles: ExtractMap<RoleId, Role, foldhash::fast::RandomState>,
     /// All of the guild's custom emojis.
-    pub emojis: ExtractMap<EmojiId, Emoji>,
+    pub emojis: ExtractMap<EmojiId, Emoji, foldhash::fast::RandomState>,
     /// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
@@ -216,7 +216,7 @@ pub struct Guild {
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
     pub nsfw_level: NsfwLevel,
     /// All of the guild's custom stickers.
-    pub stickers: ExtractMap<StickerId, Sticker>,
+    pub stickers: ExtractMap<StickerId, Sticker, foldhash::fast::RandomState>,
     /// Whether the guild has the boost progress bar enabled
     pub premium_progress_bar_enabled: bool,
 
@@ -233,17 +233,17 @@ pub struct Guild {
     /// The number of members in the guild.
     pub member_count: u64,
     /// A mapping of [`User`]s to their current voice state.
-    pub voice_states: ExtractMap<UserId, VoiceState>,
+    pub voice_states: ExtractMap<UserId, VoiceState, foldhash::fast::RandomState>,
     /// Users who are members of the guild.
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received if the
     /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
-    pub members: ExtractMap<UserId, Member>,
+    pub members: ExtractMap<UserId, Member, foldhash::fast::RandomState>,
     /// All voice and text channels contained within a guild.
     ///
     /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
     /// from or connect to them).
-    pub channels: ExtractMap<ChannelId, GuildChannel>,
+    pub channels: ExtractMap<ChannelId, GuildChannel, foldhash::fast::RandomState>,
     /// All active threads in this guild that current user has permission to view.
     ///
     /// A thread is guaranteed (for errors, not for panics) to be cached if a `MESSAGE_CREATE`
@@ -253,7 +253,7 @@ pub struct Guild {
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// **Note**: This will be empty unless the "guild presences" privileged intent is enabled.
-    pub presences: ExtractMap<UserId, Presence>,
+    pub presences: ExtractMap<UserId, Presence, foldhash::fast::RandomState>,
     /// The stage instances in this guild.
     pub stage_instances: FixedArray<StageInstance>,
     /// The stage instances in this guild.
@@ -433,7 +433,7 @@ impl Guild {
 
     /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn _member_highest_role_in<'a>(
-        roles: &'a ExtractMap<RoleId, Role>,
+        roles: &'a ExtractMap<RoleId, Role, foldhash::fast::RandomState>,
         member: &Member,
     ) -> Option<&'a Role> {
         let mut highest: Option<&Role> = None;
@@ -847,7 +847,7 @@ impl Guild {
         member_user_id: UserId,
         member_roles: &[RoleId],
         guild_id: GuildId,
-        guild_roles: &ExtractMap<RoleId, Role>,
+        guild_roles: &ExtractMap<RoleId, Role, foldhash::fast::RandomState>,
         guild_owner_id: UserId,
     ) -> Permissions {
         let mut everyone_allow_overwrites = Permissions::empty();

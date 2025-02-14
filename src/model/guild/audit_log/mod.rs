@@ -332,9 +332,9 @@ pub struct AuditLogs {
     /// map since archived threads might not be kept in memory by clients.
     pub threads: FixedArray<GuildChannel>,
     /// List of users referenced in the audit log.
-    pub users: ExtractMap<UserId, User>,
+    pub users: ExtractMap<UserId, User, foldhash::fast::RandomState>,
     /// List of webhooks referenced in the audit log.
-    pub webhooks: ExtractMap<WebhookId, Webhook>,
+    pub webhooks: ExtractMap<WebhookId, Webhook, foldhash::fast::RandomState>,
 }
 
 /// Partial version of [`Integration`], used in [`AuditLogs::integrations`].

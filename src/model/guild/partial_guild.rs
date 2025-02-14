@@ -63,9 +63,9 @@ pub struct PartialGuild {
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
     /// A mapping of the guild's roles.
-    pub roles: ExtractMap<RoleId, Role>,
+    pub roles: ExtractMap<RoleId, Role, foldhash::fast::RandomState>,
     /// All of the guild's custom emojis.
-    pub emojis: ExtractMap<EmojiId, Emoji>,
+    pub emojis: ExtractMap<EmojiId, Emoji, foldhash::fast::RandomState>,
     /// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
@@ -152,7 +152,7 @@ pub struct PartialGuild {
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
     pub nsfw_level: NsfwLevel,
     /// All of the guild's custom stickers.
-    pub stickers: ExtractMap<StickerId, Sticker>,
+    pub stickers: ExtractMap<StickerId, Sticker, foldhash::fast::RandomState>,
     /// Whether the guild has the boost progress bar enabled
     pub premium_progress_bar_enabled: bool,
 }

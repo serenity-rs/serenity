@@ -1136,12 +1136,12 @@ mod tests {
     use crate::cache::wrappers::MaybeMap;
     use crate::cache::Cache;
 
-    fn new_extract_map<K, T>(val: T) -> ExtractMap<K, T>
+    fn new_extract_map<K, T>(val: T) -> ExtractMap<K, T, foldhash::fast::RandomState>
     where
         K: std::hash::Hash + Eq,
         T: extract_map::ExtractKey<K>,
     {
-        let mut map = ExtractMap::new();
+        let mut map = ExtractMap::with_hasher(foldhash::fast::RandomState::default());
         map.insert(val);
         map
     }

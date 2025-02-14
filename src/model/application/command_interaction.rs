@@ -453,7 +453,7 @@ pub struct CommandDataResolved {
         skip_serializing_if = "ExtractMap::is_empty",
         serialize_with = "extract_map::serialize_as_map"
     )]
-    pub users: ExtractMap<UserId, User>,
+    pub users: ExtractMap<UserId, User, foldhash::fast::RandomState>,
     /// The resolved partial members.
     // Cannot use ExtractMap, as PartialMember does not always store an ID.
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
@@ -464,28 +464,28 @@ pub struct CommandDataResolved {
         skip_serializing_if = "ExtractMap::is_empty",
         serialize_with = "extract_map::serialize_as_map"
     )]
-    pub roles: ExtractMap<RoleId, Role>,
+    pub roles: ExtractMap<RoleId, Role, foldhash::fast::RandomState>,
     /// The resolved partial channels.
     #[serde(
         default,
         skip_serializing_if = "ExtractMap::is_empty",
         serialize_with = "extract_map::serialize_as_map"
     )]
-    pub channels: ExtractMap<ChannelId, PartialChannel>,
+    pub channels: ExtractMap<ChannelId, PartialChannel, foldhash::fast::RandomState>,
     /// The resolved messages.
     #[serde(
         default,
         skip_serializing_if = "ExtractMap::is_empty",
         serialize_with = "extract_map::serialize_as_map"
     )]
-    pub messages: ExtractMap<MessageId, Message>,
+    pub messages: ExtractMap<MessageId, Message, foldhash::fast::RandomState>,
     /// The resolved attachments.
     #[serde(
         default,
         skip_serializing_if = "ExtractMap::is_empty",
         serialize_with = "extract_map::serialize_as_map"
     )]
-    pub attachments: ExtractMap<AttachmentId, Attachment>,
+    pub attachments: ExtractMap<AttachmentId, Attachment, foldhash::fast::RandomState>,
 }
 
 /// A set of a parameter and a value from the user.

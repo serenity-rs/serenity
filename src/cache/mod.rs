@@ -465,7 +465,7 @@ impl Cache {
     pub fn guild_categories(
         &self,
         guild_id: GuildId,
-    ) -> Option<ExtractMap<ChannelId, GuildChannel>> {
+    ) -> Option<ExtractMap<ChannelId, GuildChannel, foldhash::fast::RandomState>> {
         let guild = self.guilds.get(&guild_id)?;
 
         let filter = |channel: &&GuildChannel| channel.kind == ChannelType::Category;

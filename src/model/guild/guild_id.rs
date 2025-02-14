@@ -276,7 +276,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user is not in the guild.
-    pub async fn channels(self, http: &Http) -> Result<ExtractMap<ChannelId, GuildChannel>> {
+    pub async fn channels(self, http: &Http) -> Result<ExtractMap<ChannelId, GuildChannel, foldhash::fast::RandomState>> {
         http.get_channels(self).await
     }
 
@@ -892,7 +892,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user is not in
     /// the guild.
-    pub async fn roles(self, http: &Http) -> Result<ExtractMap<RoleId, Role>> {
+    pub async fn roles(self, http: &Http) -> Result<ExtractMap<RoleId, Role, foldhash::fast::RandomState>> {
         http.get_guild_roles(self).await
     }
 

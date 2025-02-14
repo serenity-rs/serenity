@@ -194,7 +194,7 @@ pub struct GuildDeleteEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildEmojisUpdateEvent {
-    pub emojis: ExtractMap<EmojiId, Emoji>,
+    pub emojis: ExtractMap<EmojiId, Emoji, foldhash::fast::RandomState>,
     pub guild_id: GuildId,
 }
 
@@ -266,7 +266,7 @@ pub struct GuildMembersChunkEvent {
     /// ID of the guild.
     pub guild_id: GuildId,
     /// Set of guild members.
-    pub members: ExtractMap<UserId, Member>,
+    pub members: ExtractMap<UserId, Member, foldhash::fast::RandomState>,
     /// Chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count).
     pub chunk_index: u32,
     /// Total number of expected chunks for this response.
@@ -365,7 +365,7 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildStickersUpdateEvent {
-    pub stickers: ExtractMap<StickerId, Sticker>,
+    pub stickers: ExtractMap<StickerId, Sticker, foldhash::fast::RandomState>,
     pub guild_id: GuildId,
 }
 
