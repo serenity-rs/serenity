@@ -12,7 +12,6 @@ pub enum Maximum {
     StickerCount,
     WebhookName,
     AuditLogReason,
-    DeleteMessageDays,
     BulkDeleteAmount,
 }
 
@@ -38,7 +37,6 @@ impl Maximum {
             Self::StickerCount => crate::constants::STICKER_MAX_COUNT,
             Self::WebhookName | Self::BulkDeleteAmount => 100,
             Self::AuditLogReason => 512,
-            Self::DeleteMessageDays => 7,
         }
     }
 }
@@ -52,7 +50,6 @@ impl fmt::Display for Maximum {
             Self::StickerCount => f.write_str("Sticker count"),
             Self::WebhookName => f.write_str("Webhook name"),
             Self::AuditLogReason => f.write_str("Audit log reason"),
-            Self::DeleteMessageDays => f.write_str("Delete message days"),
             Self::BulkDeleteAmount => f.write_str("Message bulk delete count"),
         }
     }
@@ -100,44 +97,7 @@ impl fmt::Display for Minimum {
 ///
 /// This is always wrapped within the library's [`Error::Model`] variant.
 ///
-/// # Examples
-///
-/// Matching an [`Error`] with this variant would look something like the following for the
-/// [`GuildId::ban`] method, which in this example is used to re-ban all members.
-///
-/// ```rust,no_run
-/// use serenity::model::prelude::*;
-/// use serenity::model::ModelError;
-/// use serenity::prelude::*;
-/// use serenity::Error;
-///
-/// # #[cfg(feature = "http")]
-/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http: serenity::http::Http = unimplemented!();
-/// # let guild_id: GuildId = unimplemented!();
-/// # let user: User = unimplemented!();
-///
-/// match guild_id.ban(&http, user.id, 8, Some("No unbanning people!")).await {
-///     Ok(()) => {
-///         // Ban successful.
-///     },
-///     Err(Error::Model(ModelError::TooLarge {
-///         value, ..
-///     })) => {
-///         println!("Failed deleting {value} days' worth of messages");
-///     },
-///     Err(why) => {
-///         println!("Unexpected error: {why:?}");
-///     },
-/// }
-///
-/// # Ok(())
-/// # }
-/// ```
-///
-/// [`Error`]: crate::Error
 /// [`Error::Model`]: crate::Error::Model
-/// [`GuildId::ban`]: super::id::GuildId::ban
 /// [`model`]: crate::model
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
