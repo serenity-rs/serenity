@@ -334,19 +334,17 @@ impl Http {
     }
 
     /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last X number of
-    /// days.
+    /// seconds.
     ///
-    /// Passing a `delete_message_days` of `0` is equivalent to not removing any messages. Up to
-    /// `7` days' worth of messages may be deleted.
+    /// Passing a `delete_message_seconds` of `0` is equivalent to not removing any messages. Up to
+    /// `604800` seconds (or 7 days) worth of messages may be deleted.
     pub async fn ban_user(
         &self,
         guild_id: GuildId,
         user_id: UserId,
-        delete_message_days: u8,
+        delete_message_seconds: u32,
         reason: Option<&str>,
     ) -> Result<()> {
-        let delete_message_seconds = u32::from(delete_message_days) * 86400;
-
         self.wind(Request {
             body: None,
             multipart: None,
