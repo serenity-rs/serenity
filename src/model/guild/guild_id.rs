@@ -161,8 +161,9 @@ impl GuildId {
         builder.execute(http, self, user_id).await
     }
 
-    /// Ban a [`User`] from the guild, deleting a number of days' worth of messages (`dmd`) between
-    /// the range 0 and 7.
+    /// Ban a [`User`] from the guild, deleting `dms` seconds worth of messages from them.
+    /// `dms` should be between 0 and 604800 (subject to change). To ban someone for X days,
+    /// multiply X by 86400.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -173,31 +174,31 @@ impl GuildId {
     /// ```rust,no_run
     /// use serenity::model::id::{GuildId, UserId};
     ///
+    /// const FOUR_DAYS_IN_SECONDS: u32 = 4 * 24 * 60 * 60;
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
     /// # let http: Http = unimplemented!();
     /// # let user = UserId::new(1);
     /// // assuming a `user` has already been bound
-    /// let _ = GuildId::new(81384788765712384).ban(&http, user, 4, None).await;
+    /// let _ = GuildId::new(81384788765712384).ban(&http, user, FOUR_DAYS_IN_SECONDS, None).await;
     /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::TooLarge`] if the number of days' worth of messages
-    /// to delete is over the maximum.
-    ///
-    /// Also can return [`Error::Http`] if the current user lacks permission.
+    /// Can return [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
-    pub async fn ban(self, http: &Http, user: UserId, dmd: u8, reason: Option<&str>) -> Result<()> {
-        Maximum::DeleteMessageDays.check_overflow(dmd.into())?;
-        if let Some(reason) = reason {
-            Maximum::AuditLogReason.check_overflow(reason.len())?;
-        }
-
-        http.ban_user(self, user, dmd, reason).await
+    pub async fn ban(
+        self,
+        http: &Http,
+        user: UserId,
+        dms: u32,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        http.ban_user(self, user, dms, reason).await
     }
 
     /// Bans multiple users from the guild, returning the users that were and weren't banned, and
