@@ -5,12 +5,12 @@
 
 use serde::de::Error as DeError;
 use serde::Serialize;
+use serde_json::value::RawValue;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 use crate::constants::Opcode;
 use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
-use crate::model::utils::remove_from_map;
 
 /// Requires no gateway intents.
 ///
@@ -933,9 +933,7 @@ pub enum GatewayEvent {
     Dispatch {
         seq: u64,
         // Avoid deserialising straight away to handle errors and get access to `seq`.
-        data: JsonMap,
-        // Used for debugging, if the data cannot be deserialised.
-        original_str: FixedString,
+        event: Vec<u8>,
     },
     Heartbeat,
     Reconnect,
@@ -948,26 +946,47 @@ pub enum GatewayEvent {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
+        #[derive(Debug, Clone, Deserialize)]
+        struct GatewayEventRaw<'a> {
+            op: Opcode,
+            #[serde(rename = "s")]
+            seq: Option<u64>,
+            #[serde(rename = "d")]
+            data: &'a RawValue,
+            #[serde(rename = "t")]
+            ty: Option<&'a str>,
+        }
 
-        Ok(match remove_from_map(&mut map, "op")? {
-            Opcode::Dispatch => {
-                Self::Dispatch {
-                    seq: remove_from_map(&mut map, "s")?,
-                    // Filled in in recv_event
-                    original_str: FixedString::new(),
-                    data: map,
-                }
+        #[derive(Debug, Clone, Serialize)]
+        struct UndeserializedEvent<'a> {
+            #[serde(rename = "d")]
+            data: &'a RawValue,
+            #[serde(rename = "t")]
+            ty: &'a str,
+        }
+
+        let raw: GatewayEventRaw<'_> = Deserialize::deserialize(deserializer)?;
+
+        Ok(match raw.op {
+            Opcode::Dispatch => Self::Dispatch {
+                seq: raw.seq.ok_or_else(|| DeError::custom("missing seq"))?,
+                event: serde_json::to_vec(&UndeserializedEvent {
+                    data: raw.data,
+                    ty: raw.ty.ok_or_else(|| DeError::custom("missing t"))?,
+                })
+                .map_err(DeError::custom)?,
             },
             Opcode::Heartbeat => Self::Heartbeat,
-            Opcode::InvalidSession => Self::InvalidateSession(remove_from_map(&mut map, "d")?),
+            Opcode::InvalidSession => Self::InvalidateSession(serde_json::from_str(raw.data.get()).map_err(DeError::custom)?),
             Opcode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
                     heartbeat_interval: u64,
                 }
 
-                let inner: HelloPayload = remove_from_map(&mut map, "d")?;
+                let inner: HelloPayload =
+                    serde_json::from_str(raw.data.get()).map_err(DeError::custom)?;
+
                 Self::Hello(inner.heartbeat_interval)
             },
             Opcode::Reconnect => Self::Reconnect,
