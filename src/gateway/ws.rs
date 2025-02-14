@@ -264,7 +264,16 @@ impl WsClient {
         };
 
         match serde_json::from_slice(json_bytes) {
-            Ok(event) => Ok(Some(event)),
+            Ok(mut event) => {
+                if let GatewayEvent::Dispatch {
+                    ref mut event, ..
+                } = event
+                {
+                    *event = json_bytes.to_vec();
+                }
+
+                Ok(Some(event))
+            },
             Err(err) => {
                 debug!("Failing text: {}", String::from_utf8_lossy(json_bytes));
                 Err(Error::Json(err))

@@ -933,6 +933,7 @@ pub enum GatewayEvent {
     Dispatch {
         seq: u64,
         // Avoid deserialising straight away to handle errors and get access to `seq`.
+        // This must be filled in with original data by the caller after deserialisation.
         event: Vec<u8>,
     },
     Heartbeat,
@@ -957,24 +958,18 @@ impl<'de> Deserialize<'de> for GatewayEvent {
             ty: Option<&'a str>,
         }
 
-        #[derive(Debug, Clone, Serialize)]
-        struct UndeserializedEvent<'a> {
-            #[serde(rename = "d")]
-            data: &'a RawValue,
-            #[serde(rename = "t")]
-            ty: &'a str,
-        }
-
         let raw: GatewayEventRaw<'_> = Deserialize::deserialize(deserializer)?;
 
         Ok(match raw.op {
-            Opcode::Dispatch => Self::Dispatch {
-                seq: raw.seq.ok_or_else(|| DeError::custom("missing seq"))?,
-                event: serde_json::to_vec(&UndeserializedEvent {
-                    data: raw.data,
-                    ty: raw.ty.ok_or_else(|| DeError::custom("missing t"))?,
-                })
-                .map_err(DeError::custom)?,
+            Opcode::Dispatch => {
+                if raw.ty.is_none() {
+                    return Err(DeError::missing_field("t"));
+                }
+
+                Self::Dispatch {
+                    seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
+                    event: Vec::new(),
+                }
             },
             Opcode::Heartbeat => Self::Heartbeat,
             Opcode::InvalidSession => Self::InvalidateSession(serde_json::from_str(raw.data.get()).map_err(DeError::custom)?),
