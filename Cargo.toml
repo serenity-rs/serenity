@@ -67,8 +67,9 @@ typesize = { version = "0.1.6", optional = true, features = ["url", "time", "ser
 # Serenity workspace crates
 serenity-voice-model = { version = "0.2.0", path = "./voice-model", optional = true }
 
+# TODO (xacrimon): remove when https://github.com/GnomedDev/extract_map/pull/2 is merged and released
 [patch.crates-io]
-extract_map = { git = "https://github.com/xacrimon/extract_map.git", rev = "4b6cc35" }
+extract_map = { git = "https://github.com/xacrimon/extract_map.git", rev = "d7c2cd6" }
 
 [dev-dependencies.http_crate]
 version = "1.1.0"
