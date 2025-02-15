@@ -175,7 +175,7 @@ impl Member {
 
         for channel in &guild.channels {
             if channel.kind != ChannelType::Category
-                && guild.user_permissions_in(channel, member).view_channel()
+                && guild.member_permissions_in(channel, member).view_channel()
             {
                 return Some(channel.clone());
             }
