@@ -46,7 +46,7 @@ bool_to_bitflags = { version = "0.1.2" }
 nonmax = { version = "0.5.5", features = ["serde"] }
 strum = { version = "0.26", features = ["derive"] }
 to-arraystring = "0.2.0"
-extract_map = { version = "0.1.0", features = ["serde", "iter_mut"] }
+extract_map = { version = "0.2.0", features = ["serde", "iter_mut"] }
 aformat = "0.1.3"
 bytes = "1.5.0"
 # Optional dependencies
@@ -62,7 +62,7 @@ mime_guess = { version = "2.0.4", optional = true }
 dashmap = { version = "6.1.0", features = ["serde"], optional = true }
 parking_lot = { version = "0.12.1"}
 ed25519-dalek = { version = "2.0.0", optional = true }
-typesize = { version = "0.1.6", optional = true, features = ["url", "time", "serde_json", "secrecy", "parking_lot", "nonmax", "extract_map_01"] }
+typesize = { version = "0.1.13", optional = true, features = ["url", "time", "serde_json", "secrecy", "parking_lot", "nonmax"] }
 # serde feature only allows for serialisation,
 # Serenity workspace crates
 serenity-voice-model = { version = "0.2.0", path = "./voice-model", optional = true }
@@ -131,7 +131,7 @@ full = ["default", "collector", "voice", "voice_model", "interactions_endpoint"]
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka", "typesize?/mini_moka"]
 
-typesize = ["dep:typesize", "dashmap/typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize"]
+typesize = ["dep:typesize", "dashmap/typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize", "extract_map/typesize"]
 
 # Enables compile-time heavy instrument macros from tracing
 tracing_instrument = ["tracing/attributes"]
