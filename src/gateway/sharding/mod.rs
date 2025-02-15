@@ -458,7 +458,7 @@ impl Shard {
             }) => self
                 .handle_gateway_dispatch(seq, data, &original_str)
                 .map(|e| Some(ShardAction::Dispatch(e))),
-            Ok(GatewayEvent::Heartbeat(..)) => {
+            Ok(GatewayEvent::Heartbeat) => {
                 info!("[{:?}] Received shard heartbeat", self.shard_info);
 
                 Ok(Some(ShardAction::Heartbeat))
