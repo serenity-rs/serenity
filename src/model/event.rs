@@ -937,7 +937,7 @@ pub enum GatewayEvent {
         // Used for debugging, if the data cannot be deserialised.
         original_str: FixedString,
     },
-    Heartbeat(#[deprecated = "always 0 because it is never provided by the gateway"] u64),
+    Heartbeat,
     Reconnect,
     /// Whether the session can be resumed.
     InvalidateSession(bool),
@@ -959,11 +959,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                     data: map,
                 }
             },
-            Opcode::Heartbeat => {
-                // Placeholder value. Discord expects the last Dispatch
-                // sequence number and doesn't send it with the heartbeat.
-                Self::Heartbeat(0)
-            },
+            Opcode::Heartbeat => Self::Heartbeat,
             Opcode::InvalidSession => Self::InvalidateSession(remove_from_map(&mut map, "d")?),
             Opcode::Hello => {
                 #[derive(Deserialize)]
