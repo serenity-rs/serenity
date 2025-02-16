@@ -932,9 +932,7 @@ pub struct MessagePollVoteRemoveEvent {
 pub enum GatewayEvent {
     Dispatch {
         seq: u64,
-        // Avoid deserialising straight away to handle errors and get access to `seq`.
-        // This must be filled in with original data by the caller after deserialisation.
-        event: Vec<u8>,
+        event: DeserializedEvent,
     },
     Heartbeat,
     Reconnect,
@@ -942,6 +940,13 @@ pub enum GatewayEvent {
     InvalidateSession(bool),
     Hello(u64),
     HeartbeatAck,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum DeserializedEvent {
+    Success(Event),
+    Unknown { t: String, d: JsonMap },
 }
 
 // Manual impl needed to emulate integer enum tags
@@ -968,7 +973,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
                 Self::Dispatch {
                     seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
-                    event: Vec::new(),
+                    event: serde_json::from_str(raw.data.get()).map_err(DeError::custom)?,
                 }
             },
             Opcode::Heartbeat => Self::Heartbeat,
