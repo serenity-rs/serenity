@@ -943,12 +943,22 @@ pub enum GatewayEvent {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 #[serde(untagged)]
 pub enum DeserializedEvent {
     Success(Event),
-    Unknown { t: String, d: JsonMap },
+    Unknown(UnknownEvent),
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct UnknownEvent {
+    #[serde(rename = "t")]
+    pub ty: String,
+    #[serde(rename = "d")]
+    pub data: Box<RawValue>,
 }
 
 // Manual impl needed to emulate integer enum tags
@@ -975,21 +985,27 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
                 Self::Dispatch {
                     seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
-                    event: serde_json::from_str(raw.data.get()).map_err(DeError::custom)?,
+                    event: {
+                        match Event::deserialize(raw.data) {
+                            Ok(event) => DeserializedEvent::Success(event),
+                            Err(_) => DeserializedEvent::Unknown(
+                                UnknownEvent::deserialize(raw.data).map_err(DeError::custom)?,
+                            ),
+                        }
+                    },
                 }
             },
             Opcode::Heartbeat => Self::Heartbeat,
-            Opcode::InvalidSession => Self::InvalidateSession(
-                serde_json::from_str(raw.data.get()).map_err(DeError::custom)?,
-            ),
+            Opcode::InvalidSession => {
+                Self::InvalidateSession(bool::deserialize(raw.data).map_err(DeError::custom)?)
+            },
             Opcode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
                     heartbeat_interval: u64,
                 }
 
-                let inner: HelloPayload =
-                    serde_json::from_str(raw.data.get()).map_err(DeError::custom)?;
+                let inner = HelloPayload::deserialize(raw.data).map_err(DeError::custom)?;
 
                 Self::Hello(inner.heartbeat_interval)
             },

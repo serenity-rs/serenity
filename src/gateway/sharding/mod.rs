@@ -59,7 +59,7 @@ pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
-use crate::model::event::{DeserializedEvent, Event, GatewayEvent};
+use crate::model::event::{DeserializedEvent, Event, GatewayEvent, UnknownEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::{ApplicationId, GuildId, ShardId};
 use crate::model::user::OnlineStatus;
@@ -321,12 +321,12 @@ impl Shard {
 
         let event = match event {
             DeserializedEvent::Success(event) => event,
-            DeserializedEvent::Unknown {
-                t,
-                ref d,
-            } => {
-                debug!("Unknown event: {t}");
-                debug!("Failing event data: {d:?}");
+            DeserializedEvent::Unknown(UnknownEvent {
+                ty,
+                ref data,
+            }) => {
+                debug!("Unknown event: {ty}");
+                debug!("Failing event data: {data:?}");
                 return None;
             },
         };
