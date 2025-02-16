@@ -447,7 +447,7 @@ impl Shard {
         match event {
             Ok(GatewayEvent::Dispatch {
                 seq,
-                event
+                event,
             }) => self.handle_gateway_dispatch(seq, &event).map(|e| Some(ShardAction::Dispatch(e))),
             Ok(GatewayEvent::Heartbeat) => {
                 info!("[{:?}] Received shard heartbeat", self.shard_info);

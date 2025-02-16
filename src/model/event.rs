@@ -972,7 +972,9 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                 }
             },
             Opcode::Heartbeat => Self::Heartbeat,
-            Opcode::InvalidSession => Self::InvalidateSession(serde_json::from_str(raw.data.get()).map_err(DeError::custom)?),
+            Opcode::InvalidSession => Self::InvalidateSession(
+                serde_json::from_str(raw.data.get()).map_err(DeError::custom)?,
+            ),
             Opcode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
