@@ -942,7 +942,9 @@ pub enum GatewayEvent {
     HeartbeatAck,
 }
 
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 #[serde(untagged)]
 pub enum DeserializedEvent {
     Success(Event),
