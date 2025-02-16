@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use std::env::consts;
 use std::io::Read;
 use std::time::SystemTime;
@@ -7,7 +6,6 @@ use flate2::read::ZlibDecoder;
 #[cfg(feature = "transport_compression_zlib")]
 use flate2::Decompress as ZlibInflater;
 use futures::{SinkExt, StreamExt};
-use small_fixed_array::FixedString;
 use tokio::net::TcpStream;
 use tokio::time::{timeout, Duration};
 use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
@@ -254,13 +252,10 @@ impl WsClient {
         };
 
         let json_bytes = match message {
-            Message::Text(payload) => Cow::Owned(payload.as_bytes().to_vec()),
-            Message::Binary(bytes) => {
-                let Some(decompressed) = self.compression.inflate(&bytes)? else {
-                    return Ok(None);
-                };
-
-                Cow::Borrowed(decompressed)
+            Message::Text(ref payload) => payload.as_bytes(),
+            Message::Binary(ref bytes) => match self.compression.inflate(bytes)? {
+                Some(decompressed) => decompressed,
+                None => return Ok(None),
             },
             Message::Close(Some(frame)) => {
                 return Err(Error::Gateway(GatewayError::Closed(Some(frame))));
@@ -268,21 +263,19 @@ impl WsClient {
             _ => return Ok(None),
         };
 
-        // TODO: Use `String::from_utf8_lossy_owned` when stable.
-        let json_str = || String::from_utf8_lossy(&json_bytes);
-        match serde_json::from_slice(&json_bytes) {
+        match serde_json::from_slice(json_bytes) {
             Ok(mut event) => {
                 if let GatewayEvent::Dispatch {
-                    original_str, ..
-                } = &mut event
+                    ref mut event, ..
+                } = event
                 {
-                    *original_str = FixedString::from_string_trunc(json_str().into_owned());
+                    *event = json_bytes.to_vec();
                 }
 
                 Ok(Some(event))
             },
             Err(err) => {
-                debug!("Failing text: {}", json_str());
+                debug!("Failing text: {}", String::from_utf8_lossy(json_bytes));
                 Err(Error::Json(err))
             },
         }
