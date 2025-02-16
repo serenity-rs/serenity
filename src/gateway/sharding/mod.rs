@@ -47,7 +47,6 @@ use std::time::{Duration as StdDuration, Instant};
 #[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
 use aformat::aformat_into;
 use aformat::{aformat, ArrayString, CapStr};
-use serde::Deserialize;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 #[cfg(feature = "tracing_instrument")]
@@ -319,18 +318,13 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn handle_gateway_dispatch(
-        &mut self,
-        seq: u64,
-        event: JsonMap,
-        original_str: &str,
-    ) -> Result<Event> {
+    fn handle_gateway_dispatch(&mut self, seq: u64, event: &[u8]) -> Result<Event> {
         if seq > self.seq + 1 {
             warn!("[{:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
         }
 
         self.seq = seq;
-        let event = deserialize_and_log_event(event, original_str)?;
+        let event = deserialize_and_log_event(event)?;
 
         match &event {
             Event::Ready(ready) => {
@@ -453,11 +447,8 @@ impl Shard {
         match event {
             Ok(GatewayEvent::Dispatch {
                 seq,
-                data,
-                original_str,
-            }) => self
-                .handle_gateway_dispatch(seq, data, &original_str)
-                .map(|e| Some(ShardAction::Dispatch(e))),
+                event,
+            }) => self.handle_gateway_dispatch(seq, &event).map(|e| Some(ShardAction::Dispatch(e))),
             Ok(GatewayEvent::Heartbeat) => {
                 info!("[{:?}] Received shard heartbeat", self.shard_info);
 
@@ -749,9 +740,8 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
     WsClient::connect(url, compression).await
 }
 
-fn deserialize_and_log_event(map: JsonMap, original_str: &str) -> Result<Event> {
-    Event::deserialize(Value::Object(map)).map_err(|err| {
-        let err = serde::de::Error::custom(err);
+fn deserialize_and_log_event(event: &[u8]) -> Result<Event> {
+    serde_json::from_slice(event).map_err(|err| {
         let err_dbg = format!("{err:?}");
         if let Some((variant_name, _)) =
             err_dbg.strip_prefix(r#"Error("unknown variant `"#).and_then(|s| s.split_once('`'))
@@ -760,7 +750,9 @@ fn deserialize_and_log_event(map: JsonMap, original_str: &str) -> Result<Event> 
         } else {
             warn!("Err deserializing text: {err_dbg}");
         }
-        debug!("Failing text: {original_str}");
+
+        let event_str = String::from_utf8_lossy(event);
+        debug!("Failing event data: {event_str}");
         Error::Json(err)
     })
 }
