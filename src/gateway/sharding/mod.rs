@@ -742,7 +742,6 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
 
 fn deserialize_and_log_event(event: &[u8]) -> Result<Event> {
     serde_json::from_slice(event).map_err(|err| {
-        let err = serde::de::Error::custom(err);
         let err_dbg = format!("{err:?}");
         if let Some((variant_name, _)) =
             err_dbg.strip_prefix(r#"Error("unknown variant `"#).and_then(|s| s.split_once('`'))

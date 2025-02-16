@@ -958,7 +958,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
             ty: Option<&'a str>,
         }
 
-        let raw: GatewayEventRaw<'_> = Deserialize::deserialize(deserializer)?;
+        let raw = GatewayEventRaw::deserialize(deserializer)?;
 
         Ok(match raw.op {
             Opcode::Dispatch => {
