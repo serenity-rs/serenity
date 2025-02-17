@@ -62,11 +62,12 @@ async fn main() {
             sleep(Duration::from_secs(30)).await;
 
             for (id, runner) in &runners {
-                let runner = runner.lock().await;
-                println!(
-                    "Shard ID {} is {} with a latency of {:?}",
-                    id, runner.stage, runner.latency,
-                );
+                if let Ok(runner) = runner.lock() {
+                    println!(
+                        "Shard ID {} is {} with a latency of {:?}",
+                        id, runner.stage, runner.latency,
+                    );
+                }
             }
         }
     });
