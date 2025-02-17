@@ -180,7 +180,7 @@ impl ShardManager {
         self.queue.push_back(shard_id);
         self.queue.set_concurrent(concurrent);
         if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::PollShardQueue) {
-            warn!("Failed to poll shard queue: {why:?}")
+            warn!("Failed to poll shard queue: {why:?}");
         }
     }
 

@@ -459,7 +459,7 @@ impl ShardRunner {
             warn!(
                 "[ShardRunner {:?}] Failed to send restart request back to shard manager: {why:?}",
                 self.shard.shard_info(),
-            )
+            );
         }
 
         #[cfg(feature = "voice")]
