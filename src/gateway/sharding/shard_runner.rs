@@ -1,7 +1,6 @@
 use std::sync::{Arc, Mutex};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use futures::SinkExt;
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
@@ -456,7 +455,12 @@ impl ShardRunner {
         debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
 
         let shard_id = self.shard.shard_info().id;
-        drop(self.manager_tx.send(ShardManagerMessage::Restart(shard_id)));
+        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::Restart(shard_id)) {
+            warn!(
+                "[ShardRunner {:?}] Failed to send restart request back to shard manager: {why:?}",
+                self.shard.shard_info(),
+            )
+        }
 
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {

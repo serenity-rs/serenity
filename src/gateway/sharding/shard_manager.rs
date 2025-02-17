@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use futures::{SinkExt, StreamExt};
+use futures::StreamExt;
 use tokio::time::{sleep, timeout};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
@@ -141,7 +141,7 @@ impl ShardManager {
         shard_init: u16,
         shard_total: NonZeroU16,
     ) -> Result<(), GatewayError> {
-        self.initialize(shard_index, shard_init, shard_total).await;
+        self.initialize(shard_index, shard_init, shard_total);
         loop {
             if let Ok(Some(msg)) =
                 timeout(self.wait_time_between_shard_start, self.manager_rx.next()).await
@@ -152,7 +152,7 @@ impl ShardManager {
                             self.checked_start(batch).await;
                         }
                     },
-                    ShardManagerMessage::Restart(shard_id) => self.restart(shard_id).await,
+                    ShardManagerMessage::Restart(shard_id) => self.restart(shard_id),
                     ShardManagerMessage::Quit(err) => return Err(err),
                 }
             }
@@ -164,22 +164,24 @@ impl ShardManager {
     /// Note that this queues all shards but does not actually start them. To start the manager's
     /// event loop and dispatch [`ShardRunner`]s as they get queued, call [`Self::run`] instead.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
+    pub fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         let shard_to = shard_index + shard_init;
 
         self.shard_total = shard_total;
         for shard_id in shard_index..shard_to {
-            self.boot(ShardId(shard_id), true).await;
+            self.boot(ShardId(shard_id), true);
         }
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn boot(&mut self, shard_id: ShardId, concurrent: bool) {
+    fn boot(&mut self, shard_id: ShardId, concurrent: bool) {
         info!("Queueing shard {shard_id} for starting");
 
         self.queue.push_back(shard_id);
         self.queue.set_concurrent(concurrent);
-        drop(self.manager_tx.send(ShardManagerMessage::PollShardQueue).await);
+        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::PollShardQueue) {
+            warn!("Failed to poll shard queue: {why:?}")
+        }
     }
 
     /// Restarts a shard runner.
@@ -195,18 +197,18 @@ impl ShardManager {
     /// use serenity::model::id::ShardId;
     /// use serenity::prelude::*;
     ///
-    /// # async fn run(mut client: Client) {
+    /// # fn run(mut client: Client) {
     /// // restart shard ID 7
-    /// client.shard_manager.restart(ShardId(7)).await;
+    /// client.shard_manager.restart(ShardId(7));
     /// # }
     /// ```
     ///
     /// [`ShardRunner`]: super::ShardRunner
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn restart(&mut self, shard_id: ShardId) {
+    pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {shard_id}");
         self.shutdown(shard_id, 4000);
-        self.boot(shard_id, false).await;
+        self.boot(shard_id, false);
     }
 
     /// Attempts to shut down the shard runner by Id.
@@ -222,10 +224,7 @@ impl ShardManager {
             if let Err(why) =
                 messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(shard_id, code))
             {
-                warn!(
-                    "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
-                    shard_id, why,
-                );
+                warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
         }
     }
@@ -306,11 +305,11 @@ impl ShardManager {
 
         self.runners.insert(shard_id, (runner_info, runner.messenger()));
 
-        let mut manager_tx = self.manager_tx.clone();
+        let manager_tx = self.manager_tx.clone();
         spawn_named("shard_runner::run", async move {
             if let Err(Error::Gateway(e)) = runner.run().await {
-                if let Err(e) = manager_tx.send(ShardManagerMessage::Quit(e)).await {
-                    warn!("Failed to send return value: {}", e);
+                if let Err(why) = manager_tx.unbounded_send(ShardManagerMessage::Quit(e)) {
+                    warn!("Failed to send return value: {why}");
                 }
             }
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
@@ -367,10 +366,7 @@ impl Drop for ShardManager {
             if let Err(why) =
                 messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(shard_id, 1000))
             {
-                warn!(
-                    "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
-                    shard_id, why,
-                );
+                warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
         }
     }
