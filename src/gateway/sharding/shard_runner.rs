@@ -7,7 +7,7 @@ use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tokio_tungstenite::tungstenite::Message;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
-use tracing::{debug, error, info, trace, warn};
+use tracing::{debug, error, trace, warn};
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
@@ -110,7 +110,7 @@ impl ShardRunner {
     /// [`Event`]: crate::model::event::Event
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn run(&mut self) -> Result<()> {
-        info!("[ShardRunner {:?}] Running", self.shard.shard_info());
+        debug!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
             trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
@@ -235,6 +235,7 @@ impl ShardRunner {
     // Shuts down the WebSocket client.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn shutdown(&mut self, close_code: u16) {
+        debug!("[ShardRunner {:?}] Shutting down.", self.shard.shard_info());
         // Send a Close Frame to Discord, which allows a bot to "log off"
         drop(
             self.shard
