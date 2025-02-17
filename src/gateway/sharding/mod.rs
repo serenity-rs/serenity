@@ -30,6 +30,7 @@
 
 mod shard_manager;
 mod shard_messenger;
+mod shard_queue;
 mod shard_runner;
 
 use std::fmt;
@@ -51,10 +52,10 @@ pub use self::shard_manager::{
     ShardManager,
     ShardManagerMessage,
     ShardManagerOptions,
-    ShardQueue,
     DEFAULT_WAIT_BETWEEN_SHARD_START,
 };
 pub use self::shard_messenger::ShardMessenger;
+pub use self::shard_queue::ShardQueue;
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, CloseCode};

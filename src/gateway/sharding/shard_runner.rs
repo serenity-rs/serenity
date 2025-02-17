@@ -1,8 +1,7 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::SinkExt;
-use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
@@ -134,7 +133,7 @@ impl ShardRunner {
             let post = self.shard.stage();
 
             if post != pre {
-                self.update_runner_info().await;
+                self.update_runner_info();
 
                 if let Some(event_handler) = &self.event_handler {
                     let event_handler = Arc::clone(event_handler);
@@ -420,7 +419,7 @@ impl ShardRunner {
         };
 
         if is_ack {
-            self.update_runner_info().await;
+            self.update_runner_info();
         }
 
         Ok(action)
@@ -451,11 +450,10 @@ impl ShardRunner {
         }
     }
 
+    #[cfg_attr(not(feature = "voice"), expect(clippy::unused_async))]
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn request_restart(&mut self) {
         debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
-
-        self.update_runner_info().await;
 
         let shard_id = self.shard.shard_info().id;
         drop(self.manager_tx.send(ShardManagerMessage::Restart(shard_id)));
@@ -467,10 +465,11 @@ impl ShardRunner {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn update_runner_info(&self) {
-        let mut runner_info = self.runner_info.lock().await;
-        runner_info.latency = self.shard.latency();
-        runner_info.stage = self.shard.stage();
+    fn update_runner_info(&self) {
+        if let Ok(mut runner_info) = self.runner_info.try_lock() {
+            runner_info.latency = self.shard.latency();
+            runner_info.stage = self.shard.stage();
+        }
     }
 
     fn make_context(&self) -> Context {

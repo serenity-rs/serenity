@@ -1,13 +1,12 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 use std::num::NonZeroU16;
-use std::sync::Arc;
 #[cfg(feature = "framework")]
 use std::sync::OnceLock;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::{SinkExt, StreamExt};
-use tokio::sync::Mutex;
 use tokio::time::{sleep, timeout};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
@@ -18,6 +17,7 @@ use super::{
     ShardId,
     ShardInfo,
     ShardMessenger,
+    ShardQueue,
     ShardRunner,
     ShardRunnerInfo,
     ShardRunnerMessage,
@@ -124,7 +124,7 @@ impl ShardManager {
     ///
     /// This function takes care of:
     ///   1. Starting [`ShardRunner`]s and spawning tasks.
-    ///   2. Restarting shards (by shuttind them down and spawning a new task) when requested.
+    ///   2. Restarting shards (by shutting them down and spawning a new task) when requested.
     ///   3. Quitting if a shard runner encounters a fatal gateway error.
     ///
     /// # Errors
@@ -153,7 +153,7 @@ impl ShardManager {
                         }
                     },
                     ShardManagerMessage::Restart(shard_id) => self.restart(shard_id).await,
-                    ShardManagerMessage::Err(err) => return Err(err),
+                    ShardManagerMessage::Quit(err) => return Err(err),
                 }
             }
         }
@@ -224,8 +224,7 @@ impl ShardManager {
             {
                 warn!(
                     "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
-                    shard_id,
-                    why,
+                    shard_id, why,
                 );
             }
         }
@@ -310,7 +309,7 @@ impl ShardManager {
         let mut manager_tx = self.manager_tx.clone();
         spawn_named("shard_runner::run", async move {
             if let Err(Error::Gateway(e)) = runner.run().await {
-                if let Err(e) = manager_tx.send(ShardManagerMessage::Err(e)).await {
+                if let Err(e) = manager_tx.send(ShardManagerMessage::Quit(e)).await {
                     warn!("Failed to send return value: {}", e);
                 }
             }
@@ -363,8 +362,16 @@ impl Drop for ShardManager {
     fn drop(&mut self) {
         info!("Shutting down all shards");
 
-        for shard_id in self.shards_instantiated() {
-            self.shutdown(shard_id, 1000);
+        for (shard_id, (_, messenger)) in self.runners.drain() {
+            info!("Shutting down shard {}", shard_id);
+            if let Err(why) =
+                messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(shard_id, 1000))
+            {
+                warn!(
+                    "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
+                    shard_id, why,
+                );
+            }
         }
     }
 }
@@ -390,59 +397,13 @@ pub struct ShardManagerOptions {
     pub presence: Option<PresenceData>,
 }
 
+/// A message indicating what action the [`ShardManager`] should take.
 pub enum ShardManagerMessage {
+    /// Indicates that the manager should try and call [`ShardQueue::pop_batch`] on its internal
+    /// shard queue. If said call returns `Some`, then the manager will start a batch of shards.
     PollShardQueue,
+    /// Indicates that a specific shard should be restarted.
     Restart(ShardId),
-    Err(GatewayError),
-}
-
-/// A queue of [`ShardId`]s that is split up into multiple buckets according to the value of
-/// [`max_concurrency`](crate::model::gateway::SessionStartLimit::max_concurrency).
-#[must_use]
-pub struct ShardQueue {
-    buckets: FixedArray<VecDeque<ShardId>, u16>,
-    concurrent: bool,
-}
-
-impl ShardQueue {
-    pub fn new(max_concurrency: NonZeroU16) -> Self {
-        let buckets = vec![VecDeque::new(); max_concurrency.get() as usize].into_boxed_slice();
-        let buckets = FixedArray::try_from(buckets).expect("should fit without truncation");
-
-        Self {
-            buckets,
-            concurrent: false,
-        }
-    }
-
-    fn calculate_bucket(&self, shard_id: ShardId) -> u16 {
-        shard_id.0 % self.buckets.len()
-    }
-
-    /// Calculates the corresponding bucket for the given `ShardId` and **appends** to it.
-    pub fn push_back(&mut self, shard_id: ShardId) {
-        let bucket = self.calculate_bucket(shard_id);
-        self.buckets[bucket].push_back(shard_id);
-    }
-
-    /// Calculates the corresponding bucket for the given `ShardId` and **prepends** to it.
-    pub fn push_front(&mut self, shard_id: ShardId) {
-        let bucket = self.calculate_bucket(shard_id);
-        self.buckets[bucket].push_front(shard_id);
-    }
-
-    /// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
-    /// If the queue is in concurrent mode, will wait until all buckets are filled before returning
-    /// a maximally-sized batch.
-    pub fn pop_batch(&mut self) -> Option<Vec<ShardId>> {
-        if self.concurrent && !self.buckets.iter().all(|b| !b.is_empty()) {
-            None
-        } else {
-            Some(self.buckets.iter_mut().filter_map(VecDeque::pop_front).collect())
-        }
-    }
-
-    pub fn set_concurrent(&mut self, concurrent: bool) {
-        self.concurrent = concurrent;
-    }
+    /// Indicates that a shard runner encountered a fatal error and the shard manager should quit.
+    Quit(GatewayError),
 }
