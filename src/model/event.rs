@@ -958,7 +958,13 @@ pub struct UnknownEvent {
     #[serde(rename = "t")]
     pub ty: String,
     #[serde(rename = "d")]
+    #[cfg_attr(feature = "typesize", typesize(with = raw_value_len))]
     pub data: Box<RawValue>,
+}
+
+#[cfg(feature = "typesize")]
+fn raw_value_len(val: &RawValue) -> usize {
+    val.get().len()
 }
 
 // Manual impl needed to emulate integer enum tags
