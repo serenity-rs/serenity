@@ -141,18 +141,13 @@ impl ShardManager {
         shard_init: u16,
         shard_total: NonZeroU16,
     ) -> Result<(), GatewayError> {
-        self.initialize(shard_index, shard_init, shard_total);
+        self.initialize(shard_index, shard_init, shard_total).await;
         loop {
             if let Ok(Some(msg)) =
                 timeout(self.wait_time_between_shard_start, self.manager_rx.next()).await
             {
                 match msg {
-                    ShardManagerMessage::PollShardQueue => {
-                        if let Some(batch) = self.queue.pop_batch() {
-                            self.checked_start(batch).await;
-                        }
-                    },
-                    ShardManagerMessage::Restart(shard_id) => self.restart(shard_id),
+                    ShardManagerMessage::Boot(shard_id) => self.boot(shard_id, false).await,
                     ShardManagerMessage::Quit(err) => return Err(err),
                 }
             }
@@ -164,23 +159,23 @@ impl ShardManager {
     /// Note that this queues all shards but does not actually start them. To start the manager's
     /// event loop and dispatch [`ShardRunner`]s as they get queued, call [`Self::run`] instead.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
+    pub async fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         let shard_to = shard_index + shard_init;
 
         self.shard_total = shard_total;
         for shard_id in shard_index..shard_to {
-            self.boot(ShardId(shard_id), true);
+            self.boot(ShardId(shard_id), true).await;
         }
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn boot(&mut self, shard_id: ShardId, concurrent: bool) {
+    async fn boot(&mut self, shard_id: ShardId, concurrent: bool) {
         info!("Queueing shard {shard_id} for starting");
 
         self.queue.push_back(shard_id);
         self.queue.set_concurrent(concurrent);
-        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::PollShardQueue) {
-            warn!("Failed to poll shard queue: {why:?}");
+        if let Some(batch) = self.queue.pop_batch() {
+            self.checked_start(batch).await;
         }
     }
 
@@ -207,8 +202,12 @@ impl ShardManager {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {shard_id}");
-        self.shutdown(shard_id, 4000);
-        self.boot(shard_id, false);
+
+        if let Some((_, messenger)) = self.runners.remove(&shard_id) {
+            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Restart) {
+                warn!("Failed to send restart signal to shard {shard_id}: {why:?}");
+            }
+        }
     }
 
     /// Attempts to shut down the shard runner by Id.
@@ -221,9 +220,7 @@ impl ShardManager {
         info!("Shutting down shard {}", shard_id);
 
         if let Some((_, messenger)) = self.runners.remove(&shard_id) {
-            if let Err(why) =
-                messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(shard_id, code))
-            {
+            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(code)) {
                 warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
         }
@@ -363,9 +360,7 @@ impl Drop for ShardManager {
 
         for (shard_id, (_, messenger)) in self.runners.drain() {
             info!("Shutting down shard {}", shard_id);
-            if let Err(why) =
-                messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(shard_id, 1000))
-            {
+            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(1000)) {
                 warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
         }
@@ -395,11 +390,12 @@ pub struct ShardManagerOptions {
 
 /// A message indicating what action the [`ShardManager`] should take.
 pub enum ShardManagerMessage {
-    /// Indicates that the manager should try and call [`ShardQueue::pop_batch`] on its internal
-    /// shard queue. If said call returns `Some`, then the manager will start a batch of shards.
-    PollShardQueue,
-    /// Indicates that a specific shard should be restarted.
-    Restart(ShardId),
+    /// Indicates that the manager should attempt to start a shard.
+    ///
+    /// Note that this makes use of the manager's shard queue for batching shards together, and if
+    /// the queue is operating in concurrent mode (in order to start multiple shards at once),
+    /// the shard is not guaranteed to immediately start, until more shards are queued.
+    Boot(ShardId),
     /// Indicates that a shard runner encountered a fatal error and the shard manager should quit.
     Quit(GatewayError),
 }

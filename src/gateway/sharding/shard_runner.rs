@@ -14,7 +14,6 @@ use super::CollectorCallback;
 use super::{
     Shard,
     ShardAction,
-    ShardId,
     ShardManagerMessage,
     ShardMessenger,
     ShardRunnerInfo,
@@ -123,7 +122,7 @@ impl ShardRunner {
             if !self.shard.do_heartbeat().await {
                 warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
 
-                self.request_restart().await;
+                self.restart().await;
                 return Ok(());
             }
 
@@ -233,20 +232,9 @@ impl ShardRunner {
         }
     }
 
-    // Checks if the ID received to shutdown is equivalent to the ID of the shard this runner is
-    // responsible. If so, it shuts down the WebSocket client.
-    //
-    // Returns whether the WebSocket client is still active.
-    //
-    // If true, the WebSocket client was _not_ shutdown. If false, it was.
+    // Shuts down the WebSocket client.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
-        // First verify the ID so we know for certain this runner is to shutdown.
-        if id != self.shard.shard_info().id {
-            // Not meant for this runner for some reason, don't shutdown.
-            return true;
-        }
-
+    async fn shutdown(&mut self, close_code: u16) {
         // Send a Close Frame to Discord, which allows a bot to "log off"
         drop(
             self.shard
@@ -262,13 +250,13 @@ impl ShardRunner {
         // is deemed disconnected from Discord.
         loop {
             match self.shard.client.next().await {
-                Some(Ok(tungstenite::Message::Close(_))) => return false,
+                Some(Ok(tungstenite::Message::Close(_))) => return,
                 Some(Err(_)) => {
                     warn!(
                         "[ShardRunner {:?}] Received an error awaiting close frame",
                         self.shard.shard_info(),
                     );
-                    return false;
+                    return;
                 },
                 _ => {},
             }
@@ -280,12 +268,18 @@ impl ShardRunner {
     // Returns a boolean on whether the shard runner can continue.
     //
     // This always returns true, except in the case that the shard manager asked the runner to
-    // shutdown.
+    // shutdown or restart.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn handle_rx_value(&mut self, msg: ShardRunnerMessage) -> bool {
         match msg {
-            ShardRunnerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
-            ShardRunnerMessage::Shutdown(id, code) => self.checked_shutdown(id, code).await,
+            ShardRunnerMessage::Restart => {
+                self.restart().await;
+                false
+            },
+            ShardRunnerMessage::Shutdown(code) => {
+                self.shutdown(code).await;
+                false
+            },
             ShardRunnerMessage::ChunkGuild {
                 guild_id,
                 limit,
@@ -368,7 +362,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
 
-                    self.request_restart().await;
+                    self.restart().await;
                     return false;
                 },
                 Err(_) => break,
@@ -390,9 +384,8 @@ impl ShardRunner {
             },
             Err(Error::Tungstenite(tung_err)) if matches!(*tung_err, TungsteniteError::Io(_)) => {
                 debug!("Attempting to auto-reconnect");
-                self.reconnect().await;
 
-                return Ok(None);
+                return Ok(Some(ShardAction::Reconnect));
             },
             Err(why) => Err(why),
         };
@@ -439,32 +432,32 @@ impl ShardRunner {
                     // Don't spam reattempts on internet connection loss
                     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
-                    self.request_restart().await;
+                    self.restart().await;
                     false
                 },
             }
         } else {
-            self.request_restart().await;
+            self.restart().await;
             false
         }
     }
 
-    #[cfg_attr(not(feature = "voice"), expect(clippy::unused_async))]
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn request_restart(&mut self) {
-        debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info());
-
+    async fn restart(&mut self) {
         let shard_id = self.shard.shard_info().id;
-        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::Restart(shard_id)) {
-            warn!(
-                "[ShardRunner {:?}] Failed to send restart request back to shard manager: {why:?}",
-                self.shard.shard_info(),
-            );
-        }
 
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
             voice_manager.deregister_shard(shard_id.0).await;
+        }
+
+        self.shutdown(4000).await;
+
+        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::Boot(shard_id)) {
+            warn!(
+                "[ShardRunner {:?}] Failed to send boot request back to shard manager: {why:?}",
+                self.shard.shard_info(),
+            );
         }
     }
 
@@ -517,10 +510,10 @@ pub struct ShardRunnerOptions {
 #[derive(Debug)]
 pub enum ShardRunnerMessage {
     /// Indicator that a shard should be restarted.
-    Restart(ShardId),
+    Restart,
     /// Indicator that a shard should be fully shutdown without bringing it
     /// back up.
-    Shutdown(ShardId, u16),
+    Shutdown(u16),
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {
         /// The IDs of the [`Guild`] to chunk.
