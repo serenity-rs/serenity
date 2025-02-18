@@ -184,20 +184,6 @@ impl ShardManager {
     /// Sends a shutdown signal to a shard's associated [`ShardRunner`], and then queues an
     /// initialization of a new shard runner for the same shard.
     ///
-    /// # Examples
-    ///
-    /// Restarting a shard by ID:
-    ///
-    /// ```rust,no_run
-    /// use serenity::model::id::ShardId;
-    /// use serenity::prelude::*;
-    ///
-    /// # fn run(mut client: Client) {
-    /// // restart shard ID 7
-    /// client.shard_manager.restart(ShardId(7));
-    /// # }
-    /// ```
-    ///
     /// [`ShardRunner`]: super::ShardRunner
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn restart(&mut self, shard_id: ShardId) {
