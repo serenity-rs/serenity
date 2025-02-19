@@ -35,32 +35,29 @@ use std::sync::Arc;
 use std::sync::OnceLock;
 use std::time::Duration;
 
-use futures::channel::mpsc::UnboundedReceiver as Receiver;
 use futures::future::BoxFuture;
-use futures::StreamExt as _;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, warn};
 
 pub use self::context::Context;
 pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
-use super::TransportCompression;
+#[cfg(feature = "voice")]
+use super::VoiceGatewayManager;
+use super::{
+    ActivityData,
+    PresenceData,
+    ShardManager,
+    ShardManagerOptions,
+    TransportCompression,
+    DEFAULT_WAIT_BETWEEN_SHARD_START,
+};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::cache::Settings as CacheSettings;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-#[cfg(feature = "voice")]
-use crate::gateway::VoiceGatewayManager;
-use crate::gateway::{
-    ActivityData,
-    GatewayError,
-    PresenceData,
-    ShardManager,
-    ShardManagerOptions,
-    DEFAULT_WAIT_BETWEEN_SHARD_START,
-};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -316,9 +313,6 @@ impl IntoFuture for ClientBuilder {
             }
         }
 
-        #[cfg(feature = "voice")]
-        let voice_manager = self.voice_manager;
-
         #[cfg(feature = "cache")]
         let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
@@ -337,7 +331,8 @@ impl IntoFuture for ClientBuilder {
 
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceLock::new());
-            let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
+
+            let shard_manager = ShardManager::new(ShardManagerOptions {
                 token: self.token,
                 data: Arc::clone(&data),
                 event_handler: self.event_handler,
@@ -345,25 +340,24 @@ impl IntoFuture for ClientBuilder {
                 #[cfg(feature = "framework")]
                 framework: Arc::clone(&framework_cell),
                 #[cfg(feature = "voice")]
-                voice_manager: voice_manager.clone(),
+                voice_manager: self.voice_manager.clone(),
                 ws_url: Arc::clone(&ws_url),
+                compression: self.compression,
                 shard_total,
+                max_concurrency,
                 #[cfg(feature = "cache")]
                 cache: Arc::clone(&cache),
                 http: Arc::clone(&http),
                 intents,
                 presence: Some(presence),
-                max_concurrency,
                 wait_time_between_shard_start: self.wait_time_between_shard_start,
-                compression: self.compression,
             });
 
             let client = Client {
                 data,
                 shard_manager,
-                shard_manager_return_value: shard_manager_ret_value,
                 #[cfg(feature = "voice")]
-                voice_manager,
+                voice_manager: self.voice_manager,
                 ws_url,
                 #[cfg(feature = "cache")]
                 cache,
@@ -449,12 +443,9 @@ pub struct Client {
     /// # use std::time::Duration;
     /// #
     /// # fn run(client: Client) {
-    /// // Create a clone of the `Arc` containing the shard manager.
-    /// let shard_manager = client.shard_manager.clone();
-    ///
     /// tokio::spawn(async move {
     ///     loop {
-    ///         let count = shard_manager.shards_instantiated().await.len();
+    ///         let count = client.shard_manager.shards_instantiated().len();
     ///         println!("Shard count instantiated: {}", count);
     ///
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
@@ -462,30 +453,7 @@ pub struct Client {
     /// });
     /// # }
     /// ```
-    ///
-    /// Shutting down all connections after one minute of operation:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use std::time::Duration;
-    /// #
-    /// # fn run(client: Client) {
-    /// // Create a clone of the `Arc` containing the shard manager.
-    /// let shard_manager = client.shard_manager.clone();
-    ///
-    /// // Create a thread which will sleep for 60 seconds and then have the shard manager
-    /// // shutdown.
-    /// tokio::spawn(async move {
-    ///     tokio::time::sleep(Duration::from_secs(60)).await;
-    ///
-    ///     shard_manager.shutdown_all().await;
-    ///
-    ///     println!("Shutdown shard manager!");
-    /// });
-    /// # }
-    /// ```
-    pub shard_manager: Arc<ShardManager>,
-    shard_manager_return_value: Receiver<Result<(), GatewayError>>,
+    pub shard_manager: ShardManager,
     /// The voice manager for the client.
     ///
     /// This is an ergonomic structure for interfacing over shards' voice
@@ -796,12 +764,7 @@ impl Client {
 
         debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
 
-        self.shard_manager.initialize(start_shard, init, total_shards);
-        if let Some(Err(err)) = self.shard_manager_return_value.next().await {
-            return Err(Error::Gateway(err));
-        }
-
-        Ok(())
+        self.shard_manager.run(start_shard, init, total_shards).await.map_err(Error::Gateway)
     }
 }
 

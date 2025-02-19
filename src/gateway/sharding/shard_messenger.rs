@@ -6,7 +6,7 @@ use tokio_tungstenite::tungstenite::Message;
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{ChunkGuildFilter, ShardRunner, ShardRunnerMessage};
+use super::{ChunkGuildFilter, ShardRunnerMessage};
 use crate::gateway::ActivityData;
 use crate::model::prelude::*;
 
@@ -25,20 +25,6 @@ pub struct ShardMessenger {
 }
 
 impl ShardMessenger {
-    /// Creates a new shard messenger.
-    ///
-    /// If you are using the [`Client`], you do not need to do this.
-    ///
-    /// [`Client`]: crate::Client
-    #[must_use]
-    pub fn new(shard: &ShardRunner) -> Self {
-        Self {
-            tx: shard.runner_tx(),
-            #[cfg(feature = "collector")]
-            collectors: Arc::clone(&shard.collectors),
-        }
-    }
-
     /// Requests that one or multiple [`Guild`]s be chunked.
     ///
     /// This will ask the gateway to start sending member chunks for large guilds (250 members+).
