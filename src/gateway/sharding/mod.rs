@@ -16,16 +16,9 @@
 //!
 //! ### [`ShardManager`]
 //!
-//! The shard manager provides a clean interface for communicating with shard runners either
-//! individually or collectively, with functions such as [`ShardManager::shutdown`] and
-//! [`ShardManager::restart`] to manage shards in a fine-grained way.
-//!
-//! For most use cases, the [`ShardManager`] will fit all your low-level sharding needs.
-//!
-//! ### [`ShardQueuer`]
-//!
-//! A light wrapper around an mpsc receiver that receives [`ShardQueuerMessage`]s. It should be run
-//! in its own thread so it can receive messages to start shards concurrently in a queue.
+//! The shard manager provides an interface for managing the starting, restarting, and shutdown of
+//! shards by spawning tasks, each containing a [`ShardRunner`], and communicating with each task
+//! using message passing.
 //!
 //! ### [`ShardRunner`]
 //!
@@ -37,7 +30,7 @@
 
 mod shard_manager;
 mod shard_messenger;
-mod shard_queuer;
+mod shard_queue;
 mod shard_runner;
 
 use std::fmt;
@@ -56,11 +49,12 @@ use url::Url;
 
 pub use self::shard_manager::{
     ShardManager,
+    ShardManagerMessage,
     ShardManagerOptions,
     DEFAULT_WAIT_BETWEEN_SHARD_START,
 };
 pub use self::shard_messenger::ShardMessenger;
-pub use self::shard_queuer::{ShardQueue, ShardQueuer, ShardQueuerMessage};
+pub use self::shard_queue::ShardQueue;
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, CloseCode};
@@ -779,9 +773,6 @@ pub enum ShardAction {
 pub struct ShardRunnerInfo {
     /// The latency between when a heartbeat was sent and when the acknowledgement was received.
     pub latency: Option<StdDuration>,
-    /// The channel used to communicate with the shard runner, telling it what to do with regards
-    /// to its status.
-    pub runner_tx: ShardMessenger,
     /// The current connection stage of the shard.
     pub stage: ConnectionStage,
 }
