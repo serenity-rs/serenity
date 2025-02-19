@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
-use crate::gateway::{ActivityData, ShardMessenger, ShardRunner};
+use crate::gateway::{ActivityData, ShardMessenger};
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
 
@@ -62,15 +62,15 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     pub(crate) fn new(
         data: Arc<dyn std::any::Any + Send + Sync>,
-        runner: &ShardRunner,
+        shard_messenger: ShardMessenger,
         shard_id: ShardId,
         http: Arc<Http>,
         #[cfg(feature = "cache")] cache: Arc<Cache>,
     ) -> Context {
         Context {
-            shard: ShardMessenger::new(runner),
-            shard_id,
             data,
+            shard: shard_messenger,
+            shard_id,
             http,
             #[cfg(feature = "cache")]
             cache,
