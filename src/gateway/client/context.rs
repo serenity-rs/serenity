@@ -465,7 +465,7 @@ impl Context {
             channel_id,
             self_mute,
             self_deaf,
-        })
+        });
     }
 
     /// Sends a message to the shard.
