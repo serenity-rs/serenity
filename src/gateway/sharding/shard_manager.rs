@@ -1,25 +1,27 @@
 use std::collections::HashMap;
 use std::num::NonZeroU16;
-use std::sync::Arc;
 #[cfg(feature = "framework")]
 use std::sync::OnceLock;
-use std::time::Duration;
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use futures::{SinkExt, StreamExt};
-use tokio::sync::Mutex;
-use tokio::time::timeout;
+use futures::StreamExt;
+use tokio::time::{sleep, timeout};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use super::{
+    Shard,
     ShardId,
+    ShardInfo,
+    ShardMessenger,
     ShardQueue,
-    ShardQueuer,
-    ShardQueuerMessage,
+    ShardRunner,
     ShardRunnerInfo,
-    TransportCompression,
+    ShardRunnerMessage,
+    ShardRunnerOptions,
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
@@ -28,7 +30,7 @@ use crate::framework::Framework;
 use crate::gateway::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
-use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
+use crate::gateway::{ConnectionStage, GatewayError, PresenceData, TransportCompression};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
@@ -39,126 +41,70 @@ pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
 
 /// A manager for handling the status of shards by starting them, restarting them, and stopping
 /// them when required.
-///
-/// **Note**: The [`Client`] internally uses a shard manager. If you are using a Client, then you
-/// do not need to make one of these.
-///
-/// # Examples
-///
-/// Initialize a shard manager for shards 0 through 2, of 5 total shards:
-///
-/// ```rust,no_run
-/// # use std::error::Error;
-/// #
-/// # #[cfg(feature = "voice")]
-/// # use serenity::model::id::UserId;
-/// # #[cfg(feature = "cache")]
-/// # use serenity::cache::Cache;
-/// #
-/// # #[cfg(feature = "framework")]
-/// # async fn run() -> Result<(), Box<dyn Error>> {
-/// #
-/// use std::env;
-/// use std::sync::{Arc, OnceLock};
-///
-/// use serenity::gateway::client::EventHandler;
-/// use serenity::gateway::{
-///     ShardManager,
-///     ShardManagerOptions,
-///     TransportCompression,
-///     DEFAULT_WAIT_BETWEEN_SHARD_START,
-/// };
-/// use serenity::http::Http;
-/// use serenity::model::gateway::GatewayIntents;
-/// use serenity::prelude::*;
-/// use tokio::sync::{Mutex, RwLock};
-///
-/// struct Handler;
-///
-/// impl EventHandler for Handler {}
-///
-/// # let http: Arc<Http> = unimplemented!();
-/// let gateway_info = http.get_bot_gateway().await?;
-///
-/// let data = Arc::new(());
-/// let shard_total = gateway_info.shards;
-/// let ws_url = Arc::from(gateway_info.url);
-/// let event_handler = Arc::new(Handler);
-/// let max_concurrency = std::num::NonZeroU16::MIN;
-/// let token = Token::from_env("DISCORD_TOKEN")?;
-///
-/// ShardManager::new(ShardManagerOptions {
-///     token,
-///     data,
-///     event_handler: Some(event_handler),
-///     raw_event_handler: None,
-///     framework: Arc::new(OnceLock::new()),
-///     # #[cfg(feature = "voice")]
-///     # voice_manager: None,
-///     ws_url,
-///     shard_total,
-///     # #[cfg(feature = "cache")]
-///     # cache: unimplemented!(),
-///     # http,
-///     intents: GatewayIntents::non_privileged(),
-///     presence: None,
-///     max_concurrency,
-///     wait_time_between_shard_start: DEFAULT_WAIT_BETWEEN_SHARD_START,
-///     compression: TransportCompression::None,
-/// });
-/// # Ok(())
-/// # }
-/// ```
-///
-/// [`Client`]: crate::Client
-#[derive(Debug)]
 pub struct ShardManager {
-    return_value_tx: Mutex<Sender<Result<(), GatewayError>>>,
+    token: Token,
+    /// A sender that is cloned and given out to each ShardRunner as it is created
+    manager_tx: Sender<ShardManagerMessage>,
+    manager_rx: Receiver<ShardManagerMessage>,
+
+    /// A copy of [`Client::data`] to be given to runners for contextual dispatching.
+    ///
+    /// [`Client::data`]: crate::Client::data
+    pub data: Arc<dyn std::any::Any + Send + Sync>,
+    /// A reference to an [`EventHandler`].
+    pub event_handler: Option<Arc<dyn EventHandler>>,
+    /// A reference to a [`RawEventHandler`].
+    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    /// A copy of the framework.
+    #[cfg(feature = "framework")]
+    pub framework: Arc<OnceLock<Arc<dyn Framework>>>,
+    /// The instant that a shard was last started.
+    ///
+    /// This is used to determine how long to wait between shard IDENTIFYs.
+    pub last_start: Option<Instant>,
+    /// The shards that are queued for booting.
+    pub queue: ShardQueue,
     /// The shard runners currently managed.
     ///
-    /// **Note**: It is highly unrecommended to mutate this yourself unless you need to. Instead
+    /// **Note**: It is highly recommended to not mutate this yourself unless you need to. Instead
     /// prefer to use methods on this struct that are provided where possible.
-    pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
-    shard_queuer: Sender<ShardQueuerMessage>,
-    // We can safely use a Mutex for this field, as it is only ever used in one single place
-    // and only is ever used to receive a single message
-    shard_shutdown: Mutex<Receiver<ShardId>>,
-    shard_shutdown_send: Sender<ShardId>,
-    gateway_intents: GatewayIntents,
+    pub runners: HashMap<ShardId, (Arc<Mutex<ShardRunnerInfo>>, ShardMessenger)>,
+    /// A copy of the client's voice manager.
+    #[cfg(feature = "voice")]
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
+    /// A copy of the URL to use to connect to the gateway.
+    pub ws_url: Arc<str>,
+    /// The compression method to use for the WebSocket connection.
+    pub compression: TransportCompression,
+    /// The total amount of shards to start.
+    pub shard_total: NonZeroU16,
+    /// Number of seconds to wait between each start.
+    pub wait_time_between_shard_start: Duration,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<Cache>,
+    pub http: Arc<Http>,
+    pub intents: GatewayIntents,
+    pub presence: Option<PresenceData>,
 }
 
 impl ShardManager {
-    /// Creates a new shard manager, returning both the manager and a monitor for usage in a
-    /// separate thread.
     #[must_use]
-    pub fn new(opt: ShardManagerOptions) -> (Arc<Self>, Receiver<Result<(), GatewayError>>) {
-        let (return_value_tx, return_value_rx) = mpsc::unbounded();
-        let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
+    pub fn new(opt: ShardManagerOptions) -> Self {
+        let (manager_tx, manager_rx) = mpsc::unbounded();
 
-        let runners = Arc::new(Mutex::new(HashMap::new()));
-        let (shutdown_send, shutdown_recv) = mpsc::unbounded();
-
-        let manager = Arc::new(Self {
-            return_value_tx: Mutex::new(return_value_tx),
-            shard_queuer: shard_queue_tx,
-            shard_shutdown: Mutex::new(shutdown_recv),
-            shard_shutdown_send: shutdown_send,
-            runners: Arc::clone(&runners),
-            gateway_intents: opt.intents,
-        });
-
-        let mut shard_queuer = ShardQueuer {
+        Self {
             token: opt.token,
+            manager_tx,
+            manager_rx,
+
             data: opt.data,
             event_handler: opt.event_handler,
             raw_event_handler: opt.raw_event_handler,
             #[cfg(feature = "framework")]
             framework: opt.framework,
             last_start: None,
-            manager: Arc::clone(&manager),
             queue: ShardQueue::new(opt.max_concurrency),
-            runners,
-            rx: shard_queue_rx,
+            runners: HashMap::new(),
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
@@ -170,213 +116,240 @@ impl ShardManager {
             intents: opt.intents,
             presence: opt.presence,
             wait_time_between_shard_start: opt.wait_time_between_shard_start,
-        };
-
-        spawn_named("shard_queuer::run", async move {
-            shard_queuer.run().await;
-        });
-
-        (Arc::clone(&manager), return_value_rx)
+        }
     }
 
-    /// Returns whether the shard manager contains either an active instance of a shard runner
-    /// responsible for the given ID.
+    /// The main interface for starting the management of shards. Initializes the shards by
+    /// queueing them for starting, and then listens for [`ShardManagerMessage`]s in a loop.
     ///
-    /// If a shard has been queued but has not yet been initiated, then this will return `false`.
-    pub async fn has(&self, shard_id: ShardId) -> bool {
-        self.runners.lock().await.contains_key(&shard_id)
+    /// This function takes care of:
+    ///   1. Starting [`ShardRunner`]s and spawning tasks.
+    ///   2. Restarting shards (by shutting them down and spawning a new task) when requested.
+    ///   3. Quitting if a shard runner encounters a fatal gateway error.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`GatewayError`] if an unrecoverable error is received from the gateway. These
+    /// include the following:
+    ///   * [`GatewayError::InvalidAuthentication`]
+    ///   * [`GatewayError::InvalidApiVersion`]
+    ///   * [`GatewayError::InvalidGatewayIntents`]
+    ///   * [`GatewayError::DisallowedGatewayIntents`]
+    pub async fn run(
+        &mut self,
+        shard_index: u16,
+        shard_init: u16,
+        shard_total: NonZeroU16,
+    ) -> Result<(), GatewayError> {
+        self.initialize(shard_index, shard_init, shard_total).await;
+        loop {
+            if let Ok(Some(msg)) =
+                timeout(self.wait_time_between_shard_start, self.manager_rx.next()).await
+            {
+                match msg {
+                    ShardManagerMessage::Boot(shard_id) => self.boot(shard_id, false).await,
+                    ShardManagerMessage::Quit(err) => return Err(err),
+                }
+            }
+        }
     }
 
     /// Initializes all shards that the manager is responsible for.
     ///
-    /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
-    /// queued.
+    /// Note that this queues all shards but does not actually start them. To start the manager's
+    /// event loop and dispatch [`ShardRunner`]s as they get queued, call [`Self::run`] instead.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn initialize(&self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
+    pub async fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         let shard_to = shard_index + shard_init;
 
-        self.set_shard_total(shard_total);
+        self.shard_total = shard_total;
         for shard_id in shard_index..shard_to {
-            self.boot(ShardId(shard_id), true);
+            self.boot(ShardId(shard_id), true).await;
+        }
+    }
+
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    async fn boot(&mut self, shard_id: ShardId, concurrent: bool) {
+        info!("Queueing shard {shard_id} for starting");
+
+        self.queue.push_back(shard_id);
+        self.queue.set_concurrent(concurrent);
+        if let Some(batch) = self.queue.pop_batch() {
+            self.checked_start(batch).await;
         }
     }
 
     /// Restarts a shard runner.
     ///
-    /// This sends a shutdown signal to a shard's associated [`ShardRunner`], and then queues a
-    /// initialization of a shard runner for the same shard via the [`ShardQueuer`].
-    ///
-    /// # Examples
-    ///
-    /// Restarting a shard by ID:
-    ///
-    /// ```rust,no_run
-    /// use serenity::model::id::ShardId;
-    /// use serenity::prelude::*;
-    ///
-    /// # async fn run(client: Client) {
-    /// // restart shard ID 7
-    /// client.shard_manager.restart(ShardId(7)).await;
-    /// # }
-    /// ```
+    /// Sends a shutdown signal to a shard's associated [`ShardRunner`], and then queues an
+    /// initialization of a new shard runner for the same shard.
     ///
     /// [`ShardRunner`]: super::ShardRunner
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn restart(&self, shard_id: ShardId) {
+    pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {shard_id}");
-        self.shutdown(shard_id, 4000).await;
-        self.boot(shard_id, false);
-    }
 
-    /// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
-    /// valid [`ShardRunner`].
-    ///
-    /// [`ShardRunner`]: super::ShardRunner
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn shards_instantiated(&self) -> Vec<ShardId> {
-        self.runners.lock().await.keys().copied().collect()
+        if let Some((_, messenger)) = self.runners.remove(&shard_id) {
+            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Restart) {
+                warn!("Failed to send restart signal to shard {shard_id}: {why:?}");
+            }
+        }
     }
 
     /// Attempts to shut down the shard runner by Id.
-    ///
-    /// Returns a boolean indicating whether a shard runner was present. This is _not_ necessary an
-    /// indicator of whether the shard runner was successfully shut down.
     ///
     /// **Note**: If the receiving end of an mpsc channel - owned by the shard runner - no longer
     /// exists, then the shard runner will not know it should shut down. This _should never happen_.
     /// It may already be stopped.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn shutdown(&self, shard_id: ShardId, code: u16) {
-        const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
-
+    pub fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
-        {
-            let mut shard_shutdown = self.shard_shutdown.lock().await;
-
-            drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard {
-                shard_id,
-                code,
-            }));
-            match timeout(TIMEOUT, shard_shutdown.next()).await {
-                Ok(Some(shutdown_shard_id)) => {
-                    if shutdown_shard_id != shard_id {
-                        warn!(
-                        "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
-                        shard_id,
-                    );
-                    }
-                },
-                Ok(None) => (),
-                Err(why) => {
-                    warn!(
-                        "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
-                        shard_id, why
-                    );
-                },
+        if let Some((_, messenger)) = self.runners.remove(&shard_id) {
+            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(code)) {
+                warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
-            // shard_shutdown is dropped here and releases the lock
-            // in theory we should never have two calls to shutdown()
-            // at the same time but this is a safety measure just in case:tm:
         }
-
-        self.runners.lock().await.remove(&shard_id);
     }
 
-    /// Sends a shutdown message for all shards that the manager is responsible for that are still
-    /// known to be running.
-    ///
-    /// If you only need to shutdown a select number of shards, prefer looping over the
-    /// [`Self::shutdown`] method.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn shutdown_all(&self) {
-        let keys = {
-            let runners = self.runners.lock().await;
+    // This function assumes that each of the shard ids are bucketed separately according to
+    // `max_concurrency`. If this assumption is violated, you will likely get ratelimited.
+    //
+    // See: https://discord.com/developers/docs/events/gateway#sharding-max-concurrency
+    async fn checked_start(&mut self, shard_ids: Vec<ShardId>) {
+        if shard_ids.is_empty() {
+            return;
+        }
 
-            if runners.is_empty() {
-                return;
+        if shard_ids.len() > 1 {
+            debug!("[Shard Manager] Starting batch of {} shards", shard_ids.len());
+        }
+
+        // We must wait 5 seconds between IDENTIFYs to avoid session invalidations.
+        if let Some(instant) = self.last_start {
+            let elapsed = instant.elapsed();
+            if elapsed < self.wait_time_between_shard_start {
+                sleep(self.wait_time_between_shard_start - elapsed).await;
             }
+        }
 
-            runners.keys().copied().collect::<Vec<_>>()
+        for shard_id in shard_ids {
+            debug!("[Shard Manager] Starting shard {shard_id}");
+            if let Err(why) = self.start_runner(shard_id).await {
+                warn!("[Shard Manager] Err starting shard {shard_id}: {why:?}");
+                info!("[Shard Manager] Re-queueing shard {shard_id}");
+
+                // Re-queue at the *front* of the bucket in order to keep decent ordering
+                self.queue.push_front(shard_id);
+            }
+            self.last_start = Some(Instant::now());
+        }
+    }
+
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    async fn start_runner(&mut self, shard_id: ShardId) -> Result<()> {
+        let shard_info = ShardInfo {
+            id: shard_id,
+            total: self.shard_total,
         };
+        let mut shard = Shard::new(
+            Arc::clone(&self.ws_url),
+            self.token.clone(),
+            shard_info,
+            self.intents,
+            self.presence.clone(),
+            self.compression,
+        )
+        .await?;
 
-        info!("Shutting down all shards");
+        let cloned_http = Arc::clone(&self.http);
+        shard.set_application_id_callback(move |id| cloned_http.set_application_id(id));
 
-        for shard_id in keys {
-            self.shutdown(shard_id, 1000).await;
-        }
-
-        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
-
-        // this message is received by Client::start_connection, which lets the main thread know
-        // and finally return from Client::start
-        drop(self.return_value_tx.lock().await.unbounded_send(Ok(())));
-    }
-
-    fn set_shard_total(&self, shard_total: NonZeroU16) {
-        info!("Setting shard total to {shard_total}");
-
-        let msg = ShardQueuerMessage::SetShardTotal(shard_total);
-        drop(self.shard_queuer.unbounded_send(msg));
-    }
-
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn boot(&self, shard_id: ShardId, concurrent: bool) {
-        info!("Telling shard queuer to start shard {shard_id}");
-
-        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Start {
-            shard_id,
-            concurrent,
+        let runner_info = Arc::new(Mutex::new(ShardRunnerInfo {
+            latency: None,
+            stage: ConnectionStage::Disconnected,
         }));
+
+        let mut runner = ShardRunner::new(ShardRunnerOptions {
+            data: Arc::clone(&self.data),
+            event_handler: self.event_handler.clone(),
+            raw_event_handler: self.raw_event_handler.clone(),
+            #[cfg(feature = "framework")]
+            framework: self.framework.get().cloned(),
+            runner_info: Arc::clone(&runner_info),
+            manager_tx: self.manager_tx.clone(),
+            #[cfg(feature = "voice")]
+            voice_manager: self.voice_manager.clone(),
+            shard,
+            #[cfg(feature = "cache")]
+            cache: Arc::clone(&self.cache),
+            http: Arc::clone(&self.http),
+        });
+
+        self.runners.insert(shard_id, (runner_info, runner.messenger()));
+
+        let manager_tx = self.manager_tx.clone();
+        spawn_named("shard_runner::run", async move {
+            if let Err(Error::Gateway(e)) = runner.run().await {
+                if let Err(why) = manager_tx.unbounded_send(ShardManagerMessage::Quit(e)) {
+                    warn!("Failed to send return value: {why}");
+                }
+            }
+            debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
+        });
+
+        Ok(())
+    }
+
+    /// Returns whether the shard manager contains an active instance of a shard runner responsible
+    /// for the given ID.
+    ///
+    /// If a shard has been queued but has not yet been initiated, then this will return `false`.
+    #[must_use]
+    pub fn has(&self, shard_id: ShardId) -> bool {
+        self.runners.contains_key(&shard_id)
+    }
+
+    /// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
+    /// valid [`ShardRunner`].
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[must_use]
+    pub fn shards_instantiated(&self) -> Vec<ShardId> {
+        self.runners.keys().copied().collect()
+    }
+
+    /// Returns the [`ShardRunnerInfo`] corresponding to each running shard.
+    ///
+    /// Note that the shard runner also holds a copy of its info, which is why each entry is
+    /// wrapped in `Arc<Mutex<T>>`.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    #[must_use]
+    pub fn runner_info(&self) -> HashMap<ShardId, Arc<Mutex<ShardRunnerInfo>>> {
+        self.runners.iter().map(|(&id, (runner, _))| (id, Arc::clone(runner))).collect()
     }
 
     /// Returns the gateway intents used for this gateway connection.
     #[must_use]
     pub fn intents(&self) -> GatewayIntents {
-        self.gateway_intents
-    }
-
-    pub async fn return_with_value(&self, ret: Result<(), GatewayError>) {
-        if let Err(e) = self.return_value_tx.lock().await.send(ret).await {
-            tracing::warn!("failed to send return value: {}", e);
-        }
-    }
-
-    pub fn shutdown_finished(&self, id: ShardId) {
-        if let Err(e) = self.shard_shutdown_send.unbounded_send(id) {
-            tracing::warn!("failed to notify about finished shutdown: {}", e);
-        }
-    }
-
-    pub async fn restart_shard(&self, shard_id: ShardId) {
-        self.restart(shard_id).await;
-        if let Err(e) = self.shard_shutdown_send.unbounded_send(shard_id) {
-            tracing::warn!("failed to notify about finished shutdown: {e}");
-        }
-    }
-
-    pub async fn update_shard_latency_and_stage(
-        &self,
-        id: ShardId,
-        latency: Option<Duration>,
-        stage: ConnectionStage,
-    ) {
-        if let Some(runner) = self.runners.lock().await.get_mut(&id) {
-            runner.latency = latency;
-            runner.stage = stage;
-        }
+        self.intents
     }
 }
 
 impl Drop for ShardManager {
     /// A custom drop implementation to clean up after the manager.
     ///
-    /// This shuts down all active [`ShardRunner`]s and attempts to tell the [`ShardQueuer`] to
-    /// shutdown.
+    /// This shuts down all active [`ShardRunner`]s.
     ///
     /// [`ShardRunner`]: super::ShardRunner
     fn drop(&mut self) {
-        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
+        info!("Shutting down all shards");
+
+        for (shard_id, (_, messenger)) in self.runners.drain() {
+            info!("Shutting down shard {}", shard_id);
+            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(1000)) {
+                warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
+            }
+        }
     }
 }
 
@@ -390,14 +363,25 @@ pub struct ShardManagerOptions {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     pub ws_url: Arc<str>,
+    pub compression: TransportCompression,
     pub shard_total: NonZeroU16,
+    pub max_concurrency: NonZeroU16,
+    pub wait_time_between_shard_start: Duration,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
-    pub max_concurrency: NonZeroU16,
-    /// Number of seconds to wait between starting each shard/set of shards start
-    pub wait_time_between_shard_start: Duration,
-    pub compression: TransportCompression,
+}
+
+/// A message indicating what action the [`ShardManager`] should take.
+pub enum ShardManagerMessage {
+    /// Indicates that the manager should attempt to start a shard.
+    ///
+    /// Note that this makes use of the manager's shard queue for batching shards together, and if
+    /// the queue is operating in concurrent mode (in order to start multiple shards at once),
+    /// the shard is not guaranteed to immediately start, until more shards are queued.
+    Boot(ShardId),
+    /// Indicates that a shard runner encountered a fatal error and the shard manager should quit.
+    Quit(GatewayError),
 }
