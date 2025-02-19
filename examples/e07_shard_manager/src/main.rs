@@ -52,21 +52,22 @@ async fn main() {
     let mut client =
         Client::builder(token, intents).event_handler(Handler).await.expect("Err creating client");
 
-    // Here we clone a lock to the Shard Manager, and then move it into a new thread. The thread
-    // will unlock the manager and print shards' status on a loop.
-    let manager = client.shard_manager.clone();
+    // Here we get a HashMap of of the shards' status that we move into a new thread. A separate
+    // tokio task holds the ownership to each entry, so each one will require acquiring a lock
+    // before reading.
+    let runners = client.shard_manager.runner_info();
 
     tokio::spawn(async move {
         loop {
             sleep(Duration::from_secs(30)).await;
 
-            let shard_runners = manager.runners.lock().await;
-
-            for (id, runner) in shard_runners.iter() {
-                println!(
-                    "Shard ID {} is {} with a latency of {:?}",
-                    id, runner.stage, runner.latency,
-                );
+            for (id, runner) in &runners {
+                if let Ok(runner) = runner.lock() {
+                    println!(
+                        "Shard ID {} is {} with a latency of {:?}",
+                        id, runner.stage, runner.latency,
+                    );
+                }
             }
         }
     });
