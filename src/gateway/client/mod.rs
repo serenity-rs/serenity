@@ -45,11 +45,11 @@ pub use self::event_handler::{EventHandler, FullEvent, RawEventHandler};
 use super::VoiceGatewayManager;
 use super::{
     ActivityData,
+    DEFAULT_WAIT_BETWEEN_SHARD_START,
     PresenceData,
     ShardManager,
     ShardManagerOptions,
     TransportCompression,
-    DEFAULT_WAIT_BETWEEN_SHARD_START,
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
@@ -394,9 +394,9 @@ impl IntoFuture for ClientBuilder {
 /// "ping-pong" bot is simple:
 ///
 /// ```no_run
+/// use serenity::Client;
 /// use serenity::model::prelude::*;
 /// use serenity::prelude::*;
-/// use serenity::Client;
 ///
 /// struct Handler;
 ///
@@ -741,11 +741,7 @@ impl Client {
             #[cfg(feature = "cache")]
             let cache_user_id = {
                 let cache_user = self.cache.current_user();
-                if cache_user.id == UserId::default() {
-                    None
-                } else {
-                    Some(cache_user.id)
-                }
+                if cache_user.id == UserId::default() { None } else { Some(cache_user.id) }
             };
 
             #[cfg(not(feature = "cache"))]

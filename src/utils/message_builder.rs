@@ -858,7 +858,7 @@ pub trait EmbedMessageBuilding {
     /// ```
     #[must_use]
     fn push_named_link<'a>(self, name: impl Into<Content<'a>>, url: impl Into<Content<'a>>)
-        -> Self;
+    -> Self;
 
     /// Pushes a named link intended for use in an embed, but with a normalized name to avoid
     /// escaping issues.
