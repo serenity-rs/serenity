@@ -41,10 +41,12 @@ pub enum Component {
     SelectMenu(SelectMenu),
     Section(Section),
     TextDisplay(TextDisplay),
+    Thumbnail(Thumbnail),
     MediaGallery(MediaGallery),
     Separator(Separator),
     File(FileComponent),
     Container(Container),
+    Unknown, // always update the macro below.
 }
 
 // TODO: add something like this to every variant.
@@ -55,7 +57,7 @@ pub enum Component {
 // TODO: use fixedstring is places i missed when i find suitable lengths
 
 impl<'de> Deserialize<'de> for Component {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
