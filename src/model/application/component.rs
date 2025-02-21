@@ -130,6 +130,7 @@ pub struct UnfurledMediaItem {
 pub enum SectionAccessory {
     Thumbnail(Thumbnail),
     Button(Button),
+    Unknown,
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -137,6 +138,7 @@ pub enum SectionAccessory {
 #[non_exhaustive]
 pub enum SectionComponent {
     TextDisplay(TextDisplay),
+    Unknown,
     // TODO: check others because i'm rushing this.
 }
 
