@@ -947,6 +947,9 @@ bitflags! {
         /// As of 2023-04-20, bots are currently not able to send voice messages
         /// ([source](https://github.com/discord/discord-api-docs/pull/6082)).
         const IS_VOICE_MESSAGE = 1 << 13;
+        /// TODO: document
+        /// for me: when enabled, content and embeds can't be used.
+        const IS_COMPONENTS_V2 = 1 << 15;
     }
 }
 

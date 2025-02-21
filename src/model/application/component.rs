@@ -19,8 +19,180 @@ enum_number! {
         RoleSelect = 6,
         MentionableSelect = 7,
         ChannelSelect = 8,
+        Section = 9,
+        TextDisplay = 10,
+        Thumbnail = 11,
+        MediaGallery = 12,
+        File = 13,
+        Separator = 14,
+        Container = 17,
         _ => Unknown(u8),
     }
+}
+
+// TODO: doc everything new :sob:
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub enum Component {
+    ActionRow(ActionRow),
+    Button(Button),
+    SelectMenu(SelectMenu),
+    Section(Section),
+    TextDisplay(TextDisplay),
+    MediaGallery(MediaGallery),
+    Separator(Separator),
+    File(FileComponent),
+    Container(Container),
+}
+
+// TODO: add something like this to every variant.
+// The component type, it will always be [`ComponentType::Thing`].
+// #[serde(rename = "type")]
+// pub kind: ComponentType,
+
+// TODO: use fixedstring is places i missed when i find suitable lengths
+
+impl<'de> Deserialize<'de> for Component {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct ComponentRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
+
+        let value = <&RawValue>::deserialize(deserializer)?;
+        let raw = ComponentRaw::deserialize(value).map_err(DeError::custom)?;
+
+        match raw.kind {
+            ComponentType::ActionRow => Deserialize::deserialize(value).map(Component::ActionRow),
+            ComponentType::Button => Deserialize::deserialize(value).map(Component::Button),
+            ComponentType::StringSelect
+            | ComponentType::UserSelect
+            | ComponentType::RoleSelect
+            | ComponentType::MentionableSelect
+            | ComponentType::ChannelSelect => {
+                Deserialize::deserialize(value).map(Component::SelectMenu)
+            },
+            ComponentType::Section => Deserialize::deserialize(value).map(Component::Section),
+            ComponentType::TextDisplay => {
+                Deserialize::deserialize(value).map(Component::TextDisplay)
+            },
+            ComponentType::MediaGallery => {
+                Deserialize::deserialize(value).map(Component::MediaGallery)
+            },
+            ComponentType::Separator => Deserialize::deserialize(value).map(Component::Separator),
+            ComponentType::File => Deserialize::deserialize(value).map(Component::File),
+            ComponentType::Container => Deserialize::deserialize(value).map(Component::Container),
+            // TODO: maybe just not include it so the deserialization doesn't explode.
+            // With all new component types right now, the ENTIRE message won't deserialize.
+            // I need to do other stuff in other places too so that its as resilent as possible, it
+            // should not die when discord adds new stuff.
+            _ => Err(DeError::custom("Unknown component type")),
+        }
+        .map_err(DeError::custom)
+    }
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Section {
+    components: FixedArray<TextDisplay>,
+    accessory: SectionAccessory,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Thumbnail {
+    media: UnfurledMediaItem,
+    description: Option<String>,
+    spoiler: Option<bool>,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct UnfurledMediaItem {
+    url: String,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub enum SectionAccessory {
+    Thumbnail(Thumbnail),
+    Button(Button),
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub enum SectionComponent {
+    TextDisplay(TextDisplay),
+    // TODO: check others because i'm rushing this.
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct TextDisplay {
+    content: String,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MediaGallery {
+    items: FixedArray<MediaGalleryItem>,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MediaGalleryItem {
+    media: UnfurledMediaItem,
+    description: Option<String>,
+    spoiler: Option<bool>,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Separator {
+    divider: Option<bool>,
+    spacing: Option<SeparatorSpacingSize>,
+}
+
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum SeparatorSpacingSize {
+        Small = 1,
+        Large = 2,
+        _ => Unknown(u8),
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct FileComponent {
+    file: UnfurledMediaItem,
+    spoiler: Option<bool>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Container {
+    accent_color: Option<u32>,
+    spoiler: Option<bool>,
+    components: FixedArray<Component>,
 }
 
 /// An action row.
