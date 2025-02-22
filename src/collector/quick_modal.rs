@@ -1,6 +1,12 @@
 use std::borrow::Cow;
 
-use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
+use crate::builder::{
+    CreateActionRow,
+    CreateComponent,
+    CreateInputText,
+    CreateInteractionResponse,
+    CreateModal,
+};
 use crate::collector::ModalInteractionCollector;
 use crate::gateway::client::Context;
 use crate::internal::prelude::*;
@@ -91,7 +97,9 @@ impl<'a> CreateQuickModal<'a> {
                     .into_iter()
                     .enumerate()
                     .map(|(i, input_text)| {
-                        CreateActionRow::InputText(input_text.custom_id(i.to_string()))
+                        CreateComponent::ActionRow(CreateActionRow::InputText(
+                            input_text.custom_id(i.to_string()),
+                        ))
                     })
                     .collect::<Vec<_>>(),
             ),

@@ -4,6 +4,15 @@ use serde::Serialize;
 
 use crate::model::prelude::*;
 
+#[derive(Clone, Debug)]
+struct StaticU8<const VAL: u8>;
+
+impl<const VAL: u8> Serialize for StaticU8<VAL> {
+    fn serialize<S: serde::Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
+        ser.serialize_u8(VAL)
+    }
+}
+
 /// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
@@ -44,6 +53,131 @@ impl serde::Serialize for CreateActionRow<'_> {
         }
 
         map.end()
+    }
+}
+
+/// TODO: doc
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+pub enum CreateComponent<'a> {
+    /// A regular action row, a V1 component.
+    ActionRow(CreateActionRow<'a>),
+    /// A section, V2 component.
+    Section(CreateSection<'a>),
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateSection<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<9>,
+    // so i gotta include a type to all of these so discord can serialize properly.
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    components: Cow<'a, [CreateSectionComponent<'a>]>,
+    accessory: CreateSectionAccessory<'a>,
+}
+
+impl<'a> CreateSection<'a> {
+    // TODO: change type
+    pub fn new(
+        components: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>,
+        accessory: CreateSectionAccessory<'a>,
+    ) -> Self {
+        CreateSection {
+            kind: StaticU8::<9>,
+            components: components.into(),
+            accessory,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+pub enum CreateSectionComponent<'a> {
+    TextDisplay(CreateTextDisplay<'a>),
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateTextDisplay<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<10>,
+    content: Cow<'a, str>,
+}
+
+impl<'a> CreateTextDisplay<'a> {
+    pub fn new(content: impl Into<Cow<'a, str>>) -> Self {
+        CreateTextDisplay {
+            kind: StaticU8::<10>,
+            content: content.into(),
+        }
+    }
+
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
+        self.content = content.into();
+        self
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+pub enum CreateSectionAccessory<'a> {
+    // Thumbnail(CreateThumbnail<'a>),
+    // TODO: check if it actually still is unsupported here, docs say it will be supported.
+    Button(CreateButton<'a>),
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateThumbnail<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<11>,
+    media: CreateUnfurledMediaItem<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+}
+
+impl<'a> CreateThumbnail<'a> {
+    pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
+        CreateThumbnail {
+            kind: StaticU8::<11>,
+            media,
+            description: None,
+            spoiler: None,
+        }
+    }
+
+    pub fn media(mut self, media: CreateUnfurledMediaItem<'a>) -> Self {
+        self.media = media;
+        self
+    }
+
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Default)]
+#[must_use]
+pub struct CreateUnfurledMediaItem<'a> {
+    url: Cow<'a, str>,
+}
+
+impl<'a> CreateUnfurledMediaItem<'a> {
+    pub fn url(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+        self.url = url.into();
+        self
     }
 }
 

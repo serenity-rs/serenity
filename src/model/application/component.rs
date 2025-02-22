@@ -46,7 +46,8 @@ pub enum Component {
     Separator(Separator),
     File(FileComponent),
     Container(Container),
-    Unknown, // always update the macro below.
+    Unknown,
+    // always update the macro below.
 }
 
 // TODO: add something like this to every variant.
