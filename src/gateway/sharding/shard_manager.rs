@@ -141,16 +141,18 @@ impl ShardManager {
         shard_init: u16,
         shard_total: NonZeroU16,
     ) -> Result<(), GatewayError> {
-        self.initialize(shard_index, shard_init, shard_total).await;
+        self.initialize(shard_index, shard_init, shard_total);
         loop {
             if let Ok(Some(msg)) =
                 timeout(self.wait_time_between_shard_start, self.manager_rx.next()).await
             {
                 match msg {
-                    ShardManagerMessage::Boot(shard_id) => self.boot(shard_id, false).await,
+                    ShardManagerMessage::Boot(shard_id) => self.queue_for_start(shard_id),
                     ShardManagerMessage::Quit(err) => return Err(err),
                 }
             }
+            let batch = self.queue.pop_batch();
+            self.checked_start(batch).await;
         }
     }
 
@@ -159,24 +161,20 @@ impl ShardManager {
     /// Note that this queues all shards but does not actually start them. To start the manager's
     /// event loop and dispatch [`ShardRunner`]s as they get queued, call [`Self::run`] instead.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
+    pub fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         let shard_to = shard_index + shard_init;
 
         self.shard_total = shard_total;
         for shard_id in shard_index..shard_to {
-            self.boot(ShardId(shard_id), true).await;
+            self.queue_for_start(ShardId(shard_id));
         }
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn boot(&mut self, shard_id: ShardId, concurrent: bool) {
+    fn queue_for_start(&mut self, shard_id: ShardId) {
         info!("Queueing shard {shard_id} for starting");
 
         self.queue.push_back(shard_id);
-        self.queue.set_concurrent(concurrent);
-        if let Some(batch) = self.queue.pop_batch() {
-            self.checked_start(batch).await;
-        }
     }
 
     /// Restarts a shard runner.
