@@ -186,6 +186,7 @@ enum_number! {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
 pub struct FileComponent {
     file: UnfurledMediaItem,
@@ -193,6 +194,7 @@ pub struct FileComponent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
 pub struct Container {
     accent_color: Option<Colour>,
