@@ -195,7 +195,7 @@ pub struct FileComponent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Container {
-    accent_color: Option<u32>,
+    accent_color: Option<Colour>,
     spoiler: Option<bool>,
     components: FixedArray<Component>,
 }

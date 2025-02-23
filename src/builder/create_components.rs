@@ -72,7 +72,6 @@ pub enum CreateComponent<'a> {
 pub struct CreateSection<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<9>,
-    // so i gotta include a type to all of these so discord can serialize properly.
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
     components: Cow<'a, [CreateSectionComponent<'a>]>,
     accessory: CreateSectionAccessory<'a>,
@@ -125,8 +124,7 @@ impl<'a> CreateTextDisplay<'a> {
 #[must_use]
 #[serde(untagged)]
 pub enum CreateSectionAccessory<'a> {
-    // Thumbnail(CreateThumbnail<'a>),
-    // TODO: check if it actually still is unsupported here, docs say it will be supported.
+    Thumbnail(CreateThumbnail<'a>),
     Button(CreateButton<'a>),
 }
 
@@ -175,9 +173,152 @@ pub struct CreateUnfurledMediaItem<'a> {
 }
 
 impl<'a> CreateUnfurledMediaItem<'a> {
+    pub fn new(url: impl Into<Cow<'a, str>>) -> Self {
+        CreateUnfurledMediaItem {
+            url: url.into(),
+        }
+    }
+
     pub fn url(mut self, url: impl Into<Cow<'a, str>>) -> Self {
         self.url = url.into();
         self
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateMediaGallery<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<12>,
+    items: Cow<'a, [CreateSectionComponent<'a>]>,
+}
+
+impl<'a> CreateMediaGallery<'a> {
+    pub fn new(items: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>) -> Self {
+        CreateMediaGallery {
+            kind: StaticU8::<12>,
+            items: items.into(),
+        }
+    }
+
+    pub fn items(mut self, items: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>) -> Self {
+        self.items = items.into();
+        self
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Default)]
+#[must_use]
+pub struct CreateMediaGalleryItem<'a> {
+    media: CreateUnfurledMediaItem<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateFile<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<13>,
+    file: CreateUnfurledMediaItem<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+}
+
+impl<'a> CreateFile<'a> {
+    pub fn new(file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
+        CreateFile {
+            kind: StaticU8::<13>,
+            file: file.into(),
+            spoiler: None,
+        }
+    }
+
+    // Only supports attachment:// format.
+    pub fn file(mut self, file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
+        self.file = file.into();
+        self
+    }
+
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateSeparator {
+    #[serde(rename = "type")]
+    kind: StaticU8<14>,
+    divider: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spacing: Option<Spacing>,
+}
+
+impl CreateSeparator {
+    pub fn new(divider: bool) -> Self {
+        CreateSeparator {
+            kind: StaticU8::<14>,
+            divider,
+            spacing: None,
+        }
+    }
+
+    pub fn spacing(mut self, spacing: Spacing) -> Self {
+        self.spacing = Some(spacing);
+        self
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateContainer<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<17>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    accent_color: Option<Colour>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+    components: Cow<'a, [CreateComponent<'a>]>,
+}
+
+impl<'a> CreateContainer<'a> {
+    pub fn new(components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+        CreateContainer {
+            kind: StaticU8::<17>,
+            accent_color: None,
+            spoiler: None,
+            components: components.into(),
+        }
+    }
+
+    pub fn accent_color(mut self, accent_color: Colour) -> Self {
+        self.accent_color = Some(accent_color);
+        self
+    }
+
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
+
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+        self.components = components.into();
+        self
+    }
+}
+
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum Spacing {
+        Small = 1,
+        Large = 2,
+        _ => Unknown(u8),
     }
 }
 
