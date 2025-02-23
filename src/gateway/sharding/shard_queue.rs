@@ -9,7 +9,6 @@ use crate::internal::prelude::*;
 #[must_use]
 pub struct ShardQueue {
     buckets: FixedArray<VecDeque<ShardId>, u16>,
-    concurrent: bool,
 }
 
 impl ShardQueue {
@@ -19,7 +18,6 @@ impl ShardQueue {
 
         Self {
             buckets,
-            concurrent: false,
         }
     }
 
@@ -40,21 +38,7 @@ impl ShardQueue {
     }
 
     /// Pops a `ShardId` from every bucket containing at least one and returns them all as a `Vec`.
-    ///
-    /// If the queue is in concurrent mode, calling this will only return `Some` if all buckets are
-    /// filled and a maximally-sized batch can be popped, otherwise will return `None`.
-    ///
-    /// If the queue is _not_ in concurrent mode, this will return `Some` as long as at least one
-    /// bucket is filled.
-    pub fn pop_batch(&mut self) -> Option<Vec<ShardId>> {
-        if self.concurrent && !self.buckets.iter().all(|b| !b.is_empty()) {
-            None
-        } else {
-            Some(self.buckets.iter_mut().filter_map(VecDeque::pop_front).collect())
-        }
-    }
-
-    pub fn set_concurrent(&mut self, concurrent: bool) {
-        self.concurrent = concurrent;
+    pub fn pop_batch(&mut self) -> Vec<ShardId> {
+        self.buckets.iter_mut().filter_map(VecDeque::pop_front).collect()
     }
 }
