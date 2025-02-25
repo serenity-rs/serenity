@@ -3,7 +3,7 @@ use std::fmt;
 #[cfg(feature = "model")]
 use futures::stream::Stream;
 #[cfg(feature = "model")]
-use nonmax::{NonMaxU16, NonMaxU8};
+use nonmax::{NonMaxU8, NonMaxU16};
 
 #[cfg(feature = "model")]
 use crate::builder::{

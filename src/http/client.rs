@@ -6,11 +6,11 @@ use std::cell::Cell;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use arrayvec::ArrayVec;
-use nonmax::{NonMaxU16, NonMaxU8};
-use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use reqwest::header::{HeaderMap as Headers, HeaderValue};
+use nonmax::{NonMaxU8, NonMaxU16};
+use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
 #[cfg(feature = "utils")]
 use reqwest::Url;
+use reqwest::header::{HeaderMap as Headers, HeaderValue};
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::ser::SerializeSeq as _;
@@ -264,11 +264,7 @@ impl Http {
 
     pub fn application_id(&self) -> Option<ApplicationId> {
         let application_id = self.application_id.load(Ordering::Acquire);
-        if application_id == u64::MAX {
-            None
-        } else {
-            Some(ApplicationId::new(application_id))
-        }
+        if application_id == u64::MAX { None } else { Some(ApplicationId::new(application_id)) }
     }
 
     fn try_application_id(&self) -> Result<ApplicationId> {
@@ -304,11 +300,7 @@ impl Http {
             })
             .await?;
 
-        if response.status() == 204 {
-            Ok(None)
-        } else {
-            Ok(Some(response.json().await?))
-        }
+        if response.status() == 204 { Ok(None) } else { Ok(Some(response.json().await?)) }
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -4711,7 +4703,9 @@ impl Http {
         if status.is_success() {
             if status != StatusCode::NO_CONTENT {
                 let route = route.path();
-                warn!("Mismatched successful response status from {route}! Expected 'No Content' but got {status}");
+                warn!(
+                    "Mismatched successful response status from {route}! Expected 'No Content' but got {status}"
+                );
             }
 
             return Ok(());

@@ -7,7 +7,7 @@ use std::str::FromStr;
 #[cfg(feature = "model")]
 use nonmax::NonMaxU8;
 #[cfg(feature = "http")]
-use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
+use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeMap, Serializer};
 #[cfg(feature = "model")]

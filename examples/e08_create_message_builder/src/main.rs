@@ -1,8 +1,8 @@
 use serenity::async_trait;
 use serenity::builder::{CreateAttachment, CreateEmbed, CreateEmbedFooter, CreateMessage};
+use serenity::model::Timestamp;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
-use serenity::model::Timestamp;
 use serenity::prelude::*;
 
 struct Handler;

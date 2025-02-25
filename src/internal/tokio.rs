@@ -1,7 +1,4 @@
 #[cfg(feature = "http")]
-use std::future::Future;
-
-#[cfg(feature = "http")]
 pub fn spawn_named<F, T>(_name: &str, future: F) -> tokio::task::JoinHandle<T>
 where
     F: Future<Output = T> + Send + 'static,
