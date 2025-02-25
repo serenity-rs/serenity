@@ -1,6 +1,6 @@
 use std::fmt;
 
-use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8};
+use nonmax::{NonMaxU8, NonMaxU16, NonMaxU32};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -398,11 +398,7 @@ impl GuildChannel {
                 .iter()
                 .filter_map(|v| {
                     v.channel_id.and_then(|c| {
-                        if c == self.id {
-                            guild.members.get(&v.user_id).cloned()
-                        } else {
-                            None
-                        }
+                        if c == self.id { guild.members.get(&v.user_id).cloned() } else { None }
                     })
                 })
                 .collect()),

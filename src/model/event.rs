@@ -3,8 +3,8 @@
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
-use serde::de::Error as DeError;
 use serde::Serialize;
+use serde::de::Error as DeError;
 use serde_json::value::RawValue;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
 

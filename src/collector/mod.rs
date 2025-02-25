@@ -33,10 +33,11 @@ use crate::model::prelude::*;
 ///     .await;
 /// # }
 /// ```
-pub fn collect<T: Send + 'static>(
-    shard: &ShardMessenger,
-    extractor: impl Fn(&Event) -> Option<T> + Send + Sync + 'static,
-) -> impl Stream<Item = T> {
+pub fn collect<T, F>(shard: &ShardMessenger, extractor: F) -> impl Stream<Item = T> + use<T, F>
+where
+    T: Send + 'static,
+    F: Fn(&Event) -> Option<T> + Send + Sync + 'static,
+{
     let (sender, mut receiver) = tokio::sync::mpsc::unbounded_channel();
 
     // Register an event callback in the shard. It's kept alive as long as we return `true`
@@ -138,7 +139,7 @@ macro_rules! make_specific_collector {
             }
         }
 
-        impl std::future::IntoFuture for $collector_type {
+        impl IntoFuture for $collector_type {
             type Output = Option<$item_type>;
             type IntoFuture = futures::future::BoxFuture<'static, Self::Output>;
 

@@ -1,7 +1,7 @@
 //! Representations of voice information.
 
-use serde::de::{Deserialize, Deserializer};
 use serde::Serialize;
+use serde::de::{Deserialize, Deserializer};
 
 use crate::model::prelude::*;
 

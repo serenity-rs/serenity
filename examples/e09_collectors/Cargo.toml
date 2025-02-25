@@ -2,7 +2,7 @@
 name = "e09_collectors"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
-edition = "2018"
+edition.workspace = true
 
 [dependencies.serenity]
 features = ["collector", "framework", "rustls_backend"]

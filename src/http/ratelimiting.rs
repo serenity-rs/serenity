@@ -44,7 +44,7 @@ use dashmap::DashMap;
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
 use tokio::sync::Mutex;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 use tracing::debug;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;

@@ -4,9 +4,9 @@ use std::hash::Hash;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 
+use dashmap::DashMap;
 use dashmap::mapref::multiple::RefMulti;
 use dashmap::mapref::one::{Ref, RefMut};
-use dashmap::DashMap;
 #[cfg(feature = "typesize")]
 use typesize::TypeSize;
 
@@ -128,7 +128,7 @@ impl<T> MaybeOwnedArc<T> {
 
     pub(crate) fn get_inner(self) -> Arc<T> {
         #[cfg(feature = "typesize")]
-        let inner = self.0 .0;
+        let inner = self.0.0;
         #[cfg(not(feature = "typesize"))]
         let inner = self.0;
 

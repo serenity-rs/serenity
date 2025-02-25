@@ -10,13 +10,13 @@ use super::{
     PingInteraction,
 };
 use crate::internal::prelude::*;
+use crate::model::Permissions;
 #[cfg(not(feature = "unstable"))]
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, GuildId, InteractionId, MessageId, UserId};
 use crate::model::monetization::Entitlement;
 use crate::model::user::User;
-use crate::model::utils::{deserialize_val, remove_from_map, StrOrInt};
-use crate::model::Permissions;
+use crate::model::utils::{StrOrInt, deserialize_val, remove_from_map};
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -541,7 +541,9 @@ impl serde::Serialize for MessageInteractionMetadata {
                 serialize_with_type(serializer, val, InteractionType::Modal)
             },
             &MessageInteractionMetadata::Unknown(InteractionType(kind)) => {
-                tracing::warn!("Tried to serialize MessageInteractionMetadata::Unknown({kind}), serialising null instead");
+                tracing::warn!(
+                    "Tried to serialize MessageInteractionMetadata::Unknown({kind}), serialising null instead"
+                );
                 serializer.serialize_none()
             },
         }

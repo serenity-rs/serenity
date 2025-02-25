@@ -2,15 +2,15 @@ use std::env::consts;
 use std::io::Read;
 use std::time::SystemTime;
 
-use flate2::read::ZlibDecoder;
 #[cfg(feature = "transport_compression_zlib")]
 use flate2::Decompress as ZlibInflater;
+use flate2::read::ZlibDecoder;
 use futures::{SinkExt, StreamExt};
 use tokio::net::TcpStream;
-use tokio::time::{timeout, Duration};
+use tokio::time::{Duration, timeout};
 use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
 use tokio_tungstenite::tungstenite::{Error as WsError, Message};
-use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
+use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async_with_config};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, trace, warn};
@@ -164,7 +164,7 @@ impl Compression {
                         Ok(0) => break,
                         Ok(_hint) => {},
                         Err(code) => {
-                            return Err(Error::Gateway(GatewayError::DecompressZstd(code)))
+                            return Err(Error::Gateway(GatewayError::DecompressZstd(code)));
                         },
                     }
 

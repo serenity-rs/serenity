@@ -53,7 +53,6 @@
 #![forbid(unsafe_code)]
 #![warn(
     unused,
-    rust_2018_idioms,
     clippy::unwrap_used,
     clippy::clone_on_ref_ptr,
     clippy::non_ascii_literal,

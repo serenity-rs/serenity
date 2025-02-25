@@ -3,7 +3,7 @@ use std::fmt;
 use std::io::Error as IoError;
 
 #[cfg(feature = "http")]
-use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
+use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "gateway")]
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "tracing_instrument")]
