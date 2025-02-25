@@ -66,10 +66,10 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
             | ComponentType::MentionableSelect
             | ComponentType::ChannelSelect => from_value(value).map(ActionRowComponent::SelectMenu),
             ComponentType::ActionRow => {
-                return Err(DeError::custom("Invalid component type ActionRow"))
+                return Err(DeError::custom("Invalid component type ActionRow"));
             },
             ComponentType(i) => {
-                return Err(DeError::custom(format_args!("Unknown component type {i}")))
+                return Err(DeError::custom(format_args!("Unknown component type {i}")));
             },
         }
         .map_err(DeError::custom)

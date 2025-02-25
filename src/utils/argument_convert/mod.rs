@@ -124,7 +124,7 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 /// ```
 #[must_use]
 pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
-    use aformat::{aformat, CapStr};
+    use aformat::{CapStr, aformat};
 
     for domain in DOMAINS {
         let prefix = aformat!("https://{}/channels/", CapStr::<MAX_DOMAIN_LEN>(domain));
@@ -163,7 +163,7 @@ pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
 /// ```
 #[must_use]
 pub fn parse_channel_url(s: &str) -> Option<(GuildId, ChannelId)> {
-    use aformat::{aformat, CapStr};
+    use aformat::{CapStr, aformat};
 
     for domain in DOMAINS {
         let prefix = aformat!("https://{}/channels/", CapStr::<MAX_DOMAIN_LEN>(domain));

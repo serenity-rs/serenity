@@ -60,7 +60,7 @@ impl Default for ContentSafeOptions {
 /// ```rust
 /// # let cache = serenity::cache::Cache::default();
 /// # let guild = serenity::model::guild::Guild::default();
-/// use serenity::utils::{content_safe, ContentSafeOptions};
+/// use serenity::utils::{ContentSafeOptions, content_safe};
 ///
 /// let with_mention = "@everyone";
 /// let without_mention = content_safe(&guild, &with_mention, ContentSafeOptions::default(), &[]);
@@ -73,7 +73,7 @@ impl Default for ContentSafeOptions {
 /// ```rust
 /// use serenity::cache::Cache;
 /// use serenity::model::channel::Message;
-/// use serenity::utils::{content_safe, ContentSafeOptions};
+/// use serenity::utils::{ContentSafeOptions, content_safe};
 ///
 /// fn filter_message(cache: &Cache, message: &Message) -> String {
 ///     if let Some(guild) = message.guild(cache) {

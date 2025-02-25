@@ -1,5 +1,4 @@
 use std::borrow::Cow;
-use std::future::Future;
 
 use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
 use crate::collector::ModalInteractionCollector;
