@@ -2,9 +2,9 @@ use std::sync::{Arc, Mutex};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio_tungstenite::tungstenite;
+use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
-use tokio_tungstenite::tungstenite::Message;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, error, trace, warn};
@@ -23,10 +23,10 @@ use super::{
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::client::dispatch::dispatch_model;
-use crate::gateway::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
+use crate::gateway::client::dispatch::dispatch_model;
+use crate::gateway::client::{Context, EventHandler, RawEventHandler};
 use crate::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -158,10 +158,10 @@ impl ShardRunner {
                     ShardAction::Heartbeat => {
                         if let Err(e) = self.shard.heartbeat().await {
                             debug!(
-                            "[ShardRunner {:?}] Reconnecting due to error while heartbeating: {:?}",
-                            self.shard.shard_info(),
-                            e
-                        );
+                                "[ShardRunner {:?}] Reconnecting due to error while heartbeating: {:?}",
+                                self.shard.shard_info(),
+                                e
+                            );
                             if !self.reconnect().await {
                                 return Ok(());
                             }
@@ -170,10 +170,10 @@ impl ShardRunner {
                     ShardAction::Identify => {
                         if let Err(e) = self.shard.identify().await {
                             debug!(
-                            "[ShardRunner {:?}] Reconnecting due to error while identifying: {:?}",
-                            self.shard.shard_info(),
-                            e
-                        );
+                                "[ShardRunner {:?}] Reconnecting due to error while identifying: {:?}",
+                                self.shard.shard_info(),
+                                e
+                            );
                             if !self.reconnect().await {
                                 return Ok(());
                             }

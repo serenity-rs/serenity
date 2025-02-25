@@ -17,14 +17,14 @@ pub use tokio::sync::{Mutex, RwLock};
 
 pub use crate::error::Error as SerenityError;
 #[cfg(feature = "gateway")]
-pub use crate::gateway::client::{Client, Context, EventHandler, RawEventHandler};
-#[cfg(feature = "gateway")]
 pub use crate::gateway::GatewayError;
+#[cfg(feature = "gateway")]
+pub use crate::gateway::client::{Client, Context, EventHandler, RawEventHandler};
 #[cfg(feature = "http")]
 pub use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 pub use crate::http::HttpError;
 pub use crate::model::mention::Mentionable;
 #[cfg(feature = "model")]
-pub use crate::model::{gateway::GatewayIntents, ModelError};
+pub use crate::model::{ModelError, gateway::GatewayIntents};
 pub use crate::secrets::Token;

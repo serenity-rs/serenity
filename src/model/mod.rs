@@ -79,6 +79,8 @@ pub mod prelude {
     };
     #[doc(hidden)]
     pub use super::{
+        ModelError,
+        Timestamp,
         application::*,
         channel::*,
         colour::*,
@@ -97,8 +99,6 @@ pub mod prelude {
         user::*,
         voice::*,
         webhook::*,
-        ModelError,
-        Timestamp,
     };
     pub(crate) use crate::internal::prelude::*;
 }

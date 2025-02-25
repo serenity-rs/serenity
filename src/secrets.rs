@@ -4,7 +4,7 @@ use std::fmt;
 use std::str::FromStr;
 use std::sync::Arc;
 
-use aformat::{aformat, CapStr};
+use aformat::{CapStr, aformat};
 
 /// A cheaply clonable, zeroed on drop, String.
 ///
