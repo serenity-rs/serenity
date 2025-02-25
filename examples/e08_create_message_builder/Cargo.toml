@@ -2,7 +2,7 @@
 name = "e08_create_message_builder"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
-edition = "2018"
+edition.workspace = true
 
 [dependencies]
 serenity = { path = "../../", default-features = false, features = ["gateway", "model", "chrono", "rustls_backend"] }
