@@ -2,7 +2,7 @@
 name = "e07_shard_manager"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
-edition = "2018"
+edition.workspace = true
 
 [dependencies]
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread", "time"] }

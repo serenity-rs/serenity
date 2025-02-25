@@ -1265,7 +1265,7 @@ mod test {
 
         use crate::model::prelude::*;
 
-        fn gen_member() -> Member {
+        fn get_member() -> Member {
             Member {
                 nick: Some(FixedString::from_static_trunc("aaaa")),
                 user: User {
@@ -1277,8 +1277,8 @@ mod test {
             }
         }
 
-        fn gen() -> Guild {
-            let m = gen_member();
+        fn get_guild() -> Guild {
+            let m = get_member();
 
             Guild {
                 members: ExtractMap::from_iter([m]),
@@ -1288,18 +1288,18 @@ mod test {
 
         #[test]
         fn member_named_username() {
-            let guild = gen();
+            let guild = get_guild();
             let lhs = guild.member_named("test#1432").unwrap().display_name();
 
-            assert_eq!(lhs, gen_member().display_name());
+            assert_eq!(lhs, get_member().display_name());
         }
 
         #[test]
         fn member_named_nickname() {
-            let guild = gen();
+            let guild = get_guild();
             let lhs = guild.member_named("aaaa").unwrap().display_name();
 
-            assert_eq!(lhs, gen_member().display_name());
+            assert_eq!(lhs, get_member().display_name());
         }
     }
 }

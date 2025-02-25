@@ -39,7 +39,7 @@ use std::time::{Duration as StdDuration, Instant};
 
 #[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
 use aformat::aformat_into;
-use aformat::{aformat, ArrayString, CapStr};
+use aformat::{ArrayString, CapStr, aformat};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 #[cfg(feature = "tracing_instrument")]
@@ -48,10 +48,10 @@ use tracing::{debug, error, info, trace, warn};
 use url::Url;
 
 pub use self::shard_manager::{
+    DEFAULT_WAIT_BETWEEN_SHARD_START,
     ShardManager,
     ShardManagerMessage,
     ShardManagerOptions,
-    DEFAULT_WAIT_BETWEEN_SHARD_START,
 };
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queue::ShardQueue;

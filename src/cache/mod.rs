@@ -32,8 +32,8 @@ use std::sync::Arc;
 #[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
-use dashmap::mapref::one::{MappedRef, Ref};
 use dashmap::DashMap;
+use dashmap::mapref::one::{MappedRef, Ref};
 #[cfg(feature = "temp_cache")]
 use mini_moka::sync::Cache as MokaCache;
 use parking_lot::RwLock;

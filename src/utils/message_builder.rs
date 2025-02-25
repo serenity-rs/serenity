@@ -858,7 +858,7 @@ pub trait EmbedMessageBuilding {
     /// ```
     #[must_use]
     fn push_named_link<'a>(self, name: impl Into<Content<'a>>, url: impl Into<Content<'a>>)
-        -> Self;
+    -> Self;
 
     /// Pushes a named link intended for use in an embed, but with a normalized name to avoid
     /// escaping issues.
@@ -1102,7 +1102,7 @@ mod test {
     use super::MessageBuilder;
     use crate::model::prelude::*;
 
-    macro_rules! gen {
+    macro_rules! generate {
         ($($fn:ident => [$($text:expr => $expected:expr),+]),+) => ({
             $(
                 $(
@@ -1217,7 +1217,7 @@ mod test {
 
     #[test]
     fn push_safe() {
-        gen! {
+        generate! {
             push_safe => [
                 "" => "",
                 "foo" => "foo",
@@ -1293,7 +1293,7 @@ mod test {
 
     #[test]
     fn push_unsafe() {
-        gen! {
+        generate! {
             push_bold => [
                 "a" => "**a**",
                 "" => "****",

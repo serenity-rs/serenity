@@ -4,7 +4,7 @@ use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
 
-use aformat::{aformat_into, ArrayString, ToArrayString};
+use aformat::{ArrayString, ToArrayString, aformat_into};
 
 use super::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]

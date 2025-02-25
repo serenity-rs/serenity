@@ -2,7 +2,7 @@ use std::error::Error as StdError;
 use std::fmt;
 use std::str::FromStr;
 
-use aformat::{aformat_into, ArrayString, ToArrayString};
+use aformat::{ArrayString, ToArrayString, aformat_into};
 
 use crate::model::Timestamp;
 
