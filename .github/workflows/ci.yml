@@ -3,8 +3,8 @@ name: CI
 on: [push, pull_request]
 
 env:
-  rust_min: 1.82.0
-  rust_nightly: nightly-2024-11-01
+  rust_min: 1.85.0
+  rust_nightly: nightly-2025-02-19
 
 jobs:
   test:
@@ -164,14 +164,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
-
-      - name: Pin problematic dependencies to working versions
-        run: |
-          cargo update ed25519-dalek --precise 2.1.1
-          cargo update idna_adapter --precise 1.1.0
-          cargo update base64ct --precise 1.7.3
-          cargo update deranged --precise 0.5.3
-          cargo update time --precise 0.3.40
 
       - name: Check
         run: cargo check --features full

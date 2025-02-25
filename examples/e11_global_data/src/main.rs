@@ -1,8 +1,8 @@
 //! In this example, you will be shown how to share data between events.
 
 use std::borrow::Cow;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use serenity::async_trait;
 use serenity::model::channel::Message;
@@ -42,7 +42,9 @@ impl EventHandler for Handler {
 
         if msg.content.starts_with("~owo_count") {
             let response = if owo_count == 1 {
-                Cow::Borrowed("You are the first one to say owo this session! *because it's on the command name* :P")
+                Cow::Borrowed(
+                    "You are the first one to say owo this session! *because it's on the command name* :P",
+                )
             } else {
                 Cow::Owned(format!("OWO Has been said {owo_count} times!"))
             };

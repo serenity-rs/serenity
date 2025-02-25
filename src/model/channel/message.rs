@@ -14,7 +14,7 @@ use crate::constants;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
-use crate::model::utils::{deserialize_components, discord_colours, StrOrInt};
+use crate::model::utils::{StrOrInt, deserialize_components, discord_colours};
 
 /// A representation of a message over a guild's text channel, a group, or a private channel.
 ///
@@ -1134,8 +1134,8 @@ mod tests {
         User,
         UserId,
     };
-    use crate::cache::wrappers::MaybeMap;
     use crate::cache::Cache;
+    use crate::cache::wrappers::MaybeMap;
 
     fn new_extract_map<K, T>(val: T) -> ExtractMap<K, T>
     where

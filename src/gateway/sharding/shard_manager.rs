@@ -5,8 +5,8 @@ use std::sync::OnceLock;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
+use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio::time::{sleep, timeout};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
@@ -27,9 +27,9 @@ use super::{
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
+use crate::gateway::client::{EventHandler, RawEventHandler};
 use crate::gateway::{ConnectionStage, GatewayError, PresenceData, TransportCompression};
 use crate::http::Http;
 use crate::internal::prelude::*;

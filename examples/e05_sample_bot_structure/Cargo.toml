@@ -2,7 +2,7 @@
 name = "e05_sample_bot_structure"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
-edition = "2021"
+edition.workspace = true
 
 [dependencies]
 serenity = { path = "../../", default-features = false, features = ["collector", "rustls_backend"] }

@@ -1,11 +1,11 @@
 use std::fmt::Write;
 
 use reqwest::header::{
-    HeaderMap as Headers,
-    HeaderValue,
     AUTHORIZATION,
     CONTENT_LENGTH,
     CONTENT_TYPE,
+    HeaderMap as Headers,
+    HeaderValue,
     USER_AGENT,
 };
 use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
