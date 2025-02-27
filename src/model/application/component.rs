@@ -1,3 +1,4 @@
+use nonmax::NonMaxU32;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
 use serde_json::value::RawValue;
@@ -52,10 +53,6 @@ pub enum Component {
 
 // TODO: add something like this to every variant.
 // The component type, it will always be [`ComponentType::Thing`].
-// #[serde(rename = "type")]
-// pub kind: ComponentType,
-
-// TODO: use fixedstring is places i missed when i find suitable lengths
 
 impl<'de> Deserialize<'de> for Component {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
@@ -114,15 +111,50 @@ pub struct Section {
 #[non_exhaustive]
 pub struct Thumbnail {
     media: UnfurledMediaItem,
-    description: Option<String>,
+    description: Option<FixedString<u16>>,
     spoiler: Option<bool>,
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[serde(untagged)]
+pub enum MediaItem {
+    Resolved(ResolvedUnfurledMediaItem),
+    Unresolved(UnfurledMediaItem),
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct UnfurledMediaItem {
-    url: String,
+    url: FixedString<u16>,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ResolvedUnfurledMediaItem {
+    url: FixedString<u16>,
+    proxy_url: FixedString<u16>,
+    width: NonMaxU32,
+    height: NonMaxU32,
+    content_type: FixedString,
+    loading_state: UnfurledMediaItemLoadingState,
+}
+
+enum_number! {
+    /// The loading state of the media item.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum UnfurledMediaItemLoadingState {
+        DiscordUnknown = 0,
+        Loading = 1,
+        LoadingSuccess = 2,
+        LoadingNotFound = 3,
+        _ => Unknown(u8),
+    }
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -147,7 +179,7 @@ pub enum SectionComponent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct TextDisplay {
-    content: String,
+    content: FixedString<u16>,
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -162,7 +194,7 @@ pub struct MediaGallery {
 #[non_exhaustive]
 pub struct MediaGalleryItem {
     media: UnfurledMediaItem,
-    description: Option<String>,
+    description: Option<FixedString<u16>>,
     spoiler: Option<bool>,
 }
 

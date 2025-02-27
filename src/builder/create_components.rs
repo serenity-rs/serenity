@@ -65,6 +65,12 @@ pub enum CreateComponent<'a> {
     ActionRow(CreateActionRow<'a>),
     /// A section, V2 component.
     Section(CreateSection<'a>),
+    TextDisplay(CreateTextDisplay<'a>),
+    Thumbnail(CreateThumbnail<'a>),
+    MediaGallery(CreateMediaGallery<'a>),
+    File(CreateFile<'a>),
+    Separator(CreateSeparator),
+    Container(CreateContainer<'a>),
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -78,7 +84,6 @@ pub struct CreateSection<'a> {
 }
 
 impl<'a> CreateSection<'a> {
-    // TODO: change type
     pub fn new(
         components: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>,
         accessory: CreateSectionAccessory<'a>,
@@ -190,18 +195,18 @@ impl<'a> CreateUnfurledMediaItem<'a> {
 pub struct CreateMediaGallery<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<12>,
-    items: Cow<'a, [CreateSectionComponent<'a>]>,
+    items: Cow<'a, [CreateMediaGalleryItem<'a>]>,
 }
 
 impl<'a> CreateMediaGallery<'a> {
-    pub fn new(items: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>) -> Self {
+    pub fn new(items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
         CreateMediaGallery {
             kind: StaticU8::<12>,
             items: items.into(),
         }
     }
 
-    pub fn items(mut self, items: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>) -> Self {
+    pub fn items(mut self, items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
         self.items = items.into();
         self
     }
@@ -215,6 +220,31 @@ pub struct CreateMediaGalleryItem<'a> {
     description: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spoiler: Option<bool>,
+}
+
+impl<'a> CreateMediaGalleryItem<'a> {
+    pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
+        CreateMediaGalleryItem {
+            media,
+            description: None,
+            spoiler: None,
+        }
+    }
+
+    pub fn media(mut self, media: CreateUnfurledMediaItem<'a>) -> Self {
+        self.media = media;
+        self
+    }
+
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
 }
 
 #[derive(Clone, Debug, Serialize)]
