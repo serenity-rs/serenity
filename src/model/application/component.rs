@@ -1,3 +1,4 @@
+#[cfg(feature = "unstable")]
 use nonmax::NonMaxU32;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
@@ -20,12 +21,19 @@ enum_number! {
         RoleSelect = 6,
         MentionableSelect = 7,
         ChannelSelect = 8,
+        #[cfg(feature = "unstable")]
         Section = 9,
+        #[cfg(feature = "unstable")]
         TextDisplay = 10,
+        #[cfg(feature = "unstable")]
         Thumbnail = 11,
+        #[cfg(feature = "unstable")]
         MediaGallery = 12,
+        #[cfg(feature = "unstable")]
         File = 13,
+        #[cfg(feature = "unstable")]
         Separator = 14,
+        #[cfg(feature = "unstable")]
         Container = 17,
         _ => Unknown(u8),
     }
@@ -42,6 +50,7 @@ enum_number! {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub enum Component {
     ActionRow(ActionRow),
     Button(Button),
@@ -60,6 +69,7 @@ pub enum Component {
 // TODO: add something like this to every variant.
 // The component type, it will always be [`ComponentType::Thing`].
 
+#[cfg(feature = "unstable")]
 impl<'de> Deserialize<'de> for Component {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
     where
@@ -110,6 +120,7 @@ impl<'de> Deserialize<'de> for Component {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct Section {
     /// Always [`ComponentType::Section`]
     #[serde(rename = "type")]
@@ -133,6 +144,7 @@ pub struct Section {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct Thumbnail {
     /// Always [`ComponentType::Thumbnail`]
     #[serde(rename = "type")]
@@ -140,9 +152,9 @@ pub struct Thumbnail {
     /// The internal media item this contains.
     pub media: UnfurledMediaItem,
     /// The description of the thumbnail.
-    description: Option<FixedString<u16>>,
+    pub description: Option<FixedString<u16>>,
     /// Whether or not this component is spoilered.
-    spoiler: Option<bool>,
+    pub spoiler: Option<bool>,
 }
 
 /// An abstraction over a resolved and unresolved unfurled media item.
@@ -150,6 +162,7 @@ pub struct Thumbnail {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 #[serde(untagged)]
+#[cfg(feature = "unstable")]
 pub enum MediaItem {
     Resolved(ResolvedUnfurledMediaItem),
     Unresolved(UnfurledMediaItem),
@@ -161,6 +174,7 @@ pub enum MediaItem {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct UnfurledMediaItem {
     /// The url of this item.
     pub url: FixedString<u16>,
@@ -172,6 +186,7 @@ pub struct UnfurledMediaItem {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct ResolvedUnfurledMediaItem {
     /// The url of this item.
     pub url: FixedString<u16>,
@@ -187,6 +202,7 @@ pub struct ResolvedUnfurledMediaItem {
     pub loading_state: UnfurledMediaItemLoadingState,
 }
 
+#[cfg(feature = "unstable")]
 enum_number! {
     /// The loading state of the media item.
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
@@ -201,34 +217,13 @@ enum_number! {
     }
 }
 
-/// A list of valid components for an accessory of a section.
-///
-/// See [`Section`] for how this works.
-///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub enum SectionAccessory {
-    Thumbnail(Thumbnail),
-    Button(Button),
-    Unknown,
-}
-
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub enum SectionComponent {
-    TextDisplay(TextDisplay),
-    Unknown,
-}
-
 /// A text display component.
 ///
 /// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct TextDisplay {
     /// The content of this text display component.
     pub content: FixedString<u16>,
@@ -240,6 +235,7 @@ pub struct TextDisplay {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct MediaGallery {
     /// Always [`ComponentType::MediaGallery`]
     #[serde(rename = "type")]
@@ -256,6 +252,7 @@ pub struct MediaGallery {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct MediaGalleryItem {
     /// The internal media piece that this item contains.
     pub media: UnfurledMediaItem,
@@ -271,6 +268,7 @@ pub struct MediaGalleryItem {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct Separator {
     /// Always [`ComponentType::Separator`]
     #[serde(rename = "type")]
@@ -281,6 +279,7 @@ pub struct Separator {
     pub spacing: Option<SeparatorSpacingSize>,
 }
 
+#[cfg(feature = "unstable")]
 enum_number! {
     /// The size of a separator component.
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
@@ -299,6 +298,7 @@ enum_number! {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct FileComponent {
     /// Always [`ComponentType::File`]
     #[serde(rename = "type")]
@@ -315,6 +315,7 @@ pub struct FileComponent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
+#[cfg(feature = "unstable")]
 pub struct Container {
     /// Always [`ComponentType::Container`]
     #[serde(rename = "type")]

@@ -5,8 +5,10 @@ use serde::Serialize;
 use crate::model::prelude::*;
 
 #[derive(Clone, Debug)]
+#[cfg(feature = "unstable")]
 struct StaticU8<const VAL: u8>;
 
+#[cfg(feature = "unstable")]
 impl<const VAL: u8> Serialize for StaticU8<VAL> {
     fn serialize<S: serde::Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
         ser.serialize_u8(VAL)
@@ -75,6 +77,7 @@ impl serde::Serialize for CreateActionRow<'_> {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 #[serde(untagged)]
+#[cfg(feature = "unstable")]
 pub enum CreateComponent<'a> {
     /// Represents an action row component (V1).
     ///
@@ -112,6 +115,7 @@ pub enum CreateComponent<'a> {
 /// accessory.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateSection<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<9>,
@@ -120,6 +124,7 @@ pub struct CreateSection<'a> {
     accessory: CreateSectionAccessory<'a>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateSection<'a> {
     /// Creates a new builder with the specified components and accessory.
     ///
@@ -166,6 +171,7 @@ impl<'a> CreateSection<'a> {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 #[serde(untagged)]
+#[cfg(feature = "unstable")]
 pub enum CreateSectionComponent<'a> {
     TextDisplay(CreateTextDisplay<'a>),
 }
@@ -173,12 +179,14 @@ pub enum CreateSectionComponent<'a> {
 /// A builder to create a text display component.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateTextDisplay<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<10>,
     content: Cow<'a, str>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateTextDisplay<'a> {
     /// Creates a new text display component.
     ///
@@ -204,6 +212,7 @@ impl<'a> CreateTextDisplay<'a> {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 #[serde(untagged)]
+#[cfg(feature = "unstable")]
 pub enum CreateSectionAccessory<'a> {
     Thumbnail(CreateThumbnail<'a>),
     Button(CreateButton<'a>),
@@ -212,6 +221,7 @@ pub enum CreateSectionAccessory<'a> {
 /// A builder to create a thumbnail for a section.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateThumbnail<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<11>,
@@ -222,6 +232,7 @@ pub struct CreateThumbnail<'a> {
     spoiler: Option<bool>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateThumbnail<'a> {
     /// Creates a new thumbnail with a media item.
     pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
@@ -255,10 +266,12 @@ impl<'a> CreateThumbnail<'a> {
 /// A builder to create a media item.
 #[derive(Clone, Debug, Serialize, Default)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateUnfurledMediaItem<'a> {
     url: Cow<'a, str>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateUnfurledMediaItem<'a> {
     /// Creates a new media item.
     pub fn new(url: impl Into<Cow<'a, str>>) -> Self {
@@ -279,12 +292,14 @@ impl<'a> CreateUnfurledMediaItem<'a> {
 /// Note: May contain up to **10** items.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateMediaGallery<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<12>,
     items: Cow<'a, [CreateMediaGalleryItem<'a>]>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateMediaGallery<'a> {
     /// Creates a new media gallery with up to **10** items.
     pub fn new(items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
@@ -315,6 +330,7 @@ impl<'a> CreateMediaGallery<'a> {
 /// Builder to create individual media gallery items.
 #[derive(Clone, Debug, Serialize, Default)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateMediaGalleryItem<'a> {
     media: CreateUnfurledMediaItem<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -323,6 +339,7 @@ pub struct CreateMediaGalleryItem<'a> {
     spoiler: Option<bool>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateMediaGalleryItem<'a> {
     /// Create a new media gallery item.
     pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
@@ -372,6 +389,7 @@ impl<'a> CreateMediaGalleryItem<'a> {
 /// refer to the [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateFile<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<13>,
@@ -380,6 +398,7 @@ pub struct CreateFile<'a> {
     spoiler: Option<bool>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateFile<'a> {
     /// Create a new builder for the file component. Refer to this builders documentation for
     /// limits.
@@ -408,6 +427,7 @@ impl<'a> CreateFile<'a> {
 /// A builder for creating a separator.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateSeparator {
     #[serde(rename = "type")]
     kind: StaticU8<14>,
@@ -416,6 +436,7 @@ pub struct CreateSeparator {
     spacing: Option<Spacing>,
 }
 
+#[cfg(feature = "unstable")]
 impl CreateSeparator {
     /// Creates a new separator, with or without a divider.
     pub fn new(divider: bool) -> Self {
@@ -443,6 +464,7 @@ impl CreateSeparator {
 /// A builder to create a container, which acts similarly to embeds.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+#[cfg(feature = "unstable")]
 pub struct CreateContainer<'a> {
     #[serde(rename = "type")]
     kind: StaticU8<17>,
@@ -453,6 +475,7 @@ pub struct CreateContainer<'a> {
     components: Cow<'a, [CreateComponent<'a>]>,
 }
 
+#[cfg(feature = "unstable")]
 impl<'a> CreateContainer<'a> {
     /// Create a new container, with an array of components inside. This component may contain any
     /// other component except another container!

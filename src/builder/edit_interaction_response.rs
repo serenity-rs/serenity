@@ -1,9 +1,12 @@
 use std::borrow::Cow;
 
+#[cfg(not(feature = "unstable"))]
+use super::CreateActionRow;
+#[cfg(feature = "unstable")]
+use super::CreateComponent;
 use super::{
     CreateAllowedMentions,
     CreateAttachment,
-    CreateComponent,
     CreateEmbed,
     EditAttachments,
     EditWebhookMessage,
@@ -70,9 +73,17 @@ impl<'a> EditInteractionResponse<'a> {
     }
 
     /// Sets the components of this message.
+    #[cfg(feature = "unstable")]
     pub fn components(self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         Self(self.0.components(components))
     }
+
+    /// Sets the components of this message.
+    #[cfg(not(feature = "unstable"))]
+    pub fn components(self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        Self(self.0.components(components))
+    }
+
     super::button_and_select_menu_convenience_methods!(self.0.components);
 
     /// Sets attachments, see [`EditAttachments`] for more details.

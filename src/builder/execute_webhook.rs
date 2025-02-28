@@ -1,12 +1,10 @@
 use std::borrow::Cow;
 
-use super::{
-    CreateAllowedMentions,
-    CreateAttachment,
-    CreateComponent,
-    CreateEmbed,
-    EditAttachments,
-};
+#[cfg(not(feature = "unstable"))]
+use super::CreateActionRow;
+#[cfg(feature = "unstable")]
+use super::CreateComponent;
+use super::{CreateAllowedMentions, CreateAttachment, CreateEmbed, EditAttachments};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -68,7 +66,11 @@ pub struct ExecuteWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg(feature = "unstable")]
     components: Option<Cow<'a, [CreateComponent<'a>]>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg(not(feature = "unstable"))]
+    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -216,10 +218,24 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
+    #[cfg(not(feature = "unstable"))]
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+        self.components = Some(components.into());
+        self
+    }
+
+    /// Sets the components for this message. Requires an application-owned webhook, meaning either
+    /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
+    /// application (and has kind [`WebhookType::Incoming`]).
+    ///
+    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
+    /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
+    #[cfg(feature = "unstable")]
     pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
+
     super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Set an embed for the message.

@@ -1,15 +1,12 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
+#[cfg(not(feature = "unstable"))]
+use super::CreateActionRow;
+#[cfg(feature = "unstable")]
+use super::CreateComponent;
 use super::create_poll::Ready;
-use super::{
-    CreateAllowedMentions,
-    CreateAttachment,
-    CreateComponent,
-    CreateEmbed,
-    CreatePoll,
-    EditAttachments,
-};
+use super::{CreateAllowedMentions, CreateAttachment, CreateEmbed, CreatePoll, EditAttachments};
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -160,7 +157,11 @@ pub struct CreateInteractionResponseMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<InteractionResponseFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg(feature = "unstable")]
     components: Option<Cow<'a, [CreateComponent<'a>]>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg(not(feature = "unstable"))]
+    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     poll: Option<CreatePoll<'a, Ready>>,
     attachments: EditAttachments<'a>,
@@ -273,7 +274,15 @@ impl<'a> CreateInteractionResponseMessage<'a> {
     }
 
     /// Sets the components of this message.
+    #[cfg(feature = "unstable")]
     pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+        self.components = Some(components.into());
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(not(feature = "unstable"))]
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
@@ -423,6 +432,9 @@ impl<'a> CreateAutocompleteResponse<'a> {
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateModal<'a> {
+    #[cfg(not(feature = "unstable"))]
+    components: Cow<'a, [CreateActionRow<'a>]>,
+    #[cfg(feature = "unstable")]
     components: Cow<'a, [CreateComponent<'a>]>,
     custom_id: Cow<'a, str>,
     title: Cow<'a, str>,
@@ -441,7 +453,17 @@ impl<'a> CreateModal<'a> {
     /// Sets the components of this message.
     ///
     /// Overwrites existing components.
+    #[cfg(feature = "unstable")]
     pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+        self.components = components.into();
+        self
+    }
+
+    /// Sets the components of this message.
+    ///
+    /// Overwrites existing components.
+    #[cfg(not(feature = "unstable"))]
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
         self.components = components.into();
         self
     }

@@ -109,6 +109,12 @@ pub struct Message {
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<Box<GuildThread>>,
     /// The components of this message
+    #[serde(default)]
+    #[cfg(feature = "unstable")]
+    pub components: FixedArray<Component>,
+
+    /// The components of this message
+    #[cfg(not(feature = "unstable"))]
     #[serde(default, deserialize_with = "deserialize_components")]
     pub components: FixedArray<ActionRow>,
     /// Array of message sticker item objects.
@@ -873,21 +879,25 @@ pub struct ChannelMention {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct MessageSnapshot {
-    pub content: String,
+    pub content: FixedString<u16>,
     pub timestamp: Timestamp,
     pub edited_timestamp: Option<Timestamp>,
-    pub mentions: Vec<User>,
+    pub mentions: FixedArray<User>,
     #[serde(default)]
-    pub mention_roles: Vec<RoleId>,
-    pub attachments: Vec<Attachment>,
-    pub embeds: Vec<Embed>,
+    pub mention_roles: FixedArray<RoleId>,
+    pub attachments: FixedArray<Attachment>,
+    pub embeds: FixedArray<Embed>,
     #[serde(rename = "type")]
     pub kind: MessageType,
     pub flags: Option<MessageFlags>,
+    #[serde(default)]
+    #[cfg(feature = "unstable")]
+    pub components: FixedArray<Component>,
     #[serde(default, deserialize_with = "deserialize_components")]
+    #[cfg(not(feature = "unstable"))]
     pub components: FixedArray<ActionRow>,
     #[serde(default)]
-    pub sticker_items: Vec<StickerItem>,
+    pub sticker_items: FixedArray<StickerItem>,
 }
 
 /// Custom deserialization function to handle the nested "message" field
