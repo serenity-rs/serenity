@@ -31,8 +31,14 @@ enum_number! {
     }
 }
 
-// TODO: doc everything new :sob:
-
+/// Represents Discord components, a part of messages that are usually interactable.
+///
+/// # Component Versioning
+///
+/// - When `IS_COMPONENTS_V2` is **not** set, the **only** valid top-level component is
+///   [`ActionRow`].
+/// - When `IS_COMPONENTS_V2` **is** set, other component types may be used at the top level, but
+///   other message limitations are applied.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
@@ -98,23 +104,38 @@ impl<'de> Deserialize<'de> for Component {
     }
 }
 
+/// A component that is a container for up to 3 text display components and an accessory.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Section {
-    components: FixedArray<TextDisplay>,
+    /// Always [`ComponentType::Section`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    components: FixedArray<SectionComponent>,
     accessory: SectionAccessory,
 }
 
+/// A section component's thumbnail.
+///
+/// See [`Section`] for how this fits within a section.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Thumbnail {
+    /// Always [`ComponentType::Thumbnail`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
     media: UnfurledMediaItem,
     description: Option<FixedString<u16>>,
     spoiler: Option<bool>,
 }
 
+/// An abstraction over a resolved and unresolved unfurled media item.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -124,6 +145,9 @@ pub enum MediaItem {
     Unresolved(UnfurledMediaItem),
 }
 
+/// An unfurled media item, stores the url to the item.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -131,6 +155,9 @@ pub struct UnfurledMediaItem {
     url: FixedString<u16>,
 }
 
+/// A resolved unfurled media item, with extra metadata added by Discord.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -157,6 +184,11 @@ enum_number! {
     }
 }
 
+/// A list of valid components for an accessory of a section.
+///
+/// See [`Section`] for how this works.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -172,9 +204,11 @@ pub enum SectionAccessory {
 pub enum SectionComponent {
     TextDisplay(TextDisplay),
     Unknown,
-    // TODO: check others because i'm rushing this.
 }
 
+/// A text display component.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -182,13 +216,24 @@ pub struct TextDisplay {
     content: FixedString<u16>,
 }
 
+/// A media gallery component.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MediaGallery {
+    /// Always [`ComponentType::MediaGallery`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
     items: FixedArray<MediaGalleryItem>,
 }
 
+/// An individual media gallery item.
+///
+/// Belongs to [`MediaGallery`].
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -198,15 +243,22 @@ pub struct MediaGalleryItem {
     spoiler: Option<bool>,
 }
 
+/// A separator component
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Separator {
+    /// Always [`ComponentType::Separator`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
     divider: Option<bool>,
     spacing: Option<SeparatorSpacingSize>,
 }
 
 enum_number! {
+    /// The size of a separator component.
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[non_exhaustive]
@@ -217,18 +269,30 @@ enum_number! {
     }
 }
 
+/// A file component, will not render a text preview to the user.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
 pub struct FileComponent {
+    /// Always [`ComponentType::File`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
     file: UnfurledMediaItem,
     spoiler: Option<bool>,
 }
 
+/// A container component, similar to an embed but without all the functionality.
+///
+/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
 pub struct Container {
+    /// Always [`ComponentType::Container`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
     accent_color: Option<Colour>,
     spoiler: Option<bool>,
     components: FixedArray<Component>,

@@ -947,9 +947,21 @@ bitflags! {
         /// As of 2023-04-20, bots are currently not able to send voice messages
         /// ([source](https://github.com/discord/discord-api-docs/pull/6082)).
         const IS_VOICE_MESSAGE = 1 << 13;
-        /// TODO: document
-        /// for me: when enabled, content and embeds can't be used.
+        /// Enables support for sending Components V2.
+        ///
+        /// Setting this flag is required to use V2 components.
+        /// Attempting to send V2 components without enabling this flag will result in an error.
+        ///
+        /// # Limitations
+        /// When this flag is enabled, certain restrictions apply:
+        /// - The `content` and `embeds` fields cannot be set.
+        /// - Audio file attachments are not supported.
+        /// - Files will not have a simple text preview.
+        /// - URLs will not generate embeds.
+        ///
+        /// For more details, refer to the Discord documentation: [https://github.com/Lulalaby/discord-api-docs/pull/30]
         const IS_COMPONENTS_V2 = 1 << 15;
+
     }
 }
 
