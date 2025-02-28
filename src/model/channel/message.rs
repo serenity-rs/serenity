@@ -118,7 +118,7 @@ pub struct Message {
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<GuildChannel>,
     /// The components of this message
-    #[serde(default)]
+    #[serde(default, deserialize_with = "deserialize_components")]
     pub components: Vec<ActionRow>,
     /// Array of message sticker item objects.
     #[serde(default)]
@@ -149,6 +149,41 @@ pub struct Message {
     ///
     /// Only present in [`MessageCreateEvent`].
     pub poll: Option<Box<Poll>>,
+}
+
+// Custom deserialize function to deserialize components safely without knocking the whole message
+// out when new components are found but not supported.
+fn deserialize_components<'de, D>(deserializer: D) -> Result<Vec<ActionRow>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    struct ComponentsVisitor;
+
+    impl<'de> Visitor<'de> for ComponentsVisitor {
+        type Value = Vec<ActionRow>;
+
+        fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            formatter.write_str("a sequence of ActionRow elements")
+        }
+
+        fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+        where
+            A: serde::de::SeqAccess<'de>,
+        {
+            let mut components = Vec::new();
+            while let Some(action_row) = seq.next_element::<serde_json::Value>()? {
+                match serde_json::from_value::<ActionRow>(action_row) {
+                    Ok(valid_row) => components.push(valid_row),
+                    Err(_) => {
+                        tracing::debug!("Could not deserialize interaction as ActionRow, likely new V2 component.");
+                    },
+                }
+            }
+            Ok(components)
+        }
+    }
+
+    deserializer.deserialize_seq(ComponentsVisitor)
 }
 
 #[cfg(feature = "model")]
@@ -1211,7 +1246,7 @@ pub struct MessageSnapshot {
     #[serde(rename = "type")]
     pub kind: MessageType,
     pub flags: Option<MessageFlags>,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "deserialize_components")]
     pub components: Vec<ActionRow>,
     #[serde(default)]
     pub sticker_items: Vec<StickerItem>,
