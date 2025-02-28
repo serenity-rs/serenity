@@ -114,8 +114,15 @@ pub struct Section {
     /// Always [`ComponentType::Section`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    components: FixedArray<SectionComponent>,
-    accessory: SectionAccessory,
+    /// The components inside of the section.
+    ///
+    /// As of 2025-02-28, this is limited to just [`ComponentType::TextDisplay`] with up to 3 max.
+    pub components: FixedArray<Component>,
+    /// The accessory to the side of the section.
+    ///
+    /// As of 2025-02-28, this is limited to [`ComponentType::Button`] or
+    /// [`ComponentType::Thumbnail`]
+    pub accessory: Box<Component>,
 }
 
 /// A section component's thumbnail.
@@ -130,8 +137,11 @@ pub struct Thumbnail {
     /// Always [`ComponentType::Thumbnail`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    media: UnfurledMediaItem,
+    /// The internal media item this contains.
+    pub media: UnfurledMediaItem,
+    /// The description of the thumbnail.
     description: Option<FixedString<u16>>,
+    /// Whether or not this component is spoilered.
     spoiler: Option<bool>,
 }
 
@@ -152,7 +162,8 @@ pub enum MediaItem {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct UnfurledMediaItem {
-    url: FixedString<u16>,
+    /// The url of this item.
+    pub url: FixedString<u16>,
 }
 
 /// A resolved unfurled media item, with extra metadata added by Discord.
@@ -162,12 +173,18 @@ pub struct UnfurledMediaItem {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ResolvedUnfurledMediaItem {
-    url: FixedString<u16>,
-    proxy_url: FixedString<u16>,
-    width: NonMaxU32,
-    height: NonMaxU32,
-    content_type: FixedString,
-    loading_state: UnfurledMediaItemLoadingState,
+    /// The url of this item.
+    pub url: FixedString<u16>,
+    /// The proxied discord url.
+    pub proxy_url: FixedString<u16>,
+    /// The width of the media item.
+    pub width: NonMaxU32,
+    /// The height of the media item.
+    pub height: NonMaxU32,
+    /// The content type of the media item.
+    pub content_type: FixedString,
+    /// The loading state of the item, declaring if it has fully loaded yet.
+    pub loading_state: UnfurledMediaItemLoadingState,
 }
 
 enum_number! {
@@ -213,7 +230,8 @@ pub enum SectionComponent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct TextDisplay {
-    content: FixedString<u16>,
+    /// The content of this text display component.
+    pub content: FixedString<u16>,
 }
 
 /// A media gallery component.
@@ -226,7 +244,8 @@ pub struct MediaGallery {
     /// Always [`ComponentType::MediaGallery`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    items: FixedArray<MediaGalleryItem>,
+    /// Array of images this media gallery can contain, max of 10.
+    pub items: FixedArray<MediaGalleryItem>,
 }
 
 /// An individual media gallery item.
@@ -238,9 +257,12 @@ pub struct MediaGallery {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MediaGalleryItem {
-    media: UnfurledMediaItem,
-    description: Option<FixedString<u16>>,
-    spoiler: Option<bool>,
+    /// The internal media piece that this item contains.
+    pub media: UnfurledMediaItem,
+    /// The description of the media item.
+    pub description: Option<FixedString<u16>>,
+    /// Whether or not this component is spoilered.
+    pub spoiler: Option<bool>,
 }
 
 /// A separator component
@@ -253,8 +275,10 @@ pub struct Separator {
     /// Always [`ComponentType::Separator`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    divider: Option<bool>,
-    spacing: Option<SeparatorSpacingSize>,
+    /// Whether or not this contains a separating divider.
+    pub divider: Option<bool>,
+    /// The spacing of the separator.
+    pub spacing: Option<SeparatorSpacingSize>,
 }
 
 enum_number! {
@@ -279,8 +303,10 @@ pub struct FileComponent {
     /// Always [`ComponentType::File`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    file: UnfurledMediaItem,
-    spoiler: Option<bool>,
+    /// The file this component internally contains.
+    pub file: UnfurledMediaItem,
+    /// Whether or not this component is spoilered.
+    pub spoiler: Option<bool>,
 }
 
 /// A container component, similar to an embed but without all the functionality.
@@ -293,9 +319,16 @@ pub struct Container {
     /// Always [`ComponentType::Container`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    accent_color: Option<Colour>,
-    spoiler: Option<bool>,
-    components: FixedArray<Component>,
+    /// The accent colour, similar to an embeds accent.
+    pub accent_color: Option<Colour>,
+    /// Whether or not this component is spoilered.
+    pub spoiler: Option<bool>,
+    /// The components within this container.
+    ///
+    /// As of 2025-02-28, this can be [`ComponentType::ActionRow`], [`ComponentType::Section`],
+    /// [`ComponentType::TextDisplay`], [`ComponentType::MediaGallery`], [`ComponentType::File`] or
+    /// [`ComponentType::Separator`]
+    pub components: FixedArray<Component>,
 }
 
 /// An action row.
