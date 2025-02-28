@@ -466,7 +466,7 @@ impl<'a> CreateContainer<'a> {
     }
 
     // Set the colour of the left-hand side of the container.
-    pub fn accent_colour<C: Into<Colour>>(mut self, colour: C) -> Selff {
+    pub fn accent_colour<C: Into<Colour>>(mut self, colour: C) -> Self {
         self.accent_color = Some(colour.into());
         self
     }
