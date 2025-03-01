@@ -116,14 +116,7 @@ impl Invite {
         expiration: bool,
         event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
-        let mut invite = code;
-
-        #[cfg(feature = "utils")]
-        {
-            invite = crate::utils::parse_invite(invite);
-        }
-
-        http.get_invite(invite, member_counts, expiration, event_id).await
+        http.get_invite(code, member_counts, expiration, event_id).await
     }
 
     /// Returns a URL to use for the invite.

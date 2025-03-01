@@ -3845,9 +3845,6 @@ impl Http {
         event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
         let (member_counts_str, expiration_str, event_id_str);
-        #[cfg(feature = "utils")]
-        let code = crate::utils::parse_invite(code);
-
         let mut params = ArrayVec::<_, 3>::new();
 
         member_counts_str = member_counts.to_arraystring();
