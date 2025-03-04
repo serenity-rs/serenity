@@ -217,7 +217,7 @@ impl Message {
         let mut permissions = if let Some(member) = &self.member {
             guild.partial_member_permissions_in(channel, self.author.id, member)
         } else {
-            guild.user_permissions_in(channel, guild.members.get(&self.author.id)?)
+            guild.member_permissions_in(channel, guild.members.get(&self.author.id)?)
         };
 
         if is_thread {

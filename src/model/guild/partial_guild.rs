@@ -225,13 +225,53 @@ impl PartialGuild {
             assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
         }
 
-        Guild::user_permissions_in_(
+        Guild::member_permissions_in_(
             channel,
             member_id,
             &member.roles,
             self.id,
             &self.roles,
             self.owner_id,
+        )
+    }
+
+    /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// See `Guild::member_permissions_guild_level` for note on usage.
+    #[must_use]
+    pub fn member_permissions_guild_level(&self, member: &Member) -> Permissions {
+        Guild::member_permissions_guild_level_(
+            member.user.id,
+            &member.roles,
+            self.id,
+            self.owner_id,
+            &self.roles,
+        )
+    }
+
+    /// Calculate a [`PartialMember`]'s permissions in the guild.
+    ///
+    /// See `Guild::member_permissions_guild_level` for note on usage.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+    #[must_use]
+    pub fn partial_member_permissions_guild_level(
+        &self,
+        member_id: UserId,
+        member: &PartialMember,
+    ) -> Permissions {
+        if let Some(user) = &member.user {
+            assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
+        }
+
+        Guild::member_permissions_guild_level_(
+            member_id,
+            &member.roles,
+            self.id,
+            self.owner_id,
+            &self.roles,
         )
     }
 
@@ -249,8 +289,8 @@ impl PartialGuild {
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
     #[must_use]
-    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
-        Guild::user_permissions_in_(
+    pub fn member_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
+        Guild::member_permissions_in_(
             channel,
             member.user.id,
             &member.roles,

@@ -270,7 +270,7 @@ impl Guild {
         let member = self.members.get(&uid)?;
         self.channels.iter().find(|&channel| {
             channel.kind != ChannelType::Category
-                && self.user_permissions_in(channel, member).view_channel()
+                && self.member_permissions_in(channel, member).view_channel()
         })
     }
 
@@ -285,7 +285,7 @@ impl Guild {
                 && self
                     .members
                     .iter()
-                    .map(|member| self.user_permissions_in(channel, member))
+                    .map(|member| self.member_permissions_in(channel, member))
                     .all(Permissions::view_channel)
         })
     }
@@ -804,8 +804,8 @@ impl Guild {
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
     #[must_use]
-    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
-        Self::user_permissions_in_(
+    pub fn member_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
+        Self::member_permissions_in_(
             channel,
             member.user.id,
             &member.roles,
@@ -831,7 +831,7 @@ impl Guild {
             assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
         }
 
-        Self::user_permissions_in_(
+        Self::member_permissions_in_(
             channel,
             member_id,
             &member.roles,
@@ -841,8 +841,84 @@ impl Guild {
         )
     }
 
+    /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// **Note**: This method calculates the permissions granted to the member across the entire
+    /// guild, excluding any channel-specific overrides. If you are not checking permissions that
+    /// do not apply on the channel level, like `Permissions::BAN_MEMBERS`, use
+    /// member_permissions_in instead.
+    #[must_use]
+    pub fn member_permissions_guild_level(&self, member: &Member) -> Permissions {
+        Self::member_permissions_guild_level_(
+            member.user.id,
+            &member.roles,
+            self.id,
+            self.owner_id,
+            &self.roles,
+        )
+    }
+
+    /// Calculate a [`PartialMember`]'s permissions in the guild.
+    ///
+    /// See `Self::member_permissions_guild_level` for note on usage.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+    #[must_use]
+    pub fn partial_member_permissions_guild_level(
+        &self,
+        member_id: UserId,
+        member: &PartialMember,
+    ) -> Permissions {
+        if let Some(user) = &member.user {
+            assert_eq!(user.id, member_id, "User::id does not match provided PartialMember");
+        }
+
+        Self::member_permissions_guild_level_(
+            member_id,
+            &member.roles,
+            self.id,
+            self.owner_id,
+            &self.roles,
+        )
+    }
+
     /// Helper function that can also be used from [`PartialGuild`].
-    pub(crate) fn user_permissions_in_(
+    pub(crate) fn member_permissions_guild_level_(
+        user_id: UserId,
+        member_roles: &[RoleId],
+        guild_id: GuildId,
+        guild_owner_id: UserId,
+        guild_roles: &ExtractMap<RoleId, Role>,
+    ) -> Permissions {
+        if user_id == guild_owner_id {
+            return Permissions::all();
+        }
+
+        //// Get @everyone permissions first.
+        let mut permissions = if let Some(role) = guild_roles.get(&RoleId::new(guild_id.get())) {
+            role.permissions
+        } else {
+            error!("@everyone role missing in {}", guild_id);
+            Permissions::empty()
+        };
+
+        for role_id in member_roles {
+            if let Some(role) = guild_roles.get(role_id) {
+                permissions |= role.permissions;
+            }
+        }
+
+        if permissions.contains(Permissions::ADMINISTRATOR) {
+            return Permissions::all();
+        }
+
+        permissions
+    }
+
+    /// Helper function that can also be used from [`PartialGuild`].
+    pub(crate) fn member_permissions_in_(
         channel: &GuildChannel,
         member_user_id: UserId,
         member_roles: &[RoleId],

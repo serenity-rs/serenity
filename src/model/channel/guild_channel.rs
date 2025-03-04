@@ -406,7 +406,7 @@ impl GuildChannel {
                 .members
                 .iter()
                 .filter(|member| {
-                    guild.user_permissions_in(self, member).contains(Permissions::VIEW_CHANNEL)
+                    guild.member_permissions_in(self, member).contains(Permissions::VIEW_CHANNEL)
                 })
                 .cloned()
                 .collect::<Vec<Member>>()),
