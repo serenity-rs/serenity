@@ -157,6 +157,12 @@ fn deserialize_components<'de, D>(deserializer: D) -> Result<Vec<ActionRow>, D::
 where
     D: Deserializer<'de>,
 {
+    #[derive(Deserialize)]
+    struct MinComponent {
+        #[serde(rename = "type")]
+        kind: u8,
+    }
+
     struct ComponentsVisitor;
 
     impl<'de> Visitor<'de> for ComponentsVisitor {
@@ -171,14 +177,30 @@ where
             A: serde::de::SeqAccess<'de>,
         {
             let mut components = Vec::new();
-            while let Some(action_row) = seq.next_element::<serde_json::Value>()? {
-                match serde_json::from_value::<ActionRow>(action_row) {
-                    Ok(valid_row) => components.push(valid_row),
-                    Err(_) => {
-                        tracing::debug!("Could not deserialize interaction as ActionRow, likely new V2 component.");
-                    },
+
+            while let Some(raw) = seq.next_element::<&serde_json::value::RawValue>()? {
+                let min_component: MinComponent =
+                    serde_json::from_str(raw.get()).map_err(serde::de::Error::custom)?;
+
+                // This is an action row, the only top level supported component in serenity at this
+                // time.
+                if min_component.kind == 1 {
+                    match serde_json::from_str::<ActionRow>(raw.get()) {
+                        Ok(valid_row) => components.push(valid_row),
+                        Err(_) => {
+                            tracing::debug!("Failed to deserialize ActionRow, malformed data.");
+                        },
+                    }
+                } else {
+                    // Top level component is not an action row and cannot be supported on
+                    // serenity@current without breaking changes, so we skip them.
+                    tracing::debug!(
+                        "Skipping component with unsupported kind: {}",
+                        min_component.kind
+                    );
                 }
             }
+
             Ok(components)
         }
     }
