@@ -49,12 +49,10 @@ impl CreateAttachment {
         let mut data = Vec::new();
         file.read_to_end(&mut data).await?;
 
-        let filename = path.as_ref().file_name().ok_or_else(|| {
-            std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "attachment path must not be a directory",
-            )
-        })?;
+        let filename = path
+            .as_ref()
+            .file_name()
+            .ok_or_else(|| std::io::Error::other("attachment path must not be a directory"))?;
 
         Ok(CreateAttachment::bytes(data, filename.to_string_lossy().to_string()))
     }
