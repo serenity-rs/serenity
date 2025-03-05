@@ -442,7 +442,9 @@ impl Shard {
             Ok(GatewayEvent::Dispatch {
                 seq,
                 event,
-            }) => self.handle_gateway_dispatch(seq, &event).map(|e| Some(ShardAction::Dispatch(e))),
+            }) => self
+                .handle_gateway_dispatch(seq, &event)
+                .map(|e| Some(ShardAction::Dispatch(Box::new(e)))),
             Ok(GatewayEvent::Heartbeat) => {
                 info!("[{:?}] Received shard heartbeat", self.shard_info);
 
@@ -762,7 +764,7 @@ pub enum ShardAction {
     Heartbeat,
     Identify,
     Reconnect,
-    Dispatch(Event),
+    Dispatch(Box<Event>),
 }
 
 /// Information about a [`ShardRunner`].
