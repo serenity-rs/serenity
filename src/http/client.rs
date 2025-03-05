@@ -2579,6 +2579,8 @@ impl Http {
     /// Same as [`Self::execute_webhook`] but allows sending non interactive components on non
     /// app-owned webhooks.
     ///
+    /// Refer to the [Discord docs] for more information on how this works.
+    ///
     /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook_with_components(
         &self,
