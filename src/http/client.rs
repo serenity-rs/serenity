@@ -2237,7 +2237,7 @@ impl Http {
         self.execute_webhook_(webhook_id, thread_id, token, wait, files, map, true).await
     }
 
-    #[allow(clippy::too_many_arguments)]
+    #[expect(clippy::too_many_arguments)]
     async fn execute_webhook_(
         &self,
         webhook_id: WebhookId,
