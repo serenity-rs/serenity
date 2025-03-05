@@ -2589,7 +2589,7 @@ impl Http {
         files: Vec<CreateAttachment>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
-        self.execute_webhook_(webhook_id, thread_id, token, wait, files, map, false).await
+        self.execute_webhook_(webhook_id, thread_id, token, wait, files, map, true).await
     }
 
     #[expect(clippy::too_many_arguments)]
