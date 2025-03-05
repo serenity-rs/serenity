@@ -4022,7 +4022,7 @@ impl Http {
 
     /// Gets a paginated list of the current user's guilds.
     ///
-    /// The `limit` has a maximum value of 100.
+    /// The `limit` has a maximum value of 200.
     ///
     /// [Discord's documentation][docs]
     ///

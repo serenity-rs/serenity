@@ -449,7 +449,6 @@ impl PartialGuild {
     /// long, or if the image is too large.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-    /// [`utils::read_image`]: crate::utils::read_image
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     #[inline]
     pub async fn create_emoji(
