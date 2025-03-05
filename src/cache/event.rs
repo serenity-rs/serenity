@@ -40,12 +40,10 @@ impl CacheUpdate for ChannelCreateEvent {
     type Output = GuildChannel;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        let old_channel = cache
+        cache
             .guilds
             .get_mut(&self.channel.guild_id)
-            .and_then(|mut g| g.channels.insert(self.channel.clone()));
-
-        old_channel
+            .and_then(|mut g| g.channels.insert(self.channel.clone()))
     }
 }
 
