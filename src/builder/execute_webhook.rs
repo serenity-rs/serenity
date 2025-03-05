@@ -79,6 +79,8 @@ pub struct ExecuteWebhook {
 
     #[serde(skip)]
     thread_id: Option<ChannelId>,
+    #[serde(skip)]
+    with_components: Option<bool>,
 }
 
 impl ExecuteWebhook {
@@ -222,7 +224,10 @@ impl ExecuteWebhook {
     /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
     /// application (and has kind [`WebhookType::Incoming`]).
     ///
-    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
+    /// If [`Self::with_components`] is set, non-interactive components can be used on non
+    /// application-owned webhooks.
+    ///
+    /// [`WebhookType::Application`]: crate::model::webhook::WebhookT
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
     pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
@@ -337,6 +342,12 @@ impl ExecuteWebhook {
         self.thread_name = Some(thread_name);
         self
     }
+
+    /// Allows sending non interactive components on non application owned webhooks.
+    pub fn with_components(mut self, with_components: bool) -> Self {
+        self.with_components = Some(with_components);
+        self
+    }
 }
 
 #[cfg(feature = "http")]
@@ -367,6 +378,11 @@ impl Builder for ExecuteWebhook {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        http.execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
+        if self.with_components.unwrap_or_default() {
+            http.execute_webhook_with_components(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self)
+                .await
+        } else {
+            http.execute_webhook(ctx.0, self.thread_id, ctx.1, ctx.2, files, &self).await
+        }
     }
 }

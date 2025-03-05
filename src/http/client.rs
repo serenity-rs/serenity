@@ -2573,9 +2573,43 @@ impl Http {
         files: Vec<CreateAttachment>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
+        self.execute_webhook_(webhook_id, thread_id, token, wait, files, map, false).await
+    }
+
+    /// Same as [`Self::execute_webhook`] but allows sending non interactive components on non
+    /// app-owned webhooks.
+    ///
+    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
+    pub async fn execute_webhook_with_components(
+        &self,
+        webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
+        token: &str,
+        wait: bool,
+        files: Vec<CreateAttachment>,
+        map: &impl serde::Serialize,
+    ) -> Result<Option<Message>> {
+        self.execute_webhook_(webhook_id, thread_id, token, wait, files, map, false).await
+    }
+
+    #[expect(clippy::too_many_arguments)]
+    async fn execute_webhook_(
+        &self,
+        webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
+        token: &str,
+        wait: bool,
+        files: Vec<CreateAttachment>,
+        map: &impl serde::Serialize,
+        with_components: bool,
+    ) -> Result<Option<Message>> {
         let mut params = vec![("wait", wait.to_string())];
         if let Some(thread_id) = thread_id {
             params.push(("thread_id", thread_id.to_string()));
+        }
+
+        if with_components {
+            params.push(("with_components", with_components.to_string()));
         }
 
         let mut request = Request {
