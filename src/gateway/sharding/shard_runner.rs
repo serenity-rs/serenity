@@ -216,7 +216,7 @@ impl ShardRunner {
                             spawn_named(
                                 "shard_runner::dispatch",
                                 dispatch_model(
-                                    event,
+                                    *event,
                                     context,
                                     #[cfg(feature = "framework")]
                                     self.framework.clone(),
