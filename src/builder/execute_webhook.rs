@@ -227,7 +227,7 @@ impl ExecuteWebhook {
     /// If [`Self::with_components`] is set, non-interactive components can be used on non
     /// application-owned webhooks.
     ///
-    /// [`WebhookType::Application`]: crate::model::webhook::WebhookT
+    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
     pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
