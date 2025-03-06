@@ -187,12 +187,7 @@ where
 
                 // Action rows are the only top level component supported in serenity at this time.
                 if min_component.kind == 1 {
-                    match ActionRow::deserialize(raw) {
-                        Ok(valid_row) => components.push(valid_row),
-                        Err(_) => {
-                            tracing::debug!("Failed to deserialize ActionRow, malformed data.");
-                        },
-                    }
+                    components.push(ActionRow::deserialize(raw).map_err(serde::de::Error::custom)?);
                 } else {
                     // Top level component is not an action row and cannot be supported on
                     // serenity@current without breaking changes, so we skip them.
