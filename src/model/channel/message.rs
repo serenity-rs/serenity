@@ -185,9 +185,7 @@ where
                 let min_component =
                     MinComponent::deserialize(raw).map_err(serde::de::Error::custom)?;
 
-                // This is an action row, the only top level supported component in serenity at this
-                // time, we only have deseliazed the kind until now to avoid parsing unsupported
-                // components.
+                // Action rows are the only top level component supported in serenity at this time.
                 if min_component.kind == 1 {
                     match ActionRow::deserialize(raw) {
                         Ok(valid_row) => components.push(valid_row),
