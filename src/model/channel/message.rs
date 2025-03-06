@@ -179,13 +179,13 @@ where
             let mut components = Vec::new();
 
             while let Some(raw) = seq.next_element::<&serde_json::value::RawValue>()? {
-                let min_component: MinComponent =
-                    serde_json::from_str(raw.get()).map_err(serde::de::Error::custom)?;
+                let min_component =
+                    MinComponent::deserialize(raw).map_err(serde::de::Error::custom)?;
 
                 // This is an action row, the only top level supported component in serenity at this
                 // time.
                 if min_component.kind == 1 {
-                    match serde_json::from_str::<ActionRow>(raw.get()) {
+                    match ActionRow::deserialize(raw) {
                         Ok(valid_row) => components.push(valid_row),
                         Err(_) => {
                             tracing::debug!("Failed to deserialize ActionRow, malformed data.");
