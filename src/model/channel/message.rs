@@ -176,7 +176,7 @@ where
         where
             A: serde::de::SeqAccess<'de>,
         {
-            let mut components = Vec::new();
+            let mut components = Vec::with_capacity(seq.size_hint().unwrap_or_default());
 
             while let Some(raw) = seq.next_element::<&serde_json::value::RawValue>()? {
                 // We deserialize only the `kind` field to determine the component type.
