@@ -179,11 +179,15 @@ where
             let mut components = Vec::new();
 
             while let Some(raw) = seq.next_element::<&serde_json::value::RawValue>()? {
+                // We deserialize only the `kind` field to determine the component type.
+                // We later use this to check if its a supported component before deserializing the
+                // entire payload.
                 let min_component =
                     MinComponent::deserialize(raw).map_err(serde::de::Error::custom)?;
 
                 // This is an action row, the only top level supported component in serenity at this
-                // time.
+                // time, we only have deseliazed the kind until now to avoid parsing unsupported
+                // components.
                 if min_component.kind == 1 {
                     match ActionRow::deserialize(raw) {
                         Ok(valid_row) => components.push(valid_row),
