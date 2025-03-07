@@ -148,7 +148,7 @@ impl ShardManager {
             {
                 match msg {
                     ShardManagerMessage::Boot(shard_id) => self.queue_for_start(shard_id),
-                    ShardManagerMessage::Quit(err) => return Err(err),
+                    ShardManagerMessage::Quit(res) => return res,
                 }
             }
             let batch = self.queue.pop_batch();
@@ -289,7 +289,7 @@ impl ShardManager {
         let manager_tx = self.manager_tx.clone();
         spawn_named("shard_runner::run", async move {
             if let Err(Error::Gateway(e)) = runner.run().await {
-                if let Err(why) = manager_tx.unbounded_send(ShardManagerMessage::Quit(e)) {
+                if let Err(why) = manager_tx.unbounded_send(ShardManagerMessage::Quit(Err(e))) {
                     warn!("Failed to send return value: {why}");
                 }
             }
@@ -330,6 +330,12 @@ impl ShardManager {
     #[must_use]
     pub fn intents(&self) -> GatewayIntents {
         self.intents
+    }
+
+    /// Returns a channel that allows the user to send messages to the shard manager.
+    #[must_use]
+    pub fn manager_tx(&self) -> Sender<ShardManagerMessage> {
+        self.manager_tx.clone()
     }
 }
 
@@ -381,5 +387,5 @@ pub enum ShardManagerMessage {
     /// the shard is not guaranteed to immediately start, until more shards are queued.
     Boot(ShardId),
     /// Indicates that a shard runner encountered a fatal error and the shard manager should quit.
-    Quit(GatewayError),
+    Quit(Result<(), GatewayError>),
 }
