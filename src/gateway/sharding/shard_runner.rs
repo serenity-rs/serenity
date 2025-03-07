@@ -81,6 +81,21 @@ impl ShardRunner {
         }
     }
 
+    /// A wrapper around [`ShardRunner::start_loop`] that starts the runner's main loop and
+    /// monitors for errors.
+    ///
+    /// If a fatal error occurs, this will send a message to the shard manager to close the
+    /// connection.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    pub async fn run(&mut self) {
+        if let Err(Error::Gateway(e)) = self.start_loop().await {
+            if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::Quit(Err(e))) {
+                warn!("Failed to send return value: {why}");
+            }
+        }
+        debug!("[ShardRunner {:?}] Stopping", self.shard.shard_info());
+    }
+
     /// Starts the runner's loop to receive events.
     ///
     /// This runs a loop that performs the following in each iteration:
@@ -103,7 +118,7 @@ impl ShardRunner {
     /// [`ShardManager`]: super::ShardManager
     /// [`Event`]: crate::model::event::Event
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn run(&mut self) -> Result<()> {
+    pub async fn start_loop(&mut self) -> Result<()> {
         debug!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
@@ -447,11 +462,13 @@ impl ShardRunner {
     fn make_context(&self) -> Context {
         Context {
             data: Arc::clone(&self.data),
-            shard: self.runner_tx(),
+            shard: self.runner_tx.clone(),
+            manager: self.manager_tx.clone(),
             shard_id: self.shard.shard_info().id,
             http: Arc::clone(&self.http),
             #[cfg(feature = "cache")]
             cache: Arc::clone(&self.cache),
+            runner_info: Arc::clone(&self.runner_info),
             #[cfg(feature = "collector")]
             collectors: Arc::clone(&self.collectors),
         }

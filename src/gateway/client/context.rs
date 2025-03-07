@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use futures::channel::mpsc::UnboundedSender as Sender;
 
@@ -6,7 +6,13 @@ use futures::channel::mpsc::UnboundedSender as Sender;
 pub use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::gateway::CollectorCallback;
-use crate::gateway::{ActivityData, ChunkGuildFilter, ShardRunnerMessage};
+use crate::gateway::{
+    ActivityData,
+    ChunkGuildFilter,
+    ShardManagerMessage,
+    ShardRunnerInfo,
+    ShardRunnerMessage,
+};
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
 
@@ -33,11 +39,14 @@ pub struct Context {
     pub(crate) data: Arc<dyn std::any::Any + Send + Sync>,
     /// The channel to communicate with the shard runner.
     pub(crate) shard: Sender<ShardRunnerMessage>,
+    /// The channel to communicate with the shard manager.
+    pub(crate) manager: Sender<ShardManagerMessage>,
     /// The ID of the shard this context is related to.
     pub shard_id: ShardId,
     pub http: Arc<Http>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
+    pub runner_info: Arc<Mutex<ShardRunnerInfo>>,
     #[cfg(feature = "collector")]
     pub(crate) collectors: Arc<parking_lot::RwLock<Vec<CollectorCallback>>>,
 }
@@ -472,6 +481,14 @@ impl Context {
     fn send_to_shard(&self, msg: ShardRunnerMessage) {
         if let Err(e) = self.shard.unbounded_send(msg) {
             tracing::warn!("failed to send ShardRunnerMessage to shard: {}", e);
+        }
+    }
+
+    /// Sends a message back to the shard manager to shutdown all currently running shards,
+    /// including this one.
+    pub fn shutdown_all(&self) {
+        if let Err(e) = self.manager.unbounded_send(ShardManagerMessage::Quit(Ok(()))) {
+            tracing::warn!("failed to send shutdown request to shard manager: {}", e);
         }
     }
 
