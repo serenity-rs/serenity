@@ -993,9 +993,7 @@ pub struct MessagePollVoteRemoveEvent {
 pub enum GatewayEvent {
     Dispatch {
         seq: u64,
-        // Avoid deserialising straight away to handle errors and get access to `seq`.
-        // This must be filled in with original data by the caller after deserialisation.
-        event: Vec<u8>,
+        event: Box<DeserializedEvent>,
     },
     Heartbeat,
     Reconnect,
@@ -1003,6 +1001,32 @@ pub enum GatewayEvent {
     InvalidateSession(bool),
     Hello(u64),
     HeartbeatAck,
+}
+
+#[expect(clippy::large_enum_variant)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+#[serde(untagged)]
+pub enum DeserializedEvent {
+    Success(Event),
+    Unknown(UnknownEvent),
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct UnknownEvent {
+    #[serde(rename = "t")]
+    pub ty: String,
+    #[serde(rename = "d")]
+    #[cfg_attr(feature = "typesize", typesize(with = raw_value_len))]
+    pub data: Box<RawValue>,
+}
+
+#[cfg(feature = "typesize")]
+fn raw_value_len(val: &RawValue) -> usize {
+    val.get().len()
 }
 
 // Manual impl needed to emulate integer enum tags
@@ -1029,21 +1053,27 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
                 Self::Dispatch {
                     seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
-                    event: Vec::new(),
+                    event: {
+                        Box::new(match Event::deserialize(raw.data) {
+                            Ok(event) => DeserializedEvent::Success(event),
+                            Err(_) => DeserializedEvent::Unknown(
+                                UnknownEvent::deserialize(raw.data).map_err(DeError::custom)?,
+                            ),
+                        })
+                    },
                 }
             },
             Opcode::Heartbeat => Self::Heartbeat,
-            Opcode::InvalidSession => Self::InvalidateSession(
-                serde_json::from_str(raw.data.get()).map_err(DeError::custom)?,
-            ),
+            Opcode::InvalidSession => {
+                Self::InvalidateSession(bool::deserialize(raw.data).map_err(DeError::custom)?)
+            },
             Opcode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
                     heartbeat_interval: u64,
                 }
 
-                let inner: HelloPayload =
-                    serde_json::from_str(raw.data.get()).map_err(DeError::custom)?;
+                let inner = HelloPayload::deserialize(raw.data).map_err(DeError::custom)?;
 
                 Self::Hello(inner.heartbeat_interval)
             },

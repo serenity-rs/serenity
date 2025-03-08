@@ -59,7 +59,7 @@ pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
-use crate::model::event::{Event, GatewayEvent};
+use crate::model::event::{DeserializedEvent, Event, GatewayEvent, UnknownEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::{ApplicationId, GuildId, ShardId};
 use crate::model::user::OnlineStatus;
@@ -312,13 +312,24 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn handle_gateway_dispatch(&mut self, seq: u64, event: &[u8]) -> Result<Event> {
+    fn handle_gateway_dispatch(&mut self, seq: u64, event: DeserializedEvent) -> Option<Event> {
         if seq > self.seq + 1 {
             warn!("[{:?}] Sequence off; them: {}, us: {}", self.info, seq, self.seq);
         }
 
         self.seq = seq;
-        let event = deserialize_and_log_event(event)?;
+
+        let event = match event {
+            DeserializedEvent::Success(event) => event,
+            DeserializedEvent::Unknown(UnknownEvent {
+                ty,
+                ref data,
+            }) => {
+                debug!("Unknown event: {ty}");
+                debug!("Failing event data: {data:?}");
+                return None;
+            },
+        };
 
         match &event {
             Event::Ready(ready) => {
@@ -345,7 +356,7 @@ impl Shard {
             _ => {},
         }
 
-        Ok(event)
+        Some(event)
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
@@ -436,9 +447,9 @@ impl Shard {
             Ok(GatewayEvent::Dispatch {
                 seq,
                 event,
-            }) => self
-                .handle_gateway_dispatch(seq, &event)
-                .map(|e| Some(ShardAction::Dispatch(Box::new(e)))),
+            }) => Ok(self
+                .handle_gateway_dispatch(seq, *event)
+                .map(|e| ShardAction::Dispatch(Box::new(e)))),
             Ok(GatewayEvent::Heartbeat) => {
                 info!("[{:?}] Received shard heartbeat", self.info);
 
@@ -740,23 +751,6 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
     })?;
 
     WsClient::connect(url, compression).await
-}
-
-fn deserialize_and_log_event(event: &[u8]) -> Result<Event> {
-    serde_json::from_slice(event).map_err(|err| {
-        let err_dbg = format!("{err:?}");
-        if let Some((variant_name, _)) =
-            err_dbg.strip_prefix(r#"Error("unknown variant `"#).and_then(|s| s.split_once('`'))
-        {
-            debug!("Unknown event: {variant_name}");
-        } else {
-            warn!("Err deserializing text: {err_dbg}");
-        }
-
-        let event_str = String::from_utf8_lossy(event);
-        debug!("Failing event data: {event_str}");
-        Error::Json(err)
-    })
 }
 
 struct ResumeMetadata {

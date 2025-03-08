@@ -408,7 +408,6 @@ impl ShardRunner {
 
                 return Err(Error::Gateway(why));
             },
-            Err(Error::Json(_)) => return Ok(None),
             Err(why) => {
                 error!("Shard handler recieved err: {why:?}");
                 return Ok(None);
