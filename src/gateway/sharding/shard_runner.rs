@@ -534,6 +534,7 @@ pub enum ShardRunnerMessage {
     ///
     /// Pass `None` to keep a value unmodified. The `activity` field is nullable, in other words
     /// passing `Some(None)` will clear the current activity.
+    #[expect(clippy::option_option)]
     SetPresence { activity: Option<Option<ActivityData>>, status: Option<OnlineStatus> },
     /// Indicates that the client wants to join, move, or disconnect from a voice channel.
     #[cfg(feature = "voice")]
