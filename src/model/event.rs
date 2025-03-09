@@ -1043,7 +1043,9 @@ impl<'de> Deserialize<'de> for GatewayEvent {
             ty: Option<&'a str>,
         }
 
-        let raw = GatewayEventRaw::deserialize(deserializer)?;
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+
+        let raw = GatewayEventRaw::deserialize(raw_data).map_err(DeError::custom)?;
 
         Ok(match raw.op {
             Opcode::Dispatch => {
@@ -1054,10 +1056,10 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                 Self::Dispatch {
                     seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
                     event: {
-                        Box::new(match Event::deserialize(raw.data) {
+                        Box::new(match Event::deserialize(raw_data) {
                             Ok(event) => DeserializedEvent::Success(event),
                             Err(_) => DeserializedEvent::Unknown(
-                                UnknownEvent::deserialize(raw.data).map_err(DeError::custom)?,
+                                UnknownEvent::deserialize(raw_data).map_err(DeError::custom)?,
                             ),
                         })
                     },
