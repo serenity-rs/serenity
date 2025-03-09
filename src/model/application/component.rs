@@ -191,15 +191,15 @@ pub struct ResolvedUnfurledMediaItem {
     /// The url of this item.
     pub url: FixedString<u16>,
     /// The proxied discord url.
-    pub proxy_url: FixedString<u16>,
+    pub proxy_url: Option<FixedString<u16>>,
     /// The width of the media item.
-    pub width: NonMaxU32,
+    pub width: Option<NonMaxU32>,
     /// The height of the media item.
-    pub height: NonMaxU32,
+    pub height: Option<NonMaxU32>,
     /// The content type of the media item.
-    pub content_type: FixedString,
+    pub content_type: Option<FixedString>,
     /// The loading state of the item, declaring if it has fully loaded yet.
-    pub loading_state: UnfurledMediaItemLoadingState,
+    pub loading_state: Option<UnfurledMediaItemLoadingState>,
 }
 
 #[cfg(feature = "unstable")]
