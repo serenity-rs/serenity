@@ -497,8 +497,7 @@ where
                 // Action rows are the only top level component supported in serenity at this time.
                 if kind == 1 {
                     let value = Value::from(map);
-                    components
-                        .push(ActionRow::deserialize(value).map_err(DeError::custom)?);
+                    components.push(ActionRow::deserialize(value).map_err(DeError::custom)?);
                 } else {
                     // Top level component is not an action row and cannot be supported on
                     // serenity@current without breaking changes, so we skip them.
