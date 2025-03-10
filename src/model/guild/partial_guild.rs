@@ -1032,9 +1032,11 @@ impl PartialGuild {
     }
 
     /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// You likely want to use PartialGuild::user_permissions_in instead as this function does not
+    /// consider permission overwrites.
     #[inline]
     #[must_use]
-    #[deprecated = "Use PartialGuild::user_permissions_in, as this doesn't consider permission overwrites"]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
         Guild::user_permissions_in_(
             None,
@@ -1048,12 +1050,14 @@ impl PartialGuild {
 
     /// Calculate a [`PartialMember`]'s permissions in the guild.
     ///
+    /// You likely want to use PartialGuild::partial_member_permissions_in instead as this function
+    /// does not consider permission overwrites.
+    ///
     /// # Panics
     ///
     /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
     #[inline]
     #[must_use]
-    #[deprecated = "Use PartialGuild::partial_member_permissions_in, as this doesn't consider permission overwrites"]
     pub fn partial_member_permissions(
         &self,
         member_id: UserId,

@@ -428,6 +428,11 @@ impl Member {
     /// member.permissions(&cache).expect("permissions").bits());
     /// ```
     ///
+    /// # Note
+    ///
+    /// You likely want to use Guild::user_permissions_in instead as this function does not consider
+    /// permission overwrites.
+    ///
     /// # Errors
     ///
     /// Returns a [`ModelError::GuildNotFound`] if the guild the member's in could not be
