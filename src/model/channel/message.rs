@@ -22,7 +22,7 @@ use crate::gateway::ShardMessenger;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
-use crate::model::utils::{discord_colours, StrOrInt};
+use crate::model::utils::{deserialize_val, discord_colours, StrOrInt};
 #[cfg(all(feature = "model", feature = "cache"))]
 use crate::utils;
 
@@ -157,12 +157,6 @@ fn deserialize_components<'de, D>(deserializer: D) -> Result<Vec<ActionRow>, D::
 where
     D: Deserializer<'de>,
 {
-    #[derive(Deserialize)]
-    struct MinComponent {
-        #[serde(rename = "type")]
-        kind: u8,
-    }
-
     struct ComponentsVisitor;
 
     impl<'de> Visitor<'de> for ComponentsVisitor {
@@ -178,23 +172,23 @@ where
         {
             let mut components = Vec::with_capacity(seq.size_hint().unwrap_or_default());
 
-            while let Some(raw) = seq.next_element::<&serde_json::value::RawValue>()? {
+            while let Some(map) = seq.next_element::<JsonMap>()? {
                 // We deserialize only the `kind` field to determine the component type.
                 // We later use this to check if its a supported component before deserializing the
                 // entire payload.
-                let min_component =
-                    MinComponent::deserialize(raw).map_err(serde::de::Error::custom)?;
+                let raw_kind =
+                    map.get("type").ok_or_else(|| DeError::missing_field("type"))?.clone();
+                let kind: i64 = deserialize_val(raw_kind)?;
 
                 // Action rows are the only top level component supported in serenity at this time.
-                if min_component.kind == 1 {
-                    components.push(ActionRow::deserialize(raw).map_err(serde::de::Error::custom)?);
+                if kind == 1 {
+                    let value = Value::from(map);
+                    components
+                        .push(ActionRow::deserialize(value).map_err(serde::de::Error::custom)?);
                 } else {
                     // Top level component is not an action row and cannot be supported on
                     // serenity@current without breaking changes, so we skip them.
-                    tracing::debug!(
-                        "Skipping component with unsupported kind: {}",
-                        min_component.kind
-                    );
+                    tracing::debug!("Skipping component with unsupported kind: {kind}");
                 }
             }
 
