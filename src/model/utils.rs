@@ -43,22 +43,6 @@ pub(super) fn icon_url(id: GuildId, icon: Option<&ImageHash>) -> Option<String> 
     })
 }
 
-pub fn deserialize_val<T, E>(val: Value) -> StdResult<T, E>
-where
-    T: serde::de::DeserializeOwned,
-    E: serde::de::Error,
-{
-    T::deserialize(val).map_err(serde::de::Error::custom)
-}
-
-pub fn remove_from_map<T, E>(map: &mut JsonMap, key: &'static str) -> StdResult<T, E>
-where
-    T: serde::de::DeserializeOwned,
-    E: serde::de::Error,
-{
-    map.remove(key).ok_or_else(|| serde::de::Error::missing_field(key)).and_then(deserialize_val)
-}
-
 pub(super) enum StrOrInt<'de> {
     String(String),
     Str(&'de str),

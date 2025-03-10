@@ -468,9 +468,11 @@ pub struct MessageDeleteEvent {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+// This ensures that `RawValue` is further supported in nested fields of `Message`.
+// Fields underneath #[serde(flatten)] cannot be deserialized as `RawValue`.
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct MessageUpdateEvent {
-    #[serde(flatten)]
     pub message: Message,
 }
 
