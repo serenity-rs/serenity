@@ -451,18 +451,16 @@ where
         .collect()
 }
 
+// A function used for deserializing components within a MessageUpdateEvent.
+// Due to discord now sending the whole message payload, we don't need to distinguish between None
+// and empty, as such we always return Some.
 pub fn optional_deserialize_components<'de, D>(
     deserializer: D,
 ) -> Result<Option<Vec<ActionRow>>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let components = deserialize_components(deserializer)?;
-    if components.is_empty() {
-        Ok(None)
-    } else {
-        Ok(Some(components))
-    }
+    Ok(Some(deserialize_components(deserializer)?))
 }
 
 // Custom deserialize function to deserialize components safely without knocking the whole message
