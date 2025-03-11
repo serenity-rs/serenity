@@ -460,7 +460,7 @@ pub fn optional_deserialize_components<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    Ok(Some(deserialize_components(deserializer)?))
+    deserialize_components(deserializer).map(Some)
 }
 
 // Custom deserialize function to deserialize components safely without knocking the whole message
