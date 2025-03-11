@@ -137,9 +137,16 @@ macro_rules! id_u64 {
 }
 
 /// The inner storage of an ID.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[repr(Rust, packed)]
 pub(crate) struct InnerId(NonZeroU64);
+
+impl fmt::Debug for InnerId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let inner = self.0;
+        inner.fmt(f)
+    }
+}
 
 struct SnowflakeVisitor;
 
