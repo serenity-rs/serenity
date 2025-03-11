@@ -602,6 +602,8 @@ pub struct PartialMember {
     ///
     /// Will be None or a time in the past if the user is not flagged.
     pub unusual_dm_activity_until: Option<Timestamp>,
+    /// The guild avatar hash
+    pub avatar: Option<ImageHash>,
 }
 
 impl From<PartialMember> for Member {
@@ -609,7 +611,7 @@ impl From<PartialMember> for Member {
         Member {
             user: partial.user.unwrap_or_default(),
             nick: partial.nick,
-            avatar: None,
+            avatar: partial.avatar,
             roles: partial.roles,
             joined_at: partial.joined_at,
             premium_since: partial.premium_since,
@@ -639,6 +641,7 @@ impl From<Member> for PartialMember {
             user: Some(member.user),
             permissions: member.permissions,
             unusual_dm_activity_until: member.unusual_dm_activity_until,
+            avatar: member.avatar,
         }
     }
 }
