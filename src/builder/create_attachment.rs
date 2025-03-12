@@ -95,11 +95,18 @@ impl CreateAttachment {
     /// places.
     #[must_use]
     pub fn to_base64(&self) -> String {
-        let mut encoded = {
-            use base64::Engine;
-            base64::prelude::BASE64_STANDARD.encode(&self.data)
-        };
-        encoded.insert_str(0, "data:image/png;base64,");
+        use base64::engine::{Config, Engine};
+
+        const PREFIX: &str = "data:image/png;base64,";
+
+        let engine = base64::prelude::BASE64_STANDARD;
+        let encoded_size = base64::encoded_len(self.data.len(), engine.config().encode_padding())
+            .and_then(|len| len.checked_add(PREFIX.len()))
+            .expect("buffer capacity overflow");
+
+        let mut encoded = String::with_capacity(encoded_size);
+        encoded.push_str(PREFIX);
+        engine.encode_string(&self.data, &mut encoded);
         encoded
     }
 
