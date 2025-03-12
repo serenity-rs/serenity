@@ -62,16 +62,18 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
         let raw = ActionRowRaw::deserialize(raw_data).map_err(DeError::custom)?;
 
         match raw.kind {
-            ComponentType::Button => Button::deserialize(raw_data).map(ActionRowComponent::Button),
+            ComponentType::Button => {
+                Deserialize::deserialize(raw_data).map(ActionRowComponent::Button)
+            },
             ComponentType::InputText => {
-                InputText::deserialize(raw_data).map(ActionRowComponent::InputText)
+                Deserialize::deserialize(raw_data).map(ActionRowComponent::InputText)
             },
             ComponentType::StringSelect
             | ComponentType::UserSelect
             | ComponentType::RoleSelect
             | ComponentType::MentionableSelect
             | ComponentType::ChannelSelect => {
-                SelectMenu::deserialize(raw_data).map(ActionRowComponent::SelectMenu)
+                Deserialize::deserialize(raw_data).map(ActionRowComponent::SelectMenu)
             },
             ComponentType::ActionRow => {
                 return Err(DeError::custom("Invalid component type ActionRow"));

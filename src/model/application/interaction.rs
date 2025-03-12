@@ -255,18 +255,16 @@ impl<'de> Deserialize<'de> for Interaction {
 
         match raw.kind {
             InteractionType::Command => {
-                CommandInteraction::deserialize(raw_data).map(Interaction::Command)
+                Deserialize::deserialize(raw_data).map(Interaction::Command)
             },
             InteractionType::Component => {
-                ComponentInteraction::deserialize(raw_data).map(Interaction::Component)
+                Deserialize::deserialize(raw_data).map(Interaction::Component)
             },
             InteractionType::Autocomplete => {
-                CommandInteraction::deserialize(raw_data).map(Interaction::Autocomplete)
+                Deserialize::deserialize(raw_data).map(Interaction::Autocomplete)
             },
-            InteractionType::Modal => {
-                ModalInteraction::deserialize(raw_data).map(Interaction::Modal)
-            },
-            InteractionType::Ping => PingInteraction::deserialize(raw_data).map(Interaction::Ping),
+            InteractionType::Modal => Deserialize::deserialize(raw_data).map(Interaction::Modal),
+            InteractionType::Ping => Deserialize::deserialize(raw_data).map(Interaction::Ping),
             InteractionType(_) => return Err(DeError::custom("Unknown interaction type")),
         }
         .map_err(DeError::custom)
@@ -516,15 +514,9 @@ impl<'de> serde::Deserialize<'de> for MessageInteractionMetadata {
         let raw = InteractionRaw::deserialize(raw_data).map_err(DeError::custom)?;
 
         match raw.kind {
-            InteractionType::Command => {
-                MessageCommandInteractionMetadata::deserialize(raw_data).map(Self::Command)
-            },
-            InteractionType::Component => {
-                MessageComponentInteractionMetadata::deserialize(raw_data).map(Self::Component)
-            },
-            InteractionType::Modal => {
-                MessageModalSubmitInteractionMetadata::deserialize(raw_data).map(Self::ModalSubmit)
-            },
+            InteractionType::Command => Deserialize::deserialize(raw_data).map(Self::Command),
+            InteractionType::Component => Deserialize::deserialize(raw_data).map(Self::Component),
+            InteractionType::Modal => Deserialize::deserialize(raw_data).map(Self::ModalSubmit),
 
             unknown => Ok(Self::Unknown(unknown)),
         }

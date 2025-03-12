@@ -167,9 +167,9 @@ impl<'de> Deserialize<'de> for Channel {
 
         match raw.kind {
             0 | 2 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => {
-                GuildChannel::deserialize(raw_data).map(Channel::Guild)
+                Deserialize::deserialize(raw_data).map(Channel::Guild)
             },
-            1 => PrivateChannel::deserialize(raw_data).map(Channel::Private),
+            1 => Deserialize::deserialize(raw_data).map(Channel::Private),
             _ => return Err(DeError::custom("Unknown channel type")),
         }
         .map_err(DeError::custom)
