@@ -16,7 +16,7 @@ use crate::utils;
 
 /// Hides the implementation detail of ImageHash as an enum.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
 enum ImageHashInner {
     Normal { hash: [u8; 16], is_animated: bool },
     Clyde,
@@ -36,7 +36,7 @@ enum ImageHashInner {
 /// ```
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct ImageHash(ImageHashInner);
 
 impl ImageHash {
