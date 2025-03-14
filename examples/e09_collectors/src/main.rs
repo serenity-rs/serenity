@@ -26,8 +26,7 @@ impl EventHandler for Handler {
         // There is a method implemented for some models to conveniently collect replies. They
         // return a builder that can be turned into a Stream, or here, where we can await a
         // single reply
-        let collector =
-            msg.author.id.collect_messages(ctx.shard.clone()).timeout(Duration::from_secs(10));
+        let collector = msg.author.id.collect_messages(&ctx).timeout(Duration::from_secs(10));
         if let Some(answer) = collector.await {
             if answer.content.to_lowercase() == "ferris" {
                 let _ = answer.reply(&ctx.http, "That's correct!").await;
@@ -47,7 +46,7 @@ impl EventHandler for Handler {
         // The message model can also be turned into a Collector to collect reactions on it.
         let collector = react_msg
             .id
-            .collect_reactions(ctx.shard.clone())
+            .collect_reactions(&ctx)
             .timeout(Duration::from_secs(10))
             .author_id(msg.author.id);
 
@@ -65,7 +64,7 @@ impl EventHandler for Handler {
         let _ = msg.reply(&ctx.http, "Write 5 messages in 10 seconds").await;
 
         // We can create a collector from scratch too using this builder future.
-        let collector = MessageCollector::new(ctx.shard.clone())
+        let collector = MessageCollector::new(&ctx)
         // Only collect messages by this user.
             .author_id(msg.author.id)
             .channel_id(msg.channel_id)
@@ -100,7 +99,7 @@ impl EventHandler for Handler {
         // We can also collect arbitrary events using the collect() function. For example, here we
         // collect updates to the messages that the user sent above and check for them updating all
         // 5 of them.
-        let mut collector = serenity::collector::collect(&ctx.shard, move |event| match event {
+        let mut collector = serenity::collector::collect(&ctx, move |event| match event {
             // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
             Event::MessageUpdate(event)
                 if collected.iter().any(|msg| event.message.id == msg.id) =>

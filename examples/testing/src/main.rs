@@ -122,7 +122,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 .await?;
             let button_press = msg
                 .id
-                .collect_component_interactions(ctx.shard.clone())
+                .collect_component_interactions(ctx)
                 .timeout(std::time::Duration::from_secs(10))
                 .await;
             match button_press {
@@ -181,7 +181,7 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             .await?;
 
         let msg_id = msg.id;
-        let mut message_updates = serenity::collector::collect(&ctx.shard, move |ev| match ev {
+        let mut message_updates = serenity::collector::collect(ctx, move |ev| match ev {
             Event::MessageUpdate(x) if x.message.id == msg_id => Some(()),
             _ => None,
         });
