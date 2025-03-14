@@ -6,7 +6,8 @@ use futures::future::pending;
 use futures::{Stream, StreamExt as _};
 pub use quick_modal::*;
 
-use crate::gateway::{CollectorCallback, ShardMessenger};
+use crate::gateway::CollectorCallback;
+use crate::gateway::client::Context;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -18,10 +19,10 @@ use crate::model::prelude::*;
 /// # use std::time::Duration;
 /// # use futures::StreamExt as _;
 /// # use serenity::model::prelude::Event;
-/// # use serenity::gateway::ShardMessenger;
+/// # use serenity::gateway::client::Context;
 /// # use serenity::collector::collect;
-/// # async fn example_(shard: &ShardMessenger) {
-/// let stream = collect(shard, |event| match event {
+/// # async fn example_(ctx: &Context) {
+/// let stream = collect(ctx, |event| match event {
 ///     Event::ReactionRemove(event) => Some(event.reaction.clone()),
 ///     _ => None,
 /// });
@@ -33,7 +34,7 @@ use crate::model::prelude::*;
 ///     .await;
 /// # }
 /// ```
-pub fn collect<T, F>(shard: &ShardMessenger, extractor: F) -> impl Stream<Item = T> + use<T, F>
+pub fn collect<T, F>(ctx: &Context, extractor: F) -> impl Stream<Item = T> + use<T, F>
 where
     T: Send + 'static,
     F: Fn(&Event) -> Option<T> + Send + Sync + 'static,
@@ -41,10 +42,12 @@ where
     let (sender, mut receiver) = tokio::sync::mpsc::unbounded_channel();
 
     // Register an event callback in the shard. It's kept alive as long as we return `true`
-    shard.add_collector(CollectorCallback(Arc::new(move |event| match extractor(event) {
-        // If this event matches, we send it to the receiver stream
-        Some(item) => sender.send(item).is_ok(),
-        None => !sender.is_closed(),
+    ctx.collectors.write().push(CollectorCallback(Arc::new(move |event| {
+        match extractor(event) {
+            // If this event matches, we send it to the receiver stream
+            Some(item) => sender.send(item).is_ok(),
+            None => !sender.is_closed(),
+        }
     })));
 
     // Convert the mpsc Receiver into a Stream
@@ -62,18 +65,18 @@ macro_rules! make_specific_collector {
         #[doc = concat!("A [`", stringify!($collector_type), "`] receives [`", stringify!($item_type), "`]'s match the given filters for a set duration.")]
         $( #[ $($meta)* ] )*
         #[must_use]
-        pub struct $collector_type {
-            shard: ShardMessenger,
+        pub struct $collector_type<'a> {
+            ctx: &'a Context,
             duration: Option<std::time::Duration>,
             filter: Option<Box<dyn Fn(&$item_type) -> bool + Send + Sync>>,
             $( $filter_name: Option<$filter_type>, )*
         }
 
-        impl $collector_type {
+        impl<'a> $collector_type<'a> {
             /// Creates a new collector without any filters configured.
-            pub fn new(shard: ShardMessenger) -> Self {
+            pub fn new(ctx: &'a Context) -> Self {
                 Self {
-                    shard,
+                    ctx,
                     duration: None,
                     filter: None,
                     $( $filter_name: None, )*
@@ -124,7 +127,7 @@ macro_rules! make_specific_collector {
                     None => pending::<()>().await,
                 } };
 
-                let stream = collect(&self.shard, move |event| match event {
+                let stream = collect(&self.ctx, move |event| match event {
                     $extractor if filters_pass($extracted_item) => Some($extracted_item.clone()),
                     _ => None,
                 });
@@ -139,9 +142,9 @@ macro_rules! make_specific_collector {
             }
         }
 
-        impl IntoFuture for $collector_type {
+        impl<'a> IntoFuture for $collector_type<'a> {
             type Output = Option<$item_type>;
-            type IntoFuture = futures::future::BoxFuture<'static, Self::Output>;
+            type IntoFuture = futures::future::BoxFuture<'a, Self::Output>;
 
             fn into_future(self) -> Self::IntoFuture {
                 Box::pin(self.next())
@@ -149,13 +152,13 @@ macro_rules! make_specific_collector {
         }
 
         pub trait $collector_trait {
-            fn $method_name(self, shard_messenger: ShardMessenger) -> $collector_type;
+            fn $method_name(self, ctx: &Context) -> $collector_type<'_>;
         }
 
         $(
             impl $collector_trait for $filter_type {
-                fn $method_name(self, shard_messenger: ShardMessenger) -> $collector_type {
-                    $collector_type::new(shard_messenger).$filter_name(self)
+                fn $method_name(self, ctx: &Context) -> $collector_type<'_> {
+                    $collector_type::new(ctx).$filter_name(self)
                 }
             }
         )*
