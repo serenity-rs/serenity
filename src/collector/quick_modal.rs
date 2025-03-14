@@ -98,7 +98,7 @@ impl<'a> CreateQuickModal<'a> {
         );
         builder.execute(&ctx.http, interaction_id, token).await?;
 
-        let collector = ModalInteractionCollector::new(ctx.shard.clone())
+        let collector = ModalInteractionCollector::new(ctx)
             .custom_ids(vec![FixedString::from_str_trunc(&modal_custom_id)]);
 
         let collector = match self.timeout {

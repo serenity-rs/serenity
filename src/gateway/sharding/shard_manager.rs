@@ -16,7 +16,6 @@ use super::{
     Shard,
     ShardId,
     ShardInfo,
-    ShardMessenger,
     ShardQueue,
     ShardRunner,
     ShardRunnerInfo,
@@ -68,7 +67,7 @@ pub struct ShardManager {
     ///
     /// **Note**: It is highly recommended to not mutate this yourself unless you need to. Instead
     /// prefer to use methods on this struct that are provided where possible.
-    pub runners: HashMap<ShardId, (Arc<Mutex<ShardRunnerInfo>>, ShardMessenger)>,
+    pub runners: HashMap<ShardId, (Arc<Mutex<ShardRunnerInfo>>, Sender<ShardRunnerMessage>)>,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
@@ -148,7 +147,7 @@ impl ShardManager {
             {
                 match msg {
                     ShardManagerMessage::Boot(shard_id) => self.queue_for_start(shard_id),
-                    ShardManagerMessage::Quit(err) => return Err(err),
+                    ShardManagerMessage::Quit(res) => return res,
                 }
             }
             let batch = self.queue.pop_batch();
@@ -187,8 +186,8 @@ impl ShardManager {
     pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {shard_id}");
 
-        if let Some((_, messenger)) = self.runners.remove(&shard_id) {
-            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Restart) {
+        if let Some((_, tx)) = self.runners.remove(&shard_id) {
+            if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Restart) {
                 warn!("Failed to send restart signal to shard {shard_id}: {why:?}");
             }
         }
@@ -203,8 +202,8 @@ impl ShardManager {
     pub fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
-        if let Some((_, messenger)) = self.runners.remove(&shard_id) {
-            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(code)) {
+        if let Some((_, tx)) = self.runners.remove(&shard_id) {
+            if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Shutdown(code)) {
                 warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
         }
@@ -284,17 +283,9 @@ impl ShardManager {
             http: Arc::clone(&self.http),
         });
 
-        self.runners.insert(shard_id, (runner_info, runner.messenger()));
+        self.runners.insert(shard_id, (runner_info, runner.runner_tx()));
 
-        let manager_tx = self.manager_tx.clone();
-        spawn_named("shard_runner::run", async move {
-            if let Err(Error::Gateway(e)) = runner.run().await {
-                if let Err(why) = manager_tx.unbounded_send(ShardManagerMessage::Quit(e)) {
-                    warn!("Failed to send return value: {why}");
-                }
-            }
-            debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
-        });
+        spawn_named("shard_runner::run", async move { runner.run().await });
 
         Ok(())
     }
@@ -342,9 +333,9 @@ impl Drop for ShardManager {
     fn drop(&mut self) {
         info!("Shutting down all shards");
 
-        for (shard_id, (_, messenger)) in self.runners.drain() {
+        for (shard_id, (_, tx)) in self.runners.drain() {
             info!("Shutting down shard {}", shard_id);
-            if let Err(why) = messenger.tx.unbounded_send(ShardRunnerMessage::Shutdown(1000)) {
+            if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Shutdown(1000)) {
                 warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
         }
@@ -381,5 +372,5 @@ pub enum ShardManagerMessage {
     /// the shard is not guaranteed to immediately start, until more shards are queued.
     Boot(ShardId),
     /// Indicates that a shard runner encountered a fatal error and the shard manager should quit.
-    Quit(GatewayError),
+    Quit(Result<(), GatewayError>),
 }

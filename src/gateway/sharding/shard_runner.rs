@@ -2,7 +2,6 @@ use std::sync::{Arc, Mutex};
 
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio_tungstenite::tungstenite;
-use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 #[cfg(feature = "tracing_instrument")]
@@ -11,14 +10,7 @@ use tracing::{debug, error, trace, warn};
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{
-    Shard,
-    ShardAction,
-    ShardManagerMessage,
-    ShardMessenger,
-    ShardRunnerInfo,
-    ShardStageUpdateEvent,
-};
+use super::{Shard, ShardAction, ShardManagerMessage, ShardRunnerInfo, ShardStageUpdateEvent};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
@@ -34,6 +26,8 @@ use crate::internal::tokio::spawn_named;
 #[cfg(feature = "voice")]
 use crate::model::event::Event;
 use crate::model::event::GatewayEvent;
+#[cfg(feature = "voice")]
+use crate::model::id::ChannelId;
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
 
@@ -87,6 +81,21 @@ impl ShardRunner {
         }
     }
 
+    /// A wrapper around [`ShardRunner::start_loop`] that starts the runner's main loop and
+    /// monitors for errors.
+    ///
+    /// If a fatal error occurs, this will send a message to the shard manager to close the
+    /// connection.
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    pub async fn run(&mut self) {
+        if let Err(Error::Gateway(e)) = self.start_loop().await {
+            if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::Quit(Err(e))) {
+                warn!("Failed to send return value: {why}");
+            }
+        }
+        debug!("[ShardRunner {:?}] Stopping", self.shard.shard_info());
+    }
+
     /// Starts the runner's loop to receive events.
     ///
     /// This runs a loop that performs the following in each iteration:
@@ -110,7 +119,7 @@ impl ShardRunner {
     /// [`ShardManager`]: super::ShardManager
     /// [`Event`]: crate::model::event::Event
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn run(&mut self) -> Result<()> {
+    pub async fn start_loop(&mut self) -> Result<()> {
         debug!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
@@ -187,32 +196,18 @@ impl ShardRunner {
                         }
 
                         let context = self.make_context();
-                        let can_dispatch = self
+                        if self
                             .event_handler
                             .as_ref()
                             .is_none_or(|handler| handler.filter_event(&context, &event))
                             && self
                                 .raw_event_handler
                                 .as_ref()
-                                .is_none_or(|handler| handler.filter_event(&context, &event));
-
-                        if can_dispatch {
+                                .is_none_or(|handler| handler.filter_event(&context, &event))
+                        {
                             #[cfg(feature = "collector")]
-                            {
-                                let read_lock = self.collectors.read();
-                                // search all collectors to be removed and clone the Arcs
-                                let to_remove: Vec<_> = read_lock
-                                    .iter()
-                                    .filter(|callback| !callback.0(&event))
-                                    .cloned()
-                                    .collect();
-                                drop(read_lock);
-                                // remove all found arcs from the collection
-                                // this compares the inner pointer of the Arc
-                                if !to_remove.is_empty() {
-                                    self.collectors.write().retain(|f| !to_remove.contains(f));
-                                }
-                            }
+                            self.collectors.write().retain(|callback| (callback.0)(&event));
+
                             spawn_named(
                                 "shard_runner::dispatch",
                                 dispatch_model(
@@ -309,14 +304,33 @@ impl ShardRunner {
                 self.shard.set_activity(activity);
                 self.shard.update_presence().await.is_ok()
             },
-            ShardRunnerMessage::SetPresence(activity, status) => {
-                self.shard.set_presence(activity, status);
-                self.shard.update_presence().await.is_ok()
-            },
             ShardRunnerMessage::SetStatus(status) => {
                 self.shard.set_status(status);
                 self.shard.update_presence().await.is_ok()
             },
+            ShardRunnerMessage::SetPresence {
+                activity,
+                status,
+            } => {
+                if let Some(activity) = activity {
+                    self.shard.set_activity(activity);
+                }
+                if let Some(status) = status {
+                    self.shard.set_status(status);
+                }
+                self.shard.update_presence().await.is_ok()
+            },
+            #[cfg(feature = "voice")]
+            ShardRunnerMessage::UpdateVoiceState {
+                guild_id,
+                channel_id,
+                self_mute,
+                self_deaf,
+            } => self
+                .shard
+                .update_voice_state(guild_id, channel_id, self_mute, self_deaf)
+                .await
+                .is_ok(),
         }
     }
 
@@ -354,23 +368,16 @@ impl ShardRunner {
     // Returns whether the shard runner is in a state that can continue.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn recv(&mut self) -> bool {
-        loop {
-            match self.runner_rx.try_recv() {
-                Ok(value) => {
-                    if !self.handle_rx_value(value).await {
-                        return false;
-                    }
-                },
-                Err(mpsc::TryRecvError::Closed) => {
-                    warn!(
-                        "[ShardRunner {:?}] Sending half DC; restarting",
-                        self.shard.shard_info(),
-                    );
-
-                    self.restart().await;
+        while let Ok(msg) = self.runner_rx.try_next() {
+            if let Some(value) = msg {
+                if !self.handle_rx_value(value).await {
                     return false;
-                },
-                Err(mpsc::TryRecvError::Empty) => break,
+                }
+            } else {
+                warn!("[ShardRunner {:?}] Sending half DC; restarting", self.shard.shard_info(),);
+
+                self.restart().await;
+                return false;
             }
         }
 
@@ -474,22 +481,22 @@ impl ShardRunner {
     }
 
     fn make_context(&self) -> Context {
-        Context::new(
-            Arc::clone(&self.data),
-            self.messenger(),
-            self.shard.shard_info().id,
-            Arc::clone(&self.http),
+        Context {
+            data: Arc::clone(&self.data),
+            shard: self.runner_tx.clone(),
+            manager: self.manager_tx.clone(),
+            shard_id: self.shard.shard_info().id,
+            http: Arc::clone(&self.http),
             #[cfg(feature = "cache")]
-            Arc::clone(&self.cache),
-        )
-    }
-
-    pub(super) fn messenger(&self) -> ShardMessenger {
-        ShardMessenger {
-            tx: self.runner_tx.clone(),
+            cache: Arc::clone(&self.cache),
+            runner_info: Arc::clone(&self.runner_info),
             #[cfg(feature = "collector")]
             collectors: Arc::clone(&self.collectors),
         }
+    }
+
+    pub(super) fn runner_tx(&self) -> Sender<ShardRunnerMessage> {
+        self.runner_tx.clone()
     }
 }
 
@@ -515,8 +522,13 @@ pub struct ShardRunnerOptions {
 pub enum ShardRunnerMessage {
     /// Indicator that a shard should be restarted.
     Restart,
-    /// Indicator that a shard should be fully shutdown without bringing it
-    /// back up.
+    /// Indicator that a shard should be shutdown with a specific WebSocket close code. Sending a
+    /// code of 1000 or 1001 will invalidate the session and show the current user as logged off.
+    /// Any other code will keep the session active until it times out.
+    ///
+    /// See the [Discord docs].
+    ///
+    /// [Discord docs]: https://discord.com/developers/docs/events/gateway#initiating-a-disconnect
     Shutdown(u16),
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {
@@ -539,20 +551,18 @@ pub enum ShardRunnerMessage {
         /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
         nonce: Option<String>,
     },
-    /// Indicates that the client is to close with the given status code and reason.
+    /// Indicates that the client is to update the shard's presence.
     ///
-    /// You should rarely - if _ever_ - need this, but the option is available. Prefer to use the
-    /// [`ShardManager`] to shutdown WebSocket clients if you are intending to send a 1000 close
-    /// code.
-    ///
-    /// [`ShardManager`]: super::ShardManager
-    Close(u16, Option<String>),
-    /// Indicates that the client is to send a custom WebSocket message.
-    Message(Message),
-    /// Indicates that the client is to update the shard's presence's activity.
-    SetActivity(Option<ActivityData>),
-    /// Indicates that the client is to update the shard's presence in its entirety.
-    SetPresence(Option<ActivityData>, OnlineStatus),
-    /// Indicates that the client is to update the shard's presence's status.
-    SetStatus(OnlineStatus),
+    /// Pass `None` to keep a value unmodified. The `activity` field is nullable, in other words
+    /// passing `Some(None)` will clear the current activity.
+    #[expect(clippy::option_option)]
+    SetPresence { activity: Option<Option<ActivityData>>, status: Option<OnlineStatus> },
+    /// Indicates that the client wants to join, move, or disconnect from a voice channel.
+    #[cfg(feature = "voice")]
+    UpdateVoiceState {
+        guild_id: GuildId,
+        channel_id: Option<ChannelId>,
+        self_mute: bool,
+        self_deaf: bool,
+    },
 }
