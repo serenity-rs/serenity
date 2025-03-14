@@ -52,7 +52,7 @@ pub enum ActionRowComponent {
 
 impl<'de> Deserialize<'de> for ActionRowComponent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
-        #[derive(Debug, Clone, Deserialize)]
+        #[derive(Deserialize)]
         struct ActionRowRaw {
             #[serde(rename = "type")]
             kind: ComponentType,

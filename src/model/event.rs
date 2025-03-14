@@ -973,7 +973,7 @@ fn raw_value_len(val: &RawValue) -> usize {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Debug, Clone, Deserialize)]
+        #[derive(Deserialize)]
         struct GatewayEventRaw<'a> {
             op: Opcode,
             #[serde(rename = "s")]

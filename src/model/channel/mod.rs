@@ -156,7 +156,7 @@ impl Channel {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Channel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Debug, Clone, Deserialize)]
+        #[derive(Deserialize)]
         struct ChannelRaw {
             #[serde(rename = "type")]
             kind: u64,

@@ -244,7 +244,7 @@ impl Interaction {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Interaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
-        #[derive(Debug, Clone, Deserialize)]
+        #[derive(Deserialize)]
         struct InteractionRaw {
             #[serde(rename = "type")]
             kind: InteractionType,
@@ -504,7 +504,7 @@ pub enum MessageInteractionMetadata {
 
 impl<'de> serde::Deserialize<'de> for MessageInteractionMetadata {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Debug, Clone, Deserialize)]
+        #[derive(Deserialize)]
         struct InteractionRaw {
             #[serde(rename = "type")]
             kind: InteractionType,
