@@ -1,9 +1,18 @@
-use std::fmt;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
+
+use futures::channel::mpsc::UnboundedSender as Sender;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
-use crate::gateway::{ActivityData, ShardMessenger};
+#[cfg(feature = "collector")]
+use crate::gateway::CollectorCallback;
+use crate::gateway::{
+    ActivityData,
+    ChunkGuildFilter,
+    ShardManagerMessage,
+    ShardRunnerInfo,
+    ShardRunnerMessage,
+};
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
 
@@ -27,25 +36,19 @@ pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more information.
     ///
     /// [`Client::data`]: super::Client::data
-    data: Arc<dyn std::any::Any + Send + Sync>,
-    /// The messenger to communicate with the shard runner.
-    pub shard: ShardMessenger,
+    pub(crate) data: Arc<dyn std::any::Any + Send + Sync>,
+    /// The channel to communicate with the shard runner.
+    pub(crate) shard: Sender<ShardRunnerMessage>,
+    /// The channel to communicate with the shard manager.
+    pub(crate) manager: Sender<ShardManagerMessage>,
     /// The ID of the shard this context is related to.
     pub shard_id: ShardId,
     pub http: Arc<Http>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
-}
-
-// Used by the #[cfg_attr(feature = "tracing_instrument", instrument)] macro on
-// client::dispatch::handle_event
-impl fmt::Debug for Context {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Context")
-            .field("shard", &self.shard)
-            .field("shard_id", &self.shard_id)
-            .finish_non_exhaustive()
-    }
+    pub runner_info: Arc<Mutex<ShardRunnerInfo>>,
+    #[cfg(feature = "collector")]
+    pub(crate) collectors: Arc<parking_lot::RwLock<Vec<CollectorCallback>>>,
 }
 
 impl CacheHttp for Context {
@@ -59,24 +62,6 @@ impl CacheHttp for Context {
 }
 
 impl Context {
-    /// Create a new Context to be passed to an event handler.
-    pub(crate) fn new(
-        data: Arc<dyn std::any::Any + Send + Sync>,
-        shard_messenger: ShardMessenger,
-        shard_id: ShardId,
-        http: Arc<Http>,
-        #[cfg(feature = "cache")] cache: Arc<Cache>,
-    ) -> Context {
-        Context {
-            data,
-            shard: shard_messenger,
-            shard_id,
-            http,
-            #[cfg(feature = "cache")]
-            cache,
-        }
-    }
-
     /// A container for a data type that can be used across contexts.
     ///
     /// The purpose of the data field is to be accessible and persistent across contexts; that is,
@@ -118,7 +103,7 @@ impl Context {
     /// # use serenity::model::channel::Message;
     /// #
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
@@ -131,7 +116,7 @@ impl Context {
     ///
     /// [`Online`]: OnlineStatus::Online
     pub fn online(&self) {
-        self.shard.set_status(OnlineStatus::Online);
+        self.set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current activity.
@@ -145,7 +130,7 @@ impl Context {
     /// # use serenity::model::channel::Message;
     /// #
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
@@ -158,7 +143,7 @@ impl Context {
     ///
     /// [`Idle`]: OnlineStatus::Idle
     pub fn idle(&self) {
-        self.shard.set_status(OnlineStatus::Idle);
+        self.set_status(OnlineStatus::Idle);
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the current activity.
@@ -172,7 +157,7 @@ impl Context {
     /// # use serenity::model::channel::Message;
     /// #
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
@@ -185,7 +170,7 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     pub fn dnd(&self) {
-        self.shard.set_status(OnlineStatus::DoNotDisturb);
+        self.set_status(OnlineStatus::DoNotDisturb);
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current activity.
@@ -199,7 +184,7 @@ impl Context {
     /// # use serenity::model::channel::Message;
     /// #
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
@@ -212,7 +197,47 @@ impl Context {
     ///
     /// [`Invisible`]: OnlineStatus::Invisible
     pub fn invisible(&self) {
-        self.shard.set_status(OnlineStatus::Invisible);
+        self.set_status(OnlineStatus::Invisible);
+    }
+
+    /// Sets the user's current online status.
+    ///
+    /// Note that [`Offline`] is not a valid online status, so it is automatically converted to
+    /// [`Invisible`].
+    ///
+    /// Other presence settings are maintained.
+    ///
+    /// # Examples
+    ///
+    /// Setting the current online status to [`DoNotDisturb`]:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::gateway::Ready;
+    /// # struct Handler;
+    /// #
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&self, ctx: Context, _: Ready) {
+    ///         use serenity::model::user::OnlineStatus;
+    ///
+    ///         ctx.set_status(OnlineStatus::DoNotDisturb);
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+    /// [`Invisible`]: OnlineStatus::Invisible
+    /// [`Offline`]: OnlineStatus::Offline
+    pub fn set_status(&self, mut online_status: OnlineStatus) {
+        if online_status == OnlineStatus::Offline {
+            online_status = OnlineStatus::Invisible;
+        }
+
+        self.send_to_shard(ShardRunnerMessage::SetPresence {
+            activity: None,
+            status: Some(online_status),
+        });
     }
 
     /// "Resets" the current user's presence, by setting the activity to [`None`] and the online
@@ -229,7 +254,7 @@ impl Context {
     /// # use serenity::model::channel::Message;
     /// #
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
@@ -243,7 +268,7 @@ impl Context {
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
     pub fn reset_presence(&self) {
-        self.shard.set_presence(None, OnlineStatus::Online);
+        self.set_presence(None, OnlineStatus::Online);
     }
 
     /// Sets the current activity.
@@ -256,7 +281,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// # struct Handler;
-    ///
+    /// #
     /// use serenity::gateway::ActivityData;
     ///
     /// #[serenity::async_trait]
@@ -271,7 +296,10 @@ impl Context {
     /// }
     /// ```
     pub fn set_activity(&self, activity: Option<ActivityData>) {
-        self.shard.set_activity(activity);
+        self.send_to_shard(ShardRunnerMessage::SetPresence {
+            activity: Some(activity),
+            status: None,
+        });
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -284,7 +312,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn ready(&self, ctx: Context, _: Ready) {
@@ -301,7 +329,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
     /// # struct Handler;
-    ///
+    /// #
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn ready(&self, context: Context, _: Ready) {
@@ -318,8 +346,150 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Idle`]: OnlineStatus::Idle
-    pub fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
-        self.shard.set_presence(activity, status);
+    pub fn set_presence(&self, activity: Option<ActivityData>, mut status: OnlineStatus) {
+        if status == OnlineStatus::Offline {
+            status = OnlineStatus::Invisible;
+        }
+
+        self.send_to_shard(ShardRunnerMessage::SetPresence {
+            activity: Some(activity),
+            status: Some(status),
+        });
+    }
+
+    /// Requests that one or multiple [`Guild`]s be chunked.
+    ///
+    /// This will ask the gateway to start sending member chunks for large guilds. If a guild is
+    /// large enough, then a full member list will not be provided upon connection, and must
+    /// instead be requested directly. The full list will be sent in "chunks" until all members
+    /// matching the request have been sent.
+    ///
+    /// Member chunks are sent as the [`Event::GuildMembersChunk`] event. Each chunk only contains
+    /// a partial amount of the total members.
+    ///
+    /// # Examples
+    ///
+    /// Chunk a single guild, limiting to 2000 [`Member`]s, and not specifying a query
+    /// parameter:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::gateway::ChunkGuildFilter;
+    /// # use serenity::model::gateway::Ready;
+    /// # struct Handler;
+    /// #
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&self, context: Context, _: Ready) {
+    ///         use serenity::model::id::GuildId;
+    ///
+    ///         context.chunk_guild(
+    ///             GuildId::new(81384788765712384),
+    ///             Some(2000),
+    ///             false,
+    ///             ChunkGuildFilter::None,
+    ///             None,
+    ///         );
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// Chunk a single guild by Id, limiting to 20 members, specifying a query parameter of `"do"`
+    /// and a nonce of `"request"`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::gateway::Ready;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
+    /// # struct Handler;
+    /// #
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&self, context: Context, _: Ready) {
+    ///         use serenity::model::id::GuildId;
+    ///
+    ///         context.chunk_guild(
+    ///             GuildId::new(81384788765712384),
+    ///             Some(20),
+    ///             false,
+    ///             ChunkGuildFilter::Query("do".to_owned()),
+    ///             Some("request".to_string()),
+    ///         );
+    ///     }
+    /// }
+    /// ```
+    pub fn chunk_guild(
+        &self,
+        guild_id: GuildId,
+        limit: Option<u16>,
+        presences: bool,
+        filter: ChunkGuildFilter,
+        nonce: Option<String>,
+    ) {
+        self.send_to_shard(ShardRunnerMessage::ChunkGuild {
+            guild_id,
+            limit,
+            presences,
+            filter,
+            nonce,
+        });
+    }
+
+    /// Indicates to the gateway that the client wants to join, move, or disconnect from a voice
+    /// channel.
+    ///
+    /// # Examples
+    ///
+    /// Join a voice channel, while staying muted:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # use serenity::model::gateway::Ready;
+    /// # struct Handler;
+    /// #
+    /// #[serenity::async_trait]
+    /// impl EventHandler for Handler {
+    ///     async fn ready(&self, context: Context, _: Ready) {
+    ///         use serenity::model::id::{ChannelId, GuildId};
+    ///
+    ///         context.update_voice_state(
+    ///             GuildId::new(81384788765712384),
+    ///             Some(ChannelId::new(111880193700067777)),
+    ///             true,
+    ///             false,
+    ///         )
+    ///     }
+    /// }
+    /// ```
+    #[cfg(feature = "voice")]
+    pub fn update_voice_state(
+        &self,
+        guild_id: GuildId,
+        channel_id: Option<ChannelId>,
+        self_mute: bool,
+        self_deaf: bool,
+    ) {
+        self.send_to_shard(ShardRunnerMessage::UpdateVoiceState {
+            guild_id,
+            channel_id,
+            self_mute,
+            self_deaf,
+        });
+    }
+
+    /// Sends a message to the shard.
+    fn send_to_shard(&self, msg: ShardRunnerMessage) {
+        if let Err(e) = self.shard.unbounded_send(msg) {
+            tracing::warn!("failed to send ShardRunnerMessage to shard: {}", e);
+        }
+    }
+
+    /// Sends a message back to the shard manager to shutdown all currently running shards,
+    /// including this one.
+    pub fn shutdown_all(&self) {
+        if let Err(e) = self.manager.unbounded_send(ShardManagerMessage::Quit(Ok(()))) {
+            tracing::warn!("failed to send shutdown request to shard manager: {}", e);
+        }
     }
 
     /// Gets all emojis for the current application.
