@@ -22,6 +22,8 @@ use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, Transpor
 use crate::constants::{self, Opcode};
 use crate::model::event::GatewayEvent;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
+#[cfg(feature = "voice")]
+use crate::model::id::ChannelId;
 use crate::model::id::{GuildId, UserId};
 use crate::{Error, Result};
 
@@ -65,6 +67,13 @@ enum WebSocketMessageData<'a> {
         intents: GatewayIntents,
         properties: IdentifyProperties,
         presence: PresenceUpdateMessage<'a>,
+    },
+    #[cfg(feature = "voice")]
+    VoiceStateUpdate {
+        guild_id: GuildId,
+        channel_id: Option<ChannelId>,
+        self_mute: bool,
+        self_deaf: bool,
     },
     PresenceUpdate(PresenceUpdateMessage<'a>),
     Resume {
@@ -284,12 +293,6 @@ impl WsClient {
         self.stream.next().await
     }
 
-    /// Delegate to `SinkExt::send`
-    pub(crate) async fn send(&mut self, message: Message) -> Result<()> {
-        self.stream.send(message).await?;
-        Ok(())
-    }
-
     /// Delegate to `WebSocketStream::close`
     pub(crate) async fn close(&mut self, msg: Option<CloseFrame>) -> Result<()> {
         self.stream.close(msg).await?;
@@ -430,6 +433,33 @@ impl WsClient {
                 session_id,
                 token,
                 seq,
+            },
+        })
+        .await
+    }
+
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    #[cfg(feature = "voice")]
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    pub async fn send_voice_state_update(
+        &mut self,
+        shard_info: &ShardInfo,
+        guild_id: GuildId,
+        channel_id: Option<ChannelId>,
+        self_mute: bool,
+        self_deaf: bool,
+    ) -> Result<()> {
+        debug!("[{:?}] Sending voice state update", shard_info);
+
+        self.send_json(&WebSocketMessage {
+            op: Opcode::VoiceStateUpdate,
+            d: WebSocketMessageData::VoiceStateUpdate {
+                guild_id,
+                channel_id,
+                self_mute,
+                self_deaf,
             },
         })
         .await

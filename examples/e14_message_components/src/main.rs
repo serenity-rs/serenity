@@ -60,7 +60,7 @@ impl EventHandler for Handler {
         // manually in the EventHandler.
         let interaction = match m
             .id
-            .collect_component_interactions(ctx.shard.clone())
+            .collect_component_interactions(&ctx)
             .timeout(Duration::from_secs(60 * 3))
             .await
         {
@@ -108,9 +108,7 @@ impl EventHandler for Handler {
 
         // Wait for multiple interactions
         let mut interaction_stream =
-            m.id.collect_component_interactions(ctx.shard.clone())
-                .timeout(Duration::from_secs(60 * 3))
-                .stream();
+            m.id.collect_component_interactions(&ctx).timeout(Duration::from_secs(60 * 3)).stream();
 
         while let Some(interaction) = interaction_stream.next().await {
             let sound = &interaction.data.custom_id;
