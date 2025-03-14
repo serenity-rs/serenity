@@ -152,9 +152,13 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: &CreateAttachment<'_>) -> Self {
-        self.image = Some(image.to_base64());
-        self
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    pub async fn image(mut self, image: &CreateAttachment<'_>) -> Result<Self> {
+        self.image = Some(image.to_base64().await?);
+        Ok(self)
     }
 
     /// Sets the request's audit log reason.

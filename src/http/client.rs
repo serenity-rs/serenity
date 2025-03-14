@@ -4408,7 +4408,8 @@ impl Http {
                     &self.client,
                     self.token.as_ref().map(Token::expose_secret),
                     self.proxy.as_deref(),
-                )?
+                )
+                .await?
                 .build()?;
             self.client.execute(request).await?
         };

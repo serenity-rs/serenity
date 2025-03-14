@@ -91,17 +91,24 @@ impl<'a> EditGuild<'a> {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
-    /// let icon = CreateAttachment::path("./guild_icon.png").await?;
+    /// let icon = CreateAttachment::path("./guild_icon.png")?;
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::new().icon(Some(&icon));
+    /// let builder = EditGuild::new().icon(Some(&icon)).await?;
     /// guild.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Self {
-        self.icon = Some(icon.map(CreateAttachment::to_base64));
-        self
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    pub async fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Result<Self> {
+        self.icon = Some(match icon {
+            Some(attachment) => Some(attachment.to_base64().await?),
+            None => None,
+        });
+        Ok(self)
     }
 
     /// Clear the current guild icon, resetting it to the default logo.
@@ -181,10 +188,17 @@ impl<'a> EditGuild<'a> {
     /// Requires that the guild have the `BANNER` feature enabled. You can check this through a
     /// guild's [`features`] list.
     ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    ///
     /// [`features`]: Guild::features
-    pub fn banner(mut self, banner: Option<&CreateAttachment<'_>>) -> Self {
-        self.banner = Some(banner.map(CreateAttachment::to_base64).map(Cow::from));
-        self
+    pub async fn banner(mut self, banner: Option<&CreateAttachment<'_>>) -> Result<Self> {
+        self.banner = Some(match banner {
+            Some(attachment) => Some(attachment.to_base64().await?.into()),
+            None => None,
+        });
+        Ok(self)
     }
 
     /// Set the channel ID where welcome messages and boost events will be posted.

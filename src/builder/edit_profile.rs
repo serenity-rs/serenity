@@ -3,7 +3,6 @@ use std::borrow::Cow;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::user::CurrentUser;
@@ -41,14 +40,19 @@ impl<'a> EditProfile<'a> {
     /// #
     /// # #[cfg(feature = "http")]
     /// # async fn foo_(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
-    /// let avatar = CreateAttachment::path("./my_image.jpg").await.expect("Failed to read image.");
-    /// current_user.edit(http, EditProfile::new().avatar(&avatar)).await?;
+    /// let avatar = CreateAttachment::path("./my_image.jpg").expect("Invalid filename.");
+    /// let builder = EditProfile::new().avatar(&avatar).await?;
+    /// current_user.edit(http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
-        self.avatar = Some(Some(avatar.to_base64()));
-        self
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    pub async fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Result<Self> {
+        self.avatar = Some(Some(avatar.to_base64().await?));
+        Ok(self)
     }
 
     /// Delete the current user's avatar, resetting it to the default logo.
@@ -68,9 +72,13 @@ impl<'a> EditProfile<'a> {
     }
 
     /// Sets the banner of the current user.
-    pub fn banner(mut self, banner: &CreateAttachment<'_>) -> Self {
-        self.banner = Some(Some(banner.to_base64()));
-        self
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    pub async fn banner(mut self, banner: &CreateAttachment<'_>) -> Result<Self> {
+        self.banner = Some(Some(banner.to_base64().await?));
+        Ok(self)
     }
 
     /// Deletes the current user's banner, resetting it to the default.

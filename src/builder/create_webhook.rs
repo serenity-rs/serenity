@@ -3,7 +3,6 @@ use std::borrow::Cow;
 use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
@@ -39,9 +38,13 @@ impl<'a> CreateWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
-        self.avatar = Some(avatar.to_base64());
-        self
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    pub async fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Result<Self> {
+        self.avatar = Some(avatar.to_base64().await?);
+        Ok(self)
     }
 
     /// Sets the request's audit log reason.

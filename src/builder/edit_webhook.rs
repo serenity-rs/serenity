@@ -43,9 +43,13 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
-        self.avatar = Some(Some(avatar.to_base64()));
-        self
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    pub async fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Result<Self> {
+        self.avatar = Some(Some(avatar.to_base64().await?));
+        Ok(self)
     }
 
     /// Delete the webhook's avatar, resetting it to the default logo.

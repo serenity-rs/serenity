@@ -131,10 +131,17 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    pub fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Self {
-        self.icon = Some(icon.map(CreateAttachment::to_base64).map(Into::into));
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::to_base64`] for possible errors.
+    pub async fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Result<Self> {
+        self.icon = Some(match icon {
+            Some(attachment) => Some(attachment.to_base64().await?.into()),
+            None => None,
+        });
         self.unicode_emoji = Some(None);
-        self
+        Ok(self)
     }
 
     /// Sets the request's audit log reason.

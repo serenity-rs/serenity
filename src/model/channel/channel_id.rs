@@ -651,8 +651,8 @@ impl ChannelId {
     /// let channel_id = ChannelId::new(7);
     ///
     /// let paths = [
-    ///     CreateAttachment::path("/path/to/file.jpg").await?,
-    ///     CreateAttachment::path("path/to/file2.jpg").await?,
+    ///     CreateAttachment::path("/path/to/file.jpg")?,
+    ///     CreateAttachment::path("/path/to/file2.jpg")?,
     /// ];
     ///
     /// let builder = CreateMessage::new().content("some files");
@@ -674,12 +674,12 @@ impl ChannelId {
     ///
     /// let channel_id = ChannelId::new(7);
     ///
-    /// let f1 = File::open("my_file.jpg").await?;
-    /// let f2 = File::open("my_file2.jpg").await?;
+    /// let f1 = File::open("/path/to/file.jpg").await?;
+    /// let f2 = File::open("/path/to/file2.jpg").await?;
     ///
     /// let files = [
-    ///     CreateAttachment::file(&f1, "my_file.jpg").await?,
-    ///     CreateAttachment::file(&f2, "my_file2.jpg").await?,
+    ///     CreateAttachment::file(&f1, "test_file1.jpg"),
+    ///     CreateAttachment::file(&f2, "test_file2.jpg"),
     /// ];
     ///
     /// let builder = CreateMessage::new().content("some files");

@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use bytes::Bytes;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
@@ -14,6 +14,13 @@ use crate::http::Http;
 use crate::model::channel::Message;
 use crate::model::id::AttachmentId;
 
+#[derive(Clone, Debug)]
+pub enum AttachmentData<'a> {
+    Bytes(Bytes),
+    File(&'a File),
+    Path(PathBuf),
+}
+
 /// A builder for creating a new attachment from a file path, file data, or URL.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
@@ -23,16 +30,16 @@ use crate::model::id::AttachmentId;
 pub struct CreateAttachment<'a> {
     pub filename: Cow<'static, str>,
     pub description: Option<Cow<'a, str>>,
-    pub data: Bytes,
+    pub data: AttachmentData<'a>,
 }
 
 impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
     pub fn bytes(data: impl Into<Bytes>, filename: impl Into<Cow<'static, str>>) -> Self {
         CreateAttachment {
-            data: data.into(),
             filename: filename.into(),
             description: None,
+            data: AttachmentData::Bytes(data.into()),
         }
     }
 
@@ -40,33 +47,28 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// # Errors
     ///
-    /// [`Error::Io`] if reading the file fails.
-    pub async fn path(path: impl AsRef<Path>) -> Result<Self> {
-        async fn inner(path: &Path) -> Result<CreateAttachment<'static>> {
-            let mut file = File::open(path).await?;
-            let mut data = Vec::new();
-            file.read_to_end(&mut data).await?;
-
-            let filename = path
-                .file_name()
-                .ok_or_else(|| std::io::Error::other("attachment path must not be a directory"))?;
-
-            Ok(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned()))
-        }
-
-        inner(path.as_ref()).await
+    /// Returns [`Error::Io`] if the path is not a valid file path.
+    pub fn path(path: impl AsRef<Path>) -> Result<Self> {
+        let path = path.as_ref().to_owned();
+        let filename = path
+            .file_name()
+            .ok_or_else(|| std::io::Error::other("attachment path must not be a directory"))?
+            .to_string_lossy()
+            .into_owned();
+        Ok(CreateAttachment {
+            filename: filename.into(),
+            description: None,
+            data: AttachmentData::Path(path),
+        })
     }
 
     /// Builds an [`CreateAttachment`] by reading from a file handler.
-    ///
-    /// # Errors
-    ///
-    /// [`Error::Io`] error if reading the file fails.
-    pub async fn file(file: &File, filename: impl Into<Cow<'static, str>>) -> Result<Self> {
-        let mut data = Vec::new();
-        file.try_clone().await?.read_to_end(&mut data).await?;
-
-        Ok(CreateAttachment::bytes(data, filename))
+    pub fn file(file: &'a File, filename: impl Into<Cow<'static, str>>) -> Self {
+        CreateAttachment {
+            filename: filename.into(),
+            description: None,
+            data: AttachmentData::File(file),
+        }
     }
 
     /// Builds an [`CreateAttachment`] by downloading attachment data from a URL.
@@ -86,25 +88,51 @@ impl<'a> CreateAttachment<'a> {
         Ok(CreateAttachment::bytes(data, filename))
     }
 
+    /// Returns the underlying data for the attachment.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if fetching the data failed in some way. If the attachment is a
+    /// [`CreateAttachment::path`], then the file at the specified path was unable to be read. If
+    /// instead it's [`CreateAttachment::file`], then cloning the handle to the file failed, likely
+    /// due to hitting the system's limit on number of open file handles.
+    pub async fn get_data(&self) -> Result<Bytes> {
+        match &self.data {
+            AttachmentData::Bytes(bytes) => Ok(bytes.clone()),
+            AttachmentData::Path(path) => {
+                let mut file = File::open(path).await?;
+                let mut data = Vec::new();
+                file.read_to_end(&mut data).await?;
+                Ok(data.into())
+            },
+            AttachmentData::File(file) => {
+                let mut data = Vec::new();
+                file.try_clone().await?.read_to_end(&mut data).await?;
+                Ok(data.into())
+            },
+        }
+    }
+
     /// Converts the stored data to the base64 representation.
     ///
     /// This is used in the library internally because Discord expects image data as base64 in many
     /// places.
     #[must_use]
-    pub fn to_base64(&self) -> String {
+    pub async fn to_base64(&self) -> Result<String> {
         use base64::engine::{Config, Engine};
 
         const PREFIX: &str = "data:image/png;base64,";
+        let data = self.get_data().await?;
 
         let engine = base64::prelude::BASE64_STANDARD;
-        let encoded_size = base64::encoded_len(self.data.len(), engine.config().encode_padding())
+        let encoded_size = base64::encoded_len(data.len(), engine.config().encode_padding())
             .and_then(|len| len.checked_add(PREFIX.len()))
             .expect("buffer capacity overflow");
 
         let mut encoded = String::with_capacity(encoded_size);
         encoded.push_str(PREFIX);
-        engine.encode_string(&self.data, &mut encoded);
-        encoded
+        engine.encode_string(&data, &mut encoded);
+        Ok(encoded)
     }
 
     /// Sets a description for the file (max 1024 characters).
@@ -114,15 +142,10 @@ impl<'a> CreateAttachment<'a> {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
-struct ExistingAttachment {
-    id: AttachmentId,
-}
-
 #[derive(Clone, Debug)]
-enum NewOrExisting<'a> {
+enum EditAttachmentsInner<'a> {
     New(CreateAttachment<'a>),
-    Existing(ExistingAttachment),
+    Existing(AttachmentId),
 }
 
 /// You can add new attachments and edit existing ones using this builder.
@@ -183,7 +206,7 @@ enum NewOrExisting<'a> {
 #[derive(Default, Debug, Clone)]
 #[must_use]
 pub struct EditAttachments<'a> {
-    new_and_existing_attachments: Vec<NewOrExisting<'a>>,
+    inner: Vec<EditAttachmentsInner<'a>>,
 }
 
 impl<'a> EditAttachments<'a> {
@@ -207,15 +230,7 @@ impl<'a> EditAttachments<'a> {
     /// Discord will throw an error!**
     pub fn keep_all(msg: &Message) -> Self {
         Self {
-            new_and_existing_attachments: msg
-                .attachments
-                .iter()
-                .map(|a| {
-                    NewOrExisting::Existing(ExistingAttachment {
-                        id: a.id,
-                    })
-                })
-                .collect(),
+            inner: msg.attachments.iter().map(|a| EditAttachmentsInner::Existing(a.id)).collect(),
         }
     }
 
@@ -224,9 +239,7 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::remove`].
     pub fn keep(mut self, id: AttachmentId) -> Self {
-        self.new_and_existing_attachments.push(NewOrExisting::Existing(ExistingAttachment {
-            id,
-        }));
+        self.inner.push(EditAttachmentsInner::Existing(id));
         self
     }
 
@@ -235,10 +248,9 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::keep`].
     pub fn remove(mut self, id: AttachmentId) -> Self {
-        #[expect(clippy::match_like_matches_macro)] // `matches!` is less clear here
-        self.new_and_existing_attachments.retain(|a| match a {
-            NewOrExisting::Existing(a) if a.id == id => false,
-            _ => true,
+        self.inner.retain(|a| match a {
+            EditAttachmentsInner::Existing(existing_id) => *existing_id != id,
+            EditAttachmentsInner::New(_) => true,
         });
         self
     }
@@ -246,7 +258,7 @@ impl<'a> EditAttachments<'a> {
     /// Adds a new attachment to the attachment list.
     #[expect(clippy::should_implement_trait)] // Clippy thinks add == std::ops::Add::add
     pub fn add(mut self, attachment: CreateAttachment<'a>) -> Self {
-        self.new_and_existing_attachments.push(NewOrExisting::New(attachment));
+        self.inner.push(EditAttachmentsInner::New(attachment));
         self
     }
 
@@ -254,19 +266,17 @@ impl<'a> EditAttachments<'a> {
     /// are needed for the multipart form data. The data is taken out of `self` in the process, so
     /// this method can only be called once.
     #[cfg(feature = "http")]
-    pub(crate) fn take_files(&mut self) -> Vec<CreateAttachment<'a>> {
-        let mut files = Vec::new();
-        for attachment in &mut self.new_and_existing_attachments {
-            if let NewOrExisting::New(attachment) = attachment {
-                let cloned_attachment = CreateAttachment::bytes(
-                    std::mem::take(&mut attachment.data),
-                    attachment.filename.clone(),
-                );
-
-                files.push(cloned_attachment);
-            }
-        }
-        files
+    pub(crate) fn new_attachments(&mut self) -> Vec<CreateAttachment<'a>> {
+        self.inner
+            .iter()
+            .filter_map(|attachment| {
+                if let EditAttachmentsInner::New(attachment) = &attachment {
+                    Some(attachment.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }
 
@@ -279,14 +289,19 @@ impl Serialize for EditAttachments<'_> {
             description: &'a Option<Cow<'a, str>>,
         }
 
+        #[derive(Serialize)]
+        struct ExistingAttachment {
+            id: AttachmentId,
+        }
+
         // Instead of an `AttachmentId`, the `id` field for new attachments corresponds to the
         // index of the new attachment in the multipart payload. The attachment data will be
         // labeled with `files[{id}]` in the multipart body. See `Multipart::build_form`.
         let mut id = 0;
-        let mut seq = serializer.serialize_seq(Some(self.new_and_existing_attachments.len()))?;
-        for attachment in &self.new_and_existing_attachments {
+        let mut seq = serializer.serialize_seq(Some(self.inner.len()))?;
+        for attachment in &self.inner {
             match attachment {
-                NewOrExisting::New(new_attachment) => {
+                EditAttachmentsInner::New(new_attachment) => {
                     let attachment = NewAttachment {
                         id,
                         filename: &new_attachment.filename,
@@ -295,8 +310,10 @@ impl Serialize for EditAttachments<'_> {
                     id += 1;
                     seq.serialize_element(&attachment)?;
                 },
-                NewOrExisting::Existing(existing_attachment) => {
-                    seq.serialize_element(existing_attachment)?;
+                EditAttachmentsInner::Existing(id) => {
+                    seq.serialize_element(&ExistingAttachment {
+                        id: *id,
+                    })?;
                 },
             }
         }

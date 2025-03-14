@@ -192,11 +192,10 @@ impl Ratelimiter {
                 sleep(delay_time).await;
             }
 
-            let request = req.clone().build(
-                &self.client,
-                self.token.as_ref().map(Token::expose_secret),
-                None,
-            )?;
+            let request = req
+                .clone()
+                .build(&self.client, self.token.as_ref().map(Token::expose_secret), None)
+                .await?;
             let response = self.client.execute(request.build()?).await?;
 
             // Check if the request got ratelimited by checking for status 429, and if so, sleep
