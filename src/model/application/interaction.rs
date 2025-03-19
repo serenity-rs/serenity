@@ -1,6 +1,6 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
-use serde_json::from_value;
+use serde_json::value::RawValue;
 
 use super::{
     CommandInteraction,
@@ -16,7 +16,7 @@ use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, GuildId, InteractionId, MessageId, UserId};
 use crate::model::monetization::Entitlement;
 use crate::model::user::User;
-use crate::model::utils::{StrOrInt, deserialize_val, remove_from_map};
+use crate::model::utils::StrOrInt;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -246,17 +246,27 @@ impl Interaction {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Interaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
+        #[derive(Deserialize)]
+        struct InteractionRaw {
+            #[serde(rename = "type")]
+            kind: InteractionType,
+        }
 
-        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?.clone();
-        let value = Value::from(map);
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = InteractionRaw::deserialize(raw_data).map_err(DeError::custom)?;
 
-        match deserialize_val(raw_kind)? {
-            InteractionType::Command => from_value(value).map(Interaction::Command),
-            InteractionType::Component => from_value(value).map(Interaction::Component),
-            InteractionType::Autocomplete => from_value(value).map(Interaction::Autocomplete),
-            InteractionType::Modal => from_value(value).map(Interaction::Modal),
-            InteractionType::Ping => from_value(value).map(Interaction::Ping),
+        match raw.kind {
+            InteractionType::Command => {
+                Deserialize::deserialize(raw_data).map(Interaction::Command)
+            },
+            InteractionType::Component => {
+                Deserialize::deserialize(raw_data).map(Interaction::Component)
+            },
+            InteractionType::Autocomplete => {
+                Deserialize::deserialize(raw_data).map(Interaction::Autocomplete)
+            },
+            InteractionType::Modal => Deserialize::deserialize(raw_data).map(Interaction::Modal),
+            InteractionType::Ping => Deserialize::deserialize(raw_data).map(Interaction::Ping),
             InteractionType(_) => return Err(DeError::custom("Unknown interaction type")),
         }
         .map_err(DeError::custom)
@@ -497,16 +507,23 @@ pub enum MessageInteractionMetadata {
 
 impl<'de> serde::Deserialize<'de> for MessageInteractionMetadata {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut data = JsonMap::deserialize(deserializer)?;
-        let kind: InteractionType = remove_from_map(&mut data, "type")?;
+        #[derive(Deserialize)]
+        struct InteractionRaw {
+            #[serde(rename = "type")]
+            kind: InteractionType,
+        }
 
-        match kind {
-            InteractionType::Command => deserialize_val(Value::from(data)).map(Self::Command),
-            InteractionType::Component => deserialize_val(Value::from(data)).map(Self::Component),
-            InteractionType::Modal => deserialize_val(Value::from(data)).map(Self::ModalSubmit),
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = InteractionRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        match raw.kind {
+            InteractionType::Command => Deserialize::deserialize(raw_data).map(Self::Command),
+            InteractionType::Component => Deserialize::deserialize(raw_data).map(Self::Component),
+            InteractionType::Modal => Deserialize::deserialize(raw_data).map(Self::ModalSubmit),
 
             unknown => Ok(Self::Unknown(unknown)),
         }
+        .map_err(DeError::custom)
     }
 }
 

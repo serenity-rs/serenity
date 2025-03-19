@@ -3,6 +3,7 @@ use std::fmt;
 use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
 use serde_cow::CowStr;
+use serde_json::value::RawValue;
 use small_fixed_array::FixedString;
 
 use super::prelude::*;
@@ -58,22 +59,6 @@ pub(super) fn icon_url(id: GuildId, icon: Option<&ImageHash>) -> Option<String> 
 
         cdn!("/icons/{}/{}.{}", id, icon, ext)
     })
-}
-
-pub fn deserialize_val<T, E>(val: Value) -> StdResult<T, E>
-where
-    T: serde::de::DeserializeOwned,
-    E: serde::de::Error,
-{
-    T::deserialize(val).map_err(serde::de::Error::custom)
-}
-
-pub fn remove_from_map<T, E>(map: &mut JsonMap, key: &'static str) -> StdResult<T, E>
-where
-    T: serde::de::DeserializeOwned,
-    E: serde::de::Error,
-{
-    map.remove(key).ok_or_else(|| serde::de::Error::missing_field(key)).and_then(deserialize_val)
 }
 
 pub(super) enum StrOrInt<'de> {
@@ -278,6 +263,12 @@ pub fn deserialize_components<'de, D>(deserializer: D) -> Result<FixedArray<Acti
 where
     D: Deserializer<'de>,
 {
+    #[derive(Deserialize)]
+    struct MinComponent {
+        #[serde(rename = "type")]
+        kind: u8,
+    }
+
     struct ComponentsVisitor;
 
     impl<'de> Visitor<'de> for ComponentsVisitor {
@@ -293,22 +284,23 @@ where
         {
             let mut components = Vec::with_capacity(seq.size_hint().unwrap_or_default());
 
-            while let Some(map) = seq.next_element::<JsonMap>()? {
+            while let Some(raw) = seq.next_element::<&RawValue>()? {
                 // We deserialize only the `kind` field to determine the component type.
                 // We later use this to check if its a supported component before deserializing the
                 // entire payload.
-                let raw_kind =
-                    map.get("type").ok_or_else(|| DeError::missing_field("type"))?.clone();
-                let kind: i64 = deserialize_val(raw_kind)?;
+                let min_component =
+                    MinComponent::deserialize(raw).map_err(serde::de::Error::custom)?;
 
                 // Action rows are the only top level component supported in serenity at this time.
-                if kind == 1 {
-                    let value = Value::from(map);
-                    components.push(ActionRow::deserialize(value).map_err(DeError::custom)?);
+                if min_component.kind == 1 {
+                    components.push(ActionRow::deserialize(raw).map_err(serde::de::Error::custom)?);
                 } else {
                     // Top level component is not an action row and cannot be supported on
                     // serenity@current without breaking changes, so we skip them.
-                    tracing::debug!("Skipping component with unsupported kind: {kind}");
+                    tracing::debug!(
+                        "Skipping component with unsupported kind: {}",
+                        min_component.kind
+                    );
                 }
             }
 
