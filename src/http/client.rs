@@ -1835,13 +1835,11 @@ impl Http {
     pub async fn edit_member_me(
         &self,
         guild_id: GuildId,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Member> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
