@@ -142,16 +142,29 @@ impl ShardManager {
     ) -> Result<(), GatewayError> {
         self.initialize(shard_index, shard_init, shard_total);
         loop {
-            if let Ok(Some(msg)) =
-                timeout(self.wait_time_between_shard_start, self.manager_rx.next()).await
-            {
+            let batch = self.queue.pop_batch();
+            let msg = if batch.is_empty() {
+                // This function is the only code that can add new shards
+                // to start to the queue directly (enforced by `&mut`), so
+                // if the batch is empty, it will always be empty until a
+                // `ShardManagerMessage::Boot` is received here.
+                self.manager_rx.next().await
+            } else {
+                self.checked_start(batch).await;
+
+                // Include a timeout so we can start the next batch of
+                // shards even if no more messages are received.
+                timeout(self.wait_time_between_shard_start, self.manager_rx.next())
+                    .await
+                    .unwrap_or_default()
+            };
+
+            if let Some(msg) = msg {
                 match msg {
                     ShardManagerMessage::Boot(shard_id) => self.queue_for_start(shard_id),
                     ShardManagerMessage::Quit(res) => return res,
                 }
             }
-            let batch = self.queue.pop_batch();
-            self.checked_start(batch).await;
         }
     }
 
