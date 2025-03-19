@@ -14,5 +14,3 @@ pub use super::utils::join_to_string;
 pub use crate::error::Error;
 pub use crate::error::Result;
 pub use crate::secrets::{SecretString, Token};
-
-pub type JsonMap = serde_json::Map<String, Value>;
