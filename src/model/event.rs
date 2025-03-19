@@ -468,9 +468,11 @@ pub struct MessageDeleteEvent {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-update).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+// This ensures that `RawValue` is further supported in nested fields of `Message`.
+// Fields underneath #[serde(flatten)] cannot be deserialized as `RawValue`.
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct MessageUpdateEvent {
-    #[serde(flatten)]
     pub message: Message,
 }
 
@@ -971,7 +973,7 @@ fn raw_value_len(val: &RawValue) -> usize {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Debug, Clone, Deserialize)]
+        #[derive(Deserialize)]
         struct GatewayEventRaw<'a> {
             op: Opcode,
             #[serde(rename = "s")]
