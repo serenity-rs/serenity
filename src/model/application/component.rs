@@ -1,9 +1,9 @@
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
-use serde_json::from_value;
+use serde_json::value::RawValue;
 
 use crate::model::prelude::*;
-use crate::model::utils::{default_true, deserialize_val};
+use crate::model::utils::default_true;
 
 enum_number! {
     /// The type of a component
@@ -52,19 +52,29 @@ pub enum ActionRowComponent {
 
 impl<'de> Deserialize<'de> for ActionRowComponent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
+        #[derive(Deserialize)]
+        struct ActionRowRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
 
-        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?.clone();
-        let value = Value::from(map);
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = ActionRowRaw::deserialize(raw_data).map_err(DeError::custom)?;
 
-        match deserialize_val(raw_kind)? {
-            ComponentType::Button => from_value(value).map(ActionRowComponent::Button),
-            ComponentType::InputText => from_value(value).map(ActionRowComponent::InputText),
+        match raw.kind {
+            ComponentType::Button => {
+                Deserialize::deserialize(raw_data).map(ActionRowComponent::Button)
+            },
+            ComponentType::InputText => {
+                Deserialize::deserialize(raw_data).map(ActionRowComponent::InputText)
+            },
             ComponentType::StringSelect
             | ComponentType::UserSelect
             | ComponentType::RoleSelect
             | ComponentType::MentionableSelect
-            | ComponentType::ChannelSelect => from_value(value).map(ActionRowComponent::SelectMenu),
+            | ComponentType::ChannelSelect => {
+                Deserialize::deserialize(raw_data).map(ActionRowComponent::SelectMenu)
+            },
             ComponentType::ActionRow => {
                 return Err(DeError::custom("Invalid component type ActionRow"));
             },
