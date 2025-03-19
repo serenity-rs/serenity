@@ -11,9 +11,9 @@ mod reaction;
 
 use std::fmt;
 
-use serde::de::{Error as DeError, Unexpected};
+use serde::de::Error as DeError;
 use serde::ser::SerializeMap as _;
-use serde_json::from_value;
+use serde_json::value::RawValue;
 
 pub use self::attachment::*;
 #[cfg(feature = "model")]
@@ -156,22 +156,20 @@ impl Channel {
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Channel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
+        #[derive(Deserialize)]
+        struct ChannelRaw {
+            #[serde(rename = "type")]
+            kind: u64,
+        }
 
-        let kind = {
-            let kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
-            kind.as_u64().ok_or_else(|| {
-                DeError::invalid_type(
-                    Unexpected::Other("non-positive integer"),
-                    &"a positive integer",
-                )
-            })?
-        };
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = ChannelRaw::deserialize(raw_data).map_err(DeError::custom)?;
 
-        let value = Value::from(map);
-        match kind {
-            0 | 2 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value(value).map(Channel::Guild),
-            1 => from_value(value).map(Channel::Private),
+        match raw.kind {
+            0 | 2 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => {
+                Deserialize::deserialize(raw_data).map(Channel::Guild)
+            },
+            1 => Deserialize::deserialize(raw_data).map(Channel::Private),
             _ => return Err(DeError::custom("Unknown channel type")),
         }
         .map_err(DeError::custom)
