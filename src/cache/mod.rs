@@ -264,19 +264,6 @@ impl Cache {
     /// This can be used in combination with [`Shard::chunk_guild`], and can be used to determine
     /// how many members have not yet been received.
     ///
-    /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::prelude::*;
-    /// struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn cache_ready(&self, ctx: Context, _: Vec<GuildId>) {
-    ///         println!("{} unknown members", ctx.cache.unknown_members());
-    ///     }
-    /// }
-    /// ```
-    ///
     /// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild
     pub fn unknown_members(&self) -> u64 {
         let mut total = 0;
@@ -305,17 +292,23 @@ impl Cache {
     /// Print all of the Ids of guilds in the Cache:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
+    /// # use serenity::gateway::client::FullEvent;
     /// # use serenity::prelude::*;
-    /// #
+    ///
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&self, context: Context, _: Ready) {
-    ///         let guilds = context.cache.guilds().len();
-    ///
-    ///         println!("Guilds in the Cache: {}", guilds);
+    ///     async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+    ///         match event {
+    ///             FullEvent::Ready {
+    ///                 data_about_bot, ..
+    ///             } => {
+    ///                 let guilds = ctx.cache.guilds().len();
+    ///                 println!("Guilds in the Cache: {guilds}");
+    ///             },
+    ///             _ => {},
+    ///         }
     ///     }
     /// }
     /// ```
@@ -391,7 +384,7 @@ impl Cache {
     ///
     /// # Examples
     ///
-    /// Retrieving the message object from a channel, in a [`EventHandler::message`] context:
+    /// Retrieving the message object from a channel.
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -405,8 +398,6 @@ impl Cache {
     /// };
     /// # }
     /// ```
-    ///
-    /// [`EventHandler::message`]: crate::gateway::client::EventHandler::message
     pub fn message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
         #[cfg(feature = "temp_cache")]
         if let Some(message) = self.temp_messages.get(&message_id) {

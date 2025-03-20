@@ -4,8 +4,8 @@ use std::env;
 
 use serenity::async_trait;
 use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseMessage};
+use serenity::gateway::client::FullEvent;
 use serenity::model::application::{Command, Interaction};
-use serenity::model::gateway::Ready;
 use serenity::model::id::GuildId;
 use serenity::prelude::*;
 
@@ -13,59 +13,74 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        if let Interaction::Command(command) = interaction {
-            println!("Received command interaction: {command:#?}");
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        // clippy can't decide between if it wants it collapsed, or if it wants you to use if let
+        // because its a single pattern.
+        #[expect(clippy::collapsible_match)]
+        match event {
+            FullEvent::InteractionCreate {
+                interaction, ..
+            } => {
+                if let Interaction::Command(command) = interaction {
+                    println!("Received command interaction: {command:#?}");
 
-            let content = match command.data.name.as_str() {
-                "ping" => Some(commands::ping::run(&command.data.options())),
-                "id" => Some(commands::id::run(&command.data.options())),
-                "attachmentinput" => Some(commands::attachmentinput::run(&command.data.options())),
-                "modal" => {
-                    commands::modal::run(&ctx, &command).await.unwrap();
-                    None
-                },
-                _ => Some("not implemented :(".to_string()),
-            };
+                    let content = match command.data.name.as_str() {
+                        "ping" => Some(commands::ping::run(&command.data.options())),
+                        "id" => Some(commands::id::run(&command.data.options())),
+                        "attachmentinput" => {
+                            Some(commands::attachmentinput::run(&command.data.options()))
+                        },
+                        "modal" => {
+                            commands::modal::run(ctx, command).await.unwrap();
+                            None
+                        },
+                        _ => Some("not implemented :(".to_string()),
+                    };
 
-            if let Some(content) = content {
-                let data = CreateInteractionResponseMessage::new().content(content);
-                let builder = CreateInteractionResponse::Message(data);
-                if let Err(why) = command.create_response(&ctx.http, builder).await {
-                    println!("Cannot respond to slash command: {why}");
+                    if let Some(content) = content {
+                        let data = CreateInteractionResponseMessage::new().content(content);
+                        let builder = CreateInteractionResponse::Message(data);
+                        if let Err(why) = command.create_response(&ctx.http, builder).await {
+                            println!("Cannot respond to slash command: {why}");
+                        }
+                    }
                 }
-            }
+            },
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                println!("{} is connected!", data_about_bot.user.name);
+
+                let guild_id = GuildId::new(
+                    env::var("GUILD_ID")
+                        .expect("Expected GUILD_ID in environment")
+                        .parse()
+                        .expect("GUILD_ID must be an integer"),
+                );
+
+                let commands = guild_id
+                    .set_commands(&ctx.http, &[
+                        commands::ping::register(),
+                        commands::id::register(),
+                        commands::welcome::register(),
+                        commands::numberinput::register(),
+                        commands::attachmentinput::register(),
+                        commands::modal::register(),
+                    ])
+                    .await;
+
+                println!("I now have the following guild slash commands: {commands:#?}");
+
+                let global_command =
+                    Command::create_global_command(&ctx.http, commands::wonderful_command::register())
+                        .await;
+
+                println!("I created the following global slash command: {global_command:#?}");
+
+                println!("{} is connected!", data_about_bot.user.name);
+            },
+            _ => {},
         }
-    }
-
-    async fn ready(&self, ctx: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-
-        let guild_id = GuildId::new(
-            env::var("GUILD_ID")
-                .expect("Expected GUILD_ID in environment")
-                .parse()
-                .expect("GUILD_ID must be an integer"),
-        );
-
-        let commands = guild_id
-            .set_commands(&ctx.http, &[
-                commands::ping::register(),
-                commands::id::register(),
-                commands::welcome::register(),
-                commands::numberinput::register(),
-                commands::attachmentinput::register(),
-                commands::modal::register(),
-            ])
-            .await;
-
-        println!("I now have the following guild slash commands: {commands:#?}");
-
-        let global_command =
-            Command::create_global_command(&ctx.http, commands::wonderful_command::register())
-                .await;
-
-        println!("I created the following global slash command: {global_command:#?}");
     }
 }
 
