@@ -5,8 +5,6 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 
 // A container type is created for inserting into the Client's `data`, which allows for data to be
@@ -16,47 +14,58 @@ struct UserData {
     message_count: AtomicUsize,
 }
 
+use serenity::gateway::client::FullEvent;
 struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        // Since data is located in Context, this means you are able to use it within events!
-        let data = ctx.data::<UserData>();
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Message {
+                new_message, ..
+            } => {
+                // Since data is located in Context, this means you are able to use it within
+                // events!
+                let data = ctx.data::<UserData>();
 
-        // We are verifying if the bot id is the same as the message author id.
-        let owo_count = if msg.author.id != ctx.cache.current_user().id
-            && msg.content.to_lowercase().contains("owo")
-        {
-            // Here, we are checking how many "owo" there are in the message content.
-            let owo_in_msg = msg.content.to_ascii_lowercase().matches("owo").count();
+                // We are verifying if the bot id is the same as the message author id.
+                let owo_count = if new_message.author.id != ctx.cache.current_user().id
+                    && new_message.content.to_lowercase().contains("owo")
+                {
+                    // Here, we are checking how many "owo" there are in the message content.
+                    let owo_in_msg =
+                        new_message.content.to_ascii_lowercase().matches("owo").count();
 
-            // Atomic operations with ordering do not require mut to be modified.
-            // In this case, we want to increase the message count by 1.
-            // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_add
-            data.message_count.fetch_add(owo_in_msg, Ordering::SeqCst) + 1
-        } else {
-            // We don't need to check for "owo_count" if "owo" isn't in the message!
-            return;
-        };
+                    // Atomic operations with ordering do not require mut to be modified.
+                    // In this case, we want to increase the message count by 1.
+                    // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_add
+                    data.message_count.fetch_add(owo_in_msg, Ordering::SeqCst) + 1
+                } else {
+                    // We don't need to check for "owo_count" if "owo" isn't in the message!
+                    return;
+                };
 
-        if msg.content.starts_with("~owo_count") {
-            let response = if owo_count == 1 {
-                Cow::Borrowed(
-                    "You are the first one to say owo this session! *because it's on the command name* :P",
-                )
-            } else {
-                Cow::Owned(format!("OWO Has been said {owo_count} times!"))
-            };
+                if new_message.content.starts_with("~owo_count") {
+                    let response = if owo_count == 1 {
+                        Cow::Borrowed(
+                            "You are the first one to say owo this session! *because it's on the command name* :P",
+                        )
+                    } else {
+                        Cow::Owned(format!("OWO Has been said {owo_count} times!"))
+                    };
 
-            if let Err(err) = msg.reply(&ctx.http, response).await {
-                eprintln!("Error sending response: {err:?}")
-            };
+                    if let Err(err) = new_message.reply(&ctx.http, response).await {
+                        eprintln!("Error sending response: {err:?}")
+                    };
+                }
+            },
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                println!("{} is connected!", data_about_bot.user.name);
+            },
+            _ => {},
         }
-    }
-
-    async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
     }
 }
 
