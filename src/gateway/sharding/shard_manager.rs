@@ -142,6 +142,9 @@ impl ShardManager {
     ) -> Result<(), GatewayError> {
         self.initialize(shard_index, shard_init, shard_total);
         loop {
+            let batch = self.queue.pop_batch();
+            self.checked_start(batch).await;
+
             if let Ok(Some(msg)) =
                 timeout(self.wait_time_between_shard_start, self.manager_rx.next()).await
             {
@@ -150,8 +153,6 @@ impl ShardManager {
                     ShardManagerMessage::Quit(res) => return res,
                 }
             }
-            let batch = self.queue.pop_batch();
-            self.checked_start(batch).await;
         }
     }
 
