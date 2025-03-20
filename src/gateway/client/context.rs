@@ -94,52 +94,12 @@ impl Context {
 
     /// Sets the current user as being [`Online`]. This maintains the current activity.
     ///
-    /// # Examples
-    ///
-    /// Set the current user to being online on the shard:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
-    /// #
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!online" {
-    ///             ctx.online();
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
     /// [`Online`]: OnlineStatus::Online
     pub fn online(&self) {
         self.set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current activity.
-    ///
-    /// # Examples
-    ///
-    /// Set the current user to being idle on the shard:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
-    /// #
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!idle" {
-    ///             ctx.idle();
-    ///         }
-    ///     }
-    /// }
-    /// ```
     ///
     /// [`Idle`]: OnlineStatus::Idle
     pub fn idle(&self) {
@@ -148,25 +108,6 @@ impl Context {
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the current activity.
     ///
-    /// # Examples
-    ///
-    /// Set the current user to being Do Not Disturb on the shard:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
-    /// #
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!dnd" {
-    ///             ctx.dnd();
-    ///         }
-    ///     }
-    /// }
-    /// ```
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     pub fn dnd(&self) {
@@ -174,26 +115,6 @@ impl Context {
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current activity.
-    ///
-    /// # Examples
-    ///
-    /// Set the current user to being invisible on the shard:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
-    /// #
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!invisible" {
-    ///             ctx.invisible();
-    ///         }
-    ///     }
-    /// }
-    /// ```
     ///
     /// [`Invisible`]: OnlineStatus::Invisible
     pub fn invisible(&self) {
@@ -205,28 +126,6 @@ impl Context {
     /// Note that [`Offline`] is not a valid online status, so it is automatically converted to
     /// [`Invisible`].
     ///
-    /// Other presence settings are maintained.
-    ///
-    /// # Examples
-    ///
-    /// Setting the current online status to [`DoNotDisturb`]:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn ready(&self, ctx: Context, _: Ready) {
-    ///         use serenity::model::user::OnlineStatus;
-    ///
-    ///         ctx.set_status(OnlineStatus::DoNotDisturb);
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Invisible`]: OnlineStatus::Invisible
     /// [`Offline`]: OnlineStatus::Offline
     pub fn set_status(&self, mut online_status: OnlineStatus) {
@@ -245,56 +144,12 @@ impl Context {
     ///
     /// Use [`Self::set_presence`] for fine-grained control over individual details.
     ///
-    /// # Examples
-    ///
-    /// Reset the current user's presence on the shard:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
-    /// #
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         if msg.content == "!reset_presence" {
-    ///             ctx.reset_presence();
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
     pub fn reset_presence(&self) {
         self.set_presence(None, OnlineStatus::Online);
     }
 
     /// Sets the current activity.
-    ///
-    /// # Examples
-    ///
-    /// Create a command named `~setgame` that accepts a name of a game to be playing:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::channel::Message;
-    /// # struct Handler;
-    /// #
-    /// use serenity::gateway::ActivityData;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, ctx: Context, msg: Message) {
-    ///         let mut args = msg.content.splitn(2, ' ');
-    ///
-    ///         if let (Some("~setgame"), Some(game)) = (args.next(), args.next()) {
-    ///             ctx.set_activity(Some(ActivityData::playing(game)));
-    ///         }
-    ///     }
-    /// }
-    /// ```
     pub fn set_activity(&self, activity: Option<ActivityData>) {
         self.send_to_shard(ShardRunnerMessage::SetPresence {
             activity: Some(activity),
@@ -303,49 +158,6 @@ impl Context {
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
-    ///
-    /// # Examples
-    ///
-    /// Setting the current user as having no activity and being [`Idle`]:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn ready(&self, ctx: Context, _: Ready) {
-    ///         use serenity::model::user::OnlineStatus;
-    ///
-    ///         ctx.set_presence(None, OnlineStatus::Idle);
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// Setting the current user as playing `"Heroes of the Storm"`, while being [`DoNotDisturb`]:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn ready(&self, context: Context, _: Ready) {
-    ///         use serenity::gateway::ActivityData;
-    ///         use serenity::model::user::OnlineStatus;
-    ///
-    ///         let activity = ActivityData::playing("Heroes of the Storm");
-    ///         let status = OnlineStatus::DoNotDisturb;
-    ///
-    ///         context.set_presence(Some(activity), status);
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
-    /// [`Idle`]: OnlineStatus::Idle
     pub fn set_presence(&self, activity: Option<ActivityData>, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
@@ -374,22 +186,31 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # use serenity::gateway::ChunkGuildFilter;
     /// # use serenity::model::gateway::Ready;
+    /// # use serenity::gateway::client::FullEvent;
+    /// # use serenity::gateway::{ChunkGuildFilter, Shard};
+    /// # use serenity::all::GuildId;
+    ///
     /// # struct Handler;
     /// #
+    ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&self, context: Context, _: Ready) {
-    ///         use serenity::model::id::GuildId;
-    ///
-    ///         context.chunk_guild(
-    ///             GuildId::new(81384788765712384),
-    ///             Some(2000),
-    ///             false,
-    ///             ChunkGuildFilter::None,
-    ///             None,
-    ///         );
+    ///     async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+    ///         match event {
+    ///             FullEvent::Ready {
+    ///                 ..
+    ///             } => {
+    ///                 ctx.chunk_guild(
+    ///                     GuildId::new(81384788765712384),
+    ///                     Some(2000),
+    ///                     false,
+    ///                     ChunkGuildFilter::None,
+    ///                     None,
+    ///                 );
+    ///             },
+    ///             _ => {},
+    ///         }
     ///     }
     /// }
     /// ```
@@ -400,21 +221,30 @@ impl Context {
     /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
+    /// # use serenity::gateway::client::FullEvent;
     /// # use serenity::gateway::{ChunkGuildFilter, Shard};
+    /// # use serenity::all::GuildId;
+    ///
     /// # struct Handler;
     /// #
+    ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn ready(&self, context: Context, _: Ready) {
-    ///         use serenity::model::id::GuildId;
-    ///
-    ///         context.chunk_guild(
-    ///             GuildId::new(81384788765712384),
-    ///             Some(20),
-    ///             false,
-    ///             ChunkGuildFilter::Query("do".to_owned()),
-    ///             Some("request".to_string()),
-    ///         );
+    ///     async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+    ///         match event {
+    ///             FullEvent::Ready {
+    ///                 ..
+    ///             } => {
+    ///                 ctx.chunk_guild(
+    ///                     GuildId::new(81384788765712384),
+    ///                     Some(20),
+    ///                     false,
+    ///                     ChunkGuildFilter::Query("do".to_owned()),
+    ///                     Some("request".to_string()),
+    ///                 );
+    ///             },
+    ///             _ => {},
+    ///         }
     ///     }
     /// }
     /// ```
@@ -437,30 +267,6 @@ impl Context {
 
     /// Indicates to the gateway that the client wants to join, move, or disconnect from a voice
     /// channel.
-    ///
-    /// # Examples
-    ///
-    /// Join a voice channel, while staying muted:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
-    /// # struct Handler;
-    /// #
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn ready(&self, context: Context, _: Ready) {
-    ///         use serenity::model::id::{ChannelId, GuildId};
-    ///
-    ///         context.update_voice_state(
-    ///             GuildId::new(81384788765712384),
-    ///             Some(ChannelId::new(111880193700067777)),
-    ///             true,
-    ///             false,
-    ///         )
-    ///     }
-    /// }
-    /// ```
     #[cfg(feature = "voice")]
     pub fn update_voice_state(
         &self,

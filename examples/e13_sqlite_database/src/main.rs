@@ -10,61 +10,78 @@ struct Bot {
     database: sqlx::SqlitePool,
 }
 
+use serenity::gateway::client::FullEvent;
+
 #[async_trait]
 impl EventHandler for Bot {
-    async fn message(&self, ctx: Context, msg: Message) {
-        let user_id = msg.author.id.get() as i64;
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Message {
+                new_message, ..
+            } => {
+                let user_id = new_message.author.id.get() as i64;
 
-        if let Some(task_description) = msg.content.strip_prefix("~todo add") {
-            let task_description = task_description.trim();
-            // That's how we are going to use a sqlite command.
-            // We are inserting into the todo table, our task_description in task column and our
-            // user_id in user_Id column.
-            sqlx::query!(
-                "INSERT INTO todo (task, user_id) VALUES (?, ?)",
-                task_description,
-                user_id,
-            )
-            .execute(&self.database) // < Where the command will be executed
-            .await
-            .unwrap();
-
-            let response = format!("Successfully added `{task_description}` to your todo list");
-            msg.channel_id.say(&ctx.http, response).await.unwrap();
-        } else if let Some(task_index) = msg.content.strip_prefix("~todo remove") {
-            let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
-
-            // "SELECT" will return the rowid of the todo rows where the user_Id column = user_id.
-            let entry = sqlx::query!(
-                "SELECT rowid, task FROM todo WHERE user_id = ? ORDER BY rowid LIMIT 1 OFFSET ?",
-                user_id,
-                task_index,
-            )
-            .fetch_one(&self.database) // < Just one data will be sent to entry
-            .await
-            .unwrap();
-
-            // Every todo row with rowid column = entry.rowid will be deleted.
-            sqlx::query!("DELETE FROM todo WHERE rowid = ?", entry.rowid)
-                .execute(&self.database)
-                .await
-                .unwrap();
-
-            let response = format!("Successfully completed `{}`!", entry.task);
-            msg.channel_id.say(&ctx.http, response).await.unwrap();
-        } else if msg.content.trim() == "~todo list" {
-            // "SELECT" will return the task of all rows where user_Id column = user_id in todo.
-            let todos = sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
-                    .fetch_all(&self.database) // < All matched data will be sent to todos
+                if let Some(task_description) = new_message.content.strip_prefix("~todo add") {
+                    let task_description = task_description.trim();
+                    // That's how we are going to use a sqlite command.
+                    // We are inserting into the todo table, our task_description in task column and
+                    // our user_id in user_Id column.
+                    sqlx::query!(
+                        "INSERT INTO todo (task, user_id) VALUES (?, ?)",
+                        task_description,
+                        user_id,
+                    )
+                    .execute(&self.database) // < Where the command will be executed
                     .await
                     .unwrap();
 
-            let mut response = format!("You have {} pending tasks:\n", todos.len());
-            for (i, todo) in todos.iter().enumerate() {
-                writeln!(response, "{}. {}", i + 1, todo.task).unwrap();
-            }
+                    let response =
+                        format!("Successfully added `{task_description}` to your todo list");
+                    new_message.channel_id.say(&ctx.http, response).await.unwrap();
+                } else if let Some(task_index) = new_message.content.strip_prefix("~todo remove") {
+                    let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
 
-            msg.channel_id.say(&ctx.http, response).await.unwrap();
+                    // "SELECT" will return the rowid of the todo rows where the user_Id column =
+                    // user_id.
+                    let entry = sqlx::query!(
+                        "SELECT rowid, task FROM todo WHERE user_id = ? ORDER BY rowid LIMIT 1 OFFSET ?",
+                        user_id,
+                        task_index,
+                    )
+                    .fetch_one(&self.database) // < Just one data will be sent to entry
+                    .await
+                    .unwrap();
+
+                    // Every todo row with rowid column = entry.rowid will be deleted.
+                    sqlx::query!("DELETE FROM todo WHERE rowid = ?", entry.rowid)
+                        .execute(&self.database)
+                        .await
+                        .unwrap();
+
+                    let response = format!("Successfully completed `{}`!", entry.task);
+                    new_message.channel_id.say(&ctx.http, response).await.unwrap();
+                } else if new_message.content.trim() == "~todo list" {
+                    // "SELECT" will return the task of all rows where user_Id column = user_id in
+                    // todo.
+                    let todos = sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
+                            .fetch_all(&self.database) // < All matched data will be sent to todos
+                            .await
+                            .unwrap();
+
+                    let mut response = format!("You have {} pending tasks:\n", todos.len());
+                    for (i, todo) in todos.iter().enumerate() {
+                        writeln!(response, "{}. {}", i + 1, todo.task).unwrap();
+                    }
+
+                    new_message.channel_id.say(&ctx.http, response).await.unwrap();
+                }
+            },
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                println!("{} is connected!", data_about_bot.user.name);
+            },
+            _ => {},
         }
     }
 }

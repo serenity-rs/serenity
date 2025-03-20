@@ -61,20 +61,43 @@ pub(crate) async fn dispatch_model(
     );
 
     #[cfg(feature = "framework")]
+    tokio::join!(
+        dispatch_framework(&context, framework, &full_event, extra_event.as_ref()),
+        dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref())
+    );
+
+    #[cfg(not(feature = "framework"))]
+    dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref()).await;
+}
+
+#[cfg(feature = "framework")]
+async fn dispatch_framework(
+    context: &Context,
+    framework: Option<Arc<dyn Framework>>,
+    full_event: &FullEvent,
+    extra_event: Option<&FullEvent>,
+) {
     if let Some(framework) = framework {
-        if let Some(extra_event) = &extra_event {
-            framework.dispatch(&context, extra_event).await;
+        if let Some(extra_event) = extra_event {
+            framework.dispatch(context, extra_event).await;
         }
 
-        framework.dispatch(&context, &full_event).await;
+        framework.dispatch(context, full_event).await;
     }
+}
 
+async fn dispatch_event_handler(
+    context: &Context,
+    event_handler: Option<Arc<dyn EventHandler>>,
+    full_event: &FullEvent,
+    extra_event: Option<&FullEvent>,
+) {
     if let Some(handler) = event_handler {
         if let Some(extra_event) = extra_event {
-            extra_event.dispatch(context.clone(), &*handler).await;
+            handler.dispatch(context, extra_event).await;
         }
 
-        full_event.dispatch(context, &*handler).await;
+        handler.dispatch(context, full_event).await;
     }
 }
 
