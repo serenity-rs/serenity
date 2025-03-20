@@ -22,7 +22,7 @@
 use std::time::Duration;
 
 use serenity::async_trait;
-use serenity::model::gateway::Ready;
+use serenity::gateway::client::FullEvent;
 use serenity::prelude::*;
 use tokio::time::sleep;
 
@@ -30,12 +30,16 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _: Context, ready: Ready) {
-        if let Some(shard) = ready.shard {
-            // Note that array index 0 is 0-indexed, while index 1 is 1-indexed.
-            //
-            // This may seem unintuitive, but it models Discord's behaviour.
-            println!("{} is connected on shard {}/{}!", ready.user.name, shard.id, shard.total);
+    async fn dispatch(&self, _: &Context, event: &FullEvent) {
+        if let FullEvent::Ready {
+            data_about_bot, ..
+        } = event
+            && let Some(shard) = data_about_bot.shard
+        {
+            println!(
+                "{} is connected on shard {}/{}!",
+                data_about_bot.user.name, shard.id, shard.total
+            );
         }
     }
 }

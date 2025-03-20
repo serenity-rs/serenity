@@ -1,29 +1,32 @@
 use serenity::async_trait;
-use serenity::model::event::ResumedEvent;
-use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use tracing::{debug, error, info, instrument};
 
 struct Handler;
 
+use serenity::gateway::client::FullEvent;
+
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _: Context, ready: Ready) {
-        // Log at the INFO level. This is a macro from the `tracing` crate.
-        info!("{} is connected!", ready.user.name);
-    }
-
-    // For instrument to work, all parameters must implement Debug.
-    //
-    // Handler doesn't implement Debug here, so we specify to skip that argument.
-    // Context doesn't implement Debug either, so it is also skipped.
-    #[instrument(skip(self, _ctx))]
-    async fn resume(&self, _ctx: Context, _resume: ResumedEvent) {
-        // Log at the DEBUG level.
-        //
-        // In this example, this will not show up in the logs because DEBUG is
-        // below INFO, which is the set debug level.
-        debug!("Resumed");
+    async fn dispatch(&self, _: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                // Log at the INFO level. This is a macro from the `tracing` crate.
+                info!("{} is connected!", data_about_bot.user.name);
+            },
+            FullEvent::Resume {
+                ..
+            } => {
+                // Log at the DEBUG level.
+                //
+                // In this example, this will not show up in the logs because DEBUG is
+                // below INFO, which is the set debug level.
+                debug!("Resumed");
+            },
+            _ => {},
+        }
     }
 }
 

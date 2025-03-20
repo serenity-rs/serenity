@@ -1,6 +1,5 @@
 use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
+use serenity::gateway::client::FullEvent;
 use serenity::prelude::*;
 
 // Serenity implements transparent sharding in a way that you do not need to handle separate
@@ -22,18 +21,24 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content == "!ping" {
-            println!("Shard {}", ctx.shard_id);
-
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
-                println!("Error sending message: {why:?}");
-            }
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Message {
+                new_message, ..
+            } => {
+                if new_message.content == "!ping"
+                    && let Err(why) = new_message.channel_id.say(&ctx.http, "Pong!").await
+                {
+                    println!("Error sending message: {why:?}");
+                }
+            },
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                println!("{} is connected!", data_about_bot.user.name);
+            },
+            _ => {},
         }
-    }
-
-    async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
     }
 }
 

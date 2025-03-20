@@ -5,62 +5,71 @@ use chrono::offset::Utc;
 use serenity::async_trait;
 use serenity::builder::{CreateEmbed, CreateMessage};
 use serenity::gateway::ActivityData;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
-use serenity::model::id::{ChannelId, GuildId};
+use serenity::model::id::ChannelId;
 use serenity::prelude::*;
 
 struct Handler {
     is_loop_running: AtomicBool,
 }
 
+use serenity::gateway::client::FullEvent;
+
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content.starts_with("!ping") {
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
-                eprintln!("Error sending message: {why:?}");
-            }
-        }
-    }
-
-    async fn ready(&self, _ctx: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
-    }
-
-    // We use the cache_ready event just in case some cache operation is required in whatever use
-    // case you have for this.
-    async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
-        println!("Cache built successfully!");
-
-        // We need to check that the loop is not already running when this event triggers, as this
-        // event triggers every time the bot enters or leaves a guild, along every time the ready
-        // shard event triggers.
-        //
-        // An AtomicBool is used because it doesn't require a mutable reference to be changed, as
-        // we don't have one due to self being an immutable reference.
-        if !self.is_loop_running.load(Ordering::Relaxed) {
-            // We have to clone the ctx, as it gets moved into the new thread.
-            let ctx1 = ctx.clone();
-            // tokio::spawn creates a new green thread that can run in parallel with the rest of
-            // the application.
-            tokio::spawn(async move {
-                loop {
-                    log_system_load(&ctx1).await;
-                    tokio::time::sleep(Duration::from_secs(120)).await;
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Message {
+                new_message, ..
+            } => {
+                if new_message.content == "!ping"
+                    && let Err(why) = new_message.channel_id.say(&ctx.http, "Pong!").await
+                {
+                    println!("Error sending message: {why:?}");
                 }
-            });
+            },
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                println!("{} is connected!", data_about_bot.user.name);
+            },
+            FullEvent::CacheReady {
+                ..
+            } => {
+                println!("Cache built successfully!");
 
-            // And of course, we can run more than one thread at different timings.
-            tokio::spawn(async move {
-                loop {
-                    set_activity_to_current_time(&ctx);
-                    tokio::time::sleep(Duration::from_secs(60)).await;
+                // We need to check that the loop is not already running when this event triggers,
+                // as this event triggers every time the bot enters or leaves a
+                // guild, along every time the ready shard event triggers.
+                //
+                // An AtomicBool is used because it doesn't require a mutable reference to be
+                // changed, as we don't have one due to self being an immutable
+                // reference.
+                if !self.is_loop_running.load(Ordering::Relaxed) {
+                    // We have to clone the ctx, as it gets moved into the new thread.
+                    let ctx1 = ctx.clone();
+                    // tokio::spawn creates a new green thread that can run in parallel with the
+                    // rest of the application.
+                    tokio::spawn(async move {
+                        loop {
+                            log_system_load(&ctx1).await;
+                            tokio::time::sleep(Duration::from_secs(120)).await;
+                        }
+                    });
+
+                    // And of course, we can run more than one thread at different timings.
+                    let ctx2 = ctx.clone();
+                    tokio::spawn(async move {
+                        loop {
+                            set_activity_to_current_time(&ctx2);
+                            tokio::time::sleep(Duration::from_secs(60)).await;
+                        }
+                    });
+
+                    // Now that the loop is running, we set the bool to true
+                    self.is_loop_running.swap(true, Ordering::Relaxed);
                 }
-            });
-
-            // Now that the loop is running, we set the bool to true
-            self.is_loop_running.swap(true, Ordering::Relaxed);
+            },
+            _ => {},
         }
     }
 }

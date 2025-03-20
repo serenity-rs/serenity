@@ -16,11 +16,12 @@ Serenity supports bot login via the use of [`Client::builder`].
 You may also check your tokens prior to login via the use of
 [`validate_token`].
 
-Once logged in, you may add handlers to your client to dispatch [`Event`]s,
-by implementing the handlers in a trait, such as [`EventHandler::message`].
-This will cause your handler to be called when a [`Event::MessageCreate`] is
-received. Each handler is given a [`Context`], giving information about the
-event. See the [client's module-level documentation].
+Once logged in, you can add an event handler to your client to dispatch [`Event`]s.
+This will allow you to recieve and handle events as you see fit. For example, an
+[`Event::MessageCreate`] event will be dispatched to you when a message is sent.
+Every event will give you access to a [`Context`], giving information about the event.
+See the [client's module-level documentation].
+
 
 The [`Shard`] is transparently handled by the library, removing
 unnecessary complexity. Sharded connections are automatically handled for
@@ -215,7 +216,6 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
-[`EventHandler::message`]: https://docs.rs/serenity/*/serenity/client/trait.EventHandler.html#method.message
 [`Context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
 [`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreate
