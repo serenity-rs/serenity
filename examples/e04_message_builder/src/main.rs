@@ -1,6 +1,5 @@
 use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::model::gateway::Ready;
+use serenity::gateway::client::FullEvent;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 
@@ -8,36 +7,44 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, context: Context, msg: Message) {
-        if msg.content == "!ping" {
-            let channel = match msg.channel(&context).await {
-                Ok(channel) => channel,
-                Err(why) => {
-                    println!("Error getting channel: {why:?}");
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Message {
+                new_message, ..
+            } => {
+                if new_message.content == "!ping" {
+                    let channel = match new_message.channel(ctx).await {
+                        Ok(channel) => channel,
+                        Err(why) => {
+                            println!("Error getting channel: {why:?}");
 
-                    return;
-                },
-            };
+                            return;
+                        },
+                    };
 
-            // The message builder allows for creating a message by mentioning users dynamically,
-            // pushing "safe" versions of content (such as bolding normalized content), displaying
-            // emojis, and more.
-            let response = MessageBuilder::new()
-                .push("User ")
-                .push_bold_safe(msg.author.name.as_str())
-                .push(" used the 'ping' command in the ")
-                .mention(&channel)
-                .push(" channel")
-                .build();
+                    // The message builder allows for creating a message by mentioning users
+                    // dynamically, pushing "safe" versions of content (such as
+                    // bolding normalized content), displaying emojis, and more.
+                    let response = MessageBuilder::new()
+                        .push("User ")
+                        .push_bold_safe(new_message.author.name.as_str())
+                        .push(" used the 'ping' command in the ")
+                        .mention(&channel)
+                        .push(" channel")
+                        .build();
 
-            if let Err(why) = msg.channel_id.say(&context.http, &response).await {
-                println!("Error sending message: {why:?}");
-            }
+                    if let Err(why) = new_message.channel_id.say(&ctx.http, &response).await {
+                        println!("Error sending message: {why:?}");
+                    }
+                }
+            },
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                println!("{} is connected!", data_about_bot.user.name);
+            },
+            _ => {},
         }
-    }
-
-    async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
     }
 }
 

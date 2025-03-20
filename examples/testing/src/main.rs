@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 
+use serenity::async_trait;
 use serenity::builder::*;
 use serenity::collector::CollectComponentInteractions;
 use serenity::model::prelude::*;
@@ -10,7 +11,7 @@ mod model_type_sizes;
 const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png";
 const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
-async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
+async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
     let channel_id = msg.channel_id;
     let guild_id = msg.guild_id.unwrap();
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
@@ -234,9 +235,9 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     Ok(())
 }
 
-async fn interaction(
+async fn command_interaction(
     ctx: &Context,
-    interaction: CommandInteraction,
+    interaction: &CommandInteraction,
 ) -> Result<(), serenity::Error> {
     if interaction.data.name == "editattachments" {
         // Respond with an image
@@ -375,32 +376,40 @@ async fn interaction(
 }
 
 struct Handler;
-#[serenity::async_trait]
-impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        message(&ctx, msg).await.unwrap();
-    }
 
-    async fn interaction_create(&self, ctx: Context, i: Interaction) {
-        match i {
-            Interaction::Command(i) => interaction(&ctx, i).await.unwrap(),
-            Interaction::Component(i) => println!("{:#?}", i.data),
-            Interaction::Autocomplete(i) => {
-                i.create_response(
-                    &ctx.http,
-                    CreateInteractionResponse::Autocomplete(
-                        CreateAutocompleteResponse::new().add_choice("suggestion"),
-                    ),
-                )
-                .await
-                .unwrap();
+use serenity::gateway::client::FullEvent;
+
+#[async_trait]
+impl EventHandler for Handler {
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Message {
+                new_message, ..
+            } => {
+                message(ctx, new_message).await.unwrap();
             },
+            FullEvent::InteractionCreate {
+                interaction, ..
+            } => match interaction {
+                Interaction::Command(i) => command_interaction(ctx, i).await.unwrap(),
+                Interaction::Component(i) => println!("{:#?}", i.data),
+                Interaction::Autocomplete(i) => {
+                    i.create_response(
+                        &ctx.http,
+                        CreateInteractionResponse::Autocomplete(
+                            CreateAutocompleteResponse::new().add_choice("suggestion"),
+                        ),
+                    )
+                    .await
+                    .unwrap();
+                },
+                _ => {},
+            },
+            FullEvent::ReactionRemoveEmoji {
+                removed_reactions, ..
+            } => println!("Got ReactionRemoveEmoji event: {removed_reactions:?}"),
             _ => {},
         }
-    }
-
-    async fn reaction_remove_emoji(&self, _ctx: Context, removed_reactions: Reaction) {
-        println!("Got ReactionRemoveEmoji event: {removed_reactions:?}");
     }
 }
 

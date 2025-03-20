@@ -153,7 +153,14 @@ impl ShardRunner {
                     };
 
                     spawn_named("dispatch::event_handler::shard_stage_update", async move {
-                        event_handler.shard_stage_update(context, event).await;
+                        event_handler
+                            .dispatch(
+                                &context,
+                                &crate::gateway::client::FullEvent::ShardStageUpdate {
+                                    event,
+                                },
+                            )
+                            .await;
                     });
                 }
             }

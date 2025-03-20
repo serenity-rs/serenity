@@ -382,42 +382,11 @@ impl IntoFuture for ClientBuilder {
 ///
 /// # Event Handlers
 ///
-/// Event handlers can be configured. For example, the event handler [`EventHandler::message`] will
-/// be dispatched to whenever a [`Event::MessageCreate`] is received over the connection.
+/// Event handlers can be configured. For example, the event handler will be dispatched to
+/// whenever a [`Event::MessageCreate`] is received over the connection.
 ///
 /// Note that you do not need to manually handle events, as they are handled internally and then
-/// dispatched to your event handlers.
-///
-/// # Examples
-///
-/// Creating a Client instance and adding a handler on every message receive, acting as a
-/// "ping-pong" bot is simple:
-///
-/// ```no_run
-/// use serenity::Client;
-/// use serenity::model::prelude::*;
-/// use serenity::prelude::*;
-///
-/// struct Handler;
-///
-/// #[serenity::async_trait]
-/// impl EventHandler for Handler {
-///     async fn message(&self, context: Context, msg: Message) {
-///         if msg.content == "!ping" {
-///             let _ = msg.channel_id.say(&context.http, "Pong!");
-///         }
-///     }
-/// }
-///
-/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// let token = Token::from_env("DISCORD_TOKEN")?;
-/// let mut client =
-///     Client::builder(token, GatewayIntents::default()).event_handler(Handler).await?;
-///
-/// client.start().await?;
-/// # Ok(())
-/// # }
-/// ```
+/// dispatched to your event handler.
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate

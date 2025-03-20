@@ -1,30 +1,32 @@
 use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::model::gateway::{Presence, Ready};
 use serenity::prelude::*;
 
 struct Handler;
 
+use serenity::gateway::client::FullEvent;
+
 #[async_trait]
 impl EventHandler for Handler {
-    // This event will be dispatched for guilds, but not for direct messages.
-    async fn message(&self, _ctx: Context, msg: Message) {
-        println!("Received message: {}", msg.content);
-    }
-
-    // As the intents set in this example, this event shall never be dispatched.
-    // Try it by changing your status.
-    async fn presence_update(
-        &self,
-        _ctx: Context,
-        _old_data: Option<Presence>,
-        _new_data: Presence,
-    ) {
-        println!("Presence Update");
-    }
-
-    async fn ready(&self, _: Context, ready: Ready) {
-        println!("{} is connected!", ready.user.name);
+    async fn dispatch(&self, _: &Context, event: &FullEvent) {
+        match event {
+            // This event will be dispatched for guilds, but not for direct messages.
+            FullEvent::Message {
+                new_message, ..
+            } => println!("Received message: {}", new_message.content),
+            // As the intents set in this example, this event shall never be dispatched.
+            // Try it by changing your status.
+            FullEvent::PresenceUpdate {
+                ..
+            } => {
+                println!("Presence Update")
+            },
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                println!("{} is connected!", data_about_bot.user.name);
+            },
+            _ => {},
+        }
     }
 }
 
