@@ -306,7 +306,11 @@ impl Shard {
     }
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn handle_gateway_dispatch(&mut self, seq: u64, event: DeserializedEvent) -> Option<Event> {
+    fn handle_gateway_dispatch(
+        &mut self,
+        seq: u64,
+        event: DeserializedEvent,
+    ) -> Option<Box<Event>> {
         if seq > self.seq + 1 {
             warn!("[{:?}] Sequence off; them: {}, us: {}", self.info, seq, self.seq);
         }
@@ -325,7 +329,7 @@ impl Shard {
             },
         };
 
-        match &event {
+        match &*event {
             Event::Ready(ready) => {
                 debug!("[{:?}] Received Ready", self.info);
 
@@ -441,9 +445,7 @@ impl Shard {
             Ok(GatewayEvent::Dispatch {
                 seq,
                 event,
-            }) => Ok(self
-                .handle_gateway_dispatch(seq, *event)
-                .map(|e| ShardAction::Dispatch(Box::new(e)))),
+            }) => Ok(self.handle_gateway_dispatch(seq, event).map(ShardAction::Dispatch)),
             Ok(GatewayEvent::Heartbeat) => {
                 info!("[{:?}] Received shard heartbeat", self.info);
 

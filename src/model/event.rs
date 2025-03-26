@@ -995,7 +995,7 @@ pub struct MessagePollVoteRemoveEvent {
 pub enum GatewayEvent {
     Dispatch {
         seq: u64,
-        event: Box<DeserializedEvent>,
+        event: DeserializedEvent,
     },
     Heartbeat,
     Reconnect,
@@ -1005,13 +1005,12 @@ pub enum GatewayEvent {
     HeartbeatAck,
 }
 
-#[expect(clippy::large_enum_variant)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 #[serde(untagged)]
 pub enum DeserializedEvent {
-    Success(Event),
+    Success(Box<Event>),
     Unknown(UnknownEvent),
 }
 
@@ -1057,13 +1056,11 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
                 Self::Dispatch {
                     seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
-                    event: {
-                        Box::new(match Event::deserialize(raw_data) {
-                            Ok(event) => DeserializedEvent::Success(event),
-                            Err(_) => DeserializedEvent::Unknown(
-                                UnknownEvent::deserialize(raw_data).map_err(DeError::custom)?,
-                            ),
-                        })
+                    event: match Box::<Event>::deserialize(raw_data) {
+                        Ok(event) => DeserializedEvent::Success(event),
+                        Err(_) => DeserializedEvent::Unknown(
+                            UnknownEvent::deserialize(raw_data).map_err(DeError::custom)?,
+                        ),
                     },
                 }
             },
