@@ -34,7 +34,6 @@ enum ImageHashInner {
 /// let image_hash: ImageHash = "f1eff024d9c85339c877985229ed8fec".parse().unwrap();
 /// assert_eq!(image_hash.to_string(), String::from("f1eff024d9c85339c877985229ed8fec"));
 /// ```
-
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct ImageHash(ImageHashInner);

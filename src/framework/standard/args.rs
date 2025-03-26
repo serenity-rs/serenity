@@ -317,7 +317,7 @@ enum State {
 #[derive(Clone, Debug)]
 pub struct Args {
     message: String,
-    args: Vec<Token>,
+    tokens: Vec<Token>,
     offset: usize,
     state: State,
 }
@@ -359,7 +359,7 @@ impl Args {
             .map(Delimiter::to_str)
             .collect::<Vec<_>>();
 
-        let args = if delims.is_empty() {
+        let tokens = if delims.is_empty() {
             let msg = message.trim();
             let kind = if is_quoted(msg) { TokenKind::QuotedArgument } else { TokenKind::Argument };
 
@@ -387,7 +387,7 @@ impl Args {
         };
 
         Args {
-            args,
+            tokens,
             message: message.to_string(),
             offset: 0,
             state: State::None,
@@ -396,7 +396,7 @@ impl Args {
 
     #[inline]
     fn span(&self) -> (usize, usize) {
-        self.args[self.offset].span
+        self.tokens[self.offset].span
     }
 
     #[inline]
@@ -574,7 +574,7 @@ impl Args {
             return self;
         }
 
-        let is_quoted = self.args[self.offset].kind == TokenKind::QuotedArgument;
+        let is_quoted = self.tokens[self.offset].kind == TokenKind::QuotedArgument;
 
         if is_quoted {
             match self.state {
@@ -733,7 +733,7 @@ impl Args {
     #[must_use]
     pub fn raw(&self) -> RawArguments<'_> {
         RawArguments {
-            tokens: &self.args,
+            tokens: &self.tokens,
             msg: &self.message,
             quoted: false,
         }
@@ -802,7 +802,7 @@ impl Args {
         self.offset = pos;
         let parsed = self.single_quoted::<T>()?;
 
-        self.args.remove(pos);
+        self.tokens.remove(pos);
         self.offset = before;
         self.rewind();
 
@@ -888,7 +888,7 @@ impl Args {
     #[inline]
     #[must_use]
     pub fn len(&self) -> usize {
-        self.args.len()
+        self.tokens.len()
     }
 
     /// Assert that there are no more arguments left.

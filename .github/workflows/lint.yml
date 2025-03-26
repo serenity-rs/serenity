@@ -26,9 +26,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run clippy
-        #!! Remove `-A clippy::result_large_err` once this is on `next`. This is to
-        #!! temporarily allow Clippy CI to run on `current`
-        run: cargo clippy --workspace --tests --features full -- -A clippy::result_large_err -D warnings --cfg ignore_serenity_deprecated
+        run: cargo clippy --workspace --tests --features full -- -D warnings --cfg ignore_serenity_deprecated
 
   rustfmt:
     name: Format
