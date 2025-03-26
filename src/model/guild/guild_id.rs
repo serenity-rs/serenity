@@ -336,10 +336,13 @@ impl GuildId {
         builder.execute(http, self).await
     }
 
-    /// Creates an emoji in the guild with a name and base64-encoded image.
+    /// Creates an emoji in the guild with a name and base64-encoded image and set of roles.
     ///
     /// The name of the emoji must be at least 2 characters long and can only contain alphanumeric
     /// characters and underscores.
+    ///
+    /// The emoji will only be visible by anyone that has the role(s) defined in the `roles`
+    /// parameter.
     ///
     /// Requires the [Create Guild Expressions] permission.
     ///
@@ -361,17 +364,21 @@ impl GuildId {
         http: &Http,
         name: &str,
         image: &str,
+        roles: Option<Vec<RoleId>>,
         reason: Option<&str>,
     ) -> Result<Emoji> {
         #[derive(serde::Serialize)]
         struct CreateEmoji<'a> {
             name: &'a str,
             image: &'a str,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            roles: Option<Vec<RoleId>>,
         }
 
         let body = CreateEmoji {
             name,
             image,
+            roles,
         };
 
         http.create_emoji(self, &body, reason).await
@@ -583,11 +590,14 @@ impl GuildId {
         builder.execute(http, self).await
     }
 
-    /// Edits an [`Emoji`]'s name in the guild.
+    /// Edits an [`Emoji`]'s name and roles in the guild.
     ///
     /// **Note**: If the emoji was created by the current user, requires either the [Create Guild
     /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
     /// Expressions] permission is required.
+    ///
+    /// If an emoji was edited to be visible by the selected roles in the parameter, only those with
+    /// it can only see the emoji.
     ///
     /// # Errors
     ///
@@ -601,15 +611,19 @@ impl GuildId {
         http: &Http,
         emoji_id: EmojiId,
         name: &str,
+        roles: Option<Vec<RoleId>>,
         reason: Option<&str>,
     ) -> Result<Emoji> {
         #[derive(serde::Serialize)]
         struct EditEmoji<'a> {
             name: &'a str,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            roles: Option<Vec<RoleId>>,
         }
 
         let map = EditEmoji {
             name,
+            roles,
         };
 
         http.edit_emoji(self, emoji_id, &map, reason).await
