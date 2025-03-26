@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use super::{Cache, CacheUpdate};
 use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
@@ -474,26 +472,7 @@ impl CacheUpdate for ReadyEvent {
             cache.unavailable_guilds.insert(unavailable.id, ());
         }
 
-        // We may be removed from some guilds between disconnect and ready, so handle that.
-        let mut guilds_to_remove = vec![];
-        let ready_guilds_hashset =
-            self.ready.guilds.iter().map(|status| status.id).collect::<HashSet<_>>();
         let shard_data = self.ready.shard.unwrap_or_else(|| ShardInfo::new(ShardId(1), 1));
-
-        for guild_entry in cache.guilds.iter() {
-            let guild = guild_entry.key();
-            // Only handle data for our shard.
-            if crate::utils::shard_id(*guild, shard_data.total) == shard_data.id.0
-                && !ready_guilds_hashset.contains(guild)
-            {
-                guilds_to_remove.push(*guild);
-            }
-        }
-        if !guilds_to_remove.is_empty() {
-            for guild in guilds_to_remove {
-                cache.guilds.remove(&guild);
-            }
-        }
 
         {
             let mut cached_shard_data = cache.shard_data.write();
