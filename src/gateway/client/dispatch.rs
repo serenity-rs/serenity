@@ -44,7 +44,7 @@ macro_rules! update_cache {
 /// This MUST be called from a different task to the recv_event loop, to allow for
 /// intra-shard concurrency between the shard loop and event handler.
 pub(crate) async fn dispatch_model(
-    event: Event,
+    event: Box<Event>,
     context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework>>,
     event_handler: Option<Arc<dyn EventHandler>>,
@@ -110,10 +110,10 @@ async fn dispatch_event_handler(
 #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
 fn update_cache_with_event(
     #[cfg(feature = "cache")] cache: &Cache,
-    event: Event,
+    event: Box<Event>,
 ) -> (FullEvent, Option<FullEvent>) {
     let mut extra_event = None;
-    let event = match event {
+    let event = match *event {
         Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
             permission: event.permission,
         },
