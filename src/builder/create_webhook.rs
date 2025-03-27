@@ -1,8 +1,9 @@
 use std::borrow::Cow;
 
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
@@ -13,7 +14,7 @@ use crate::model::prelude::*;
 pub struct CreateWebhook<'a> {
     name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<String>,
+    avatar: Option<ImageData>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -38,13 +39,9 @@ impl<'a> CreateWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateAttachment::to_base64`] for possible errors.
-    pub async fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Result<Self> {
-        self.avatar = Some(avatar.to_base64().await?);
-        Ok(self)
+    pub fn avatar(mut self, avatar: ImageData) -> Self {
+        self.avatar = Some(avatar);
+        self
     }
 
     /// Sets the request's audit log reason.

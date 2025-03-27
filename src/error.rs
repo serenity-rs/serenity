@@ -8,6 +8,7 @@ use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
+use url::ParseError as UrlError;
 
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
@@ -53,6 +54,8 @@ pub enum Error {
     ///
     /// [`secrets`]: crate::secrets
     Token(TokenError),
+    /// When parsing an URL failed due to invalid input.
+    Url(UrlError),
 }
 
 #[cfg(feature = "gateway")]
@@ -100,6 +103,12 @@ impl From<TokenError> for Error {
     }
 }
 
+impl From<UrlError> for Error {
+    fn from(e: UrlError) -> Error {
+        Error::Url(e)
+    }
+}
+
 #[cfg(feature = "http")]
 impl From<InvalidHeaderValue> for Error {
     fn from(e: InvalidHeaderValue) -> Error {
@@ -127,6 +136,7 @@ impl fmt::Display for Error {
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
             Self::Token(inner) => fmt::Display::fmt(&inner, f),
+            Self::Url(inner) => fmt::Display::fmt(&inner, f),
         }
     }
 }
@@ -145,6 +155,7 @@ impl StdError for Error {
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => Some(inner),
             Self::Token(inner) => Some(inner),
+            Self::Url(inner) => Some(inner),
         }
     }
 }

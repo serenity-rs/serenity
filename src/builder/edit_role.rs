@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::prelude::*;
@@ -50,7 +50,7 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<Option<Cow<'a, str>>>,
+    icon: Option<Option<ImageData>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     unicode_emoji: Option<Option<Cow<'a, str>>>,
 
@@ -131,17 +131,10 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateAttachment::to_base64`] for possible errors.
-    pub async fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Result<Self> {
-        self.icon = Some(match icon {
-            Some(attachment) => Some(attachment.to_base64().await?.into()),
-            None => None,
-        });
+    pub fn icon(mut self, icon: Option<ImageData>) -> Self {
+        self.icon = Some(icon);
         self.unicode_emoji = Some(None);
-        Ok(self)
+        self
     }
 
     /// Sets the request's audit log reason.

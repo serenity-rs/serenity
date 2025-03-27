@@ -2,6 +2,7 @@ use std::borrow::Cow;
 use std::path::{Path, PathBuf};
 
 use bytes::Bytes;
+use reqwest::{IntoUrl, Url};
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
@@ -79,7 +80,7 @@ impl<'a> CreateAttachment<'a> {
     #[cfg(feature = "http")]
     pub async fn url(
         http: &Http,
-        url: impl reqwest::IntoUrl,
+        url: impl IntoUrl,
         filename: impl Into<Cow<'static, str>>,
     ) -> Result<Self> {
         let response = http.client.get(url).send().await?;
@@ -113,12 +114,16 @@ impl<'a> CreateAttachment<'a> {
         }
     }
 
-    /// Converts the stored data to the base64 representation.
+    /// Converts the stored data to a base64-encoded data URI.
     ///
     /// This is used in the library internally because Discord expects image data as base64 in many
     /// places.
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::get_data`] for details.
     #[must_use]
-    pub async fn to_base64(&self) -> Result<String> {
+    pub async fn encode(&self) -> Result<ImageData> {
         use base64::engine::{Config, Engine};
 
         const PREFIX: &str = "data:image/png;base64,";
@@ -132,13 +137,23 @@ impl<'a> CreateAttachment<'a> {
         let mut encoded = String::with_capacity(encoded_size);
         encoded.push_str(PREFIX);
         engine.encode_string(&data, &mut encoded);
-        Ok(encoded)
+        Ok(ImageData(encoded))
     }
 
     /// Sets a description for the file (max 1024 characters).
     pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(transparent)]
+pub struct ImageData(String);
+
+impl ImageData {
+    pub fn from_base64(s: &str) -> Result<Self> {
+        Ok(Self(Url::parse(s)?.into()))
     }
 }
 

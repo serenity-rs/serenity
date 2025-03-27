@@ -379,10 +379,10 @@ impl Guild {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild: Guild = unimplemented!();
-    /// let icon = CreateAttachment::path("./icon.png")?;
+    /// let icon = CreateAttachment::path("./icon.png")?.encode().await?;
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::new().icon(Some(&icon)).await?;
+    /// let builder = EditGuild::new().icon(Some(icon));
     /// guild.edit(&http, builder).await?;
     /// # Ok(())
     /// # }

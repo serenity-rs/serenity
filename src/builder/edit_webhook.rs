@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -14,7 +14,7 @@ pub struct EditWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<Option<String>>,
+    avatar: Option<Option<ImageData>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
 
@@ -43,13 +43,9 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateAttachment::to_base64`] for possible errors.
-    pub async fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Result<Self> {
-        self.avatar = Some(Some(avatar.to_base64().await?));
-        Ok(self)
+    pub fn avatar(mut self, avatar: ImageData) -> Self {
+        self.avatar = Some(Some(avatar));
+        self
     }
 
     /// Delete the webhook's avatar, resetting it to the default logo.

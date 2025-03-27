@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -24,7 +24,7 @@ pub struct CreateScheduledEvent<'a> {
     description: Option<Cow<'a, str>>,
     entity_type: ScheduledEventType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    image: Option<String>,
+    image: Option<ImageData>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -110,13 +110,9 @@ impl<'a> CreateScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateAttachment::to_base64`] for possible errors.
-    pub async fn image(mut self, image: &CreateAttachment<'_>) -> Result<Self> {
-        self.image = Some(image.to_base64().await?);
-        Ok(self)
+    pub fn image(mut self, image: ImageData) -> Self {
+        self.image = Some(image);
+        self
     }
 
     /// Sets the request's audit log reason.

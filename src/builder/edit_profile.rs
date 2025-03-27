@@ -1,8 +1,9 @@
 use std::borrow::Cow;
 
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::user::CurrentUser;
@@ -17,9 +18,9 @@ pub struct EditProfile<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     username: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<Option<String>>,
+    avatar: Option<Option<ImageData>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    banner: Option<Option<String>>,
+    banner: Option<Option<ImageData>>,
 }
 
 impl<'a> EditProfile<'a> {
@@ -40,19 +41,15 @@ impl<'a> EditProfile<'a> {
     /// #
     /// # #[cfg(feature = "http")]
     /// # async fn foo_(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
-    /// let avatar = CreateAttachment::path("./my_image.jpg").expect("Invalid filename.");
-    /// let builder = EditProfile::new().avatar(&avatar).await?;
+    /// let avatar = CreateAttachment::path("./my_image.jpg")?.encode().await?;
+    /// let builder = EditProfile::new().avatar(avatar);
     /// current_user.edit(http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateAttachment::to_base64`] for possible errors.
-    pub async fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Result<Self> {
-        self.avatar = Some(Some(avatar.to_base64().await?));
-        Ok(self)
+    pub fn avatar(mut self, avatar: ImageData) -> Self {
+        self.avatar = Some(Some(avatar));
+        self
     }
 
     /// Delete the current user's avatar, resetting it to the default logo.
@@ -72,13 +69,9 @@ impl<'a> EditProfile<'a> {
     }
 
     /// Sets the banner of the current user.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateAttachment::to_base64`] for possible errors.
-    pub async fn banner(mut self, banner: &CreateAttachment<'_>) -> Result<Self> {
-        self.banner = Some(Some(banner.to_base64().await?));
-        Ok(self)
+    pub fn banner(mut self, banner: ImageData) -> Self {
+        self.banner = Some(Some(banner));
+        self
     }
 
     /// Deletes the current user's banner, resetting it to the default.
