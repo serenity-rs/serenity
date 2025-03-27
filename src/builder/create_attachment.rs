@@ -2,10 +2,10 @@ use std::borrow::Cow;
 use std::path::{Path, PathBuf};
 
 use bytes::Bytes;
-use reqwest::{IntoUrl, Url};
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
+use url::Url;
 
 #[cfg(doc)]
 use crate::error::Error;
@@ -80,7 +80,7 @@ impl<'a> CreateAttachment<'a> {
     #[cfg(feature = "http")]
     pub async fn url(
         http: &Http,
-        url: impl IntoUrl,
+        url: impl reqwest::IntoUrl,
         filename: impl Into<Cow<'static, str>>,
     ) -> Result<Self> {
         let response = http.client.get(url).send().await?;
