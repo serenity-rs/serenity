@@ -319,10 +319,9 @@ impl<'a> EditAttachments<'a> {
     }
 
     /// Clones all new attachments into a new Vec, keeping only data and filename, because those
-    /// are needed for the multipart form data. The data is taken out of `self` in the process, so
-    /// this method can only be called once.
+    /// are needed for the multipart form data.
     #[cfg(feature = "http")]
-    pub(crate) fn new_attachments(&mut self) -> Vec<CreateAttachment<'a>> {
+    pub(crate) fn new_attachments(&self) -> Vec<CreateAttachment<'a>> {
         self.new_and_existing_attachments
             .iter()
             .filter_map(|attachment| {
