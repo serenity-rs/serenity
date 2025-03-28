@@ -1,11 +1,10 @@
 use std::borrow::Cow;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use bytes::Bytes;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
-use url::Url;
 
 use crate::error::{Error, Result, UrlError};
 #[cfg(feature = "http")]
@@ -17,7 +16,7 @@ use crate::model::id::AttachmentId;
 pub enum AttachmentData<'a> {
     Bytes(Bytes),
     File(&'a File),
-    Path(PathBuf),
+    Path(&'a Path),
 }
 
 /// A builder for creating a new attachment from a file path, file data, or URL.
@@ -47,8 +46,7 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// Returns [`Error::Io`] if the path is not a valid file path.
-    pub fn path(path: impl AsRef<Path>) -> Result<Self> {
-        let path = path.as_ref().to_owned();
+    pub fn path(path: &'a Path) -> Result<Self> {
         let filename = path
             .file_name()
             .ok_or_else(|| std::io::Error::other("attachment path must not be a directory"))?
@@ -112,10 +110,7 @@ impl<'a> CreateAttachment<'a> {
         }
     }
 
-    /// Converts the stored data to a base64-encoded data URI.
-    ///
-    /// This is used in the library internally because Discord expects image data as base64 in many
-    /// places.
+    /// Converts the attachment data to a base64-encoded data URI.
     ///
     /// # Errors
     ///
@@ -144,13 +139,15 @@ impl<'a> CreateAttachment<'a> {
     }
 }
 
+/// A wrapper around some base64-encoded image data. Used when an endpoint expects the image
+/// payload directly as part of the JSON body, instead of as a multipart upload.
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 pub struct ImageData(String);
 
 impl ImageData {
     /// Constructs image data from a base64-encoded blob of data. The string must be a valid data
-    /// URI, and must be encoded with base64, for example:
+    /// URI, for example:
     ///
     /// ```
     /// use serenity::builder::ImageData;
@@ -164,22 +161,14 @@ impl ImageData {
     /// Returns a [`Error::Url`] if the string is not a valid data URI. See the [Discord
     /// docs](https://discord.com/developers/docs/reference#image-data).
     pub fn from_base64(s: &str) -> Result<Self> {
-        let url = Url::parse(s).map_err(|_| UrlError::InvalidDataURI)?;
-
-        let err = Error::Url(UrlError::InvalidDataURI);
-        if url.scheme() != "data" {
-            return Err(err);
+        if let Some(("data", tail)) = s.split_once(':') {
+            if let Some((mimetype, encoding)) = tail.split_once(';') {
+                if mimetype.split_once('/').is_some() && encoding.starts_with("base64,") {
+                    return Ok(Self(s.to_string()));
+                }
+            }
         }
-
-        let Some((mimetype, encoding)) = url.path().split_once(';') else {
-            return Err(err);
-        };
-
-        if mimetype.split_once('/').is_some() && encoding.starts_with("base64,") {
-            Ok(Self(url.into()))
-        } else {
-            Err(err)
-        }
+        Err(Error::Url(UrlError::InvalidDataURI))
     }
 }
 
