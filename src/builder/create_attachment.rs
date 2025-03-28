@@ -183,10 +183,15 @@ impl ImageData {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct ExistingAttachment {
+    id: AttachmentId,
+}
+
 #[derive(Clone, Debug)]
-enum EditAttachmentsInner<'a> {
+enum NewOrExisting<'a> {
     New(CreateAttachment<'a>),
-    Existing(AttachmentId),
+    Existing(ExistingAttachment),
 }
 
 /// You can add new attachments and edit existing ones using this builder.
@@ -247,7 +252,7 @@ enum EditAttachmentsInner<'a> {
 #[derive(Default, Debug, Clone)]
 #[must_use]
 pub struct EditAttachments<'a> {
-    inner: Vec<EditAttachmentsInner<'a>>,
+    new_and_existing_attachments: Vec<NewOrExisting<'a>>,
 }
 
 impl<'a> EditAttachments<'a> {
@@ -271,7 +276,15 @@ impl<'a> EditAttachments<'a> {
     /// Discord will throw an error!**
     pub fn keep_all(msg: &Message) -> Self {
         Self {
-            inner: msg.attachments.iter().map(|a| EditAttachmentsInner::Existing(a.id)).collect(),
+            new_and_existing_attachments: msg
+                .attachments
+                .iter()
+                .map(|a| {
+                    NewOrExisting::Existing(ExistingAttachment {
+                        id: a.id,
+                    })
+                })
+                .collect(),
         }
     }
 
@@ -280,7 +293,9 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::remove`].
     pub fn keep(mut self, id: AttachmentId) -> Self {
-        self.inner.push(EditAttachmentsInner::Existing(id));
+        self.new_and_existing_attachments.push(NewOrExisting::Existing(ExistingAttachment {
+            id,
+        }));
         self
     }
 
@@ -289,9 +304,9 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::keep`].
     pub fn remove(mut self, id: AttachmentId) -> Self {
-        self.inner.retain(|a| match a {
-            EditAttachmentsInner::Existing(existing_id) => *existing_id != id,
-            EditAttachmentsInner::New(_) => true,
+        self.new_and_existing_attachments.retain(|a| match a {
+            NewOrExisting::Existing(a) => a.id != id,
+            NewOrExisting::New(_) => true,
         });
         self
     }
@@ -299,7 +314,7 @@ impl<'a> EditAttachments<'a> {
     /// Adds a new attachment to the attachment list.
     #[expect(clippy::should_implement_trait)] // Clippy thinks add == std::ops::Add::add
     pub fn add(mut self, attachment: CreateAttachment<'a>) -> Self {
-        self.inner.push(EditAttachmentsInner::New(attachment));
+        self.new_and_existing_attachments.push(NewOrExisting::New(attachment));
         self
     }
 
@@ -308,10 +323,10 @@ impl<'a> EditAttachments<'a> {
     /// this method can only be called once.
     #[cfg(feature = "http")]
     pub(crate) fn new_attachments(&mut self) -> Vec<CreateAttachment<'a>> {
-        self.inner
+        self.new_and_existing_attachments
             .iter()
             .filter_map(|attachment| {
-                if let EditAttachmentsInner::New(attachment) = &attachment {
+                if let NewOrExisting::New(attachment) = &attachment {
                     Some(attachment.clone())
                 } else {
                     None
@@ -330,19 +345,14 @@ impl Serialize for EditAttachments<'_> {
             description: &'a Option<Cow<'a, str>>,
         }
 
-        #[derive(Serialize)]
-        struct ExistingAttachment {
-            id: AttachmentId,
-        }
-
         // Instead of an `AttachmentId`, the `id` field for new attachments corresponds to the
         // index of the new attachment in the multipart payload. The attachment data will be
         // labeled with `files[{id}]` in the multipart body. See `Multipart::build_form`.
         let mut id = 0;
-        let mut seq = serializer.serialize_seq(Some(self.inner.len()))?;
-        for attachment in &self.inner {
+        let mut seq = serializer.serialize_seq(Some(self.new_and_existing_attachments.len()))?;
+        for attachment in &self.new_and_existing_attachments {
             match attachment {
-                EditAttachmentsInner::New(new_attachment) => {
+                NewOrExisting::New(new_attachment) => {
                     let attachment = NewAttachment {
                         id,
                         filename: &new_attachment.filename,
@@ -351,10 +361,8 @@ impl Serialize for EditAttachments<'_> {
                     id += 1;
                     seq.serialize_element(&attachment)?;
                 },
-                EditAttachmentsInner::Existing(id) => {
-                    seq.serialize_element(&ExistingAttachment {
-                        id: *id,
-                    })?;
+                NewOrExisting::Existing(existing_attachment) => {
+                    seq.serialize_element(existing_attachment)?;
                 },
             }
         }
