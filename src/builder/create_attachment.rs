@@ -7,9 +7,7 @@ use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 use url::Url;
 
-#[cfg(doc)]
-use crate::error::Error;
-use crate::error::Result;
+use crate::error::{Error, Result, UrlError};
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::channel::Message;
@@ -122,7 +120,6 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// See [`CreateAttachment::get_data`] for details.
-    #[must_use]
     pub async fn encode(&self) -> Result<ImageData> {
         use base64::engine::{Config, Engine};
 
@@ -152,8 +149,37 @@ impl<'a> CreateAttachment<'a> {
 pub struct ImageData(String);
 
 impl ImageData {
+    /// Constructs image data from a base64-encoded blob of data. The string must be a valid data
+    /// URI, and must be encoded with base64, for example:
+    ///
+    /// ```
+    /// use serenity::builder::ImageData;
+    ///
+    /// let s = "data:image/png;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=";
+    /// assert!(ImageData::from_base64(s).is_ok());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`Error::Url`] if the string is not a valid data URI. See the [Discord
+    /// docs](https://discord.com/developers/docs/reference#image-data).
     pub fn from_base64(s: &str) -> Result<Self> {
-        Ok(Self(Url::parse(s)?.into()))
+        let url = Url::parse(s).map_err(|_| UrlError::InvalidDataURI)?;
+
+        let err = Error::Url(UrlError::InvalidDataURI);
+        if url.scheme() != "data" {
+            return Err(err);
+        }
+
+        let Some((mimetype, encoding)) = url.path().split_once(';') else {
+            return Err(err);
+        };
+
+        if mimetype.split_once('/').is_some() && encoding.starts_with("base64,") {
+            Ok(Self(url.into()))
+        } else {
+            Err(err)
+        }
     }
 }
 

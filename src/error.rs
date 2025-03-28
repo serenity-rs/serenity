@@ -8,7 +8,6 @@ use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
-use url::ParseError as UrlError;
 
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
@@ -54,8 +53,33 @@ pub enum Error {
     ///
     /// [`secrets`]: crate::secrets
     Token(TokenError),
-    /// When parsing an URL failed due to invalid input.
+    /// When parsing a URL failed due to invalid input.
     Url(UrlError),
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum UrlError {
+    Parsing(url::ParseError),
+    InvalidDataURI,
+}
+
+impl fmt::Display for UrlError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Parsing(inner) => fmt::Display::fmt(&inner, f),
+            Self::InvalidDataURI => f.write_str("Provided string is not a valid data URI"),
+        }
+    }
+}
+
+impl StdError for UrlError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            Self::Parsing(inner) => Some(inner),
+            _ => None,
+        }
+    }
 }
 
 #[cfg(feature = "gateway")]
@@ -106,6 +130,12 @@ impl From<TokenError> for Error {
 impl From<UrlError> for Error {
     fn from(e: UrlError) -> Error {
         Error::Url(e)
+    }
+}
+
+impl From<url::ParseError> for Error {
+    fn from(e: url::ParseError) -> Error {
+        UrlError::Parsing(e).into()
     }
 }
 
