@@ -7,6 +7,7 @@ use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::internal::prelude::*;
+use crate::internal::tokio::spawn_named;
 use crate::model::channel::ChannelType;
 use crate::model::event::Event;
 use crate::model::guild::Member;
@@ -40,9 +41,6 @@ macro_rules! update_cache {
 }
 
 /// Calls the user's event handlers and the framework handler.
-///
-/// This MUST be called from a different task to the recv_event loop, to allow for
-/// intra-shard concurrency between the shard loop and event handler.
 pub(crate) async fn dispatch_model(
     event: Box<Event>,
     context: Context,
@@ -60,14 +58,16 @@ pub(crate) async fn dispatch_model(
         event,
     );
 
-    #[cfg(feature = "framework")]
-    tokio::join!(
-        dispatch_framework(&context, framework, &full_event, extra_event.as_ref()),
-        dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref())
-    );
+    spawn_named("dispatch::user", async move {
+        #[cfg(feature = "framework")]
+        tokio::join!(
+            dispatch_framework(&context, framework, &full_event, extra_event.as_ref()),
+            dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref())
+        );
 
-    #[cfg(not(feature = "framework"))]
-    dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref()).await;
+        #[cfg(not(feature = "framework"))]
+        dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref()).await;
+    });
 }
 
 #[cfg(feature = "framework")]
