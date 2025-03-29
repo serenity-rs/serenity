@@ -91,7 +91,7 @@ impl<'a> EditGuild<'a> {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
-    /// let icon = CreateAttachment::path("./guild_icon.png")?.encode().await?;
+    /// let icon = CreateAttachment::path("./guild_icon.png".as_ref())?.encode().await?;
     ///
     /// // assuming a `guild` has already been bound
     /// let builder = EditGuild::new().icon(Some(icon));

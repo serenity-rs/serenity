@@ -41,7 +41,7 @@ impl<'a> EditProfile<'a> {
     /// #
     /// # #[cfg(feature = "http")]
     /// # async fn foo_(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
-    /// let avatar = CreateAttachment::path("./my_image.jpg")?.encode().await?;
+    /// let avatar = CreateAttachment::path("./my_image.jpg".as_ref())?.encode().await?;
     /// let builder = EditProfile::new().avatar(avatar);
     /// current_user.edit(http, builder).await?;
     /// # Ok(())

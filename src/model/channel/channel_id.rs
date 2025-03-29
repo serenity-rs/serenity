@@ -651,8 +651,8 @@ impl ChannelId {
     /// let channel_id = ChannelId::new(7);
     ///
     /// let paths = [
-    ///     CreateAttachment::path("/path/to/file.jpg")?,
-    ///     CreateAttachment::path("/path/to/file2.jpg")?,
+    ///     CreateAttachment::path("/path/to/file.jpg".as_ref())?,
+    ///     CreateAttachment::path("/path/to/file2.jpg".as_ref())?,
     /// ];
     ///
     /// let builder = CreateMessage::new().content("some files");
