@@ -93,7 +93,7 @@ impl CreateCommandPermission {
     pub fn everyone(guild_id: GuildId, allow: bool) -> Self {
         Self(CommandPermission {
             id: guild_id.get().into(),
-            kind: CommandPermissionType::User,
+            kind: CommandPermissionType::Role,
             permission: allow,
         })
     }
