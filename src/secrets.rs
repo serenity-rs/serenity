@@ -75,10 +75,7 @@ impl Token {
 /// This performs the following checks on a given token:
 /// - Is not empty;
 /// - Is optionally prefixed with `"Bot "` or `"Bearer "`;
-/// - Contains 3 parts (split by the period char `'.'`);
-///
-/// Note that a token prefixed with `"Bearer "` will have its prefix changed to `"Bot "` when
-/// parsed.
+/// - Contains 3 parts (for bot tokens) (split by the period char `'.'`);
 ///
 /// # Examples
 ///
@@ -102,7 +99,11 @@ impl FromStr for Token {
     type Err = TokenError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let token = s.trim().trim_start_matches("Bot ").trim_start_matches("Bearer ");
+        if s.starts_with("Bearer ") {
+            return Ok(Self(SecretString::new(Arc::from(s))));
+        }
+
+        let token = s.trim().trim_start_matches("Bot ");
 
         let mut parts = token.split('.');
         let is_valid = parts.next().is_some_and(|p| !p.is_empty())
