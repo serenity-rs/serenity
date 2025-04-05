@@ -209,7 +209,7 @@ impl Http {
     }
 
     pub fn application_id(&self) -> Option<ApplicationId> {
-        let application_id = self.application_id.load(Ordering::Relaxed);
+        let application_id = self.application_id.load(Ordering::Acquire);
         NonZeroU64::new(application_id).map(ApplicationId::from)
     }
 
@@ -218,7 +218,7 @@ impl Http {
     }
 
     pub fn set_application_id(&self, application_id: ApplicationId) {
-        self.application_id.store(application_id.get(), Ordering::Relaxed);
+        self.application_id.store(application_id.get(), Ordering::Release);
     }
 
     pub fn token(&self) -> &str {
