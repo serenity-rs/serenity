@@ -34,11 +34,10 @@ use crate::model::prelude::*;
 ///     .await;
 /// # }
 /// ```
-pub fn collect<T, F>(ctx: &Context, extractor: F) -> impl Stream<Item = T> + use<T, F>
-where
-    T: Send + 'static,
-    F: Fn(&Event) -> Option<T> + Send + Sync + 'static,
-{
+pub fn collect<T: Send + 'static>(
+    ctx: &Context,
+    extractor: impl Fn(&Event) -> Option<T> + Send + Sync + 'static,
+) -> impl Stream<Item = T> {
     let (sender, mut receiver) = tokio::sync::mpsc::unbounded_channel();
 
     // Register an event callback in the shard. It's kept alive as long as we return `true`
