@@ -18,9 +18,9 @@ pub struct EditProfile<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     username: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<Option<ImageData>>,
+    avatar: Option<Option<ImageData<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    banner: Option<Option<ImageData>>,
+    banner: Option<Option<ImageData<'a>>>,
 }
 
 impl<'a> EditProfile<'a> {
@@ -40,14 +40,16 @@ impl<'a> EditProfile<'a> {
     /// # use serenity::http::Http;
     /// #
     /// # #[cfg(feature = "http")]
-    /// # async fn foo_(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
+    /// # async fn run() -> Result<(), SerenityError> {
+    /// # let http: Http = unimplemented!();
+    /// # let mut user = CurrentUser::default();
     /// let avatar = CreateAttachment::path("./my_image.jpg".as_ref())?.encode().await?;
     /// let builder = EditProfile::new().avatar(avatar);
-    /// current_user.edit(http, builder).await?;
+    /// user.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn avatar(mut self, avatar: ImageData) -> Self {
+    pub fn avatar(mut self, avatar: ImageData<'a>) -> Self {
         self.avatar = Some(Some(avatar));
         self
     }
@@ -69,7 +71,7 @@ impl<'a> EditProfile<'a> {
     }
 
     /// Sets the banner of the current user.
-    pub fn banner(mut self, banner: ImageData) -> Self {
+    pub fn banner(mut self, banner: ImageData<'a>) -> Self {
         self.banner = Some(Some(banner));
         self
     }

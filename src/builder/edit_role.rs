@@ -50,7 +50,7 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<Option<ImageData>>,
+    icon: Option<Option<ImageData<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     unicode_emoji: Option<Option<Cow<'a, str>>>,
 
@@ -131,7 +131,7 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    pub fn icon(mut self, icon: Option<ImageData>) -> Self {
+    pub fn icon(mut self, icon: Option<ImageData<'a>>) -> Self {
         self.icon = Some(icon);
         self.unicode_emoji = Some(None);
         self

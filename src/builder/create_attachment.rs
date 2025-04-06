@@ -129,7 +129,7 @@ impl<'a> CreateAttachment<'a> {
         let mut encoded = String::with_capacity(encoded_size);
         encoded.push_str(PREFIX);
         engine.encode_string(&data, &mut encoded);
-        Ok(ImageData(encoded))
+        Ok(ImageData(encoded.into()))
     }
 
     /// Sets a description for the file (max 1024 characters).
@@ -143,9 +143,9 @@ impl<'a> CreateAttachment<'a> {
 /// payload directly as part of the JSON body, instead of as a multipart upload.
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
-pub struct ImageData(String);
+pub struct ImageData<'a>(Cow<'a, str>);
 
-impl ImageData {
+impl<'a> ImageData<'a> {
     /// Constructs image data from a base64-encoded blob of data. The string must be a valid data
     /// URI, for example:
     ///
@@ -160,11 +160,12 @@ impl ImageData {
     ///
     /// Returns a [`Error::Url`] if the string is not a valid data URI. See the [Discord
     /// docs](https://discord.com/developers/docs/reference#image-data).
-    pub fn from_base64(s: &str) -> Result<Self> {
+    pub fn from_base64(s: impl Into<Cow<'a, str>>) -> Result<Self> {
+        let s = s.into();
         if let Some(("data", tail)) = s.split_once(':') {
             if let Some((mimetype, encoding)) = tail.split_once(';') {
                 if mimetype.split_once('/').is_some() && encoding.starts_with("base64,") {
-                    return Ok(Self(s.to_string()));
+                    return Ok(Self(s));
                 }
             }
         }

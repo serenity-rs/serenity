@@ -24,7 +24,7 @@ pub struct CreateScheduledEvent<'a> {
     description: Option<Cow<'a, str>>,
     entity_type: ScheduledEventType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    image: Option<ImageData>,
+    image: Option<ImageData<'a>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -110,7 +110,7 @@ impl<'a> CreateScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: ImageData) -> Self {
+    pub fn image(mut self, image: ImageData<'a>) -> Self {
         self.image = Some(image);
         self
     }

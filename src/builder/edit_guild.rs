@@ -27,7 +27,7 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     afk_timeout: Option<AfkTimeout>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<Option<ImageData>>,
+    icon: Option<Option<ImageData<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     owner_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -35,7 +35,7 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     discovery_splash: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    banner: Option<Option<ImageData>>,
+    banner: Option<Option<ImageData<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     system_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,7 +101,7 @@ impl<'a> EditGuild<'a> {
     /// ```
     ///
     /// [`CreateAttachment`]: super::CreateAttachment
-    pub fn icon(mut self, icon: Option<ImageData>) -> Self {
+    pub fn icon(mut self, icon: Option<ImageData<'a>>) -> Self {
         self.icon = Some(icon);
         self
     }
@@ -184,7 +184,7 @@ impl<'a> EditGuild<'a> {
     /// guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn banner(mut self, banner: Option<ImageData>) -> Self {
+    pub fn banner(mut self, banner: Option<ImageData<'a>>) -> Self {
         self.banner = Some(banner);
         self
     }
