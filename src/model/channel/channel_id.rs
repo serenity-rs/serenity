@@ -22,6 +22,8 @@ use crate::builder::{
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
+#[cfg(all(feature = "cache", feature = "temp_cache", feature = "model"))]
+use crate::cache::MaybeOwnedArc;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 use crate::model::prelude::*;
@@ -39,6 +41,55 @@ impl ChannelId {
 
 #[cfg(feature = "model")]
 impl ChannelId {
+    /// Fetches a channel from the cache, falling back to HTTP/temp cache.
+    ///
+    /// It is highly recommended to pass the `guild_id` parameter as otherwise this may perform many
+    /// HTTP requests.
+    ///
+    /// # Errors
+    ///
+    /// Errors if the HTTP fallback fails, or if the channel does not come from the guild passed.
+    pub async fn to_guild_channel(
+        self,
+        cache_http: impl CacheHttp,
+        guild_id: Option<GuildId>,
+    ) -> Result<GuildChannel> {
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            if let Some(guild_id) = guild_id {
+                if let Some(guild) = cache.guild(guild_id) {
+                    if let Some(channel) = guild.channels.get(&self) {
+                        return Ok(channel.clone());
+                    }
+                }
+            }
+
+            #[cfg(feature = "temp_cache")]
+            if let Some(temp_channel) = cache.temp_channels.get(&self) {
+                if guild_id.is_some_and(|id| temp_channel.base.guild_id != id) {
+                    return Err(Error::Model(ModelError::ChannelNotFound));
+                }
+
+                return Ok(GuildChannel::clone(&temp_channel));
+            }
+        }
+
+        let channel = cache_http.http().get_channel(self.widen()).await?;
+        let guild_channel = channel.guild().ok_or(ModelError::InvalidChannelType)?;
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
+        if let Some(cache) = cache_http.cache() {
+            let cached_channel = MaybeOwnedArc::new(guild_channel.clone());
+            cache.temp_channels.insert(self, cached_channel);
+        }
+
+        if guild_id.is_some_and(|id| guild_channel.base.guild_id != id) {
+            return Err(Error::Model(ModelError::ChannelNotFound));
+        }
+
+        Ok(guild_channel)
+    }
+
     /// Creates an invite for the given channel.
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
@@ -626,8 +677,6 @@ impl GenericChannelId {
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         if let Some(cache) = cache_http.cache() {
-            use crate::cache::MaybeOwnedArc;
-
             match &channel {
                 Channel::Guild(guild_channel) => {
                     let cached_channel = MaybeOwnedArc::new(guild_channel.clone());
@@ -643,29 +692,6 @@ impl GenericChannelId {
         }
 
         Ok(channel)
-    }
-
-    /// Fetches a channel from the cache, falling back to HTTP/temp cache.
-    ///
-    /// It is highly recommended to pass the `guild_id` parameter as otherwise this may perform many
-    /// HTTP requests.
-    ///
-    /// # Errors
-    ///
-    /// Errors if the HTTP fallback fails, or if the channel does not come from the guild passed.
-    pub async fn to_guild_channel(
-        self,
-        cache_http: impl CacheHttp,
-        guild_id: Option<GuildId>,
-    ) -> Result<GuildChannel> {
-        let channel = self.to_channel(cache_http, guild_id).await?;
-        let guild_channel = channel.guild().ok_or(ModelError::InvalidChannelType)?;
-
-        if guild_id.is_some_and(|id| guild_channel.base.guild_id != id) {
-            return Err(Error::Model(ModelError::ChannelNotFound));
-        }
-
-        Ok(guild_channel)
     }
 
     /// Gets a message from the channel.
