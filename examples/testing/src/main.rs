@@ -87,7 +87,8 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         model_type_sizes::print_ranking();
     } else if msg.content == "auditlog" {
         // Test special characters in audit log reason
-        msg.channel_id
+        channel_id
+            .expect_channel()
             .edit(
                 &ctx.http,
                 EditChannel::new().name("new-channel-name").audit_log_reason("hello\nworld\n🙂"),
@@ -155,6 +156,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         guild_id.ban(&ctx.http, user_id, 0, None).await?;
     } else if msg.content == "createtags" {
         channel_id
+            .expect_channel()
             .edit(
                 &ctx.http,
                 EditChannel::new().available_tags(vec![
@@ -165,9 +167,10 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .await?;
     } else if msg.content == "assigntags" {
         let forum_id = msg.guild_channel(&ctx).await?.parent_id.unwrap();
-        let forum = forum_id.to_guild_channel(&ctx, msg.guild_id).await?;
+        let forum = forum_id.widen().to_guild_channel(&ctx, msg.guild_id).await?;
         channel_id
-            .edit_thread(
+            .expect_thread()
+            .edit(
                 &ctx.http,
                 EditThread::new()
                     .applied_tags(forum.available_tags.iter().map(|t| t.id).collect::<Vec<_>>()),
@@ -199,7 +202,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         msg.author.id.dm(&ctx.http, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
         let mut channel = {
-            let channel_id = channel.trim().parse::<ChannelId>().unwrap();
+            let channel_id = channel.trim().parse::<GenericChannelId>().unwrap();
             channel_id.to_guild_channel(&ctx, msg.guild_id).await.unwrap()
         };
 

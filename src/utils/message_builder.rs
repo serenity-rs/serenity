@@ -2,7 +2,7 @@ use std::fmt::{self as fmt, Write};
 use std::ops::Add;
 
 use crate::model::guild::Emoji;
-use crate::model::id::{ChannelId, RoleId, UserId};
+use crate::model::id::{GenericChannelId, RoleId, UserId};
 use crate::model::mention::Mentionable;
 
 /// The Message Builder is an ergonomic utility to easily build a message, by adding text and
@@ -63,10 +63,10 @@ impl MessageBuilder {
     /// it to retrieve the inner String:
     ///
     /// ```rust
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::id::GenericChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let channel_id = ChannelId::new(81384788765712384);
+    /// let channel_id = GenericChannelId::new(81384788765712384);
     ///
     /// let content = MessageBuilder::new().channel(channel_id).push("!").build();
     ///
@@ -86,23 +86,17 @@ impl MessageBuilder {
         self.0
     }
 
-    /// Mentions the [`GuildChannel`] in the built message.
-    ///
-    /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to [`ChannelId`]'s
-    /// documentation for more information.
-    ///
-    /// Refer to [`ChannelId`]'s [Display implementation] for more information on how this is
-    /// formatted.
+    /// Mentions the [`Channel`] in the built message.
     ///
     /// # Examples
     ///
     /// Mentioning a [`Channel`] by Id:
     ///
     /// ```rust
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::id::GenericChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let channel_id = ChannelId::new(81384788765712384);
+    /// let channel_id = GenericChannelId::new(81384788765712384);
     ///
     /// let content = MessageBuilder::new().push("The channel is: ").channel(channel_id).build();
     ///
@@ -110,9 +104,7 @@ impl MessageBuilder {
     /// ```
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    /// [`GuildChannel`]: crate::model::channel::GuildChannel
-    /// [Display implementation]: ChannelId#impl-Display
-    pub fn channel(mut self, channel: ChannelId) -> Self {
+    pub fn channel(mut self, channel: GenericChannelId) -> Self {
         self.push_(&channel.mention());
         self
     }
@@ -1146,7 +1138,7 @@ mod test {
 
         let content_emoji = MessageBuilder::new().emoji(&emoji).build();
         let content_mentions = MessageBuilder::new()
-            .channel(ChannelId::new(1))
+            .channel(GenericChannelId::new(1))
             .mention(&UserId::new(2))
             .role(RoleId::new(3))
             .user(UserId::new(4))

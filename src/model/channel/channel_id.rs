@@ -18,7 +18,6 @@ use crate::builder::{
     EditChannel,
     EditMessage,
     EditStageInstance,
-    EditThread,
     GetMessages,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -27,39 +26,19 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http, Typing};
 use crate::model::prelude::*;
 
+impl ChannelId {
+    /// Converts the type of this Id to [`GenericChannelId`].
+    ///
+    /// This allows you to call methods which are shared between channels and threads, and does not
+    /// change the inner value at all.
+    #[must_use]
+    pub fn widen(self) -> GenericChannelId {
+        self.into()
+    }
+}
+
 #[cfg(feature = "model")]
 impl ChannelId {
-    /// Broadcasts that the current user is typing to a channel for the next 5 seconds.
-    ///
-    /// After 5 seconds, another request must be made to continue broadcasting that the current
-    /// user is typing.
-    ///
-    /// This should rarely be used for bots, and should likely only be used for signifying that a
-    /// long-running command is still being executed.
-    ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,no_run
-    /// use serenity::model::id::ChannelId;
-    ///
-    /// # async fn run() {
-    /// # let http: serenity::http::Http = unimplemented!();
-    /// let _successful = ChannelId::new(7).broadcast_typing(&http).await;
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission to send messages to this
-    /// channel.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn broadcast_typing(self, http: &Http) -> Result<()> {
-        http.broadcast_typing(self).await
-    }
-
     /// Creates an invite for the given channel.
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
@@ -93,6 +72,338 @@ impl ChannelId {
     ) -> Result<()> {
         let data: PermissionOverwriteData = target.into();
         http.create_permission(self, data.id, &data, reason).await
+    }
+
+    /// Deletes all permission overrides in the channel from a member or role.
+    ///
+    /// **Note**: Requires the [Manage Channel] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
+    pub async fn delete_permission(
+        self,
+        http: &Http,
+        permission_type: PermissionOverwriteType,
+        reason: Option<&str>,
+    ) -> Result<()> {
+        let id = match permission_type {
+            PermissionOverwriteType::Member(id) => id.into(),
+            PermissionOverwriteType::Role(id) => id.get().into(),
+        };
+        http.delete_permission(self, id, reason).await
+    }
+
+    /// Edits a channel's settings.
+    ///
+    /// Refer to the documentation for [`EditChannel`] for a full list of methods.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`EditChannel::permissions`] also requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change a voice channel's name and bitrate:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::builder::EditChannel;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::ChannelId;
+    /// # async fn run() {
+    /// # let http: Http = unimplemented!();
+    /// # let channel_id = ChannelId::new(1234);
+    /// let builder = EditChannel::new().name("test").bitrate(64000);
+    /// channel_id.edit(&http, builder).await;
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    pub async fn edit(self, http: &Http, builder: EditChannel<'_>) -> Result<GuildChannel> {
+        builder.execute(http, self).await
+    }
+
+    /// Follows the News Channel
+    ///
+    /// Requires [Manage Webhook] permissions on the target channel.
+    ///
+    /// **Note**: Only available on news channels.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission. [Manage Webhook]:
+    /// Permissions::MANAGE_WEBHOOKS
+    pub async fn follow(
+        self,
+        http: &Http,
+        target_channel_id: ChannelId,
+    ) -> Result<FollowedChannel> {
+        #[derive(serde::Serialize)]
+        struct FollowChannel {
+            webhook_channel_id: ChannelId,
+        }
+
+        let map = FollowChannel {
+            webhook_channel_id: target_channel_id,
+        };
+
+        http.follow_news_channel(self, &map).await
+    }
+
+    /// Gets all of the channel's invites.
+    ///
+    /// Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    pub async fn invites(self, http: &Http) -> Result<Vec<RichInvite>> {
+        http.get_channel_invites(self).await
+    }
+
+    /// Crossposts a [`Message`].
+    ///
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on
+    /// this channel.
+    ///
+    /// **Note**: Only available on news channels.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, and if the user is not the
+    /// author of the message.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    pub async fn crosspost(self, http: &Http, message_id: MessageId) -> Result<Message> {
+        http.crosspost_message(self, message_id).await
+    }
+
+    /// Retrieves the channel's webhooks.
+    ///
+    /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
+    pub async fn webhooks(self, http: &Http) -> Result<Vec<Webhook>> {
+        http.get_channel_webhooks(self).await
+    }
+
+    /// Creates a webhook in the channel.
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    pub async fn create_webhook(self, http: &Http, builder: CreateWebhook<'_>) -> Result<Webhook> {
+        builder.execute(http, self).await
+    }
+
+    /// Gets a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
+    /// instance currently.
+    pub async fn get_stage_instance(self, http: &Http) -> Result<StageInstance> {
+        http.get_stage_instance(self).await
+    }
+
+    /// Creates a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if there is already a stage instance currently.
+    pub async fn create_stage_instance(
+        self,
+        http: &Http,
+        builder: CreateStageInstance<'_>,
+    ) -> Result<StageInstance> {
+        builder.execute(http, self).await
+    }
+
+    /// Edits the stage instance
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
+    /// instance currently.
+    pub async fn edit_stage_instance(
+        self,
+        http: &Http,
+        builder: EditStageInstance<'_>,
+    ) -> Result<StageInstance> {
+        builder.execute(http, self).await
+    }
+
+    /// Deletes a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
+    /// instance currently.
+    pub async fn delete_stage_instance(self, http: &Http, reason: Option<&str>) -> Result<()> {
+        http.delete_stage_instance(self, reason).await
+    }
+
+    /// Creates a public thread that is connected to a message.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    #[doc(alias = "create_public_thread")]
+    pub async fn create_thread_from_message(
+        self,
+        http: &Http,
+        message_id: MessageId,
+        builder: CreateThread<'_>,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self, Some(message_id)).await
+    }
+
+    /// Creates a thread that is not connected to a message.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    #[doc(alias = "create_public_thread", alias = "create_private_thread")]
+    pub async fn create_thread(
+        self,
+        http: &Http,
+        builder: CreateThread<'_>,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self, None).await
+    }
+
+    /// Creates a post in a forum channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_forum_post(
+        self,
+        http: &Http,
+        builder: CreateForumPost<'_>,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self).await
+    }
+
+    /// Gets private archived threads of a channel.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
+    pub async fn get_archived_private_threads(
+        self,
+        http: &Http,
+        before: Option<Timestamp>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        http.get_channel_archived_private_threads(self, before, limit).await
+    }
+
+    /// Gets public archived threads of a channel.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
+    pub async fn get_archived_public_threads(
+        self,
+        http: &Http,
+        before: Option<Timestamp>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        http.get_channel_archived_public_threads(self, before, limit).await
+    }
+
+    /// Gets private archived threads joined by the current user of a channel.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
+    pub async fn get_joined_archived_private_threads(
+        self,
+        http: &Http,
+        before: Option<ChannelId>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        http.get_channel_joined_archived_private_threads(self, before, limit).await
+    }
+
+    /// Sends a soundboard sound to this voice channel.
+    ///
+    /// # Errors
+    ///
+    /// Errors if this channel ID does not point to a voice channel, or you do not
+    /// have the required [`SPEAK`], [`USE_SOUNDBOARD`], and/or
+    /// [`USE_EXTERNAL_SOUNDS`] permissions.
+    ///
+    /// [`SPEAK`]: Permissions::SPEAK
+    /// [`USE_SOUNDBOARD`]: Permissions::USE_SOUNDBOARD
+    /// [`USE_EXTERNAL_SOUNDS`]: Permissions::USE_EXTERNAL_SOUNDS
+    pub async fn send_soundboard(
+        self,
+        http: impl AsRef<Http>,
+        sound_id: SoundId,
+        guild_id: Option<GuildId>,
+    ) -> Result<()> {
+        #[derive(serde::Serialize)]
+        struct SendSoundboard {
+            sound_id: SoundId,
+            source_guild_id: Option<GuildId>,
+        }
+
+        let map = SendSoundboard {
+            sound_id,
+            source_guild_id: guild_id,
+        };
+
+        http.as_ref().send_soundboard_sound(self, &map).await
+    }
+}
+
+#[cfg(feature = "model")]
+impl GenericChannelId {
+    /// Broadcasts that the current user is typing to a channel for the next 5 seconds.
+    ///
+    /// After 5 seconds, another request must be made to continue broadcasting that the current
+    /// user is typing.
+    ///
+    /// This should rarely be used for bots, and should likely only be used for signifying that a
+    /// long-running command is still being executed.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::id::GenericChannelId;
+    ///
+    /// # async fn run() {
+    /// # let http: serenity::http::Http = unimplemented!();
+    /// let _successful = GenericChannelId::new(7).broadcast_typing(&http).await;
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission to send messages to this
+    /// channel.
+    ///
+    /// [Send Messages]: Permissions::SEND_MESSAGES
+    pub async fn broadcast_typing(self, http: &Http) -> Result<()> {
+        http.broadcast_typing(self).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -194,28 +505,6 @@ impl ChannelId {
         }
     }
 
-    /// Deletes all permission overrides in the channel from a member or role.
-    ///
-    /// **Note**: Requires the [Manage Channel] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
-    pub async fn delete_permission(
-        self,
-        http: &Http,
-        permission_type: PermissionOverwriteType,
-        reason: Option<&str>,
-    ) -> Result<()> {
-        let id = match permission_type {
-            PermissionOverwriteType::Member(id) => id.into(),
-            PermissionOverwriteType::Role(id) => id.get().into(),
-        };
-        http.delete_permission(self, id, reason).await
-    }
-
     /// Deletes the given [`Reaction`] from the channel.
     ///
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current user did not perform
@@ -273,39 +562,6 @@ impl ChannelId {
         http.delete_message_reaction_emoji(self, message_id, &reaction_type.into()).await
     }
 
-    /// Edits a channel's settings.
-    ///
-    /// Refer to the documentation for [`EditChannel`] for a full list of methods.
-    ///
-    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
-    /// [`EditChannel::permissions`] also requires the [Manage Roles] permission.
-    ///
-    /// # Examples
-    ///
-    /// Change a voice channel's name and bitrate:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::builder::EditChannel;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::id::ChannelId;
-    /// # async fn run() {
-    /// # let http: Http = unimplemented!();
-    /// # let channel_id = ChannelId::new(1234);
-    /// let builder = EditChannel::new().name("test").bitrate(64000);
-    /// channel_id.edit(&http, builder).await;
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-    ///
-    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit(self, http: &Http, builder: EditChannel<'_>) -> Result<GuildChannel> {
-        builder.execute(http, self).await
-    }
-
     /// Edits a [`Message`] in the channel given its Id.
     ///
     /// Message editing preserves all unchanged message data, with some exceptions for embeds and
@@ -329,71 +585,60 @@ impl ChannelId {
         builder.execute(http, self, message_id, None).await
     }
 
-    /// Follows the News Channel
-    ///
-    /// Requires [Manage Webhook] permissions on the target channel.
-    ///
-    /// **Note**: Only available on news channels.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission. [Manage Webhook]:
-    /// Permissions::MANAGE_WEBHOOKS
-    pub async fn follow(
-        self,
-        http: &Http,
-        target_channel_id: ChannelId,
-    ) -> Result<FollowedChannel> {
-        #[derive(serde::Serialize)]
-        struct FollowChannel {
-            webhook_channel_id: ChannelId,
-        }
-
-        let map = FollowChannel {
-            webhook_channel_id: target_channel_id,
-        };
-
-        http.follow_news_channel(self, &map).await
-    }
-
     /// Attempts to retrieve the channel from the guild cache, otherwise from HTTP/temp cache.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
-    #[cfg_attr(not(feature = "cache"), allow(unused_variables))]
     pub async fn to_channel(
         self,
         cache_http: impl CacheHttp,
         guild_id: Option<GuildId>,
     ) -> Result<Channel> {
+        #[cfg_attr(not(feature = "temp_cache"), expect(unused_variables))]
+        let (channel_id, thread_id) = self.split();
+
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
-            if let Some(guild_id) = guild_id {
-                if let Some(guild) = cache.guild(guild_id) {
-                    if let Some(channel) = guild.channels.get(&self) {
-                        return Ok(Channel::Guild(channel.clone()));
-                    }
-                }
+            match guild_id.and_then(|id| cache.guild(id)).as_ref().and_then(|g| g.channel(self)) {
+                Some(GenericGuildChannelRef::Channel(chan)) => {
+                    return Ok(Channel::Guild(chan.clone()));
+                },
+                Some(GenericGuildChannelRef::Thread(th)) => {
+                    return Ok(Channel::GuildThread(th.clone()));
+                },
+                None => {},
             }
 
             #[cfg(feature = "temp_cache")]
-            if let Some(channel) = cache.temp_channels.get(&self) {
-                return Ok(Channel::Guild(GuildChannel::clone(&*channel)));
+            {
+                if let Some(channel) = cache.temp_channels.get(&channel_id) {
+                    return Ok(Channel::Guild(GuildChannel::clone(&*channel)));
+                }
+
+                if let Some(thread) = cache.temp_threads.get(&thread_id) {
+                    return Ok(Channel::GuildThread(GuildThread::clone(&*thread)));
+                }
             }
         }
 
         let channel = cache_http.http().get_channel(self).await?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Channel::Guild(guild_channel) = &channel {
-                    use crate::cache::MaybeOwnedArc;
+        if let Some(cache) = cache_http.cache() {
+            use crate::cache::MaybeOwnedArc;
 
+            match &channel {
+                Channel::Guild(guild_channel) => {
                     let cached_channel = MaybeOwnedArc::new(guild_channel.clone());
-                    cache.temp_channels.insert(cached_channel.id, cached_channel);
-                }
+                    cache.temp_channels.insert(channel_id, cached_channel);
+                },
+                Channel::GuildThread(guild_thread) => {
+                    let cached_thread = MaybeOwnedArc::new(guild_thread.clone());
+                    cache.temp_threads.insert(thread_id, cached_thread);
+                },
+                // No access to `UserId`, so this can't cache.
+                Channel::Private(_) => {},
             }
         }
 
@@ -416,24 +661,11 @@ impl ChannelId {
         let channel = self.to_channel(cache_http, guild_id).await?;
         let guild_channel = channel.guild().ok_or(ModelError::InvalidChannelType)?;
 
-        if guild_id.is_some_and(|id| guild_channel.guild_id != id) {
+        if guild_id.is_some_and(|id| guild_channel.base.guild_id != id) {
             return Err(Error::Model(ModelError::ChannelNotFound));
         }
 
         Ok(guild_channel)
-    }
-
-    /// Gets all of the channel's invites.
-    ///
-    /// Requires the [Manage Channels] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn invites(self, http: &Http) -> Result<Vec<RichInvite>> {
-        http.get_channel_invites(self).await
     }
 
     /// Gets a message from the channel.
@@ -501,11 +733,11 @@ impl ChannelId {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::id::GenericChannelId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() {
-    /// # let channel_id = ChannelId::new(1);
+    /// # let channel_id = GenericChannelId::new(1);
     /// # let ctx: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
@@ -538,23 +770,6 @@ impl ChannelId {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn pin(self, http: &Http, message_id: MessageId, reason: Option<&str>) -> Result<()> {
         http.pin_message(self, message_id, reason).await
-    }
-
-    /// Crossposts a [`Message`].
-    ///
-    /// Requires either to be the message author or to have manage [Manage Messages] permissions on
-    /// this channel.
-    ///
-    /// **Note**: Only available on news channels.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, and if the user is not the
-    /// author of the message.
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn crosspost(self, http: &Http, message_id: MessageId) -> Result<Message> {
-        http.crosspost_message(self, message_id).await
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -646,9 +861,9 @@ impl ChannelId {
     /// # async fn run() -> Result<(), serenity::Error> {
     /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::id::GenericChannelId;
     ///
-    /// let channel_id = ChannelId::new(7);
+    /// let channel_id = GenericChannelId::new(7);
     ///
     /// let paths = [
     ///     CreateAttachment::path("/path/to/file.jpg").await?,
@@ -669,10 +884,10 @@ impl ChannelId {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
     /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::id::ChannelId;
+    /// use serenity::model::id::GenericChannelId;
     /// use tokio::fs::File;
     ///
-    /// let channel_id = ChannelId::new(7);
+    /// let channel_id = GenericChannelId::new(7);
     ///
     /// let f1 = File::open("my_file.jpg").await?;
     /// let f2 = File::open("my_file2.jpg").await?;
@@ -733,14 +948,14 @@ impl ChannelId {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::Http, Result, model::id::ChannelId};
+    /// # use serenity::{http::Http, Result, model::id::GenericChannelId};
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
     /// # fn main() {
     /// # let http: Arc<Http> = unimplemented!();
     /// // Initiate typing (assuming http is `Arc<Http>`)
-    /// let typing = ChannelId::new(7).start_typing(http);
+    /// let typing = GenericChannelId::new(7).start_typing(http);
     ///
     /// // Run some long-running process
     /// long_process();
@@ -776,231 +991,6 @@ impl ChannelId {
         http.unpin_message(self, message_id, reason).await
     }
 
-    /// Retrieves the channel's webhooks.
-    ///
-    /// **Note**: Requires the [Manage Webhooks] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
-    pub async fn webhooks(self, http: &Http) -> Result<Vec<Webhook>> {
-        http.get_channel_webhooks(self).await
-    }
-
-    /// Creates a webhook in the channel.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
-    pub async fn create_webhook(self, http: &Http, builder: CreateWebhook<'_>) -> Result<Webhook> {
-        builder.execute(http, self).await
-    }
-
-    /// Gets a stage instance.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
-    /// instance currently.
-    pub async fn get_stage_instance(self, http: &Http) -> Result<StageInstance> {
-        http.get_stage_instance(self).await
-    }
-
-    /// Creates a stage instance.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if there is already a stage instance currently.
-    pub async fn create_stage_instance(
-        self,
-        http: &Http,
-        builder: CreateStageInstance<'_>,
-    ) -> Result<StageInstance> {
-        builder.execute(http, self).await
-    }
-
-    /// Edits the stage instance
-    ///
-    /// # Errors
-    ///
-    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
-    ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
-    /// instance currently.
-    pub async fn edit_stage_instance(
-        self,
-        http: &Http,
-        builder: EditStageInstance<'_>,
-    ) -> Result<StageInstance> {
-        builder.execute(http, self).await
-    }
-
-    /// Edits a thread.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread(self, http: &Http, builder: EditThread<'_>) -> Result<GuildChannel> {
-        builder.execute(http, self).await
-    }
-
-    /// Deletes a stage instance.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
-    /// instance currently.
-    pub async fn delete_stage_instance(self, http: &Http, reason: Option<&str>) -> Result<()> {
-        http.delete_stage_instance(self, reason).await
-    }
-
-    /// Creates a public thread that is connected to a message.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[doc(alias = "create_public_thread")]
-    pub async fn create_thread_from_message(
-        self,
-        http: &Http,
-        message_id: MessageId,
-        builder: CreateThread<'_>,
-    ) -> Result<GuildChannel> {
-        builder.execute(http, self, Some(message_id)).await
-    }
-
-    /// Creates a thread that is not connected to a message.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    #[doc(alias = "create_public_thread", alias = "create_private_thread")]
-    pub async fn create_thread(
-        self,
-        http: &Http,
-        builder: CreateThread<'_>,
-    ) -> Result<GuildChannel> {
-        builder.execute(http, self, None).await
-    }
-
-    /// Creates a post in a forum channel.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_forum_post(
-        self,
-        http: &Http,
-        builder: CreateForumPost<'_>,
-    ) -> Result<GuildChannel> {
-        builder.execute(http, self).await
-    }
-
-    /// Gets the thread members, if this channel is a thread.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn get_thread_members(self, http: &Http) -> Result<Vec<ThreadMember>> {
-        http.get_channel_thread_members(self).await
-    }
-
-    /// Joins the thread, if this channel is a thread.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn join_thread(self, http: &Http) -> Result<()> {
-        http.join_thread_channel(self).await
-    }
-
-    /// Leaves the thread, if this channel is a thread.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn leave_thread(self, http: &Http) -> Result<()> {
-        http.leave_thread_channel(self).await
-    }
-
-    /// Adds a thread member, if this channel is a thread.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn add_thread_member(self, http: &Http, user_id: UserId) -> Result<()> {
-        http.add_thread_channel_member(self, user_id).await
-    }
-
-    /// Removes a thread member, if this channel is a thread.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn remove_thread_member(self, http: &Http, user_id: UserId) -> Result<()> {
-        http.remove_thread_channel_member(self, user_id).await
-    }
-
-    /// Gets a thread member, if this channel is a thread.
-    ///
-    /// `with_member` controls if ThreadMember::member should be `Some`
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the channel is not a thread channel
-    pub async fn get_thread_member(
-        self,
-        http: &Http,
-        user_id: UserId,
-        with_member: bool,
-    ) -> Result<ThreadMember> {
-        http.get_thread_channel_member(self, user_id, with_member).await
-    }
-
-    /// Gets private archived threads of a channel.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
-    pub async fn get_archived_private_threads(
-        self,
-        http: &Http,
-        before: Option<Timestamp>,
-        limit: Option<u64>,
-    ) -> Result<ThreadsData> {
-        http.get_channel_archived_private_threads(self, before, limit).await
-    }
-
-    /// Gets public archived threads of a channel.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
-    pub async fn get_archived_public_threads(
-        self,
-        http: &Http,
-        before: Option<Timestamp>,
-        limit: Option<u64>,
-    ) -> Result<ThreadsData> {
-        http.get_channel_archived_public_threads(self, before, limit).await
-    }
-
-    /// Gets private archived threads joined by the current user of a channel.
-    ///
-    /// # Errors
-    ///
-    /// It may return an [`Error::Http`] if the bot doesn't have the permission to get it.
-    pub async fn get_joined_archived_private_threads(
-        self,
-        http: &Http,
-        before: Option<ChannelId>,
-        limit: Option<u64>,
-    ) -> Result<ThreadsData> {
-        http.get_channel_joined_archived_private_threads(self, before, limit).await
-    }
-
     /// Get a list of users that voted for this specific answer.
     ///
     /// # Errors
@@ -1025,51 +1015,20 @@ impl ChannelId {
     pub async fn end_poll(self, http: &Http, message_id: MessageId) -> Result<Message> {
         http.expire_poll(self, message_id).await
     }
-
-    /// Sends a soundboard sound to this voice channel.
-    ///
-    /// # Errors
-    ///
-    /// Errors if this channel ID does not point to a voice channel, or you do not
-    /// have the required [`SPEAK`], [`USE_SOUNDBOARD`], and/or
-    /// [`USE_EXTERNAL_SOUNDS`] permissions.
-    ///
-    /// [`SPEAK`]: Permissions::SPEAK
-    /// [`USE_SOUNDBOARD`]: Permissions::USE_SOUNDBOARD
-    /// [`USE_EXTERNAL_SOUNDS`]: Permissions::USE_EXTERNAL_SOUNDS
-    pub async fn send_soundboard(
-        self,
-        http: impl AsRef<Http>,
-        sound_id: SoundId,
-        guild_id: Option<GuildId>,
-    ) -> Result<()> {
-        #[derive(serde::Serialize)]
-        struct SendSoundboard {
-            sound_id: SoundId,
-            source_guild_id: Option<GuildId>,
-        }
-
-        let map = SendSoundboard {
-            sound_id,
-            source_guild_id: guild_id,
-        };
-
-        http.as_ref().send_soundboard_sound(self, &map).await
-    }
 }
 
 #[cfg(feature = "model")]
-impl From<Channel> for ChannelId {
+impl From<Channel> for GenericChannelId {
     /// Gets the Id of a [`Channel`].
-    fn from(channel: Channel) -> ChannelId {
+    fn from(channel: Channel) -> Self {
         channel.id()
     }
 }
 
 #[cfg(feature = "model")]
-impl From<&Channel> for ChannelId {
+impl From<&Channel> for GenericChannelId {
     /// Gets the Id of a [`Channel`].
-    fn from(channel: &Channel) -> ChannelId {
+    fn from(channel: &Channel) -> Self {
         channel.id()
     }
 }
@@ -1116,14 +1075,14 @@ impl From<&WebhookChannel> for ChannelId {
     }
 }
 
-/// A helper class returned by [`ChannelId::messages_iter`]
+/// A helper class returned by [`GenericChannelId::messages_iter`]
 #[derive(Clone, Debug)]
 #[cfg(feature = "model")]
 pub struct MessagesIter<'a> {
     http: &'a Http,
     #[cfg(feature = "cache")]
     cache: Option<&'a Arc<Cache>>,
-    channel_id: ChannelId,
+    channel_id: GenericChannelId,
     buffer: Vec<Message>,
     before: Option<MessageId>,
     tried_fetch: bool,
@@ -1131,7 +1090,7 @@ pub struct MessagesIter<'a> {
 
 #[cfg(feature = "model")]
 impl<'a> MessagesIter<'a> {
-    fn new(cache_http: &'a impl CacheHttp, channel_id: ChannelId) -> MessagesIter<'a> {
+    fn new(cache_http: &'a impl CacheHttp, channel_id: GenericChannelId) -> MessagesIter<'a> {
         MessagesIter {
             http: cache_http.http(),
             #[cfg(feature = "cache")]
@@ -1192,19 +1151,19 @@ impl<'a> MessagesIter<'a> {
 
     /// Streams over all the messages in a channel.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`ChannelId::messages`]. A buffer
-    /// of at most 100 messages is used to reduce the number of calls necessary.
+    /// This is accomplished and equivalent to repeated calls to [`GenericChannelId::messages`]. A
+    /// buffer of at most 100 messages is used to reduce the number of calls necessary.
     ///
     /// The stream returns the newest message first, followed by older messages.
     ///
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::id::GenericChannelId;
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() {
-    /// # let channel_id = ChannelId::new(1);
+    /// # let channel_id = GenericChannelId::new(1);
     /// # let http: Http = unimplemented!();
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
@@ -1220,7 +1179,7 @@ impl<'a> MessagesIter<'a> {
     /// ```
     pub fn stream(
         cache_http: &'a impl CacheHttp,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
     ) -> impl Stream<Item = Result<Message>> + 'a {
         let init_state = MessagesIter::new(cache_http, channel_id);
 

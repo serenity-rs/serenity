@@ -103,7 +103,7 @@ pub struct ChannelDeleteEvent {
 #[non_exhaustive]
 pub struct ChannelPinsUpdateEvent {
     pub guild_id: Option<GuildId>,
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     pub last_pin_timestamp: Option<Timestamp>,
 }
 
@@ -167,7 +167,8 @@ pub struct GuildCreateEvent {
 impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild: Guild = Guild::deserialize(deserializer)?;
-        lending_for_each!(guild.channels.iter_mut(), |x| x.guild_id = guild.id);
+        lending_for_each!(guild.channels.iter_mut(), |x| x.base.guild_id = guild.id);
+        lending_for_each!(guild.threads.iter_mut(), |x| x.base.guild_id = guild.id);
         lending_for_each!(guild.members.iter_mut(), |x| x.guild_id = guild.id);
         lending_for_each!(guild.roles.iter_mut(), |x| x.guild_id = guild.id);
         Ok(Self {
@@ -446,7 +447,7 @@ pub struct MessageCreateEvent {
 #[non_exhaustive]
 pub struct MessageDeleteBulkEvent {
     pub guild_id: Option<GuildId>,
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     pub ids: FixedArray<MessageId>,
 }
 
@@ -458,7 +459,7 @@ pub struct MessageDeleteBulkEvent {
 #[non_exhaustive]
 pub struct MessageDeleteEvent {
     pub guild_id: Option<GuildId>,
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     #[serde(rename = "id")]
     pub message_id: MessageId,
 }
@@ -522,7 +523,7 @@ pub struct ReactionRemoveEvent {
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ReactionRemoveAllEvent {
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     pub message_id: MessageId,
     pub guild_id: Option<GuildId>,
 }
@@ -568,7 +569,7 @@ pub struct ResumedEvent {}
 #[non_exhaustive]
 pub struct TypingStartEvent {
     /// ID of the channel.
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     /// ID of the guild.
     pub guild_id: Option<GuildId>,
     /// ID of the user.
@@ -724,7 +725,7 @@ pub struct StageInstanceDeleteEvent {
 #[non_exhaustive]
 pub struct ThreadCreateEvent {
     #[serde(flatten)]
-    pub thread: GuildChannel,
+    pub thread: GuildThread,
     pub newly_created: Option<bool>,
 }
 
@@ -736,7 +737,7 @@ pub struct ThreadCreateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ThreadUpdateEvent {
-    pub thread: GuildChannel,
+    pub thread: GuildThread,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].
@@ -747,7 +748,7 @@ pub struct ThreadUpdateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ThreadDeleteEvent {
-    pub thread: PartialGuildChannel,
+    pub thread: PartialGuildThread,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].
@@ -906,7 +907,7 @@ pub struct EntitlementDeleteEvent {
 #[non_exhaustive]
 pub struct MessagePollVoteAddEvent {
     pub user_id: UserId,
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     pub message_id: MessageId,
     pub guild_id: Option<GuildId>,
     pub answer_id: AnswerId,
@@ -920,7 +921,7 @@ pub struct MessagePollVoteAddEvent {
 #[non_exhaustive]
 pub struct MessagePollVoteRemoveEvent {
     pub user_id: UserId,
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     pub message_id: MessageId,
     pub guild_id: Option<GuildId>,
     pub answer_id: AnswerId,

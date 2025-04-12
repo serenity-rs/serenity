@@ -224,7 +224,7 @@ pub enum CreateSelectMenuKind<'a> {
     },
     Channel {
         channel_types: Option<Cow<'a, [ChannelType]>>,
-        default_channels: Option<Cow<'a, [ChannelId]>>,
+        default_channels: Option<Cow<'a, [GenericChannelId]>>,
     },
 }
 

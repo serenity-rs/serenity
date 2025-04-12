@@ -1,6 +1,6 @@
 use std::fmt;
 
-use nonmax::{NonMaxU8, NonMaxU16, NonMaxU32};
+use nonmax::{NonMaxU16, NonMaxU32};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -9,7 +9,6 @@ use crate::builder::{
     CreateWebhook,
     EditChannel,
     EditStageInstance,
-    EditThread,
     EditVoiceState,
 };
 #[cfg(feature = "cache")]
@@ -18,51 +17,63 @@ use crate::cache::{self, Cache};
 use crate::http::Http;
 use crate::model::prelude::*;
 
-/// Represents a guild's text, news, or voice channel.
+/// Represents the shared fields between [`GuildChannel`] and [`GuildThread`].
 ///
-/// Some methods are available only for voice channels and some are only available for text
-/// channels. News channels are a subset of text channels and lack slow mode hence
-/// [`Self::rate_limit_per_user`] will be [`None`].
+/// [Discord docs](https://discord.com/developers/docs/topics/threads#thread-fields)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct BaseGuildChannel {
+    /// The Id of the guild the channel is located in.
+    #[serde(default)]
+    pub guild_id: GuildId,
+    /// The type of the channel.
+    #[serde(rename = "type")]
+    pub kind: ChannelType,
+    /// The name of the channel. (1-100 characters)
+    pub name: FixedString<u16>,
+    /// The Id of the last message sent in the channel.
+    pub last_message_id: Option<MessageId>,
+    /// The timestamp of the time a pin was most recently made.
+    pub last_pin_timestamp: Option<Timestamp>,
+    /// A rate limit that applies per user and excludes bots.
+    ///
+    /// **Note**: This is only available for text channels excluding news channels.
+    #[doc(alias = "slowmode")]
+    #[serde(default)]
+    pub rate_limit_per_user: Option<NonMaxU16>,
+}
+
+#[cfg(feature = "model")]
+impl BaseGuildChannel {
+    /// Attempts to find this channel's guild in the Cache.
+    #[cfg(feature = "cache")]
+    pub fn guild<'a>(&self, cache: &'a Cache) -> Option<cache::GuildRef<'a>> {
+        cache.guild(self.guild_id)
+    }
+}
+
+/// Represents a channel in a [`Guild`], excluding thread information.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
-    /// The unique Id of the channel.
+    /// The shared fields between [`GuildChannel`] and [`GuildThread`].
+    #[serde(flatten)]
+    pub base: BaseGuildChannel,
+    /// The unique ID of the channel.
     pub id: ChannelId,
+    /// The Id of the parent category for a channel.
+    ///
+    /// **Note**: This is only available for channels in a category.
+    // Technically shared, but for different purposes.
+    pub parent_id: Option<ChannelId>,
     /// The bitrate of the channel.
     ///
     /// **Note**: This is only available for voice and stage channels.
     pub bitrate: Option<NonMaxU32>,
-    /// The Id of the parent category for a channel, or of the parent text channel for a thread.
-    ///
-    /// **Note**: This is only available for channels in a category and thread channels.
-    pub parent_id: Option<ChannelId>,
-    /// The Id of the guild the channel is located in.
-    ///
-    /// The original voice channel has an Id equal to the guild's Id, incremented by one.
-    ///
-    /// [`id`]: GuildChannel::id
-    #[serde(default)]
-    pub guild_id: GuildId,
-    /// The type of the channel.
-    #[serde(rename = "type")]
-    pub kind: ChannelType,
-    /// The Id of the user who created this channel
-    ///
-    /// **Note**: This is only available for threads and forum posts
-    pub owner_id: Option<UserId>,
-    /// The Id of the last message sent in the channel.
-    ///
-    /// **Note**: This is only available for text channels.
-    pub last_message_id: Option<MessageId>,
-    /// The timestamp of the time a pin was most recently made.
-    ///
-    /// **Note**: This is only available for text channels.
-    pub last_pin_timestamp: Option<Timestamp>,
-    /// The name of the channel. (1-100 characters)
-    pub name: FixedString<u16>,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.
     #[serde(default)]
     pub permission_overwrites: FixedArray<PermissionOverwrite>,
@@ -83,12 +94,6 @@ pub struct GuildChannel {
     // This field can or can not be present sometimes, but if it isn't default to `false`.
     #[serde(default)]
     pub nsfw: bool,
-    /// A rate limit that applies per user and excludes bots.
-    ///
-    /// **Note**: This is only available for text channels excluding news channels.
-    #[doc(alias = "slowmode")]
-    #[serde(default)]
-    pub rate_limit_per_user: Option<NonMaxU16>,
     /// The region override.
     ///
     /// **Note**: This is only available for voice and stage channels. [`None`] for voice and stage
@@ -96,21 +101,6 @@ pub struct GuildChannel {
     pub rtc_region: Option<FixedString<u8>>,
     /// The video quality mode for a voice channel.
     pub video_quality_mode: Option<VideoQualityMode>,
-    /// An approximate count of messages in the thread.
-    ///
-    /// **Note**: This is only available on thread channels.
-    pub message_count: Option<NonMaxU32>,
-    /// An approximate count of users in a thread, stops counting at 50.
-    ///
-    /// **Note**: This is only available on thread channels.
-    pub member_count: Option<NonMaxU8>,
-    /// The thread metadata.
-    ///
-    /// **Note**: This is only available on thread channels.
-    pub thread_metadata: Option<ThreadMetadata>,
-    /// Thread member object for the current user, if they have joined the thread, only included on
-    /// certain API endpoints.
-    pub member: Option<PartialThreadMember>,
     /// Default duration for newly created threads, in minutes, to automatically archive the thread
     /// after recent activity.
     pub default_auto_archive_duration: Option<AutoArchiveDuration>,
@@ -123,19 +113,11 @@ pub struct GuildChannel {
     /// **Note**: This is only available in forum channels.
     #[serde(default)]
     pub flags: ChannelFlags,
-    /// The number of messages ever sent in a thread, it's similar to `message_count` on message
-    /// creation, but will not decrement the number when a message is deleted.
-    pub total_message_sent: Option<NonMaxU32>,
     /// The set of available tags.
     ///
     /// **Note**: This is only available in forum channels.
     #[serde(default)]
     pub available_tags: FixedArray<ForumTag>,
-    /// The set of applied tags.
-    ///
-    /// **Note**: This is only available in a thread in a forum.
-    #[serde(default)]
-    pub applied_tags: FixedArray<ForumTagId>,
     /// The emoji to show in the add reaction button
     ///
     /// **Note**: This is only available in a forum.
@@ -184,7 +166,7 @@ impl GuildChannel {
     #[must_use]
     pub fn is_text_based(&self) -> bool {
         matches!(
-            self.kind,
+            self.base.kind,
             ChannelType::Text
                 | ChannelType::News
                 | ChannelType::Voice
@@ -205,7 +187,7 @@ impl GuildChannel {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<GuildChannel> {
-        let channel = self.id.delete(http, reason).await?;
+        let channel = self.id.widen().delete(http, reason).await?;
         channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 
@@ -241,16 +223,6 @@ impl GuildChannel {
     pub async fn edit(&mut self, http: &Http, builder: EditChannel<'_>) -> Result<()> {
         let channel = builder.execute(http, self.id).await?;
         *self = channel;
-        Ok(())
-    }
-
-    /// Edits a thread.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread(&mut self, http: &Http, builder: EditThread<'_>) -> Result<()> {
-        *self = self.id.edit_thread(http, builder).await?;
         Ok(())
     }
 
@@ -301,11 +273,11 @@ impl GuildChannel {
         user_id: UserId,
         builder: EditVoiceState,
     ) -> Result<()> {
-        if self.kind != ChannelType::Stage {
+        if self.base.kind != ChannelType::Stage {
             return Err(Error::from(ModelError::InvalidChannelType));
         }
 
-        builder.execute(http, self.guild_id, self.id, Some(user_id)).await
+        builder.execute(http, self.base.guild_id, self.id, Some(user_id)).await
     }
 
     /// Edits the current user's voice state in a stage channel.
@@ -355,13 +327,7 @@ impl GuildChannel {
     /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
     /// [Mute Members]: Permissions::MUTE_MEMBERS
     pub async fn edit_own_voice_state(&self, http: &Http, builder: EditVoiceState) -> Result<()> {
-        builder.execute(http, self.guild_id, self.id, None).await
-    }
-
-    /// Attempts to find this channel's guild in the Cache.
-    #[cfg(feature = "cache")]
-    pub fn guild<'a>(&self, cache: &'a Cache) -> Option<cache::GuildRef<'a>> {
-        cache.guild(self.guild_id)
+        builder.execute(http, self.base.guild_id, self.id, None).await
     }
 
     /// Sends a message to the channel.
@@ -374,7 +340,7 @@ impl GuildChannel {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     pub async fn send_message(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
-        builder.execute(http, self.id, Some(self.guild_id)).await
+        builder.execute(http, self.id.widen(), Some(self.base.guild_id)).await
     }
 
     /// Retrieves [`Member`]s from the current channel.
@@ -390,9 +356,9 @@ impl GuildChannel {
     /// [`ModelError::InvalidChannelType`].
     #[cfg(feature = "cache")]
     pub fn members(&self, cache: &Cache) -> Result<Vec<Member>> {
-        let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
+        let guild = cache.guild(self.base.guild_id).ok_or(ModelError::GuildNotFound)?;
 
-        match self.kind {
+        match self.base.kind {
             ChannelType::Voice | ChannelType::Stage => Ok(guild
                 .voice_states
                 .iter()
@@ -426,7 +392,7 @@ impl GuildChannel {
     pub async fn create_webhook(&self, http: &Http, builder: CreateWebhook<'_>) -> Result<Webhook> {
         // forum channels are not text-based, but webhooks can be created in them
         // and used to send messages in their posts
-        if !self.is_text_based() && self.kind != ChannelType::Forum {
+        if !self.is_text_based() && self.base.kind != ChannelType::Forum {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -441,7 +407,7 @@ impl GuildChannel {
     ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
     pub async fn get_stage_instance(&self, http: &Http) -> Result<StageInstance> {
-        if self.kind != ChannelType::Stage {
+        if self.base.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -460,7 +426,7 @@ impl GuildChannel {
         http: &Http,
         builder: CreateStageInstance<'_>,
     ) -> Result<StageInstance> {
-        if self.kind != ChannelType::Stage {
+        if self.base.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -480,7 +446,7 @@ impl GuildChannel {
         http: &Http,
         builder: EditStageInstance<'_>,
     ) -> Result<StageInstance> {
-        if self.kind != ChannelType::Stage {
+        if self.base.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -495,7 +461,7 @@ impl GuildChannel {
     ///
     /// Returns [`Error::Http`] if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: &Http, reason: Option<&str>) -> Result<()> {
-        if self.kind != ChannelType::Stage {
+        if self.base.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -506,7 +472,7 @@ impl GuildChannel {
 impl fmt::Display for GuildChannel {
     /// Formats the channel, creating a mention of it.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Display::fmt(&self.id.mention(), f)
+        fmt::Display::fmt(&self.mention(), f)
     }
 }
 
@@ -514,23 +480,4 @@ impl ExtractKey<ChannelId> for GuildChannel {
     fn extract_key(&self) -> &ChannelId {
         &self.id
     }
-}
-
-/// A partial guild channel.
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
-/// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct PartialGuildChannel {
-    /// The channel Id.
-    pub id: ChannelId,
-    /// The channel guild Id.
-    pub guild_id: GuildId,
-    /// The channel category Id,  or the parent text channel Id for a thread.
-    pub parent_id: ChannelId,
-    /// The channel type.
-    #[serde(rename = "type")]
-    pub kind: ChannelType,
 }

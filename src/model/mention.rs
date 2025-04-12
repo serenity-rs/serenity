@@ -73,10 +73,10 @@ pub trait Mentionable {
 /// # Examples
 ///
 /// ```
-/// # use serenity::model::id::{RoleId, ChannelId, UserId};
+/// # use serenity::model::id::{RoleId, GenericChannelId, UserId};
 /// use serenity::model::mention::Mention;
 /// let user = UserId::new(1);
-/// let channel = ChannelId::new(2);
+/// let channel = GenericChannelId::new(2);
 /// let role = RoleId::new(3);
 /// assert_eq!(
 ///     "<@1> <#2> <@&3>",
@@ -85,7 +85,7 @@ pub trait Mentionable {
 /// ```
 #[derive(Clone, Copy, Debug)]
 pub enum Mention {
-    Channel(ChannelId),
+    Channel(GenericChannelId),
     Role(RoleId),
     User(UserId),
 }
@@ -101,7 +101,7 @@ macro_rules! mention {
 }
 
 mention!(value:
-    ChannelId, Mention::Channel(value);
+    GenericChannelId, Mention::Channel(value);
     RoleId, Mention::Role(value);
     UserId, Mention::User(value);
 );
@@ -187,12 +187,15 @@ macro_rules! mentionable {
 #[cfg(feature = "model")]
 mentionable!(value: Channel, value.id());
 
-mentionable!(value: GuildChannel, value.id);
-mentionable!(value: PrivateChannel, value.id);
+mentionable!(value: GuildChannel, value.id.widen());
+mentionable!(value: GuildThread, value.id.widen());
+mentionable!(value: PrivateChannel, value.id.widen());
 mentionable!(value: Member, value.user.id);
 mentionable!(value: CurrentUser, value.id);
 mentionable!(value: User, value.id);
 mentionable!(value: Role, value.id);
+
+mentionable!(value: ChannelId, value.widen());
 
 #[cfg(feature = "utils")]
 #[cfg(test)]
