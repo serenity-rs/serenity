@@ -1,6 +1,8 @@
 use super::*;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditThread};
+#[cfg(feature = "model")]
+use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::utils::is_false;
 
@@ -42,6 +44,57 @@ impl ThreadId {
 
 #[cfg(feature = "model")]
 impl ThreadId {
+    /// Fetches a thread from the cache, falling back to HTTP/temp cache.
+    ///
+    /// It is highly recommended to pass the `guild_id` parameter as otherwise this may perform many
+    /// HTTP requests.
+    ///
+    /// # Errors
+    ///
+    /// Errors if the HTTP fallback fails, or if the channel does not come from the guild passed.
+    pub async fn to_thread(
+        self,
+        cache_http: impl CacheHttp,
+        guild_id: Option<GuildId>,
+    ) -> Result<GuildThread> {
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            if let Some(guild_id) = guild_id {
+                if let Some(guild) = cache.guild(guild_id) {
+                    if let Some(thread) = guild.threads.get(&self) {
+                        return Ok(thread.clone());
+                    }
+                }
+            }
+
+            #[cfg(feature = "temp_cache")]
+            if let Some(temp_thread) = cache.temp_threads.get(&self) {
+                if guild_id.is_some_and(|id| temp_thread.base.guild_id != id) {
+                    return Err(Error::Model(ModelError::ChannelNotFound));
+                }
+
+                return Ok(GuildThread::clone(&temp_thread));
+            }
+        }
+
+        let channel = cache_http.http().get_channel(self.widen()).await?;
+        let guild_thread = channel.thread().ok_or(ModelError::InvalidChannelType)?;
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
+        if let Some(cache) = cache_http.cache() {
+            use crate::cache::wrappers::MaybeOwnedArc;
+
+            let cached_thread = MaybeOwnedArc::new(guild_thread.clone());
+            cache.temp_threads.insert(self, cached_thread);
+        }
+
+        if guild_id.is_some_and(|id| guild_thread.base.guild_id != id) {
+            return Err(Error::Model(ModelError::ChannelNotFound));
+        }
+
+        Ok(guild_thread)
+    }
+
     /// Gets the thread members, if this channel is a thread.
     ///
     /// # Errors
