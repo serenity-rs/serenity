@@ -215,17 +215,15 @@ impl ShardRunner {
                             #[cfg(feature = "collector")]
                             self.collectors.write().retain(|callback| (callback.0)(&event));
 
-                            spawn_named(
-                                "shard_runner::dispatch",
-                                dispatch_model(
-                                    event,
-                                    context,
-                                    #[cfg(feature = "framework")]
-                                    self.framework.clone(),
-                                    self.event_handler.clone(),
-                                    self.raw_event_handler.clone(),
-                                ),
-                            );
+                            dispatch_model(
+                                event,
+                                context,
+                                #[cfg(feature = "framework")]
+                                self.framework.clone(),
+                                self.event_handler.clone(),
+                                self.raw_event_handler.clone(),
+                            )
+                            .await;
                         }
                     },
                 }

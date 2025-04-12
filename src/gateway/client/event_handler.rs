@@ -6,6 +6,8 @@ use async_trait::async_trait;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 use super::context::Context;
+#[cfg(doc)]
+use crate::gateway::ShardRunner;
 use crate::gateway::ShardStageUpdateEvent;
 use crate::http::RatelimitInfo;
 use crate::model::prelude::*;
@@ -19,12 +21,8 @@ pub trait EventHandler: Send + Sync {
     ///
     /// ## Warning
     ///
-    /// This will run synchronously on every event in the dispatch loop
-    /// of the shard that is receiving the event. If your filter code
-    /// takes too long, it may delay other events from being dispatched
-    /// in a timely manner. It is recommended to keep the runtime
-    /// complexity of the filter code low to avoid unnecessarily blocking
-    /// your bot.
+    /// Similar to [`RawEventHandler`], this method runs synchronously to the [`ShardRunner`], keep
+    /// runtime complexity low.
     fn filter_event(&self, _context: &Context, _event: &Event) -> bool {
         true
     }
@@ -432,7 +430,17 @@ full_event! {
     MessagePollVoteRemove { event: MessagePollVoteRemoveEvent };
 }
 
-/// This core trait for handling raw events
+/// An event handler that receives raw `dispatch` events.
+///
+/// ## Warning
+/// As this is a low level trait, the methods of this trait are run on the same tokio task as the
+/// [`ShardRunner`].
+///
+/// This means that if any of these methods take too long to return, the shard may drop events or be
+/// disconnected entirely.
+///
+/// It is recommended to clone the fields needed out of [`Event`], then spawn a task to run
+/// concurrently to the shard loop.
 #[async_trait]
 pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
@@ -442,15 +450,6 @@ pub trait RawEventHandler: Send + Sync {
     ///
     /// Returning `false` will drop an event and prevent it being dispatched by any frameworks and
     /// will exclude it from any collectors.
-    ///
-    /// ## Warning
-    ///
-    /// This will run synchronously on every event in the dispatch loop
-    /// of the shard that is receiving the event. If your filter code
-    /// takes too long, it may delay other events from being dispatched
-    /// in a timely manner. It is recommended to keep the runtime
-    /// complexity of the filter code low to avoid unnecessarily blocking
-    /// your bot.
     fn filter_event(&self, _context: &Context, _event: &Event) -> bool {
         // Suppress unused argument warnings
         true
