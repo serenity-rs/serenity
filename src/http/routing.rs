@@ -89,7 +89,7 @@ macro_rules! routes {
 // 2. The second line provides the url for that endpoint.
 // 3. The third line indicates what type of ratelimiting the endpoint employs.
 routes! ('a, {
-    Channel { channel_id: ChannelId },
+    Channel { channel_id: GenericChannelId },
     api!("/channels/{}", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
@@ -97,7 +97,7 @@ routes! ('a, {
     api!("/channels/{}/invites", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelMessage { channel_id: ChannelId, message_id: MessageId },
+    ChannelMessage { channel_id: GenericChannelId, message_id: MessageId },
     api!("/channels/{}/messages/{}", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
@@ -105,27 +105,27 @@ routes! ('a, {
     api!("/channels/{}/messages/{}/crosspost", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelMessageReaction { channel_id: ChannelId, message_id: MessageId, user_id: UserId, reaction: &'a str },
+    ChannelMessageReaction { channel_id: GenericChannelId, message_id: MessageId, user_id: UserId, reaction: &'a str },
     api!("/channels/{}/messages/{}/reactions/{}/{}", channel_id, message_id, reaction, user_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelMessageReactionMe { channel_id: ChannelId, message_id: MessageId, reaction: &'a str },
+    ChannelMessageReactionMe { channel_id: GenericChannelId, message_id: MessageId, reaction: &'a str },
     api!("/channels/{}/messages/{}/reactions/{}/@me", channel_id, message_id, reaction),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelMessageReactionEmoji { channel_id: ChannelId, message_id: MessageId, reaction: &'a str },
+    ChannelMessageReactionEmoji { channel_id: GenericChannelId, message_id: MessageId, reaction: &'a str },
     api!("/channels/{}/messages/{}/reactions/{}", channel_id, message_id, reaction),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelMessageReactions { channel_id: ChannelId, message_id: MessageId },
+    ChannelMessageReactions { channel_id: GenericChannelId, message_id: MessageId },
     api!("/channels/{}/messages/{}/reactions", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelMessages { channel_id: ChannelId },
+    ChannelMessages { channel_id: GenericChannelId },
     api!("/channels/{}/messages", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelMessagesBulkDelete { channel_id: ChannelId },
+    ChannelMessagesBulkDelete { channel_id: GenericChannelId },
     api!("/channels/{}/messages/bulk-delete", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
@@ -137,15 +137,15 @@ routes! ('a, {
     api!("/channels/{}/permissions/{}", channel_id, target_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelPin { channel_id: ChannelId, message_id: MessageId },
+    ChannelPin { channel_id: GenericChannelId, message_id: MessageId },
     api!("/channels/{}/pins/{}", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelPins { channel_id: ChannelId },
+    ChannelPins { channel_id: GenericChannelId },
     api!("/channels/{}/pins", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelTyping { channel_id: ChannelId },
+    ChannelTyping { channel_id: GenericChannelId },
     api!("/channels/{}/typing", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
@@ -165,17 +165,17 @@ routes! ('a, {
     api!("/channels/{}/threads", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelThreadMember { channel_id: ChannelId, user_id: UserId },
-    api!("/channels/{}/thread-members/{}", channel_id, user_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    ChannelThreadMember { thread_id: ThreadId, user_id: UserId },
+    api!("/channels/{}/thread-members/{}", thread_id, user_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(thread_id.get())));
 
-    ChannelThreadMemberMe { channel_id: ChannelId },
-    api!("/channels/{}/thread-members/@me", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    ChannelThreadMemberMe { thread_id: ThreadId },
+    api!("/channels/{}/thread-members/@me", thread_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(thread_id.get())));
 
-    ChannelThreadMembers { channel_id: ChannelId },
-    api!("/channels/{}/thread-members", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    ChannelThreadMembers { thread_id: ThreadId },
+    api!("/channels/{}/thread-members", thread_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(thread_id.get())));
 
     ChannelArchivedPublicThreads { channel_id: ChannelId },
     api!("/channels/{}/threads/archived/public", channel_id),
@@ -189,11 +189,11 @@ routes! ('a, {
     api!("/channels/{}/users/@me/threads/archived/private", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelPollGetAnswerVoters { channel_id: ChannelId, message_id: MessageId, answer_id: AnswerId },
+    ChannelPollGetAnswerVoters { channel_id: GenericChannelId, message_id: MessageId, answer_id: AnswerId },
     api!("/channels/{}/polls/{}/answers/{}", channel_id, message_id, answer_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
-    ChannelPollExpire { channel_id: ChannelId, message_id: MessageId },
+    ChannelPollExpire { channel_id: GenericChannelId, message_id: MessageId },
     api!("/channels/{}/polls/{}/expire", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 

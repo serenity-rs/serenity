@@ -21,7 +21,7 @@ use crate::model::prelude::*;
 /// The other parameter specifies the number of messages to retrieve. This is _optional_, and
 /// defaults to 50 if not specified.
 ///
-/// See [`ChannelId::messages`] for more examples.
+/// See [`GenericChannelId::messages`] for more examples.
 ///
 /// # Examples
 ///
@@ -34,10 +34,10 @@ use crate::model::prelude::*;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http: Http = unimplemented!();
 /// use serenity::builder::GetMessages;
-/// use serenity::model::id::{ChannelId, MessageId};
+/// use serenity::model::id::{GenericChannelId, MessageId};
 ///
 /// // you can then pass it into a function which retrieves messages:
-/// let channel_id = ChannelId::new(81384788765712384);
+/// let channel_id = GenericChannelId::new(81384788765712384);
 ///
 /// let builder = GetMessages::new().after(MessageId::new(158339864557912064)).limit(25);
 /// let _messages = channel_id.messages(&http, builder).await?;
@@ -106,7 +106,7 @@ impl GetMessages {
     pub async fn execute(
         self,
         cache_http: impl CacheHttp,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
     ) -> Result<Vec<Message>> {
         let http = cache_http.http();
         let search_filter = self.search_filter.map(Into::into);

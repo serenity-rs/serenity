@@ -36,7 +36,7 @@ impl PrivateChannel {
     /// closing a private channel on the client, which can be re-opened.
     #[expect(clippy::missing_errors_doc)]
     pub async fn delete(&self, http: &Http) -> Result<PrivateChannel> {
-        let resp = self.id.delete(http, None).await?;
+        let resp = self.id.widen().delete(http, None).await?;
         resp.private().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }

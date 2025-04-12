@@ -16,7 +16,7 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to specify the contents of an send message request, primarily meant for use
-/// through [`ChannelId::send_message`].
+/// through [`GenericChannelId::send_message`].
 ///
 /// There are three situations where different field requirements are present:
 ///
@@ -27,7 +27,7 @@ use crate::model::prelude::*;
 ///    required.
 ///
 /// Note that if you only need to send the content of a message, without specifying other fields,
-/// then [`ChannelId::say`] may be a more preferable option.
+/// then [`GenericChannelId::say`] may be a more preferable option.
 ///
 /// # Examples
 ///
@@ -35,13 +35,13 @@ use crate::model::prelude::*;
 ///
 /// ```rust,no_run
 /// use serenity::builder::{CreateEmbed, CreateMessage};
-/// use serenity::model::id::ChannelId;
+/// use serenity::model::id::GenericChannelId;
 /// # use serenity::http::Http;
 /// # use std::sync::Arc;
 /// #
 /// # async fn run() {
 /// # let http: Arc<Http> = unimplemented!();
-/// # let channel_id = ChannelId::new(7);
+/// # let channel_id = GenericChannelId::new(7);
 /// let embed = CreateEmbed::new().title("This is an embed").description("With a description");
 /// let builder = CreateMessage::new().content("test").tts(true).embed(embed);
 /// let _ = channel_id.send_message(&http, builder).await;
@@ -290,7 +290,7 @@ impl<'a> CreateMessage<'a> {
     pub async fn execute(
         mut self,
         http: &Http,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         guild_id: Option<GuildId>,
     ) -> Result<Message> {
         self.check_length()?;

@@ -43,7 +43,7 @@ pub trait ArgumentConvert: Sized {
     async fn convert(
         ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
-        channel_id: Option<ChannelId>,
+        channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err>;
 }
@@ -55,7 +55,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
     async fn convert(
         _: impl CacheHttp,
         _: Option<GuildId>,
-        _: Option<ChannelId>,
+        _: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         T::from_str(s)
@@ -76,7 +76,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
 ///
 /// assert_eq!(
 ///     parse_message_id_pair("673965002805477386-842482646604972082"),
-///     Some((ChannelId::new(673965002805477386), MessageId::new(842482646604972082))),
+///     Some((GenericChannelId::new(673965002805477386), MessageId::new(842482646604972082))),
 /// );
 /// assert_eq!(
 ///     parse_message_id_pair("673965002805477386-842482646604972082-472029906943868929"),
@@ -84,7 +84,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
 /// );
 /// ```
 #[must_use]
-pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
+pub fn parse_message_id_pair(s: &str) -> Option<(GenericChannelId, MessageId)> {
     let mut parts = s.splitn(2, '-');
     let channel_id = parts.next()?.parse().ok()?;
     let message_id = parts.next()?.parse().ok()?;
@@ -106,7 +106,7 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 ///     ),
 ///     Some((
 ///         GuildId::new(381880193251409931),
-///         ChannelId::new(381880193700069377),
+///         GenericChannelId::new(381880193700069377),
 ///         MessageId::new(806164913558781963),
 ///     )),
 /// );
@@ -116,14 +116,14 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 ///     ),
 ///     Some((
 ///         GuildId::new(381880193251409931),
-///         ChannelId::new(381880193700069377),
+///         GenericChannelId::new(381880193700069377),
 ///         MessageId::new(806164913558781963),
 ///     )),
 /// );
 /// assert_eq!(parse_message_url("https://google.com"), None);
 /// ```
 #[must_use]
-pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
+pub fn parse_message_url(s: &str) -> Option<(GuildId, GenericChannelId, MessageId)> {
     use aformat::{CapStr, aformat};
 
     for domain in DOMAINS {
@@ -151,18 +151,18 @@ pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
 ///
 /// assert_eq!(
 ///     parse_channel_url("https://discord.com/channels/381880193251409931/381880193700069377"),
-///     Some((GuildId::new(381880193251409931), ChannelId::new(381880193700069377),)),
+///     Some((GuildId::new(381880193251409931), GenericChannelId::new(381880193700069377),)),
 /// );
 /// assert_eq!(
 ///     parse_channel_url(
 ///         "https://canary.discord.com/channels/381880193251409931/381880193700069377"
 ///     ),
-///     Some((GuildId::new(381880193251409931), ChannelId::new(381880193700069377),)),
+///     Some((GuildId::new(381880193251409931), GenericChannelId::new(381880193700069377),)),
 /// );
 /// assert_eq!(parse_channel_url("https://google.com"), None);
 /// ```
 #[must_use]
-pub fn parse_channel_url(s: &str) -> Option<(GuildId, ChannelId)> {
+pub fn parse_channel_url(s: &str) -> Option<(GuildId, GenericChannelId)> {
     use aformat::{CapStr, aformat};
 
     for domain in DOMAINS {

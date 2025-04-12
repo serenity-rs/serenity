@@ -36,7 +36,7 @@ impl ArgumentConvert for Guild {
     async fn convert(
         ctx: impl CacheHttp,
         _guild_id: Option<GuildId>,
-        _channel_id: Option<ChannelId>,
+        _channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         let guilds = &ctx.cache().ok_or(GuildParseError::NoCache)?.guilds;

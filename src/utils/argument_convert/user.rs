@@ -39,7 +39,7 @@ impl ArgumentConvert for User {
     async fn convert(
         ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
-        channel_id: Option<ChannelId>,
+        channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         // Convert as a Member which uses HTTP endpoints instead of cache
