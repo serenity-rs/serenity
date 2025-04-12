@@ -413,7 +413,7 @@ full_event! {
     MessagePollVoteRemove { event: MessagePollVoteRemoveEvent };
 }
 
-/// An event handler that recieves raw `dispatch` events.
+/// An event handler that receives raw `dispatch` events.
 ///
 /// ## Warning
 /// As this is a low level trait, the methods of this trait are run on the same tokio task as the
