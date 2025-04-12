@@ -78,7 +78,7 @@ pub struct ExecuteWebhook<'a> {
     attachments: EditAttachments<'a>,
 
     #[serde(skip)]
-    thread_id: Option<ChannelId>,
+    thread_id: Option<ThreadId>,
     #[serde(skip)]
     with_components: Option<bool>,
 }
@@ -163,19 +163,19 @@ impl<'a> ExecuteWebhook<'a> {
     /// ```rust,no_run
     /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
-    /// # use serenity::model::{id::ChannelId, webhook::Webhook};
+    /// # use serenity::model::{id::ThreadId, webhook::Webhook};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// let builder = ExecuteWebhook::new().in_thread(ChannelId::new(12345678)).content("test");
+    /// let builder = ExecuteWebhook::new().in_thread(ThreadId::new(12345678)).content("test");
     /// webhook.execute(&http, false, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn in_thread(mut self, thread_id: ChannelId) -> Self {
+    pub fn in_thread(mut self, thread_id: ThreadId) -> Self {
         self.thread_id = Some(thread_id);
         self
     }

@@ -333,7 +333,7 @@ pub enum Action {
         custom_message: Option<FixedString<u16>>,
     },
     /// Logs user content to a specified channel.
-    Alert(ChannelId),
+    Alert(GenericChannelId),
     /// Timeout user for a specified duration.
     ///
     /// Maximum of 2419200 seconds (4 weeks).
@@ -367,7 +367,7 @@ pub struct ActionExecution {
     /// ID of the user which generated the content which triggered the rule.
     pub user_id: UserId,
     /// ID of the channel in which user content was posted.
-    pub channel_id: Option<ChannelId>,
+    pub channel_id: Option<GenericChannelId>,
     /// ID of any user message which content belongs to.
     ///
     /// Will be `None` if message was blocked by automod or content was not part of any message.
@@ -396,7 +396,7 @@ pub struct ActionExecution {
 #[derive(Default, Deserialize, Serialize)]
 struct RawActionMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
-    channel_id: Option<ChannelId>,
+    channel_id: Option<GenericChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     duration_seconds: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -579,7 +579,7 @@ mod tests {
         );
 
         assert_json(
-            &Action::Alert(ChannelId::new(123)),
+            &Action::Alert(GenericChannelId::new(123)),
             json!({"type": 2, "metadata": {"channel_id": "123"}}),
         );
 

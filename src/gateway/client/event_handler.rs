@@ -228,11 +228,11 @@ full_event! {
     /// Dispatched when a message is deleted.
     ///
     /// Provides the guild's id, the channel's id and the message's id.
-    MessageDelete { channel_id: ChannelId, deleted_message_id: MessageId, guild_id: Option<GuildId> };
+    MessageDelete { channel_id: GenericChannelId, deleted_message_id: MessageId, guild_id: Option<GuildId> };
     /// Dispatched when multiple messages were deleted at once.
     ///
     /// Provides the guild's id, channel's id and the deleted messages' ids.
-    MessageDeleteBulk { channel_id: ChannelId, multiple_deleted_messages_ids: Vec<MessageId>, guild_id: Option<GuildId> };
+    MessageDeleteBulk { channel_id: GenericChannelId, multiple_deleted_messages_ids: Vec<MessageId>, guild_id: Option<GuildId> };
 
     /// Dispatched when a message is updated.
     ///
@@ -253,7 +253,7 @@ full_event! {
     /// Dispatched when all reactions of a message are detached from a message.
     ///
     /// Provides the channel's id, message's id, and guild's id if in a guild.
-    ReactionRemoveAll { guild_id: Option<GuildId>, channel_id: ChannelId, removed_from_message_id: MessageId };
+    ReactionRemoveAll { guild_id: Option<GuildId>, channel_id: GenericChannelId, removed_from_message_id: MessageId };
 
     /// Dispatched when all reactions of a message are detached from a message.
     ///
@@ -358,17 +358,17 @@ full_event! {
     /// Dispatched when a thread is created or the current user is added to a private thread.
     ///
     /// Provides the thread and if the thread was newly created.
-    ThreadCreate { thread: GuildChannel, newly_created: Option<bool> };
+    ThreadCreate { thread: GuildThread, newly_created: Option<bool> };
     /// Dispatched when a thread is updated.
     ///
     /// Provides the updated thread and the old thread data, provided the thread was cached prior to
     /// dispatch.
-    ThreadUpdate { old: Option<GuildChannel>, new: GuildChannel };
+    ThreadUpdate { old: Option<GuildThread>, new: GuildThread };
     /// Dispatched when a thread is deleted.
     ///
     /// Provides the partial data about the deleted thread and, if it was present in the cache
     /// before its deletion, its full data.
-    ThreadDelete { thread: PartialGuildChannel, full_thread_data: Option<GuildChannel> };
+    ThreadDelete { thread: PartialGuildThread, full_thread_data: Option<GuildThread> };
     /// Dispatched when the current user gains access to a channel.
     ///
     /// Provides the threads the current user can access, the thread members, the guild Id, and the

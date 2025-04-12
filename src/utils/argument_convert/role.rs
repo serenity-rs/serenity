@@ -54,7 +54,7 @@ impl ArgumentConvert for Role {
     async fn convert(
         ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
-        _channel_id: Option<ChannelId>,
+        _channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         let guild_id = guild_id.ok_or(RoleParseError::NotInGuild)?;

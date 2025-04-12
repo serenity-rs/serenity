@@ -44,7 +44,7 @@ impl ArgumentConvert for Emoji {
     async fn convert(
         ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
-        _channel_id: Option<ChannelId>,
+        _channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         // Get Guild or PartialGuild

@@ -35,9 +35,9 @@ pub struct CommandInteraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
     /// Channel that the interaction was sent from.
-    pub channel: Option<PartialChannel>,
+    pub channel: Option<GenericInteractionChannel>,
     /// The channel Id this interaction was sent from.
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     /// The `member` data for the invoking user.
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
@@ -414,7 +414,7 @@ pub enum ResolvedValue<'a> {
     SubCommand(FixedArray<ResolvedOption<'a>>),
     SubCommandGroup(FixedArray<ResolvedOption<'a>>),
     Attachment(&'a Attachment),
-    Channel(&'a PartialChannel),
+    Channel(&'a GenericInteractionChannel),
     Role(&'a Role),
     User(&'a User, Option<&'a PartialMember>),
     Unresolved(Unresolved),
@@ -425,7 +425,7 @@ pub enum ResolvedValue<'a> {
 #[non_exhaustive]
 pub enum Unresolved {
     Attachment(AttachmentId),
-    Channel(ChannelId),
+    Channel(GenericChannelId),
     Mentionable(GenericId),
     RoleId(RoleId),
     User(UserId),
@@ -473,7 +473,7 @@ pub struct CommandDataResolved {
         skip_serializing_if = "ExtractMap::is_empty",
         serialize_with = "extract_map::serialize_as_map"
     )]
-    pub channels: ExtractMap<ChannelId, PartialChannel>,
+    pub channels: ExtractMap<GenericChannelId, GenericInteractionChannel>,
     /// The resolved messages.
     #[serde(
         default,
@@ -634,7 +634,7 @@ pub enum CommandDataOptionValue {
     SubCommand(FixedArray<CommandDataOption>),
     SubCommandGroup(FixedArray<CommandDataOption>),
     Attachment(AttachmentId),
-    Channel(ChannelId),
+    Channel(GenericChannelId),
     Mentionable(GenericId),
     Role(RoleId),
     User(UserId),
@@ -713,7 +713,7 @@ impl CommandDataOptionValue {
 
     /// If the value is an `ChannelId`, returns the associated ID. Returns None otherwise.
     #[must_use]
-    pub fn as_channel_id(&self) -> Option<ChannelId> {
+    pub fn as_channel_id(&self) -> Option<GenericChannelId> {
         match self {
             Self::Channel(id) => Some(*id),
             _ => None,
@@ -803,7 +803,7 @@ mod tests {
                     value: CommandDataOptionValue::SubCommand(
                         vec![CommandDataOption {
                             name: FixedString::from_static_trunc("channel"),
-                            value: CommandDataOptionValue::Channel(ChannelId::new(3)),
+                            value: CommandDataOptionValue::Channel(GenericChannelId::new(3)),
                         }]
                         .trunc_into(),
                     ),

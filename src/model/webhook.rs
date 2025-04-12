@@ -349,7 +349,7 @@ impl Webhook {
     pub async fn get_message(
         &self,
         http: &Http,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         message_id: MessageId,
     ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
@@ -390,7 +390,7 @@ impl Webhook {
     pub async fn delete_message(
         &self,
         http: &Http,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         message_id: MessageId,
     ) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();

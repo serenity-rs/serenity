@@ -720,7 +720,12 @@ impl UserId {
         cache_http: impl CacheHttp,
         builder: CreateMessage<'_>,
     ) -> Result<Message> {
-        self.create_dm_channel(&cache_http).await?.id.send_message(cache_http.http(), builder).await
+        self.create_dm_channel(&cache_http)
+            .await?
+            .id
+            .widen()
+            .send_message(cache_http.http(), builder)
+            .await
     }
 
     /// This is an alias of [`Self::direct_message`].

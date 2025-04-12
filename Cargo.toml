@@ -49,6 +49,7 @@ to-arraystring = "0.2.0"
 extract_map = { version = "0.2.0", features = ["serde", "iter_mut"] }
 aformat = "0.1.3"
 bytes = "1.5.0"
+ref-cast = "1.0.23"
 # Optional dependencies
 foldhash = { version = "0.1.4", optional = true }
 chrono = { version = "0.4.31", default-features = false, features = ["clock", "serde"], optional = true }

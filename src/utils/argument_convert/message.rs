@@ -53,7 +53,7 @@ impl ArgumentConvert for Message {
     async fn convert(
         ctx: impl CacheHttp,
         _guild_id: Option<GuildId>,
-        channel_id: Option<ChannelId>,
+        channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         let extract_from_message_id = || Some((channel_id?, s.parse().ok()?));
