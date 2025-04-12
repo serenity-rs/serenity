@@ -29,9 +29,9 @@ pub struct ModalInteraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
     /// Channel that the interaction was sent from.
-    pub channel: Option<PartialChannel>,
+    pub channel: Option<GenericInteractionChannel>,
     /// The channel Id this interaction was sent from.
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     /// The `member` data for the invoking user.
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.

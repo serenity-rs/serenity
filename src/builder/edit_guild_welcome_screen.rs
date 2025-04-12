@@ -82,14 +82,14 @@ impl<'a> EditGuildWelcomeScreen<'a> {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateGuildWelcomeChannel<'a> {
-    channel_id: ChannelId,
+    channel_id: GenericChannelId,
     emoji_name: Option<String>,
     emoji_id: Option<EmojiId>,
     description: Cow<'a, str>,
 }
 
 impl<'a> CreateGuildWelcomeChannel<'a> {
-    pub fn new(channel_id: ChannelId, description: impl Into<Cow<'a, str>>) -> Self {
+    pub fn new(channel_id: GenericChannelId, description: impl Into<Cow<'a, str>>) -> Self {
         Self {
             channel_id,
             emoji_id: None,
@@ -99,7 +99,7 @@ impl<'a> CreateGuildWelcomeChannel<'a> {
     }
 
     /// The Id of the channel to show.
-    pub fn id(mut self, id: ChannelId) -> Self {
+    pub fn id(mut self, id: GenericChannelId) -> Self {
         self.channel_id = id;
         self
     }

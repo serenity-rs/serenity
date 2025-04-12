@@ -114,8 +114,8 @@ pub type UserRef<'a> = CacheRef<'a, UserId, User, Never>;
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild, Never>;
 pub type SettingsRef<'a> = CacheRef<'a, Never, Settings, Never>;
 pub type CurrentUserRef<'a> = CacheRef<'a, Never, CurrentUser, Never>;
-pub type MessageRef<'a> = CacheRef<'a, ChannelId, Message, VecDeque<Message>>;
-pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, VecDeque<Message>, Never>;
+pub type MessageRef<'a> = CacheRef<'a, GenericChannelId, Message, VecDeque<Message>>;
+pub type ChannelMessagesRef<'a> = CacheRef<'a, GenericChannelId, VecDeque<Message>, Never>;
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
@@ -154,6 +154,11 @@ pub struct Cache {
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
     pub(crate) temp_channels: MokaCache<ChannelId, MaybeOwnedArc<GuildChannel>, BuildHasher>,
+    /// Cache of threads that have been fetched via to_channel.
+    ///
+    /// The TTL for each value is configured in CacheSettings.
+    #[cfg(feature = "temp_cache")]
+    pub(crate) temp_threads: MokaCache<ThreadId, MaybeOwnedArc<GuildThread>, BuildHasher>,
     /// Cache of private channels created via create_dm_channel.
     ///
     /// The TTL for each value is configured in CacheSettings.
@@ -183,7 +188,7 @@ pub struct Cache {
 
     // Messages cache:
     // ---
-    pub(crate) messages: DashMap<ChannelId, VecDeque<Message>, BuildHasher>,
+    pub(crate) messages: DashMap<GenericChannelId, VecDeque<Message>, BuildHasher>,
 
     // Miscellanous fixed-size data
     // ---
@@ -235,6 +240,8 @@ impl Cache {
             temp_private_channels: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_channels: temp_cache(settings.time_to_live),
+            #[cfg(feature = "temp_cache")]
+            temp_threads: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_messages: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
@@ -330,15 +337,15 @@ impl Cache {
     /// Find all messages by user ID 8 in channel ID 7:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::id::GenericChannelId;
     /// #
     /// # let cache: serenity::cache::Cache = todo!();
-    /// if let Some(messages_in_channel) = cache.channel_messages(ChannelId::new(7)) {
+    /// if let Some(messages_in_channel) = cache.channel_messages(GenericChannelId::new(7)) {
     ///     let messages_by_user: Vec<_> =
     ///         messages_in_channel.iter().filter(|m| m.author.id == 8).collect();
     /// }
     /// ```
-    pub fn channel_messages(&self, channel_id: ChannelId) -> Option<ChannelMessagesRef<'_>> {
+    pub fn channel_messages(&self, channel_id: GenericChannelId) -> Option<ChannelMessagesRef<'_>> {
         self.messages.get(&channel_id).map(CacheRef::from_ref)
     }
 
@@ -398,7 +405,11 @@ impl Cache {
     /// };
     /// # }
     /// ```
-    pub fn message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<MessageRef<'_>> {
+    pub fn message(
+        &self,
+        channel_id: GenericChannelId,
+        message_id: MessageId,
+    ) -> Option<MessageRef<'_>> {
         #[cfg(feature = "temp_cache")]
         if let Some(message) = self.temp_messages.get(&message_id) {
             return Some(CacheRef::from_arc(message));
@@ -459,7 +470,7 @@ impl Cache {
     ) -> Option<ExtractMap<ChannelId, GuildChannel>> {
         let guild = self.guilds.get(&guild_id)?;
 
-        let filter = |channel: &&GuildChannel| channel.kind == ChannelType::Category;
+        let filter = |channel: &&GuildChannel| channel.base.kind == ChannelType::Category;
         Some(guild.channels.iter().filter(filter).cloned().collect())
     }
 
@@ -469,7 +480,7 @@ impl Cache {
     /// contains randomly ordered messages, and respects the [`Settings::max_messages`] setting.
     pub(crate) fn fill_message_cache(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         new_messages: impl Iterator<Item = Message>,
     ) {
         let max_messages = self.settings().max_messages;
@@ -560,8 +571,11 @@ mod test {
         }
 
         let channel = GuildChannel {
-            id: event.message.channel_id,
-            guild_id: event.message.guild_id.unwrap(),
+            id: event.message.channel_id.expect_channel(),
+            base: BaseGuildChannel {
+                guild_id: event.message.guild_id.unwrap(),
+                ..Default::default()
+            },
             ..Default::default()
         };
 
@@ -571,7 +585,7 @@ mod test {
             channel: channel.clone(),
         };
         assert!(cache.update(&mut delete).is_some());
-        assert!(!cache.messages.contains_key(&delete.channel.id));
+        assert!(!cache.messages.contains_key(&delete.channel.id.into()));
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
         let mut guild_create = GuildCreateEvent {
@@ -595,6 +609,6 @@ mod test {
         assert!(cache.update(&mut guild_delete).is_some());
 
         // Assert that the channel's message cache no longer exists.
-        assert!(!cache.messages.contains_key(&ChannelId::new(2)));
+        assert!(!cache.messages.contains_key(&GenericChannelId::new(2)));
     }
 }

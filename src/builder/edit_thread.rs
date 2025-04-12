@@ -108,8 +108,12 @@ impl<'a> EditThread<'a> {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`ModelError::InvalidChannelType`] if the `ThreadId` is not identifying a thread.
     #[cfg(feature = "http")]
-    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
-        http.edit_thread(channel_id, &self, self.audit_log_reason).await
+    pub async fn execute(self, http: &Http, thread_id: ThreadId) -> Result<GuildThread> {
+        http.edit_channel(thread_id.widen(), &self, self.audit_log_reason)
+            .await?
+            .thread()
+            .ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }

@@ -49,8 +49,8 @@ impl CustomMessage {
 
     /// Assign the dummy message its origin channel's ID.
     ///
-    /// If not used, the default value is `ChannelId::new(1)`.
-    pub fn channel_id(&mut self, channel_id: ChannelId) -> &mut Self {
+    /// If not used, the default value is `GenericChannelId::new(1)`.
+    pub fn channel_id(&mut self, channel_id: GenericChannelId) -> &mut Self {
         self.msg.channel_id = channel_id;
 
         self
