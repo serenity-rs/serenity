@@ -7,7 +7,7 @@ use tokio::time::{Duration, sleep};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::id::ChannelId;
+use crate::model::id::GenericChannelId;
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
 ///
@@ -32,7 +32,7 @@ use crate::model::id::ChannelId;
 /// # fn long_process() {}
 /// # fn main() {
 /// # let http: Http = unimplemented!();
-/// let channel_id = ChannelId::new(7);
+/// let channel_id = GenericChannelId::new(7);
 /// // Initiate typing (assuming `http` is bound)
 /// let typing = Typing::start(Arc::new(http), channel_id);
 ///
@@ -60,7 +60,7 @@ impl Typing {
     /// Returns an  [`Error::Http`] if there is an error.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Self {
+    pub fn start(http: Arc<Http>, channel_id: GenericChannelId) -> Self {
         let (sx, mut rx) = oneshot::channel();
 
         spawn_named::<_, Result<_>>("typing::start", async move {

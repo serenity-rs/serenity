@@ -32,7 +32,7 @@ pub struct Reaction {
     /// Set to [`None`] by [`Message::react`] when cache is not available.
     pub user_id: Option<UserId>,
     /// The [`Channel`] of the associated [`Message`].
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     /// The Id of the [`Message`] that was reacted to.
     pub message_id: MessageId,
     /// The optional Id of the [`Guild`] where the reaction was sent.

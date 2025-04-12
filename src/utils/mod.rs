@@ -183,12 +183,12 @@ pub fn parse_role_mention(mention: &str) -> Option<RoleId> {
 /// Retrieving an Id from a valid [`Channel`] mention:
 ///
 /// ```rust
-/// use serenity::model::id::ChannelId;
+/// use serenity::model::id::GenericChannelId;
 /// use serenity::utils::parse_channel_mention;
 ///
 /// assert_eq!(
 ///     parse_channel_mention("<#81384788765712384>"),
-///     Some(ChannelId::new(81384788765712384))
+///     Some(GenericChannelId::new(81384788765712384))
 /// );
 /// ```
 ///
@@ -203,7 +203,7 @@ pub fn parse_role_mention(mention: &str) -> Option<RoleId> {
 ///
 /// [`Channel`]: crate::model::channel::Channel
 #[must_use]
-pub fn parse_channel_mention(mention: &str) -> Option<ChannelId> {
+pub fn parse_channel_mention(mention: &str) -> Option<GenericChannelId> {
     if mention.len() < 4 {
         return None;
     }

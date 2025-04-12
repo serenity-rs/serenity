@@ -375,7 +375,7 @@ impl Http {
     }
 
     /// Broadcasts that the current user is typing in the given [`Channel`].
-    pub async fn broadcast_typing(&self, channel_id: ChannelId) -> Result<()> {
+    pub async fn broadcast_typing(&self, channel_id: GenericChannelId) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -788,7 +788,7 @@ impl Http {
     /// Reacts to a message.
     pub async fn create_reaction(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
@@ -806,6 +806,7 @@ impl Http {
         })
         .await
     }
+
     /// Creates a role.
     pub async fn create_role(
         &self,
@@ -943,7 +944,7 @@ impl Http {
     /// Deletes a private channel or a channel in a guild.
     pub async fn delete_channel(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         audit_log_reason: Option<&str>,
     ) -> Result<Channel> {
         self.fire(Request {
@@ -1131,7 +1132,7 @@ impl Http {
     /// Deletes a message if created by us or we have specific permissions.
     pub async fn delete_message(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -1152,7 +1153,7 @@ impl Http {
     /// Deletes a bunch of messages, only works for bots.
     pub async fn delete_messages(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -1172,7 +1173,7 @@ impl Http {
     /// Deletes all of the [`Reaction`]s associated with a [`Message`].
     pub async fn delete_message_reactions(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
     ) -> Result<()> {
         self.wind(Request {
@@ -1192,7 +1193,7 @@ impl Http {
     /// Deletes all the reactions for a given emoji on a message.
     pub async fn delete_message_reaction_emoji(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
@@ -1254,7 +1255,7 @@ impl Http {
     /// Deletes a user's reaction from a message.
     pub async fn delete_reaction(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         user_id: UserId,
         reaction_type: &ReactionType,
@@ -1278,7 +1279,7 @@ impl Http {
     /// Deletes a reaction by the current user from a message.
     pub async fn delete_reaction_me(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
@@ -1421,14 +1422,12 @@ impl Http {
     /// Changes channel information.
     pub async fn edit_channel(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<GuildChannel> {
-        let body = to_vec(map)?;
-
+    ) -> Result<Channel> {
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -1778,7 +1777,7 @@ impl Http {
     /// **Note**: Only the author of a message can modify it.
     pub async fn edit_message(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment<'_>>,
@@ -2077,26 +2076,6 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
-    /// Edits a thread channel in the [`GuildChannel`] given its Id.
-    pub async fn edit_thread(
-        &self,
-        channel_id: ChannelId,
-        map: &impl serde::Serialize,
-        audit_log_reason: Option<&str>,
-    ) -> Result<GuildChannel> {
-        self.fire(Request {
-            body: Some(to_vec(map)?),
-            multipart: None,
-            headers: audit_log_reason.map(reason_into_header),
-            method: LightMethod::Patch,
-            route: Route::Channel {
-                channel_id,
-            },
-            params: None,
-        })
-        .await
-    }
-
     /// Changes another user's voice state in a stage channel.
     pub async fn edit_voice_state(
         &self,
@@ -2207,7 +2186,7 @@ impl Http {
     pub async fn execute_webhook(
         &self,
         webhook_id: WebhookId,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         token: &str,
         wait: bool,
         files: Vec<CreateAttachment<'_>>,
@@ -2225,7 +2204,7 @@ impl Http {
     pub async fn execute_webhook_with_components(
         &self,
         webhook_id: WebhookId,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         token: &str,
         wait: bool,
         files: Vec<CreateAttachment<'_>>,
@@ -2238,7 +2217,7 @@ impl Http {
     async fn execute_webhook_(
         &self,
         webhook_id: WebhookId,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         token: &str,
         wait: bool,
         files: Vec<CreateAttachment<'_>>,
@@ -2291,7 +2270,7 @@ impl Http {
     pub async fn get_webhook_message(
         &self,
         webhook_id: WebhookId,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         token: &str,
         message_id: MessageId,
     ) -> Result<Message> {
@@ -2322,7 +2301,7 @@ impl Http {
     pub async fn edit_webhook_message(
         &self,
         webhook_id: WebhookId,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
@@ -2366,7 +2345,7 @@ impl Http {
     pub async fn delete_webhook_message(
         &self,
         webhook_id: WebhookId,
-        thread_id: Option<ChannelId>,
+        thread_id: Option<ThreadId>,
         token: &str,
         message_id: MessageId,
     ) -> Result<()> {
@@ -2673,7 +2652,7 @@ impl Http {
     /// Gets all thread members for a thread.
     pub async fn get_channel_thread_members(
         &self,
-        channel_id: ChannelId,
+        thread_id: ThreadId,
     ) -> Result<Vec<ThreadMember>> {
         self.fire(Request {
             body: None,
@@ -2681,7 +2660,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::ChannelThreadMembers {
-                channel_id,
+                thread_id,
             },
             params: None,
         })
@@ -2797,14 +2776,14 @@ impl Http {
     }
 
     /// Joins a thread channel.
-    pub async fn join_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
+    pub async fn join_thread_channel(&self, thread_id: ThreadId) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Put,
             route: Route::ChannelThreadMemberMe {
-                channel_id,
+                thread_id,
             },
             params: None,
         })
@@ -2812,14 +2791,14 @@ impl Http {
     }
 
     /// Leaves a thread channel.
-    pub async fn leave_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
+    pub async fn leave_thread_channel(&self, thread_id: ThreadId) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
             method: LightMethod::Delete,
             route: Route::ChannelThreadMemberMe {
-                channel_id,
+                thread_id,
             },
             params: None,
         })
@@ -2829,7 +2808,7 @@ impl Http {
     /// Adds a member to a thread channel.
     pub async fn add_thread_channel_member(
         &self,
-        channel_id: ChannelId,
+        thread_id: ThreadId,
         user_id: UserId,
     ) -> Result<()> {
         self.wind(Request {
@@ -2838,7 +2817,7 @@ impl Http {
             headers: None,
             method: LightMethod::Put,
             route: Route::ChannelThreadMember {
-                channel_id,
+                thread_id,
                 user_id,
             },
             params: None,
@@ -2849,7 +2828,7 @@ impl Http {
     /// Removes a member from a thread channel.
     pub async fn remove_thread_channel_member(
         &self,
-        channel_id: ChannelId,
+        thread_id: ThreadId,
         user_id: UserId,
     ) -> Result<()> {
         self.wind(Request {
@@ -2858,7 +2837,7 @@ impl Http {
             headers: None,
             method: LightMethod::Delete,
             route: Route::ChannelThreadMember {
-                channel_id,
+                thread_id,
                 user_id,
             },
             params: None,
@@ -2868,7 +2847,7 @@ impl Http {
 
     pub async fn get_thread_channel_member(
         &self,
-        channel_id: ChannelId,
+        thread_id: ThreadId,
         user_id: UserId,
         with_member: bool,
     ) -> Result<ThreadMember> {
@@ -2878,7 +2857,7 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::ChannelThreadMember {
-                channel_id,
+                thread_id,
                 user_id,
             },
             params: Some(&[("with_member", &with_member.to_arraystring())]),
@@ -2902,7 +2881,7 @@ impl Http {
     }
 
     /// Gets channel information.
-    pub async fn get_channel(&self, channel_id: ChannelId) -> Result<Channel> {
+    pub async fn get_channel(&self, channel_id: GenericChannelId) -> Result<Channel> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2952,7 +2931,7 @@ impl Http {
     /// Get a list of users that voted for this specific answer.
     pub async fn get_poll_answer_voters(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         answer_id: AnswerId,
         after: Option<UserId>,
@@ -2995,7 +2974,7 @@ impl Http {
 
     pub async fn expire_poll(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
     ) -> Result<Message> {
         self.fire(Request {
@@ -3849,7 +3828,7 @@ impl Http {
     /// Gets a message by an Id, bots only.
     pub async fn get_message(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
     ) -> Result<Message> {
         self.fire(Request {
@@ -3869,7 +3848,7 @@ impl Http {
     /// Gets X messages from a channel.
     pub async fn get_messages(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         target: Option<MessagePagination>,
         limit: Option<NonMaxU8>,
     ) -> Result<Vec<Message>> {
@@ -3940,7 +3919,7 @@ impl Http {
     }
 
     /// Gets all pins of a channel.
-    pub async fn get_pins(&self, channel_id: ChannelId) -> Result<Vec<Message>> {
+    pub async fn get_pins(&self, channel_id: GenericChannelId) -> Result<Vec<Message>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3957,7 +3936,7 @@ impl Http {
     /// Gets user Ids based on their reaction to a message. This endpoint is dumb.
     pub async fn get_reaction_users(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         reaction_type: &ReactionType,
         limit: u8,
@@ -4226,7 +4205,7 @@ impl Http {
     /// Sends a message to a channel.
     pub async fn send_message(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         files: Vec<CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
@@ -4257,7 +4236,7 @@ impl Http {
     /// Pins a message in a channel.
     pub async fn pin_message(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -4396,7 +4375,7 @@ impl Http {
     /// Unpins a message from a channel.
     pub async fn unpin_message(
         &self,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {

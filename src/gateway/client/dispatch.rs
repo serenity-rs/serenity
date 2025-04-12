@@ -133,7 +133,7 @@ fn update_cache_with_event(
             update_cache!(cache, event);
 
             let channel = event.channel;
-            if channel.kind == ChannelType::Category {
+            if channel.base.kind == ChannelType::Category {
                 FullEvent::CategoryCreate {
                     category: channel,
                 }
@@ -147,7 +147,7 @@ fn update_cache_with_event(
             let cached_messages = if_cache!(event.update(cache));
 
             let channel = event.channel;
-            if channel.kind == ChannelType::Category {
+            if channel.base.kind == ChannelType::Category {
                 FullEvent::CategoryDelete {
                     category: channel,
                 }

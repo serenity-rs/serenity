@@ -35,7 +35,8 @@ impl fmt::Display for ChannelParseError {
 
 fn channel_belongs_to_guild(channel: &Channel, guild: GuildId) -> bool {
     match channel {
-        Channel::Guild(channel) => channel.guild_id == guild,
+        Channel::GuildThread(channel) => channel.base.guild_id == guild,
+        Channel::Guild(channel) => channel.base.guild_id == guild,
         Channel::Private(_channel) => false,
     }
 }
@@ -59,7 +60,7 @@ async fn lookup_channel_global(
     #[cfg(feature = "cache")]
     if let Some(cache) = ctx.cache() {
         if let Some(guild) = cache.guild(guild_id) {
-            let channel = guild.channels.iter().find(|c| c.name.eq_ignore_ascii_case(s));
+            let channel = guild.channels.iter().find(|c| c.base.name.eq_ignore_ascii_case(s));
             if let Some(channel) = channel {
                 return Ok(Channel::Guild(channel.clone()));
             }
@@ -69,7 +70,7 @@ async fn lookup_channel_global(
     }
 
     let channels = ctx.http().get_channels(guild_id).await.map_err(ChannelParseError::Http)?;
-    if let Some(channel) = channels.into_iter().find(|c| c.name.eq_ignore_ascii_case(s)) {
+    if let Some(channel) = channels.into_iter().find(|c| c.base.name.eq_ignore_ascii_case(s)) {
         Ok(Channel::Guild(channel))
     } else {
         Err(ChannelParseError::NotFoundOrMalformed)
@@ -93,7 +94,7 @@ impl ArgumentConvert for Channel {
     async fn convert(
         ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
-        _channel_id: Option<ChannelId>,
+        _channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         let channel = lookup_channel_global(&ctx, guild_id, s).await?;
@@ -153,7 +154,7 @@ impl ArgumentConvert for GuildChannel {
     async fn convert(
         ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
-        channel_id: Option<ChannelId>,
+        channel_id: Option<GenericChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         match Channel::convert(&ctx, guild_id, channel_id, s).await {

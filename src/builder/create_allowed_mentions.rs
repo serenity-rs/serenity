@@ -24,8 +24,7 @@ impl ParseAction {
     }
 }
 
-/// A builder to manage the allowed mentions on a message, used by the [`ChannelId::send_message`]
-/// and [`ChannelId::edit_message`] methods.
+/// A builder to manage the allowed mentions on a message.
 ///
 /// # Examples
 ///

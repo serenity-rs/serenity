@@ -152,8 +152,8 @@ fn clean_mentions(guild: &Guild, s: &str, options: ContentSafeOptions, users: &[
 fn clean_mention(guild: &Guild, mention: Mention, users: &[User]) -> Cow<'static, str> {
     match mention {
         Mention::Channel(id) => {
-            if let Some(channel) = guild.channels.get(&id) {
-                format!("#{}", channel.name).into()
+            if let Some(channel) = guild.channel(id) {
+                format!("#{}", channel.base().name).into()
             } else {
                 "#deleted-channel".into()
             }
@@ -213,7 +213,10 @@ mod tests {
 
         let channel = GuildChannel {
             id: ChannelId::new(111880193700067777),
-            name: FixedString::from_static_trunc("general"),
+            base: BaseGuildChannel {
+                name: FixedString::from_static_trunc("general"),
+                ..Default::default()
+            },
             ..Default::default()
         };
 
