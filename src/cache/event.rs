@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use super::{Cache, CacheUpdate};
+use super::{BaseGuildChannel, Cache, CacheUpdate, GenericChannelId, GuildThread};
 use crate::internal::prelude::*;
 use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
@@ -42,7 +42,7 @@ impl CacheUpdate for ChannelCreateEvent {
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         cache
             .guilds
-            .get_mut(&self.channel.guild_id)
+            .get_mut(&self.channel.base.guild_id)
             .and_then(|mut g| g.channels.insert(self.channel.clone()))
     }
 }
@@ -51,12 +51,12 @@ impl CacheUpdate for ChannelDeleteEvent {
     type Output = VecDeque<Message>;
 
     fn update(&mut self, cache: &Cache) -> Option<VecDeque<Message>> {
-        let (channel_id, guild_id) = (self.channel.id, self.channel.guild_id);
+        let (channel_id, guild_id) = (self.channel.id, self.channel.base.guild_id);
 
         cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
 
         // Remove the cached messages for the channel.
-        cache.messages.remove(&channel_id).map(|(_, messages)| messages)
+        cache.messages.remove(&channel_id.widen()).map(|(_, messages)| messages)
     }
 }
 
@@ -66,7 +66,7 @@ impl CacheUpdate for ChannelUpdateEvent {
     fn update(&mut self, cache: &Cache) -> Option<GuildChannel> {
         cache
             .guilds
-            .get_mut(&self.channel.guild_id)
+            .get_mut(&self.channel.base.guild_id)
             .and_then(|mut g| g.channels.insert(self.channel.clone()))
     }
 }
@@ -77,8 +77,14 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
     fn update(&mut self, cache: &Cache) -> Option<()> {
         if let Some(guild_id) = self.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
-                if let Some(mut channel) = guild.channels.get_mut(&self.channel_id) {
-                    channel.last_pin_timestamp = self.last_pin_timestamp;
+                let (channel_id, thread_id) = self.channel_id.split();
+                if let Some(mut channel) = guild.channels.get_mut(&channel_id) {
+                    channel.base.last_pin_timestamp = self.last_pin_timestamp;
+                    return None;
+                }
+
+                if let Some(mut thread) = guild.threads.get_mut(&thread_id) {
+                    thread.base.last_pin_timestamp = self.last_pin_timestamp;
                 }
             }
         }
@@ -115,7 +121,7 @@ impl CacheUpdate for GuildDeleteEvent {
             Some(guild) => {
                 for channel in &guild.1.channels {
                     // Remove the channel's cached messages.
-                    cache.messages.remove(&channel.id);
+                    cache.messages.remove(&channel.id.widen());
                 }
 
                 Some(guild.1)
@@ -333,20 +339,14 @@ impl CacheUpdate for MessageCreateEvent {
         let guild = self.message.guild_id.and_then(|g_id| cache.guilds.get_mut(&g_id));
 
         if let Some(mut guild) = guild {
-            let mut found_channel = false;
-            if let Some(mut channel) = guild.channels.get_mut(&self.message.channel_id) {
-                update_channel_last_message_id(&self.message, &mut channel, cache);
-                found_channel = true;
+            let shared_id = self.message.channel_id;
+            let (channel_id, thread_id) = shared_id.split();
+            if let Some(mut channel) = guild.channels.get_mut(&channel_id) {
+                update_channel_last_message_id(&self.message, &mut channel.base, shared_id, cache);
             }
 
-            // found_channel is to avoid limitations of the NLL borrow checker.
-            if !found_channel {
-                // This may be a thread.
-                let thread =
-                    guild.threads.iter_mut().find(|thread| thread.id == self.message.channel_id);
-                if let Some(thread) = thread {
-                    update_channel_last_message_id(&self.message, thread, cache);
-                }
+            if let Some(mut thread) = guild.threads.get_mut(&thread_id) {
+                update_channel_last_message_id(&self.message, &mut thread.base, shared_id, cache);
             }
         }
 
@@ -372,9 +372,14 @@ impl CacheUpdate for MessageCreateEvent {
     }
 }
 
-fn update_channel_last_message_id(message: &Message, channel: &mut GuildChannel, cache: &Cache) {
+fn update_channel_last_message_id(
+    message: &Message,
+    channel: &mut BaseGuildChannel,
+    channel_id: GenericChannelId,
+    cache: &Cache,
+) {
     if let Some(last_message_id) = channel.last_message_id {
-        let most_recent_timestamp = cache.message(channel.id, last_message_id).map(|m| m.timestamp);
+        let most_recent_timestamp = cache.message(channel_id, last_message_id).map(|m| m.timestamp);
         if let Some(most_recent_timestamp) = most_recent_timestamp {
             if message.timestamp > most_recent_timestamp {
                 channel.last_message_id = Some(message.id);
@@ -471,68 +476,35 @@ impl CacheUpdate for ReadyEvent {
 }
 
 impl CacheUpdate for ThreadCreateEvent {
-    type Output = GuildChannel;
+    type Output = GuildThread;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
-
-        cache.guilds.get_mut(&guild_id).and_then(|mut g| {
-            if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
-                Some(std::mem::replace(&mut g.threads[i as u32], self.thread.clone()))
-            } else {
-                // This is a rare enough occurence to realloc.
-                let mut threads = std::mem::take(&mut g.threads).into_vec();
-                threads.push(self.thread.clone());
-
-                g.threads = FixedArray::try_from(threads.into_boxed_slice())
-                    .expect("A guild should not have 4 billion threads");
-
-                None
-            }
-        })
+        cache
+            .guilds
+            .get_mut(&self.thread.base.guild_id)
+            .and_then(|mut g| g.threads.insert(self.thread.clone()))
     }
 }
 
 impl CacheUpdate for ThreadUpdateEvent {
-    type Output = GuildChannel;
+    type Output = GuildThread;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
-
-        cache.guilds.get_mut(&guild_id).and_then(|mut g| {
-            if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
-                Some(std::mem::replace(&mut g.threads[i as u32], self.thread.clone()))
-            } else {
-                // This is a rare enough occurence to realloc.
-                let mut threads = std::mem::take(&mut g.threads).into_vec();
-                threads.push(self.thread.clone());
-
-                g.threads = FixedArray::try_from(threads.into_boxed_slice())
-                    .expect("A guild should not have 4 billion threads");
-
-                None
-            }
-        })
+        cache
+            .guilds
+            .get_mut(&self.thread.base.guild_id)
+            .and_then(|mut g| g.threads.insert(self.thread.clone()))
     }
 }
 
 impl CacheUpdate for ThreadDeleteEvent {
-    type Output = GuildChannel;
+    type Output = GuildThread;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
-
-        cache.guilds.get_mut(&guild_id).and_then(|mut g| {
-            g.threads.iter().position(|e| e.id == thread_id).map(|i| {
-                let mut threads = std::mem::take(&mut g.threads).into_vec();
-                let thread = threads.remove(i);
-
-                g.threads = FixedArray::try_from(threads.into_boxed_slice())
-                    .expect("A guild should not have 4 billion threads");
-
-                thread
-            })
-        })
+        cache
+            .guilds
+            .get_mut(&self.thread.guild_id)
+            .and_then(|mut g| g.threads.remove(&self.thread.id))
     }
 }
 

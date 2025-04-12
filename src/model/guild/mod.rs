@@ -222,7 +222,7 @@ pub struct Guild {
     /// A thread is guaranteed (for errors, not for panics) to be cached if a `MESSAGE_CREATE`
     /// event is fired in said thread, however an `INTERACTION_CREATE` may not have a private
     /// thread in cache.
-    pub threads: FixedArray<GuildChannel>,
+    pub threads: ExtractMap<ThreadId, GuildThread>,
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
     /// **Note**: This will be empty unless the "guild presences" privileged intent is enabled.
@@ -246,9 +246,19 @@ impl Guild {
     pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         self.channels.iter().find(|&channel| {
-            channel.kind != ChannelType::Category
+            channel.base.kind != ChannelType::Category
                 && self.user_permissions_in(channel, member).view_channel()
         })
+    }
+
+    /// Returns either the [`GuildChannel`] or the [`GuildThread`] that this ID corresponds to.
+    #[must_use]
+    pub fn channel(&self, channel_id: GenericChannelId) -> Option<GenericGuildChannelRef<'_>> {
+        let (channel_id, thread_id) = channel_id.split();
+        let channel = self.channels.get(&channel_id).map(GenericGuildChannelRef::Channel);
+        let thread = || self.threads.get(&thread_id).map(GenericGuildChannelRef::Thread);
+
+        channel.or_else(thread)
     }
 
     /// Returns the guaranteed "default" channel of the guild. (This returns the first channel that
@@ -258,7 +268,7 @@ impl Guild {
     #[must_use]
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         self.channels.iter().find(|&channel| {
-            channel.kind != ChannelType::Category
+            channel.base.kind != ChannelType::Category
                 && self
                     .members
                     .iter()

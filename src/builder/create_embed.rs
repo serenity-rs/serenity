@@ -185,12 +185,11 @@ impl<'a> CreateEmbed<'a> {
 
     /// Same as calling [`Self::image`] with "attachment://filename.(jpg, png)".
     ///
-    /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
-    /// with the provided filename. Or else this won't work.
+    /// Remember to set an attachment with the provided filename via [`CreateAttachment`]
     ///
     /// Refer [`Self::image`] for rules on naming local attachments.
     ///
-    /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
+    /// [`CreateAttachment`]: crate::builder::CreateAttachment
     pub fn attachment(self, filename: impl Into<String>) -> Self {
         let mut filename = filename.into();
         filename.insert_str(0, "attachment://");

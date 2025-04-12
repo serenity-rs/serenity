@@ -150,7 +150,7 @@ impl Ratelimiter {
     /// # let http: Http = unimplemented!();
     /// let routes = http.ratelimiter.unwrap().routes();
     ///
-    /// let channel_id = ChannelId::new(7);
+    /// let channel_id = GenericChannelId::new(7);
     /// let route = Route::Channel {
     ///     channel_id,
     /// };

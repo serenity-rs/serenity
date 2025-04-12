@@ -5,7 +5,7 @@ use chrono::offset::Utc;
 use serenity::async_trait;
 use serenity::builder::{CreateEmbed, CreateMessage};
 use serenity::gateway::ActivityData;
-use serenity::model::id::ChannelId;
+use serenity::model::id::GenericChannelId;
 use serenity::prelude::*;
 
 struct Handler {
@@ -93,7 +93,7 @@ async fn log_system_load(ctx: &Context) {
             false,
         );
     let builder = CreateMessage::new().embed(embed);
-    let message = ChannelId::new(381926291785383946).send_message(&ctx.http, builder).await;
+    let message = GenericChannelId::new(381926291785383946).send_message(&ctx.http, builder).await;
     if let Err(why) = message {
         eprintln!("Error sending message: {why:?}");
     };

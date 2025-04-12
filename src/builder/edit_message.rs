@@ -221,7 +221,7 @@ impl<'a> EditMessage<'a> {
     pub async fn execute(
         mut self,
         cache_http: impl CacheHttp,
-        channel_id: ChannelId,
+        channel_id: GenericChannelId,
         message_id: MessageId,
         user_id: Option<UserId>,
     ) -> Result<Message> {

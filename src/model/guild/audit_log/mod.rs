@@ -396,7 +396,7 @@ pub struct AuditLogEntryOptions {
     pub members_removed: Option<NonMaxU64>,
     /// Channel in which the messages were deleted
     #[serde(default)]
-    pub channel_id: Option<ChannelId>,
+    pub channel_id: Option<GenericChannelId>,
     /// Number of deleted messages.
     #[serde(default, with = "optional_string")]
     pub count: Option<NonMaxU64>,

@@ -3,11 +3,13 @@
 mod attachment;
 mod channel_id;
 mod embed;
+mod followed_channel;
 mod guild_channel;
+mod interaction_channel;
 mod message;
-mod partial_channel;
 mod private_channel;
 mod reaction;
+mod thread;
 
 use std::fmt;
 
@@ -19,15 +21,45 @@ pub use self::attachment::*;
 #[cfg(feature = "model")]
 pub use self::channel_id::*;
 pub use self::embed::*;
+pub use self::followed_channel::*;
 pub use self::guild_channel::*;
+pub use self::interaction_channel::*;
 pub use self::message::*;
-pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
+pub use self::thread::*;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::prelude::*;
-use crate::model::utils::is_false;
+
+/// A container for a reference to any Guild channel.
+#[derive(Clone, Copy, Debug)]
+// purposefully missing non-exhaustive, as discord considers new channel types like threads to be
+// breaking (see the difference between API v8/v9).
+pub enum GenericGuildChannelRef<'a> {
+    Channel(&'a GuildChannel),
+    Thread(&'a GuildThread),
+}
+
+impl<'a> GenericGuildChannelRef<'a> {
+    /// Returns the [`GenericChannelId`] of the [`GenericGuildChannelRef`].
+    #[must_use]
+    pub fn id(self) -> GenericChannelId {
+        match self {
+            Self::Channel(ch) => ch.id.widen(),
+            Self::Thread(th) => th.id.widen(),
+        }
+    }
+
+    /// Returns the shared fields between a [`GuildChannel`] and a [`GuildThread`].
+    #[must_use]
+    pub fn base(self) -> &'a BaseGuildChannel {
+        match self {
+            Self::Channel(ch) => &ch.base,
+            Self::Thread(th) => &th.base,
+        }
+    }
+}
 
 /// A container for any channel.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -37,6 +69,8 @@ use crate::model::utils::is_false;
 pub enum Channel {
     /// A channel within a [`Guild`].
     Guild(GuildChannel),
+    /// A thread inside a [`Guild`].
+    GuildThread(GuildThread),
     /// A private channel to another [`User`] (Direct Message). No other users may access the
     /// channel.
     Private(PrivateChannel),
@@ -44,63 +78,29 @@ pub enum Channel {
 
 #[cfg(feature = "model")]
 impl Channel {
-    /// Converts from [`Channel`] to `Option<GuildChannel>`.
-    ///
-    /// Converts `self` into an `Option<GuildChannel>`, consuming `self`, and discarding a
-    /// [`PrivateChannel`] if any.
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::channel::Channel;
-    /// # fn run(channel: Channel) {
-    /// match channel.guild() {
-    ///     Some(guild_channel) => {
-    ///         println!("It's a guild channel named {}!", guild_channel.name);
-    ///     },
-    ///     None => {
-    ///         println!("It's not in a guild!");
-    ///     },
-    /// }
-    /// # }
-    /// ```
+    /// If this is a guild channel, returns it.
     #[must_use]
     pub fn guild(self) -> Option<GuildChannel> {
         match self {
-            Self::Guild(lock) => Some(lock),
+            Self::Guild(channel) => Some(channel),
             _ => None,
         }
     }
 
-    /// Converts from [`Channel`] to `Option<PrivateChannel>`.
-    ///
-    /// Converts `self` into an `Option<PrivateChannel>`, consuming `self`, and discarding a
-    /// [`GuildChannel`], if any.
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::channel::Channel;
-    /// # fn run(channel: Channel) {
-    /// #
-    /// match channel.private() {
-    ///     Some(private) => {
-    ///         println!("It's a private channel with {}!", &private.recipient);
-    ///     },
-    ///     None => {
-    ///         println!("It's not a private channel!");
-    ///     },
-    /// }
-    /// # }
-    /// ```
+    /// If this is a guild thread, returns it.
+    #[must_use]
+    pub fn thread(self) -> Option<GuildThread> {
+        match self {
+            Self::GuildThread(thread) => Some(thread),
+            _ => None,
+        }
+    }
+
+    /// If this is a private channel, returns it.
     #[must_use]
     pub fn private(self) -> Option<PrivateChannel> {
         match self {
-            Self::Private(lock) => Some(lock),
+            Self::Private(channel) => Some(channel),
             _ => None,
         }
     }
@@ -109,7 +109,7 @@ impl Channel {
     #[must_use]
     pub fn category(self) -> Option<GuildChannel> {
         match self {
-            Self::Guild(c) if c.kind == ChannelType::Category => Some(c),
+            Self::Guild(c) if c.base.kind == ChannelType::Category => Some(c),
             _ => None,
         }
     }
@@ -124,6 +124,9 @@ impl Channel {
             Self::Guild(public_channel) => {
                 public_channel.delete(http, reason).await?;
             },
+            Self::GuildThread(thread) => {
+                thread.delete(http, reason).await?;
+            },
             Self::Private(private_channel) => {
                 private_channel.delete(http).await?;
             },
@@ -132,43 +135,41 @@ impl Channel {
         Ok(())
     }
 
-    /// Retrieves the Id of the inner [`GuildChannel`], or [`PrivateChannel`].
+    /// Retrieves the inner Id.
     #[must_use]
-    pub const fn id(&self) -> ChannelId {
+    pub fn id(&self) -> GenericChannelId {
         match self {
-            Self::Guild(ch) => ch.id,
-            Self::Private(ch) => ch.id,
+            Self::Guild(ch) => ch.id.widen(),
+            Self::GuildThread(ch) => ch.id.widen(),
+            Self::Private(ch) => ch.id.widen(),
         }
+    }
+}
+
+fn extract_type<'de, D>(deserializer: D) -> StdResult<(u64, &'de RawValue), D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    struct ChannelRaw {
+        #[serde(rename = "type")]
+        kind: u64,
     }
 
-    /// Retrieves the position of the inner [`GuildChannel`].
-    ///
-    /// In DMs (private channel) it will return None.
-    #[must_use]
-    pub const fn position(&self) -> Option<u16> {
-        match self {
-            Self::Guild(channel) => Some(channel.position),
-            Self::Private(_) => None,
-        }
-    }
+    let raw_data = <&RawValue>::deserialize(deserializer)?;
+    let raw = ChannelRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+    Ok((raw.kind, raw_data))
 }
 
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Channel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Deserialize)]
-        struct ChannelRaw {
-            #[serde(rename = "type")]
-            kind: u64,
-        }
+        let (kind, raw_data) = extract_type(deserializer)?;
 
-        let raw_data = <&RawValue>::deserialize(deserializer)?;
-        let raw = ChannelRaw::deserialize(raw_data).map_err(DeError::custom)?;
-
-        match raw.kind {
-            0 | 2 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => {
-                Deserialize::deserialize(raw_data).map(Channel::Guild)
-            },
+        match kind {
+            0 | 2 | 4 | 5 | 13 | 14 | 15 => Deserialize::deserialize(raw_data).map(Channel::Guild),
+            10..=12 => Deserialize::deserialize(raw_data).map(Channel::GuildThread),
             1 => Deserialize::deserialize(raw_data).map(Channel::Private),
             _ => return Err(DeError::custom("Unknown channel type")),
         }
@@ -185,7 +186,8 @@ impl fmt::Display for Channel {
     ///   click on.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),
+            Self::Guild(ch) => fmt::Display::fmt(&ch.id.widen().mention(), f),
+            Self::GuildThread(ch) => fmt::Display::fmt(&ch.id.widen().mention(), f),
             Self::Private(ch) => fmt::Display::fmt(&ch.recipient.name, f),
         }
     }
@@ -372,7 +374,7 @@ enum_number! {
     /// See [`ThreadMetadata::auto_archive_duration`].
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object)
-    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[non_exhaustive]
     pub enum AutoArchiveDuration {
@@ -404,35 +406,6 @@ pub struct StageInstance {
     pub discoverable_disabled: bool,
     /// The id of the scheduled event for this Stage instance.
     pub guild_scheduled_event_id: Option<ScheduledEventId>,
-}
-
-/// A thread data.
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
-#[bool_to_bitflags::bool_to_bitflags]
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
-pub struct ThreadMetadata {
-    /// Whether the thread is archived.
-    pub archived: bool,
-    /// Duration in minutes to automatically archive the thread after recent activity.
-    pub auto_archive_duration: AutoArchiveDuration,
-    /// The last time the thread's archive status was last changed; used for calculating recent
-    /// activity.
-    pub archive_timestamp: Option<Timestamp>,
-    /// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
-    #[serde(default)]
-    pub locked: bool,
-    /// Timestamp when the thread was created.
-    ///
-    /// **Note**: only populated for threads created after 2022-01-09
-    pub create_timestamp: Option<Timestamp>,
-    /// Whether non-moderators can add other non-moderators to a thread.
-    ///
-    /// **Note**: Only available on private threads.
-    #[serde(default, skip_serializing_if = "is_false")]
-    pub invitable: bool,
 }
 
 /// A response to getting several threads channels.

@@ -1,4 +1,5 @@
 //! A collection of newtypes defining type-strong IDs.
+#![expect(clippy::unsafe_derive_deserialize)] // This is from `ref_cast`
 
 use std::fmt;
 
@@ -44,8 +45,10 @@ macro_rules! id_u64 {
     ($($name:ident: $doc:literal;)*) => {
         $(
             #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+            #[derive(ref_cast::RefCastCustom)]
+            #[repr(transparent)]
             #[doc = $doc]
-            pub struct $name(InnerId);
+            pub struct $name(pub(crate) InnerId);
 
             impl $name {
                 #[doc = concat!("Creates a new ", stringify!($name), " from a u64.")]
@@ -59,6 +62,10 @@ macro_rules! id_u64 {
                         None => panic!(concat!("Attempted to call ", stringify!($name), "::new with invalid (u64::MAX) value"))
                     }
                 }
+
+                #[ref_cast::ref_cast_custom]
+                #[allow(unused, clippy::allow_attributes, reason = "Most IDs don't need casting like this")]
+                pub(crate) const fn cast_from(inner: &InnerId) -> &Self;
 
                 /// Retrieves the inner `id` as a [`u64`].
                 #[must_use]
@@ -185,7 +192,8 @@ impl serde::Serialize for InnerId {
 id_u64! {
     AttachmentId: "An identifier for an attachment.";
     ApplicationId: "An identifier for an Application.";
-    ChannelId: "An identifier for a Channel";
+    ChannelId: "An identifier for a GuildChannel or PrivateChannel";
+    GenericChannelId: "An identifier for a Channel.";
     EmojiId: "An identifier for an Emoji";
     GenericId: "An identifier for an unspecific entity.";
     GuildId: "An identifier for a Guild";
@@ -198,6 +206,7 @@ id_u64! {
     StickerPackId: "An identifier for a sticker pack.";
     StickerPackBannerId: "An identifier for a sticker pack banner.";
     SkuId: "An identifier for a SKU.";
+    ThreadId: "An identifier for a GuildThread.";
     UserId: "An identifier for a User";
     WebhookId: "An identifier for a [`Webhook`]";
     AuditLogEntryId: "An identifier for an audit log entry.";

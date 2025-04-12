@@ -28,7 +28,7 @@ pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date of the message.
     pub id: MessageId,
     /// The Id of the [`Channel`] that the message was sent to.
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     /// The user that sent the message.
     pub author: User,
     /// The content of the message.
@@ -166,7 +166,7 @@ impl Message {
             }
         }
 
-        self.channel_id.crosspost(http, self.id).await
+        self.channel_id.expect_channel().crosspost(http, self.id).await
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
@@ -206,10 +206,12 @@ impl Message {
         };
 
         let guild = cache.guild(guild_id)?;
-        let (channel, is_thread) = if let Some(channel) = guild.channels.get(&self.channel_id) {
+        let (channel_id, thread_id) = self.channel_id.split();
+        let (channel, is_thread) = if let Some(channel) = guild.channels.get(&channel_id) {
             (channel, false)
-        } else if let Some(thread) = guild.threads.iter().find(|th| th.id == self.channel_id) {
-            (thread, true)
+        } else if let Some(thread) = guild.threads.get(&thread_id) {
+            let channel = guild.channels.get(&thread.parent_id)?;
+            (channel, true)
         } else {
             return None;
         };
@@ -544,7 +546,7 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// See [`ChannelId::end_poll`] for more information.
+    /// See [`GenericChannelId::end_poll`] for more information.
     pub async fn end_poll(&self, http: &Http) -> Result<Self> {
         self.channel_id.end_poll(http, self.id).await
     }
@@ -568,24 +570,12 @@ impl Message {
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
             if let Some(guild) = cache.guild(self.guild_id?) {
-                let channel = guild.channels.get(&self.channel_id)?;
-                return if channel.thread_metadata.is_some() {
-                    let thread_parent = guild.channels.get(&channel.parent_id?)?;
-                    thread_parent.parent_id
-                } else {
-                    channel.parent_id
-                };
+                let channel = guild.channels.get(&self.channel_id.expect_channel())?;
+                return channel.parent_id;
             }
         }
 
-        let http = cache_http.http();
-        let channel = http.get_channel(self.channel_id).await.ok()?.guild()?;
-        if channel.thread_metadata.is_some() {
-            let thread_parent = http.get_channel(channel.parent_id?).await.ok()?.guild()?;
-            thread_parent.parent_id
-        } else {
-            channel.parent_id
-        }
+        cache_http.http().get_channel(self.channel_id).await.ok()?.guild()?.parent_id
     }
 }
 
@@ -797,7 +787,7 @@ pub struct MessageReference {
     /// ID of the originating message.
     pub message_id: Option<MessageId>,
     /// ID of the originating message's channel.
-    pub channel_id: ChannelId,
+    pub channel_id: GenericChannelId,
     /// ID of the originating message's guild.
     pub guild_id: Option<GuildId>,
     /// When sending, whether to error if the referenced message doesn't exist instead of sending
@@ -807,7 +797,7 @@ pub struct MessageReference {
 
 impl MessageReference {
     #[must_use]
-    pub fn new(kind: MessageReferenceKind, channel_id: ChannelId) -> Self {
+    pub fn new(kind: MessageReferenceKind, channel_id: GenericChannelId) -> Self {
         Self {
             kind,
             channel_id,
@@ -953,7 +943,7 @@ impl MessageId {
     /// Returns a link referencing this message. When clicked, users will jump to the message. The
     /// link will be valid for messages in either private channels or guilds.
     #[must_use]
-    pub fn link(self, channel_id: ChannelId, guild_id: Option<GuildId>) -> String {
+    pub fn link(self, channel_id: GenericChannelId, guild_id: Option<GuildId>) -> String {
         if let Some(guild_id) = guild_id {
             format!("https://discord.com/channels/{guild_id}/{channel_id}/{self}")
         } else {
@@ -1165,7 +1155,7 @@ mod tests {
             }]),
             ..Default::default()
         };
-        let channel_id = channel.id;
+        let channel_id = channel.id.widen();
 
         // Guild with the author and channel cached, default (empty) permissions.
         let guild = Guild {
