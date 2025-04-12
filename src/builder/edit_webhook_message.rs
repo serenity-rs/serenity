@@ -31,7 +31,7 @@ pub struct EditWebhookMessage<'a> {
     pub(crate) attachments: Option<EditAttachments<'a>>,
 
     #[serde(skip)]
-    thread_id: Option<ChannelId>,
+    thread_id: Option<ThreadId>,
 }
 
 impl<'a> EditWebhookMessage<'a> {
@@ -55,7 +55,7 @@ impl<'a> EditWebhookMessage<'a> {
 
     /// Edits a message within a given thread. If the provided thread Id doesn't belong to the
     /// current webhook, the API will return an error.
-    pub fn in_thread(mut self, thread_id: ChannelId) -> Self {
+    pub fn in_thread(mut self, thread_id: ThreadId) -> Self {
         self.thread_id = Some(thread_id);
         self
     }

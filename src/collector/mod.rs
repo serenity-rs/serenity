@@ -180,7 +180,7 @@ make_specific_collector!(
     // - filter argument type (used as argument of the builder-like method on the collector type)
     // - filter expression (this expressoin must return true to let the event through)
     author_id: UserId => interaction.user.id == *author_id,
-    channel_id: ChannelId => interaction.channel_id == *channel_id,
+    channel_id: GenericChannelId => interaction.channel_id == *channel_id,
     guild_id: GuildId => interaction.guild_id.is_none_or(|x| x == *guild_id),
     message_id: MessageId => interaction.message.id == *message_id,
     custom_ids: FixedArray<FixedString> => custom_ids.contains(&interaction.data.custom_id),
@@ -192,7 +192,7 @@ make_specific_collector!(
         interaction: Interaction::Modal(interaction),
     }) => interaction,
     author_id: UserId => interaction.user.id == *author_id,
-    channel_id: ChannelId => interaction.channel_id == *channel_id,
+    channel_id: GenericChannelId => interaction.channel_id == *channel_id,
     guild_id: GuildId => interaction.guild_id.is_none_or(|g| g == *guild_id),
     message_id: MessageId => interaction.message.as_ref().is_none_or(|m| m.id == *message_id),
     custom_ids: Vec<FixedString> => custom_ids.contains(&interaction.data.custom_id),
@@ -202,7 +202,7 @@ make_specific_collector!(
     CollectReactions, collect_reactions,
     Event::ReactionAdd(ReactionAddEvent { reaction }) => reaction,
     author_id: UserId => reaction.user_id.is_none_or(|a| a == *author_id),
-    channel_id: ChannelId => reaction.channel_id == *channel_id,
+    channel_id: GenericChannelId => reaction.channel_id == *channel_id,
     guild_id: GuildId => reaction.guild_id.is_none_or(|g| g == *guild_id),
     message_id: MessageId => reaction.message_id == *message_id,
 );
@@ -211,6 +211,6 @@ make_specific_collector!(
     CollectMessages, collect_messages,
     Event::MessageCreate(MessageCreateEvent { message }) => message,
     author_id: UserId => message.author.id == *author_id,
-    channel_id: ChannelId => message.channel_id == *channel_id,
+    channel_id: GenericChannelId => message.channel_id == *channel_id,
     guild_id: GuildId => message.guild_id.is_none_or(|g| g == *guild_id),
 );
