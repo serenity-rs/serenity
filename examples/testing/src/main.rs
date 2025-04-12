@@ -167,7 +167,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .await?;
     } else if msg.content == "assigntags" {
         let forum_id = msg.guild_channel(&ctx).await?.parent_id.unwrap();
-        let forum = forum_id.widen().to_guild_channel(&ctx, msg.guild_id).await?;
+        let forum = forum_id.to_guild_channel(&ctx, msg.guild_id).await?;
         channel_id
             .expect_thread()
             .edit(
@@ -202,7 +202,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         msg.author.id.dm(&ctx.http, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
         let mut channel = {
-            let channel_id = channel.trim().parse::<GenericChannelId>().unwrap();
+            let channel_id = channel.trim().parse::<ChannelId>().unwrap();
             channel_id.to_guild_channel(&ctx, msg.guild_id).await.unwrap()
         };
 

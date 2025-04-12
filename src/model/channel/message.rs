@@ -169,8 +169,9 @@ impl Message {
         self.channel_id.expect_channel().crosspost(http, self.id).await
     }
 
-    /// First attempts to find a [`Channel`] by its Id in the cache, upon failure requests it via
-    /// HTTP.
+    /// Retrieves the [`Channel`] the message was sent in.
+    ///
+    /// See [`GenericChannelId::to_channel`] for information about how this is retrieved.
     ///
     /// # Errors
     ///
@@ -179,14 +180,26 @@ impl Message {
         self.channel_id.to_channel(cache_http, self.guild_id).await
     }
 
-    /// First attempts to find the [`GuildChannel`] by it's Id in the cache, upon failure requests
-    /// it via HTTP.
+    /// Retrieves the [`GuildChannel`] the message was sent in.
+    ///
+    /// See [`ChannelId::to_guild_channel`] for information on how this is retrieved.
     ///
     /// # Errors
     ///
-    /// Can return an error if the HTTP request fails, or this is executed in a DM channel.
+    /// Can return an error if the HTTP request fails, or this is not called in a guild channel.
     pub async fn guild_channel(&self, cache_http: impl CacheHttp) -> Result<GuildChannel> {
-        self.channel_id.to_guild_channel(cache_http, self.guild_id).await
+        self.channel_id.expect_channel().to_guild_channel(cache_http, self.guild_id).await
+    }
+
+    /// Retrieves the [`GuildThread`] the message was sent in.
+    ///
+    /// See [`ThreadId::to_thread`] for information on how this is retrieved.
+    ///
+    /// # Errors
+    ///
+    /// Can return an error if the HTTP request fails, or this is not called in a guild thread.
+    pub async fn guild_thread(&self, cache_http: impl CacheHttp) -> Result<GuildThread> {
+        self.channel_id.expect_thread().to_thread(cache_http, self.guild_id).await
     }
 
     /// Calculates the permissions of the message author in the current channel.
