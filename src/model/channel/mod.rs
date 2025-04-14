@@ -32,6 +32,35 @@ pub use self::thread::*;
 use crate::http::Http;
 use crate::model::prelude::*;
 
+impl From<ThreadId> for GenericChannelId {
+    fn from(val: ThreadId) -> Self {
+        Self::new(val.get())
+    }
+}
+
+impl From<ChannelId> for GenericChannelId {
+    fn from(val: ChannelId) -> Self {
+        Self::new(val.get())
+    }
+}
+
+impl GenericChannelId {
+    #[must_use]
+    pub fn split(self) -> (ChannelId, ThreadId) {
+        (self.expect_channel(), self.expect_thread())
+    }
+
+    #[must_use]
+    pub fn expect_channel(self) -> ChannelId {
+        ChannelId::new(self.get())
+    }
+
+    #[must_use]
+    pub fn expect_thread(self) -> ThreadId {
+        ThreadId::new(self.get())
+    }
+}
+
 /// A container for a reference to any Guild channel.
 #[derive(Clone, Copy, Debug)]
 // purposefully missing non-exhaustive, as discord considers new channel types like threads to be
