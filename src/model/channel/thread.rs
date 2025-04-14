@@ -6,35 +6,6 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::utils::is_false;
 
-impl From<ThreadId> for GenericChannelId {
-    fn from(val: ThreadId) -> Self {
-        Self::new(val.get())
-    }
-}
-
-impl From<ChannelId> for GenericChannelId {
-    fn from(val: ChannelId) -> Self {
-        Self::new(val.get())
-    }
-}
-
-impl GenericChannelId {
-    #[must_use]
-    pub fn split(self) -> (ChannelId, ThreadId) {
-        (self.expect_channel(), self.expect_thread())
-    }
-
-    #[must_use]
-    pub fn expect_channel(self) -> ChannelId {
-        ChannelId::new(self.get())
-    }
-
-    #[must_use]
-    pub fn expect_thread(self) -> ThreadId {
-        ThreadId::new(self.get())
-    }
-}
-
 impl ThreadId {
     #[must_use]
     pub fn widen(self) -> GenericChannelId {
@@ -316,7 +287,7 @@ pub struct ThreadMember {
     #[serde(flatten)]
     pub inner: PartialThreadMember,
     /// The id of the thread.
-    pub id: ChannelId,
+    pub id: ThreadId,
     /// The id of the user.
     pub user_id: UserId,
     /// Additional information about the user.
