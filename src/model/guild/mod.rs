@@ -665,6 +665,8 @@ impl Guild {
     ///
     /// [`Shard`]: crate::gateway::Shard
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
+    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://discord.com/developers/docs/change-log#deprecating-guild-creation-by-apps"]
+
     pub async fn create(
         http: impl AsRef<Http>,
         name: &str,
