@@ -1,5 +1,7 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
+use dashmap::DashMap;
+use dashmap::try_result::TryResult;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
@@ -28,7 +30,7 @@ use crate::model::event::Event;
 use crate::model::event::GatewayEvent;
 #[cfg(feature = "voice")]
 use crate::model::id::ChannelId;
-use crate::model::id::GuildId;
+use crate::model::id::{GuildId, ShardId};
 use crate::model::user::OnlineStatus;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -38,7 +40,7 @@ pub struct ShardRunner {
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework>>,
-    runner_info: Arc<Mutex<ShardRunnerInfo>>,
+    runners: Arc<DashMap<ShardId, (ShardRunnerInfo, Sender<ShardRunnerMessage>)>>,
     // channel to send messages back to the shard manager
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
@@ -66,7 +68,7 @@ impl ShardRunner {
             raw_event_handler: opt.raw_event_handler,
             #[cfg(feature = "framework")]
             framework: opt.framework,
-            runner_info: opt.runner_info,
+            runners: opt.runners,
             manager_tx: opt.manager_tx,
             runner_rx: rx,
             runner_tx: tx,
@@ -479,7 +481,9 @@ impl ShardRunner {
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn update_runner_info(&self) {
-        if let Ok(mut runner_info) = self.runner_info.try_lock() {
+        if let TryResult::Present(mut entry) = self.runners.try_get_mut(&self.shard.info.id) {
+            let (runner_info, _) = entry.value_mut();
+
             runner_info.latency = self.shard.latency();
             runner_info.stage = self.shard.stage();
         }
@@ -494,7 +498,7 @@ impl ShardRunner {
             http: Arc::clone(&self.http),
             #[cfg(feature = "cache")]
             cache: Arc::clone(&self.cache),
-            runner_info: Arc::clone(&self.runner_info),
+            runners: Arc::clone(&self.runners),
             #[cfg(feature = "collector")]
             collectors: Arc::clone(&self.collectors),
         }
@@ -512,7 +516,7 @@ pub struct ShardRunnerOptions {
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework>>,
-    pub runner_info: Arc<Mutex<ShardRunnerInfo>>,
+    pub runners: Arc<DashMap<ShardId, (ShardRunnerInfo, Sender<ShardRunnerMessage>)>>,
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
     #[cfg(feature = "voice")]
