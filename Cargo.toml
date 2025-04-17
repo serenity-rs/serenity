@@ -98,7 +98,7 @@ collector = ["gateway"]
 # Enables the Framework trait which is an abstraction for old-style text commands.
 framework = ["gateway"]
 # Enables gateway support, which allows bots to listen for Discord events.
-gateway = ["model", "flate2"]
+gateway = ["model", "flate2", "dashmap"]
 # Enables HTTP, which enables bots to execute actions on Discord.
 http = ["dashmap", "mime_guess", "percent-encoding"]
 # Enables wrapper methods around HTTP requests on model types.
