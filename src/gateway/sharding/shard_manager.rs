@@ -1,10 +1,10 @@
-use std::collections::HashMap;
 use std::num::NonZeroU16;
+use std::sync::Arc;
 #[cfg(feature = "framework")]
 use std::sync::OnceLock;
-use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use dashmap::DashMap;
 use futures::StreamExt;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio::time::{sleep, timeout};
@@ -67,7 +67,7 @@ pub struct ShardManager {
     ///
     /// **Note**: It is highly recommended to not mutate this yourself unless you need to. Instead
     /// prefer to use methods on this struct that are provided where possible.
-    pub runners: HashMap<ShardId, (Arc<Mutex<ShardRunnerInfo>>, Sender<ShardRunnerMessage>)>,
+    pub runners: Arc<DashMap<ShardId, (ShardRunnerInfo, Sender<ShardRunnerMessage>)>>,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
@@ -103,7 +103,7 @@ impl ShardManager {
             framework: opt.framework,
             last_start: None,
             queue: ShardQueue::new(opt.max_concurrency),
-            runners: HashMap::new(),
+            runners: Arc::new(DashMap::new()),
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
@@ -187,7 +187,7 @@ impl ShardManager {
     pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {shard_id}");
 
-        if let Some((_, tx)) = self.runners.remove(&shard_id) {
+        if let Some((_, (_, tx))) = self.runners.remove(&shard_id) {
             if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Restart) {
                 warn!("Failed to send restart signal to shard {shard_id}: {why:?}");
             }
@@ -203,7 +203,7 @@ impl ShardManager {
     pub fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
-        if let Some((_, tx)) = self.runners.remove(&shard_id) {
+        if let Some((_, (_, tx))) = self.runners.remove(&shard_id) {
             if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Shutdown(code)) {
                 warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
             }
@@ -263,18 +263,13 @@ impl ShardManager {
         let cloned_http = Arc::clone(&self.http);
         shard.set_application_id_callback(move |id| cloned_http.set_application_id(id));
 
-        let runner_info = Arc::new(Mutex::new(ShardRunnerInfo {
-            latency: None,
-            stage: ConnectionStage::Disconnected,
-        }));
-
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
             event_handler: self.event_handler.clone(),
             raw_event_handler: self.raw_event_handler.clone(),
             #[cfg(feature = "framework")]
             framework: self.framework.get().cloned(),
-            runner_info: Arc::clone(&runner_info),
+            runners: Arc::clone(&self.runners),
             manager_tx: self.manager_tx.clone(),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
@@ -283,6 +278,11 @@ impl ShardManager {
             cache: Arc::clone(&self.cache),
             http: Arc::clone(&self.http),
         });
+
+        let runner_info = ShardRunnerInfo {
+            latency: None,
+            stage: ConnectionStage::Disconnected,
+        };
 
         self.runners.insert(shard_id, (runner_info, runner.runner_tx()));
 
@@ -305,17 +305,7 @@ impl ShardManager {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     #[must_use]
     pub fn shards_instantiated(&self) -> Vec<ShardId> {
-        self.runners.keys().copied().collect()
-    }
-
-    /// Returns the [`ShardRunnerInfo`] corresponding to each running shard.
-    ///
-    /// Note that the shard runner also holds a copy of its info, which is why each entry is
-    /// wrapped in `Arc<Mutex<T>>`.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    #[must_use]
-    pub fn runner_info(&self) -> HashMap<ShardId, Arc<Mutex<ShardRunnerInfo>>> {
-        self.runners.iter().map(|(&id, (runner, _))| (id, Arc::clone(runner))).collect()
+        self.runners.iter().map(|entries| *entries.key()).collect()
     }
 
     /// Returns the gateway intents used for this gateway connection.
@@ -334,7 +324,8 @@ impl Drop for ShardManager {
     fn drop(&mut self) {
         info!("Shutting down all shards");
 
-        for (shard_id, (_, tx)) in self.runners.drain() {
+        for entry in self.runners.iter() {
+            let (shard_id, (_, tx)) = entry.pair();
             info!("Shutting down shard {}", shard_id);
             if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Shutdown(1000)) {
                 warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
