@@ -7,8 +7,7 @@
 //!
 //! This isn't particularly useful for small bots, but is useful for large bots that may need to
 //! split load on separate VPSs or dedicated servers. Additionally, Discord requires that there be
-//! at least one shard for every
-//! 2500 guilds that a bot is on.
+//! at least one shard for every 2500 guilds that a bot is on.
 //!
 //! For the purposes of this example, we'll print the current statuses of the two shards to the
 //! terminal every 30 seconds. This includes the ID of the shard, the current connection stage,
@@ -56,22 +55,19 @@ async fn main() {
     let mut client =
         Client::builder(token, intents).event_handler(Handler).await.expect("Err creating client");
 
-    // Here we get a HashMap of of the shards' status that we move into a new thread. A separate
-    // tokio task holds the ownership to each entry, so each one will require acquiring a lock
-    // before reading.
-    let runners = client.shard_manager.runner_info();
+    // Here we get a DashMap of of the shards' status that we move into a new thread.
+    let runners = client.shard_manager.runners.clone();
 
     tokio::spawn(async move {
         loop {
             sleep(Duration::from_secs(30)).await;
 
-            for (id, runner) in &runners {
-                if let Ok(runner) = runner.lock() {
-                    println!(
-                        "Shard ID {} is {} with a latency of {:?}",
-                        id, runner.stage, runner.latency,
-                    );
-                }
+            for entry in runners.iter() {
+                let (id, (runner, _)) = entry.pair();
+                println!(
+                    "Shard ID {} is {} with a latency of {:?}",
+                    id, runner.stage, runner.latency,
+                );
             }
         }
     });
