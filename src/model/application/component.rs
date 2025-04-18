@@ -62,7 +62,7 @@ pub enum Component {
     Separator(Separator),
     File(FileComponent),
     Container(Container),
-    Unknown,
+    Unknown(u8),
     // always update the macro below.
 }
 
@@ -75,6 +75,8 @@ impl<'de> Deserialize<'de> for Component {
     where
         D: Deserializer<'de>,
     {
+        use serde_json::value::RawValue;
+
         #[derive(Deserialize)]
         struct ComponentRaw {
             #[serde(rename = "type")]
@@ -104,11 +106,8 @@ impl<'de> Deserialize<'de> for Component {
             ComponentType::Separator => Deserialize::deserialize(value).map(Component::Separator),
             ComponentType::File => Deserialize::deserialize(value).map(Component::File),
             ComponentType::Container => Deserialize::deserialize(value).map(Component::Container),
-            // TODO: maybe just not include it so the deserialization doesn't explode.
-            // With all new component types right now, the ENTIRE message won't deserialize.
-            // I need to do other stuff in other places too so that its as resilent as possible, it
-            // should not die when discord adds new stuff.
-            _ => Err(DeError::custom("Unknown component type")),
+            ComponentType::Thumbnail => Deserialize::deserialize(value).map(Component::Thumbnail),
+            ComponentType(i) => Ok(Component::Unknown(i)),
         }
         .map_err(DeError::custom)
     }
@@ -157,18 +156,7 @@ pub struct Thumbnail {
     pub spoiler: Option<bool>,
 }
 
-/// An abstraction over a resolved and unresolved unfurled media item.
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-#[serde(untagged)]
-#[cfg(feature = "unstable")]
-pub enum MediaItem {
-    Resolved(ResolvedUnfurledMediaItem),
-    Unresolved(UnfurledMediaItem),
-}
-
-/// An unfurled media item, stores the url to the item.
+/// An unfurled media item.
 ///
 /// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -176,18 +164,6 @@ pub enum MediaItem {
 #[non_exhaustive]
 #[cfg(feature = "unstable")]
 pub struct UnfurledMediaItem {
-    /// The url of this item.
-    pub url: FixedString<u16>,
-}
-
-/// A resolved unfurled media item, with extra metadata added by Discord.
-///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-#[cfg(feature = "unstable")]
-pub struct ResolvedUnfurledMediaItem {
     /// The url of this item.
     pub url: FixedString<u16>,
     /// The proxied discord url.
