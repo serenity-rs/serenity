@@ -242,6 +242,7 @@ where
 
 // Custom deserialize function to deserialize components safely without knocking the whole message
 // out when new components are found but not supported.
+#[cfg(not(feature = "unstable"))]
 pub fn deserialize_components<'de, D>(deserializer: D) -> Result<FixedArray<ActionRow>, D::Error>
 where
     D: Deserializer<'de>,

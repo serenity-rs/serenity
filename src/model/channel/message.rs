@@ -14,7 +14,9 @@ use crate::constants;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
-use crate::model::utils::{StrOrInt, deserialize_components, discord_colours};
+#[cfg(not(feature = "unstable"))]
+use crate::model::utils::deserialize_components;
+use crate::model::utils::{StrOrInt, discord_colours};
 
 /// A representation of a message over a guild's text channel, a group, or a private channel.
 ///
