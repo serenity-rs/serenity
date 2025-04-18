@@ -3,6 +3,7 @@ use std::fmt;
 use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
 use serde_cow::CowStr;
+#[cfg(not(feature = "unstable"))]
 use serde_json::value::RawValue;
 use small_fixed_array::FixedString;
 
