@@ -5,7 +5,6 @@ use serde::Serialize;
 use crate::builder::EditGuild;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::icon_url;
@@ -348,7 +347,7 @@ impl PartialGuild {
 impl<'de> Deserialize<'de> for PartialGuildGeneratedOriginal {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
-        lending_for_each!(guild.roles.iter_mut(), |r| r.guild_id = guild.id);
+        guild.roles.iter_mut().for_each(|r| r.guild_id = guild.id);
         Ok(guild)
     }
 }
