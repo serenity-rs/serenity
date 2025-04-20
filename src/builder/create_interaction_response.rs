@@ -131,7 +131,7 @@ impl CreateInteractionResponse<'_> {
         let files = match &mut self {
             CreateInteractionResponse::Message(msg)
             | CreateInteractionResponse::Defer(msg)
-            | CreateInteractionResponse::UpdateMessage(msg) => msg.attachments.take_files(),
+            | CreateInteractionResponse::UpdateMessage(msg) => msg.attachments.new_attachments(),
             _ => Vec::new(),
         };
 
