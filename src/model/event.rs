@@ -9,7 +9,6 @@ use serde_json::value::RawValue;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 use crate::constants::Opcode;
-use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
 
 /// Requires no gateway intents.
@@ -167,10 +166,10 @@ pub struct GuildCreateEvent {
 impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild: Guild = Guild::deserialize(deserializer)?;
-        lending_for_each!(guild.channels.iter_mut(), |x| x.base.guild_id = guild.id);
-        lending_for_each!(guild.threads.iter_mut(), |x| x.base.guild_id = guild.id);
-        lending_for_each!(guild.members.iter_mut(), |x| x.guild_id = guild.id);
-        lending_for_each!(guild.roles.iter_mut(), |x| x.guild_id = guild.id);
+        guild.channels.iter_mut().for_each(|x| x.base.guild_id = guild.id);
+        guild.threads.iter_mut().for_each(|x| x.base.guild_id = guild.id);
+        guild.members.iter_mut().for_each(|x| x.guild_id = guild.id);
+        guild.roles.iter_mut().for_each(|x| x.guild_id = guild.id);
         Ok(Self {
             guild,
         })
@@ -291,7 +290,7 @@ pub struct GuildMembersChunkEvent {
 impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut event = Self::deserialize(deserializer)?; // calls #[serde(remote)]-generated inherent method
-        lending_for_each!(event.members.iter_mut(), |m| m.guild_id = event.guild_id);
+        event.members.iter_mut().for_each(|m| m.guild_id = event.guild_id);
         Ok(event)
     }
 }
