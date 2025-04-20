@@ -2,17 +2,8 @@ use serde::Serialize;
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    CreateChannel,
-    CreateCommand,
-    CreateSticker,
-    EditAutoModRule,
-    EditCommandPermissions,
-    EditGuild,
-    EditGuildWelcomeScreen,
-    EditGuildWidget,
-    EditMember,
-    EditRole,
-    EditSticker,
+    CreateChannel, CreateCommand, CreateSticker, EditAutoModRule, EditCommandPermissions,
+    EditGuild, EditGuildWelcomeScreen, EditGuildWidget, EditMember, EditRole, EditSticker,
 };
 #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
 use crate::cache::Cache;

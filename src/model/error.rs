@@ -181,9 +181,7 @@ impl fmt::Display for Error {
             Self::ChannelNotFound => f.write_str("Channel not found in the cache."),
             Self::Hierarchy => f.write_str("Role hierarchy prevents this action."),
             Self::InvalidChannelType => f.write_str("The channel cannot perform the action."),
-            Self::InvalidPermissions {
-                ..
-            } => f.write_str("Invalid permissions."),
+            Self::InvalidPermissions { .. } => f.write_str("Invalid permissions."),
             Self::InvalidUser => f.write_str("The current user cannot perform the action."),
             Self::ItemMissing => f.write_str("The required item is missing from the cache."),
             Self::WrongGuild => f.write_str("Provided member or channel is from the wrong guild."),

@@ -4,20 +4,9 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    Builder,
-    CreateAttachment,
-    CreateForumPost,
-    CreateInvite,
-    CreateMessage,
-    CreateStageInstance,
-    CreateThread,
-    CreateWebhook,
-    EditChannel,
-    EditMessage,
-    EditStageInstance,
-    EditThread,
-    EditVoiceState,
-    GetMessages,
+    Builder, CreateAttachment, CreateForumPost, CreateInvite, CreateMessage, CreateStageInstance,
+    CreateThread, CreateWebhook, EditChannel, EditMessage, EditStageInstance, EditThread,
+    EditVoiceState, GetMessages,
 };
 #[cfg(feature = "cache")]
 use crate::cache::{self, Cache};

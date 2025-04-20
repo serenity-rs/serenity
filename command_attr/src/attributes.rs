@@ -61,12 +61,7 @@ pub struct Values {
 impl Values {
     #[inline]
     pub fn new(name: Ident, kind: ValueKind, literals: Vec<Lit>, span: Span) -> Self {
-        Values {
-            name,
-            literals,
-            kind,
-            span,
-        }
+        Values { name, literals, kind, span }
     }
 }
 

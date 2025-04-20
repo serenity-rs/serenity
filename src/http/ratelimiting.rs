@@ -410,12 +410,7 @@ impl Ratelimit {
 
 impl Default for Ratelimit {
     fn default() -> Self {
-        Self {
-            limit: i64::MAX,
-            remaining: i64::MAX,
-            reset: None,
-            reset_after: None,
-        }
+        Self { limit: i64::MAX, remaining: i64::MAX, reset: None, reset_after: None }
     }
 }
 

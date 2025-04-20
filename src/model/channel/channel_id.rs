@@ -6,18 +6,8 @@ use futures::stream::Stream;
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    Builder,
-    CreateAttachment,
-    CreateForumPost,
-    CreateInvite,
-    CreateMessage,
-    CreateStageInstance,
-    CreateThread,
-    CreateWebhook,
-    EditChannel,
-    EditMessage,
-    EditStageInstance,
-    EditThread,
+    Builder, CreateAttachment, CreateForumPost, CreateInvite, CreateMessage, CreateStageInstance,
+    CreateThread, CreateWebhook, EditChannel, EditMessage, EditStageInstance, EditThread,
     GetMessages,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -1164,13 +1154,7 @@ pub struct MessagesIter<H: AsRef<Http>> {
 #[cfg(feature = "model")]
 impl<H: AsRef<Http>> MessagesIter<H> {
     fn new(http: H, channel_id: ChannelId) -> MessagesIter<H> {
-        MessagesIter {
-            http,
-            channel_id,
-            buffer: Vec::new(),
-            before: None,
-            tried_fetch: false,
-        }
+        MessagesIter { http, channel_id, buffer: Vec::new(), before: None, tried_fetch: false }
     }
 
     /// Fills the `self.buffer` cache with [`Message`]s.

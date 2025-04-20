@@ -291,14 +291,10 @@ mod tests {
         let id = GuildId::new(17_5928_8472_9911_7063);
         assert_json(&id, json!("175928847299117063"));
 
-        let s = S {
-            id: InnerId(NonZeroU64::new(17_5928_8472_9911_7063).unwrap()),
-        };
+        let s = S { id: InnerId(NonZeroU64::new(17_5928_8472_9911_7063).unwrap()) };
         assert_json(&s, json!({"id": "175928847299117063"}));
 
-        let s = Opt {
-            id: Some(GuildId::new(17_5928_8472_9911_7063)),
-        };
+        let s = Opt { id: Some(GuildId::new(17_5928_8472_9911_7063)) };
         assert_json(&s, json!({"id": "175928847299117063"}));
     }
 }

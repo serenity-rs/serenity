@@ -13,12 +13,7 @@ use typemap_rev::TypeMap;
 #[cfg(feature = "voice")]
 use super::VoiceGatewayManager;
 use super::{
-    ShardId,
-    ShardManager,
-    ShardMessenger,
-    ShardQueuerMessage,
-    ShardRunner,
-    ShardRunnerInfo,
+    ShardId, ShardManager, ShardMessenger, ShardQueuerMessage, ShardRunner, ShardRunnerInfo,
     ShardRunnerOptions,
 };
 #[cfg(feature = "cache")]
@@ -30,7 +25,7 @@ use crate::gateway::{ConnectionStage, PresenceData, Shard, ShardRunnerMessage};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::{GatewayIntents, ShardInfo};
+use crate::model::gateway::ShardInfo;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 
@@ -76,7 +71,6 @@ pub struct ShardQueuer {
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
-    pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }
 
@@ -170,7 +164,6 @@ impl ShardQueuer {
             Arc::clone(&self.ws_url),
             self.http.token(),
             shard_info,
-            self.intents,
             self.presence.clone(),
         )
         .await?;

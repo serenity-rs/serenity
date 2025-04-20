@@ -5,21 +5,9 @@ use futures::stream::Stream;
 
 #[cfg(feature = "model")]
 use crate::builder::{
-    AddMember,
-    Builder,
-    CreateChannel,
-    CreateCommand,
-    CreateScheduledEvent,
-    CreateSticker,
-    EditAutoModRule,
-    EditCommandPermissions,
-    EditGuild,
-    EditGuildWelcomeScreen,
-    EditGuildWidget,
-    EditMember,
-    EditRole,
-    EditScheduledEvent,
-    EditSticker,
+    AddMember, Builder, CreateChannel, CreateCommand, CreateScheduledEvent, CreateSticker,
+    EditAutoModRule, EditCommandPermissions, EditGuild, EditGuildWelcomeScreen, EditGuildWidget,
+    EditMember, EditRole, EditScheduledEvent, EditSticker,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
@@ -272,10 +260,7 @@ impl GuildId {
             delete_message_seconds: u32,
         }
 
-        let map = BulkBan {
-            user_ids,
-            delete_message_seconds,
-        };
+        let map = BulkBan { user_ids, delete_message_seconds };
 
         http.bulk_ban_users(self, &map, reason).await
     }
@@ -1781,13 +1766,7 @@ pub struct MembersIter<H: AsRef<Http>> {
 #[cfg(feature = "model")]
 impl<H: AsRef<Http>> MembersIter<H> {
     fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
-        MembersIter {
-            guild_id,
-            http,
-            buffer: Vec::new(),
-            after: None,
-            tried_fetch: false,
-        }
+        MembersIter { guild_id, http, buffer: Vec::new(), after: None, tried_fetch: false }
     }
 
     /// Fills the `self.buffer` cache of Members.

@@ -47,9 +47,7 @@ impl Default for CreatePoll<NeedsQuestion> {
         // Producing dummy values is okay as we must transition through all `Stage`s before firing,
         // which fills in the values with real values.
         Self {
-            question: CreatePollMedia {
-                text: String::default(),
-            },
+            question: CreatePollMedia { text: String::default() },
             answers: Vec::default(),
             duration: u8::default(),
             allow_multiselect: false,
@@ -86,9 +84,7 @@ impl CreatePoll<NeedsQuestion> {
     /// Sets the question to be polled.
     pub fn question(self, text: impl Into<String>) -> CreatePoll<NeedsAnswers> {
         CreatePoll {
-            question: CreatePollMedia {
-                text: text.into(),
-            },
+            question: CreatePollMedia { text: text.into() },
             answers: self.answers,
             duration: self.duration,
             allow_multiselect: self.allow_multiselect,

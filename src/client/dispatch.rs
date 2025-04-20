@@ -98,33 +98,23 @@ fn update_cache_with_event(
 ) -> Option<(FullEvent, Option<FullEvent>)> {
     let mut extra_event = None;
     let event = match event {
-        Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
-            permission: event.permission,
+        Event::CommandPermissionsUpdate(event) => {
+            FullEvent::CommandPermissionsUpdate { permission: event.permission }
         },
-        Event::AutoModRuleCreate(event) => FullEvent::AutoModRuleCreate {
-            rule: event.rule,
-        },
-        Event::AutoModRuleUpdate(event) => FullEvent::AutoModRuleUpdate {
-            rule: event.rule,
-        },
-        Event::AutoModRuleDelete(event) => FullEvent::AutoModRuleDelete {
-            rule: event.rule,
-        },
-        Event::AutoModActionExecution(event) => FullEvent::AutoModActionExecution {
-            execution: event.execution,
+        Event::AutoModRuleCreate(event) => FullEvent::AutoModRuleCreate { rule: event.rule },
+        Event::AutoModRuleUpdate(event) => FullEvent::AutoModRuleUpdate { rule: event.rule },
+        Event::AutoModRuleDelete(event) => FullEvent::AutoModRuleDelete { rule: event.rule },
+        Event::AutoModActionExecution(event) => {
+            FullEvent::AutoModActionExecution { execution: event.execution }
         },
         Event::ChannelCreate(mut event) => {
             update_cache!(cache, event);
 
             let channel = event.channel;
             if channel.kind == ChannelType::Category {
-                FullEvent::CategoryCreate {
-                    category: channel,
-                }
+                FullEvent::CategoryCreate { category: channel }
             } else {
-                FullEvent::ChannelCreate {
-                    channel,
-                }
+                FullEvent::ChannelCreate { channel }
             }
         },
         Event::ChannelDelete(mut event) => {
@@ -132,38 +122,25 @@ fn update_cache_with_event(
 
             let channel = event.channel;
             if channel.kind == ChannelType::Category {
-                FullEvent::CategoryDelete {
-                    category: channel,
-                }
+                FullEvent::CategoryDelete { category: channel }
             } else {
-                FullEvent::ChannelDelete {
-                    channel,
-                    messages: cached_messages,
-                }
+                FullEvent::ChannelDelete { channel, messages: cached_messages }
             }
         },
-        Event::ChannelPinsUpdate(event) => FullEvent::ChannelPinsUpdate {
-            pin: event,
-        },
+        Event::ChannelPinsUpdate(event) => FullEvent::ChannelPinsUpdate { pin: event },
         Event::ChannelUpdate(mut event) => {
             let old_channel = if_cache!(event.update(cache));
 
-            FullEvent::ChannelUpdate {
-                old: old_channel,
-                new: event.channel,
-            }
+            FullEvent::ChannelUpdate { old: old_channel, new: event.channel }
         },
-        Event::GuildAuditLogEntryCreate(event) => FullEvent::GuildAuditLogEntryCreate {
-            entry: event.entry,
-            guild_id: event.guild_id,
+        Event::GuildAuditLogEntryCreate(event) => {
+            FullEvent::GuildAuditLogEntryCreate { entry: event.entry, guild_id: event.guild_id }
         },
-        Event::GuildBanAdd(event) => FullEvent::GuildBanAddition {
-            guild_id: event.guild_id,
-            banned_user: event.user,
+        Event::GuildBanAdd(event) => {
+            FullEvent::GuildBanAddition { guild_id: event.guild_id, banned_user: event.user }
         },
-        Event::GuildBanRemove(event) => FullEvent::GuildBanRemoval {
-            guild_id: event.guild_id,
-            unbanned_user: event.user,
+        Event::GuildBanRemove(event) => {
+            FullEvent::GuildBanRemoval { guild_id: event.guild_id, unbanned_user: event.user }
         },
         Event::GuildCreate(mut event) => {
             let is_new = if_cache!(Some(!cache.unavailable_guilds.contains(&event.guild.id)));
@@ -178,42 +155,29 @@ fn update_cache_with_event(
                     let guild_amount =
                         cache.guilds.iter().map(|i| *i.key()).collect::<Vec<GuildId>>();
 
-                    extra_event = Some(FullEvent::CacheReady {
-                        guilds: guild_amount,
-                    });
+                    extra_event = Some(FullEvent::CacheReady { guilds: guild_amount });
                 }
             }
 
-            FullEvent::GuildCreate {
-                guild: event.guild,
-                is_new,
-            }
+            FullEvent::GuildCreate { guild: event.guild, is_new }
         },
         Event::GuildDelete(mut event) => {
             let full = if_cache!(event.update(cache));
 
-            FullEvent::GuildDelete {
-                incomplete: event.guild,
-                full,
-            }
+            FullEvent::GuildDelete { incomplete: event.guild, full }
         },
         Event::GuildEmojisUpdate(mut event) => {
             update_cache!(cache, event);
 
-            FullEvent::GuildEmojisUpdate {
-                guild_id: event.guild_id,
-                current_state: event.emojis,
-            }
+            FullEvent::GuildEmojisUpdate { guild_id: event.guild_id, current_state: event.emojis }
         },
-        Event::GuildIntegrationsUpdate(event) => FullEvent::GuildIntegrationsUpdate {
-            guild_id: event.guild_id,
+        Event::GuildIntegrationsUpdate(event) => {
+            FullEvent::GuildIntegrationsUpdate { guild_id: event.guild_id }
         },
         Event::GuildMemberAdd(mut event) => {
             update_cache!(cache, event);
 
-            FullEvent::GuildMemberAddition {
-                new_member: event.member,
-            }
+            FullEvent::GuildMemberAddition { new_member: event.member }
         },
         Event::GuildMemberRemove(mut event) => {
             let member = if_cache!(event.update(cache));
@@ -231,25 +195,17 @@ fn update_cache_with_event(
                 guild.and_then(|g| g.members.get(&event.user.id).cloned())
             });
 
-            FullEvent::GuildMemberUpdate {
-                old_if_available: before,
-                new: after,
-                event,
-            }
+            FullEvent::GuildMemberUpdate { old_if_available: before, new: after, event }
         },
         Event::GuildMembersChunk(mut event) => {
             update_cache!(cache, event);
 
-            FullEvent::GuildMembersChunk {
-                chunk: event,
-            }
+            FullEvent::GuildMembersChunk { chunk: event }
         },
         Event::GuildRoleCreate(mut event) => {
             update_cache!(cache, event);
 
-            FullEvent::GuildRoleCreate {
-                new: event.role,
-            }
+            FullEvent::GuildRoleCreate { new: event.role }
         },
         Event::GuildRoleDelete(mut event) => {
             let role = if_cache!(event.update(cache));
@@ -263,10 +219,7 @@ fn update_cache_with_event(
         Event::GuildRoleUpdate(mut event) => {
             let before = if_cache!(event.update(cache));
 
-            FullEvent::GuildRoleUpdate {
-                old_data_if_available: before,
-                new: event.role,
-            }
+            FullEvent::GuildRoleUpdate { old_data_if_available: before, new: event.role }
         },
         Event::GuildStickersUpdate(mut event) => {
             update_cache!(cache, event);
@@ -279,23 +232,14 @@ fn update_cache_with_event(
         Event::GuildUpdate(event) => {
             let before = if_cache!(cache.guild(event.guild.id).map(|g| g.clone()));
 
-            FullEvent::GuildUpdate {
-                old_data_if_available: before,
-                new_data: event.guild,
-            }
+            FullEvent::GuildUpdate { old_data_if_available: before, new_data: event.guild }
         },
-        Event::InviteCreate(event) => FullEvent::InviteCreate {
-            data: event,
-        },
-        Event::InviteDelete(event) => FullEvent::InviteDelete {
-            data: event,
-        },
+        Event::InviteCreate(event) => FullEvent::InviteCreate { data: event },
+        Event::InviteDelete(event) => FullEvent::InviteDelete { data: event },
         Event::MessageCreate(mut event) => {
             update_cache!(cache, event);
 
-            FullEvent::Message {
-                new_message: event.message,
-            }
+            FullEvent::Message { new_message: event.message }
         },
         Event::MessageDeleteBulk(event) => FullEvent::MessageDeleteBulk {
             channel_id: event.channel_id,
@@ -311,35 +255,25 @@ fn update_cache_with_event(
             let before = if_cache!(event.update(cache));
             let after = if_cache!(cache.message(event.channel_id, event.id).map(|m| m.clone()));
 
-            FullEvent::MessageUpdate {
-                old_if_available: before,
-                new: after,
-                event,
-            }
+            FullEvent::MessageUpdate { old_if_available: before, new: after, event }
         },
         #[allow(deprecated)]
-        Event::PresencesReplace(event) => FullEvent::PresenceReplace {
-            presences: event.presences,
-        },
+        Event::PresencesReplace(event) => FullEvent::PresenceReplace { presences: event.presences },
         Event::PresenceUpdate(mut event) => {
             update_cache!(cache, event);
 
-            FullEvent::PresenceUpdate {
-                new_data: event.presence,
-            }
+            FullEvent::PresenceUpdate { new_data: event.presence }
         },
-        Event::ReactionAdd(event) => FullEvent::ReactionAdd {
-            add_reaction: event.reaction,
-        },
-        Event::ReactionRemove(event) => FullEvent::ReactionRemove {
-            removed_reaction: event.reaction,
+        Event::ReactionAdd(event) => FullEvent::ReactionAdd { add_reaction: event.reaction },
+        Event::ReactionRemove(event) => {
+            FullEvent::ReactionRemove { removed_reaction: event.reaction }
         },
         Event::ReactionRemoveAll(event) => FullEvent::ReactionRemoveAll {
             channel_id: event.channel_id,
             removed_from_message_id: event.message_id,
         },
-        Event::ReactionRemoveEmoji(event) => FullEvent::ReactionRemoveEmoji {
-            removed_reactions: event.reaction,
+        Event::ReactionRemoveEmoji(event) => {
+            FullEvent::ReactionRemoveEmoji { removed_reactions: event.reaction }
         },
         Event::Ready(mut event) => {
             update_cache!(cache, event);
@@ -352,22 +286,14 @@ fn update_cache_with_event(
                     let total = shards.total;
                     drop(shards);
 
-                    extra_event = Some(FullEvent::ShardsReady {
-                        total_shards: total,
-                    });
+                    extra_event = Some(FullEvent::ShardsReady { total_shards: total });
                 }
             }
 
-            FullEvent::Ready {
-                data_about_bot: event.ready,
-            }
+            FullEvent::Ready { data_about_bot: event.ready }
         },
-        Event::Resumed(event) => FullEvent::Resume {
-            event,
-        },
-        Event::TypingStart(event) => FullEvent::TypingStart {
-            event,
-        },
+        Event::Resumed(event) => FullEvent::Resume { event },
+        Event::TypingStart(event) => FullEvent::TypingStart { event },
         Event::Unknown(event) => {
             debug!("An unknown event was received: {event:?}");
             return None;
@@ -375,21 +301,13 @@ fn update_cache_with_event(
         Event::UserUpdate(mut event) => {
             let before = if_cache!(event.update(cache));
 
-            FullEvent::UserUpdate {
-                old_data: before,
-                new: event.current_user,
-            }
+            FullEvent::UserUpdate { old_data: before, new: event.current_user }
         },
-        Event::VoiceServerUpdate(event) => FullEvent::VoiceServerUpdate {
-            event,
-        },
+        Event::VoiceServerUpdate(event) => FullEvent::VoiceServerUpdate { event },
         Event::VoiceStateUpdate(mut event) => {
             let before = if_cache!(event.update(cache));
 
-            FullEvent::VoiceStateUpdate {
-                old: before,
-                new: event.voice_state,
-            }
+            FullEvent::VoiceStateUpdate { old: before, new: event.voice_state }
         },
         Event::VoiceChannelStatusUpdate(mut event) => {
             let old = if_cache!(event.update(cache));
@@ -406,91 +324,77 @@ fn update_cache_with_event(
             guild_id: event.guild_id,
             belongs_to_channel_id: event.channel_id,
         },
-        Event::InteractionCreate(event) => FullEvent::InteractionCreate {
-            interaction: event.interaction,
+        Event::InteractionCreate(event) => {
+            FullEvent::InteractionCreate { interaction: event.interaction }
         },
-        Event::IntegrationCreate(event) => FullEvent::IntegrationCreate {
-            integration: event.integration,
+        Event::IntegrationCreate(event) => {
+            FullEvent::IntegrationCreate { integration: event.integration }
         },
-        Event::IntegrationUpdate(event) => FullEvent::IntegrationUpdate {
-            integration: event.integration,
+        Event::IntegrationUpdate(event) => {
+            FullEvent::IntegrationUpdate { integration: event.integration }
         },
         Event::IntegrationDelete(event) => FullEvent::IntegrationDelete {
             integration_id: event.id,
             guild_id: event.guild_id,
             application_id: event.application_id,
         },
-        Event::StageInstanceCreate(event) => FullEvent::StageInstanceCreate {
-            stage_instance: event.stage_instance,
+        Event::StageInstanceCreate(event) => {
+            FullEvent::StageInstanceCreate { stage_instance: event.stage_instance }
         },
-        Event::StageInstanceUpdate(event) => FullEvent::StageInstanceUpdate {
-            stage_instance: event.stage_instance,
+        Event::StageInstanceUpdate(event) => {
+            FullEvent::StageInstanceUpdate { stage_instance: event.stage_instance }
         },
-        Event::StageInstanceDelete(event) => FullEvent::StageInstanceDelete {
-            stage_instance: event.stage_instance,
+        Event::StageInstanceDelete(event) => {
+            FullEvent::StageInstanceDelete { stage_instance: event.stage_instance }
         },
         Event::ThreadCreate(mut event) => {
             update_cache!(cache, event);
 
-            FullEvent::ThreadCreate {
-                thread: event.thread,
-            }
+            FullEvent::ThreadCreate { thread: event.thread }
         },
         Event::ThreadUpdate(mut event) => {
             let old = if_cache!(event.update(cache));
 
-            FullEvent::ThreadUpdate {
-                old,
-                new: event.thread,
-            }
+            FullEvent::ThreadUpdate { old, new: event.thread }
         },
         Event::ThreadDelete(mut event) => {
             let full_thread_data = if_cache!(event.update(cache));
 
-            FullEvent::ThreadDelete {
-                thread: event.thread,
-                full_thread_data,
-            }
+            FullEvent::ThreadDelete { thread: event.thread, full_thread_data }
         },
-        Event::ThreadListSync(event) => FullEvent::ThreadListSync {
-            thread_list_sync: event,
+        Event::ThreadListSync(event) => FullEvent::ThreadListSync { thread_list_sync: event },
+        Event::ThreadMemberUpdate(event) => {
+            FullEvent::ThreadMemberUpdate { thread_member: event.member }
         },
-        Event::ThreadMemberUpdate(event) => FullEvent::ThreadMemberUpdate {
-            thread_member: event.member,
+        Event::ThreadMembersUpdate(event) => {
+            FullEvent::ThreadMembersUpdate { thread_members_update: event }
         },
-        Event::ThreadMembersUpdate(event) => FullEvent::ThreadMembersUpdate {
-            thread_members_update: event,
+        Event::GuildScheduledEventCreate(event) => {
+            FullEvent::GuildScheduledEventCreate { event: event.event }
         },
-        Event::GuildScheduledEventCreate(event) => FullEvent::GuildScheduledEventCreate {
-            event: event.event,
+        Event::GuildScheduledEventUpdate(event) => {
+            FullEvent::GuildScheduledEventUpdate { event: event.event }
         },
-        Event::GuildScheduledEventUpdate(event) => FullEvent::GuildScheduledEventUpdate {
-            event: event.event,
+        Event::GuildScheduledEventDelete(event) => {
+            FullEvent::GuildScheduledEventDelete { event: event.event }
         },
-        Event::GuildScheduledEventDelete(event) => FullEvent::GuildScheduledEventDelete {
-            event: event.event,
+        Event::GuildScheduledEventUserAdd(event) => {
+            FullEvent::GuildScheduledEventUserAdd { subscribed: event }
         },
-        Event::GuildScheduledEventUserAdd(event) => FullEvent::GuildScheduledEventUserAdd {
-            subscribed: event,
+        Event::GuildScheduledEventUserRemove(event) => {
+            FullEvent::GuildScheduledEventUserRemove { unsubscribed: event }
         },
-        Event::GuildScheduledEventUserRemove(event) => FullEvent::GuildScheduledEventUserRemove {
-            unsubscribed: event,
+        Event::EntitlementCreate(event) => {
+            FullEvent::EntitlementCreate { entitlement: event.entitlement }
         },
-        Event::EntitlementCreate(event) => FullEvent::EntitlementCreate {
-            entitlement: event.entitlement,
+        Event::EntitlementUpdate(event) => {
+            FullEvent::EntitlementUpdate { entitlement: event.entitlement }
         },
-        Event::EntitlementUpdate(event) => FullEvent::EntitlementUpdate {
-            entitlement: event.entitlement,
+        Event::EntitlementDelete(event) => {
+            FullEvent::EntitlementDelete { entitlement: event.entitlement }
         },
-        Event::EntitlementDelete(event) => FullEvent::EntitlementDelete {
-            entitlement: event.entitlement,
-        },
-        Event::MessagePollVoteAdd(event) => FullEvent::MessagePollVoteAdd {
-            event,
-        },
-        Event::MessagePollVoteRemove(event) => FullEvent::MessagePollVoteRemove {
-            event,
-        },
+        Event::MessagePollVoteAdd(event) => FullEvent::MessagePollVoteAdd { event },
+        Event::MessagePollVoteRemove(event) => FullEvent::MessagePollVoteRemove { event },
     };
 
     Some((event, extra_event))

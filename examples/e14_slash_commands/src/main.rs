@@ -49,14 +49,17 @@ impl EventHandler for Handler {
         );
 
         let commands = guild_id
-            .set_commands(&ctx.http, vec![
-                commands::ping::register(),
-                commands::id::register(),
-                commands::welcome::register(),
-                commands::numberinput::register(),
-                commands::attachmentinput::register(),
-                commands::modal::register(),
-            ])
+            .set_commands(
+                &ctx.http,
+                vec![
+                    commands::ping::register(),
+                    commands::id::register(),
+                    commands::welcome::register(),
+                    commands::numberinput::register(),
+                    commands::attachmentinput::register(),
+                    commands::modal::register(),
+                ],
+            )
             .await;
 
         println!("I now have the following guild slash commands: {commands:#?}");

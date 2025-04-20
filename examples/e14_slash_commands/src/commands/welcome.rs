@@ -25,10 +25,11 @@ pub fn register() -> CreateCommand {
                         "Willkommen auf unserem coolen Server! Frag mich, falls du Hilfe brauchst",
                     )],
                 )
-                .add_string_choice_localized("Hey, do you want a coffee?", "coffee", [(
-                    "de",
-                    "Hey, willst du einen Kaffee?",
-                )])
+                .add_string_choice_localized(
+                    "Hey, do you want a coffee?",
+                    "coffee",
+                    [("de", "Hey, willst du einen Kaffee?")],
+                )
                 .add_string_choice_localized(
                     "Welcome to the club, you're now a good person. Well, I hope.",
                     "club",

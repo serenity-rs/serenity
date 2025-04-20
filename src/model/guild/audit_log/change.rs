@@ -2,12 +2,8 @@ use crate::json::Value;
 use crate::model::channel::PermissionOverwrite;
 use crate::model::guild::automod::{Action, EventType, TriggerMetadata, TriggerType};
 use crate::model::guild::{
-    AfkTimeout,
-    DefaultMessageNotificationLevel,
-    ExplicitContentFilter,
-    MfaLevel,
-    SystemChannelFlags,
-    VerificationLevel,
+    AfkTimeout, DefaultMessageNotificationLevel, ExplicitContentFilter, MfaLevel,
+    SystemChannelFlags, VerificationLevel,
 };
 use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, UserId};
 use crate::model::misc::ImageHash;
@@ -276,24 +272,16 @@ mod tests {
 
     #[test]
     fn afk_channel_id_variant() {
-        let value = Change::AfkChannelId {
-            old: Some(ChannelId::new(1)),
-            new: Some(ChannelId::new(2)),
-        };
+        let value =
+            Change::AfkChannelId { old: Some(ChannelId::new(1)), new: Some(ChannelId::new(2)) };
         assert_json(&value, json!({"key": "afk_channel_id", "old_value": "1", "new_value": "2"}));
     }
 
     #[test]
     fn skip_serializing_if_none() {
-        let value = Change::AfkChannelId {
-            old: None,
-            new: Some(ChannelId::new(2)),
-        };
+        let value = Change::AfkChannelId { old: None, new: Some(ChannelId::new(2)) };
         assert_json(&value, json!({"key": "afk_channel_id", "new_value": "2"}));
-        let value = Change::AfkChannelId {
-            old: Some(ChannelId::new(1)),
-            new: None,
-        };
+        let value = Change::AfkChannelId { old: Some(ChannelId::new(1)), new: None };
         assert_json(&value, json!({"key": "afk_channel_id", "old_value": "1"}));
     }
 

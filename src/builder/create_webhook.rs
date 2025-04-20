@@ -23,11 +23,7 @@ pub struct CreateWebhook<'a> {
 impl<'a> CreateWebhook<'a> {
     /// Creates a new builder with the given webhook name, leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
-        Self {
-            name: name.into(),
-            avatar: None,
-            audit_log_reason: None,
-        }
+        Self { name: name.into(), avatar: None, audit_log_reason: None }
     }
 
     /// Set the webhook's name, replacing the current value as set in [`Self::new`].

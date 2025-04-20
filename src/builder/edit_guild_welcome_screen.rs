@@ -92,11 +92,7 @@ pub struct CreateGuildWelcomeChannel(GuildWelcomeChannel);
 
 impl CreateGuildWelcomeChannel {
     pub fn new(channel_id: ChannelId, description: String) -> Self {
-        Self(GuildWelcomeChannel {
-            channel_id,
-            description,
-            emoji: None,
-        })
+        Self(GuildWelcomeChannel { channel_id, description, emoji: None })
     }
 
     /// The Id of the channel to show.

@@ -125,11 +125,7 @@ impl EmbedField {
     }
 
     pub(crate) const fn new_(name: String, value: String, inline: bool) -> Self {
-        Self {
-            name,
-            value,
-            inline,
-        }
+        Self { name, value, inline }
     }
 }
 

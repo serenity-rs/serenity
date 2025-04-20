@@ -107,9 +107,7 @@ mod tests {
             opt: Option<u64>,
         }
 
-        let value = T {
-            opt: Some(12345),
-        };
+        let value = T { opt: Some(12345) };
 
         assert_json(&value, json!({"opt": "12345"}));
     }

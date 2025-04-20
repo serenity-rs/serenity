@@ -22,11 +22,7 @@ pub struct WithWhiteSpace {
 impl Default for WithWhiteSpace {
     /// Impose the default settings to (false, true, true).
     fn default() -> Self {
-        WithWhiteSpace {
-            prefixes: false,
-            groups: true,
-            commands: true,
-        }
+        WithWhiteSpace { prefixes: false, groups: true, commands: true }
     }
 }
 
@@ -34,32 +30,21 @@ impl From<bool> for WithWhiteSpace {
     /// Impose the prefix setting.
     fn from(b: bool) -> Self {
         // Assume that they want to do this for prefixes
-        WithWhiteSpace {
-            prefixes: b,
-            ..Default::default()
-        }
+        WithWhiteSpace { prefixes: b, ..Default::default() }
     }
 }
 
 impl From<(bool, bool)> for WithWhiteSpace {
     /// Impose the prefix and group prefix settings.
     fn from((prefixes, groups): (bool, bool)) -> Self {
-        WithWhiteSpace {
-            prefixes,
-            groups,
-            ..Default::default()
-        }
+        WithWhiteSpace { prefixes, groups, ..Default::default() }
     }
 }
 
 impl From<(bool, bool, bool)> for WithWhiteSpace {
     /// Impose the prefix, group prefix and command names settings.
     fn from((prefixes, groups, commands): (bool, bool, bool)) -> Self {
-        WithWhiteSpace {
-            prefixes,
-            groups,
-            commands,
-        }
+        WithWhiteSpace { prefixes, groups, commands }
     }
 }
 

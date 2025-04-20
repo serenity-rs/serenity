@@ -219,7 +219,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    /// 
+    ///
     /// Pushing a codeblock without a language:
     /// ```rust
     /// use serenity::utils::MessageBuilder;
@@ -1128,10 +1128,7 @@ impl std::fmt::Display for Content {
 
 impl<T: Into<String>> From<T> for Content {
     fn from(t: T) -> Content {
-        Content {
-            inner: t.into(),
-            ..Default::default()
-        }
+        Content { inner: t.into(), ..Default::default() }
     }
 }
 

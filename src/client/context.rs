@@ -74,11 +74,7 @@ impl Context {
 
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
     pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u32, http: Arc<Http>) -> Context {
-        Context {
-            shard_id,
-            data,
-            http,
-        }
+        Context { shard_id, data, http }
     }
 
     /// Sets the current user as being [`Online`]. This maintains the current activity.
@@ -341,10 +337,7 @@ impl Context {
             image: &'a str,
         }
 
-        let body = CreateEmoji {
-            name,
-            image,
-        };
+        let body = CreateEmoji { name, image };
 
         self.http.create_application_emoji(&body).await
     }
@@ -360,9 +353,7 @@ impl Context {
             name: &'a str,
         }
 
-        let body = EditEmoji {
-            name,
-        };
+        let body = EditEmoji { name };
 
         self.http.edit_application_emoji(emoji_id, &body).await
     }

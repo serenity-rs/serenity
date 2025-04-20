@@ -188,22 +188,10 @@ mod test {
 
     #[test]
     fn test_mention() {
-        let channel = Channel::Guild(GuildChannel {
-            id: ChannelId::new(4),
-            ..Default::default()
-        });
-        let role = Role {
-            id: RoleId::new(2),
-            ..Default::default()
-        };
-        let user = User {
-            id: UserId::new(6),
-            ..Default::default()
-        };
-        let member = Member {
-            user: user.clone(),
-            ..Default::default()
-        };
+        let channel = Channel::Guild(GuildChannel { id: ChannelId::new(4), ..Default::default() });
+        let role = Role { id: RoleId::new(2), ..Default::default() };
+        let user = User { id: UserId::new(6), ..Default::default() };
+        let member = Member { user: user.clone(), ..Default::default() };
 
         assert_eq!(ChannelId::new(1).mention().to_string(), "<#1>");
         #[cfg(feature = "model")]

@@ -172,25 +172,18 @@ impl Serialize for Trigger {
             },
         };
         match self {
-            Self::Keyword {
-                strings,
-                regex_patterns,
-                allow_list,
-            } => {
+            Self::Keyword { strings, regex_patterns, allow_list } => {
                 trigger.metadata.keyword_filter = Some(strings.clone());
                 trigger.metadata.regex_patterns = Some(regex_patterns.clone());
                 trigger.metadata.allow_list = Some(allow_list.clone());
             },
-            Self::KeywordPreset {
-                presets,
-                allow_list,
-            } => {
+            Self::KeywordPreset { presets, allow_list } => {
                 trigger.metadata.presets = Some(presets.clone());
                 trigger.metadata.allow_list = Some(allow_list.clone());
             },
-            Self::MentionSpam {
-                mention_total_limit,
-            } => trigger.metadata.mention_total_limit = Some(*mention_total_limit),
+            Self::MentionSpam { mention_total_limit } => {
+                trigger.metadata.mention_total_limit = Some(*mention_total_limit)
+            },
             Self::Spam | Self::Unknown(_) => {},
         }
         trigger.serialize(serializer)
@@ -201,16 +194,10 @@ impl Trigger {
     #[must_use]
     pub fn kind(&self) -> TriggerType {
         match self {
-            Self::Keyword {
-                ..
-            } => TriggerType::Keyword,
+            Self::Keyword { .. } => TriggerType::Keyword,
             Self::Spam => TriggerType::Spam,
-            Self::KeywordPreset {
-                ..
-            } => TriggerType::KeywordPreset,
-            Self::MentionSpam {
-                ..
-            } => TriggerType::MentionSpam,
+            Self::KeywordPreset { .. } => TriggerType::KeywordPreset,
+            Self::MentionSpam { .. } => TriggerType::MentionSpam,
             Self::Unknown(unknown) => TriggerType::Unknown(*unknown),
         }
     }
@@ -445,14 +432,9 @@ impl<'de> Deserialize<'de> for Action {
 impl Serialize for Action {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let action = match self.clone() {
-            Action::BlockMessage {
-                custom_message,
-            } => RawAction {
+            Action::BlockMessage { custom_message } => RawAction {
                 kind: ActionType::BlockMessage,
-                metadata: Some(RawActionMetadata {
-                    custom_message,
-                    ..Default::default()
-                }),
+                metadata: Some(RawActionMetadata { custom_message, ..Default::default() }),
             },
             Action::Alert(channel_id) => RawAction {
                 kind: ActionType::Alert,
@@ -468,10 +450,7 @@ impl Serialize for Action {
                     ..Default::default()
                 }),
             },
-            Action::Unknown(n) => RawAction {
-                kind: ActionType::Unknown(n),
-                metadata: None,
-            },
+            Action::Unknown(n) => RawAction { kind: ActionType::Unknown(n), metadata: None },
         };
         action.serialize(serializer)
     }
@@ -481,9 +460,7 @@ impl Action {
     #[must_use]
     pub fn kind(&self) -> ActionType {
         match self {
-            Self::BlockMessage {
-                ..
-            } => ActionType::BlockMessage,
+            Self::BlockMessage { .. } => ActionType::BlockMessage,
             Self::Alert(_) => ActionType::Alert,
             Self::Timeout(_) => ActionType::Timeout,
             Self::Unknown(unknown) => ActionType::Unknown(*unknown),
@@ -532,9 +509,7 @@ mod tests {
         );
 
         assert_json(
-            &Rule {
-                trigger: Trigger::Spam,
-            },
+            &Rule { trigger: Trigger::Spam },
             json!({"trigger_type": 3, "trigger_metadata": {}}),
         );
 
@@ -553,18 +528,12 @@ mod tests {
         );
 
         assert_json(
-            &Rule {
-                trigger: Trigger::MentionSpam {
-                    mention_total_limit: 7,
-                },
-            },
+            &Rule { trigger: Trigger::MentionSpam { mention_total_limit: 7 } },
             json!({"trigger_type": 5, "trigger_metadata": {"mention_total_limit": 7}}),
         );
 
         assert_json(
-            &Rule {
-                trigger: Trigger::Unknown(123),
-            },
+            &Rule { trigger: Trigger::Unknown(123) },
             json!({"trigger_type": 123, "trigger_metadata": {}}),
         );
     }
@@ -572,9 +541,7 @@ mod tests {
     #[test]
     fn action_serde() {
         assert_json(
-            &Action::BlockMessage {
-                custom_message: None,
-            },
+            &Action::BlockMessage { custom_message: None },
             json!({"type": 1, "metadata": {}}),
         );
 

@@ -33,20 +33,9 @@ pub use self::system_channel::*;
 pub use self::welcome_screen::*;
 #[cfg(feature = "model")]
 use crate::builder::{
-    AddMember,
-    CreateChannel,
-    CreateCommand,
-    CreateScheduledEvent,
-    CreateSticker,
-    EditAutoModRule,
-    EditCommandPermissions,
-    EditGuild,
-    EditGuildWelcomeScreen,
-    EditGuildWidget,
-    EditMember,
-    EditRole,
-    EditScheduledEvent,
-    EditSticker,
+    AddMember, CreateChannel, CreateCommand, CreateScheduledEvent, CreateSticker, EditAutoModRule,
+    EditCommandPermissions, EditGuild, EditGuildWelcomeScreen, EditGuildWidget, EditMember,
+    EditRole, EditScheduledEvent, EditSticker,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -2892,10 +2881,7 @@ mod test {
         fn gen() -> Guild {
             let m = gen_member();
 
-            Guild {
-                members: HashMap::from([(m.user.id, m)]),
-                ..Default::default()
-            }
+            Guild { members: HashMap::from([(m.user.id, m)]), ..Default::default() }
         }
 
         #[test]

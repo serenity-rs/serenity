@@ -126,26 +126,13 @@ impl Serialize for ButtonKind {
         }
 
         let helper = match self {
-            ButtonKind::Link {
-                url,
-            } => Helper {
-                style: 5,
-                url: Some(url),
-                custom_id: None,
-                sku_id: None,
+            ButtonKind::Link { url } => {
+                Helper { style: 5, url: Some(url), custom_id: None, sku_id: None }
             },
-            ButtonKind::Premium {
-                sku_id,
-            } => Helper {
-                style: 6,
-                url: None,
-                custom_id: None,
-                sku_id: Some(*sku_id),
+            ButtonKind::Premium { sku_id } => {
+                Helper { style: 6, url: None, custom_id: None, sku_id: Some(*sku_id) }
             },
-            ButtonKind::NonLink {
-                custom_id,
-                style,
-            } => Helper {
+            ButtonKind::NonLink { custom_id, style } => Helper {
                 style: (*style).into(),
                 url: None,
                 custom_id: Some(custom_id),
@@ -316,10 +303,7 @@ mod tests {
     fn test_button_serde() {
         let mut button = Button {
             kind: ComponentType::Button,
-            data: ButtonKind::NonLink {
-                custom_id: "hello".into(),
-                style: ButtonStyle::Danger,
-            },
+            data: ButtonKind::NonLink { custom_id: "hello".into(), style: ButtonStyle::Danger },
             label: Some("a".into()),
             emoji: None,
             disabled: false,
@@ -329,17 +313,13 @@ mod tests {
             json!({"type": 2, "style": 4, "custom_id": "hello", "label": "a", "disabled": false}),
         );
 
-        button.data = ButtonKind::Link {
-            url: "https://google.com".into(),
-        };
+        button.data = ButtonKind::Link { url: "https://google.com".into() };
         assert_json(
             &button,
             json!({"type": 2, "style": 5, "url": "https://google.com", "label": "a", "disabled": false}),
         );
 
-        button.data = ButtonKind::Premium {
-            sku_id: 1234965026943668316.into(),
-        };
+        button.data = ButtonKind::Premium { sku_id: 1234965026943668316.into() };
         assert_json(
             &button,
             json!({"type": 2, "style": 6, "sku_id": "1234965026943668316", "label": "a", "disabled": false}),

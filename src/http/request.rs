@@ -1,12 +1,7 @@
 use std::fmt::Write;
 
 use reqwest::header::{
-    HeaderMap as Headers,
-    HeaderValue,
-    AUTHORIZATION,
-    CONTENT_LENGTH,
-    CONTENT_TYPE,
-    USER_AGENT,
+    HeaderMap as Headers, HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT,
 };
 use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
 use tracing::instrument;
@@ -33,14 +28,7 @@ pub struct Request<'a> {
 
 impl<'a> Request<'a> {
     pub const fn new(route: Route<'a>, method: LightMethod) -> Self {
-        Self {
-            body: None,
-            multipart: None,
-            headers: None,
-            method,
-            route,
-            params: None,
-        }
+        Self { body: None, multipart: None, headers: None, method, route, params: None }
     }
 
     pub fn body(mut self, body: Option<Vec<u8>>) -> Self {

@@ -14,12 +14,7 @@ pub struct CreateForumTag {
 
 impl CreateForumTag {
     pub fn new(name: impl Into<String>) -> Self {
-        Self {
-            name: name.into(),
-            moderated: false,
-            emoji_id: None,
-            emoji_name: None,
-        }
+        Self { name: name.into(), moderated: false, emoji_id: None, emoji_name: None }
     }
 
     pub fn moderated(mut self, moderated: bool) -> Self {
@@ -29,9 +24,7 @@ impl CreateForumTag {
 
     pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
         match emoji.into() {
-            ReactionType::Custom {
-                id, ..
-            } => {
+            ReactionType::Custom { id, .. } => {
                 self.emoji_id = Some(id);
                 self.emoji_name = None;
             },

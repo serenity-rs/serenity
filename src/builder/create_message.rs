@@ -2,11 +2,7 @@ use super::create_poll::Ready;
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
 use super::{
-    CreateActionRow,
-    CreateAllowedMentions,
-    CreateAttachment,
-    CreateEmbed,
-    CreatePoll,
+    CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed, CreatePoll,
     EditAttachments,
 };
 #[cfg(feature = "http")]

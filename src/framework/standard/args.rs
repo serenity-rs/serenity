@@ -96,10 +96,7 @@ struct Token {
 impl Token {
     #[inline]
     fn new(kind: TokenKind, start: usize, end: usize) -> Self {
-        Token {
-            kind,
-            span: (start, end),
-        }
+        Token { kind, span: (start, end) }
     }
 }
 
@@ -386,12 +383,7 @@ impl Args {
             args
         };
 
-        Args {
-            tokens,
-            message: message.to_string(),
-            offset: 0,
-            state: State::None,
-        }
+        Args { tokens, message: message.to_string(), offset: 0, state: State::None }
     }
 
     #[inline]
@@ -707,11 +699,7 @@ impl Args {
     /// ```
     #[inline]
     pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
-        Iter {
-            args: self,
-            state: State::None,
-            _marker: PhantomData,
-        }
+        Iter { args: self, state: State::None, _marker: PhantomData }
     }
 
     /// Return an iterator over all unmodified arguments.
@@ -732,11 +720,7 @@ impl Args {
     #[inline]
     #[must_use]
     pub fn raw(&self) -> RawArguments<'_> {
-        RawArguments {
-            tokens: &self.tokens,
-            msg: &self.message,
-            quoted: false,
-        }
+        RawArguments { tokens: &self.tokens, msg: &self.message, quoted: false }
     }
 
     /// Return an iterator over all arguments, stripped of their quotations if any were present.

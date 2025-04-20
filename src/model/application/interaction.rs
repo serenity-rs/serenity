@@ -2,10 +2,7 @@ use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
 use super::{
-    CommandInteraction,
-    ComponentInteraction,
-    InstallationContext,
-    ModalInteraction,
+    CommandInteraction, ComponentInteraction, InstallationContext, ModalInteraction,
     PingInteraction,
 };
 use crate::internal::prelude::*;
@@ -519,10 +516,7 @@ impl serde::Serialize for MessageInteractionMetadata {
             val: T,
             kind: InteractionType,
         ) -> StdResult<S::Ok, S::Error> {
-            let wrapper = WithType {
-                kind,
-                val,
-            };
+            let wrapper = WithType { kind, val };
 
             wrapper.serialize(serializer)
         }

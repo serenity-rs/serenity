@@ -9,13 +9,7 @@ use serenity::async_trait;
 use serenity::collector::MessageCollector;
 use serenity::framework::standard::macros::{command, group, help};
 use serenity::framework::standard::{
-    help_commands,
-    Args,
-    CommandGroup,
-    CommandResult,
-    Configuration,
-    HelpOptions,
-    StandardFramework,
+    help_commands, Args, CommandGroup, CommandResult, Configuration, HelpOptions, StandardFramework,
 };
 // Collectors are streams, that means we can use `StreamExt` and `TryStreamExt`.
 use serenity::futures::stream::StreamExt;

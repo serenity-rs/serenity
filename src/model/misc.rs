@@ -51,20 +51,14 @@ impl ImageHash {
     #[must_use]
     pub fn is_animated(&self) -> bool {
         match &self.0 {
-            ImageHashInner::Normal {
-                is_animated, ..
-            } => *is_animated,
+            ImageHashInner::Normal { is_animated, .. } => *is_animated,
             ImageHashInner::Clyde => true,
         }
     }
 
     #[must_use]
     fn into_arraystring(self) -> ArrayString<34> {
-        let ImageHashInner::Normal {
-            hash,
-            is_animated,
-        } = &self.0
-        else {
+        let ImageHashInner::Normal { hash, is_animated } = &self.0 else {
             return ArrayString::from_str("clyde").expect("the string clyde is less than 34 chars");
         };
 
@@ -150,10 +144,7 @@ impl std::str::FromStr for ImageHash {
             });
         }
 
-        Ok(Self(ImageHashInner::Normal {
-            is_animated,
-            hash,
-        }))
+        Ok(Self(ImageHashInner::Normal { is_animated, hash }))
     }
 }
 
@@ -221,9 +212,8 @@ impl FromStr for EmojiIdentifier {
     type Err = EmojiIdentifierParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
-            parsed_string: s.to_owned(),
-        })
+        utils::parse_emoji(s)
+            .ok_or_else(|| EmojiIdentifierParseError { parsed_string: s.to_owned() })
     }
 }
 

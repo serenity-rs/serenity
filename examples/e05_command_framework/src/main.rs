@@ -18,17 +18,8 @@ use serenity::builder::EditChannel;
 use serenity::framework::standard::buckets::{LimitedFor, RevertBucket};
 use serenity::framework::standard::macros::{check, command, group, help, hook};
 use serenity::framework::standard::{
-    help_commands,
-    Args,
-    BucketBuilder,
-    CommandGroup,
-    CommandOptions,
-    CommandResult,
-    Configuration,
-    DispatchError,
-    HelpOptions,
-    Reason,
-    StandardFramework,
+    help_commands, Args, BucketBuilder, CommandGroup, CommandOptions, CommandResult, Configuration,
+    DispatchError, HelpOptions, Reason, StandardFramework,
 };
 use serenity::gateway::ShardManager;
 use serenity::http::Http;

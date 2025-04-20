@@ -28,10 +28,7 @@ mod export {
     pub const NULL: Value = Value::Static(simd_json::StaticNode::Null);
 
     pub use simd_json::prelude::{
-        TypedContainerValue,
-        ValueAsContainer,
-        ValueAsMutContainer,
-        ValueAsScalar,
+        TypedContainerValue, ValueAsContainer, ValueAsMutContainer, ValueAsScalar,
     };
     pub use simd_json::{json, Error as JsonError, StaticNode};
 }

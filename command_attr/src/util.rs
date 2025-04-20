@@ -126,11 +126,7 @@ pub struct Argument {
 
 impl ToTokens for Argument {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        let Argument {
-            mutable,
-            name,
-            kind,
-        } = self;
+        let Argument { mutable, name, kind } = self;
 
         stream.extend(quote! {
             #mutable #name: #kind

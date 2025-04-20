@@ -313,11 +313,7 @@ impl<'de> Deserialize<'de> for ReactionType {
         }
         let emoji = PartialEmoji::deserialize(deserializer)?;
         Ok(match (emoji.id, emoji.name) {
-            (Some(id), name) => ReactionType::Custom {
-                animated: emoji.animated,
-                id,
-                name,
-            },
+            (Some(id), name) => ReactionType::Custom { animated: emoji.animated, id, name },
             (None, Some(name)) => ReactionType::Unicode(name),
             (None, None) => return Err(DeError::custom("invalid reaction type data")),
         })
@@ -330,11 +326,7 @@ impl Serialize for ReactionType {
         S: Serializer,
     {
         match self {
-            ReactionType::Custom {
-                animated,
-                id,
-                name,
-            } => {
+            ReactionType::Custom { animated, id, name } => {
                 let mut map = serializer.serialize_map(Some(3))?;
 
                 map.serialize_entry("animated", animated)?;
@@ -365,11 +357,7 @@ impl ReactionType {
     #[cfg(feature = "http")]
     pub fn as_data(&self) -> String {
         match self {
-            ReactionType::Custom {
-                id,
-                name,
-                ..
-            } => {
+            ReactionType::Custom { id, name, .. } => {
                 format!("{}:{id}", name.as_deref().unwrap_or_default())
             },
             ReactionType::Unicode(unicode) => {
@@ -431,21 +419,13 @@ impl From<char> for ReactionType {
 
 impl From<Emoji> for ReactionType {
     fn from(emoji: Emoji) -> ReactionType {
-        ReactionType::Custom {
-            animated: emoji.animated,
-            id: emoji.id,
-            name: Some(emoji.name),
-        }
+        ReactionType::Custom { animated: emoji.animated, id: emoji.id, name: Some(emoji.name) }
     }
 }
 
 impl From<EmojiId> for ReactionType {
     fn from(emoji_id: EmojiId) -> ReactionType {
-        ReactionType::Custom {
-            animated: false,
-            id: emoji_id,
-            name: Some("emoji".to_string()),
-        }
+        ReactionType::Custom { animated: false, id: emoji_id, name: Some("emoji".to_string()) }
     }
 }
 
@@ -547,11 +527,7 @@ impl TryFrom<&str> for ReactionType {
         let name = split_iter.next().ok_or(ReactionConversionError)?.to_string().into();
         let id = split_iter.next().and_then(|s| s.parse().ok()).ok_or(ReactionConversionError)?;
 
-        Ok(ReactionType::Custom {
-            animated,
-            id,
-            name,
-        })
+        Ok(ReactionType::Custom { animated, id, name })
     }
 }
 
@@ -572,11 +548,7 @@ impl fmt::Display for ReactionType {
     /// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ReactionType::Custom {
-                animated,
-                id,
-                name,
-            } => {
+            ReactionType::Custom { animated, id, name } => {
                 if *animated {
                     f.write_str("<a:")?;
                 } else {

@@ -346,9 +346,7 @@ impl Builder for EditChannel<'_> {
                 .http()
                 .edit_voice_status(
                     ctx,
-                    &EditVoiceStatusBody {
-                        status: status.as_str(),
-                    },
+                    &EditVoiceStatusBody { status: status.as_str() },
                     self.audit_log_reason,
                 )
                 .await?;

@@ -1,9 +1,5 @@
 use crate::builder::{
-    Builder as _,
-    CreateActionRow,
-    CreateInputText,
-    CreateInteractionResponse,
-    CreateModal,
+    Builder as _, CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal,
 };
 use crate::client::Context;
 use crate::collector::ModalInteractionCollector;
@@ -42,11 +38,7 @@ pub struct CreateQuickModal {
 #[cfg(feature = "collector")]
 impl CreateQuickModal {
     pub fn new(title: impl Into<String>) -> Self {
-        Self {
-            title: title.into(),
-            timeout: None,
-            input_texts: Vec::new(),
-        }
+        Self { title: title.into(), timeout: None, input_texts: Vec::new() }
     }
 
     /// Sets a timeout when waiting for the modal response.
@@ -140,9 +132,6 @@ impl CreateQuickModal {
             })
             .collect();
 
-        Ok(Some(QuickModalResponse {
-            inputs,
-            interaction: modal_interaction,
-        }))
+        Ok(Some(QuickModalResponse { inputs, interaction: modal_interaction }))
     }
 }

@@ -24,7 +24,6 @@ use crate::gateway::{ConnectionStage, GatewayError, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::GatewayIntents;
 
 /// A manager for handling the status of shards by starting them, restarting them, and stopping
 /// them when required.
@@ -55,7 +54,6 @@ use crate::model::gateway::GatewayIntents;
 /// use serenity::framework::{Framework, StandardFramework};
 /// use serenity::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::http::Http;
-/// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
 /// use tokio::sync::{Mutex, RwLock};
 ///
@@ -87,7 +85,6 @@ use crate::model::gateway::GatewayIntents;
 ///     # #[cfg(feature = "cache")]
 ///     # cache: unimplemented!(),
 ///     # http,
-///     intents: GatewayIntents::non_privileged(),
 ///     presence: None,
 /// });
 /// # Ok(())
@@ -115,7 +112,6 @@ pub struct ShardManager {
     // and only is ever used to receive a single message
     shard_shutdown: Mutex<Receiver<ShardId>>,
     shard_shutdown_send: Sender<ShardId>,
-    gateway_intents: GatewayIntents,
 }
 
 impl ShardManager {
@@ -138,7 +134,6 @@ impl ShardManager {
             shard_shutdown: Mutex::new(shutdown_recv),
             shard_shutdown_send: shutdown_send,
             runners: Arc::clone(&runners),
-            gateway_intents: opt.intents,
         });
 
         let mut shard_queuer = ShardQueuer {
@@ -158,7 +153,6 @@ impl ShardManager {
             #[cfg(feature = "cache")]
             cache: opt.cache,
             http: opt.http,
-            intents: opt.intents,
             presence: opt.presence,
         };
 
@@ -333,12 +327,6 @@ impl ShardManager {
         drop(self.shard_queuer.unbounded_send(msg));
     }
 
-    /// Returns the gateway intents used for this gateway connection.
-    #[must_use]
-    pub fn intents(&self) -> GatewayIntents {
-        self.gateway_intents
-    }
-
     pub async fn return_with_value(&self, ret: Result<(), GatewayError>) {
         if let Err(e) = self.return_value_tx.lock().await.send(ret).await {
             tracing::warn!("failed to send return value: {}", e);
@@ -398,6 +386,5 @@ pub struct ShardManagerOptions {
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
-    pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }

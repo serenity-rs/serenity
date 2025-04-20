@@ -1,11 +1,7 @@
 #[cfg(feature = "http")]
 use super::Builder;
 use super::{
-    CreateActionRow,
-    CreateAllowedMentions,
-    CreateAttachment,
-    CreateEmbed,
-    EditAttachments,
+    CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed, EditAttachments,
     EditWebhookMessage,
 };
 #[cfg(feature = "http")]

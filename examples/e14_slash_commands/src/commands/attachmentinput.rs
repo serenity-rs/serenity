@@ -2,9 +2,8 @@ use serenity::builder::{CreateCommand, CreateCommandOption};
 use serenity::model::application::{CommandOptionType, ResolvedOption, ResolvedValue};
 
 pub fn run(options: &[ResolvedOption]) -> String {
-    if let Some(ResolvedOption {
-        value: ResolvedValue::Attachment(attachment), ..
-    }) = options.first()
+    if let Some(ResolvedOption { value: ResolvedValue::Attachment(attachment), .. }) =
+        options.first()
     {
         format!("Attachment name: {}, attachment size: {}", attachment.filename, attachment.size)
     } else {

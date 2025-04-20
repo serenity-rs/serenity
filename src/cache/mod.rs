@@ -71,10 +71,7 @@ pub struct CacheRef<'a, K, V, T = ()> {
 
 impl<'a, K, V, T> CacheRef<'a, K, V, T> {
     fn new(inner: CacheRefInner<'a, K, V, T>) -> Self {
-        Self {
-            inner,
-            phantom: std::marker::PhantomData,
-        }
+        Self { inner, phantom: std::marker::PhantomData }
     }
 
     #[cfg(feature = "temp_cache")]
@@ -778,10 +775,7 @@ mod test {
 
     #[test]
     fn test_cache_messages() {
-        let settings = Settings {
-            max_messages: 2,
-            ..Default::default()
-        };
+        let settings = Settings { max_messages: 2, ..Default::default() };
         let cache = Cache::new_with_settings(settings);
 
         // Test inserting one message into a channel's message cache.
@@ -827,9 +821,7 @@ mod test {
 
         // Add a channel delete event to the cache, the cached messages for that channel should now
         // be gone.
-        let mut delete = ChannelDeleteEvent {
-            channel: channel.clone(),
-        };
+        let mut delete = ChannelDeleteEvent { channel: channel.clone() };
         assert!(cache.update(&mut delete).is_some());
         assert!(!cache.messages.contains_key(&delete.channel.id));
 
@@ -845,10 +837,7 @@ mod test {
         assert!(cache.update(&mut event).is_none());
 
         let mut guild_delete = GuildDeleteEvent {
-            guild: UnavailableGuild {
-                id: GuildId::new(1),
-                unavailable: false,
-            },
+            guild: UnavailableGuild { id: GuildId::new(1), unavailable: false },
         };
 
         // The guild existed in the cache, so the cache's guild is returned by the update.

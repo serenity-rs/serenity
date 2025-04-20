@@ -1,31 +1,12 @@
 use super::{Cache, CacheUpdate};
 use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
-    ChannelCreateEvent,
-    ChannelDeleteEvent,
-    ChannelPinsUpdateEvent,
-    ChannelUpdateEvent,
-    GuildCreateEvent,
-    GuildDeleteEvent,
-    GuildEmojisUpdateEvent,
-    GuildMemberAddEvent,
-    GuildMemberRemoveEvent,
-    GuildMemberUpdateEvent,
-    GuildMembersChunkEvent,
-    GuildRoleCreateEvent,
-    GuildRoleDeleteEvent,
-    GuildRoleUpdateEvent,
-    GuildStickersUpdateEvent,
-    GuildUpdateEvent,
-    MessageCreateEvent,
-    MessageUpdateEvent,
-    PresenceUpdateEvent,
-    ReadyEvent,
-    ThreadCreateEvent,
-    ThreadDeleteEvent,
-    ThreadUpdateEvent,
-    UserUpdateEvent,
-    VoiceChannelStatusUpdateEvent,
+    ChannelCreateEvent, ChannelDeleteEvent, ChannelPinsUpdateEvent, ChannelUpdateEvent,
+    GuildCreateEvent, GuildDeleteEvent, GuildEmojisUpdateEvent, GuildMemberAddEvent,
+    GuildMemberRemoveEvent, GuildMemberUpdateEvent, GuildMembersChunkEvent, GuildRoleCreateEvent,
+    GuildRoleDeleteEvent, GuildRoleUpdateEvent, GuildStickersUpdateEvent, GuildUpdateEvent,
+    MessageCreateEvent, MessageUpdateEvent, PresenceUpdateEvent, ReadyEvent, ThreadCreateEvent,
+    ThreadDeleteEvent, ThreadUpdateEvent, UserUpdateEvent, VoiceChannelStatusUpdateEvent,
     VoiceStateUpdateEvent,
 };
 use crate::model::gateway::ShardInfo;
@@ -214,22 +195,25 @@ impl CacheUpdate for GuildMemberUpdateEvent {
             };
 
             if item.is_none() {
-                guild.members.insert(self.user.id, Member {
-                    deaf: false,
-                    guild_id: self.guild_id,
-                    joined_at: Some(self.joined_at),
-                    mute: false,
-                    nick: self.nick.clone(),
-                    roles: self.roles.clone(),
-                    user: self.user.clone(),
-                    pending: self.pending,
-                    premium_since: self.premium_since,
-                    permissions: None,
-                    avatar: self.avatar,
-                    communication_disabled_until: self.communication_disabled_until,
-                    flags: GuildMemberFlags::default(),
-                    unusual_dm_activity_until: self.unusual_dm_activity_until,
-                });
+                guild.members.insert(
+                    self.user.id,
+                    Member {
+                        deaf: false,
+                        guild_id: self.guild_id,
+                        joined_at: Some(self.joined_at),
+                        mute: false,
+                        nick: self.nick.clone(),
+                        roles: self.roles.clone(),
+                        user: self.user.clone(),
+                        pending: self.pending,
+                        premium_since: self.premium_since,
+                        permissions: None,
+                        avatar: self.avatar,
+                        communication_disabled_until: self.communication_disabled_until,
+                        flags: GuildMemberFlags::default(),
+                        unusual_dm_activity_until: self.unusual_dm_activity_until,
+                    },
+                );
             }
 
             item

@@ -10,13 +10,7 @@ use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::channel::ChannelType;
 use crate::model::id::{
-    ApplicationId,
-    CommandId,
-    CommandPermissionId,
-    CommandVersionId,
-    GuildId,
-    RoleId,
-    UserId,
+    ApplicationId, CommandId, CommandPermissionId, CommandVersionId, GuildId, RoleId, UserId,
 };
 use crate::model::Permissions;
 

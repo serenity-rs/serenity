@@ -124,14 +124,17 @@ impl<'de> Visitor<'de> for EventVisitor {
                 // So, if order correct then we don't need to pass the RawValue back out.
                 Some("d") => match op {
                     Some(Opcode::Identify) => return Ok(map.next_value::<Identify>()?.into()),
-                    Some(Opcode::SelectProtocol) =>
-                        return Ok(map.next_value::<SelectProtocol>()?.into()),
+                    Some(Opcode::SelectProtocol) => {
+                        return Ok(map.next_value::<SelectProtocol>()?.into())
+                    },
                     Some(Opcode::Ready) => return Ok(map.next_value::<Ready>()?.into()),
                     Some(Opcode::Heartbeat) => return Ok(map.next_value::<Heartbeat>()?.into()),
-                    Some(Opcode::HeartbeatAck) =>
-                        return Ok(map.next_value::<HeartbeatAck>()?.into()),
-                    Some(Opcode::SessionDescription) =>
-                        return Ok(map.next_value::<SessionDescription>()?.into()),
+                    Some(Opcode::HeartbeatAck) => {
+                        return Ok(map.next_value::<HeartbeatAck>()?.into())
+                    },
+                    Some(Opcode::SessionDescription) => {
+                        return Ok(map.next_value::<SessionDescription>()?.into())
+                    },
                     Some(Opcode::Speaking) => return Ok(map.next_value::<Speaking>()?.into()),
                     Some(Opcode::Resume) => return Ok(map.next_value::<Resume>()?.into()),
                     Some(Opcode::Hello) => return Ok(map.next_value::<Hello>()?.into()),
@@ -139,21 +142,24 @@ impl<'de> Visitor<'de> for EventVisitor {
                         let _ = map.next_value::<Option<()>>()?;
                         return Ok(Event::Resumed);
                     },
-                    Some(Opcode::ClientConnect) =>
-                        return Ok(map.next_value::<ClientConnect>()?.into()),
-                    Some(Opcode::ClientDisconnect) =>
-                        return Ok(map.next_value::<ClientDisconnect>()?.into()),
+                    Some(Opcode::ClientConnect) => {
+                        return Ok(map.next_value::<ClientConnect>()?.into())
+                    },
+                    Some(Opcode::ClientDisconnect) => {
+                        return Ok(map.next_value::<ClientDisconnect>()?.into())
+                    },
                     None => {
                         d = Some(map.next_value::<&RawValue>()?);
                     },
                 },
                 Some(_) => {},
-                None =>
+                None => {
                     if d.is_none() {
                         return Err(DeError::missing_field("d"));
                     } else if op.is_none() {
                         return Err(DeError::missing_field("op"));
-                    },
+                    }
+                },
             }
 
             if d.is_some() && op.is_some() {
@@ -170,8 +176,9 @@ impl<'de> Visitor<'de> for EventVisitor {
             Opcode::Ready => serde_json::from_str::<Ready>(d).map(Into::into),
             Opcode::Heartbeat => serde_json::from_str::<Heartbeat>(d).map(Into::into),
             Opcode::HeartbeatAck => serde_json::from_str::<HeartbeatAck>(d).map(Into::into),
-            Opcode::SessionDescription =>
-                serde_json::from_str::<SessionDescription>(d).map(Into::into),
+            Opcode::SessionDescription => {
+                serde_json::from_str::<SessionDescription>(d).map(Into::into)
+            },
             Opcode::Speaking => serde_json::from_str::<Speaking>(d).map(Into::into),
             Opcode::Resume => serde_json::from_str::<Resume>(d).map(Into::into),
             Opcode::Hello => serde_json::from_str::<Hello>(d).map(Into::into),

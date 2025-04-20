@@ -88,9 +88,7 @@ async fn main() {
     // Run migrations, which updates the database's schema to the latest version.
     sqlx::migrate!("./migrations").run(&database).await.expect("Couldn't run database migrations");
 
-    let bot = Bot {
-        database,
-    };
+    let bot = Bot { database };
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES

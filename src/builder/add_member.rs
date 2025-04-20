@@ -26,13 +26,7 @@ pub struct AddMember {
 impl AddMember {
     /// Constructs a new builder with the given access token, leaving all other fields empty.
     pub fn new(access_token: String) -> Self {
-        Self {
-            access_token,
-            nick: None,
-            roles: Vec::new(),
-            mute: None,
-            deaf: None,
-        }
+        Self { access_token, nick: None, roles: Vec::new(), mute: None, deaf: None }
     }
 
     /// Sets the OAuth2 access token for this request, replacing the current one.

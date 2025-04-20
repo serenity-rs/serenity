@@ -393,10 +393,8 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         command_usage_table.add_row(Row(idx as u64));
         command_usage_table.set_cell(Row(idx as u64), Col(0), i.options.names[0]);
         command_usage_table.set_cell(Row(idx as u64), Col(1), 0);
-        command_usage_values.insert(i.options.names[0], CommandUsageValue {
-            index: idx,
-            use_count: 0,
-        });
+        command_usage_values
+            .insert(i.options.names[0], CommandUsageValue { index: idx, use_count: 0 });
     }
 
     let components = Arc::new(Components {

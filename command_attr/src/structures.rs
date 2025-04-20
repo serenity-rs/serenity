@@ -6,20 +6,8 @@ use syn::parse::{Error, Parse, ParseStream, Result};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{
-    braced,
-    Attribute,
-    Block,
-    Expr,
-    ExprClosure,
-    FnArg,
-    Ident,
-    Pat,
-    Path,
-    ReturnType,
-    Stmt,
-    Token,
-    Type,
-    Visibility,
+    braced, Attribute, Block, Expr, ExprClosure, FnArg, Ident, Pat, Path, ReturnType, Stmt, Token,
+    Type, Visibility,
 };
 
 use crate::consts::CHECK;
@@ -66,22 +54,14 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
                     let name = id.ident;
                     let mutable = id.mutability;
 
-                    Ok(Argument {
-                        mutable,
-                        name,
-                        kind: *kind,
-                    })
+                    Ok(Argument { mutable, name, kind: *kind })
                 },
                 Pat::Wild(wild) => {
                     let token = wild.underscore_token;
 
                     let name = Ident::new("_", token.spans[0]);
 
-                    Ok(Argument {
-                        mutable: None,
-                        name,
-                        kind: *kind,
-                    })
+                    Ok(Argument { mutable: None, name, kind: *kind })
                 },
                 _ => Err(Error::new(pat.span(), format_args!("unsupported pattern: {pat:?}"))),
             }
@@ -175,29 +155,13 @@ impl Parse for CommandFun {
 
         let args = args.into_iter().map(parse_argument).collect::<Result<Vec<_>>>()?;
 
-        Ok(Self {
-            attributes,
-            cooked,
-            visibility,
-            name,
-            args,
-            ret,
-            body,
-        })
+        Ok(Self { attributes, cooked, visibility, name, args, ret, body })
     }
 }
 
 impl ToTokens for CommandFun {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        let Self {
-            attributes: _,
-            cooked,
-            visibility,
-            name,
-            args,
-            ret,
-            body,
-        } = self;
+        let Self { attributes: _, cooked, visibility, name, args, ret, body } = self;
 
         stream.extend(quote! {
             #(#cooked)*
@@ -273,26 +237,14 @@ fn parse_function_hook(input: ParseStream<'_>, attributes: Vec<Attribute>) -> Re
 
     let args = args.into_iter().map(parse_argument).collect::<Result<Vec<_>>>()?;
 
-    Ok(FunctionHook {
-        attributes,
-        visibility,
-        name,
-        args,
-        ret,
-        body,
-    })
+    Ok(FunctionHook { attributes, visibility, name, args, ret, body })
 }
 
 fn parse_closure_hook(input: ParseStream<'_>, attributes: Vec<Attribute>) -> Result<ClosureHook> {
     input.parse::<Token![async]>()?;
     let closure = input.parse::<ExprClosure>()?;
 
-    Ok(ClosureHook {
-        attributes,
-        args: closure.inputs,
-        ret: closure.output,
-        body: closure.body,
-    })
+    Ok(ClosureHook { attributes, args: closure.inputs, ret: closure.output, body: closure.body })
 }
 
 #[derive(Debug, Default)]
@@ -463,10 +415,7 @@ pub struct Options {
 impl Options {
     #[inline]
     pub fn new() -> Self {
-        Self {
-            help_available: true,
-            ..Default::default()
-        }
+        Self { help_available: true, ..Default::default() }
     }
 }
 
@@ -592,23 +541,13 @@ impl Parse for GroupStruct {
 
         input.parse::<Token![;]>()?;
 
-        Ok(Self {
-            visibility,
-            cooked,
-            attributes,
-            name,
-        })
+        Ok(Self { visibility, cooked, attributes, name })
     }
 }
 
 impl ToTokens for GroupStruct {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        let Self {
-            visibility,
-            cooked,
-            attributes: _,
-            name,
-        } = self;
+        let Self { visibility, cooked, attributes: _, name } = self;
 
         stream.extend(quote! {
             #(#cooked)*
@@ -637,9 +576,6 @@ pub struct GroupOptions {
 impl GroupOptions {
     #[inline]
     pub fn new() -> Self {
-        Self {
-            help_available: true,
-            ..Default::default()
-        }
+        Self { help_available: true, ..Default::default() }
     }
 }

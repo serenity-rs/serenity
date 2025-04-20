@@ -32,7 +32,7 @@ use crate::json::from_str;
 use crate::json::to_string;
 #[cfg(feature = "client")]
 use crate::model::event::GatewayEvent;
-use crate::model::gateway::{GatewayIntents, ShardInfo};
+use crate::model::gateway::ShardInfo;
 use crate::model::id::{GuildId, UserId};
 #[cfg(feature = "client")]
 use crate::Error;
@@ -75,7 +75,6 @@ enum WebSocketMessageData<'a> {
         token: &'a str,
         large_threshold: u8,
         shard: &'a ShardInfo,
-        intents: GatewayIntents,
         properties: IdentifyProperties,
         presence: PresenceUpdateMessage<'a>,
     },
@@ -102,11 +101,8 @@ const DECOMPRESSION_MULTIPLIER: usize = 3;
 
 impl WsClient {
     pub(crate) async fn connect(url: Url) -> Result<Self> {
-        let config = WebSocketConfig {
-            max_message_size: None,
-            max_frame_size: None,
-            ..Default::default()
-        };
+        let config =
+            WebSocketConfig { max_message_size: None, max_frame_size: None, ..Default::default() };
         let (stream, _) = connect_async_with_config(url, Some(config), false).await?;
 
         Ok(Self(stream))
@@ -228,7 +224,6 @@ impl WsClient {
         &mut self,
         shard: &ShardInfo,
         token: &str,
-        intents: GatewayIntents,
         presence: &PresenceData,
     ) -> Result<()> {
         let activities: Vec<_> = presence.activity.iter().collect();
@@ -241,7 +236,6 @@ impl WsClient {
             d: WebSocketMessageData::Identify {
                 token,
                 shard,
-                intents,
                 compress: true,
                 large_threshold: constants::LARGE_THRESHOLD,
                 properties: IdentifyProperties {
@@ -296,11 +290,7 @@ impl WsClient {
 
         self.send_json(&WebSocketMessage {
             op: Opcode::Resume,
-            d: WebSocketMessageData::Resume {
-                session_id,
-                token,
-                seq,
-            },
+            d: WebSocketMessageData::Resume { session_id, token, seq },
         })
         .await
     }

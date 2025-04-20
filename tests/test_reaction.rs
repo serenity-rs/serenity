@@ -86,10 +86,7 @@ fn json_to_reaction_type() {
     let s = r#"{"name": "foo", "id": "1"}"#;
     let value = serde_json::from_str(s).unwrap();
     assert!(matches!(value, ReactionType::Custom { .. }));
-    if let ReactionType::Custom {
-        name, ..
-    } = value
-    {
+    if let ReactionType::Custom { name, .. } = value {
         assert_eq!(name.as_deref(), Some("foo"));
     }
 

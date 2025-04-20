@@ -41,20 +41,14 @@ impl FormattedTimestamp {
     /// [`FormattedTimestampStyle`].
     #[must_use]
     pub fn new(timestamp: Timestamp, style: Option<FormattedTimestampStyle>) -> Self {
-        Self {
-            timestamp: timestamp.unix_timestamp(),
-            style,
-        }
+        Self { timestamp: timestamp.unix_timestamp(), style }
     }
 
     /// Creates a new [`FormattedTimestamp`] instance representing the current timestamp with the
     /// default style.
     #[must_use]
     pub fn now() -> Self {
-        Self {
-            timestamp: Timestamp::now().unix_timestamp(),
-            style: None,
-        }
+        Self { timestamp: Timestamp::now().unix_timestamp(), style: None }
     }
 
     /// Returns the timestamp of this [`FormattedTimestamp`].
@@ -74,10 +68,7 @@ impl From<Timestamp> for FormattedTimestamp {
     /// Creates a new [`FormattedTimestamp`] instance from the given [`Timestamp`] with the default
     /// style.
     fn from(timestamp: Timestamp) -> Self {
-        Self {
-            timestamp: timestamp.unix_timestamp(),
-            style: None,
-        }
+        Self { timestamp: timestamp.unix_timestamp(), style: None }
     }
 }
 
@@ -129,10 +120,7 @@ fn parse_formatted_timestamp(s: &str) -> Option<FormattedTimestamp> {
             timestamp: timestamp.parse().ok()?,
             style: Some(style.parse().ok()?),
         },
-        None => FormattedTimestamp {
-            timestamp: inner.parse().ok()?,
-            style: None,
-        },
+        None => FormattedTimestamp { timestamp: inner.parse().ok()?, style: None },
     })
 }
 
@@ -141,9 +129,7 @@ impl FromStr for FormattedTimestamp {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match parse_formatted_timestamp(s) {
             Some(x) => Ok(x),
-            None => Err(FormattedTimestampParseError {
-                string: s.into(),
-            }),
+            None => Err(FormattedTimestampParseError { string: s.into() }),
         }
     }
 }
@@ -159,9 +145,7 @@ impl FromStr for FormattedTimestampStyle {
             "f" => Ok(Self::ShortDateTime),
             "F" => Ok(Self::LongDateTime),
             "R" => Ok(Self::RelativeTime),
-            _ => Err(FormattedTimestampParseError {
-                string: s.into(),
-            }),
+            _ => Err(FormattedTimestampParseError { string: s.into() }),
         }
     }
 }

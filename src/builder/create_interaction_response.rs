@@ -2,11 +2,7 @@ use super::create_poll::Ready;
 #[cfg(feature = "http")]
 use super::{check_overflow, Builder};
 use super::{
-    CreateActionRow,
-    CreateAllowedMentions,
-    CreateAttachment,
-    CreateEmbed,
-    CreatePoll,
+    CreateActionRow, CreateAllowedMentions, CreateAttachment, CreateEmbed, CreatePoll,
     EditAttachments,
 };
 #[cfg(feature = "http")]
@@ -81,17 +77,20 @@ impl serde::Serialize for CreateInteractionResponse {
         use serde::ser::SerializeMap as _;
 
         let mut map = serializer.serialize_map(Some(2))?;
-        map.serialize_entry("type", &match self {
-            Self::Pong => 1,
-            Self::Message(_) => 4,
-            Self::Defer(_) => 5,
-            Self::Acknowledge => 6,
-            Self::UpdateMessage(_) => 7,
-            Self::Autocomplete(_) => 8,
-            Self::Modal(_) => 9,
-            Self::PremiumRequired => 10,
-            Self::LaunchActivity => 12,
-        })?;
+        map.serialize_entry(
+            "type",
+            &match self {
+                Self::Pong => 1,
+                Self::Message(_) => 4,
+                Self::Defer(_) => 5,
+                Self::Acknowledge => 6,
+                Self::UpdateMessage(_) => 7,
+                Self::Autocomplete(_) => 8,
+                Self::Modal(_) => 9,
+                Self::PremiumRequired => 10,
+                Self::LaunchActivity => 12,
+            },
+        )?;
 
         match self {
             Self::Pong => map.serialize_entry("data", &None::<()>)?,
@@ -440,11 +439,7 @@ pub struct CreateModal {
 impl CreateModal {
     /// Creates a new modal.
     pub fn new(custom_id: impl Into<String>, title: impl Into<String>) -> Self {
-        Self {
-            components: Vec::new(),
-            custom_id: custom_id.into(),
-            title: title.into(),
-        }
+        Self { components: Vec::new(), custom_id: custom_id.into(), title: title.into() }
     }
 
     /// Sets the components of this message.

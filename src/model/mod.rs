@@ -68,37 +68,14 @@ pub mod prelude {
     pub use super::guild::automod::EventType as AutomodEventType;
     #[doc(hidden)]
     pub use super::guild::automod::{
-        Action,
-        ActionExecution,
-        ActionType,
-        KeywordPresetType,
-        Rule,
-        Trigger,
-        TriggerMetadata,
+        Action, ActionExecution, ActionType, KeywordPresetType, Rule, Trigger, TriggerMetadata,
         TriggerType,
     };
     #[doc(hidden)]
     pub use super::{
-        application::*,
-        channel::*,
-        colour::*,
-        connection::*,
-        event::*,
-        gateway::*,
-        guild::audit_log::*,
-        guild::*,
-        id::*,
-        invite::*,
-        mention::*,
-        misc::*,
-        monetization::*,
-        permissions::*,
-        sticker::*,
-        user::*,
-        voice::*,
-        webhook::*,
-        ModelError,
-        Timestamp,
+        application::*, channel::*, colour::*, connection::*, event::*, gateway::*,
+        guild::audit_log::*, guild::*, id::*, invite::*, mention::*, misc::*, monetization::*,
+        permissions::*, sticker::*, user::*, voice::*, webhook::*, ModelError, Timestamp,
     };
     pub(crate) use crate::internal::prelude::*;
 }

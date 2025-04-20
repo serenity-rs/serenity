@@ -852,14 +852,10 @@ mod test {
             discriminator: Option<NonZeroU16>,
         }
 
-        let user = User {
-            discriminator: NonZeroU16::new(123),
-        };
+        let user = User { discriminator: NonZeroU16::new(123) };
         assert_json(&user, json!({"discriminator": "0123"}));
 
-        let user_no_discriminator = User {
-            discriminator: None,
-        };
+        let user_no_discriminator = User { discriminator: None };
         assert_json(&user_no_discriminator, json!({}));
     }
 

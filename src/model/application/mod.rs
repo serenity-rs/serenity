@@ -300,13 +300,16 @@ mod team_role_ordering {
 
         roles.sort();
 
-        assert_eq!(roles, [
-            other(""),
-            other("test"),
-            TeamMemberRole::ReadOnly,
-            TeamMemberRole::Developer,
-            TeamMemberRole::Admin,
-        ]);
+        assert_eq!(
+            roles,
+            [
+                other(""),
+                other("test"),
+                TeamMemberRole::ReadOnly,
+                TeamMemberRole::Developer,
+                TeamMemberRole::Admin,
+            ]
+        );
     }
 
     #[test]

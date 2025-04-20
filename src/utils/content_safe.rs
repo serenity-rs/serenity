@@ -293,15 +293,9 @@ mod tests {
             ..Default::default()
         };
 
-        let mut guild = Guild {
-            id: GuildId::new(381880193251409931),
-            ..Default::default()
-        };
+        let mut guild = Guild { id: GuildId::new(381880193251409931), ..Default::default() };
 
-        let member = Member {
-            nick: Some("Ferris".to_string()),
-            ..Default::default()
-        };
+        let member = Member { nick: Some("Ferris".to_string()), ..Default::default() };
 
         let role = Role {
             id: RoleId::new(333333333333333333),

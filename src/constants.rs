@@ -24,11 +24,8 @@ pub const MEMBER_FETCH_LIMIT: u64 = 1000;
 /// The [UserAgent] sent along with every request.
 ///
 /// [UserAgent]: ::reqwest::header::USER_AGENT
-pub const USER_AGENT: &str = concat!(
-    "DiscordBot (https://github.com/serenity-rs/serenity, ",
-    env!("CARGO_PKG_VERSION"),
-    ")"
-);
+pub const USER_AGENT: &str =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0";
 
 enum_number! {
     /// An enum representing the [gateway opcodes].
