@@ -116,10 +116,11 @@ impl<'a> EditInteractionResponse<'a> {
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
     #[cfg(feature = "http")]
-    pub async fn execute(mut self, http: &Http, interaction_token: &str) -> Result<Message> {
+    pub async fn execute(self, http: &Http, interaction_token: &str) -> Result<Message> {
         self.0.check_length()?;
 
-        let files = self.0.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
+        let files =
+            self.0.attachments.as_ref().map_or(Vec::new(), EditAttachments::new_attachments);
 
         http.edit_original_interaction_response(interaction_token, &self, files).await
     }

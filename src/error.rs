@@ -53,6 +53,33 @@ pub enum Error {
     ///
     /// [`secrets`]: crate::secrets
     Token(TokenError),
+    /// When parsing a URL failed due to invalid input.
+    Url(UrlError),
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum UrlError {
+    Parsing(url::ParseError),
+    InvalidDataURI,
+}
+
+impl fmt::Display for UrlError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Parsing(inner) => fmt::Display::fmt(&inner, f),
+            Self::InvalidDataURI => f.write_str("Provided string is not a valid data URI"),
+        }
+    }
+}
+
+impl StdError for UrlError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            Self::Parsing(inner) => Some(inner),
+            _ => None,
+        }
+    }
 }
 
 #[cfg(feature = "gateway")]
@@ -100,6 +127,18 @@ impl From<TokenError> for Error {
     }
 }
 
+impl From<UrlError> for Error {
+    fn from(e: UrlError) -> Error {
+        Error::Url(e)
+    }
+}
+
+impl From<url::ParseError> for Error {
+    fn from(e: url::ParseError) -> Error {
+        UrlError::Parsing(e).into()
+    }
+}
+
 #[cfg(feature = "http")]
 impl From<InvalidHeaderValue> for Error {
     fn from(e: InvalidHeaderValue) -> Error {
@@ -127,6 +166,7 @@ impl fmt::Display for Error {
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
             Self::Token(inner) => fmt::Display::fmt(&inner, f),
+            Self::Url(inner) => fmt::Display::fmt(&inner, f),
         }
     }
 }
@@ -145,6 +185,7 @@ impl StdError for Error {
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => Some(inner),
             Self::Token(inner) => Some(inner),
+            Self::Url(inner) => Some(inner),
         }
     }
 }
