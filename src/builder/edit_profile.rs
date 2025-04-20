@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -18,9 +18,9 @@ pub struct EditProfile<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     username: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<Option<String>>,
+    avatar: Option<Option<ImageData<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    banner: Option<Option<String>>,
+    banner: Option<Option<ImageData<'a>>>,
 }
 
 impl<'a> EditProfile<'a> {
@@ -40,14 +40,17 @@ impl<'a> EditProfile<'a> {
     /// # use serenity::http::Http;
     /// #
     /// # #[cfg(feature = "http")]
-    /// # async fn foo_(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
-    /// let avatar = CreateAttachment::path("./my_image.jpg").await.expect("Failed to read image.");
-    /// current_user.edit(http, EditProfile::new().avatar(&avatar)).await?;
+    /// # async fn run() -> Result<(), SerenityError> {
+    /// # let http: Http = unimplemented!();
+    /// # let mut user = CurrentUser::default();
+    /// let avatar = CreateAttachment::path("./my_image.jpg".as_ref())?.encode().await?;
+    /// let builder = EditProfile::new().avatar(avatar);
+    /// user.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
-        self.avatar = Some(Some(avatar.to_base64()));
+    pub fn avatar(mut self, avatar: ImageData<'a>) -> Self {
+        self.avatar = Some(Some(avatar));
         self
     }
 
@@ -68,8 +71,8 @@ impl<'a> EditProfile<'a> {
     }
 
     /// Sets the banner of the current user.
-    pub fn banner(mut self, banner: &CreateAttachment<'_>) -> Self {
-        self.banner = Some(Some(banner.to_base64()));
+    pub fn banner(mut self, banner: ImageData<'a>) -> Self {
+        self.banner = Some(Some(banner));
         self
     }
 
