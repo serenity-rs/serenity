@@ -69,7 +69,7 @@ impl<'a> Request<'a> {
     ///
     /// Errors if the given proxy URL is invalid, or the token cannot be parsed into a HTTP header.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(token)))]
-    pub fn build(
+    pub async fn build(
         self,
         client: &Client,
         token: Option<&str>,
@@ -102,7 +102,7 @@ impl<'a> Request<'a> {
 
         if let Some(multipart) = self.multipart {
             // Setting multipart adds the content-length header.
-            builder = builder.multipart(multipart.build_form()?);
+            builder = builder.multipart(multipart.build_form().await?);
         } else if let Some(bytes) = self.body {
             headers.insert(CONTENT_LENGTH, bytes.len().into());
             headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));

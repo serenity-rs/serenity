@@ -1,4 +1,4 @@
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
@@ -12,7 +12,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct CreateSoundboard<'a> {
     name: String,
-    sound: String,
+    sound: ImageData<'a>,
     volume: f64,
     #[serde(skip_serializing_if = "Option::is_none")]
     emoji_id: Option<EmojiId>,
@@ -25,10 +25,10 @@ pub struct CreateSoundboard<'a> {
 
 impl<'a> CreateSoundboard<'a> {
     /// Creates a new builder with the given data.
-    pub fn new(name: impl Into<String>, sound: &CreateAttachment) -> Self {
+    pub fn new(name: impl Into<String>, sound: ImageData<'a>) -> Self {
         Self {
             name: name.into(),
-            sound: sound.to_base64(),
+            sound,
             volume: 1.0,
             emoji_id: None,
             emoji_name: None,
@@ -48,8 +48,8 @@ impl<'a> CreateSoundboard<'a> {
     ///
     /// **Note**: Must be audio that is encoded in MP3 or OGG, max 512 KB, max
     /// duration 5.2 seconds.
-    pub fn sound(mut self, sound: &CreateAttachment) -> Self {
-        self.sound = sound.to_base64();
+    pub fn sound(mut self, sound: ImageData<'a>) -> Self {
+        self.sound = sound;
         self
     }
 

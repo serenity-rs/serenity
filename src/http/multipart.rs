@@ -1,13 +1,18 @@
 use std::borrow::Cow;
 
 use reqwest::multipart::{Form, Part};
+use tokio::fs::File;
 
-use crate::builder::CreateAttachment;
+use crate::builder::{AttachmentData, CreateAttachment};
 use crate::internal::prelude::*;
 
 impl CreateAttachment<'_> {
-    fn into_part(self) -> Result<Part> {
-        let mut part = Part::stream(self.data);
+    async fn into_part(self) -> Result<Part> {
+        let mut part = match self.data {
+            AttachmentData::Bytes(bytes) => Part::stream(bytes),
+            AttachmentData::File(file) => Part::stream(file.try_clone().await?),
+            AttachmentData::Path(path) => Part::stream(File::open(path).await?),
+        };
         part = guess_mime_str(part, &self.filename)?;
         part = part.file_name(self.filename);
         Ok(part)
@@ -35,16 +40,16 @@ pub struct Multipart<'a> {
 }
 
 impl Multipart<'_> {
-    pub(crate) fn build_form(self) -> Result<Form> {
+    pub(crate) async fn build_form(self) -> Result<Form> {
         let mut multipart = Form::new();
 
         match self.upload {
             MultipartUpload::File(upload_file) => {
-                multipart = multipart.part("file", upload_file.into_part()?);
+                multipart = multipart.part("file", upload_file.into_part().await?);
             },
             MultipartUpload::Attachments(attachment_files) => {
                 for (idx, file) in attachment_files.into_iter().enumerate() {
-                    multipart = multipart.part(format!("files[{idx}]"), file.into_part()?);
+                    multipart = multipart.part(format!("files[{idx}]"), file.into_part().await?);
                 }
             },
         }
