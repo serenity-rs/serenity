@@ -4216,7 +4216,7 @@ impl Http {
     /// This method does _not_ require authentication
     #[cfg(feature = "utils")]
     pub async fn get_webhook_from_url(&self, url: &str) -> Result<Webhook> {
-        let url = Url::parse(url).map_err(HttpError::Url)?;
+        let url = Url::parse(url)?;
         let (webhook_id, token) =
             crate::utils::parse_webhook(&url).ok_or(HttpError::InvalidWebhook)?;
         self.fire(Request {
@@ -4650,7 +4650,8 @@ impl Http {
                     &self.client,
                     self.token.as_ref().map(Token::expose_secret),
                     self.proxy.as_deref(),
-                )?
+                )
+                .await?
                 .build()?;
             self.client.execute(request).await?
         };

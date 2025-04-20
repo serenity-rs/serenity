@@ -98,8 +98,8 @@ impl<'a> CreateForumPost<'a> {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[cfg(feature = "http")]
-    pub async fn execute(mut self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
-        let files = self.message.attachments.take_files();
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
+        let files = self.message.attachments.new_attachments();
         http.create_forum_post(channel_id, &self, files, self.audit_log_reason).await
     }
 }

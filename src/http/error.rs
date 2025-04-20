@@ -6,7 +6,6 @@ use std::sync::Arc;
 use reqwest::header::InvalidHeaderValue;
 use reqwest::{Error as ReqwestError, Method, Response, StatusCode};
 use serde::de::{Deserialize, Deserializer, Error as _};
-use url::ParseError as UrlError;
 
 use crate::internal::prelude::*;
 
@@ -309,8 +308,6 @@ pub enum HttpError {
     RateLimitI64F64,
     /// When the decoding of a ratelimit header could not be properly decoded from UTF-8.
     RateLimitUtf8,
-    /// When parsing an URL failed due to invalid input.
-    Url(UrlError),
     /// When parsing a Webhook fails due to invalid input.
     InvalidWebhook,
     /// Header value contains invalid input.
@@ -326,12 +323,6 @@ impl HttpError {
     #[must_use]
     pub fn is_unsuccessful_request(&self) -> bool {
         matches!(self, Self::UnsuccessfulRequest(_))
-    }
-
-    /// Returns true when the error is caused by the url containing invalid input
-    #[must_use]
-    pub fn is_url_error(&self) -> bool {
-        matches!(self, Self::Url(_))
     }
 
     /// Returns true when the error is caused by an invalid header
@@ -359,12 +350,6 @@ impl From<ErrorResponse> for HttpError {
 impl From<ReqwestError> for HttpError {
     fn from(error: ReqwestError) -> Self {
         Self::Request(error)
-    }
-}
-
-impl From<UrlError> for HttpError {
-    fn from(error: UrlError) -> Self {
-        Self::Url(error)
     }
 }
 
@@ -400,7 +385,6 @@ impl fmt::Display for HttpError {
             },
             Self::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
             Self::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
-            Self::Url(_) => f.write_str("Provided URL is incorrect."),
             Self::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
             Self::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
             Self::Request(_) => f.write_str("Error while sending HTTP request."),
@@ -412,7 +396,6 @@ impl fmt::Display for HttpError {
 impl StdError for HttpError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
-            Self::Url(inner) => Some(inner),
             Self::Request(inner) => Some(inner),
             _ => None,
         }

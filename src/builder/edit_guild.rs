@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::CreateAttachment;
+use super::ImageData;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -27,7 +27,7 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     afk_timeout: Option<AfkTimeout>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<Option<String>>,
+    icon: Option<Option<ImageData<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     owner_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -35,7 +35,7 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     discovery_splash: Option<Option<Cow<'a, str>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    banner: Option<Option<Cow<'a, str>>>,
+    banner: Option<Option<ImageData<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     system_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -91,16 +91,18 @@ impl<'a> EditGuild<'a> {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
-    /// let icon = CreateAttachment::path("./guild_icon.png").await?;
+    /// let icon = CreateAttachment::path("./guild_icon.png".as_ref())?.encode().await?;
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::new().icon(Some(&icon));
+    /// let builder = EditGuild::new().icon(Some(icon));
     /// guild.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn icon(mut self, icon: Option<&CreateAttachment<'_>>) -> Self {
-        self.icon = Some(icon.map(CreateAttachment::to_base64));
+    ///
+    /// [`CreateAttachment`]: super::CreateAttachment
+    pub fn icon(mut self, icon: Option<ImageData<'a>>) -> Self {
+        self.icon = Some(icon);
         self
     }
 
@@ -182,8 +184,8 @@ impl<'a> EditGuild<'a> {
     /// guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn banner(mut self, banner: Option<&CreateAttachment<'_>>) -> Self {
-        self.banner = Some(banner.map(CreateAttachment::to_base64).map(Cow::from));
+    pub fn banner(mut self, banner: Option<ImageData<'a>>) -> Self {
+        self.banner = Some(banner);
         self
     }
 

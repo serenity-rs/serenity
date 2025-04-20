@@ -236,7 +236,7 @@ impl<'a> EditMessage<'a> {
             }
         }
 
-        let files = self.attachments.as_mut().map_or(Vec::new(), EditAttachments::take_files);
+        let files = self.attachments.as_ref().map_or(Vec::new(), EditAttachments::new_attachments);
 
         let http = cache_http.http();
         if self.allowed_mentions.is_none() {

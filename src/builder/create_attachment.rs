@@ -6,13 +6,18 @@ use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
-#[cfg(doc)]
-use crate::error::Error;
-use crate::error::Result;
+use crate::error::{Error, Result, UrlError};
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::channel::Message;
 use crate::model::id::AttachmentId;
+
+#[derive(Clone, Debug)]
+pub enum AttachmentData<'a> {
+    Bytes(Bytes),
+    File(&'a File),
+    Path(&'a Path),
+}
 
 /// A builder for creating a new attachment from a file path, file data, or URL.
 ///
@@ -23,16 +28,16 @@ use crate::model::id::AttachmentId;
 pub struct CreateAttachment<'a> {
     pub filename: Cow<'static, str>,
     pub description: Option<Cow<'a, str>>,
-    pub data: Bytes,
+    pub data: AttachmentData<'a>,
 }
 
 impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
     pub fn bytes(data: impl Into<Bytes>, filename: impl Into<Cow<'static, str>>) -> Self {
         CreateAttachment {
-            data: data.into(),
             filename: filename.into(),
             description: None,
+            data: AttachmentData::Bytes(data.into()),
         }
     }
 
@@ -40,33 +45,27 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// # Errors
     ///
-    /// [`Error::Io`] if reading the file fails.
-    pub async fn path(path: impl AsRef<Path>) -> Result<Self> {
-        async fn inner(path: &Path) -> Result<CreateAttachment<'static>> {
-            let mut file = File::open(path).await?;
-            let mut data = Vec::new();
-            file.read_to_end(&mut data).await?;
-
-            let filename = path
-                .file_name()
-                .ok_or_else(|| std::io::Error::other("attachment path must not be a directory"))?;
-
-            Ok(CreateAttachment::bytes(data, filename.to_string_lossy().into_owned()))
-        }
-
-        inner(path.as_ref()).await
+    /// Returns [`Error::Io`] if the path is not a valid file path.
+    pub fn path(path: &'a Path) -> Result<Self> {
+        let filename = path
+            .file_name()
+            .ok_or_else(|| std::io::Error::other("attachment path must not be a directory"))?
+            .to_string_lossy()
+            .into_owned();
+        Ok(CreateAttachment {
+            filename: filename.into(),
+            description: None,
+            data: AttachmentData::Path(path),
+        })
     }
 
     /// Builds an [`CreateAttachment`] by reading from a file handler.
-    ///
-    /// # Errors
-    ///
-    /// [`Error::Io`] error if reading the file fails.
-    pub async fn file(file: &File, filename: impl Into<Cow<'static, str>>) -> Result<Self> {
-        let mut data = Vec::new();
-        file.try_clone().await?.read_to_end(&mut data).await?;
-
-        Ok(CreateAttachment::bytes(data, filename))
+    pub fn file(file: &'a File, filename: impl Into<Cow<'static, str>>) -> Self {
+        CreateAttachment {
+            filename: filename.into(),
+            description: None,
+            data: AttachmentData::File(file),
+        }
     }
 
     /// Builds an [`CreateAttachment`] by downloading attachment data from a URL.
@@ -86,31 +85,91 @@ impl<'a> CreateAttachment<'a> {
         Ok(CreateAttachment::bytes(data, filename))
     }
 
-    /// Converts the stored data to the base64 representation.
+    /// Returns the underlying data for the attachment.
     ///
-    /// This is used in the library internally because Discord expects image data as base64 in many
-    /// places.
-    #[must_use]
-    pub fn to_base64(&self) -> String {
+    /// # Errors
+    ///
+    /// Returns an error if fetching the data failed in some way. If the attachment is a
+    /// [`CreateAttachment::path`], then the file at the specified path was unable to be read. If
+    /// instead it's [`CreateAttachment::file`], then cloning the handle to the file failed, likely
+    /// due to hitting the system's limit on number of open file handles.
+    pub async fn get_data(&self) -> Result<Bytes> {
+        match &self.data {
+            AttachmentData::Bytes(bytes) => Ok(bytes.clone()),
+            AttachmentData::Path(path) => {
+                let mut file = File::open(path).await?;
+                let mut data = Vec::new();
+                file.read_to_end(&mut data).await?;
+                Ok(data.into())
+            },
+            AttachmentData::File(file) => {
+                let mut data = Vec::new();
+                file.try_clone().await?.read_to_end(&mut data).await?;
+                Ok(data.into())
+            },
+        }
+    }
+
+    /// Converts the attachment data to a base64-encoded data URI.
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateAttachment::get_data`] for details.
+    pub async fn encode(&self) -> Result<ImageData> {
         use base64::engine::{Config, Engine};
 
         const PREFIX: &str = "data:image/png;base64,";
+        let data = self.get_data().await?;
 
         let engine = base64::prelude::BASE64_STANDARD;
-        let encoded_size = base64::encoded_len(self.data.len(), engine.config().encode_padding())
+        let encoded_size = base64::encoded_len(data.len(), engine.config().encode_padding())
             .and_then(|len| len.checked_add(PREFIX.len()))
             .expect("buffer capacity overflow");
 
         let mut encoded = String::with_capacity(encoded_size);
         encoded.push_str(PREFIX);
-        engine.encode_string(&self.data, &mut encoded);
-        encoded
+        engine.encode_string(&data, &mut encoded);
+        Ok(ImageData(encoded.into()))
     }
 
     /// Sets a description for the file (max 1024 characters).
     pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self
+    }
+}
+
+/// A wrapper around some base64-encoded image data. Used when an endpoint expects the image
+/// payload directly as part of the JSON body, instead of as a multipart upload.
+#[derive(Clone, Debug, Serialize)]
+#[serde(transparent)]
+pub struct ImageData<'a>(Cow<'a, str>);
+
+impl<'a> ImageData<'a> {
+    /// Constructs image data from a base64-encoded blob of data. The string must be a valid data
+    /// URI, for example:
+    ///
+    /// ```
+    /// use serenity::builder::ImageData;
+    ///
+    /// let s = "data:image/png;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=";
+    /// assert!(ImageData::from_base64(s).is_ok());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`Error::Url`] if the string is not a valid data URI. See the [Discord
+    /// docs](https://discord.com/developers/docs/reference#image-data).
+    pub fn from_base64(s: impl Into<Cow<'a, str>>) -> Result<Self> {
+        let s = s.into();
+        if let Some(("data", tail)) = s.split_once(':') {
+            if let Some((mimetype, encoding)) = tail.split_once(';') {
+                if mimetype.split_once('/').is_some() && encoding.starts_with("base64,") {
+                    return Ok(Self(s));
+                }
+            }
+        }
+        Err(Error::Url(UrlError::InvalidDataURI))
     }
 }
 
@@ -235,10 +294,9 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::keep`].
     pub fn remove(mut self, id: AttachmentId) -> Self {
-        #[expect(clippy::match_like_matches_macro)] // `matches!` is less clear here
         self.new_and_existing_attachments.retain(|a| match a {
-            NewOrExisting::Existing(a) if a.id == id => false,
-            _ => true,
+            NewOrExisting::Existing(a) => a.id != id,
+            NewOrExisting::New(_) => true,
         });
         self
     }
@@ -251,22 +309,19 @@ impl<'a> EditAttachments<'a> {
     }
 
     /// Clones all new attachments into a new Vec, keeping only data and filename, because those
-    /// are needed for the multipart form data. The data is taken out of `self` in the process, so
-    /// this method can only be called once.
+    /// are needed for the multipart form data.
     #[cfg(feature = "http")]
-    pub(crate) fn take_files(&mut self) -> Vec<CreateAttachment<'a>> {
-        let mut files = Vec::new();
-        for attachment in &mut self.new_and_existing_attachments {
-            if let NewOrExisting::New(attachment) = attachment {
-                let cloned_attachment = CreateAttachment::bytes(
-                    std::mem::take(&mut attachment.data),
-                    attachment.filename.clone(),
-                );
-
-                files.push(cloned_attachment);
-            }
-        }
-        files
+    pub(crate) fn new_attachments(&self) -> Vec<CreateAttachment<'a>> {
+        self.new_and_existing_attachments
+            .iter()
+            .filter_map(|attachment| {
+                if let NewOrExisting::New(attachment) = &attachment {
+                    Some(attachment.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }
 
