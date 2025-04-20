@@ -14,7 +14,6 @@ use crate::builder::{
 };
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::utils::lending_for_each;
 use crate::model::prelude::*;
 
 /// An interaction when a user invokes a slash command.
@@ -216,8 +215,7 @@ impl<'de> Deserialize<'de> for CommandInteraction {
                 interaction.user = member.user.clone();
             }
 
-            let iter = interaction.data.resolved.roles.iter_mut();
-            lending_for_each!(iter, |r| r.guild_id = guild_id);
+            interaction.data.resolved.roles.iter_mut().for_each(|r| r.guild_id = guild_id);
         }
         Ok(interaction)
     }

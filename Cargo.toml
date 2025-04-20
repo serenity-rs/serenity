@@ -46,7 +46,7 @@ bool_to_bitflags = { version = "0.1.2" }
 nonmax = { version = "0.5.5", features = ["serde"] }
 strum = { version = "0.26", features = ["derive"] }
 to-arraystring = "0.2.0"
-extract_map = { version = "0.2.0", features = ["serde", "iter_mut"] }
+extract_map = { version = "0.3.0", features = ["serde"] }
 aformat = "0.1.3"
 bytes = "1.5.0"
 ref-cast = "1.0.23"
