@@ -449,7 +449,7 @@ pub struct StageInstance {
 #[non_exhaustive]
 pub struct ThreadsData {
     /// The threads channels.
-    pub threads: FixedArray<GuildChannel>,
+    pub threads: FixedArray<GuildThread>,
     /// A thread member for each returned thread the current user has joined.
     pub members: FixedArray<ThreadMember>,
     /// Whether there are potentially more threads that could be returned on a subsequent call.
