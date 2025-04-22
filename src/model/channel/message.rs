@@ -971,7 +971,7 @@ bitflags! {
         /// - Files will not have a simple text preview.
         /// - URLs will not generate embeds.
         ///
-        /// For more details, refer to the Discord documentation: [https://github.com/Lulalaby/discord-api-docs/pull/30]
+        /// For more details, refer to the Discord documentation: [https://github.com/discord/discord-api-docs/pull/7487/]
         const IS_COMPONENTS_V2 = 1 << 15;
 
     }

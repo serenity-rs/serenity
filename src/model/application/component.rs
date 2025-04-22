@@ -115,7 +115,7 @@ impl<'de> Deserialize<'de> for Component {
 
 /// A component that is a container for up to 3 text display components and an accessory.
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -139,7 +139,7 @@ pub struct Section {
 ///
 /// See [`Section`] for how this fits within a section.
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -158,7 +158,7 @@ pub struct Thumbnail {
 
 /// An unfurled media item.
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -195,7 +195,7 @@ enum_number! {
 
 /// A text display component.
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -207,7 +207,7 @@ pub struct TextDisplay {
 
 /// A media gallery component.
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -224,7 +224,7 @@ pub struct MediaGallery {
 ///
 /// Belongs to [`MediaGallery`].
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -240,7 +240,7 @@ pub struct MediaGalleryItem {
 
 /// A separator component
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -270,7 +270,7 @@ enum_number! {
 
 /// A file component, will not render a text preview to the user.
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
@@ -287,7 +287,7 @@ pub struct FileComponent {
 
 /// A container component, similar to an embed but without all the functionality.
 ///
-/// [Incomplete Discord docs](https://github.com/Lulalaby/discord-api-docs/pull/30)
+/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
