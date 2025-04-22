@@ -115,7 +115,7 @@ impl<'de> Deserialize<'de> for Component {
 
 /// A component that is a container for up to 3 text display components and an accessory.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#section)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -139,7 +139,7 @@ pub struct Section {
 ///
 /// See [`Section`] for how this fits within a section.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#thumbnail)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -156,9 +156,9 @@ pub struct Thumbnail {
     pub spoiler: Option<bool>,
 }
 
-/// An unfurled media item.
+/// A url or attachment.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#unfurled-media-item-structure)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -174,28 +174,12 @@ pub struct UnfurledMediaItem {
     pub height: Option<NonMaxU32>,
     /// The content type of the media item.
     pub content_type: Option<FixedString>,
-    /// The loading state of the item, declaring if it has fully loaded yet.
-    pub loading_state: Option<UnfurledMediaItemLoadingState>,
 }
 
-#[cfg(feature = "unstable")]
-enum_number! {
-    /// The loading state of the media item.
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
-    pub enum UnfurledMediaItemLoadingState {
-        DiscordUnknown = 0,
-        Loading = 1,
-        LoadingSuccess = 2,
-        LoadingNotFound = 3,
-        _ => Unknown(u8),
-    }
-}
-
-/// A text display component.
+/// A component that allows you to add text to your message, similiar to the `content` field of a
+/// message.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#text-display)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -205,9 +189,10 @@ pub struct TextDisplay {
     pub content: FixedString<u16>,
 }
 
-/// A media gallery component.
+/// A Media Gallery is a component that allows you to display media attachments in an organized
+/// gallery format.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#media-gallery)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -224,7 +209,7 @@ pub struct MediaGallery {
 ///
 /// Belongs to [`MediaGallery`].
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#media-gallery-media-gallery-item-structure)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -238,9 +223,9 @@ pub struct MediaGalleryItem {
     pub spoiler: Option<bool>,
 }
 
-/// A separator component
+/// A component that adds vertical padding and visual division between other components.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#separator)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -270,7 +255,7 @@ enum_number! {
 
 /// A file component, will not render a text preview to the user.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#file)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
@@ -287,7 +272,7 @@ pub struct FileComponent {
 
 /// A container component, similar to an embed but without all the functionality.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/7487/)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#container)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
