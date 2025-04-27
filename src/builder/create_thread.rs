@@ -107,7 +107,7 @@ impl<'a> CreateThread<'a> {
         http: &Http,
         channel_id: ChannelId,
         message_id: Option<MessageId>,
-    ) -> Result<GuildChannel> {
+    ) -> Result<GuildThread> {
         match message_id {
             Some(id) => {
                 http.create_thread_from_message(channel_id, id, &self, self.audit_log_reason).await
