@@ -7,6 +7,10 @@ use crate::internal::prelude::*;
 use crate::model::utils::is_false;
 
 impl ThreadId {
+    /// Converts the type of this Id to [`GenericChannelId`].
+    ///
+    /// This allows you to call methods which are shared between channels and threads, and does not
+    /// change the inner value at all.
     #[must_use]
     pub fn widen(self) -> GenericChannelId {
         self.into()
