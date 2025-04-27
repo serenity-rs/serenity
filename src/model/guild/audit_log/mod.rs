@@ -332,7 +332,7 @@ pub struct AuditLogs {
     ///
     /// Threads referenced in THREAD_CREATE and THREAD_UPDATE events are included in the threads
     /// map since archived threads might not be kept in memory by clients.
-    pub threads: FixedArray<GuildChannel>,
+    pub threads: FixedArray<GuildThread>,
     /// List of users referenced in the audit log.
     pub users: ExtractMap<UserId, User>,
     /// List of webhooks referenced in the audit log.

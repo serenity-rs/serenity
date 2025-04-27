@@ -319,7 +319,7 @@ impl ChannelId {
         http: &Http,
         message_id: MessageId,
         builder: CreateThread<'_>,
-    ) -> Result<GuildChannel> {
+    ) -> Result<GuildThread> {
         builder.execute(http, self, Some(message_id)).await
     }
 
@@ -333,7 +333,7 @@ impl ChannelId {
         self,
         http: &Http,
         builder: CreateThread<'_>,
-    ) -> Result<GuildChannel> {
+    ) -> Result<GuildThread> {
         builder.execute(http, self, None).await
     }
 
@@ -346,7 +346,7 @@ impl ChannelId {
         self,
         http: &Http,
         builder: CreateForumPost<'_>,
-    ) -> Result<GuildChannel> {
+    ) -> Result<GuildThread> {
         builder.execute(http, self).await
     }
 
