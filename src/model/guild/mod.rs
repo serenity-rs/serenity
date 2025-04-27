@@ -229,9 +229,9 @@ pub struct Guild {
     pub presences: ExtractMap<UserId, Presence>,
     /// The stage instances in this guild.
     pub stage_instances: FixedArray<StageInstance>,
-    /// The stage instances in this guild.
+    /// The scheduled events in this guild.
     #[serde(rename = "guild_scheduled_events")]
-    pub scheduled_events: FixedArray<ScheduledEvent>,
+    pub scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
     /// The id of the channel where this guild will recieve safety alerts.
     pub safety_alerts_channel_id: Option<ChannelId>,
     /// The incidents data for this guild, if any.

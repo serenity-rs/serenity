@@ -1,5 +1,7 @@
 use std::collections::VecDeque;
 
+use extract_map::entry::Entry;
+
 use super::{BaseGuildChannel, Cache, CacheUpdate, GenericChannelId, GuildThread};
 use crate::internal::prelude::*;
 use crate::model::channel::{GuildChannel, Message};
@@ -18,6 +20,9 @@ use crate::model::event::{
     GuildRoleCreateEvent,
     GuildRoleDeleteEvent,
     GuildRoleUpdateEvent,
+    GuildScheduledEventCreateEvent,
+    GuildScheduledEventDeleteEvent,
+    GuildScheduledEventUpdateEvent,
     GuildStickersUpdateEvent,
     GuildUpdateEvent,
     MessageCreateEvent,
@@ -26,13 +31,21 @@ use crate::model::event::{
     ReadyEvent,
     ThreadCreateEvent,
     ThreadDeleteEvent,
+    ThreadListSyncEvent,
     ThreadUpdateEvent,
     UserUpdateEvent,
     VoiceChannelStatusUpdateEvent,
     VoiceStateUpdateEvent,
 };
 use crate::model::gateway::Presence;
-use crate::model::guild::{Guild, GuildMemberFlags, Member, MemberGeneratedFlags, Role};
+use crate::model::guild::{
+    Guild,
+    GuildMemberFlags,
+    Member,
+    MemberGeneratedFlags,
+    Role,
+    ScheduledEvent,
+};
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 
@@ -72,9 +85,9 @@ impl CacheUpdate for ChannelUpdateEvent {
 }
 
 impl CacheUpdate for ChannelPinsUpdateEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(guild_id) = self.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
                 let (channel_id, thread_id) = self.channel_id.split();
@@ -94,9 +107,9 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
 }
 
 impl CacheUpdate for GuildCreateEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         cache.unavailable_guilds.remove(&self.guild.id);
         let guild = self.guild.clone();
 
@@ -132,9 +145,9 @@ impl CacheUpdate for GuildDeleteEvent {
 }
 
 impl CacheUpdate for GuildEmojisUpdateEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
             guild.emojis.clone_from(&self.emojis);
         }
@@ -144,9 +157,9 @@ impl CacheUpdate for GuildEmojisUpdateEvent {
 }
 
 impl CacheUpdate for GuildMemberAddEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.member.guild_id) {
             guild.member_count += 1;
             guild.members.insert(self.member.clone());
@@ -228,9 +241,9 @@ impl CacheUpdate for GuildMemberUpdateEvent {
 }
 
 impl CacheUpdate for GuildMembersChunkEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut g) = cache.guilds.get_mut(&self.guild_id) {
             g.members.extend(self.members.clone());
         }
@@ -240,9 +253,9 @@ impl CacheUpdate for GuildMembersChunkEvent {
 }
 
 impl CacheUpdate for GuildRoleCreateEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         cache.guilds.get_mut(&self.role.guild_id).map(|mut g| g.roles.insert(self.role.clone()));
         None
     }
@@ -271,9 +284,9 @@ impl CacheUpdate for GuildRoleUpdateEvent {
 }
 
 impl CacheUpdate for GuildStickersUpdateEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
             guild.stickers.clone_from(&self.stickers);
         }
@@ -283,9 +296,9 @@ impl CacheUpdate for GuildStickersUpdateEvent {
 }
 
 impl CacheUpdate for GuildUpdateEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild.id) {
             guild.afk_metadata.clone_from(&self.guild.afk_metadata);
             guild.banner.clone_from(&self.guild.banner);
@@ -454,9 +467,9 @@ impl CacheUpdate for PresenceUpdateEvent {
 }
 
 impl CacheUpdate for ReadyEvent {
-    type Output = ();
+    type Output = std::convert::Infallible;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         for unavailable in &self.ready.guilds {
             cache.guilds.remove(&unavailable.id);
             cache.unavailable_guilds.insert(unavailable.id, ());
@@ -508,6 +521,51 @@ impl CacheUpdate for ThreadDeleteEvent {
     }
 }
 
+impl CacheUpdate for ThreadListSyncEvent {
+    type Output = std::convert::Infallible;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let mut guild = cache.guilds.get_mut(&self.guild_id)?;
+        let Some(channel_ids) = &self.channel_ids else {
+            // channel_ids is none, this is a full sync, easy path
+            guild.threads.clone_from(&self.threads);
+            return None;
+        };
+
+        // Add new threads and update existing threads.
+        for new_thread in &self.threads {
+            match guild.threads.entry(&new_thread.id) {
+                Entry::Occupied(mut entry) => {
+                    entry.get_mut().clone_from(new_thread);
+                },
+                Entry::Vacant(entry) => {
+                    entry.insert(new_thread.clone());
+                },
+            }
+        }
+
+        // Remove threads which are not provided in the sync and are in the provided channels.
+        let mut removed_threads = Vec::new();
+        for &channel_id in channel_ids {
+            for thread in &guild.threads {
+                if thread.parent_id != channel_id {
+                    continue;
+                }
+
+                if !self.threads.contains_key(&thread.id) {
+                    removed_threads.push(thread.id);
+                }
+            }
+        }
+
+        for to_remove in removed_threads {
+            guild.threads.remove(&to_remove);
+        }
+
+        None
+    }
+}
+
 impl CacheUpdate for UserUpdateEvent {
     type Output = CurrentUser;
 
@@ -555,5 +613,36 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
         let old = channel.status.clone();
         channel.status.clone_from(&self.status);
         old
+    }
+}
+
+fn update_guild_event(cache: &Cache, event: &ScheduledEvent) -> Option<ScheduledEvent> {
+    let mut guild = cache.guilds.get_mut(&event.guild_id)?;
+    guild.scheduled_events.insert(event.clone())
+}
+
+impl CacheUpdate for GuildScheduledEventCreateEvent {
+    type Output = std::convert::Infallible;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        update_guild_event(cache, &self.event);
+        None
+    }
+}
+
+impl CacheUpdate for GuildScheduledEventUpdateEvent {
+    type Output = ScheduledEvent;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        update_guild_event(cache, &self.event)
+    }
+}
+
+impl CacheUpdate for GuildScheduledEventDeleteEvent {
+    type Output = ScheduledEvent;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let mut guild = cache.guilds.get_mut(&self.event.guild_id)?;
+        guild.scheduled_events.remove(&self.event.id)
     }
 }
