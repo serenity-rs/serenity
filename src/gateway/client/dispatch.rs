@@ -475,8 +475,12 @@ fn update_cache_with_event(
                 full_thread_data,
             }
         },
-        Event::ThreadListSync(event) => FullEvent::ThreadListSync {
-            thread_list_sync: event,
+        Event::ThreadListSync(mut event) => {
+            update_cache!(cache, event);
+
+            FullEvent::ThreadListSync {
+                thread_list_sync: event,
+            }
         },
         Event::ThreadMemberUpdate(event) => FullEvent::ThreadMemberUpdate {
             thread_member: event.member,
@@ -484,14 +488,26 @@ fn update_cache_with_event(
         Event::ThreadMembersUpdate(event) => FullEvent::ThreadMembersUpdate {
             thread_members_update: event,
         },
-        Event::GuildScheduledEventCreate(event) => FullEvent::GuildScheduledEventCreate {
-            event: event.event,
+        Event::GuildScheduledEventCreate(mut event) => {
+            update_cache!(cache, event);
+
+            FullEvent::GuildScheduledEventCreate {
+                event: event.event,
+            }
         },
-        Event::GuildScheduledEventUpdate(event) => FullEvent::GuildScheduledEventUpdate {
-            event: event.event,
+        Event::GuildScheduledEventUpdate(mut event) => {
+            update_cache!(cache, event);
+
+            FullEvent::GuildScheduledEventUpdate {
+                event: event.event,
+            }
         },
-        Event::GuildScheduledEventDelete(event) => FullEvent::GuildScheduledEventDelete {
-            event: event.event,
+        Event::GuildScheduledEventDelete(mut event) => {
+            update_cache!(cache, event);
+
+            FullEvent::GuildScheduledEventDelete {
+                event: event.event,
+            }
         },
         Event::GuildScheduledEventUserAdd(event) => FullEvent::GuildScheduledEventUserAdd {
             subscribed: event,

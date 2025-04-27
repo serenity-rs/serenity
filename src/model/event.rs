@@ -825,7 +825,7 @@ pub struct ThreadListSyncEvent {
     /// well, so you know to clear that data.
     pub channel_ids: Option<Vec<ChannelId>>,
     /// All active threads in the given channels that the current user can access.
-    pub threads: FixedArray<GuildThread>,
+    pub threads: ExtractMap<ThreadId, GuildThread>,
     /// All thread member objects from the synced threads for the current user, indicating which
     /// threads the current user has been added to
     pub members: FixedArray<ThreadMember>,
