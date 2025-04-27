@@ -45,16 +45,32 @@ impl From<ChannelId> for GenericChannelId {
 }
 
 impl GenericChannelId {
+    /// Copies this ID into a [`ChannelId`] and a [`ThreadId`].
+    ///
+    /// It is only correct to use this when you use both returned values,
+    /// otherwise use [`Self::expect_channel`] or [`Self::expect_thread`].
     #[must_use]
     pub fn split(self) -> (ChannelId, ThreadId) {
         (self.expect_channel(), self.expect_thread())
     }
 
+    /// Converts the type of this Id to [`ChannelId`].
+    ///
+    /// This converts the type without changing the inner value, therefore,
+    /// is only correct when you have knowledge which is not in the type system.
+    ///
+    /// This should be used as rarely as [`Option::expect`].
     #[must_use]
     pub fn expect_channel(self) -> ChannelId {
         ChannelId::new(self.get())
     }
 
+    /// Converts the type of this Id to [`ThreadId`].
+    ///
+    /// This converts the type without changing the inner value, therefore,
+    /// is only correct when you have knowledge which is not in the type system.
+    ///
+    /// This should be used as rarely as [`Option::expect`].
     #[must_use]
     pub fn expect_thread(self) -> ThreadId {
         ThreadId::new(self.get())
@@ -449,7 +465,7 @@ pub struct StageInstance {
 #[non_exhaustive]
 pub struct ThreadsData {
     /// The threads channels.
-    pub threads: FixedArray<GuildChannel>,
+    pub threads: FixedArray<GuildThread>,
     /// A thread member for each returned thread the current user has joined.
     pub members: FixedArray<ThreadMember>,
     /// Whether there are potentially more threads that could be returned on a subsequent call.

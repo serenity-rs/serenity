@@ -162,7 +162,7 @@ pub struct GuildCreateEvent {
     pub guild: Guild,
 }
 
-// Manual impl needed to insert guild_id fields in GuildChannel, Member, Role
+// Manual impl needed to insert guild_id fields in GuildChannel, GuildThread, Member, Role
 impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild: Guild = Guild::deserialize(deserializer)?;
