@@ -55,6 +55,12 @@ pub struct ScheduledEvent {
     pub image: Option<ImageHash>,
 }
 
+impl extract_map::ExtractKey<ScheduledEventId> for ScheduledEvent {
+    fn extract_key(&self) -> &ScheduledEventId {
+        &self.id
+    }
+}
+
 enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
