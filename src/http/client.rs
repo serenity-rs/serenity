@@ -435,7 +435,7 @@ impl Http {
         message_id: MessageId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<GuildChannel> {
+    ) -> Result<GuildThread> {
         let body = to_vec(map)?;
 
         self.fire(Request {
@@ -458,7 +458,7 @@ impl Http {
         channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<GuildChannel> {
+    ) -> Result<GuildThread> {
         let body = to_vec(map)?;
 
         self.fire(Request {
@@ -481,7 +481,7 @@ impl Http {
         map: &impl serde::Serialize,
         files: Vec<CreateAttachment<'_>>,
         audit_log_reason: Option<&str>,
-    ) -> Result<GuildChannel> {
+    ) -> Result<GuildThread> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
