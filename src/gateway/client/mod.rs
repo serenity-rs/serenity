@@ -47,6 +47,7 @@ use super::{
     ActivityData,
     DEFAULT_WAIT_BETWEEN_SHARD_START,
     PresenceData,
+    ResumeState,
     ShardManager,
     ShardManagerOptions,
     TransportCompression,
@@ -473,7 +474,7 @@ impl Client {
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn start(&mut self) -> Result<()> {
+    pub async fn start(&mut self) -> Result<Option<ResumeState>> {
         self.start_connection(0, 0, NonZeroU16::MIN).await
     }
 
@@ -516,7 +517,7 @@ impl Client {
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn start_autosharded(&mut self) -> Result<()> {
+    pub async fn start_autosharded(&mut self) -> Result<Option<ResumeState>> {
         let (end, total) = {
             let res = self.http.get_bot_gateway().await?;
             (res.shards.get() - 1, res.shards)
@@ -582,7 +583,7 @@ impl Client {
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn start_shard(&mut self, shard: u16, shards: u16) -> Result<()> {
+    pub async fn start_shard(&mut self, shard: u16, shards: u16) -> Result<Option<ResumeState>> {
         self.start_connection(shard, shard, check_shard_total(shards)).await
     }
 
@@ -625,7 +626,7 @@ impl Client {
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn start_shards(&mut self, total_shards: u16) -> Result<()> {
+    pub async fn start_shards(&mut self, total_shards: u16) -> Result<Option<ResumeState>> {
         self.start_connection(0, total_shards - 1, check_shard_total(total_shards)).await
     }
 
@@ -668,7 +669,11 @@ impl Client {
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub async fn start_shard_range(&mut self, range: Range<u16>, total_shards: u16) -> Result<()> {
+    pub async fn start_shard_range(
+        &mut self,
+        range: Range<u16>,
+        total_shards: u16,
+    ) -> Result<Option<ResumeState>> {
         self.start_connection(range.start, range.end, check_shard_total(total_shards)).await
     }
 
@@ -678,7 +683,7 @@ impl Client {
         start_shard: u16,
         end_shard: u16,
         total_shards: NonZeroU16,
-    ) -> Result<()> {
+    ) -> Result<Option<ResumeState>> {
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
             #[cfg(feature = "cache")]

@@ -293,9 +293,10 @@ impl Context {
     }
 
     /// Sends a message back to the shard manager to shutdown all currently running shards,
-    /// including this one.
-    pub fn shutdown_all(&self) {
-        if let Err(e) = self.manager.unbounded_send(ShardManagerMessage::Quit(Ok(()))) {
+    ///
+    /// See the documentation of [`ShardManagerMessage::Quit`] for more information.
+    pub fn shutdown_all(&self, resuming: bool) {
+        if let Err(e) = self.manager.unbounded_send(ShardManagerMessage::Quit(Ok(resuming))) {
             tracing::warn!("failed to send shutdown request to shard manager: {}", e);
         }
     }

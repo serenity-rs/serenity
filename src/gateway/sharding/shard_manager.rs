@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::num::NonZeroU16;
 use std::sync::Arc;
 #[cfg(feature = "framework")]
@@ -7,12 +8,13 @@ use std::time::{Duration, Instant};
 use dashmap::DashMap;
 use futures::StreamExt;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use tokio::time::{sleep, timeout};
+use tokio::time::{sleep, timeout, timeout_at};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, info, warn};
 
 use super::{
+    ResumeMetadata,
     Shard,
     ShardId,
     ShardInfo,
@@ -29,6 +31,7 @@ use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
 use crate::gateway::client::{EventHandler, RawEventHandler};
+use crate::gateway::ws::RECIEVE_TIMEOUT;
 use crate::gateway::{ConnectionStage, GatewayError, PresenceData, TransportCompression};
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -45,6 +48,9 @@ pub struct ShardManager {
     /// A sender that is cloned and given out to each ShardRunner as it is created
     manager_tx: Sender<ShardManagerMessage>,
     manager_rx: Receiver<ShardManagerMessage>,
+    /// If the runners have been cleanly shutdown, or if the Drop implementation needs to notify
+    /// them to.
+    cleanly_shutdown: bool,
 
     /// A copy of [`Client::data`] to be given to runners for contextual dispatching.
     ///
@@ -95,6 +101,7 @@ impl ShardManager {
             token: opt.token,
             manager_tx,
             manager_rx,
+            cleanly_shutdown: false,
 
             data: opt.data,
             event_handler: opt.event_handler,
@@ -120,11 +127,15 @@ impl ShardManager {
 
     /// Retrieves a function which can be used to shut down the ShardManager later.
     ///
-    /// This function will return `true` if the ShardManager has successfully been
-    /// notified to shut down, or false if it has already shut down and been dropped.
-    pub fn get_shutdown_trigger(&self) -> impl FnOnce() -> bool + Send + use<> {
+    /// This function takes a single boolean argument, `resuming`, which tells the Shard Manager
+    /// whether it should shut down the connections fully (false) or keep them alive and return
+    /// [`ResumeState`] (true).
+    ///
+    /// It will return `true` if the ShardManager has successfully been notified to shut down,
+    /// or false if it has already shut down and been dropped.
+    pub fn get_shutdown_trigger(&self) -> impl FnOnce(bool) -> bool + Send + use<> {
         let manager_tx = self.manager_tx.clone();
-        move || manager_tx.unbounded_send(ShardManagerMessage::Quit(Ok(()))).is_ok()
+        move |resuming| manager_tx.unbounded_send(ShardManagerMessage::Quit(Ok(resuming))).is_ok()
     }
 
     /// The main interface for starting the management of shards. Initializes the shards by
@@ -148,7 +159,7 @@ impl ShardManager {
         shard_index: u16,
         shard_init: u16,
         shard_total: NonZeroU16,
-    ) -> Result<(), GatewayError> {
+    ) -> Result<Option<ResumeState>, GatewayError> {
         self.initialize(shard_index, shard_init, shard_total);
         loop {
             let batch = self.queue.pop_batch();
@@ -159,7 +170,11 @@ impl ShardManager {
             {
                 match msg {
                     ShardManagerMessage::Boot(shard_id) => self.queue_for_start(shard_id),
-                    ShardManagerMessage::Quit(res) => return res,
+                    ShardManagerMessage::Quit(Ok(true)) => {
+                        return Ok(Some(self.collect_resume_metadata().await));
+                    },
+                    ShardManagerMessage::Quit(Ok(false)) => return Ok(None),
+                    ShardManagerMessage::Quit(Err(err)) => return Err(err),
                 }
             }
         }
@@ -267,6 +282,43 @@ impl ShardManager {
         Ok(())
     }
 
+    async fn collect_resume_metadata(&mut self) -> ResumeState {
+        self.cleanly_shutdown = true;
+
+        let mut pending_channels = Vec::with_capacity(self.runners.len());
+        for entry in self.runners.iter() {
+            let (&id, (_, tx)) = entry.pair();
+            let (metadata_tx, metadata_rx) = futures::channel::oneshot::channel();
+
+            let message = ShardRunnerMessage::ShutdownExpectingResume {
+                metadata_tx,
+            };
+
+            if tx.unbounded_send(message).is_ok() {
+                pending_channels.push((id, metadata_rx));
+            }
+        }
+
+        let mut map = HashMap::with_capacity(pending_channels.len());
+        let response_deadline = tokio::time::Instant::now() + (RECIEVE_TIMEOUT * 2);
+        for (shard_id, metadata_rx) in pending_channels {
+            if let Ok(resp) = timeout_at(response_deadline, metadata_rx).await {
+                if let Ok(metadata) = resp {
+                    map.insert(shard_id, metadata);
+                } else {
+                    // shard has died, nothing we can do
+                }
+            } else {
+                // hit deadline, return what we collected
+                break;
+            }
+        }
+
+        ResumeState {
+            map,
+        }
+    }
+
     /// Returns the gateway intents used for this gateway connection.
     #[must_use]
     pub fn intents(&self) -> GatewayIntents {
@@ -281,8 +333,11 @@ impl Drop for ShardManager {
     ///
     /// [`ShardRunner`]: super::ShardRunner
     fn drop(&mut self) {
-        info!("Shutting down all shards");
+        if self.cleanly_shutdown {
+            return;
+        }
 
+        info!("Shutting down all shards");
         for entry in self.runners.iter() {
             let (shard_id, (_, tx)) = entry.pair();
             info!("Shutting down shard {}", shard_id);
@@ -323,5 +378,21 @@ pub enum ShardManagerMessage {
     /// the shard is not guaranteed to immediately start, until more shards are queued.
     Boot(ShardId),
     /// Indicates that a shard runner encountered a fatal error and the shard manager should quit.
-    Quit(Result<(), GatewayError>),
+    ///
+    /// `Ok(true)` indicates the ShardManager should preserve sessions and collect [`ResumeState`],
+    /// `Ok(false)` will fully invalidate sessions and disconnect cleanly.
+    Quit(Result<bool, GatewayError>),
+}
+
+/// The state for future startups to resume with.
+///
+/// If performing a restart, it is recommended to store a serialized version of this type for the
+/// next start, in which you should use `ClientBuilder::resume_with` to recieve events which have
+/// arrived during the downtime.
+///
+/// As with all resuming, Discord may decide to ignore this and refuse to send the missed events, so
+/// this should only be relied on at a best-effort basis.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ResumeState {
+    map: HashMap<ShardId, ResumeMetadata>,
 }

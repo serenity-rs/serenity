@@ -233,7 +233,7 @@ pub struct WsClient {
     compression: Compression,
 }
 
-const TIMEOUT: Duration = Duration::from_millis(500);
+pub(super) const RECIEVE_TIMEOUT: Duration = Duration::from_millis(500);
 
 impl WsClient {
     pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
@@ -254,7 +254,7 @@ impl WsClient {
     }
 
     pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
-        let message = match timeout(TIMEOUT, self.stream.next()).await {
+        let message = match timeout(RECIEVE_TIMEOUT, self.stream.next()).await {
             Ok(Some(Ok(msg))) => msg,
             Ok(Some(Err(e))) => return Err(e.into()),
             Ok(None) | Err(_) => return Ok(None),

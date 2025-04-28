@@ -48,6 +48,7 @@ use url::Url;
 
 pub use self::shard_manager::{
     DEFAULT_WAIT_BETWEEN_SHARD_START,
+    ResumeState,
     ShardManager,
     ShardManagerMessage,
     ShardManagerOptions,
@@ -701,7 +702,8 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
     WsClient::connect(url, compression).await
 }
 
-struct ResumeMetadata {
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ResumeMetadata {
     session_id: FixedString,
     resume_ws_url: FixedString,
 }

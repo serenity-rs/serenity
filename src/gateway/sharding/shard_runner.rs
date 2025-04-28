@@ -12,7 +12,14 @@ use tracing::{debug, error, trace, warn};
 
 #[cfg(feature = "collector")]
 use super::CollectorCallback;
-use super::{Shard, ShardAction, ShardManagerMessage, ShardRunnerInfo, ShardStageUpdateEvent};
+use super::{
+    ResumeMetadata,
+    Shard,
+    ShardAction,
+    ShardManagerMessage,
+    ShardRunnerInfo,
+    ShardStageUpdateEvent,
+};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
@@ -283,6 +290,15 @@ impl ShardRunner {
                 self.shutdown(code).await;
                 false
             },
+            ShardRunnerMessage::ShutdownExpectingResume {
+                metadata_tx,
+            } => {
+                if let Some(resume_metadata) = self.shard.resume_metadata.take() {
+                    drop(metadata_tx.send(resume_metadata));
+                }
+
+                false
+            },
             ShardRunnerMessage::ChunkGuild {
                 guild_id,
                 limit,
@@ -518,6 +534,11 @@ pub enum ShardRunnerMessage {
     ///
     /// [Discord docs]: https://discord.com/developers/docs/events/gateway#initiating-a-disconnect
     Shutdown(u16),
+    /// Indicator that a shard should disconnect from discord without invalidating the session.
+    ///
+    /// The shard will reply back with it's [`ResumeMetadata`] via the `metadata_tx` channel once it
+    /// is disconnected.
+    ShutdownExpectingResume { metadata_tx: futures::channel::oneshot::Sender<ResumeMetadata> },
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {
         /// The IDs of the [`Guild`] to chunk.
