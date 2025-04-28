@@ -30,7 +30,7 @@ impl LitExt for Lit {
         if let Lit::Bool(b) = self {
             b.value
         } else {
-            self.to_str().parse().unwrap_or_else(|_| panic!("expected bool from {:?}", self))
+            self.to_str().parse().unwrap_or_else(|_| panic!("expected bool from {self:?}"))
         }
     }
 
