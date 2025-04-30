@@ -1,11 +1,14 @@
 use std::borrow::Cow;
 
-#[cfg(not(feature = "unstable"))]
-use super::CreateActionRow;
-#[cfg(feature = "unstable")]
-use super::CreateComponent;
 use super::create_poll::Ready;
-use super::{CreateAllowedMentions, CreateAttachment, CreateEmbed, CreatePoll, EditAttachments};
+use super::{
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateComponent,
+    CreateEmbed,
+    CreatePoll,
+    EditAttachments,
+};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -60,11 +63,7 @@ pub struct CreateMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     message_reference: Option<MessageReference>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[cfg(feature = "unstable")]
     components: Option<Cow<'a, [CreateComponent<'a>]>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[cfg(not(feature = "unstable"))]
-    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     sticker_ids: Cow<'a, [StickerId]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
@@ -185,15 +184,7 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Sets the components of this message.
-    #[cfg(feature = "unstable")]
     pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
-        self.components = Some(components.into());
-        self
-    }
-
-    /// Sets the components of this message.
-    #[cfg(not(feature = "unstable"))]
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }

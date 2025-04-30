@@ -130,18 +130,11 @@ macro_rules! button_and_select_menu_convenience_methods {
         pub fn button(mut $self, button: super::CreateButton<'a>) -> Self {
             let rows = $self$(.$components_path)+.get_or_insert_with(Cow::default).to_mut();
             let row_with_space_left = rows.last_mut().and_then(|row| match row {
-                #[cfg(not(feature = "unstable"))]
-                super::CreateActionRow::Buttons(buttons) if buttons.len() < 5 => Some(buttons.to_mut()),
-
-                #[cfg(feature = "unstable")]
                 super::CreateComponent::ActionRow(super::CreateActionRow::Buttons(buttons)) if buttons.len() < 5 => Some(buttons.to_mut()),
                 _ => None,
             });
             match row_with_space_left {
                 Some(row) => row.push(button),
-                #[cfg(not(feature = "unstable"))]
-                None => rows.push(super::CreateActionRow::buttons(vec![button])),
-                #[cfg(feature = "unstable")]
                 None => rows.push(super::CreateComponent::ActionRow(super::CreateActionRow::buttons(vec![button]))),
             }
             $self
@@ -151,14 +144,7 @@ macro_rules! button_and_select_menu_convenience_methods {
         ///
         /// Convenience method that wraps [`Self::components`].
         pub fn select_menu(mut $self, select_menu: super::CreateSelectMenu<'a>) -> Self {
-            #[cfg(not(feature = "unstable"))]
-            $self$(.$components_path)+
-            .get_or_insert_with(Cow::default)
-            .to_mut()
-            .push(super::CreateActionRow::SelectMenu(select_menu));
 
-
-            #[cfg(feature = "unstable")]
             $self$(.$components_path)+
                 .get_or_insert_with(Cow::default)
                 .to_mut()

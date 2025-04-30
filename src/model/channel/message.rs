@@ -14,8 +14,6 @@ use crate::constants;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
-#[cfg(not(feature = "unstable"))]
-use crate::model::utils::deserialize_components;
 use crate::model::utils::{StrOrInt, discord_colours};
 
 /// A representation of a message over a guild's text channel, a group, or a private channel.
@@ -112,13 +110,7 @@ pub struct Message {
     pub thread: Option<Box<GuildThread>>,
     /// The components of this message
     #[serde(default)]
-    #[cfg(feature = "unstable")]
     pub components: FixedArray<Component>,
-
-    /// The components of this message
-    #[cfg(not(feature = "unstable"))]
-    #[serde(default, deserialize_with = "deserialize_components")]
-    pub components: FixedArray<ActionRow>,
     /// Array of message sticker item objects.
     #[serde(default)]
     pub sticker_items: FixedArray<StickerItem>,
@@ -893,11 +885,7 @@ pub struct MessageSnapshot {
     pub kind: MessageType,
     pub flags: Option<MessageFlags>,
     #[serde(default)]
-    #[cfg(feature = "unstable")]
     pub components: FixedArray<Component>,
-    #[serde(default, deserialize_with = "deserialize_components")]
-    #[cfg(not(feature = "unstable"))]
-    pub components: FixedArray<ActionRow>,
     #[serde(default)]
     pub sticker_items: FixedArray<StickerItem>,
 }

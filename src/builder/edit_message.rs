@@ -1,10 +1,12 @@
 use std::borrow::Cow;
 
-#[cfg(not(feature = "unstable"))]
-use super::CreateActionRow;
-#[cfg(feature = "unstable")]
-use super::CreateComponent;
-use super::{CreateAllowedMentions, CreateAttachment, CreateEmbed, EditAttachments};
+use super::{
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateComponent,
+    CreateEmbed,
+    EditAttachments,
+};
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
@@ -43,11 +45,7 @@ pub struct EditMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[cfg(feature = "unstable")]
     components: Option<Cow<'a, [CreateComponent<'a>]>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[cfg(not(feature = "unstable"))]
-    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     attachments: Option<EditAttachments<'a>>,
 }
@@ -138,15 +136,7 @@ impl<'a> EditMessage<'a> {
     }
 
     /// Sets the components of this message.
-    #[cfg(feature = "unstable")]
     pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
-        self.components = Some(components.into());
-        self
-    }
-
-    /// Sets the components of this message.
-    #[cfg(not(feature = "unstable"))]
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
