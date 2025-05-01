@@ -20,6 +20,7 @@ mod ping_interaction;
 pub use ping_interaction::*;
 
 use super::prelude::*;
+use crate::internal::hasher::BuildHasher;
 
 /// Partial information about the given application.
 ///
@@ -76,7 +77,8 @@ pub struct CurrentApplicationInfo {
     /// render the app as a verification method in the guild role verification configuration.
     pub role_connections_verification_url: Option<FixedString>,
     #[serde(default)]
-    pub integration_types_config: HashMap<InstallationContext, InstallationContextConfig>,
+    pub integration_types_config:
+        HashMap<InstallationContext, InstallationContextConfig, BuildHasher>,
     pub approximate_guild_count: Option<u32>,
     pub approximate_user_install_count: Option<u32>,
     pub guild: Option<PartialGuild>,
