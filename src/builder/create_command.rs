@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
+use crate::cache::BuildHasher;
 use crate::builder::EditCommand;
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -20,10 +21,10 @@ pub struct CreateCommandOption<'a> {
     kind: CommandOptionType,
     name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher>>,
     description: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    description_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    description_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher>>,
     #[serde(default)]
     required: bool,
     #[serde(default)]
@@ -157,7 +158,7 @@ impl<'a> CreateCommandOption<'a> {
         self,
         name: impl Into<Cow<'a, str>>,
         value: i64,
-        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher>>,
     ) -> Self {
         self.add_choice(CreateCommandOptionChoice {
             name: name.into(),
@@ -187,7 +188,7 @@ impl<'a> CreateCommandOption<'a> {
         self,
         name: impl Into<Cow<'a, str>>,
         value: impl Into<String>,
-        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher>>,
     ) -> Self {
         self.add_choice(CreateCommandOptionChoice {
             name: name.into(),
@@ -213,7 +214,7 @@ impl<'a> CreateCommandOption<'a> {
         self,
         name: impl Into<Cow<'a, str>>,
         value: f64,
-        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+        locales: impl Into<HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher>>,
     ) -> Self {
         self.add_choice(CreateCommandOptionChoice {
             name: name.into(),
@@ -501,6 +502,6 @@ impl<'a> CreateCommand<'a> {
 struct CreateCommandOptionChoice<'a> {
     pub name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    pub name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher>>,
     pub value: Value,
 }

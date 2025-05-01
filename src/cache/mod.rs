@@ -51,7 +51,8 @@ pub(crate) mod wrappers;
 
 #[cfg(feature = "temp_cache")]
 pub(crate) use wrappers::MaybeOwnedArc;
-use wrappers::{BuildHasher, MaybeMap, ReadOnlyMapRef};
+pub use wrappers::{ExtractMap, BuildHasher};
+use wrappers::{MaybeMap, ReadOnlyMapRef};
 
 struct NotSend;
 

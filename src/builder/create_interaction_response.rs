@@ -14,6 +14,7 @@ use super::{
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
+use crate::cache::BuildHasher;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
 #[derive(Clone, Debug)]
@@ -336,7 +337,7 @@ impl From<f64> for AutocompleteValue<'static> {
 pub struct AutocompleteChoice<'a> {
     pub name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>>>,
+    pub name_localizations: Option<HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher>>,
     pub value: AutocompleteValue<'a>,
 }
 

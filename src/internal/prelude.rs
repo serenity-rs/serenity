@@ -4,7 +4,8 @@
 
 pub use std::result::Result as StdResult;
 
-pub use extract_map::{ExtractKey, ExtractMap};
+pub use crate::cache::ExtractMap;
+pub use extract_map::ExtractKey;
 pub use serde_json::Value;
 pub use small_fixed_array::{FixedArray, FixedString, TruncatingInto};
 pub use to_arraystring::ToArrayString;

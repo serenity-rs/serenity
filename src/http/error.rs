@@ -6,7 +6,7 @@ use std::sync::Arc;
 use reqwest::header::InvalidHeaderValue;
 use reqwest::{Error as ReqwestError, Method, Response, StatusCode};
 use serde::de::{Deserialize, Deserializer, Error as _};
-
+use crate::cache::BuildHasher;
 use crate::internal::prelude::*;
 
 enum_number! {
@@ -435,11 +435,11 @@ fn make_error(
 enum ErrorValue<'a> {
     Base(Vec<RawDiscordJsonSingleError>),
     #[serde(borrow)]
-    Recurse(HashMap<&'a str, ErrorValue<'a>>),
+    Recurse(HashMap<&'a str, ErrorValue<'a>, BuildHasher>),
 }
 
 fn loop_errors<'a>(
-    value: HashMap<&'a str, ErrorValue<'a>>,
+    value: HashMap<&'a str, ErrorValue<'a>, BuildHasher>,
     errors: &mut Vec<DiscordJsonSingleError>,
     path: &mut Vec<&'a str>,
 ) -> Result<(), &'static str> {
