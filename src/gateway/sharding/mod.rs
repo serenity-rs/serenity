@@ -702,7 +702,7 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
     WsClient::connect(url, compression).await
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ResumeMetadata {
     session_id: FixedString,
     resume_ws_url: FixedString,

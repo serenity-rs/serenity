@@ -11,7 +11,7 @@
 /// settings.max_messages = 10;
 /// ```
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
 pub struct Settings {
     /// How long temporarily-cached data should be stored before being thrown out.

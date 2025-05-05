@@ -316,6 +316,7 @@ impl ShardManager {
 
         ResumeState {
             map,
+            cache: Arc::clone(&self.cache),
         }
     }
 
@@ -387,12 +388,16 @@ pub enum ShardManagerMessage {
 /// The state for future startups to resume with.
 ///
 /// If performing a restart, it is recommended to store a serialized version of this type for the
-/// next start, in which you should use `ClientBuilder::resume_with` to recieve events which have
+/// next start, in which you should use [`ClientBuilder::resume_with`] to recieve events which have
 /// arrived during the downtime.
+///
+/// It is very recommended to use functions such as [`serde_json::to_writer`] instead of serializing
+/// this type to memory, as the entire cache is serialised as a part of this type.
 ///
 /// As with all resuming, Discord may decide to ignore this and refuse to send the missed events, so
 /// this should only be relied on at a best-effort basis.
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ResumeState {
     map: HashMap<ShardId, ResumeMetadata>,
+    cache: Arc<Cache>,
 }

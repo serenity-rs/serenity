@@ -37,6 +37,7 @@ use dashmap::mapref::one::{MappedRef, Ref};
 #[cfg(feature = "temp_cache")]
 use mini_moka::sync::Cache as MokaCache;
 use parking_lot::RwLock;
+use serde::ser::SerializeMap;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 
@@ -118,11 +119,20 @@ pub type MessageRef<'a> = CacheRef<'a, GenericChannelId, Message, VecDeque<Messa
 pub type ChannelMessagesRef<'a> = CacheRef<'a, GenericChannelId, VecDeque<Message>, Never>;
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub(crate) struct CachedShardData {
     pub total: NonZeroU16,
     pub connected: HashSet<ShardId>,
     pub has_sent_shards_ready: bool,
+}
+
+#[cfg(feature = "temp_cache")]
+fn temp_cache<K, V>(ttl: Duration) -> MokaCache<K, V, BuildHasher>
+where
+    K: Hash + Eq + Send + Sync + 'static,
+    V: Clone + Send + Sync + 'static,
+{
+    MokaCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
 }
 
 /// A cache containing data received from [`Shard`]s.
@@ -226,15 +236,6 @@ impl Cache {
     /// ```
     #[cfg_attr(feature = "tracing_instrument", instrument)]
     pub fn new_with_settings(settings: Settings) -> Self {
-        #[cfg(feature = "temp_cache")]
-        fn temp_cache<K, V>(ttl: Duration) -> MokaCache<K, V, BuildHasher>
-        where
-            K: Hash + Eq + Send + Sync + 'static,
-            V: Clone + Send + Sync + 'static,
-        {
-            MokaCache::builder().time_to_live(ttl).build_with_hasher(BuildHasher::default())
-        }
-
         Self {
             #[cfg(feature = "temp_cache")]
             temp_private_channels: temp_cache(settings.time_to_live),
@@ -519,6 +520,57 @@ impl Cache {
 impl Default for Cache {
     fn default() -> Self {
         Self::new_with_settings(Settings::default())
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct CacheOnDisk {
+    settings: Settings,
+
+    guilds: MaybeMap<GuildId, Guild>,
+    unavailable_guilds: MaybeMap<GuildId, ()>,
+    messages: DashMap<GenericChannelId, VecDeque<Message>, BuildHasher>,
+
+    shard_data: CachedShardData,
+    user: CurrentUser,
+}
+
+impl<'de> serde::Deserialize<'de> for Cache {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let disk_cache = CacheOnDisk::deserialize(deserializer)?;
+        Ok(Cache {
+            #[cfg(feature = "temp_cache")]
+            temp_private_channels: temp_cache(disk_cache.settings.time_to_live),
+            #[cfg(feature = "temp_cache")]
+            temp_channels: temp_cache(disk_cache.settings.time_to_live),
+            #[cfg(feature = "temp_cache")]
+            temp_threads: temp_cache(disk_cache.settings.time_to_live),
+            #[cfg(feature = "temp_cache")]
+            temp_messages: temp_cache(disk_cache.settings.time_to_live),
+            #[cfg(feature = "temp_cache")]
+            temp_users: temp_cache(disk_cache.settings.time_to_live),
+
+            guilds: disk_cache.guilds,
+            unavailable_guilds: disk_cache.unavailable_guilds,
+            messages: disk_cache.messages,
+
+            settings: RwLock::new(disk_cache.settings),
+            shard_data: RwLock::new(disk_cache.shard_data),
+            user: RwLock::new(disk_cache.user),
+        })
+    }
+}
+
+impl serde::Serialize for Cache {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        let mut map = serializer.serialize_map(Some(6))?;
+        map.serialize_entry("settings", &self.settings)?;
+        map.serialize_entry("guilds", &self.guilds)?;
+        map.serialize_entry("unavaliable_guilds", &self.unavailable_guilds)?;
+        map.serialize_entry("messages", &self.messages)?;
+        map.serialize_entry("shard_data", &self.shard_data)?;
+        map.serialize_entry("user", &self.user)?;
+        map.end()
     }
 }
 

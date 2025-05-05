@@ -10,7 +10,7 @@ use dashmap::mapref::one::{Ref, RefMut};
 #[cfg(feature = "typesize")]
 use typesize::TypeSize;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 /// A wrapper around Option<DashMap<K, V>> to ease disabling specific cache fields.
 pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(crate) Option<DashMap<K, V, BuildHasher>>);
 impl<K: Eq + Hash, V> MaybeMap<K, V> {
