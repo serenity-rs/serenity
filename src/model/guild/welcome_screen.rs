@@ -7,6 +7,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct GuildWelcomeScreen {
     /// The server description shown in the welcome screen.
@@ -21,6 +22,7 @@ pub struct GuildWelcomeScreen {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[cfg_attr(test, derive(PartialEq))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct GuildWelcomeChannel {

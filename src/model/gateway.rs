@@ -33,6 +33,7 @@ pub struct BotGateway {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct Activity {
     /// The ID of the application for the activity.
@@ -83,6 +84,7 @@ pub struct Activity {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ActivityButton {
     /// The text shown on the button.
@@ -144,6 +146,7 @@ bitflags! {
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activityparty-struct).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ActivityParty {
     /// The ID of the party.
@@ -157,6 +160,7 @@ pub struct ActivityParty {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ActivitySecrets {
     /// The secret for joining a party.
@@ -173,6 +177,7 @@ pub struct ActivitySecrets {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ActivityEmoji {
     /// The name of the emoji.
@@ -222,6 +227,7 @@ pub struct Gateway {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ClientStatus {
     pub desktop: Option<OnlineStatus>,
@@ -239,6 +245,7 @@ pub struct ClientStatus {
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct PresenceUser {
     pub id: UserId,
@@ -301,6 +308,7 @@ impl PresenceUser {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct Presence {
     /// Data about the associated user.
@@ -404,6 +412,7 @@ impl serde::Serialize for ShardInfo {
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ActivityTimestamps {
     pub end: Option<NonZeroU64>,

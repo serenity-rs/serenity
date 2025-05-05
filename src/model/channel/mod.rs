@@ -435,6 +435,7 @@ enum_number! {
 /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct StageInstance {
     /// The Id of the stage instance.
@@ -478,6 +479,7 @@ pub struct ThreadsData {
 /// See [Discord](https://discord.com/developers/docs/resources/channel#default-reaction-object)
 /// [docs]()
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[cfg_attr(test, derive(PartialEq))]
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum ForumEmoji {
@@ -532,6 +534,7 @@ impl<'de> serde::Deserialize<'de> for ForumEmoji {
 /// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ForumTag {
     /// The id of the tag.

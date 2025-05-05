@@ -84,6 +84,7 @@ pub struct AfkMetadata {
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct Guild {
     /// The unique Id identifying the guild.

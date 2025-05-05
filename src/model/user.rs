@@ -118,6 +118,7 @@ pub(crate) mod discriminator {
 /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[serde(transparent)]
 pub struct CurrentUser(User);
 

@@ -7,6 +7,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ScheduledEvent {
     /// The Id of the scheduled event.

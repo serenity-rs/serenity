@@ -30,6 +30,7 @@ pub struct VoiceRegion {
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[serde(remote = "Self")]
 #[non_exhaustive]
 pub struct VoiceState {

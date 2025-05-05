@@ -105,6 +105,7 @@ fn banner_url(banner_asset_id: StickerPackBannerId) -> String {
 /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct Sticker {
     /// The unique ID given to this sticker.

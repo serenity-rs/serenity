@@ -120,6 +120,7 @@ pub type ChannelMessagesRef<'a> = CacheRef<'a, GenericChannelId, VecDeque<Messag
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 pub(crate) struct CachedShardData {
     pub total: NonZeroU16,
     pub connected: HashSet<ShardId>,
@@ -576,8 +577,24 @@ impl serde::Serialize for Cache {
 
 #[cfg(test)]
 mod test {
+    use super::wrappers::compare_dashmaps;
     use crate::cache::{Cache, CacheUpdate, Settings};
     use crate::model::prelude::*;
+
+    fn is_equal(cache1: &Cache, cache2: &Cache) -> bool {
+        &*cache1.settings.read() == &*cache2.settings.read()
+            && cache1.guilds == cache2.guilds
+            && cache1.unavailable_guilds == cache2.unavailable_guilds
+            && compare_dashmaps(&cache1.messages, &cache2.messages)
+            && &*cache1.shard_data.read() == &*cache2.shard_data.read()
+            && &*cache1.user.read() == &*cache2.user.read()
+    }
+
+    fn check_roundtrip(cache: &Cache) {
+        let serialized = serde_json::to_string(cache).unwrap();
+        let deserialized: Cache = serde_json::from_str(&serialized).unwrap();
+        assert!(is_equal(cache, &deserialized), "{cache:?} -> {serialized} -> {deserialized:?}");
+    }
 
     #[test]
     fn test_cache_messages() {

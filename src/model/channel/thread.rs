@@ -143,6 +143,7 @@ impl ThreadId {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct GuildThread {
     /// The shared fields between [`GuildChannel`] and [`GuildThread`].
@@ -226,6 +227,7 @@ impl ExtractKey<ThreadId> for GuildThread {
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct ThreadMetadata {
     /// Whether the thread is archived.
@@ -270,6 +272,7 @@ pub struct PartialGuildThread {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct PartialThreadMember {
     /// The time the current user last joined the thread.

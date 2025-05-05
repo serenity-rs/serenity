@@ -10,6 +10,7 @@ use crate::model::utils::default_true;
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct Emoji {
     /// Whether the emoji is animated.

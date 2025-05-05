@@ -23,6 +23,7 @@ use crate::model::utils::{StrOrInt, deserialize_components, discord_colours};
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date of the message.

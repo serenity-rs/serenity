@@ -10,9 +10,47 @@ use dashmap::mapref::one::{Ref, RefMut};
 #[cfg(feature = "typesize")]
 use typesize::TypeSize;
 
+#[cfg(test)]
+pub(super) fn compare_dashmaps<K, V, S>(this: &DashMap<K, V, S>, other: &DashMap<K, V, S>) -> bool
+where
+    K: Eq + Hash,
+    V: PartialEq,
+    S: Clone + std::hash::BuildHasher,
+{
+    if this.len() != other.len() {
+        return false;
+    }
+
+    for entry in this {
+        let (key, value) = entry.pair();
+        let Some(other_value) = other.get(key) else { return false };
+
+        if value != &*other_value {
+            return false;
+        }
+    }
+
+    true
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 /// A wrapper around Option<DashMap<K, V>> to ease disabling specific cache fields.
 pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(crate) Option<DashMap<K, V, BuildHasher>>);
+
+#[cfg(test)]
+impl<K: Eq + Hash, V: PartialEq> PartialEq for MaybeMap<K, V> {
+    fn eq(&self, other: &Self) -> bool {
+        let (this, other) = match (&self.0, &other.0) {
+            (None, None) => return true,
+            (None, Some(_)) => return false,
+            (Some(_), None) => return false,
+            (Some(this), Some(other)) => (this, other),
+        };
+
+        compare_dashmaps(this, other)
+    }
+}
+
 impl<K: Eq + Hash, V> MaybeMap<K, V> {
     pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V>> {
         Option::iter(&self.0).flat_map(DashMap::iter)

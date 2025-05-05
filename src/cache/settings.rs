@@ -12,6 +12,7 @@
 /// ```
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct Settings {
     /// How long temporarily-cached data should be stored before being thrown out.

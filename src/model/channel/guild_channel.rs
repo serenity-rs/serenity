@@ -22,6 +22,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://discord.com/developers/docs/topics/threads#thread-fields)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct BaseGuildChannel {
     /// The Id of the guild the channel is located in.
@@ -58,6 +59,7 @@ impl BaseGuildChannel {
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct GuildChannel {
     /// The shared fields between [`GuildChannel`] and [`GuildThread`].
