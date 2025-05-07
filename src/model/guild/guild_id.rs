@@ -300,6 +300,21 @@ impl GuildId {
         http.as_ref().get_bans(self, target, limit).await
     }
 
+    /// Gets a user's ban from the guild.
+    /// See [`Http::get_ban`] for details.
+    ///
+    /// **Note**: Requires the [Ban Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Ban Members]: Permissions::BAN_MEMBERS
+    #[inline]
+    pub async fn get_ban(self, http: impl AsRef<Http>, user_id: UserId) -> Result<Option<Ban>> {
+        http.as_ref().get_ban(self, user_id).await
+    }
+
     /// Gets a list of the guild's audit log entries
     ///
     /// **Note**: Requires the [View Audit Log] permission.

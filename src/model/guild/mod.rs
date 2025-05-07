@@ -587,6 +587,32 @@ impl Guild {
         self.id.bans(cache_http.http(), target, limit).await
     }
 
+    /// Gets a user's ban from the guild.
+    /// See [`Http::get_bans`] for details.
+    ///
+    /// **Note**: Requires the [Ban Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to perform bans.
+    ///
+    /// [Ban Members]: Permissions::BAN_MEMBERS
+    pub async fn get_ban(
+        &self,
+        cache_http: impl CacheHttp,
+        user_id: UserId,
+    ) -> Result<Option<Ban>> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                self.require_perms(cache, Permissions::BAN_MEMBERS)?;
+            }
+        }
+
+        self.id.get_ban(cache_http.http(), user_id).await
+    }
+
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
     ///
     /// Returns the created [`Member`] object, or nothing if the user is already a member of the

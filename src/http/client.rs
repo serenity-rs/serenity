@@ -2794,6 +2794,40 @@ impl Http {
         .await
     }
 
+    /// Gets a [`Ban`] for a specific user in a guild. Returns [`None`] if no ban was found
+    /// matching both the [`GuildId`] and [`UserId`].
+    ///
+    /// **Note**: Requires that you have the [Ban Members] permission
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Ban Members]: Permissions::BAN_MEMBERS
+    pub async fn get_ban(&self, guild_id: GuildId, user_id: UserId) -> Result<Option<Ban>> {
+        let result = self
+            .fire(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::GuildBan {
+                    guild_id,
+                    user_id,
+                },
+                params: None,
+            })
+            .await;
+
+        match result {
+            Ok(ban) => Ok(Some(ban)),
+            Err(Error::Http(ref err)) if err.status_code() == Some(StatusCode::NOT_FOUND) => {
+                Ok(None)
+            },
+            Err(e) => Err(e),
+        }
+    }
+
     /// Gets all audit logs in a specific guild.
     pub async fn get_audit_logs(
         &self,
