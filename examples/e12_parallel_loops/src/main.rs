@@ -1,3 +1,4 @@
+#![expect(clippy::collapsible_if)]
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
@@ -21,10 +22,10 @@ impl EventHandler for Handler {
             FullEvent::Message {
                 new_message, ..
             } => {
-                if new_message.content == "!ping"
-                    && let Err(why) = new_message.channel_id.say(&ctx.http, "Pong!").await
-                {
-                    println!("Error sending message: {why:?}");
+                if new_message.content == "!ping" {
+                    if let Err(why) = new_message.channel_id.say(&ctx.http, "Pong!").await {
+                        println!("Error sending message: {why:?}");
+                    }
                 }
             },
             FullEvent::Ready {
