@@ -187,7 +187,7 @@ impl MessageBuilder {
 
     #[inline]
     fn push_<C: std::fmt::Display + ?Sized>(&mut self, content: &C) -> &mut Self {
-        write!(self.0, "{content}").unwrap();
+        write!(self.0, "{content}").expect("writing to a string should never fail");
 
         self
     }
@@ -931,7 +931,8 @@ pub trait EmbedMessageBuilding {
 
 impl EmbedMessageBuilding for MessageBuilder {
     fn push_named_link(&mut self, name: impl Into<Content>, url: impl Into<Content>) -> &mut Self {
-        write!(self.0, "[{}]({})", name.into(), url.into()).unwrap();
+        write!(self.0, "[{}]({})", name.into(), url.into())
+            .expect("writing to a string should never fail");
 
         self
     }

@@ -959,7 +959,8 @@ fn flatten_group_to_plain_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        write!(group_text, "\n{repeated_indent_str}**{}**", group.name).unwrap();
+        write!(group_text, "\n{repeated_indent_str}**{}**", group.name)
+            .expect("writing to a string should never fail");
     }
 
     if group.prefixes.is_empty() {
@@ -970,7 +971,7 @@ fn flatten_group_to_plain_string(
             " ({}: `{}`): ",
             help_options.group_prefix,
             group.prefixes.join("`, `"),
-        ).unwrap();
+        ).expect("writing to a string should never fail");
     }
 
     let joined_commands = group.command_names.join(", ");
@@ -1232,7 +1233,7 @@ fn grouped_commands_to_plain_string(
     result.push('\n');
 
     for group in groups {
-        write!(result, "\n**{}**", &group.name).unwrap();
+        write!(result, "\n**{}**", &group.name).expect("writing to a string should never fail");
 
         flatten_group_to_plain_string(&mut result, group, 0, help_options);
     }
@@ -1245,15 +1246,16 @@ fn grouped_commands_to_plain_string(
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
     let mut result = String::new();
 
-    writeln!(result, "__**{}**__", command.name).unwrap();
+    writeln!(result, "__**{}**__", command.name).expect("writing to a string should never fail");
 
     if !command.aliases.is_empty() {
         write!(result, "**{}**: `{}`", help_options.aliases_label, command.aliases.join("`, `"))
-            .unwrap();
+            .expect("writing to a string should never fail");
     }
 
     if let Some(description) = command.description {
-        writeln!(result, "**{}**: {description}", help_options.description_label).unwrap();
+        writeln!(result, "**{}**: {description}", help_options.description_label)
+            .expect("writing to a string should never fail");
     }
 
     if let Some(usage) = command.usage {
@@ -1263,10 +1265,10 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
                 "**{}**: `{first_prefix} {} {usage}`",
                 help_options.usage_label, command.name
             )
-            .unwrap();
+            .expect("writing to a string should never fail");
         } else {
             writeln!(result, "**{}**: `{} {usage}`", help_options.usage_label, command.name)
-                .unwrap();
+                .expect("writing to a string should never fail");
         }
     }
 
@@ -1278,7 +1280,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
                     "**{}**: `{first_prefix} {} {example}`",
                     help_options.usage_sample_label, command.name
                 )
-                .unwrap();
+                .expect("writing to a string should never fail");
             };
             command.usage_sample.iter().for_each(format_example);
         } else {
@@ -1288,16 +1290,18 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
                     "**{}**: `{} {example}`",
                     help_options.usage_sample_label, command.name
                 )
-                .unwrap();
+                .expect("writing to a string should never fail");
             };
             command.usage_sample.iter().for_each(format_example);
         }
     }
 
-    writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name).unwrap();
+    writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name)
+        .expect("writing to a string should never fail");
 
     if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-        writeln!(result, "**{}**: {}", help_options.available_text, command.availability).unwrap();
+        writeln!(result, "**{}**: {}", help_options.available_text, command.availability)
+            .expect("writing to a string should never fail");
     }
 
     if !command.sub_commands.is_empty() {
@@ -1307,7 +1311,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
             help_options.sub_commands_label,
             command.sub_commands.join("`, `"),
         )
-        .unwrap();
+        .expect("writing to a string should never fail");
     }
 
     result
@@ -1385,8 +1389,7 @@ pub async fn plain(
     msg.channel_id.say(&ctx, result).await
 }
 
-#[cfg(test)]
-#[cfg(all(feature = "cache", feature = "http"))]
+#[cfg(all(test, feature = "cache", feature = "http"))]
 mod tests {
     use super::{SuggestedCommandName, Suggestions};
 

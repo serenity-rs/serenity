@@ -420,7 +420,8 @@ impl Message {
             at_distinct.push_str(&u.name);
             if let Some(discriminator) = u.discriminator {
                 at_distinct.push('#');
-                write!(at_distinct, "{:04}", discriminator.get()).unwrap();
+                write!(at_distinct, "{:04}", discriminator.get())
+                    .expect("writing to a string should never fail");
             }
 
             let mut m = u.mention().to_string();

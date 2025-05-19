@@ -830,7 +830,7 @@ fn tag(name: &str, discriminator: Option<NonZeroU16>) -> String {
     tag.push_str(name);
     if let Some(discriminator) = discriminator {
         tag.push('#');
-        write!(tag, "{discriminator:04}").unwrap();
+        write!(tag, "{discriminator:04}").expect("writing to a string should never fail");
     }
     tag
 }
