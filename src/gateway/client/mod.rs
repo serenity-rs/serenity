@@ -392,35 +392,9 @@ impl IntoFuture for ClientBuilder {
 /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 pub struct Client {
     data: Arc<dyn std::any::Any + Send + Sync>,
-    /// A HashMap of all shards instantiated by the Client.
+    /// The shard manager for the client.
     ///
-    /// The key is the shard ID and the value is the shard itself.
-    ///
-    /// # Examples
-    ///
-    /// If you call [`client.start_shard(3, 5)`][`Client::start_shard`], this HashMap will only
-    /// ever contain a single key of `3`, as that's the only Shard the client is responsible for.
-    ///
-    /// If you call [`client.start_shards(10)`][`Client::start_shards`], this HashMap will contain
-    /// keys 0 through 9, one for each shard handled by the client.
-    ///
-    /// Printing the number of shards currently instantiated by the client every 5 seconds:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use std::time::Duration;
-    /// #
-    /// # fn run(client: Client) {
-    /// tokio::spawn(async move {
-    ///     loop {
-    ///         let count = client.shard_manager.shards_instantiated().len();
-    ///         println!("Shard count instantiated: {}", count);
-    ///
-    ///         tokio::time::sleep(Duration::from_millis(5000)).await;
-    ///     }
-    /// });
-    /// # }
-    /// ```
+    /// This is the brains, managing shards (websocket connections) and bot lifecycle.
     pub shard_manager: ShardManager,
     /// The voice manager for the client.
     ///
