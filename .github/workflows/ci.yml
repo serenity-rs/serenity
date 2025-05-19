@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   rust_min: 1.74.0
-  rust_nightly: nightly-2024-03-09
+  rust_nightly: nightly-2025-05-18
 
 jobs:
   test:
@@ -161,6 +161,11 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
+
+      - name: Pin problematic dependencies to working versions
+        run: |
+          cargo update idna_adapter --precise 1.1.0
+          cargo update triomphe --precise 0.1.11
 
       - name: Check
         run: cargo check --features full
