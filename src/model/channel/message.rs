@@ -1122,7 +1122,7 @@ pub struct PollAnswerCount {
 #[cfg(all(test, feature = "cache"))]
 mod tests {
     use dashmap::DashMap;
-    use extract_map::ExtractMap;
+    use crate::cache::ExtractMap;
     use small_fixed_array::FixedArray;
 
     use super::{
@@ -1144,7 +1144,7 @@ mod tests {
         K: std::hash::Hash + Eq,
         T: extract_map::ExtractKey<K>,
     {
-        let mut map = ExtractMap::new();
+        let mut map = ExtractMap::default();
         map.insert(val);
         map
     }

@@ -5,6 +5,7 @@ use serde::ser::{Error as _, Serializer};
 use serde::{Deserialize, Serialize};
 
 use super::{AuthorizingIntegrationOwners, InteractionContext};
+use crate::cache::BuildHasher;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
@@ -455,7 +456,7 @@ pub struct CommandDataResolved {
     /// The resolved partial members.
     // Cannot use ExtractMap, as PartialMember does not always store an ID.
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub members: HashMap<UserId, PartialMember>,
+    pub members: HashMap<UserId, PartialMember, BuildHasher>,
     /// The resolved roles.
     #[serde(
         default,

@@ -3,9 +3,10 @@ use std::collections::HashMap;
 
 use serenity::builder::{CreateCommand, CreateCommandOption};
 use serenity::model::application::CommandOptionType;
+use serenity::cache::BuildHasher;
 
-fn new_map<'a>(key: &'a str, value: &'a str) -> HashMap<Cow<'a, str>, Cow<'a, str>> {
-    let mut map = HashMap::with_capacity(1);
+fn new_map<'a>(key: &'a str, value: &'a str) -> HashMap<Cow<'a, str>, Cow<'a, str>, BuildHasher> {
+    let mut map = HashMap::default();
     map.insert(Cow::Borrowed(key), Cow::Borrowed(value));
     map
 }
