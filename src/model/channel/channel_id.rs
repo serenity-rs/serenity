@@ -954,7 +954,7 @@ impl GenericChannelId {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     pub async fn send_message(self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
-        builder.execute(http, self, None).await
+        builder.execute(http, self).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
