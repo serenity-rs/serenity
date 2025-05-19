@@ -49,7 +49,8 @@ impl Multipart<'_> {
             },
             MultipartUpload::Attachments(attachment_files) => {
                 for (idx, file) in attachment_files.into_iter().enumerate() {
-                    multipart = multipart.part(format!("files[{idx}]"), file.into_part().await?);
+                    let part = file.into_part().await?;
+                    multipart = multipart.part(format!("files[{idx}]"), part);
                 }
             },
         }

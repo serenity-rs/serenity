@@ -75,6 +75,13 @@ impl<'a> Request<'a> {
         token: Option<&str>,
         proxy: Option<&str>,
     ) -> Result<ReqwestRequestBuilder> {
+        // Build the multipart first, as to keep future size small.
+        let multipart = if let Some(multipart) = self.multipart {
+            Some(multipart.build_form().await?)
+        } else {
+            None
+        };
+
         let mut path = self.route.path().into_owned();
 
         if let Some(proxy) = proxy {
@@ -100,9 +107,9 @@ impl<'a> Request<'a> {
             );
         }
 
-        if let Some(multipart) = self.multipart {
+        if let Some(multipart) = multipart {
             // Setting multipart adds the content-length header.
-            builder = builder.multipart(multipart.build_form().await?);
+            builder = builder.multipart(multipart);
         } else if let Some(bytes) = self.body {
             headers.insert(CONTENT_LENGTH, bytes.len().into());
             headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));

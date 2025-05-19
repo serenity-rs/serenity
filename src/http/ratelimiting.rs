@@ -171,7 +171,7 @@ impl Ratelimiter {
     ///
     /// Only error kind that may be returned is [`Error::Http`].
     #[cfg_attr(feature = "tracing_instrument", instrument)]
-    pub async fn perform(&self, req: Request<'_>) -> Result<Response> {
+    pub async fn perform(&self, req: &Request<'_>) -> Result<Response> {
         loop {
             // This will block if another thread hit the global ratelimit.
             drop(self.global.lock().await);
@@ -185,7 +185,7 @@ impl Ratelimiter {
             let ratelimiting_bucket = req.route.ratelimiting_bucket();
             let delay_time = {
                 let mut bucket = self.routes.entry(ratelimiting_bucket).or_default();
-                bucket.pre_hook(&req, &*self.ratelimit_callback.read())
+                bucket.pre_hook(req, &*self.ratelimit_callback.read())
             };
 
             if let Some(delay_time) = delay_time {
@@ -244,7 +244,7 @@ impl Ratelimiter {
                 {
                     bucket.post_hook(
                         &response,
-                        &req,
+                        req,
                         &*self.ratelimit_callback.read(),
                         self.absolute_ratelimits,
                     )

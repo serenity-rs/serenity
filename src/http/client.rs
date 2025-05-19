@@ -4415,7 +4415,7 @@ impl Http {
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let method = req.method.reqwest_method();
         let response = if let Some(ratelimiter) = &self.ratelimiter {
-            ratelimiter.perform(req).await?
+            ratelimiter.perform(&req).await?
         } else {
             let request = req
                 .build(
