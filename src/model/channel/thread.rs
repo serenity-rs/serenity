@@ -210,7 +210,9 @@ impl GuildThread {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     pub async fn send_message(&self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
-        builder.execute(http, self.id.widen(), Some(self.base.guild_id)).await
+        let mut message = self.id.widen().send_message(http, builder).await?;
+        message.guild_id = Some(self.base.guild_id);
+        Ok(message)
     }
 }
 
