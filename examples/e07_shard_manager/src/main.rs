@@ -18,6 +18,7 @@
 //!
 //! Note that it may take a minute or more for a latency to be recorded or to update, depending on
 //! how often Discord tells the client to send a heartbeat.
+#![expect(clippy::collapsible_if)]
 use std::time::Duration;
 
 use serenity::async_trait;
@@ -33,12 +34,13 @@ impl EventHandler for Handler {
         if let FullEvent::Ready {
             data_about_bot, ..
         } = event
-            && let Some(shard) = data_about_bot.shard
         {
-            println!(
-                "{} is connected on shard {}/{}!",
-                data_about_bot.user.name, shard.id, shard.total
-            );
+            if let Some(shard) = data_about_bot.shard {
+                println!(
+                    "{} is connected on shard {}/{}!",
+                    data_about_bot.user.name, shard.id, shard.total
+                );
+            }
         }
     }
 }
