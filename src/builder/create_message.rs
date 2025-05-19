@@ -71,10 +71,6 @@ pub struct CreateMessage<'a> {
     enforce_nonce: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     poll: Option<CreatePoll<'a, Ready>>,
-
-    // The following fields are handled separately.
-    #[serde(skip)]
-    reactions: Cow<'a, [ReactionType]>,
 }
 
 impl<'a> CreateMessage<'a> {
@@ -137,12 +133,6 @@ impl<'a> CreateMessage<'a> {
     /// Defaults to `false`.
     pub fn tts(mut self, tts: bool) -> Self {
         self.tts = tts;
-        self
-    }
-
-    /// Adds a list of reactions to create after the message's sent.
-    pub fn reactions(mut self, reactions: impl Into<Cow<'a, [ReactionType]>>) -> Self {
-        self.reactions = reactions.into();
         self
     }
 
@@ -287,12 +277,7 @@ impl<'a> CreateMessage<'a> {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Attach Files]: Permissions::ATTACH_FILES
     #[cfg(feature = "http")]
-    pub async fn execute(
-        mut self,
-        http: &Http,
-        channel_id: GenericChannelId,
-        guild_id: Option<GuildId>,
-    ) -> Result<Message> {
+    pub async fn execute(mut self, http: &Http, channel_id: GenericChannelId) -> Result<Message> {
         self.check_length()?;
 
         let files = self.attachments.new_attachments();
@@ -300,18 +285,6 @@ impl<'a> CreateMessage<'a> {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        let mut message = http.send_message(channel_id, files, &self).await?;
-
-        for reaction in self.reactions.iter() {
-            http.create_reaction(channel_id, message.id, reaction).await?;
-        }
-
-        // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
-        if message.guild_id.is_none() {
-            // If we were called from GuildChannel, we can fill in the GuildId ourselves.
-            message.guild_id = guild_id;
-        }
-
-        Ok(message)
+        http.send_message(channel_id, files, &self).await
     }
 }

@@ -721,12 +721,10 @@ impl UserId {
         cache_http: impl CacheHttp,
         builder: CreateMessage<'_>,
     ) -> Result<Message> {
-        self.create_dm_channel(&cache_http)
-            .await?
-            .id
-            .widen()
-            .send_message(cache_http.http(), builder)
-            .await
+        // Do not refactor this to a one liner. The PrivateChannel from `create_dm_channel`
+        // should be dropped before the `send_message` call to avoid bloating future sizes.
+        let dm_channel_id = self.create_dm_channel(&cache_http).await?.id;
+        dm_channel_id.widen().send_message(cache_http.http(), builder).await
     }
 
     /// This is an alias of [`Self::direct_message`].
