@@ -267,80 +267,6 @@ impl ShardRunner {
         }
     }
 
-    // Handles a received value over the shard runner rx channel.
-    //
-    // Returns a boolean on whether the shard runner can continue.
-    //
-    // This always returns true, except in the case that the shard manager asked the runner to
-    // shutdown or restart.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    async fn handle_rx_value(&mut self, msg: ShardRunnerMessage) -> bool {
-        match msg {
-            ShardRunnerMessage::Restart => {
-                self.restart().await;
-                false
-            },
-            ShardRunnerMessage::Shutdown(code) => {
-                self.shutdown(code).await;
-                false
-            },
-            ShardRunnerMessage::ChunkGuild {
-                guild_id,
-                limit,
-                presences,
-                filter,
-                nonce,
-            } => self
-                .shard
-                .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
-                .await
-                .is_ok(),
-            ShardRunnerMessage::SoundboardSounds {
-                guild_ids,
-            } => self.shard.request_soundboard_sounds(&guild_ids).await.is_ok(),
-            ShardRunnerMessage::Close(code, reason) => {
-                let reason = reason.unwrap_or_default();
-                let close = CloseFrame {
-                    code: code.into(),
-                    reason: reason.into(),
-                };
-                self.shard.client.close(Some(close)).await.is_ok()
-            },
-            ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
-            ShardRunnerMessage::SetActivity(activity) => {
-                self.shard.set_activity(activity);
-                self.shard.update_presence().await.is_ok()
-            },
-            ShardRunnerMessage::SetStatus(status) => {
-                self.shard.set_status(status);
-                self.shard.update_presence().await.is_ok()
-            },
-            ShardRunnerMessage::SetPresence {
-                activity,
-                status,
-            } => {
-                if let Some(activity) = activity {
-                    self.shard.set_activity(activity);
-                }
-                if let Some(status) = status {
-                    self.shard.set_status(status);
-                }
-                self.shard.update_presence().await.is_ok()
-            },
-            #[cfg(feature = "voice")]
-            ShardRunnerMessage::UpdateVoiceState {
-                guild_id,
-                channel_id,
-                self_mute,
-                self_deaf,
-            } => self
-                .shard
-                .update_voice_state(guild_id, channel_id, self_mute, self_deaf)
-                .await
-                .is_ok(),
-        }
-    }
-
     #[cfg(feature = "voice")]
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn handle_voice_event(&self, event: &Event) {
@@ -366,29 +292,79 @@ impl ShardRunner {
         }
     }
 
-    // Receives values over the internal shard runner rx channel and handles them. This will loop
-    // over values until there is no longer one.
+    // Receives messages over the internal `runner_rx` channel and handles them. Will loop over all
+    // queued messages until the channel is empty. Requests a restart if handling a message fails.
     //
-    // Requests a restart if the sending half of the channel disconnects. This should _never_
-    // happen, as the sending half is kept on the runner.
-    //
-    // Returns whether the shard runner is in a state that can continue.
+    // Returns whether the shard runner can continue executing its main loop.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn recv(&mut self) -> bool {
         while let Ok(msg) = self.runner_rx.try_next() {
-            if let Some(value) = msg {
-                if !self.handle_rx_value(value).await {
+            let Some(msg) = msg else {
+                // This should never happen, because `self.runner_tx` always holds a copy of the
+                // other end of the channel.
+                warn!(
+                    "[ShardRunner {:?}] Internal channel tx dropped; restarting",
+                    self.shard.shard_info(),
+                );
+
+                self.restart().await;
+                return false;
+            };
+
+            let res = match msg {
+                ShardRunnerMessage::Restart => {
+                    self.restart().await;
                     return false;
-                }
-            } else {
-                warn!("[ShardRunner {:?}] Sending half DC; restarting", self.shard.shard_info(),);
+                },
+                ShardRunnerMessage::Shutdown(code) => {
+                    self.shutdown(code).await;
+                    return false;
+                },
+                ShardRunnerMessage::ChunkGuild {
+                    guild_id,
+                    limit,
+                    presences,
+                    filter,
+                    nonce,
+                } => {
+                    self.shard
+                        .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
+                        .await
+                },
+                ShardRunnerMessage::SoundboardSounds {
+                    guild_ids,
+                } => self.shard.request_soundboard_sounds(&guild_ids).await,
+                ShardRunnerMessage::SetPresence {
+                    activity,
+                    status,
+                } => {
+                    if let Some(activity) = activity {
+                        self.shard.set_activity(activity);
+                    }
+                    if let Some(status) = status {
+                        self.shard.set_status(status);
+                    }
+                    self.shard.update_presence().await
+                },
+                #[cfg(feature = "voice")]
+                ShardRunnerMessage::UpdateVoiceState {
+                    guild_id,
+                    channel_id,
+                    self_mute,
+                    self_deaf,
+                } => {
+                    self.shard.update_voice_state(guild_id, channel_id, self_mute, self_deaf).await
+                },
+            };
+
+            if let Err(why) = res {
+                warn!("[ShardRunner {:?}] Websocket error: {:?}", self.shard.shard_info(), why);
 
                 self.restart().await;
                 return false;
             }
         }
 
-        // There are no longer any values available.
         true
     }
 
