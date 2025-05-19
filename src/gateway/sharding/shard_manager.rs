@@ -118,6 +118,15 @@ impl ShardManager {
         }
     }
 
+    /// Retrieves a function which can be used to shut down the ShardManager later.
+    ///
+    /// This function will return `true` if the ShardManager has successfully been
+    /// notified to shut down, or false if it has already shut down and been dropped.
+    pub fn get_shutdown_trigger(&self) -> impl FnOnce() -> bool + Send + use<> {
+        let manager_tx = self.manager_tx.clone();
+        move || manager_tx.unbounded_send(ShardManagerMessage::Quit(Ok(()))).is_ok()
+    }
+
     /// The main interface for starting the management of shards. Initializes the shards by
     /// queueing them for starting, and then listens for [`ShardManagerMessage`]s in a loop.
     ///
@@ -161,7 +170,7 @@ impl ShardManager {
     /// Note that this queues all shards but does not actually start them. To start the manager's
     /// event loop and dispatch [`ShardRunner`]s as they get queued, call [`Self::run`] instead.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
+    fn initialize(&mut self, shard_index: u16, shard_init: u16, shard_total: NonZeroU16) {
         let shard_to = shard_index + shard_init;
 
         self.shard_total = shard_total;
@@ -175,39 +184,6 @@ impl ShardManager {
         info!("Queueing shard {shard_id} for starting");
 
         self.queue.push_back(shard_id);
-    }
-
-    /// Restarts a shard runner.
-    ///
-    /// Sends a shutdown signal to a shard's associated [`ShardRunner`], and then queues an
-    /// initialization of a new shard runner for the same shard.
-    ///
-    /// [`ShardRunner`]: super::ShardRunner
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn restart(&mut self, shard_id: ShardId) {
-        info!("Restarting shard {shard_id}");
-
-        if let Some((_, (_, tx))) = self.runners.remove(&shard_id) {
-            if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Restart) {
-                warn!("Failed to send restart signal to shard {shard_id}: {why:?}");
-            }
-        }
-    }
-
-    /// Attempts to shut down the shard runner by Id.
-    ///
-    /// **Note**: If the receiving end of an mpsc channel - owned by the shard runner - no longer
-    /// exists, then the shard runner will not know it should shut down. This _should never happen_.
-    /// It may already be stopped.
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn shutdown(&mut self, shard_id: ShardId, code: u16) {
-        info!("Shutting down shard {}", shard_id);
-
-        if let Some((_, (_, tx))) = self.runners.remove(&shard_id) {
-            if let Err(why) = tx.unbounded_send(ShardRunnerMessage::Shutdown(code)) {
-                warn!("Failed to send shutdown signal to shard {shard_id}: {why:?}");
-            }
-        }
     }
 
     // This function assumes that each of the shard ids are bucketed separately according to
@@ -289,23 +265,6 @@ impl ShardManager {
         spawn_named("shard_runner::run", async move { runner.run().await });
 
         Ok(())
-    }
-
-    /// Returns whether the shard manager contains an active instance of a shard runner responsible
-    /// for the given ID.
-    ///
-    /// If a shard has been queued but has not yet been initiated, then this will return `false`.
-    #[must_use]
-    pub fn has(&self, shard_id: ShardId) -> bool {
-        self.runners.contains_key(&shard_id)
-    }
-
-    /// Returns the [`ShardId`]s of the shards that have been instantiated and currently have a
-    /// valid [`ShardRunner`].
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    #[must_use]
-    pub fn shards_instantiated(&self) -> Vec<ShardId> {
-        self.runners.iter().map(|entries| *entries.key()).collect()
     }
 
     /// Returns the gateway intents used for this gateway connection.
