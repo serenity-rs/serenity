@@ -24,7 +24,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
-use crate::model::utils::avatar_url;
+use crate::model::utils::{avatar_url, user_banner_url};
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
@@ -391,7 +391,7 @@ impl User {
     #[inline]
     #[must_use]
     pub fn banner_url(&self) -> Option<String> {
-        banner_url(self.id, self.banner.as_ref())
+        user_banner_url(None, self.id, self.banner.as_ref())
     }
 
     /// Creates a direct message channel between the [current user] and the user. This can also
@@ -811,14 +811,6 @@ fn default_avatar_url(user: &User) -> String {
 #[cfg(feature = "model")]
 fn static_avatar_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
     hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
-}
-
-#[cfg(feature = "model")]
-fn banner_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
-    hash.map(|hash| {
-        let ext = if hash.is_animated() { "gif" } else { "webp" };
-        cdn!("/banners/{}/{}.{}?size=1024", user_id, hash, ext)
-    })
 }
 
 #[cfg(feature = "model")]

@@ -12,7 +12,7 @@ use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
-use crate::model::utils::avatar_url;
+use crate::model::utils::{avatar_url, user_banner_url};
 
 /// Information about a member of a guild.
 ///
@@ -28,8 +28,10 @@ pub struct Member {
     ///
     /// Can't be longer than 32 characters.
     pub nick: Option<String>,
-    /// The guild avatar hash
+    /// The member's guild avatar hash
     pub avatar: Option<ImageHash>,
+    /// The member's guild banner hash
+    pub banner: Option<ImageHash>,
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     /// Timestamp representing the date when the member joined.
@@ -530,6 +532,14 @@ impl Member {
         avatar_url(Some(self.guild_id), self.user.id, self.avatar.as_ref())
     }
 
+    /// Returns the formatted URL of the member's per guild banner, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the member has a GIF avatar.
+    #[must_use]
+    pub fn banner_url(&self) -> Option<String> {
+        user_banner_url(Some(self.guild_id), self.user.id, self.banner.as_ref())
+    }
+
     /// Retrieves the URL to the current member's avatar, falling back to the user's avatar, then
     /// default avatar if needed.
     ///
@@ -609,8 +619,10 @@ pub struct PartialMember {
     ///
     /// Will be None or a time in the past if the user is not flagged.
     pub unusual_dm_activity_until: Option<Timestamp>,
-    /// The guild avatar hash
+    /// The member's guild avatar hash
     pub avatar: Option<ImageHash>,
+    /// The member's guild banner hash
+    pub banner: Option<ImageHash>,
 }
 
 impl From<PartialMember> for Member {
@@ -619,6 +631,7 @@ impl From<PartialMember> for Member {
             user: partial.user.unwrap_or_default(),
             nick: partial.nick,
             avatar: partial.avatar,
+            banner: partial.banner,
             roles: partial.roles,
             joined_at: partial.joined_at,
             premium_since: partial.premium_since,
@@ -649,6 +662,7 @@ impl From<Member> for PartialMember {
             permissions: member.permissions,
             unusual_dm_activity_until: member.unusual_dm_activity_until,
             avatar: member.avatar,
+            banner: member.banner,
         }
     }
 }

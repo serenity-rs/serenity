@@ -260,6 +260,7 @@ pub struct GuildMemberUpdateEvent {
     #[serde(default)]
     pub mute: bool,
     pub avatar: Option<ImageHash>,
+    pub banner: Option<ImageHash>,
     pub communication_disabled_until: Option<Timestamp>,
     pub unusual_dm_activity_until: Option<Timestamp>,
 }
