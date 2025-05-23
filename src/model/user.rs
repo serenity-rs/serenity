@@ -385,9 +385,6 @@ impl User {
     /// Returns the formatted URL of the user's banner, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
-    ///
-    /// **Note**: This will only be present if the user is fetched via Rest API, e.g. with
-    /// [`crate::http::Http::get_user`].
     #[inline]
     #[must_use]
     pub fn banner_url(&self) -> Option<String> {
