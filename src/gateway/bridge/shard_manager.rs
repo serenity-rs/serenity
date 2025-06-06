@@ -182,6 +182,7 @@ impl ShardManager {
     /// This will communicate shard boots with the [`ShardQueuer`] so that they are properly
     /// queued.
     #[instrument(skip(self))]
+    #[allow(clippy::missing_errors_doc)] // Doesn't actually error, fixed on next.
     pub fn initialize(&self) -> Result<()> {
         let shard_index = self.shard_index.load(Ordering::Relaxed);
         let shard_init = self.shard_init.load(Ordering::Relaxed);

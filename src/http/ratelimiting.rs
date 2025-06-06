@@ -323,6 +323,9 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
+    /// # Errors
+    ///
+    /// Errors if parsing headers from the response fails.
     #[instrument(skip(ratelimit_callback))]
     pub async fn post_hook(
         &mut self,

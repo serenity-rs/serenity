@@ -665,6 +665,10 @@ impl Client {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to an error.
+    ///
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start(&mut self) -> Result<()> {

@@ -63,6 +63,7 @@ impl<'a> Request<'a> {
         self
     }
 
+    #[allow(clippy::missing_errors_doc)]
     #[instrument(skip(token))]
     pub fn build(
         self,

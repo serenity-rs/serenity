@@ -630,6 +630,9 @@ impl Shard {
     /// # }
     /// ```
     ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    ///
     /// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk
     /// [`Guild`]: crate::model::guild::Guild
     /// [`Member`]: crate::model::guild::Member
@@ -650,6 +653,9 @@ impl Shard {
     /// Sets the shard as going into identifying stage, which sets:
     /// - the time that the last heartbeat sent as being now
     /// - the `stage` to [`ConnectionStage::Identifying`]
+    ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client.send_identify(&self.info, &self.token, self.intents, &self.presence).await?;
@@ -663,6 +669,10 @@ impl Shard {
     /// Initializes a new WebSocket client.
     ///
     /// This will set the stage of the shard before and after instantiation of the client.
+    ///
+    /// # Errors
+    ///
+    /// Errors if unable to establish a websocket connection.
     #[instrument(skip(self))]
     pub async fn initialize(&mut self) -> Result<WsClient> {
         debug!("[{:?}] Initializing.", self.info);
@@ -694,6 +704,9 @@ impl Shard {
         self.seq = 0;
     }
 
+    /// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
     #[instrument(skip(self))]
     pub async fn resume(&mut self) -> Result<()> {
         debug!("[{:?}] Attempting to resume", self.info);
@@ -709,6 +722,9 @@ impl Shard {
         }
     }
 
+    /// # Errors
+    ///
+    /// Errors if unable to re-establish a websocket connection.
     #[instrument(skip(self))]
     pub async fn reconnect(&mut self) -> Result<()> {
         info!("[{:?}] Attempting to reconnect", self.shard_info());
@@ -719,6 +735,9 @@ impl Shard {
         Ok(())
     }
 
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
     #[instrument(skip(self))]
     pub async fn update_presence(&mut self) -> Result<()> {
         self.client.send_presence_update(&self.info, &self.presence).await

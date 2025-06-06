@@ -93,6 +93,10 @@ impl ShardRunner {
     ///
     /// 6. Go back to 1.
     ///
+    /// # Errors
+    ///
+    /// Returns an error if authentication fails or the intents contained disallowed values.
+    ///
     /// [`ShardManager`]: super::ShardManager
     #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
