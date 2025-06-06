@@ -166,6 +166,7 @@ jobs:
         run: |
           cargo update idna_adapter --precise 1.1.0
           cargo update triomphe --precise 0.1.11
+          cargo update base64ct --precise 1.7.3
 
       - name: Check
         run: cargo check --features full
