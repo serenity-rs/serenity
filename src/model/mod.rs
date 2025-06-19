@@ -94,6 +94,7 @@ pub mod prelude {
         misc::*,
         monetization::*,
         permissions::*,
+        soundboard::*,
         sticker::*,
         user::*,
         voice::*,
