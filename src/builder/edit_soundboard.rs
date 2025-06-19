@@ -14,7 +14,6 @@ use crate::model::prelude::*;
 /// - [`Guild::edit_soundboard`]
 /// - [`PartialGuild::edit_soundboard`]
 /// - [`GuildId::edit_soundboard`]
-/// - [`Soundboard::edit`]
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/soundboard#soundboard-resource)
 #[derive(Clone, Debug, Default, Serialize)]
