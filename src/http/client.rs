@@ -4982,8 +4982,8 @@ impl Http {
     pub async fn create_guild_soundboard(
         &self,
         guild_id: GuildId,
-        audit_log_reason: Option<&str>,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<Soundboard> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -5003,8 +5003,8 @@ impl Http {
         &self,
         guild_id: GuildId,
         sound_id: SoundId,
-        audit_log_reason: Option<&str>,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<Soundboard> {
         self.fire(Request {
             body: Some(to_vec(map)?),
