@@ -56,7 +56,7 @@ impl<'a> CreateSoundboard<'a> {
     ///
     /// **Note**: Must be between 0 to 1.
     pub fn volume(mut self, volume: f64) -> Self {
-        self.volume = volume.into();
+        self.volume = volume;
         self
     }
 
