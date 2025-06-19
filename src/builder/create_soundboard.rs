@@ -5,7 +5,6 @@ use super::CreateAttachment;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
 /// A builder to create a soundboard sound.

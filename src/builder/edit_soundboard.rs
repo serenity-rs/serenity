@@ -4,7 +4,6 @@ use super::Builder;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-#[cfg(any(feature = "http", doc))]
 use crate::model::prelude::*;
 
 /// A builder to create or edit a [`Soundboard`] for use via a number of model methods.
