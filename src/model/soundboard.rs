@@ -1,3 +1,5 @@
+#[cfg(feature = "model")]
+use crate::http::Http;
 use crate::model::prelude::*;
 
 /// A representation of a soundboard sound, a kind of audio that users can play
@@ -26,4 +28,21 @@ pub struct Soundboard {
     pub available: bool,
     /// User who created this soundboard sound.
     pub user: Option<User>,
+}
+
+#[cfg(feature = "model")]
+impl SoundId {
+    /// Performs a HTTP request to fetch soundboard sound data from a guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if there is an error in the deserialization, or if the bot issuing
+    /// the request is not in the guild.
+    pub async fn to_soundboard(
+        self,
+        http: impl AsRef<Http>,
+        guild_id: GuildId,
+    ) -> Result<Soundboard> {
+        guild_id.get_soundboard(http, self).await
+    }
 }

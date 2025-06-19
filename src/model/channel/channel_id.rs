@@ -1090,6 +1090,37 @@ impl ChannelId {
     pub async fn end_poll(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<Message> {
         http.as_ref().expire_poll(self, message_id).await
     }
+
+    /// Sends a soundboard sound to this voice channel.
+    ///
+    /// # Errors
+    ///
+    /// Errors if this channel ID does not point to a voice channel, or you do not
+    /// have the required [`SPEAK`], [`USE_SOUNDBOARD`], and/or
+    /// [`USE_EXTERNAL_SOUNDS`] permissions.
+    ///
+    /// [`SPEAK`]: Permissions::SPEAK
+    /// [`USE_SOUNDBOARD`]: Permissions::USE_SOUNDBOARD
+    /// [`USE_EXTERNAL_SOUNDS`]: Permissions::USE_EXTERNAL_SOUNDS
+    pub async fn send_soundboard(
+        self,
+        http: impl AsRef<Http>,
+        sound_id: SoundId,
+        guild_id: Option<GuildId>,
+    ) -> Result<()> {
+        #[derive(serde::Serialize)]
+        struct SendSoundboard {
+            sound_id: SoundId,
+            source_guild_id: Option<GuildId>,
+        }
+
+        let map = SendSoundboard {
+            sound_id,
+            source_guild_id: guild_id,
+        };
+
+        http.as_ref().send_soundboard_sound(self, &map).await
+    }
 }
 
 #[cfg(feature = "model")]
