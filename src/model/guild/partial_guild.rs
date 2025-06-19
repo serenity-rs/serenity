@@ -1609,6 +1609,8 @@ impl PartialGuild {
     /// # Errors
     ///
     /// See [`CreateSoundboard::execute`] for a list of possible errors.
+    ///
+    /// [`CreateSoundboard::execute`]: ../../builder/struct.CreateSoundboard.html#method.execute
     pub async fn create_soundboard(
         self,
         cache_http: impl CacheHttp,
@@ -1622,6 +1624,8 @@ impl PartialGuild {
     /// # Errors
     ///
     /// See [`EditSoundboard::execute`] for a list of possible errors.
+    ///
+    /// [`EditSoundboard::execute`]: ../../builder/struct.EditSoundboard.html#method.execute
     pub async fn edit_soundboard(
         self,
         cache_http: impl CacheHttp,
