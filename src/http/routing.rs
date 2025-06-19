@@ -366,6 +366,22 @@ routes! ('a, {
     api!("/oauth2/applications/@me"),
     None;
 
+    SoundboardSend { channel_id: ChannelId },
+    api!("/channels/{}/send-soundboard-sound", channel_id),
+    Some(RatelimitingKind::PathAndId(channel_id.into()));
+
+    SoundboardListDefaults,
+    status!("/soundboard-default-sounds"),
+    None;
+
+    GuildSoundboards { guild_id: GuildId },
+    api!("/guilds/{}/soundboard-sounds", guild_id),
+    Some(RatelimitingKind::PathAndId(guild_id.into()));
+
+    GuildSoundboard { guild_id: GuildId, sound_id: SoundId },
+    api!("/guilds/{}/soundboard-sounds/{}", guild_id, sound_id),
+    Some(RatelimitingKind::PathAndId(guild_id.into()));
+
     StatusIncidentsUnresolved,
     status!("/incidents/unresolved.json"),
     None;
