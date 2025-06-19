@@ -82,9 +82,9 @@ impl Builder for EditSoundboard<'_> {
 
     /// Edits the soundboard sound.
     ///
-    /// **Note**: If the soundboard sound was created by the current user, requires either the [Create Guild
-    /// Expressions] or the [Manage Guild Expressions] permission. Otherwise, the [Manage Guild
-    /// Expressions] permission is required.
+    /// **Note**: If the soundboard sound was created by the current user, requires either the
+    /// [Create Guild Expressions] or the [Manage Guild Expressions] permission. Otherwise, the
+    /// [Manage Guild Expressions] permission is required.
     ///
     /// # Errors
     ///

@@ -37,8 +37,8 @@ use crate::builder::{
     CreateChannel,
     CreateCommand,
     CreateScheduledEvent,
-    CreateSticker,
     CreateSoundboard,
+    CreateSticker,
     EditAutoModRule,
     EditCommandPermissions,
     EditGuild,
@@ -47,8 +47,8 @@ use crate::builder::{
     EditMember,
     EditRole,
     EditScheduledEvent,
-    EditSticker,
     EditSoundboard,
+    EditSticker,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
