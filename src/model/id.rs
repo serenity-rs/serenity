@@ -196,6 +196,7 @@ id_u64! {
     MessageId: "An identifier for a Message";
     RoleId: "An identifier for a Role";
     ScheduledEventId: "An identifier for a Scheduled Event";
+    SoundId: "An identifier for a Soundboard sound";
     StickerId: "An identifier for a sticker.";
     StickerPackId: "An identifier for a sticker pack.";
     StickerPackBannerId: "An identifier for a sticker pack banner.";
