@@ -370,7 +370,7 @@ routes! ('a, {
     api!("/channels/{}/send-soundboard-sound", channel_id),
     Some(RatelimitingKind::PathAndId(channel_id.into()));
 
-    SoundboardListDefaults,
+    SoundboardDefaultSounds,
     status!("/soundboard-default-sounds"),
     None;
 

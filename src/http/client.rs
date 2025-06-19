@@ -4911,6 +4911,136 @@ impl Http {
         .await
     }
 
+    /// Sends a soundboard sound to a voice channel the user is connected to.
+    pub async fn send_soundboard_sound(
+        &self,
+        channel_id: ChannelId,
+        map: &impl serde::Serialize,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Post,
+            route: Route::SoundboardSend {
+                channel_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Retrieves a list of soundboard sounds that anyone can use.
+    pub async fn list_default_soundboard_sounds(&self) -> Result<Vec<Soundboard>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::SoundboardDefaultSounds,
+            params: None,
+        })
+        .await
+    }
+
+    /// Retrieves soundboard sounds from a guild.
+    pub async fn get_guild_soundboards(&self, guild_id: GuildId) -> Result<Vec<Soundboard>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildSoundboards {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Retrieves a soundboard sound from a guild.
+    pub async fn get_guild_soundboard(
+        &self,
+        guild_id: GuildId,
+        sound_id: SoundId,
+    ) -> Result<Soundboard> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildSoundboard {
+                guild_id,
+                sound_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Creates a soundboard sound in a guild.
+    pub async fn create_guild_soundboard(
+        &self,
+        guild_id: GuildId,
+        audit_log_reason: Option<&str>,
+        map: &impl serde::Serialize,
+    ) -> Result<Soundboard> {
+        self.fire(Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Post,
+            route: Route::GuildSoundboards {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Edits a soundboard sound in a guild.
+    pub async fn edit_guild_soundboard(
+        &self,
+        guild_id: GuildId,
+        sound_id: SoundId,
+        audit_log_reason: Option<&str>,
+        map: &impl serde::Serialize,
+    ) -> Result<Soundboard> {
+        self.fire(Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Patch,
+            route: Route::GuildSoundboard {
+                guild_id,
+                sound_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Deletes a soundboard sound in a guild.
+    pub async fn delete_guild_soundboard(
+        &self,
+        guild_id: GuildId,
+        sound_id: SoundId,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Delete,
+            route: Route::GuildSoundboard {
+                guild_id,
+                sound_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Fires off a request, deserializing the response reader via the given type bound.
     ///
     /// If you don't need to deserialize the response and want the response instance itself, use
