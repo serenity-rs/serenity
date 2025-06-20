@@ -4945,17 +4945,25 @@ impl Http {
 
     /// Retrieves soundboard sounds from a guild.
     pub async fn get_guild_soundboards(&self, guild_id: GuildId) -> Result<Vec<Soundboard>> {
-        self.fire(Request {
-            body: None,
-            multipart: None,
-            headers: None,
-            method: LightMethod::Get,
-            route: Route::GuildSoundboards {
-                guild_id,
-            },
-            params: None,
-        })
-        .await
+        #[derive(serde::Deserialize)]
+        struct SoundboardList {
+            items: Vec<Soundboard>,
+        }
+
+        let result = self
+            .fire::<SoundboardList>(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::GuildSoundboards {
+                    guild_id,
+                },
+                params: None,
+            })
+            .await?;
+
+        Ok(result.items)
     }
 
     /// Retrieves a soundboard sound from a guild.
