@@ -371,8 +371,8 @@ routes! ('a, {
     Some(RatelimitingKind::PathAndId(channel_id.into()));
 
     SoundboardDefaultSounds,
-    status!("/soundboard-default-sounds"),
-    None;
+    api!("/soundboard-default-sounds"),
+    Some(RatelimitingKind::Path);
 
     GuildSoundboards { guild_id: GuildId },
     api!("/guilds/{}/soundboard-sounds", guild_id),
