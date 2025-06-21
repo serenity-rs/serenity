@@ -3,7 +3,6 @@ use std::sync::Arc;
 use dashmap::DashMap;
 use dashmap::try_result::TryResult;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 #[cfg(feature = "tracing_instrument")]
@@ -235,7 +234,13 @@ impl ShardRunner {
         }
     }
 
-    // Shuts down the WebSocket client.
+    /// Shuts down the WebSocket client.
+    ///
+    /// The Shard will be in an indeterminate state after this call, especially if called after
+    /// error.
+    ///
+    /// Therefore, the only correct code path is to exit out of the ShardRunner loop and discard the
+    /// WebSocket client entirely.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     async fn shutdown(&mut self, close_code: u16) {
         debug!("[ShardRunner {:?}] Shutting down.", self.shard.shard_info());
@@ -249,22 +254,6 @@ impl ShardRunner {
                 }))
                 .await,
         );
-
-        // In return, we wait for either a Close Frame response, or an error, after which this WS
-        // is deemed disconnected from Discord.
-        loop {
-            match self.shard.client.next().await {
-                Some(Ok(tungstenite::Message::Close(_))) => return,
-                Some(Err(_)) => {
-                    warn!(
-                        "[ShardRunner {:?}] Received an error awaiting close frame",
-                        self.shard.shard_info(),
-                    );
-                    return;
-                },
-                _ => {},
-            }
-        }
     }
 
     #[cfg(feature = "voice")]

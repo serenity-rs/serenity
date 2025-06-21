@@ -717,7 +717,8 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
         Error::Gateway(GatewayError::BuildingUrl)
     })?;
 
-    WsClient::connect(url, compression).await
+    let client = WsClient::connect(url, compression).await?;
+    Ok(client)
 }
 
 struct ResumeMetadata {

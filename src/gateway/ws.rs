@@ -20,6 +20,7 @@ use zstd_safe::{DStream as ZstdInflater, InBuffer, OutBuffer};
 
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, TransportCompression};
 use crate::constants::{self, Opcode};
+use crate::internal::prelude::*;
 use crate::model::event::GatewayEvent;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
@@ -239,7 +240,10 @@ pub struct WsClient {
 const TIMEOUT: Duration = Duration::from_millis(500);
 
 impl WsClient {
-    pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
+    pub(crate) async fn connect(
+        url: Url,
+        compression: TransportCompression,
+    ) -> StdResult<Self, WsError> {
         let config = {
             let mut config = WebSocketConfig::default();
             config.max_message_size = None;
@@ -291,13 +295,8 @@ impl WsClient {
         Ok(())
     }
 
-    /// Delegate to `StreamExt::next`
-    pub(crate) async fn next(&mut self) -> Option<std::result::Result<Message, WsError>> {
-        self.stream.next().await
-    }
-
     /// Delegate to `WebSocketStream::close`
-    pub(crate) async fn close(&mut self, msg: Option<CloseFrame>) -> Result<()> {
+    pub(crate) async fn close(&mut self, msg: Option<CloseFrame>) -> StdResult<(), WsError> {
         self.stream.close(msg).await?;
         Ok(())
     }
