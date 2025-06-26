@@ -300,16 +300,16 @@ impl IntoFuture for ClientBuilder {
         let presence = self.presence;
         let http = self.http;
 
-        if let Some(ratelimiter) = &http.ratelimiter {
-            if let Some(event_handler) = &self.event_handler {
-                let event_handler = Arc::clone(event_handler);
-                ratelimiter.set_ratelimit_callback(Box::new(move |info| {
-                    let event_handler = Arc::clone(&event_handler);
-                    spawn_named("ratelimit::dispatch", async move {
-                        event_handler.ratelimit(info).await;
-                    });
-                }));
-            }
+        if let Some(ratelimiter) = &http.ratelimiter
+            && let Some(event_handler) = &self.event_handler
+        {
+            let event_handler = Arc::clone(event_handler);
+            ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+                let event_handler = Arc::clone(&event_handler);
+                spawn_named("ratelimit::dispatch", async move {
+                    event_handler.ratelimit(info).await;
+                });
+            }));
         }
 
         #[cfg(feature = "cache")]

@@ -350,10 +350,10 @@ impl Message {
         cache_http: impl CacheHttp,
         builder: EditMessage<'_>,
     ) -> Result<()> {
-        if let Some(flags) = self.flags {
-            if flags.contains(MessageFlags::IS_VOICE_MESSAGE) {
-                return Err(Error::Model(ModelError::CannotEditVoiceMessage));
-            }
+        if let Some(flags) = self.flags
+            && flags.contains(MessageFlags::IS_VOICE_MESSAGE)
+        {
+            return Err(Error::Model(ModelError::CannotEditVoiceMessage));
         }
 
         *self = builder.execute(cache_http, self.channel_id, self.id, Some(self.author.id)).await?;
@@ -581,11 +581,11 @@ impl Message {
     /// Retrieves the message channel's category ID if the channel has one.
     pub async fn category_id(&self, cache_http: impl CacheHttp) -> Option<ChannelId> {
         #[cfg(feature = "cache")]
-        if let Some(cache) = cache_http.cache() {
-            if let Some(guild) = cache.guild(self.guild_id?) {
-                let channel = guild.channels.get(&self.channel_id.expect_channel())?;
-                return channel.parent_id;
-            }
+        if let Some(cache) = cache_http.cache()
+            && let Some(guild) = cache.guild(self.guild_id?)
+        {
+            let channel = guild.channels.get(&self.channel_id.expect_channel())?;
+            return channel.parent_id;
         }
 
         cache_http.http().get_channel(self.channel_id).await.ok()?.guild()?.parent_id

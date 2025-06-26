@@ -353,10 +353,10 @@ impl Ratelimit {
             self.remaining = remaining;
         }
 
-        if absolute_ratelimits {
-            if let Some(reset) = parse_header::<f64>(response.headers(), "x-ratelimit-reset")? {
-                self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
-            }
+        if absolute_ratelimits
+            && let Some(reset) = parse_header::<f64>(response.headers(), "x-ratelimit-reset")?
+        {
+            self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
         }
 
         if let Some(reset_after) =
