@@ -115,7 +115,7 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// See [`CreateAttachment::get_data`] for details.
-    pub async fn encode(&self) -> Result<ImageData> {
+    pub async fn encode(&self) -> Result<ImageData<'_>> {
         use base64::engine::{Config, Engine};
 
         const PREFIX: &str = "data:image/png;base64,";
