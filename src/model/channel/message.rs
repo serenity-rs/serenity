@@ -14,7 +14,7 @@ use crate::constants;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
-use crate::model::utils::{StrOrInt, deserialize_components, discord_colours};
+use crate::model::utils::{StrOrInt, discord_colours};
 
 /// A representation of a message over a guild's text channel, a group, or a private channel.
 ///
@@ -109,8 +109,8 @@ pub struct Message {
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<Box<GuildThread>>,
     /// The components of this message
-    #[serde(default, deserialize_with = "deserialize_components")]
-    pub components: FixedArray<ActionRow>,
+    #[serde(default)]
+    pub components: FixedArray<Component>,
     /// Array of message sticker item objects.
     #[serde(default)]
     pub sticker_items: FixedArray<StickerItem>,
@@ -874,21 +874,21 @@ pub struct ChannelMention {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct MessageSnapshot {
-    pub content: String,
+    pub content: FixedString<u16>,
     pub timestamp: Timestamp,
     pub edited_timestamp: Option<Timestamp>,
-    pub mentions: Vec<User>,
+    pub mentions: FixedArray<User>,
     #[serde(default)]
-    pub mention_roles: Vec<RoleId>,
-    pub attachments: Vec<Attachment>,
-    pub embeds: Vec<Embed>,
+    pub mention_roles: FixedArray<RoleId>,
+    pub attachments: FixedArray<Attachment>,
+    pub embeds: FixedArray<Embed>,
     #[serde(rename = "type")]
     pub kind: MessageType,
     pub flags: Option<MessageFlags>,
-    #[serde(default, deserialize_with = "deserialize_components")]
-    pub components: FixedArray<ActionRow>,
     #[serde(default)]
-    pub sticker_items: Vec<StickerItem>,
+    pub components: FixedArray<Component>,
+    #[serde(default)]
+    pub sticker_items: FixedArray<StickerItem>,
 }
 
 /// Custom deserialization function to handle the nested "message" field
@@ -948,6 +948,21 @@ bitflags! {
         /// As of 2023-04-20, bots are currently not able to send voice messages
         /// ([source](https://github.com/discord/discord-api-docs/pull/6082)).
         const IS_VOICE_MESSAGE = 1 << 13;
+        /// Enables support for sending Components V2.
+        ///
+        /// Setting this flag is required to use V2 components.
+        /// Attempting to send V2 components without enabling this flag will result in an error.
+        ///
+        /// # Limitations
+        /// When this flag is enabled, certain restrictions apply:
+        /// - The `content` and `embeds` fields cannot be set.
+        /// - Audio file attachments are not supported.
+        /// - Files will not have a simple text preview.
+        /// - URLs will not generate embeds.
+        ///
+        /// For more details, refer to the Discord documentation: [https://discord.com/developers/docs/components/reference#component-reference]
+        const IS_COMPONENTS_V2 = 1 << 15;
+
     }
 }
 

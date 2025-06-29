@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
 use super::{
-    CreateActionRow,
     CreateAllowedMentions,
     CreateAttachment,
+    CreateComponent,
     CreateEmbed,
     EditAttachments,
 };
@@ -45,7 +45,7 @@ pub struct EditMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
+    components: Option<Cow<'a, [CreateComponent<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     attachments: Option<EditAttachments<'a>>,
 }
@@ -135,10 +135,11 @@ impl<'a> EditMessage<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
+
     super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Sets the flags for the message.

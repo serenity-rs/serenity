@@ -4,6 +4,15 @@ use serde::Serialize;
 
 use crate::model::prelude::*;
 
+#[derive(Clone, Debug)]
+struct StaticU8<const VAL: u8>;
+
+impl<const VAL: u8> Serialize for StaticU8<VAL> {
+    fn serialize<S: serde::Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
+        ser.serialize_u8(VAL)
+    }
+}
+
 /// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
@@ -44,6 +53,462 @@ impl serde::Serialize for CreateActionRow<'_> {
         }
 
         map.end()
+    }
+}
+
+/// A builder for creating components in a structured way.
+///
+/// This enum supports both V1 and V2 components, with the exception of `ActionRow`, which is a V1
+/// component.
+///
+/// ## V2 Components and Message Flags
+/// To send V2 components, you must set [`MessageFlags::IS_COMPONENTS_V2`].
+///
+/// ### Limitations
+/// - The total number of components is limited to **40**..
+/// - The maximum character count for text within components is **4000**.
+/// - The ability to set the `content` and `embeds` field will be disabled
+/// - No support for audio files
+/// - No simple text preview for files
+/// - No embeds for urls
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+pub enum CreateComponent<'a> {
+    /// Represents an action row component (V1).
+    ///
+    /// An action row is a container for other interactive components, such as buttons and select
+    /// menus.
+    ActionRow(CreateActionRow<'a>),
+    /// Represents a section component (V2).
+    ///
+    /// A section is used to structure and group other components with an accessory.
+    Section(CreateSection<'a>),
+    /// Represents a text display component (V2).
+    ///
+    /// This component is used for displaying text within a message, separate from interactive
+    /// elements.
+    TextDisplay(CreateTextDisplay<'a>),
+    /// Represents a media gallery component (V2).
+    ///
+    /// A media gallery allows embedding images, videos, or other media assets within a message.
+    MediaGallery(CreateMediaGallery<'a>),
+    /// Represents a file component (V2).
+    ///
+    /// This component is used for attaching and displaying files within a message.
+    File(CreateFile<'a>),
+    /// Represents a separator component (V2).
+    ///
+    /// A separator is used to visually divide sections within a message for better readability.
+    Separator(CreateSeparator),
+    /// Represents a container component (V2).
+    ///
+    /// A container is a flexible component that can hold multiple nested components.
+    Container(CreateContainer<'a>),
+}
+
+/// A builder to create a section component, supports up to a max of **3** components with an
+/// accessory.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateSection<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<9>,
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    components: Cow<'a, [CreateSectionComponent<'a>]>,
+    accessory: CreateSectionAccessory<'a>,
+}
+
+impl<'a> CreateSection<'a> {
+    /// Creates a new builder with the specified components and accessory.
+    ///
+    /// Note: You may specify no more than **3** components or this will error on send.
+    pub fn new(
+        components: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>,
+        accessory: CreateSectionAccessory<'a>,
+    ) -> Self {
+        CreateSection {
+            kind: StaticU8::<9>,
+            components: components.into(),
+            accessory,
+        }
+    }
+
+    /// Sets the components for the section. Replaces the current value as set in [`Self::new`].
+    ///
+    /// **Note**: This will replace all existing components. Use [`Self::add_component()`] to add
+    /// additional components.
+    pub fn components(
+        mut self,
+        components: impl Into<Cow<'a, [CreateSectionComponent<'a>]>>,
+    ) -> Self {
+        self.components = components.into();
+        self
+    }
+
+    /// Adds an additional component to this section.
+    ///
+    /// **Note**: This will add additional components. Use [`Self::components()`] to replace them.
+    pub fn add_component(mut self, component: CreateSectionComponent<'a>) -> Self {
+        self.components.to_mut().push(component);
+        self
+    }
+
+    /// Sets the accessory for this section. Replaces the current value as set in [`Self::new`].
+    pub fn accessory(mut self, accessory: CreateSectionAccessory<'a>) -> Self {
+        self.accessory = accessory;
+        self
+    }
+}
+
+/// An enum of all valid section components.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+pub enum CreateSectionComponent<'a> {
+    TextDisplay(CreateTextDisplay<'a>),
+}
+
+/// A builder to create a text display component.
+#[derive(Clone, Debug, Serialize)]
+pub struct CreateTextDisplay<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<10>,
+    content: Cow<'a, str>,
+}
+
+impl<'a> CreateTextDisplay<'a> {
+    /// Creates a new text display component.
+    ///
+    /// Note: All components on a message shares the same **4000** character limit.
+    pub fn new(content: impl Into<Cow<'a, str>>) -> Self {
+        CreateTextDisplay {
+            kind: StaticU8::<10>,
+            content: content.into(),
+        }
+    }
+
+    /// Sets the content of this text display component. Replaces the current value as set in
+    /// [`Self::new`].
+    ///
+    /// Note: All components on a message shares the same **4000** character limit.
+    #[must_use]
+    pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
+        self.content = content.into();
+        self
+    }
+}
+
+/// An enum of all valid section accessories.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+pub enum CreateSectionAccessory<'a> {
+    Thumbnail(CreateThumbnail<'a>),
+    Button(CreateButton<'a>),
+}
+
+/// A builder to create a thumbnail for a section.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateThumbnail<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<11>,
+    media: CreateUnfurledMediaItem<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+}
+
+impl<'a> CreateThumbnail<'a> {
+    /// Creates a new thumbnail with a media item.
+    pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
+        CreateThumbnail {
+            kind: StaticU8::<11>,
+            media,
+            description: None,
+            spoiler: None,
+        }
+    }
+
+    /// Sets the media item. Replaces the current value as set in [`Self::new`].
+    pub fn media(mut self, media: CreateUnfurledMediaItem<'a>) -> Self {
+        self.media = media;
+        self
+    }
+
+    /// Sets the description for this thumbnail.
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    /// Sets if this thumbnail is spoilered.
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
+}
+
+/// A builder to create a media item.
+#[derive(Clone, Debug, Serialize, Default)]
+#[must_use]
+pub struct CreateUnfurledMediaItem<'a> {
+    url: Cow<'a, str>,
+}
+
+impl<'a> CreateUnfurledMediaItem<'a> {
+    /// Creates a new media item.
+    pub fn new(url: impl Into<Cow<'a, str>>) -> Self {
+        CreateUnfurledMediaItem {
+            url: url.into(),
+        }
+    }
+
+    /// Sets the url to this media item. Replaces the current value as set in [`Self::new`].
+    pub fn url(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+        self.url = url.into();
+        self
+    }
+}
+
+/// A builder to create a media gallery, a component that can contain multiple pieces of media.
+///
+/// Note: May contain up to **10** items.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateMediaGallery<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<12>,
+    items: Cow<'a, [CreateMediaGalleryItem<'a>]>,
+}
+
+impl<'a> CreateMediaGallery<'a> {
+    /// Creates a new media gallery with up to **10** items.
+    pub fn new(items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
+        CreateMediaGallery {
+            kind: StaticU8::<12>,
+            items: items.into(),
+        }
+    }
+
+    /// Sets the items of the gallery. Replaces the current value as set in [`Self::new`].
+    ///
+    /// **Note**: This will replace all existing items. Use [`Self::add_item()`] to add additional
+    /// items
+    pub fn items(mut self, items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
+        self.items = items.into();
+        self
+    }
+
+    /// Adds a singular item to the gallery.
+    ///
+    /// **Note**: This will add a singular item. Use [`Self::items()`] to replace all items.
+    pub fn add_item(mut self, item: CreateMediaGalleryItem<'a>) -> Self {
+        self.items.to_mut().push(item);
+        self
+    }
+}
+
+/// Builder to create individual media gallery items.
+#[derive(Clone, Debug, Serialize, Default)]
+#[must_use]
+pub struct CreateMediaGalleryItem<'a> {
+    media: CreateUnfurledMediaItem<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+}
+
+impl<'a> CreateMediaGalleryItem<'a> {
+    /// Create a new media gallery item.
+    pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
+        CreateMediaGalleryItem {
+            media,
+            description: None,
+            spoiler: None,
+        }
+    }
+
+    /// Sets the internal media item. Replaces the current value as set in [`Self::new`].
+    pub fn media(mut self, media: CreateUnfurledMediaItem<'a>) -> Self {
+        self.media = media;
+        self
+    }
+
+    /// Sets the description of this item in the gallery.
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    /// Specifies if this piece of media should be spoilered.
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
+}
+
+/// A builder for specifying a file to be uploaded.
+///
+/// This builder **only** supports the `attachment://filename.extension` format.
+/// This means that you must first upload the file as an attachment in the message
+/// and then reference it using this format.
+///
+/// # Usage
+///
+/// 1. Upload the file as an attachment.
+/// 2. Use the `attachment://` scheme to reference the uploaded file.
+///
+/// ## Example
+///
+/// If you upload an attachment to the message that is called "example.txt", you set the url of the
+/// item to "attachment://example.txt".
+///
+/// For more details on naming and rules for attachments,
+/// refer to the [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files).
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateFile<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<13>,
+    file: CreateUnfurledMediaItem<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+}
+
+impl<'a> CreateFile<'a> {
+    /// Create a new builder for the file component. Refer to this builders documentation for
+    /// limits.
+    pub fn new(file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
+        CreateFile {
+            kind: StaticU8::<13>,
+            file: file.into(),
+            spoiler: None,
+        }
+    }
+
+    // Only supports `attachment://filename.extension` format, refer to this builders documentation
+    // for more details. Replaces the current value as set in [`Self::new`].
+    pub fn file(mut self, file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
+        self.file = file.into();
+        self
+    }
+
+    ///  Sets if this file should be spoilered or not.
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
+}
+
+/// A builder for creating a separator.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateSeparator {
+    #[serde(rename = "type")]
+    kind: StaticU8<14>,
+    divider: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spacing: Option<Spacing>,
+}
+
+impl CreateSeparator {
+    /// Creates a new separator, with or without a divider.
+    pub fn new(divider: bool) -> Self {
+        CreateSeparator {
+            kind: StaticU8::<14>,
+            divider,
+            spacing: None,
+        }
+    }
+
+    /// Sets if this separator should have a divider or not. Replaces the current value as set in
+    /// [`Self::new`].
+    pub fn divider(mut self, divider: bool) -> Self {
+        self.divider = divider;
+        self
+    }
+
+    /// Sets the spacing of this separator.
+    pub fn spacing(mut self, spacing: Spacing) -> Self {
+        self.spacing = Some(spacing);
+        self
+    }
+}
+
+/// A builder to create a container, which acts similarly to embeds.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateContainer<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<17>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    accent_color: Option<Colour>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spoiler: Option<bool>,
+    components: Cow<'a, [CreateComponent<'a>]>,
+}
+
+impl<'a> CreateContainer<'a> {
+    /// Create a new container, with an array of components inside. This component may contain any
+    /// other component except another container!
+    pub fn new(components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+        CreateContainer {
+            kind: StaticU8::<17>,
+            accent_color: None,
+            spoiler: None,
+            components: components.into(),
+        }
+    }
+
+    // Set the colour of the left-hand side of the container.
+    pub fn accent_colour<C: Into<Colour>>(mut self, colour: C) -> Self {
+        self.accent_color = Some(colour.into());
+        self
+    }
+
+    /// Set the colour of the left-hand side of the container.
+    ///
+    /// This is an alias of [`Self::accent_colour`].
+    pub fn accent_color<C: Into<Colour>>(self, colour: C) -> Self {
+        self.accent_colour(colour)
+    }
+
+    /// Sets if this container is spoilered or not.
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
+
+    /// Sets the components of this container. Replaces the current value as set in [`Self::new`].
+    ///
+    /// **Note**: This will replace all existing components. Use [`Self::add_component()`] to add
+    /// additional components.
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+        self.components = components.into();
+        self
+    }
+
+    /// Adds an additional component to this container.
+    ///
+    /// **Note**: This will add additional components. Use [`Self::components()`] to replace them.
+    pub fn add_component(mut self, component: CreateComponent<'a>) -> Self {
+        self.components.to_mut().push(component);
+        self
+    }
+}
+
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum Spacing {
+        Small = 1,
+        Large = 2,
+        _ => Unknown(u8),
     }
 }
 
