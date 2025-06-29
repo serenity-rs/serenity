@@ -104,7 +104,6 @@ pub fn print_ranking() {
         ("IntegrationDeleteEvent", std::mem::size_of::<IntegrationDeleteEvent>()),
         ("IntegrationId", std::mem::size_of::<IntegrationId>()),
         ("IntegrationUpdateEvent", std::mem::size_of::<IntegrationUpdateEvent>()),
-        ("InteractionResponseFlags", std::mem::size_of::<InteractionResponseFlags>()),
         ("InteractionCreateEvent", std::mem::size_of::<InteractionCreateEvent>()),
         ("InteractionId", std::mem::size_of::<InteractionId>()),
         ("Invite", std::mem::size_of::<Invite>()),

@@ -301,23 +301,6 @@ enum_number! {
     }
 }
 
-bitflags! {
-    /// The flags for an interaction response message.
-    ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)
-    /// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))
-    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct InteractionResponseFlags: u64 {
-        /// Do not include any embeds when serializing this message.
-        const SUPPRESS_EMBEDS = 1 << 2;
-        /// Interaction message will only be visible to sender and will
-        /// be quickly deleted.
-        const EPHEMERAL = 1 << 6;
-        /// Does not trigger push notifications or desktop notifications.
-        const SUPPRESS_NOTIFICATIONS = 1 << 12;
-    }
-}
-
 /// A cleaned up enum for determining the authorizing owner for an [`Interaction`].
 ///
 /// [Discord Docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object)
