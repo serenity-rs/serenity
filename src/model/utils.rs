@@ -3,7 +3,6 @@ use std::fmt;
 use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
 use serde_cow::CowStr;
-use serde_json::value::RawValue;
 use small_fixed_array::FixedString;
 
 use super::prelude::*;
@@ -255,58 +254,4 @@ where
                 .map_err(|_| DeError::custom("Invalid colour data"))
         })
         .collect()
-}
-
-// Custom deserialize function to deserialize components safely without knocking the whole message
-// out when new components are found but not supported.
-pub fn deserialize_components<'de, D>(deserializer: D) -> Result<FixedArray<ActionRow>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    #[derive(Deserialize)]
-    struct MinComponent {
-        #[serde(rename = "type")]
-        kind: u8,
-    }
-
-    struct ComponentsVisitor;
-
-    impl<'de> Visitor<'de> for ComponentsVisitor {
-        type Value = FixedArray<ActionRow>;
-
-        fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            formatter.write_str("a sequence of ActionRow elements")
-        }
-
-        fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-        where
-            A: serde::de::SeqAccess<'de>,
-        {
-            let mut components = Vec::with_capacity(seq.size_hint().unwrap_or_default());
-
-            while let Some(raw) = seq.next_element::<&RawValue>()? {
-                // We deserialize only the `kind` field to determine the component type.
-                // We later use this to check if its a supported component before deserializing the
-                // entire payload.
-                let min_component =
-                    MinComponent::deserialize(raw).map_err(serde::de::Error::custom)?;
-
-                // Action rows are the only top level component supported in serenity at this time.
-                if min_component.kind == 1 {
-                    components.push(ActionRow::deserialize(raw).map_err(serde::de::Error::custom)?);
-                } else {
-                    // Top level component is not an action row and cannot be supported on
-                    // serenity@current without breaking changes, so we skip them.
-                    tracing::debug!(
-                        "Skipping component with unsupported kind: {}",
-                        min_component.kind
-                    );
-                }
-            }
-
-            Ok(FixedArray::from_vec_trunc(components))
-        }
-    }
-
-    deserializer.deserialize_seq(ComponentsVisitor)
 }

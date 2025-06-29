@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
 use super::{
-    CreateActionRow,
     CreateAllowedMentions,
     CreateAttachment,
+    CreateComponent,
     CreateEmbed,
     EditAttachments,
 };
@@ -68,7 +68,7 @@ pub struct ExecuteWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
+    components: Option<Cow<'a, [CreateComponent<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -213,15 +213,12 @@ impl<'a> ExecuteWebhook<'a> {
     /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
     /// application (and has kind [`WebhookType::Incoming`]).
     ///
-    /// If [`Self::with_components`] is set, non-interactive components can be used on non
-    /// application-owned webhooks.
-    ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
-    /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
+
     super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Set an embed for the message.

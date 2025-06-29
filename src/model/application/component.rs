@@ -1,3 +1,4 @@
+use nonmax::NonMaxU32;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
 use serde_json::value::RawValue;
@@ -19,8 +20,256 @@ enum_number! {
         RoleSelect = 6,
         MentionableSelect = 7,
         ChannelSelect = 8,
+        Section = 9,
+        TextDisplay = 10,
+        Thumbnail = 11,
+        MediaGallery = 12,
+        File = 13,
+        Separator = 14,
+        Container = 17,
         _ => Unknown(u8),
     }
+}
+
+/// Represents Discord components, a part of messages that are usually interactable.
+///
+/// # Component Versioning
+///
+/// - When `IS_COMPONENTS_V2` is **not** set, the **only** valid top-level component is
+///   [`ActionRow`].
+/// - When `IS_COMPONENTS_V2` **is** set, other component types may be used at the top level, but
+///   other message limitations are applied.
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub enum Component {
+    ActionRow(ActionRow),
+    Button(Button),
+    SelectMenu(SelectMenu),
+    Section(Section),
+    TextDisplay(TextDisplay),
+    Thumbnail(Thumbnail),
+    MediaGallery(MediaGallery),
+    Separator(Separator),
+    File(FileComponent),
+    Container(Container),
+    Unknown(u8),
+}
+
+impl<'de> Deserialize<'de> for Component {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        use serde_json::value::RawValue;
+
+        #[derive(Deserialize)]
+        struct ComponentRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
+
+        let value = <&RawValue>::deserialize(deserializer)?;
+        let raw = ComponentRaw::deserialize(value).map_err(DeError::custom)?;
+
+        match raw.kind {
+            ComponentType::ActionRow => Deserialize::deserialize(value).map(Component::ActionRow),
+            ComponentType::Button => Deserialize::deserialize(value).map(Component::Button),
+            ComponentType::StringSelect
+            | ComponentType::UserSelect
+            | ComponentType::RoleSelect
+            | ComponentType::MentionableSelect
+            | ComponentType::ChannelSelect => {
+                Deserialize::deserialize(value).map(Component::SelectMenu)
+            },
+            ComponentType::Section => Deserialize::deserialize(value).map(Component::Section),
+            ComponentType::TextDisplay => {
+                Deserialize::deserialize(value).map(Component::TextDisplay)
+            },
+            ComponentType::MediaGallery => {
+                Deserialize::deserialize(value).map(Component::MediaGallery)
+            },
+            ComponentType::Separator => Deserialize::deserialize(value).map(Component::Separator),
+            ComponentType::File => Deserialize::deserialize(value).map(Component::File),
+            ComponentType::Container => Deserialize::deserialize(value).map(Component::Container),
+            ComponentType::Thumbnail => Deserialize::deserialize(value).map(Component::Thumbnail),
+            ComponentType(i) => Ok(Component::Unknown(i)),
+        }
+        .map_err(DeError::custom)
+    }
+}
+
+/// A component that is a container for up to 3 text display components and an accessory.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#section)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Section {
+    /// Always [`ComponentType::Section`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The components inside of the section.
+    ///
+    /// As of 2025-02-28, this is limited to just [`ComponentType::TextDisplay`] with up to 3 max.
+    pub components: FixedArray<Component>,
+    /// The accessory to the side of the section.
+    ///
+    /// As of 2025-02-28, this is limited to [`ComponentType::Button`] or
+    /// [`ComponentType::Thumbnail`]
+    pub accessory: Box<Component>,
+}
+
+/// A section component's thumbnail.
+///
+/// See [`Section`] for how this fits within a section.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#thumbnail)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Thumbnail {
+    /// Always [`ComponentType::Thumbnail`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The internal media item this contains.
+    pub media: UnfurledMediaItem,
+    /// The description of the thumbnail.
+    pub description: Option<FixedString<u16>>,
+    /// Whether or not this component is spoilered.
+    pub spoiler: Option<bool>,
+}
+
+/// A url or attachment.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#unfurled-media-item-structure)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct UnfurledMediaItem {
+    /// The url of this item.
+    pub url: FixedString<u16>,
+    /// The proxied discord url.
+    pub proxy_url: Option<FixedString<u16>>,
+    /// The width of the media item.
+    pub width: Option<NonMaxU32>,
+    /// The height of the media item.
+    pub height: Option<NonMaxU32>,
+    /// The content type of the media item.
+    pub content_type: Option<FixedString>,
+}
+
+/// A component that allows you to add text to your message, similiar to the `content` field of a
+/// message.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#text-display)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct TextDisplay {
+    /// Always [`ComponentType::TextDisplay`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The content of this text display component.
+    pub content: FixedString<u16>,
+}
+
+/// A Media Gallery is a component that allows you to display media attachments in an organized
+/// gallery format.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#media-gallery)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MediaGallery {
+    /// Always [`ComponentType::MediaGallery`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// Array of images this media gallery can contain, max of 10.
+    pub items: FixedArray<MediaGalleryItem>,
+}
+
+/// An individual media gallery item.
+///
+/// Belongs to [`MediaGallery`].
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#media-gallery-media-gallery-item-structure)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MediaGalleryItem {
+    /// The internal media piece that this item contains.
+    pub media: UnfurledMediaItem,
+    /// The description of the media item.
+    pub description: Option<FixedString<u16>>,
+    /// Whether or not this component is spoilered.
+    pub spoiler: Option<bool>,
+}
+
+/// A component that adds vertical padding and visual division between other components.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#separator)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Separator {
+    /// Always [`ComponentType::Separator`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// Whether or not this contains a separating divider.
+    pub divider: Option<bool>,
+    /// The spacing of the separator.
+    pub spacing: Option<SeparatorSpacingSize>,
+}
+
+enum_number! {
+    /// The size of a separator component.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum SeparatorSpacingSize {
+        Small = 1,
+        Large = 2,
+        _ => Unknown(u8),
+    }
+}
+
+/// A file component, will not render a text preview to the user.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#file)
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct FileComponent {
+    /// Always [`ComponentType::File`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The file this component internally contains.
+    pub file: UnfurledMediaItem,
+    /// Whether or not this component is spoilered.
+    pub spoiler: Option<bool>,
+}
+
+/// A container component, similar to an embed but without all the functionality.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#container)
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct Container {
+    /// Always [`ComponentType::Container`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The accent colour, similar to an embeds accent.
+    pub accent_color: Option<Colour>,
+    /// Whether or not this component is spoilered.
+    pub spoiler: Option<bool>,
+    /// The components within this container.
+    ///
+    /// As of 2025-02-28, this can be [`ComponentType::ActionRow`], [`ComponentType::Section`],
+    /// [`ComponentType::TextDisplay`], [`ComponentType::MediaGallery`], [`ComponentType::File`] or
+    /// [`ComponentType::Separator`]
+    pub components: FixedArray<Component>,
 }
 
 /// An action row.

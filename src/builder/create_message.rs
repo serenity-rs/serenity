@@ -2,9 +2,9 @@ use std::borrow::Cow;
 
 use super::create_poll::Ready;
 use super::{
-    CreateActionRow,
     CreateAllowedMentions,
     CreateAttachment,
+    CreateComponent,
     CreateEmbed,
     CreatePoll,
     EditAttachments,
@@ -63,7 +63,7 @@ pub struct CreateMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     message_reference: Option<MessageReference>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
+    components: Option<Cow<'a, [CreateComponent<'a>]>>,
     sticker_ids: Cow<'a, [StickerId]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
@@ -184,10 +184,11 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
+
     super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Sets the flags for the message.

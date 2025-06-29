@@ -2,9 +2,9 @@ use std::borrow::Cow;
 
 use super::create_poll::Ready;
 use super::{
-    CreateActionRow,
     CreateAllowedMentions,
     CreateAttachment,
+    CreateComponent,
     CreateEmbed,
     CreatePoll,
     EditAttachments,
@@ -29,7 +29,7 @@ pub struct CreateInteractionResponseFollowup<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
+    components: Option<Cow<'a, [CreateComponent<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -153,10 +153,11 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
+
     super::button_and_select_menu_convenience_methods!(self.components);
 
     /// Creates or edits a followup response to the response sent. If a [`MessageId`] is provided,

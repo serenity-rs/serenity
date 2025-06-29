@@ -6,6 +6,7 @@ use super::{
     CreateActionRow,
     CreateAllowedMentions,
     CreateAttachment,
+    CreateComponent,
     CreateEmbed,
     CreatePoll,
     EditAttachments,
@@ -158,9 +159,9 @@ pub struct CreateInteractionResponseMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    flags: Option<InteractionResponseFlags>,
+    flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<Cow<'a, [CreateActionRow<'a>]>>,
+    components: Option<Cow<'a, [CreateComponent<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     poll: Option<CreatePoll<'a, Ready>>,
     attachments: EditAttachments<'a>,
@@ -253,19 +254,19 @@ impl<'a> CreateInteractionResponseMessage<'a> {
     }
 
     /// Sets the flags for the message.
-    pub fn flags(mut self, flags: InteractionResponseFlags) -> Self {
+    pub fn flags(mut self, flags: MessageFlags) -> Self {
         self.flags = Some(flags);
         self
     }
 
     /// Adds or removes the ephemeral flag.
     pub fn ephemeral(mut self, ephemeral: bool) -> Self {
-        let mut flags = self.flags.unwrap_or_else(InteractionResponseFlags::empty);
+        let mut flags = self.flags.unwrap_or_else(MessageFlags::empty);
 
         if ephemeral {
-            flags |= InteractionResponseFlags::EPHEMERAL;
+            flags |= MessageFlags::EPHEMERAL;
         } else {
-            flags &= !InteractionResponseFlags::EPHEMERAL;
+            flags &= !MessageFlags::EPHEMERAL;
         }
 
         self.flags = Some(flags);
@@ -273,7 +274,7 @@ impl<'a> CreateInteractionResponseMessage<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         self.components = Some(components.into());
         self
     }
