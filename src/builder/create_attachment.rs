@@ -115,7 +115,7 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// See [`CreateAttachment::get_data`] for details.
-    pub async fn encode(&self) -> Result<ImageData> {
+    pub async fn encode(&self) -> Result<ImageData<'_>> {
         use base64::engine::{Config, Engine};
 
         const PREFIX: &str = "data:image/png;base64,";
@@ -162,14 +162,15 @@ impl<'a> ImageData<'a> {
     /// docs](https://discord.com/developers/docs/reference#image-data).
     pub fn from_base64(s: impl Into<Cow<'a, str>>) -> Result<Self> {
         let s = s.into();
-        if let Some(("data", tail)) = s.split_once(':') {
-            if let Some((mimetype, encoding)) = tail.split_once(';') {
-                if mimetype.split_once('/').is_some() && encoding.starts_with("base64,") {
-                    return Ok(Self(s));
-                }
-            }
+        if let Some(("data", tail)) = s.split_once(':')
+            && let Some((mimetype, encoding)) = tail.split_once(';')
+            && mimetype.split_once('/').is_some()
+            && encoding.starts_with("base64,")
+        {
+            Ok(Self(s))
+        } else {
+            Err(Error::Url(UrlError::InvalidDataURI))
         }
-        Err(Error::Url(UrlError::InvalidDataURI))
     }
 }
 

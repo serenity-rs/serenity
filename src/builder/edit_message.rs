@@ -229,12 +229,12 @@ impl<'a> EditMessage<'a> {
         self.check_length()?;
 
         #[cfg(feature = "cache")]
-        if let Some(user_id) = user_id {
-            if let Some(cache) = cache_http.cache() {
-                if user_id != cache.current_user().id && !self.is_only_suppress_embeds() {
-                    return Err(Error::Model(ModelError::InvalidUser));
-                }
-            }
+        if let Some(user_id) = user_id
+            && let Some(cache) = cache_http.cache()
+            && user_id != cache.current_user().id
+            && !self.is_only_suppress_embeds()
+        {
+            return Err(Error::Model(ModelError::InvalidUser));
         }
 
         let files = self.attachments.as_ref().map_or(Vec::new(), EditAttachments::new_attachments);

@@ -89,10 +89,10 @@ impl ShardRunner {
     /// connection.
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn run(&mut self) {
-        if let Err(Error::Gateway(e)) = self.start_loop().await {
-            if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::Quit(Err(e))) {
-                warn!("Failed to send return value: {why}");
-            }
+        if let Err(Error::Gateway(e)) = self.start_loop().await
+            && let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::Quit(Err(e)))
+        {
+            warn!("Failed to send return value: {why}");
         }
         debug!("[ShardRunner {:?}] Stopping", self.shard.shard_info());
     }
