@@ -952,10 +952,10 @@ impl GuildId {
     pub async fn to_partial_guild(self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guild(self) {
-                    return Ok(guild.clone().into());
-                }
+            if let Some(cache) = cache_http.cache()
+                && let Some(guild) = cache.guild(self)
+            {
+                return Ok(guild.clone().into());
             }
         }
 
@@ -1089,12 +1089,11 @@ impl GuildId {
     pub async fn member(self, cache_http: impl CacheHttp, user_id: UserId) -> Result<Member> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guild(self) {
-                    if let Some(member) = guild.members.get(&user_id) {
-                        return Ok(member.clone());
-                    }
-                }
+            if let Some(cache) = cache_http.cache()
+                && let Some(guild) = cache.guild(self)
+                && let Some(member) = guild.members.get(&user_id)
+            {
+                return Ok(member.clone());
             }
         }
 
@@ -1829,10 +1828,10 @@ impl<'a> MembersIter<'a> {
         let init_state = MembersIter::new(guild_id, http);
 
         futures::stream::unfold(init_state, |mut state| async {
-            if state.buffer.is_empty() && state.after.is_some() || !state.tried_fetch {
-                if let Err(error) = state.refresh().await {
-                    return Some((Err(error), state));
-                }
+            if (state.buffer.is_empty() && state.after.is_some() || !state.tried_fetch)
+                && let Err(error) = state.refresh().await
+            {
+                return Some((Err(error), state));
             }
 
             state.buffer.pop().map(|entry| (Ok(entry), state))

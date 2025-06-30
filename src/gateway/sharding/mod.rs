@@ -246,13 +246,12 @@ impl Shard {
                 Ok(())
             },
             Err(why) => {
-                if let Error::Tungstenite(err) = &why {
-                    if let TungsteniteError::Io(err) = &**err {
-                        if err.raw_os_error() != Some(32) {
-                            debug!("[{:?}] Err heartbeating: {:?}", self.info, err);
-                            return Err(Error::Gateway(GatewayError::HeartbeatFailed));
-                        }
-                    }
+                if let Error::Tungstenite(err) = &why
+                    && let TungsteniteError::Io(err) = &**err
+                    && err.raw_os_error() != Some(32)
+                {
+                    debug!("[{:?}] Err heartbeating: {:?}", self.info, err);
+                    return Err(Error::Gateway(GatewayError::HeartbeatFailed));
                 }
 
                 warn!("[{:?}] Other err w/ keepalive: {:?}", self.info, why);
@@ -522,10 +521,10 @@ impl Shard {
 
         // If a duration of time less than the heartbeat_interval has passed, then don't perform a
         // keepalive or attempt to reconnect.
-        if let Some(last_sent) = self.last_heartbeat_sent {
-            if last_sent.elapsed() <= heartbeat_interval {
-                return true;
-            }
+        if let Some(last_sent) = self.last_heartbeat_sent
+            && last_sent.elapsed() <= heartbeat_interval
+        {
+            return true;
         }
 
         // If the last heartbeat didn't receive an acknowledgement, then auto-reconnect.
@@ -552,10 +551,11 @@ impl Shard {
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn latency(&self) -> Option<StdDuration> {
-        if let (Some(sent), Some(received)) = (self.last_heartbeat_sent, self.last_heartbeat_ack) {
-            if received > sent {
-                return Some(received - sent);
-            }
+        if let Some(sent) = self.last_heartbeat_sent
+            && let Some(received) = self.last_heartbeat_ack
+            && received > sent
+        {
+            return Some(received - sent);
         }
 
         None

@@ -88,17 +88,17 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
     type Output = std::convert::Infallible;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(guild_id) = self.guild_id {
-            if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
-                let (channel_id, thread_id) = self.channel_id.split();
-                if let Some(mut channel) = guild.channels.get_mut(&channel_id) {
-                    channel.base.last_pin_timestamp = self.last_pin_timestamp;
-                    return None;
-                }
+        if let Some(guild_id) = self.guild_id
+            && let Some(mut guild) = cache.guilds.get_mut(&guild_id)
+        {
+            let (channel_id, thread_id) = self.channel_id.split();
+            if let Some(mut channel) = guild.channels.get_mut(&channel_id) {
+                channel.base.last_pin_timestamp = self.last_pin_timestamp;
+                return None;
+            }
 
-                if let Some(mut thread) = guild.threads.get_mut(&thread_id) {
-                    thread.base.last_pin_timestamp = self.last_pin_timestamp;
-                }
+            if let Some(mut thread) = guild.threads.get_mut(&thread_id) {
+                thread.base.last_pin_timestamp = self.last_pin_timestamp;
             }
         }
 
@@ -273,10 +273,10 @@ impl CacheUpdate for GuildRoleUpdateEvent {
     type Output = Role;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(mut guild) = cache.guilds.get_mut(&self.role.guild_id) {
-            if let Some(mut role) = guild.roles.get_mut(&self.role.id) {
-                return Some(std::mem::replace(&mut *role, self.role.clone()));
-            }
+        if let Some(mut guild) = cache.guilds.get_mut(&self.role.guild_id)
+            && let Some(mut role) = guild.roles.get_mut(&self.role.id)
+        {
+            return Some(std::mem::replace(&mut *role, self.role.clone()));
         }
 
         None
@@ -425,41 +425,41 @@ impl CacheUpdate for PresenceUpdateEvent {
     type Output = Presence;
 
     fn update(&mut self, cache: &Cache) -> Option<Presence> {
-        if let Some(guild_id) = self.presence.guild_id {
-            if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
-                let old = guild.presences.get(&self.presence.user.id).cloned();
+        if let Some(guild_id) = self.presence.guild_id
+            && let Some(mut guild) = cache.guilds.get_mut(&guild_id)
+        {
+            let old = guild.presences.get(&self.presence.user.id).cloned();
 
-                // If the member went offline, remove them from the presence list.
-                if self.presence.status == OnlineStatus::Offline {
-                    guild.presences.remove(&self.presence.user.id);
-                } else {
-                    guild.presences.insert(self.presence.clone());
-                }
-
-                // Create a partial member instance out of the presence update data.
-                if let Some(user) = self.presence.user.to_user() {
-                    if !guild.members.contains_key(&self.presence.user.id) {
-                        guild.members.insert(Member {
-                            guild_id,
-                            joined_at: None,
-                            nick: None,
-                            user,
-                            roles: FixedArray::default(),
-                            premium_since: None,
-                            permissions: None,
-                            avatar: None,
-                            banner: None,
-                            communication_disabled_until: None,
-                            flags: GuildMemberFlags::default(),
-                            unusual_dm_activity_until: None,
-                            avatar_decoration_data: None,
-                            __generated_flags: MemberGeneratedFlags::empty(),
-                        });
-                    }
-                }
-
-                return old;
+            // If the member went offline, remove them from the presence list.
+            if self.presence.status == OnlineStatus::Offline {
+                guild.presences.remove(&self.presence.user.id);
+            } else {
+                guild.presences.insert(self.presence.clone());
             }
+
+            // Create a partial member instance out of the presence update data.
+            if let Some(user) = self.presence.user.to_user()
+                && !guild.members.contains_key(&self.presence.user.id)
+            {
+                guild.members.insert(Member {
+                    guild_id,
+                    joined_at: None,
+                    nick: None,
+                    user,
+                    roles: FixedArray::default(),
+                    premium_since: None,
+                    permissions: None,
+                    avatar: None,
+                    banner: None,
+                    communication_disabled_until: None,
+                    flags: GuildMemberFlags::default(),
+                    unusual_dm_activity_until: None,
+                    avatar_decoration_data: None,
+                    __generated_flags: MemberGeneratedFlags::empty(),
+                });
+            }
+
+            return old;
         }
 
         None

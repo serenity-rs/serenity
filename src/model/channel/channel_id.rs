@@ -55,23 +55,21 @@ impl ChannelId {
         guild_id: Option<GuildId>,
     ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
-        if let Some(cache) = cache_http.cache() {
-            if let Some(guild_id) = guild_id {
-                if let Some(guild) = cache.guild(guild_id) {
-                    if let Some(channel) = guild.channels.get(&self) {
-                        return Ok(channel.clone());
-                    }
-                }
+        if let Some(cache) = cache_http.cache()
+            && let Some(guild_id) = guild_id
+            && let Some(guild) = cache.guild(guild_id)
+            && let Some(channel) = guild.channels.get(&self)
+        {
+            return Ok(channel.clone());
+        }
+
+        #[cfg(feature = "temp_cache")]
+        if let Some(temp_channel) = cache.temp_channels.get(&self) {
+            if guild_id.is_some_and(|id| temp_channel.base.guild_id != id) {
+                return Err(Error::Model(ModelError::ChannelNotFound));
             }
 
-            #[cfg(feature = "temp_cache")]
-            if let Some(temp_channel) = cache.temp_channels.get(&self) {
-                if guild_id.is_some_and(|id| temp_channel.base.guild_id != id) {
-                    return Err(Error::Model(ModelError::ChannelNotFound));
-                }
-
-                return Ok(GuildChannel::clone(&temp_channel));
-            }
+            return Ok(GuildChannel::clone(&temp_channel));
         }
 
         let channel = cache_http.http().get_channel(self.widen()).await?;
@@ -712,10 +710,10 @@ impl GenericChannelId {
         message_id: MessageId,
     ) -> Result<Message> {
         #[cfg(feature = "cache")]
-        if let Some(cache) = cache_http.cache() {
-            if let Some(message) = cache.message(self, message_id) {
-                return Ok(message.clone());
-            }
+        if let Some(cache) = cache_http.cache()
+            && let Some(message) = cache.message(self, message_id)
+        {
+            return Ok(message.clone());
         }
 
         let message = cache_http.http().get_message(self, message_id).await?;
@@ -1210,10 +1208,10 @@ impl<'a> MessagesIter<'a> {
         let init_state = MessagesIter::new(cache_http, channel_id);
 
         futures::stream::unfold(init_state, |mut state| async {
-            if state.buffer.is_empty() && state.before.is_some() || !state.tried_fetch {
-                if let Err(error) = state.refresh().await {
-                    return Some((Err(error), state));
-                }
+            if (state.buffer.is_empty() && state.before.is_some() || !state.tried_fetch)
+                && let Err(error) = state.refresh().await
+            {
+                return Some((Err(error), state));
             }
 
             // the resultant stream goes from newest to oldest.

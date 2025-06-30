@@ -105,44 +105,38 @@ fn clean_mentions(guild: &Guild, s: &str, options: ContentSafeOptions, users: &[
     let mut progress = 0;
     while let Some((idx1, b1)) = brackets.next() {
         // Find inner-most pairs of angle brackets
-        if b1 == "<" {
-            if let Some(&(idx2, b2)) = brackets.peek() {
-                if b2 == ">" {
-                    content.push_str(&s[progress..idx1]);
-                    let mention_str = &s[idx1..=idx2];
+        if b1 == "<"
+            && let Some(&(idx2, b2)) = brackets.peek()
+            && b2 == ">"
+        {
+            content.push_str(&s[progress..idx1]);
+            let mention_str = &s[idx1..=idx2];
 
-                    // Don't waste time parsing if we're not going to clean the mention anyway
-                    // NOTE: Emoji mentions aren't cleaned.
-                    let mut chars = mention_str.chars();
-                    chars.next();
-                    let should_parse = match chars.next() {
-                        Some('#') => options.get_clean_channel(),
-                        Some('@') => {
-                            if let Some('&') = chars.next() {
-                                options.get_clean_role()
-                            } else {
-                                options.get_clean_user()
-                            }
-                        },
-                        _ => false,
-                    };
+            // Don't waste time parsing if we're not going to clean the mention anyway
+            // NOTE: Emoji mentions aren't cleaned.
+            let mut chars = mention_str.chars();
+            chars.next();
+            let should_parse = match chars.next() {
+                Some('#') => options.get_clean_channel(),
+                Some('@') => {
+                    if let Some('&') = chars.next() {
+                        options.get_clean_role()
+                    } else {
+                        options.get_clean_user()
+                    }
+                },
+                _ => false,
+            };
 
-                    // I wish let_chains were stabilized :(
-                    let mut cleaned = false;
-                    if should_parse {
-                        // NOTE: numeric strings that are too large to fit into u64 will not parse
-                        // correctly and will be left unchanged.
-                        if let Ok(mention) = mention_str.parse() {
-                            content.push_str(&clean_mention(guild, mention, users));
-                            cleaned = true;
-                        }
-                    }
-                    if !cleaned {
-                        content.push_str(mention_str);
-                    }
-                    progress = idx2 + 1;
-                }
-            }
+            // NOTE: numeric strings that are too large to fit into u64 will not parse correctly
+            // and will be left unchanged.
+            let cleaned_mention = if should_parse && let Ok(mention) = mention_str.parse() {
+                &clean_mention(guild, mention, users)
+            } else {
+                mention_str
+            };
+            content.push_str(cleaned_mention);
+            progress = idx2 + 1;
         }
     }
     content.push_str(&s[progress..]);

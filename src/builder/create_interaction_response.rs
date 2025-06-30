@@ -136,10 +136,10 @@ impl CreateInteractionResponse<'_> {
             _ => Vec::new(),
         };
 
-        if let Self::Message(msg) | Self::Defer(msg) | Self::UpdateMessage(msg) = &mut self {
-            if msg.allowed_mentions.is_none() {
-                msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
-            }
+        if let Self::Message(msg) | Self::Defer(msg) | Self::UpdateMessage(msg) = &mut self
+            && msg.allowed_mentions.is_none()
+        {
+            msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
         http.create_interaction_response(interaction_id, interaction_token, &self, files).await

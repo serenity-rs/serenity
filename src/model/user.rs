@@ -608,12 +608,11 @@ impl User {
         // it's present in the cache, which is expensive.
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = guild_id.to_guild_cached(cache) {
-                    if let Some(member) = guild.members.get(&self.id) {
-                        return member.nick.clone().map(Into::into);
-                    }
-                }
+            if let Some(cache) = cache_http.cache()
+                && let Some(guild) = guild_id.to_guild_cached(cache)
+                && let Some(member) = guild.members.get(&self.id)
+            {
+                return member.nick.clone().map(Into::into);
             }
         }
 
