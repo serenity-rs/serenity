@@ -3,8 +3,8 @@ name: CI
 on: [push, pull_request]
 
 env:
-  rust_min: 1.85.0
-  rust_nightly: nightly-2025-02-19
+  rust_min: 1.88.0
+  rust_nightly: nightly-2025-06-25
 
 jobs:
   test:

@@ -343,10 +343,10 @@ impl Guild {
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
-                if self.owner_id != cache.current_user().id {
-                    return Err(Error::Model(ModelError::InvalidUser));
-                }
+            if let Some(cache) = cache_http.cache()
+                && self.owner_id != cache.current_user().id
+            {
+                return Err(Error::Model(ModelError::InvalidUser));
             }
         }
 
@@ -432,12 +432,11 @@ impl Guild {
                 // Skip this role if this role in iteration has:
                 // - a position less than the recorded highest
                 // - a position equal to the recorded, but a higher ID
-                if let Some(highest) = highest {
-                    if role.position < highest.position
-                        || (role.position == highest.position && role.id > highest.id)
-                    {
-                        continue;
-                    }
+                if let Some(highest) = highest
+                    && (role.position < highest.position
+                        || (role.position == highest.position && role.id > highest.id))
+                {
+                    continue;
                 }
 
                 highest = Some(role);
