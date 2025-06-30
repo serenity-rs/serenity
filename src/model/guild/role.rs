@@ -157,8 +157,9 @@ impl Eq for Role {}
 
 impl Ord for Role {
     fn cmp(&self, other: &Role) -> Ordering {
+        // Discord does position DESC, id ASC so:
         if self.position == other.position {
-            self.id.cmp(&other.id)
+            other.id.cmp(&self.id)
         } else {
             self.position.cmp(&other.position)
         }
