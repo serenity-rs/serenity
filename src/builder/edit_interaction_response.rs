@@ -76,6 +76,11 @@ impl EditInteractionResponse {
     }
     super::button_and_select_menu_convenience_methods!(self.0.components);
 
+    /// Sets the flags for the message.
+    pub fn flags(self, flags: MessageFlags) -> Self {
+        Self(self.0.flags(flags))
+    }
+
     /// Sets attachments, see [`EditAttachments`] for more details.
     pub fn attachments(self, attachments: EditAttachments) -> Self {
         Self(self.0.attachments(attachments))
