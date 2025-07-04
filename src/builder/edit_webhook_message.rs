@@ -29,6 +29,8 @@ pub struct EditWebhookMessage<'a> {
     pub(crate) components: Option<Cow<'a, [CreateComponent<'a>]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) attachments: Option<EditAttachments<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) flags: Option<MessageFlags>,
 
     #[serde(skip)]
     thread_id: Option<ThreadId>,
@@ -139,6 +141,12 @@ impl<'a> EditWebhookMessage<'a> {
     /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
     pub fn clear_attachments(mut self) -> Self {
         self.attachments = Some(EditAttachments::new());
+        self
+    }
+
+    /// Sets the flags for this message.
+    pub fn flags(mut self, flags: MessageFlags) -> Self {
+        self.flags = Some(flags);
         self
     }
 

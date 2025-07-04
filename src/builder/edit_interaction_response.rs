@@ -98,6 +98,12 @@ impl<'a> EditInteractionResponse<'a> {
         Self(self.0.clear_attachments())
     }
 
+    /// Sets the flags for this message.
+    pub fn flags(mut self, flags: MessageFlags) -> Self {
+        self.0.flags = Some(flags);
+        self
+    }
+
     /// Edits the initial interaction response. Does not work for ephemeral messages.
     ///
     /// The `application_id` used will usually be the bot's [`UserId`], except if the bot is very
