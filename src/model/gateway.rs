@@ -244,16 +244,35 @@ pub struct ClientStatus {
 #[non_exhaustive]
 pub struct PresenceUser {
     pub id: UserId,
-    pub avatar: Option<ImageHash>,
-    pub bot: Option<bool>,
-    #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
-    pub discriminator: Option<NonZeroU16>,
-    pub email: Option<String>,
-    pub mfa_enabled: Option<bool>,
     #[serde(rename = "username")]
     pub name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
+    pub discriminator: Option<NonZeroU16>,
+    pub global_name: Option<String>,
+    pub avatar: Option<ImageHash>,
+    #[serde(default)]
+    pub bot: Option<bool>,
+    #[serde(default)]
+    pub system: Option<bool>,
+    #[serde(default)]
+    pub mfa_enabled: Option<bool>,
+    pub banner: Option<ImageHash>,
+    #[serde(rename = "accent_color")]
+    pub accent_colour: Option<Colour>,
+    pub locale: Option<String>,
     pub verified: Option<bool>,
+    pub email: Option<String>,
+    #[serde(default)]
+    pub flags: Option<UserPublicFlags>,
+    #[serde(default)]
+    pub premium_type: Option<PremiumType>,
     pub public_flags: Option<UserPublicFlags>,
+    pub member: Option<Box<PartialMember>>,
+    pub primary_guild: Option<PrimaryGuild>,
+    pub avatar_decoration_data: Option<AvatarDecorationData>,
+    pub collectibles: Option<Collectibles>,
+    // system is ommitted because it'll never be true
+    // TODO: should really go over these fields at some point and check them.
 }
 
 impl PresenceUser {
@@ -266,23 +285,23 @@ impl PresenceUser {
             avatar: self.avatar,
             bot: self.bot?,
             discriminator: self.discriminator,
-            global_name: None,
+            global_name: self.global_name,
             id: self.id,
             name: self.name?,
             public_flags: self.public_flags,
-            banner: None,
-            accent_colour: None,
-            member: None,
+            banner: self.banner,
+            accent_colour: self.accent_colour,
+            member: self.member,
             system: false,
             mfa_enabled: self.mfa_enabled.unwrap_or_default(),
-            locale: None,
+            locale: self.locale,
             verified: self.verified,
             email: self.email,
             flags: self.public_flags.unwrap_or_default(),
-            premium_type: PremiumType::None,
-            primary_guild: None,
-            avatar_decoration_data: None,
-            collectibles: None,
+            premium_type: self.premium_type.unwrap_or_default(),
+            primary_guild: self.primary_guild,
+            avatar_decoration_data: self.avatar_decoration_data,
+            collectibles: self.collectibles,
         })
     }
 
