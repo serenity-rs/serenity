@@ -24,7 +24,7 @@
 /// # fn main() {
 /// # let role = from_value::<Role>(json!({
 /// #     "color": Colour::BLURPLE,
-///       "colors": RoleColours::default(),
+/// #     "colors": RoleColours::default(),
 /// #     "hoist": false,
 /// #     "id": RoleId::new(1),
 /// #     "guild_id": GuildId::new(2),

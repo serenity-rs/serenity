@@ -373,8 +373,8 @@ bitflags! {
 pub struct PrimaryGuild {
     /// the id of the user's primary guild.
     pub identity_guild_id: Option<GuildId>,
-    // whether the user is displaying the primary guild's server tag. This can be null if the
-    // system clears the identity, e.g. because the server no longer supports tags.
+    /// whether the user is displaying the primary guild's server tag. This can be null if the
+    /// system clears the identity, e.g. because the server no longer supports tags.
     pub identity_enabled: Option<bool>,
     /// the text of the [`User`]'s server tag.
     pub tag: Option<String>,
