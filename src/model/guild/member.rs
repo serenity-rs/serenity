@@ -30,6 +30,8 @@ pub struct Member {
     pub nick: Option<String>,
     /// The guild avatar hash
     pub avatar: Option<ImageHash>,
+    /// The member's guild specific banner.
+    pub banner: Option<ImageHash>,
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     /// Timestamp representing the date when the member joined.
@@ -64,6 +66,8 @@ pub struct Member {
     ///
     /// Will be None or a time in the past if the user is not flagged.
     pub unusual_dm_activity_until: Option<Timestamp>,
+    /// Information about this member's guild specific avatar decoration.
+    pub avatar_decoration_data: Option<AvatarDecorationData>,
 }
 
 bitflags! {
@@ -538,6 +542,17 @@ impl Member {
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.user.face())
     }
+
+    /// Returns the formatted URL of the user's banner, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
+    ///
+    /// **Note**: This will only be present if the user is fetched via Rest API.
+    #[inline]
+    #[must_use]
+    pub fn banner_url(&self) -> Option<String> {
+        banner_url(Some(self.guild_id), self.user.id, self.banner.as_ref())
+    }
 }
 
 impl fmt::Display for Member {
@@ -609,6 +624,10 @@ pub struct PartialMember {
     pub unusual_dm_activity_until: Option<Timestamp>,
     /// The guild avatar hash
     pub avatar: Option<ImageHash>,
+    /// The guild banner hash
+    pub banner: Option<ImageHash>,
+    /// Information about this member's avatar decoration.
+    pub avatar_decoration_data: Option<AvatarDecorationData>,
 }
 
 impl From<PartialMember> for Member {
@@ -628,6 +647,8 @@ impl From<PartialMember> for Member {
             communication_disabled_until: None,
             guild_id: partial.guild_id.unwrap_or_default(),
             unusual_dm_activity_until: partial.unusual_dm_activity_until,
+            banner: partial.banner,
+            avatar_decoration_data: partial.avatar_decoration_data,
         }
     }
 }
@@ -647,6 +668,8 @@ impl From<Member> for PartialMember {
             permissions: member.permissions,
             unusual_dm_activity_until: member.unusual_dm_activity_until,
             avatar: member.avatar,
+            banner: member.banner,
+            avatar_decoration_data: member.avatar_decoration_data,
         }
     }
 }

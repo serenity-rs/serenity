@@ -491,7 +491,7 @@ impl User {
     #[inline]
     #[must_use]
     pub fn banner_url(&self) -> Option<String> {
-        banner_url(self.id, self.banner.as_ref())
+        banner_url(None, self.id, self.banner.as_ref())
     }
 
     /// Creates a direct message channel between the [current user] and the user. This can also
@@ -914,10 +914,18 @@ fn static_avatar_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String
 }
 
 #[cfg(feature = "model")]
-fn banner_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
+pub(super) fn banner_url(
+    guild_id: Option<GuildId>,
+    user_id: UserId,
+    hash: Option<&ImageHash>,
+) -> Option<String> {
     hash.map(|hash| {
         let ext = if hash.is_animated() { "gif" } else { "webp" };
-        cdn!("/banners/{}/{}.{}?size=1024", user_id, hash, ext)
+        if let Some(guild_id) = guild_id {
+            cdn!("/guilds/{}/users/{}/banners/{}.{}?size=1024", guild_id, user_id, hash, ext)
+        } else {
+            cdn!("/banners/{}/{}.{}?size=1024", user_id, hash, ext)
+        }
     })
 }
 
