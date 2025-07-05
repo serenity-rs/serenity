@@ -445,11 +445,13 @@ pub struct Nameplate {
 #[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 impl Nameplate {
     /// Gets the static version of the nameplate's url.
+    #[must_use]
     pub fn static_url(&self) -> String {
         static_nameplate_url(&self.asset)
     }
 
     /// Gets the animated version of the nameplate's url.
+    #[must_use]
     pub fn url(&self) -> String {
         nameplate_url(&self.asset)
     }
