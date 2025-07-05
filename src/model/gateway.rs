@@ -282,6 +282,7 @@ impl PresenceUser {
             premium_type: PremiumType::None,
             primary_guild: None,
             avatar_decoration_data: None,
+            collectibles: None,
         })
     }
 
