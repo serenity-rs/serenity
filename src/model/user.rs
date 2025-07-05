@@ -289,6 +289,12 @@ pub struct User {
     /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
     // Box required to avoid infinitely recursive types
     pub member: Option<Box<PartialMember>>,
+    /// The primary guild and tag the user has active.
+    ///
+    /// Note: just because this guild is populated does not mean the tag is visible.
+    pub primary_guild: Option<PrimaryGuild>,
+    /// Data for this user's avatar decoration
+    pub avatar_decoration_data: Option<AvatarDecorationData>,
 }
 
 enum_number! {
@@ -352,6 +358,55 @@ bitflags! {
         const SPAMMER = 1 << 20;
         /// User's flag as active developer
         const ACTIVE_DEVELOPER = 1 << 22;
+    }
+}
+
+/// User's Primary Guild object
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-primary-guild)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct PrimaryGuild {
+    /// the id of the user's primary guild.
+    pub identity_guild_id: Option<GuildId>,
+    // whether the user is displaying the primary guild's server tag. This can be null if the
+    // system clears the identity, e.g. because the server no longer supports tags.
+    pub identity_enabled: Option<bool>,
+    /// the text of the [`User`]'s server tag.
+    pub tag: Option<String>,
+    /// the hash of the server badge.
+    pub badge: Option<ImageHash>,
+}
+
+#[cfg(feature = "model")]
+impl PrimaryGuild {
+    #[must_use]
+    /// Returns the formatted URL of the badge's icon, if one exists.
+    pub fn badge_url(&self) -> Option<String> {
+        primary_guild_badge_url(self.identity_guild_id, self.badge.as_ref())
+    }
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+/// The data for a [`User`]'s avatar decoration.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#avatar-decoration-data-object).
+pub struct AvatarDecorationData {
+    /// The avatar decoration hash
+    pub asset: ImageHash,
+    /// id of the avatar decoration's SKU
+    pub sku_id: SkuId,
+}
+
+#[cfg(feature = "model")]
+impl AvatarDecorationData {
+    #[must_use]
+    /// Returns the formatted URL of the decoration.
+    pub fn decoration_url(&self) -> String {
+        avatar_decoration_url(&self.asset)
     }
 }
 
@@ -822,6 +877,20 @@ fn tag(name: &str, discriminator: Option<NonZeroU16>) -> String {
         write!(tag, "{discriminator:04}").expect("writing to a string should never fail");
     }
     tag
+}
+
+#[cfg(feature = "model")]
+fn primary_guild_badge_url(guild_id: Option<GuildId>, hash: Option<&ImageHash>) -> Option<String> {
+    if let Some(guild_id) = guild_id {
+        return hash.map(|hash| cdn!("/guild-tag-badges/{}/{}.png?size=1024", guild_id, hash));
+    }
+
+    None
+}
+
+#[cfg(feature = "model")]
+fn avatar_decoration_url(hash: &ImageHash) -> String {
+    cdn!("/avatar-decoration-presets/{}.png?size=1024", hash)
 }
 
 #[cfg(test)]
