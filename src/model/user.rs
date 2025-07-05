@@ -493,7 +493,7 @@ impl User {
     /// # }
     /// ```
     #[must_use]
-    pub fn tag(&self) -> String {
+    pub fn tag(&self) -> std::borrow::Cow<'_, str> {
         tag(&self.name, self.discriminator)
     }
 
@@ -717,17 +717,20 @@ fn banner_url(user_id: UserId, hash: Option<&ImageHash>) -> Option<String> {
 }
 
 #[cfg(feature = "model")]
-fn tag(name: &str, discriminator: Option<NonZeroU16>) -> String {
+fn tag(name: &str, discriminator: Option<NonZeroU16>) -> std::borrow::Cow<'_, str> {
+    let Some(discriminator) = discriminator else {
+        return std::borrow::Cow::Borrowed(name);
+    };
+
     // 32: max length of username
     // 1: `#`
     // 4: max length of discriminator
     let mut tag = String::with_capacity(37);
     tag.push_str(name);
-    if let Some(discriminator) = discriminator {
-        tag.push('#');
-        write!(tag, "{discriminator:04}").expect("writing to a string should never fail");
-    }
-    tag
+    tag.push('#');
+    write!(tag, "{discriminator:04}").expect("writing to a string should never fail");
+
+    std::borrow::Cow::Owned(tag)
 }
 
 #[cfg(test)]
