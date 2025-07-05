@@ -19,10 +19,12 @@
 /// # use serenity::model::id::RoleId;
 /// # use serenity::model::id::GuildId;
 /// # use serenity::model::permissions;
+/// # use serenity::model::guild::RoleColours;
 /// #
 /// # fn main() {
 /// # let role = from_value::<Role>(json!({
 /// #     "color": Colour::BLURPLE,
+/// #     "colors": RoleColours::default(),
 /// #     "hoist": false,
 /// #     "id": RoleId::new(1),
 /// #     "guild_id": GuildId::new(2),
