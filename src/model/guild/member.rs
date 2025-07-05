@@ -66,6 +66,8 @@ pub struct Member {
     ///
     /// Will be None or a time in the past if the user is not flagged.
     pub unusual_dm_activity_until: Option<Timestamp>,
+    /// Information about this member's guild specific avatar decoration.
+    pub avatar_decoration_data: Option<AvatarDecorationData>,
 }
 
 bitflags! {
@@ -623,6 +625,8 @@ pub struct PartialMember {
     pub avatar: Option<ImageHash>,
     /// The member's guild banner hash
     pub banner: Option<ImageHash>,
+    /// Information about this member's avatar decoration.
+    pub avatar_decoration_data: Option<AvatarDecorationData>,
 }
 
 impl From<PartialMember> for Member {
@@ -643,6 +647,7 @@ impl From<PartialMember> for Member {
             communication_disabled_until: None,
             guild_id: partial.guild_id.unwrap_or_default(),
             unusual_dm_activity_until: partial.unusual_dm_activity_until,
+            avatar_decoration_data: partial.avatar_decoration_data,
         }
     }
 }
@@ -663,6 +668,7 @@ impl From<Member> for PartialMember {
             unusual_dm_activity_until: member.unusual_dm_activity_until,
             avatar: member.avatar,
             banner: member.banner,
+            avatar_decoration_data: member.avatar_decoration_data,
         }
     }
 }

@@ -229,8 +229,9 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     avatar: self.avatar,
                     banner: self.banner,
                     communication_disabled_until: self.communication_disabled_until,
-                    flags: GuildMemberFlags::default(),
+                    flags: self.flags.unwrap_or_default(),
                     unusual_dm_activity_until: self.unusual_dm_activity_until,
+                    avatar_decoration_data: self.avatar_decoration_data,
                 });
             }
 
@@ -466,6 +467,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         communication_disabled_until: None,
                         flags: GuildMemberFlags::default(),
                         unusual_dm_activity_until: None,
+                        avatar_decoration_data: None,
                     });
                 }
             }

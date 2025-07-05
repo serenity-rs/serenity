@@ -262,7 +262,10 @@ pub struct GuildMemberUpdateEvent {
     pub avatar: Option<ImageHash>,
     pub banner: Option<ImageHash>,
     pub communication_disabled_until: Option<Timestamp>,
+    // This is not documented but present on the event?
     pub unusual_dm_activity_until: Option<Timestamp>,
+    pub flags: Option<GuildMemberFlags>,
+    pub avatar_decoration_data: Option<AvatarDecorationData>,
 }
 
 /// Requires no gateway intents.
