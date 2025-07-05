@@ -155,32 +155,37 @@ pub struct Guild {
     /// The guild features. More information available at [`discord documentation`].
     ///
     /// The following is a list of known features:
+    /// - `ANIMATED_BANNER`
     /// - `ANIMATED_ICON`
+    /// - `APPLICATION_COMMAND_PERMISSIONS_V2`
+    /// - `AUTO_MODERATION`
     /// - `BANNER`
-    /// - `COMMERCE`
     /// - `COMMUNITY`
+    /// - `CREATOR_MONETIZABLE_PROVISIONAL`
+    /// - `CREATOR_STORE_PAGE`
+    /// - `DEVELOPER_SUPPORT_SERVER`
     /// - `DISCOVERABLE`
     /// - `FEATURABLE`
+    /// - `INVITES_DISABLED`
     /// - `INVITE_SPLASH`
     /// - `MEMBER_VERIFICATION_GATE_ENABLED`
-    /// - `MONETIZATION_ENABLED`
+    /// - `MORE_SOUNDBOARD`
     /// - `MORE_STICKERS`
     /// - `NEWS`
     /// - `PARTNERED`
     /// - `PREVIEW_ENABLED`
-    /// - `PRIVATE_THREADS`
+    /// - `RAID_ALERTS_DISABLED`
     /// - `ROLE_ICONS`
-    /// - `SEVEN_DAY_THREAD_ARCHIVE`
-    /// - `THREE_DAY_THREAD_ARCHIVE`
+    /// - `ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE`
+    /// - `ROLE_SUBSCRIPTIONS_ENABLED`
+    /// - `SOUNDBOARD`
     /// - `TICKETED_EVENTS_ENABLED`
     /// - `VANITY_URL`
     /// - `VERIFIED`
     /// - `VIP_REGIONS`
     /// - `WELCOME_SCREEN_ENABLED`
-    /// - `THREE_DAY_THREAD_ARCHIVE`
-    /// - `SEVEN_DAY_THREAD_ARCHIVE`
-    /// - `PRIVATE_THREADS`
-    ///
+    /// - `GUESTS_ENABLED`
+    /// - `ENHANCED_ROLE_COLORS`
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     pub features: Vec<String>,

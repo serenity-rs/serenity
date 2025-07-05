@@ -54,6 +54,9 @@ pub struct EditRole<'a> {
     #[serde(rename = "color")]
     colour: Option<Colour>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "colors")]
+    colours: Option<CreateRoleColours>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     icon: Option<Option<String>>,
@@ -86,6 +89,7 @@ impl<'a> EditRole<'a> {
             colour: Some(role.colour),
             unicode_emoji: role.unicode_emoji.as_ref().map(|v| Some(v.clone())),
             audit_log_reason: None,
+            colours: Some(role.colours.into()),
             // TODO: Do we want to download role.icon?
             icon: None,
         }
@@ -147,6 +151,55 @@ impl<'a> EditRole<'a> {
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
         self
+    }
+}
+
+/// The colours of a Discord role, secondary_colour and tertiary_colour may only be set if
+/// the [Guild] has the `ENHANCED_ROLE_COLORS` feature.
+///
+/// Note: 2024-07-05 - tertiary_colour is currently enforced to be set with a specific pair of
+/// primary and secondary colours, for current validation see
+/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-colors-object).
+#[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
+#[expect(clippy::struct_field_names)]
+pub struct CreateRoleColours {
+    primary_color: Colour,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    secondary_color: Option<Colour>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tertiary_color: Option<Colour>,
+}
+
+impl CreateRoleColours {
+    pub fn new(primary_colour: Colour) -> Self {
+        Self {
+            primary_color: primary_colour,
+            secondary_color: None,
+            tertiary_color: None,
+        }
+    }
+
+    /// Sets the secondary colour for this role.
+    pub fn secondary_colour(mut self, secondary_colour: Colour) -> Self {
+        self.secondary_color = Some(secondary_colour);
+        self
+    }
+
+    /// Sets the tertiary colour for this role, see struct documentation for limitations.
+    pub fn tertiary_colour(mut self, tertiary_colour: Colour) -> Self {
+        self.tertiary_color = Some(tertiary_colour);
+        self
+    }
+}
+
+impl From<RoleColours> for CreateRoleColours {
+    fn from(c: RoleColours) -> CreateRoleColours {
+        CreateRoleColours {
+            primary_color: c.primary_colour,
+            secondary_color: c.secondary_colour,
+            tertiary_color: c.tertiary_colour,
+        }
     }
 }
 
