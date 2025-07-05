@@ -293,8 +293,11 @@ pub struct User {
     ///
     /// Note: just because this guild is populated does not mean the tag is visible.
     pub primary_guild: Option<PrimaryGuild>,
-    /// Data for this user's avatar decoration
+    /// Information about this user's avatar decoration.
     pub avatar_decoration_data: Option<AvatarDecorationData>,
+    /// The collectibles the user currently has active, excluding avatar decorations and profile
+    /// effects.
+    pub collectibles: Option<Collectibles>,
 }
 
 enum_number! {
@@ -407,6 +410,48 @@ impl AvatarDecorationData {
     /// Returns the formatted URL of the decoration.
     pub fn decoration_url(&self) -> String {
         avatar_decoration_url(&self.asset)
+    }
+}
+
+/// The collectibles the user has, excluding Avatar Decorations and Profile Effects.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#collectibles).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Collectibles {
+    /// The [`User`]'s nameplate, if they have one.
+    pub nameplate: Option<Nameplate>,
+}
+
+/// A nameplate, shown on the member list on official clients.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#nameplate-nameplate-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct Nameplate {
+    /// Id of the nameplate SKU
+    pub sku_id: SkuId,
+    /// Path to the nameplate asset.
+    pub asset: String,
+    /// The label of this nameplate.
+    pub label: String,
+    /// background color of the nameplate, one of: `crimson`, `berry`, `sky`, `teal`, `forest`,
+    /// `bubble_gum`, `violet`, `cobalt`, `clover`, `lemon`, `white`
+    pub palette: String,
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+impl Nameplate {
+    /// Gets the static version of the nameplate's url.
+    pub fn static_url(&self) -> String {
+        static_nameplate_url(&self.asset)
+    }
+
+    /// Gets the animated version of the nameplate's url.
+    pub fn url(&self) -> String {
+        nameplate_url(&self.asset)
     }
 }
 
@@ -891,6 +936,17 @@ fn primary_guild_badge_url(guild_id: Option<GuildId>, hash: Option<&ImageHash>) 
 #[cfg(feature = "model")]
 fn avatar_decoration_url(hash: &ImageHash) -> String {
     cdn!("/avatar-decoration-presets/{}.png?size=1024", hash)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+fn nameplate_url(path: &str) -> String {
+    cdn!("https://cdn.discordapp.com/assets/collectibles/{}/asset.webm", path)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "model")]
+fn static_nameplate_url(path: &str) -> String {
+    cdn!("https://cdn.discordapp.com/assets/collectibles/{}/static.png", path)
 }
 
 #[cfg(test)]
