@@ -482,6 +482,8 @@ pub struct MessageModalSubmitInteractionMetadata {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
+// cannot box on current due to breaking changes
+#[allow(clippy::large_enum_variant)]
 pub enum MessageInteractionMetadata {
     Command(MessageCommandInteractionMetadata),
     Component(MessageComponentInteractionMetadata),
