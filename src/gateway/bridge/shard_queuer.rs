@@ -200,6 +200,9 @@ impl ShardQueuer {
         };
 
         spawn_named("shard_queuer::stop", async move {
+            // just over the large futures threshold but refactoring this is not worth the time for
+            // something so low impact
+            #[allow(clippy::large_futures)]
             drop(runner.run().await);
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
