@@ -33,21 +33,24 @@ impl ThreadId {
         guild_id: Option<GuildId>,
     ) -> Result<GuildThread> {
         #[cfg(feature = "cache")]
-        if let Some(cache) = cache_http.cache()
-            && let Some(guild_id) = guild_id
-            && let Some(guild) = cache.guild(guild_id)
-            && let Some(thread) = guild.threads.get(&self)
-        {
-            return Ok(thread.clone());
-        }
-
-        #[cfg(feature = "temp_cache")]
-        if let Some(temp_thread) = cache.temp_threads.get(&self) {
-            if guild_id.is_some_and(|id| temp_thread.base.guild_id != id) {
-                return Err(Error::Model(ModelError::ChannelNotFound));
+        // Ignore clippy, the two `if let`s must be separated
+        #[allow(clippy::collapsible_if)]
+        if let Some(cache) = cache_http.cache() {
+            if let Some(guild_id) = guild_id
+                && let Some(guild) = cache.guild(guild_id)
+                && let Some(thread) = guild.threads.get(&self)
+            {
+                return Ok(thread.clone());
             }
 
-            return Ok(GuildThread::clone(&temp_thread));
+            #[cfg(feature = "temp_cache")]
+            if let Some(temp_thread) = cache.temp_threads.get(&self) {
+                if guild_id.is_some_and(|id| temp_thread.base.guild_id != id) {
+                    return Err(Error::Model(ModelError::ChannelNotFound));
+                }
+
+                return Ok(GuildThread::clone(&temp_thread));
+            }
         }
 
         let channel = cache_http.http().get_channel(self.widen()).await?;
