@@ -34,7 +34,7 @@ impl ThreadId {
     ) -> Result<GuildThread> {
         #[cfg(feature = "cache")]
         // Ignore clippy, the two `if let`s must be separated
-        #[allow(clippy::collapsible_if)]
+        #[expect(clippy::collapsible_if)]
         if let Some(cache) = cache_http.cache() {
             if let Some(guild_id) = guild_id
                 && let Some(guild) = cache.guild(guild_id)
