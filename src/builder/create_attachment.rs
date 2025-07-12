@@ -146,6 +146,12 @@ impl<'a> CreateAttachment<'a> {
 pub struct ImageData<'a>(Cow<'a, str>);
 
 impl<'a> ImageData<'a> {
+    /// Accesses the stored base64-encoded image data.
+    #[must_use]
+    pub fn as_base64(&self) -> &str {
+        &self.0
+    }
+
     /// Constructs image data from a base64-encoded blob of data. The string must be a valid data
     /// URI, for example:
     ///
