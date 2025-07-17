@@ -8,8 +8,8 @@ use aformat::{CapStr, aformat};
 
 /// A cheaply clonable, zeroed on drop, String.
 ///
-/// This is a simple newtype of `Arc<str>` that uses [`zeroize::Zeroize`] on last drop to avoid
-/// keeping it around in memory.
+/// This is a simple newtype of `Arc<str>` that does not reveal its
+/// content in its [`Debug`](std::fmt::Debug) output.
 #[derive(Clone, Deserialize, Serialize)]
 pub struct SecretString(Arc<str>);
 
