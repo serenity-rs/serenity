@@ -189,6 +189,15 @@ impl Channel {
             Self::Private(ch) => ch.id.widen(),
         }
     }
+
+    /// If this is a guild channel or guild thread, returns the corresponding guild's Id.
+    pub fn guild_id(&self) -> Option<GuildId> {
+        match self {
+            Channel::GuildThread(thread) => Some(thread.base.guild_id),
+            Channel::Guild(channel) => Some(channel.base.guild_id),
+            Channel::Private(_) => None,
+        }
+    }
 }
 
 fn extract_type<'de, D>(deserializer: D) -> StdResult<(u64, &'de RawValue), D::Error>
