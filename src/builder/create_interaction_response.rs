@@ -94,15 +94,14 @@ impl serde::Serialize for CreateInteractionResponse {
         })?;
 
         match self {
-            Self::Pong => map.serialize_entry("data", &None::<()>)?,
-            Self::Message(x) => map.serialize_entry("data", &x)?,
-            Self::Defer(x) => map.serialize_entry("data", &x)?,
-            Self::Acknowledge => map.serialize_entry("data", &None::<()>)?,
-            Self::UpdateMessage(x) => map.serialize_entry("data", &x)?,
             Self::Autocomplete(x) => map.serialize_entry("data", &x)?,
             Self::Modal(x) => map.serialize_entry("data", &x)?,
-            Self::PremiumRequired => map.serialize_entry("data", &None::<()>)?,
-            Self::LaunchActivity => map.serialize_entry("data", &None::<()>)?,
+            Self::Message(x) | Self::Defer(x) | Self::UpdateMessage(x) => {
+                map.serialize_entry("data", &x)?;
+            },
+            Self::Pong | Self::Acknowledge | Self::PremiumRequired | Self::LaunchActivity => {
+                map.serialize_entry("data", &None::<()>)?;
+            },
         }
 
         map.end()

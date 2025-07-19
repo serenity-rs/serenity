@@ -135,7 +135,7 @@ impl EventHandler for Handler {
         let default_values = {
             let mut values = vec![];
             for i in u8::MIN..=u8::MAX {
-                if i % 32 == 0 {
+                if i.is_multiple_of(32) {
                     values.push(i.to_string())
                 }
             }
