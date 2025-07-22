@@ -134,6 +134,16 @@ impl<'a> CreateSection<'a> {
         }
     }
 
+    /// Returns the number of top level components in the section.
+    pub fn len(&self) -> usize {
+        self.components.len()
+    }
+
+    /// Returns `true` if the section contains no components.
+    pub fn is_empty(&self) -> bool {
+        self.components.is_empty()
+    }
+
     /// Sets the components for the section. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: This will replace all existing components. Use [`Self::add_component()`] to add
@@ -482,6 +492,17 @@ impl<'a> CreateContainer<'a> {
         self.spoiler = Some(spoiler);
         self
     }
+
+    /// Returns the number of top level components in the container.
+    pub fn len(&self) -> usize {
+        self.components.len()
+    }
+
+    /// Returns `true` if the container contains no components.
+    pub fn is_empty(&self) -> bool {
+        self.components.is_empty()
+    }
+
 
     /// Sets the components of this container. Replaces the current value as set in [`Self::new`].
     ///
