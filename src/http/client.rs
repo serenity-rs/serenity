@@ -4111,13 +4111,17 @@ impl Http {
         guild_id: GuildId,
         user_id: UserId,
     ) -> Result<VoiceState> {
-        self.fire::<VoiceState>(Request::new(
-            Route::GuildVoiceStates {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildVoiceStates {
                 guild_id,
                 user_id,
             },
-            LightMethod::Get,
-        ))
+            params: None
+        })
         .await
     }
 
