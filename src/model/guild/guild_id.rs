@@ -1149,6 +1149,15 @@ impl GuildId {
         MembersIter::stream(http, self)
     }
 
+    /// Gets a user's voice state in this guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the user is not in a voice channel in this guild.
+    pub async fn get_user_voice_state(self, http: &Http, user_id: UserId) -> Result<VoiceState> {
+        http.get_user_voice_state(self, user_id).await
+    }
+
     /// Moves a member to a specific voice channel.
     ///
     /// **Note**: Requires the [Move Members] permission.

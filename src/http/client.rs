@@ -4104,6 +4104,23 @@ impl Http {
         .await
     }
 
+    /// Get User Voice State
+    /// Returns the specified user's voice state in the guild.
+    pub async fn get_user_voice_state(
+        &self,
+        guild_id: GuildId,
+        user_id: UserId,
+    ) -> Result<VoiceState> {
+        self.fire::<VoiceState>(Request::new(
+            Route::GuildVoiceStates {
+                guild_id,
+                user_id,
+            },
+            LightMethod::Get,
+        ))
+        .await
+    }
+
     /// Retrieves a webhook given its Id.
     ///
     /// This method requires authentication, whereas [`Http::get_webhook_with_token`] and
