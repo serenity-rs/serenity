@@ -82,7 +82,7 @@ impl Action {
             90..=92 => Action::Sticker(unsafe { transmute(value) }),
             100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
-            140..=145 => Action::AutoMod(unsafe { transmute(value) }),
+            140..=146 => Action::AutoMod(unsafe { transmute(value) }),
             150..=151 => Action::CreatorMonetization(unsafe { transmute(value) }),
             192..=193 => Action::VoiceChannelStatus(unsafe { transmute(value) }),
             _ => Action::Unknown(value),
@@ -266,6 +266,7 @@ pub enum AutoModAction {
     BlockMessage = 143,
     FlagToChannel = 144,
     UserCommunicationDisabled = 145,
+    QuarantineUser = 146,
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
@@ -462,6 +463,7 @@ mod tests {
         assert_action!(Action::AutoMod(AutoModAction::BlockMessage), 143);
         assert_action!(Action::AutoMod(AutoModAction::FlagToChannel), 144);
         assert_action!(Action::AutoMod(AutoModAction::UserCommunicationDisabled), 145);
+        assert_action!(Action::AutoMod(AutoModAction::QuarantineUser), 146);
         assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::RequestCreated), 150);
         assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::TermsAccepted), 151);
         assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusUpdate), 192);
