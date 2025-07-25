@@ -1,8 +1,6 @@
 //! A set of utilities to help with common use cases that are not required to fully use the
 //! library.
 
-#[cfg(feature = "gateway")]
-mod argument_convert;
 #[cfg(feature = "cache")]
 mod content_safe;
 mod custom_message;
@@ -11,8 +9,6 @@ mod message_builder;
 
 use std::num::NonZeroU16;
 
-#[cfg(feature = "gateway")]
-pub use argument_convert::*;
 #[cfg(feature = "cache")]
 pub use content_safe::*;
 pub use formatted_timestamp::*;
@@ -367,6 +363,22 @@ const DOMAINS: [&str; 6] = [
     "ptb.discordapp.com",
 ];
 
+const MAX_DOMAIN_LEN: usize = {
+    let mut max_len = 0;
+    let mut i = 0;
+
+    while i < DOMAINS.len() {
+        let cur_len = DOMAINS[i].len();
+        if cur_len > max_len {
+            max_len = cur_len;
+        }
+
+        i += 1;
+    }
+
+    max_len
+};
+
 /// Parses the id and token from a webhook url. Expects a [`url::Url`] rather than a [`&str`].
 ///
 /// # Examples
@@ -392,6 +404,119 @@ pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
         return None;
     }
     Some((webhook_id.parse().ok()?, token))
+}
+
+/// Retrieves IDs from "{channel ID}-{message ID}" (retrieved by shift-clicking on "Copy ID").
+///
+/// If the string is invalid, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::model::prelude::*;
+/// use serenity::utils::parse_message_id_pair;
+///
+/// assert_eq!(
+///     parse_message_id_pair("673965002805477386-842482646604972082"),
+///     Some((GenericChannelId::new(673965002805477386), MessageId::new(842482646604972082))),
+/// );
+/// assert_eq!(
+///     parse_message_id_pair("673965002805477386-842482646604972082-472029906943868929"),
+///     None,
+/// );
+/// ```
+#[must_use]
+pub fn parse_message_id_pair(s: &str) -> Option<(GenericChannelId, MessageId)> {
+    let mut parts = s.splitn(2, '-');
+    let channel_id = parts.next()?.parse().ok()?;
+    let message_id = parts.next()?.parse().ok()?;
+    Some((channel_id, message_id))
+}
+
+/// Retrieves guild, channel, and message ID from a message URL.
+///
+/// If the URL is malformed, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::model::prelude::*;
+/// use serenity::utils::parse_message_url;
+///
+/// assert_eq!(
+///     parse_message_url(
+///         "https://discord.com/channels/381880193251409931/381880193700069377/806164913558781963"
+///     ),
+///     Some((
+///         GuildId::new(381880193251409931),
+///         GenericChannelId::new(381880193700069377),
+///         MessageId::new(806164913558781963),
+///     )),
+/// );
+/// assert_eq!(
+///     parse_message_url(
+///         "https://canary.discord.com/channels/381880193251409931/381880193700069377/806164913558781963"
+///     ),
+///     Some((
+///         GuildId::new(381880193251409931),
+///         GenericChannelId::new(381880193700069377),
+///         MessageId::new(806164913558781963),
+///     )),
+/// );
+/// assert_eq!(parse_message_url("https://google.com"), None);
+/// ```
+#[must_use]
+pub fn parse_message_url(s: &str) -> Option<(GuildId, GenericChannelId, MessageId)> {
+    use aformat::{CapStr, aformat};
+
+    for domain in DOMAINS {
+        let prefix = aformat!("https://{}/channels/", CapStr::<MAX_DOMAIN_LEN>(domain));
+        if let Some(parts) = s.strip_prefix(prefix.as_str()) {
+            let mut parts = parts.splitn(3, '/');
+
+            let guild_id = parts.next()?.parse().ok()?;
+            let channel_id = parts.next()?.parse().ok()?;
+            let message_id = parts.next()?.parse().ok()?;
+            return Some((guild_id, channel_id, message_id));
+        }
+    }
+    None
+}
+
+/// Retrieves guild, and channel ID from a channel URL.
+///
+/// If the URL is malformed, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::model::prelude::*;
+/// use serenity::utils::parse_channel_url;
+///
+/// assert_eq!(
+///     parse_channel_url("https://discord.com/channels/381880193251409931/381880193700069377"),
+///     Some((GuildId::new(381880193251409931), GenericChannelId::new(381880193700069377),)),
+/// );
+/// assert_eq!(
+///     parse_channel_url(
+///         "https://canary.discord.com/channels/381880193251409931/381880193700069377"
+///     ),
+///     Some((GuildId::new(381880193251409931), GenericChannelId::new(381880193700069377),)),
+/// );
+/// assert_eq!(parse_channel_url("https://google.com"), None);
+/// ```
+#[must_use]
+pub fn parse_channel_url(s: &str) -> Option<(GuildId, GenericChannelId)> {
+    use aformat::{CapStr, aformat};
+
+    for domain in DOMAINS {
+        let prefix = aformat!("https://{}/channels/", CapStr::<MAX_DOMAIN_LEN>(domain));
+        if let Some(parts) = s.strip_prefix(prefix.as_str()) {
+            let mut parts = parts.splitn(2, '/');
+
+            let guild_id = parts.next()?.parse().ok()?;
+            let channel_id = parts.next()?.parse().ok()?;
+            return Some((guild_id, channel_id));
+        }
+    }
+    None
 }
 
 /// Calculates the Id of the shard responsible for a guild, given its Id and total number of shards
