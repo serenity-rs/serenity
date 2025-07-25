@@ -8,8 +8,8 @@ use flate2::read::ZlibDecoder;
 use futures::{SinkExt, StreamExt};
 use tokio::net::TcpStream;
 use tokio::time::{Duration, timeout};
+use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
-use tokio_tungstenite::tungstenite::{Error as WsError, Message};
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async_with_config};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
@@ -20,7 +20,6 @@ use zstd_safe::{DStream as ZstdInflater, InBuffer, OutBuffer};
 
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, TransportCompression};
 use crate::constants::{self, Opcode};
-use crate::internal::prelude::*;
 use crate::model::event::GatewayEvent;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
@@ -240,10 +239,7 @@ pub struct WsClient {
 const TIMEOUT: Duration = Duration::from_millis(500);
 
 impl WsClient {
-    pub(crate) async fn connect(
-        url: Url,
-        compression: TransportCompression,
-    ) -> StdResult<Self, WsError> {
+    pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
         let config = {
             let mut config = WebSocketConfig::default();
             config.max_message_size = None;
@@ -296,7 +292,7 @@ impl WsClient {
     }
 
     /// Delegate to `WebSocketStream::close`
-    pub(crate) async fn close(&mut self, msg: Option<CloseFrame>) -> StdResult<(), WsError> {
+    pub(crate) async fn close(&mut self, msg: Option<CloseFrame>) -> Result<()> {
         self.stream.close(msg).await?;
         Ok(())
     }
