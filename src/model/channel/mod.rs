@@ -191,6 +191,7 @@ impl Channel {
     }
 
     /// If this is a guild channel or guild thread, returns the corresponding guild's Id.
+    #[must_use]
     pub fn guild_id(&self) -> Option<GuildId> {
         match self {
             Channel::GuildThread(thread) => Some(thread.base.guild_id),

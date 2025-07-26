@@ -655,10 +655,10 @@ impl UserId {
         }
 
         #[cfg(feature = "temp_cache")]
-        if let Some(cache) = cache_http.cache() {
-            if let Some(private_channel) = cache.temp_private_channels.get(&self) {
-                return Ok(PrivateChannel::clone(&private_channel));
-            }
+        if let Some(cache) = cache_http.cache()
+            && let Some(private_channel) = cache.temp_private_channels.get(&self)
+        {
+            return Ok(PrivateChannel::clone(&private_channel));
         }
 
         let body = CreateDmChannel {
@@ -744,10 +744,10 @@ impl UserId {
     pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "temp_cache")]
         {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(user) = cache.temp_users.get(&self) {
-                    return Ok(User::clone(&user));
-                }
+            if let Some(cache) = cache_http.cache()
+                && let Some(user) = cache.temp_users.get(&self)
+            {
+                return Ok(User::clone(&user));
             }
         }
 
