@@ -1137,7 +1137,6 @@ pub struct PollAnswerCount {
 // all tests here require cache, move if non-cache test is added
 #[cfg(all(test, feature = "cache"))]
 mod tests {
-    use dashmap::DashMap;
     use extract_map::ExtractMap;
     use small_fixed_array::FixedArray;
 
@@ -1153,7 +1152,7 @@ mod tests {
         UserId,
     };
     use crate::cache::Cache;
-    use crate::cache::wrappers::MaybeMap;
+    use crate::model::event::GuildCreateEvent;
 
     fn new_extract_map<K, T>(val: T) -> ExtractMap<K, T>
     where
@@ -1204,12 +1203,10 @@ mod tests {
         };
 
         // Cache, with the guild setup.
-        let mut cache = Cache::new();
-        cache.guilds = MaybeMap(Some({
-            let guilds = DashMap::default();
-            guilds.insert(guild.id, guild);
-            guilds
-        }));
+        let cache = Cache::new();
+        cache.update(&mut GuildCreateEvent {
+            guild,
+        });
 
         // The author should only have the one permission, SEND_MESSAGES.
         assert_eq!(message.author_permissions(&cache), Some(Permissions::SEND_MESSAGES));
