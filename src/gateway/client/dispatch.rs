@@ -11,8 +11,6 @@ use crate::internal::tokio::spawn_named;
 use crate::model::channel::ChannelType;
 use crate::model::event::Event;
 use crate::model::guild::Member;
-#[cfg(feature = "cache")]
-use crate::model::id::GuildId;
 
 #[cfg(feature = "cache")]
 macro_rules! if_cache {
@@ -144,7 +142,7 @@ fn update_cache_with_event(
             }
         },
         Event::ChannelDelete(mut event) => {
-            let cached_messages = if_cache!(event.update(cache));
+            let cached_messages = if_cache!(update_cache!(cache, event));
 
             let channel = event.channel;
             if channel.base.kind == ChannelType::Category {
@@ -162,7 +160,7 @@ fn update_cache_with_event(
             pin: event,
         },
         Event::ChannelUpdate(mut event) => {
-            let old_channel = if_cache!(event.update(cache));
+            let old_channel = if_cache!(update_cache!(cache, event));
 
             FullEvent::ChannelUpdate {
                 old: old_channel,
@@ -182,22 +180,13 @@ fn update_cache_with_event(
             unbanned_user: event.user,
         },
         Event::GuildCreate(mut event) => {
-            let is_new = if_cache!(Some(!cache.unavailable_guilds.contains(&event.guild.id)));
-
-            update_cache!(cache, event);
+            let is_new = if_cache!(Some(!cache.unavailable_guilds().contains(&event.guild.id)));
 
             #[cfg(feature = "cache")]
-            {
-                if cache.unavailable_guilds.len() == 0 {
-                    cache.unavailable_guilds.shrink_to_fit();
-
-                    let guild_amount =
-                        cache.guilds.iter().map(|i| *i.key()).collect::<Vec<GuildId>>();
-
-                    extra_event = Some(FullEvent::CacheReady {
-                        guilds: guild_amount,
-                    });
-                }
+            if let Some(guilds) = update_cache!(cache, event) {
+                extra_event = Some(FullEvent::CacheReady {
+                    guilds,
+                });
             }
 
             FullEvent::GuildCreate {
@@ -206,7 +195,7 @@ fn update_cache_with_event(
             }
         },
         Event::GuildDelete(mut event) => {
-            let full = if_cache!(event.update(cache));
+            let full = if_cache!(update_cache!(cache, event));
 
             FullEvent::GuildDelete {
                 incomplete: event.guild,
@@ -232,7 +221,7 @@ fn update_cache_with_event(
             }
         },
         Event::GuildMemberRemove(mut event) => {
-            let member = if_cache!(event.update(cache));
+            let member = if_cache!(update_cache!(cache, event));
 
             FullEvent::GuildMemberRemoval {
                 guild_id: event.guild_id,
@@ -241,7 +230,7 @@ fn update_cache_with_event(
             }
         },
         Event::GuildMemberUpdate(mut event) => {
-            let before = if_cache!(event.update(cache));
+            let before = if_cache!(update_cache!(cache, event));
             let after: Option<Member> = if_cache!({
                 let guild = cache.guild(event.guild_id);
                 guild.and_then(|g| g.members.get(&event.user.id).cloned())
@@ -268,7 +257,7 @@ fn update_cache_with_event(
             }
         },
         Event::GuildRoleDelete(mut event) => {
-            let role = if_cache!(event.update(cache));
+            let role = if_cache!(update_cache!(cache, event));
 
             FullEvent::GuildRoleDelete {
                 guild_id: event.guild_id,
@@ -277,7 +266,7 @@ fn update_cache_with_event(
             }
         },
         Event::GuildRoleUpdate(mut event) => {
-            let before = if_cache!(event.update(cache));
+            let before = if_cache!(update_cache!(cache, event));
 
             FullEvent::GuildRoleUpdate {
                 old_data_if_available: before,
@@ -324,7 +313,7 @@ fn update_cache_with_event(
             guild_id: event.guild_id,
         },
         Event::MessageUpdate(mut event) => {
-            let before = if_cache!(event.update(cache));
+            let before = if_cache!(update_cache!(cache, event));
 
             FullEvent::MessageUpdate {
                 old_if_available: before,
@@ -332,7 +321,7 @@ fn update_cache_with_event(
             }
         },
         Event::PresenceUpdate(mut event) => {
-            let old_data = if_cache!(event.update(cache));
+            let old_data = if_cache!(update_cache!(cache, event));
 
             FullEvent::PresenceUpdate {
                 old_data,
@@ -354,19 +343,11 @@ fn update_cache_with_event(
             removed_reactions: event.reaction,
         },
         Event::Ready(mut event) => {
-            update_cache!(cache, event);
-
             #[cfg(feature = "cache")]
-            {
-                let mut shards = cache.shard_data.write();
-                if shards.connected.len() == shards.total.get() as usize
-                    && !shards.has_sent_shards_ready
-                {
-                    shards.has_sent_shards_ready = true;
-                    extra_event = Some(FullEvent::ShardsReady {
-                        total_shards: shards.total,
-                    });
-                }
+            if let Some(total_shards) = update_cache!(cache, event) {
+                extra_event = Some(FullEvent::ShardsReady {
+                    total_shards,
+                });
             }
 
             FullEvent::Ready {
@@ -395,7 +376,7 @@ fn update_cache_with_event(
             event,
         },
         Event::UserUpdate(mut event) => {
-            let before = if_cache!(event.update(cache));
+            let before = if_cache!(update_cache!(cache, event));
 
             FullEvent::UserUpdate {
                 old_data: before,
@@ -406,7 +387,7 @@ fn update_cache_with_event(
             event,
         },
         Event::VoiceStateUpdate(mut event) => {
-            let before = if_cache!(event.update(cache));
+            let before = if_cache!(update_cache!(cache, event));
 
             FullEvent::VoiceStateUpdate {
                 old: before,
@@ -460,7 +441,7 @@ fn update_cache_with_event(
             }
         },
         Event::ThreadUpdate(mut event) => {
-            let old = if_cache!(event.update(cache));
+            let old = if_cache!(update_cache!(cache, event));
 
             FullEvent::ThreadUpdate {
                 old,
@@ -468,7 +449,7 @@ fn update_cache_with_event(
             }
         },
         Event::ThreadDelete(mut event) => {
-            let full_thread_data = if_cache!(event.update(cache));
+            let full_thread_data = if_cache!(update_cache!(cache, event));
 
             FullEvent::ThreadDelete {
                 thread: event.thread,

@@ -119,10 +119,10 @@ pub type ChannelMessagesRef<'a> = CacheRef<'a, GenericChannelId, VecDeque<Messag
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
-pub(crate) struct CachedShardData {
-    pub total: NonZeroU16,
-    pub connected: HashSet<ShardId>,
-    pub has_sent_shards_ready: bool,
+struct CachedShardData {
+    total: NonZeroU16,
+    connected: HashSet<ShardId>,
+    has_sent_shards_ready: bool,
 }
 
 /// A cache containing data received from [`Shard`]s.
@@ -179,28 +179,28 @@ pub struct Cache {
     // ---
     /// A map of guilds with full data available. This includes data like [`Role`]s and [`Emoji`]s
     /// that are not available through the REST API.
-    pub(crate) guilds: MaybeMap<GuildId, Guild>,
+    guilds: MaybeMap<GuildId, Guild>,
     /// A list of guilds which are "unavailable".
     ///
     /// Additionally, guilds are always unavailable for bot users when a Ready is received. Guilds
     /// are "sent in" over time through the receiving of [`Event::GuildCreate`]s.
-    pub(crate) unavailable_guilds: MaybeMap<GuildId, ()>,
+    unavailable_guilds: MaybeMap<GuildId, ()>,
 
     // Messages cache:
     // ---
-    pub(crate) messages: DashMap<GenericChannelId, VecDeque<Message>, BuildHasher>,
+    messages: DashMap<GenericChannelId, VecDeque<Message>, BuildHasher>,
 
     // Miscellanous fixed-size data
     // ---
     /// Information about running shards
-    pub(crate) shard_data: RwLock<CachedShardData>,
+    shard_data: RwLock<CachedShardData>,
     /// The current user "logged in" and for which events are being received for.
     ///
     /// The current user contains information that a regular [`User`] does not, such as whether it
     /// is a bot, whether the user is verified, etc.
     ///
     /// Refer to the documentation for [`CurrentUser`] for more information.
-    pub(crate) user: RwLock<CurrentUser>,
+    user: RwLock<CurrentUser>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
 }
@@ -595,7 +595,7 @@ mod test {
                 ..Default::default()
             },
         };
-        assert!(cache.update(&mut guild_create).is_none());
+        assert!(cache.update(&mut guild_create).is_some());
         assert!(cache.update(&mut event).is_none());
 
         let mut guild_delete = GuildDeleteEvent {
