@@ -123,7 +123,7 @@ pub(crate) struct MaybeOwnedArc<T>(
 #[cfg(feature = "temp_cache")]
 impl<T> MaybeOwnedArc<T> {
     pub(crate) fn new(inner: T) -> Self {
-        Self(Arc::new(inner).into())
+        Self(Arc::new(inner))
     }
 
     pub(crate) fn get_inner(self) -> Arc<T> {
@@ -159,6 +159,6 @@ impl<T> std::ops::Deref for MaybeOwnedArc<T> {
 #[cfg(feature = "temp_cache")]
 impl<T> Clone for MaybeOwnedArc<T> {
     fn clone(&self) -> Self {
-        Self(self.0.clone().into())
+        Self(Arc::clone(&self.0))
     }
 }
