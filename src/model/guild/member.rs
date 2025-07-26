@@ -92,6 +92,8 @@ bitflags! {
         const AUTOMOD_QUARANTINED_USERNAME = 1 << 7;
         /// Member has dismissed the DM settings upsell. Not editable
         const DM_SETTINGS_UPSELL_ACKNOWLEDGED = 1 << 9;
+        /// Member's guild tag is blocked by AutoMod. Not editable
+        const AUTOMOD_QUARANTINED_GUILD_TAG = 1 << 10;
     }
 }
 
