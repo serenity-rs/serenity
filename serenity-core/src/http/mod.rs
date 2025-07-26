@@ -5,18 +5,14 @@
 //! implements protection to pre-emptively ratelimit, to ensure that no wasted requests are made.
 //!
 //! The HTTP module comprises of two types of requests:
-//! - REST API requests, which require an authorization token;
+//! - REST API requests, which require authenticating to Discord's gateway using a token;
 //! - Other requests, which do not require an authorization token.
-//!
-//! The former require a [`Client`] to have logged in, while the latter may be made regardless of
-//! any other usage of the library.
 //!
 //! If a request spuriously fails, it will be retried once.
 //!
 //! Note that you may want to perform requests through a [model]s' instance methods where possible,
 //! as they each offer different levels of a high-level interface to the HTTP module.
 //!
-//! [`Client`]: crate::Client
 //! [model]: crate::model
 
 mod client;

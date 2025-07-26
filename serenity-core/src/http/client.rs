@@ -522,9 +522,7 @@ impl Http {
 
     /// Creates an application emoji with the given data.
     ///
-    /// See [`Context::create_application_emoji`] for required fields.
-    ///
-    /// [`Context::create_application_emoji`]: crate::gateway::client::Context::create_application_emoji
+    /// See [`GuildId::create_emoji`] for required fields.
     pub async fn create_application_emoji(&self, map: &impl serde::Serialize) -> Result<Emoji> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -628,10 +626,8 @@ impl Http {
 
     /// Creates a guild with the data provided.
     ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
-    /// over a [`Shard`], if at least one is running.
-    ///
-    /// [`Shard`]: crate::gateway::Shard
+    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will later be
+    /// sent over the gateway via a [`GuildCreateEvent`], if at least one shard is running.
     #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
     pub async fn create_guild(&self, map: &impl serde::Serialize) -> Result<PartialGuild> {
         self.fire(Request {
@@ -1486,9 +1482,7 @@ impl Http {
 
     /// Changes application emoji information.
     ///
-    /// See [`Context::edit_application_emoji`] for required fields.
-    ///
-    /// [`Context::edit_application_emoji`]: crate::gateway::client::Context::edit_application_emoji
+    /// See [`GuildId::edit_emoji`] for required fields.
     pub async fn edit_application_emoji(
         &self,
         emoji_id: EmojiId,

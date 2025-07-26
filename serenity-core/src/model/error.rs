@@ -97,7 +97,7 @@ impl fmt::Display for Minimum {
 ///
 /// This is always wrapped within the library's [`Error::Model`] variant.
 ///
-/// [`Error::Model`]: crate::Error::Model
+/// [`Error::Model`]: crate::error::Error::Model
 /// [`model`]: crate::model
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]

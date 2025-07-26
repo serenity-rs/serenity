@@ -1,4 +1,4 @@
-//! A cache containing data received from [`Shard`]s.
+//! A cache containing data received from the API.
 //!
 //! Using the cache allows to avoid REST API requests via the [`http`] module where possible.
 //! Issuing too many requests will lead to ratelimits.
@@ -20,7 +20,6 @@
 //! is "definitely no". If you do not care about RAM and want your bot to be able to access data
 //! while needing to hit the REST API as little as possible, then the answer is "yes".
 //!
-//! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
 //! [Manage Guild]: Permissions::MANAGE_GUILD
 
@@ -125,7 +124,7 @@ struct CachedShardData {
     has_sent_shards_ready: bool,
 }
 
-/// A cache containing data received from [`Shard`]s.
+/// A cache containing data received from the API.
 ///
 /// Using the cache allows to avoid REST API requests via the [`http`] module where possible.
 /// Issuing too many requests will lead to ratelimits.
@@ -141,7 +140,6 @@ struct CachedShardData {
 ///
 /// The documentation of each event contains the required gateway intents.
 ///
-/// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
@@ -268,10 +266,8 @@ impl Cache {
     /// data received. A single [`User`] may have multiple associated member objects that have not
     /// been received.
     ///
-    /// This can be used in combination with [`Shard::chunk_guild`], and can be used to determine
-    /// how many members have not yet been received.
-    ///
-    /// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild
+    /// This can be used in combination with guild chunking, and can be used to determine how many
+    /// members have not yet been received.
     pub fn unknown_members(&self) -> u32 {
         let mut total = 0;
 
@@ -290,9 +286,9 @@ impl Cache {
 
     /// Fetches a vector of all [`Guild`]s' Ids that are stored in the cache.
     ///
-    /// Note that if you are utilizing multiple [`Shard`]s, then the guilds retrieved over all
-    /// shards are included in this count -- not just the current [`Context`]'s shard, if accessing
-    /// from one.
+    /// Note that if you are utilizing multiple shards, then the guilds retrieved over all shards
+    /// are included in this count -- not just the current shard (assuming you are connecting via
+    /// the gateway).
     ///
     /// # Examples
     ///
@@ -319,9 +315,6 @@ impl Cache {
     ///     }
     /// }
     /// ```
-    ///
-    /// [`Context`]: crate::gateway::client::Context
-    /// [`Shard`]: crate::gateway::Shard
     pub fn guilds(&self) -> Vec<GuildId> {
         let unavailable_guilds = self.unavailable_guilds();
 

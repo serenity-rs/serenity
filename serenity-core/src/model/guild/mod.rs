@@ -34,8 +34,6 @@ pub use self::system_channel::*;
 pub use self::welcome_screen::*;
 #[cfg(feature = "model")]
 use crate::builder::EditGuild;
-#[cfg(doc)]
-use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
@@ -215,7 +213,10 @@ pub struct Guild {
     /// Users who are members of the guild.
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received if the
-    /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
+    /// [`Self::member_count`] is greater than the [Large Threshold] set by the library when
+    /// identifying.
+    ///
+    /// [Large Threshold]: https://discord.com/developers/docs/events/gateway-events#identify-identify-structure
     pub members: ExtractMap<UserId, Member>,
     /// All voice and text channels contained within a guild.
     ///
@@ -290,8 +291,8 @@ impl Guild {
 
     /// Creates a guild with the data provided.
     ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
-    /// over a [`Shard`].
+    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will later be
+    /// sent over the gateway via a [`GuildCreateEvent`], if at least one shard is running.
     ///
     /// # Examples
     ///
@@ -310,8 +311,6 @@ impl Guild {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user cannot create a Guild.
-    ///
-    /// [`Shard`]: crate::gateway::Shard
     #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
     pub async fn create(http: &Http, name: &str, icon: Option<ImageHash>) -> Result<PartialGuild> {
         #[derive(serde::Serialize)]

@@ -461,6 +461,7 @@ impl Client {
     /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
+    /// [`Error::Http`]: serenity_core::error::Error::Http
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start(&mut self) -> Result<()> {
         self.start_connection(0, 0, NonZeroU16::MIN).await
@@ -504,6 +505,7 @@ impl Client {
     /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
+    /// [`Error::Http`]: serenity_core::error::Error::Http
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_autosharded(&mut self) -> Result<()> {
         let (end, total) = {
@@ -570,6 +572,7 @@ impl Client {
     /// manager.
     ///
     /// [gateway docs]: crate::gateway#sharding
+    /// [`Error::Http`]: serenity_core::error::Error::Http
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_shard(&mut self, shard: u16, shards: u16) -> Result<()> {
         self.start_connection(shard, shard, check_shard_total(shards)).await
@@ -613,6 +616,7 @@ impl Client {
     /// manager.
     ///
     /// [Gateway docs]: crate::gateway#sharding
+    /// [`Error::Http`]: serenity_core::error::Error::Http
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_shards(&mut self, total_shards: u16) -> Result<()> {
         self.start_connection(0, total_shards - 1, check_shard_total(total_shards)).await
@@ -656,6 +660,7 @@ impl Client {
     /// manager.
     ///
     /// [Gateway docs]: crate::gateway#sharding
+    /// [`Error::Http`]: serenity_core::error::Error::Http
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_shard_range(&mut self, range: Range<u16>, total_shards: u16) -> Result<()> {
         self.start_connection(range.start, range.end, check_shard_total(total_shards)).await
