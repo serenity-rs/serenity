@@ -10,14 +10,18 @@ use crate::model::prelude::*;
 /// A builder to create a soundboard sound.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/soundboard#soundboard-resource)
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSoundboard<'a> {
     name: String,
     sound: String,
     volume: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
     emoji_id: Option<EmojiId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     emoji_name: Option<String>,
+
+    #[serde(skip)]
     audit_log_reason: Option<&'a str>,
 }
 
@@ -106,23 +110,6 @@ impl Builder for CreateSoundboard<'_> {
             Permissions::CREATE_GUILD_EXPRESSIONS,
         )?;
 
-        #[derive(serde::Serialize)]
-        struct CreateSoundboard {
-            name: String,
-            sound: String,
-            volume: f64,
-            emoji_id: Option<EmojiId>,
-            emoji_name: Option<String>,
-        }
-
-        let map = CreateSoundboard {
-            name: self.name,
-            sound: self.sound,
-            volume: self.volume,
-            emoji_id: self.emoji_id,
-            emoji_name: self.emoji_name,
-        };
-
-        cache_http.http().create_guild_soundboard(ctx, &map, self.audit_log_reason).await
+        cache_http.http().create_guild_soundboard(ctx, &self, self.audit_log_reason).await
     }
 }
