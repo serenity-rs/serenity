@@ -343,4 +343,7 @@ pub struct ComponentInteractionData {
     /// Type and type-specific data of this component interaction.
     #[serde(flatten)]
     pub kind: ComponentInteractionDataKind,
+    /// The parameters and the given values. The converted objects from the given options.
+    #[serde(default)]
+    pub resolved: CommandDataResolved,
 }
