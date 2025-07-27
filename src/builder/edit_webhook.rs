@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::ImageData;
+use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -14,7 +14,7 @@ pub struct EditWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<Option<ImageData<'a>>>,
+    avatar: Option<Option<DataUri<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
 
@@ -43,7 +43,7 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    pub fn avatar(mut self, avatar: ImageData<'a>) -> Self {
+    pub fn avatar(mut self, avatar: DataUri<'a>) -> Self {
         self.avatar = Some(Some(avatar));
         self
     }

@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::{CreateScheduledEventMetadata, ImageData};
+use super::{CreateScheduledEventMetadata, DataUri};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -30,7 +30,7 @@ pub struct EditScheduledEvent<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     status: Option<ScheduledEventStatus>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    image: Option<ImageData<'a>>,
+    image: Option<DataUri<'a>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -152,7 +152,7 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: ImageData<'a>) -> Self {
+    pub fn image(mut self, image: DataUri<'a>) -> Self {
         self.image = Some(image);
         self
     }
