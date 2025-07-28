@@ -36,7 +36,7 @@ pub type AttachmentType<'a> = crate::builder::CreateAttachment;
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 #[allow(clippy::large_enum_variant)] // https://github.com/rust-lang/rust-clippy/issues/9798
 pub enum Channel {
     /// A channel within a [`Guild`].
@@ -222,7 +222,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum ChannelType {
         /// An indicator that the channel is a text [`GuildChannel`].
         #[default]
@@ -353,7 +353,7 @@ pub struct PermissionOverwrite {
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum PermissionOverwriteType {
     /// A member which is having its permission overwrites edited.
     Member(UserId),
@@ -368,7 +368,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum VideoQualityMode {
         /// An indicator that the video quality is chosen by Discord for optimal
         /// performance.
@@ -386,7 +386,7 @@ enum_number! {
     #[derive(Clone, Copy, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum StageInstancePrivacyLevel {
         /// The Stage instance is visible publicly. (deprecated)
         Public = 1,
@@ -404,7 +404,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u16", into = "u16")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum AutoArchiveDuration {
         None = 0,
         OneHour = 60,
@@ -418,7 +418,7 @@ enum_number! {
 /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct StageInstance {
     /// The Id of the stage instance.
     pub id: StageInstanceId,
@@ -441,7 +441,7 @@ pub struct StageInstance {
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct ThreadMetadata {
     /// Whether the thread is archived.
     pub archived: bool,
@@ -473,7 +473,7 @@ pub struct ThreadMetadata {
 /// [4](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct ThreadsData {
     /// The threads channels.
     pub threads: Vec<GuildChannel>,
@@ -490,7 +490,7 @@ pub struct ThreadsData {
 /// [docs]()
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum ForumEmoji {
     /// The id of a guild's custom emoji.
     Id(EmojiId),
@@ -543,7 +543,7 @@ impl<'de> serde::Deserialize<'de> for ForumEmoji {
 /// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct ForumTag {
     /// The id of the tag.
     pub id: ForumTagId,
@@ -564,7 +564,7 @@ enum_number! {
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum SortOrder {
         /// Sort forum posts by activity.
         LatestActivity = 0,

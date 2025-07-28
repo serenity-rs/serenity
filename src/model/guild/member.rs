@@ -20,7 +20,7 @@ use crate::model::utils::avatar_url;
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Member {
     /// Attached User struct.
     pub user: User,
@@ -569,7 +569,7 @@ impl fmt::Display for Member {
 /// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct PartialMember {
     /// Indicator of whether the member can hear in voice channels.
     #[serde(default)]
@@ -653,7 +653,7 @@ impl From<Member> for PartialMember {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct PartialThreadMember {
     /// The time the current user last joined the thread.
     pub join_timestamp: Timestamp,
@@ -667,7 +667,7 @@ pub struct PartialThreadMember {
 /// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct ThreadMember {
     #[serde(flatten)]
     pub inner: PartialThreadMember,

@@ -14,7 +14,7 @@ use std::time::Duration;
 /// ```
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Settings {
     /// The maximum number of messages to store in a channel's message cache.
     ///

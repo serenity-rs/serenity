@@ -30,7 +30,7 @@ use super::Permissions;
 /// Discord docs: [application field of Ready](https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.
     pub id: ApplicationId,
@@ -42,7 +42,7 @@ pub struct PartialCurrentApplicationInfo {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct CurrentApplicationInfo {
     pub id: ApplicationId,
     pub name: String,
@@ -106,7 +106,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum InstallationContext {
         Guild = 0,
         User = 1,
@@ -121,7 +121,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum InteractionContext {
         /// Interaction can be used within servers
         Guild = 0,
@@ -145,7 +145,7 @@ pub struct InstallationContextConfig {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Team {
     /// The icon of the team.
     pub icon: Option<ImageHash>,
@@ -163,7 +163,7 @@ pub struct Team {
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-member-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct TeamMember {
     /// The member's membership state.
     pub membership_state: MembershipState,
@@ -184,7 +184,7 @@ enum_number! {
     /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum MembershipState {
         Invited = 1,
         Accepted = 2,
@@ -194,7 +194,7 @@ enum_number! {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum TeamMemberRole {
     Admin,
     Developer,
@@ -274,7 +274,7 @@ bitflags! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure).
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct InstallParams {
     pub scopes: Vec<Scope>,
     pub permissions: Permissions,

@@ -192,7 +192,7 @@ impl CurrentUser {
 #[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum OnlineStatus {
     #[serde(rename = "dnd")]
     DoNotDisturb,
@@ -226,7 +226,7 @@ impl OnlineStatus {
 /// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's creation date.
     pub id: UserId,
@@ -299,7 +299,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum PremiumType {
         #[default]
         None = 0,

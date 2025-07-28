@@ -10,7 +10,7 @@ use crate::internal::prelude::*;
 use crate::json::*;
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct DiscordJsonError {
     /// The error code.
     pub code: isize,
@@ -32,7 +32,7 @@ pub struct DiscordJsonSingleError {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct ErrorResponse {
     pub status_code: StatusCode,
     pub url: String,
@@ -57,7 +57,7 @@ impl ErrorResponse {
 }
 
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum HttpError {
     /// When a non-successful status code was received for a request.
     UnsuccessfulRequest(ErrorResponse),

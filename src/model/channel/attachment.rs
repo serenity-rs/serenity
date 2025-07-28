@@ -31,7 +31,7 @@ where
 /// [`Embed`]: super::Embed
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Attachment {
     /// The unique ID given to this attachment.
     pub id: AttachmentId,

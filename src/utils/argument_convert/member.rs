@@ -5,7 +5,7 @@ use crate::model::prelude::*;
 use crate::prelude::*;
 
 /// Error that can be returned from [`Member::convert`].
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum MemberParseError {
     /// Parser was invoked outside a guild.

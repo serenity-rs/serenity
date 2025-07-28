@@ -172,7 +172,7 @@ impl From<Activity> for ActivityData {
 ///
 /// This can be useful for knowing which shards are currently "down"/"up".
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g., a resume phase.
     Connected,
@@ -237,7 +237,7 @@ impl fmt::Display for ConnectionStage {
 }
 
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum ShardAction {
     Heartbeat,
     Identify,
@@ -246,7 +246,7 @@ pub enum ShardAction {
 
 /// The type of reconnection that should be performed.
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum ReconnectType {
     /// Indicator that a new connection should be made by sending an IDENTIFY.
     Reidentify,

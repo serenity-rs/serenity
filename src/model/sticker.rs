@@ -77,7 +77,7 @@ impl StickerId {
 /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-item-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct StickerItem {
     /// The unique ID given to this sticker.
     pub id: StickerId,
@@ -116,7 +116,7 @@ impl StickerItem {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-pack-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct StickerPack {
     /// The unique ID given to this sticker sticker pack.
     pub id: StickerPackId,
@@ -158,7 +158,7 @@ fn banner_url(banner_asset_id: StickerPackBannerId) -> String {
 /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Sticker {
     /// The unique ID given to this sticker.
     pub id: StickerId,
@@ -277,7 +277,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum StickerType {
         /// An official sticker in a pack, part of Nitro or in a removed purchasable pack.
         Standard = 1,
@@ -294,7 +294,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum StickerFormatType {
         /// A PNG format sticker.
         Png = 1,

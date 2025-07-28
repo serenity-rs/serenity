@@ -9,7 +9,7 @@ use crate::model::sticker::Sticker;
 ///
 /// [`Guild`]: super::Guild
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct GuildPreview {
     /// The guild Id.
     pub id: GuildId,

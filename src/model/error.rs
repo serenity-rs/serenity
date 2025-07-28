@@ -46,7 +46,7 @@ use super::Permissions;
 /// [`GuildId::ban`]: super::id::GuildId::ban
 /// [`model`]: crate::model
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum Error {
     /// When attempting to delete below or above the minimum or maximum allowed number of messages.
     BulkDeleteAmount,

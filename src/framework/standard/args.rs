@@ -8,7 +8,7 @@ use uwl::Stream;
 
 /// Defines how an operation on an [`Args`] method failed.
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum Error<E> {
     /// "END-OF-STRING". We reached the end. There's nothing to parse anymore.
     Eos,

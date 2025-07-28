@@ -5,7 +5,7 @@ use crate::model::prelude::*;
 use crate::prelude::*;
 
 /// Error that can be returned from [`Guild::convert`].
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum GuildParseError {
     /// The provided guild string failed to parse, or the parsed result cannot be found in the

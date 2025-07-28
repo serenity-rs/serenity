@@ -6,7 +6,7 @@ use super::prelude::*;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-connection-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Connection {
     /// The ID of the account on the other side of this connection.
     pub id: String,
@@ -40,8 +40,7 @@ enum_number! {
     ///
     /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-visibility-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum ConnectionVisibility {
         /// Invisible to everyone except the user themselves
         None = 0,

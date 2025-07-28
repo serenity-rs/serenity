@@ -6,7 +6,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 #[derive(
     Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize_repr, Serialize_repr,
 )]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 #[repr(u8)]
 pub enum Opcode {
     /// Used to begin a voice websocket connection.

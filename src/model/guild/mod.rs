@@ -69,7 +69,7 @@ use crate::model::utils::*;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#ban-object).
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Ban {
     /// The reason given for this ban.
     pub reason: Option<String>,
@@ -82,7 +82,7 @@ pub struct Ban {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#bulk-guild-ban).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct BulkBanResponse {
     /// The users that were successfully banned.
     pub banned_users: Vec<UserId>,
@@ -106,7 +106,7 @@ pub struct AfkMetadata {
 /// [extension](https://discord.com/developers/docs/topics/gateway-events#guild-create).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Guild {
     /// The unique Id identifying the guild.
     ///
@@ -2766,7 +2766,7 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-widget-settings-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct GuildWidget {
     /// Whether the widget is enabled.
     pub enabled: bool,
@@ -2779,7 +2779,7 @@ pub struct GuildWidget {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct GuildPrune {
     /// The number of members that would be pruned by the operation.
     pub pruned: u64,
@@ -2791,7 +2791,7 @@ pub struct GuildPrune {
 /// [subset example](https://discord.com/developers/docs/resources/user#get-current-user-guilds-example-partial-guild).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct GuildInfo {
     /// The unique Id of the guild.
     ///
@@ -2836,7 +2836,7 @@ impl InviteGuild {
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#unavailable-guild-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct UnavailableGuild {
     /// The Id of the [`Guild`] that may be unavailable.
     pub id: GuildId,
@@ -2852,7 +2852,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum DefaultMessageNotificationLevel {
         /// Receive notifications for everything.
         #[default]
@@ -2870,7 +2870,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum ExplicitContentFilter {
         /// Don't scan any messages.
         #[default]
@@ -2890,7 +2890,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum MfaLevel {
         /// MFA is disabled.
         #[default]
@@ -2909,7 +2909,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum VerificationLevel {
         /// Does not require any verification.
         #[default]
@@ -2933,7 +2933,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum NsfwLevel {
         /// The nsfw level is not specified.
         #[default]
@@ -2955,7 +2955,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u16", into = "u16")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum AfkTimeout {
         OneMinute = 60,
         FiveMinutes = 300,

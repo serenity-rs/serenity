@@ -13,7 +13,7 @@ use crate::payload::*;
 
 /// A representation of data received for voice gateway events.
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum Event {
     /// Used to begin a voice websocket connection.
     Identify(Identify),

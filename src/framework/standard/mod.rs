@@ -45,7 +45,7 @@ use crate::model::{guild::Role, id::RoleId};
 
 /// An enum representing all possible fail conditions under which a command won't be executed.
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum DispatchError {
     /// When a custom function check has failed.
     CheckFailed(&'static str, Reason),

@@ -16,7 +16,7 @@ use crate::internal::prelude::*;
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct Invite {
     /// The approximate number of [`Member`]s in the related [`Guild`].
     pub approximate_member_count: Option<u64>,
@@ -195,7 +195,7 @@ impl Invite {
 /// A minimal amount of information about the channel an invite points to.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
     pub id: ChannelId,
@@ -208,7 +208,7 @@ pub struct InviteChannel {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct InviteGuild {
     pub id: GuildId,
     pub name: String,
@@ -275,7 +275,7 @@ impl InviteGuild {
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-metadata-object) (extends [`Invite`] fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct RichInvite {
     /// A representation of the minimal amount of information needed about the channel being
     /// invited to.
@@ -390,7 +390,7 @@ impl RichInvite {
 
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub struct InviteStageInstance {
     /// The members speaking in the Stage
     pub members: Vec<PartialMember>,
@@ -409,7 +409,7 @@ enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
-    #[non_exhaustive]
+    #[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
     pub enum InviteTargetType {
         Stream = 1,
         EmbeddedApplication = 2,

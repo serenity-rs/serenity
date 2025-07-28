@@ -17,7 +17,7 @@ mod check;
 pub use self::check::*;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum OnlyIn {
     Dm,
     Guild,
@@ -129,7 +129,7 @@ impl PartialEq for HelpCommand {
 /// - Lacking required roles to execute the command.
 /// - The command can't be used in the current channel (as in `DM only` or `guild only`).
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
+#[cfg_attr(any(not(feature = "unstable_exhaustive_types"), doc), non_exhaustive)]
 pub enum HelpBehaviour {
     /// The command will be displayed, hence nothing will be done.
     Nothing,
