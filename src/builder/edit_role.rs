@@ -59,7 +59,6 @@ pub struct EditRole<'a> {
     icon: Option<Option<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     unicode_emoji: Option<Option<String>>,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     mentionable: Option<bool>,
 
