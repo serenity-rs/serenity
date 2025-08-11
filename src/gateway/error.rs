@@ -55,7 +55,7 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::BuildingUrl => f.write_str("Error: Failed to build url"),
+            Self::BuildingUrl => f.write_str("Error build url"),
             Self::Closed(_) => f.write_str("Connection closed"),
             Self::ExpectedHello => f.write_str("Expected a Hello"),
             Self::HeartbeatFailed => f.write_str("Failed sending a heartbeat"),
