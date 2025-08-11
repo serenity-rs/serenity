@@ -1,8 +1,9 @@
+<p align="center">
+    <img src="logo.png"
+</p>
+<h1 align="center"> serenity </h1>
+
 [![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust-version-badge]][rust-version-link]
-
-# serenity
-
-![serenity logo][logo]
 
 Serenity is a Rust library for the Discord API.
 
