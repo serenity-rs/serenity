@@ -179,9 +179,6 @@ pub struct Guild {
     /// - `VERIFIED`
     /// - `VIP_REGIONS`
     /// - `WELCOME_SCREEN_ENABLED`
-    /// - `THREE_DAY_THREAD_ARCHIVE`
-    /// - `SEVEN_DAY_THREAD_ARCHIVE`
-    /// - `PRIVATE_THREADS`
     ///
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
