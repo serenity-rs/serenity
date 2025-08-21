@@ -155,7 +155,7 @@ pub struct Guild {
     #[serde(with = "emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     /// The guild features. These are user-invisible options which are used for Discord rollouts
-    /// and/or paid benefits. More information is available in [`discord's documentation`].
+    /// and/or paid benefits. More information is available at [`discord's documentation`].
     ///
     /// [`discord's documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
