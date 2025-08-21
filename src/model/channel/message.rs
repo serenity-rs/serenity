@@ -448,13 +448,13 @@ impl Message {
 
     /// Pins this message to its channel.
     ///
-    /// **Note**: Requires the [Manage Messages] permission.
+    /// **Note**: Requires the [Pin Messages] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// [Pin Messages]: Permissions::PIN_MESSAGES
     pub async fn pin(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         self.channel_id.pin(http, self.id, reason).await
     }
@@ -546,13 +546,13 @@ impl Message {
 
     /// Unpins the message from its channel.
     ///
-    /// **Note**: Requires the [Manage Messages] permission.
+    /// **Note**: Requires the [Pin Messages] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// [Pin Messages]: Permissions::PIN_MESSAGES
     pub async fn unpin(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         http.unpin_message(self.channel_id, self.id, reason).await
     }
@@ -1169,6 +1169,28 @@ pub struct PollAnswerCount {
     pub id: AnswerId,
     pub count: u64,
     pub me_voted: bool,
+}
+
+/// A pinned message returned as part of a paginated Get Channel Pins query.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/message#message-pin-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessagePin {
+    pub pinned_at: Timestamp,
+    pub message: Message,
+}
+
+/// The response data for a paginated Get Channel Pins query.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/message#get-channel-pins)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessagePinsPage {
+    pub items: Vec<MessagePin>,
+    pub has_more: bool,
 }
 
 // all tests here require cache, move if non-cache test is added

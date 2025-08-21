@@ -138,11 +138,11 @@ routes! ('a, {
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
     ChannelPin { channel_id: GenericChannelId, message_id: MessageId },
-    api!("/channels/{}/pins/{}", channel_id, message_id),
+    api!("/channels/{}/messages/pins/{}", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
     ChannelPins { channel_id: GenericChannelId },
-    api!("/channels/{}/pins", channel_id),
+    api!("/channels/{}/messages/pins", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
     ChannelTyping { channel_id: GenericChannelId },
