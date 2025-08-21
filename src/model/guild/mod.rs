@@ -154,34 +154,10 @@ pub struct Guild {
     /// All of the guild's custom emojis.
     #[serde(with = "emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
-    /// The guild features. More information available at [`discord documentation`].
+    /// The guild features. These are user-invisible options which are used for Discord rollouts
+    /// and/or paid benefits. More information is available in [`discord's documentation`].
     ///
-    /// The following is a list of known features:
-    /// - `ANIMATED_ICON`
-    /// - `BANNER`
-    /// - `COMMERCE`
-    /// - `COMMUNITY`
-    /// - `DISCOVERABLE`
-    /// - `FEATURABLE`
-    /// - `INVITE_SPLASH`
-    /// - `MEMBER_VERIFICATION_GATE_ENABLED`
-    /// - `MONETIZATION_ENABLED`
-    /// - `MORE_STICKERS`
-    /// - `NEWS`
-    /// - `PARTNERED`
-    /// - `PREVIEW_ENABLED`
-    /// - `PRIVATE_THREADS`
-    /// - `ROLE_ICONS`
-    /// - `SEVEN_DAY_THREAD_ARCHIVE`
-    /// - `THREE_DAY_THREAD_ARCHIVE`
-    /// - `TICKETED_EVENTS_ENABLED`
-    /// - `VANITY_URL`
-    /// - `VERIFIED`
-    /// - `VIP_REGIONS`
-    /// - `WELCOME_SCREEN_ENABLED`
-    ///
-    ///
-    /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
+    /// [`discord's documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
