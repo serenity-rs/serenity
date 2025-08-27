@@ -4642,6 +4642,11 @@ impl Http {
         let url = Url::parse(url).map_err(HttpError::Url)?;
         let (webhook_id, token) =
             crate::utils::parse_webhook(&url).ok_or(HttpError::InvalidWebhook)?;
+        let mut params = url.query_pairs().collect::<Vec<(&str, String)>>();
+        let params = match params.len() {
+            0 => None,
+            _ => Some(params),
+        };
         self.fire(Request {
             body: None,
             multipart: None,
@@ -4651,7 +4656,7 @@ impl Http {
                 webhook_id,
                 token,
             },
-            params: None,
+            params,
         })
         .await
     }
