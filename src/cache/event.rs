@@ -205,6 +205,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.deaf.clone_from(&self.deaf);
                 member.mute.clone_from(&self.mute);
                 member.avatar.clone_from(&self.avatar);
+                member.banner.clone_from(&self.banner);
                 member.communication_disabled_until.clone_from(&self.communication_disabled_until);
                 member.unusual_dm_activity_until.clone_from(&self.unusual_dm_activity_until);
 
