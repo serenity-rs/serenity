@@ -4,13 +4,7 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to create or edit a [`Soundboard`] for use via a number of model methods.
-///
-/// These are:
-///
-/// - [`Guild::edit_soundboard`]
-/// - [`PartialGuild::edit_soundboard`]
-/// - [`GuildId::edit_soundboard`]
+/// A builder to create or edit a [`Soundboard`] for use with [`GuildId::edit_soundboard`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/soundboard#soundboard-resource)
 #[derive(Clone, Debug, Default, Serialize)]
@@ -81,6 +75,7 @@ impl<'a> EditSoundboard<'a> {
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
     /// [Manage Guild Expressions]: Permissions::MANAGE_GUILD_EXPRESSIONS
+    #[cfg(feature = "http")]
     pub async fn execute(
         self,
         cache_http: impl CacheHttp,
