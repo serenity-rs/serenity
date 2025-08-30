@@ -85,10 +85,10 @@ impl<'a> CreateSoundboard<'a> {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+    #[cfg(feature = "http")]
     pub async fn execute(
         self,
         cache_http: impl CacheHttp,
