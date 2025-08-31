@@ -88,6 +88,8 @@ jobs:
           - builder without model
           - unstable + typesize
           - unstable (no default features)
+          - temp cache
+          - temp cache + typesize
 
         include:
           - name: builder without model
@@ -96,6 +98,10 @@ jobs:
             features: default unstable typesize
           - name: unstable (no default features)
             features: unstable
+          - name: temp cache
+            features: default temp_cache
+          - name: temp cache + typesize
+            features: default temp_cache typesize
 
     steps:
       - name: Checkout sources
