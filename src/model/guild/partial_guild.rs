@@ -147,7 +147,7 @@ pub struct PartialGuild {
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server.
     pub premium_subscription_count: Option<u64>,
-    /// The preferred locale of this guild only set if guild has the "DISCOVERABLE" feature,
+    /// The preferred locale of this guild only set if guild has the "COMMUNITY" feature,
     /// defaults to en-US.
     pub preferred_locale: String,
     /// The id of the channel where admins and moderators of Community guilds receive notices from
