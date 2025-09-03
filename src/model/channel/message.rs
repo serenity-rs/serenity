@@ -2,6 +2,8 @@
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
+#[cfg(feature = "model")]
+use std::fmt::Display;
 
 use nonmax::NonMaxU64;
 
@@ -574,7 +576,7 @@ impl Message {
     /// Returns a link referencing this message. When clicked, users will jump to the message. The
     /// link will be valid for messages in either private channels or guilds.
     #[must_use]
-    pub fn link(&self) -> String {
+    pub fn link(&self) -> MessageLink {
         self.id.link(self.channel_id, self.guild_id)
     }
 
@@ -966,16 +968,51 @@ bitflags! {
     }
 }
 
+/// Uniquely identifies a message.
+///
+/// Implements Display to format to a url to the message.
+/// When clicked, users will jump to the message. The link will be valid
+/// for messages in either private channels or guilds.
+#[derive(Clone, Copy, Eq, PartialEq)]
+#[cfg(feature = "model")]
+pub struct MessageLink {
+    /// The id of the message
+    pub message_id: MessageId,
+    /// The id of the channel or thread the message is in
+    pub channel_id: GenericChannelId,
+    /// The id of the guild if it's a guild message
+    pub guild_id: Option<GuildId>,
+}
+
+#[cfg(feature = "model")]
+impl Display for MessageLink {
+    #[inline]
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let MessageLink {
+            message_id,
+            channel_id,
+            guild_id,
+        } = self;
+
+        f.write_str("https://discord.com/channels/")?;
+        if let Some(guild_id) = guild_id {
+            write!(f, "/{guild_id}/{channel_id}/{message_id}")
+        } else {
+            write!(f, "/@me/{channel_id}/{message_id}")
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 impl MessageId {
     /// Returns a link referencing this message. When clicked, users will jump to the message. The
     /// link will be valid for messages in either private channels or guilds.
     #[must_use]
-    pub fn link(self, channel_id: GenericChannelId, guild_id: Option<GuildId>) -> String {
-        if let Some(guild_id) = guild_id {
-            format!("https://discord.com/channels/{guild_id}/{channel_id}/{self}")
-        } else {
-            format!("https://discord.com/channels/@me/{channel_id}/{self}")
+    pub fn link(self, channel_id: GenericChannelId, guild_id: Option<GuildId>) -> MessageLink {
+        MessageLink {
+            message_id: self,
+            channel_id,
+            guild_id,
         }
     }
 }
