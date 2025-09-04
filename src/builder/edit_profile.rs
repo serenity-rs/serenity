@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::ImageData;
+use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -18,9 +18,9 @@ pub struct EditProfile<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     username: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    avatar: Option<Option<ImageData<'a>>>,
+    avatar: Option<Option<DataUri<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    banner: Option<Option<ImageData<'a>>>,
+    banner: Option<Option<DataUri<'a>>>,
 }
 
 impl<'a> EditProfile<'a> {
@@ -43,13 +43,13 @@ impl<'a> EditProfile<'a> {
     /// # async fn run() -> Result<(), SerenityError> {
     /// # let http: Http = unimplemented!();
     /// # let mut user = CurrentUser::default();
-    /// let avatar = CreateAttachment::path("./my_image.jpg".as_ref())?.encode().await?;
+    /// let avatar = CreateAttachment::path("./my_image.jpg".as_ref())?.encode("image/jpeg").await?;
     /// let builder = EditProfile::new().avatar(avatar);
     /// user.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn avatar(mut self, avatar: ImageData<'a>) -> Self {
+    pub fn avatar(mut self, avatar: DataUri<'a>) -> Self {
         self.avatar = Some(Some(avatar));
         self
     }
@@ -71,7 +71,7 @@ impl<'a> EditProfile<'a> {
     }
 
     /// Sets the banner of the current user.
-    pub fn banner(mut self, banner: ImageData<'a>) -> Self {
+    pub fn banner(mut self, banner: DataUri<'a>) -> Self {
         self.banner = Some(Some(banner));
         self
     }

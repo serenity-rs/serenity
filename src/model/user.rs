@@ -161,7 +161,7 @@ impl CurrentUser {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut user = CurrentUser::default();
-    /// let avatar = CreateAttachment::path("./avatar.png".as_ref())?.encode().await?;
+    /// let avatar = CreateAttachment::path("./avatar.png".as_ref())?.encode("image/png").await?;
     /// let builder = EditProfile::new().avatar(avatar);
     /// user.edit(&http, builder).await;
     /// # Ok(())

@@ -13,6 +13,7 @@ use crate::builder::{
     CreateScheduledEvent,
     CreateSoundboard,
     CreateSticker,
+    DataUri,
     EditAutoModRule,
     EditCommand,
     EditCommandPermissions,
@@ -25,7 +26,6 @@ use crate::builder::{
     EditScheduledEvent,
     EditSoundboard,
     EditSticker,
-    ImageData,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
@@ -364,14 +364,14 @@ impl GuildId {
         self,
         http: &Http,
         name: &str,
-        image: ImageData<'_>,
+        image: DataUri<'_>,
         roles: Option<Vec<RoleId>>,
         reason: Option<&str>,
     ) -> Result<Emoji> {
         #[derive(serde::Serialize)]
         struct CreateEmoji<'a> {
             name: &'a str,
-            image: ImageData<'a>,
+            image: DataUri<'a>,
             #[serde(skip_serializing_if = "Option::is_none")]
             roles: Option<Vec<RoleId>>,
         }
