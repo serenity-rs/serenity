@@ -115,21 +115,21 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// See [`CreateAttachment::get_data`] for details.
-    pub async fn encode(&self) -> Result<ImageData<'_>> {
+    pub async fn encode(&self, mimetype: &str) -> Result<DataUri<'_>> {
         use base64::engine::{Config, Engine};
 
-        const PREFIX: &str = "data:image/png;base64,";
+        let prefix = format!("data:{mimetype};base64,");
         let data = self.get_data().await?;
 
         let engine = base64::prelude::BASE64_STANDARD;
         let encoded_size = base64::encoded_len(data.len(), engine.config().encode_padding())
-            .and_then(|len| len.checked_add(PREFIX.len()))
+            .and_then(|len| len.checked_add(prefix.len()))
             .expect("buffer capacity overflow");
 
         let mut encoded = String::with_capacity(encoded_size);
-        encoded.push_str(PREFIX);
+        encoded.push_str(&prefix);
         engine.encode_string(&data, &mut encoded);
-        Ok(ImageData(encoded.into()))
+        Ok(DataUri(encoded.into()))
     }
 
     /// Sets a description for the file (max 1024 characters).
@@ -139,27 +139,27 @@ impl<'a> CreateAttachment<'a> {
     }
 }
 
-/// A wrapper around some base64-encoded image data. Used when an endpoint expects the image
-/// payload directly as part of the JSON body, instead of as a multipart upload.
+/// A wrapper around some base64-encoded data. Used when an endpoint expects a base64 payload
+/// directly as part of the JSON body, instead of as a multipart upload.
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
-pub struct ImageData<'a>(Cow<'a, str>);
+pub struct DataUri<'a>(Cow<'a, str>);
 
-impl<'a> ImageData<'a> {
-    /// Accesses the stored base64-encoded image data.
+impl<'a> DataUri<'a> {
+    /// Accesses the stored base64-encoded data.
     #[must_use]
     pub fn as_base64(&self) -> &str {
         &self.0
     }
 
-    /// Constructs image data from a base64-encoded blob of data. The string must be a valid data
+    /// Constructs a [`DataUri`] from a base64-encoded blob of data. The string must be a valid data
     /// URI, for example:
     ///
     /// ```
-    /// use serenity::builder::ImageData;
+    /// use serenity::builder::DataUri;
     ///
     /// let s = "data:image/png;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=";
-    /// assert!(ImageData::from_base64(s).is_ok());
+    /// assert!(DataUri::from_base64(s).is_ok());
     /// ```
     ///
     /// # Errors

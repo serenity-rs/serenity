@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::ImageData;
+use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::prelude::*;
@@ -53,7 +53,7 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    icon: Option<Option<ImageData<'a>>>,
+    icon: Option<Option<DataUri<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     unicode_emoji: Option<Option<Cow<'a, str>>>,
 
@@ -141,7 +141,7 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    pub fn icon(mut self, icon: Option<ImageData<'a>>) -> Self {
+    pub fn icon(mut self, icon: Option<DataUri<'a>>) -> Self {
         self.icon = Some(icon);
         self.unicode_emoji = Some(None);
         self
