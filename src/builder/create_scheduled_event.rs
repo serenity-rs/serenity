@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::ImageData;
+use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -24,7 +24,7 @@ pub struct CreateScheduledEvent<'a> {
     description: Option<Cow<'a, str>>,
     entity_type: ScheduledEventType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    image: Option<ImageData<'a>>,
+    image: Option<DataUri<'a>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -110,7 +110,7 @@ impl<'a> CreateScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: ImageData<'a>) -> Self {
+    pub fn image(mut self, image: DataUri<'a>) -> Self {
         self.image = Some(image);
         self
     }
