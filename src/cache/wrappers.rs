@@ -123,7 +123,7 @@ pub(crate) struct MaybeOwnedArc<T>(
 #[cfg(feature = "temp_cache")]
 impl<T> MaybeOwnedArc<T> {
     pub(crate) fn new(inner: T) -> Self {
-        Self(Arc::new(inner))
+        Self(Arc::new(inner).into())
     }
 
     pub(crate) fn get_inner(self) -> Arc<T> {
@@ -142,8 +142,10 @@ impl<T: typesize::TypeSize> typesize::TypeSize for MaybeOwnedArc<T> {
         self.0.extra_size()
     }
 
-    fn get_collection_item_count(&self) -> Option<usize> {
-        self.0.get_collection_item_count()
+    typesize::if_typesize_details! {
+        fn get_collection_item_count(&self) -> Option<usize> {
+            self.0.get_collection_item_count()
+        }
     }
 }
 
@@ -159,6 +161,6 @@ impl<T> std::ops::Deref for MaybeOwnedArc<T> {
 #[cfg(feature = "temp_cache")]
 impl<T> Clone for MaybeOwnedArc<T> {
     fn clone(&self) -> Self {
-        Self(Arc::clone(&self.0))
+        Self(self.0.clone().into())
     }
 }

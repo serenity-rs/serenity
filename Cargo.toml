@@ -130,7 +130,7 @@ chrono = ["dep:chrono", "typesize?/chrono"]
 full = ["default", "collector", "voice", "voice_model", "interactions_endpoint"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
-temp_cache = ["cache", "mini-moka", "typesize?/mini_moka"]
+temp_cache = ["cache", "mini-moka", "typesize?/mini_moka", "typesize?/dashmap"]
 
 typesize = ["dep:typesize", "dashmap/typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize", "extract_map/typesize"]
 
