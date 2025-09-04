@@ -17,15 +17,14 @@ jobs:
         name:
           - stable
           - beta
-          # The build matrix doesn't support the `env` variable in expressions
-          # see: jobs.nightly
-          # - nightly
+          - nightly
           - Windows
+          - macOS
           - native-tls
           - no default features
           - no cache
           - no gateway
-          - unstable Discord API features
+          - chrono
           - zlib compression
           - zstd compression
           - zlib and zstd compression
@@ -33,8 +32,12 @@ jobs:
         include:
           - name: beta
             toolchain: beta
+          - name: nightly
+            toolchain: nightly
           - name: Windows
             os: windows-latest
+          - name: macOS
+            os: macos-latest
           - name: native-tls
             features: default_native_tls
           - name: no default features
@@ -45,15 +48,6 @@ jobs:
             features: model rustls_backend
           - name: chrono
             features: chrono
-          - name: unstable API + typesize
-            features: default unstable typesize
-            dont-test: true
-          - name: builder without model
-            features: builder
-            dont-test: true
-          - name: unstable Discord API (no default features)
-            features: unstable
-            dont-test: true
           - name: zlib compression
             features: default transport_compression_zlib
           - name: zstd compression
@@ -68,60 +62,46 @@ jobs:
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: ${{ matrix.toolchain || 'stable' }}
+          toolchain: ${{
+              (matrix.toolchain == 'nightly' && env.rust_nightly)
+                || matrix.toolchain
+                || 'stable'
+            }}
 
       - name: Add problem matchers
-        shell: bash
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Build all features
-        if: matrix.features == ''
-        run: cargo build --features full
+      - name: Run tests
+        run: cargo test --no-default-features --features "${{ matrix.features || 'full' }}"
 
-      - name: Test all features
-        if: matrix.features == ''
-        run: cargo test --features full
-
-      - name: Build some features
-        if: matrix.features
-        run: cargo build --no-default-features --features "${{ matrix.features }}"
-
-      - name: Test some features
-        if: ${{ !matrix.dont-test && matrix.features }}
-        run: cargo test --no-default-features --features "${{ matrix.features }}"
-
-  nightly:
-    name: Test (nightly)
+  check:
+    name: Check
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+          - builder without model
+          - unstable + typesize
+          - unstable (no default features)
+          - temp cache
+          - temp cache + typesize
 
-      - name: Install toolchain (${{ env.rust_nightly }})
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.rust_nightly }}
-
-      - name: Add problem matchers
-        shell: bash
-        run: echo "::add-matcher::.github/matchers/rust.json"
-
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build all features
-        run: cargo build --features full
-
-      - name: Test all features
-        run: cargo test --features full
-
-  macOS:
-    name: Test (macOS)
-    runs-on: macos-latest
+        include:
+          - name: builder without model
+            features: builder
+          - name: unstable + typesize
+            features: default unstable typesize
+          - name: unstable (no default features)
+            features: unstable
+          - name: temp cache
+            features: default temp_cache
+          - name: temp cache + typesize
+            features: default temp_cache typesize
 
     steps:
       - name: Checkout sources
@@ -131,24 +111,20 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Add problem matchers
-        shell: bash
         run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Build
-        run: cargo build
-
-      - name: Test
-        run: cargo test
+      - name: Run checks
+        run: cargo check --no-default-features --features "${{ matrix.features || 'full' }}"
 
   MSRV:
     runs-on: ubuntu-latest
 
     # We only run this job on the current branch as keeping MSRV the same is not important on next.
     if: (github.event_name == 'push' && github.ref_name == 'current') ||
-        (github.event_name == 'pull_request' && github.base_ref == 'current') 
+        (github.event_name == 'pull_request' && github.base_ref == 'current')
 
     steps:
       - name: Checkout sources
@@ -165,7 +141,7 @@ jobs:
       - name: Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Check
+      - name: Run checks
         run: cargo check --features full
 
   min_versions:
@@ -200,10 +176,8 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
-      - name: Install toolchain (${{ env.rust_nightly }})
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.rust_nightly }}
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
@@ -214,8 +188,6 @@ jobs:
       - name: Build docs
         run: |
           cargo doc --no-deps --features full,unstable
-        env:
-          RUSTDOCFLAGS: -D rustdoc::broken_intra_doc_links
 
   examples:
     name: Examples
@@ -266,3 +238,5 @@ jobs:
         run: cargo check -p e15_webhook
       - name: 'Check example 16'
         run: cargo check -p e16_interactions_endpoint
+      - name: 'Check testing example'
+        run: cargo check -p testing
