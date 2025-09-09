@@ -41,7 +41,7 @@ base64 = { version = "0.22.0" }
 zeroize = { version = "1.7" } # Not used in serenity, but bumps the minimal version from secrecy
 arrayvec = { version = "0.7.4", features = ["serde"] }
 serde_cow = { version = "0.1.0" }
-small-fixed-array = { version = "0.4", features = ["serde"] }
+small-fixed-array = { version = "0.4.10", features = ["serde"] }
 bool_to_bitflags = { version = "0.1.2" }
 nonmax = { version = "0.5.5", features = ["serde"] }
 strum = { version = "0.26", features = ["derive"] }
@@ -154,4 +154,3 @@ native_tls_backend = [
 [package.metadata.docs.rs]
 features = ["full"]
 rustdoc-args = ["--cfg", "docsrs"]
-
