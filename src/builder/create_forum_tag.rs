@@ -39,7 +39,7 @@ impl<'a> CreateForumTag<'a> {
             },
             ReactionType::Unicode(unicode_emoji) => {
                 self.emoji_id = None;
-                self.emoji_name = Some(unicode_emoji.into_string().into());
+                self.emoji_name = Some(unicode_emoji.into());
             },
         }
         self

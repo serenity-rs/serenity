@@ -16,8 +16,6 @@
 
 use std::borrow::Cow;
 
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to create an embed in a message
@@ -247,7 +245,7 @@ impl From<Embed> for CreateEmbed<'_> {
     fn from(embed: Embed) -> Self {
         Self {
             fields: embed.fields.into_iter().map(Into::into).collect(),
-            description: embed.description.map(FixedString::into_string).map(Into::into),
+            description: embed.description.map(Into::into),
             thumbnail: embed.thumbnail.map(Into::into),
             timestamp: embed.timestamp,
             kind: Some("rich"),
@@ -255,8 +253,8 @@ impl From<Embed> for CreateEmbed<'_> {
             colour: embed.colour,
             footer: embed.footer.map(Into::into),
             image: embed.image.map(Into::into),
-            title: embed.title.map(FixedString::into_string).map(Into::into),
-            url: embed.url.map(FixedString::into_string).map(Into::into),
+            title: embed.title.map(Into::into),
+            url: embed.url.map(Into::into),
         }
     }
 }
@@ -302,9 +300,9 @@ impl<'a> CreateEmbedAuthor<'a> {
 impl From<EmbedAuthor> for CreateEmbedAuthor<'_> {
     fn from(author: EmbedAuthor) -> Self {
         Self {
-            name: author.name.into_string().into(),
-            url: author.url.map(|f| f.into_string().into()),
-            icon_url: author.icon_url.map(|f| f.into_string().into()),
+            name: author.name.into(),
+            url: author.url.map(Into::into),
+            icon_url: author.icon_url.map(Into::into),
         }
     }
 }
@@ -360,8 +358,8 @@ impl<'a> CreateEmbedFooter<'a> {
 impl From<EmbedFooter> for CreateEmbedFooter<'_> {
     fn from(footer: EmbedFooter) -> Self {
         Self {
-            text: footer.text.into_string().into(),
-            icon_url: footer.icon_url.map(|f| f.into_string().into()),
+            text: footer.text.into(),
+            icon_url: footer.icon_url.map(Into::into),
         }
     }
 }
@@ -386,8 +384,8 @@ impl<'a> From<&'a EmbedField> for CreateEmbedField<'a> {
 impl From<EmbedField> for CreateEmbedField<'_> {
     fn from(field: EmbedField) -> Self {
         Self {
-            name: field.name.into_string().into(),
-            value: field.value.into_string().into(),
+            name: field.name.into(),
+            value: field.value.into(),
             inline: field.inline,
         }
     }
@@ -401,7 +399,7 @@ struct CreateEmbedImage<'a> {
 impl From<EmbedImage> for CreateEmbedImage<'_> {
     fn from(field: EmbedImage) -> Self {
         Self {
-            url: field.url.into_string().into(),
+            url: field.url.into(),
         }
     }
 }
@@ -409,7 +407,7 @@ impl From<EmbedImage> for CreateEmbedImage<'_> {
 impl From<EmbedThumbnail> for CreateEmbedImage<'_> {
     fn from(field: EmbedThumbnail) -> Self {
         Self {
-            url: field.url.into_string().into(),
+            url: field.url.into(),
         }
     }
 }
