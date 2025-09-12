@@ -42,7 +42,7 @@ secrecy = { version = "0.8.0", features = ["serde"] }
 arrayvec = { version = "0.7.4", features = ["serde"] }
 serde_cow = { version = "0.1.0" }
 # Optional dependencies
-fxhash = { version = "0.2.1", optional = true }
+rustc-hash = { version = "2.1.1", optional = true }
 simd-json = { version = "0.13.4", optional = true }
 uwl = { version = "0.6.0", optional = true }
 levenshtein = { version = "1.0.5", optional = true }
@@ -93,7 +93,7 @@ default_no_backend = [
 builder = []
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
-cache = ["fxhash", "dashmap", "parking_lot"]
+cache = ["rustc-hash", "dashmap", "parking_lot"]
 # Enables collectors, a utility feature that lets you await interaction events in code with
 # zero setup, without needing to setup an InteractionCreate event listener.
 collector = ["gateway", "model"]

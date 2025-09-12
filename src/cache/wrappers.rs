@@ -81,7 +81,7 @@ impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
         self.0.map_or(0, DashMap::len)
     }
 }
-pub struct Hasher(fxhash::FxHasher);
+pub struct Hasher(rustc_hash::FxHasher);
 impl std::hash::Hasher for Hasher {
     fn finish(&self) -> u64 {
         self.0.finish()
@@ -92,7 +92,7 @@ impl std::hash::Hasher for Hasher {
     }
 }
 #[derive(Clone, Default)]
-pub struct BuildHasher(fxhash::FxBuildHasher);
+pub struct BuildHasher(rustc_hash::FxBuildHasher);
 impl std::hash::BuildHasher for BuildHasher {
     type Hasher = Hasher;
 
