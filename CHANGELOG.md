@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.12.5] - 2025-xx-yy
+
+Thanks to the following for their contributions:
+
+### Deprecations
+
+---
+
+### Additions
+
+---
+
+### Fixes
+
+---
+
+### Documentation improvements
+
+---
+
 ## [0.12.4] - 2024-11-15
 
 This is a hotfix release to fix broken behaviour of `Message::author_permissions` before it is relied on.
@@ -5517,6 +5537,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.12.5]: https://github.com/serenity-rs/serenity/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/serenity-rs/serenity/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/serenity-rs/serenity/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/serenity-rs/serenity/compare/v0.12.1...v0.12.2
