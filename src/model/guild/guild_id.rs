@@ -1791,13 +1791,17 @@ impl GuildId {
 
     /// Edits the guild incident actions
     ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
-    /// [Discord's docs]: https://github.com/discord/discord-api-docs/pull/6396
+    /// [Discord's docs]: https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
     pub async fn edit_guild_incident_actions(
         self,
         http: &Http,

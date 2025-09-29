@@ -4872,6 +4872,10 @@ impl Http {
     }
 
     /// Modify the guild's incident actions.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_guild_incident_actions(
         &self,
         guild_id: GuildId,

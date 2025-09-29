@@ -264,7 +264,7 @@ pub struct Guild {
     /// The stage instances in this guild.
     #[serde(rename = "guild_scheduled_events")]
     pub scheduled_events: Vec<ScheduledEvent>,
-    /// the id of the channel where this guild will recieve safety alerts.
+    /// The id of the channel where this guild will recieve safety alerts.
     pub safety_alerts_channel_id: Option<ChannelId>,
     /// The incidents data for this guild, if any.
     pub incidents_data: Option<IncidentsData>,
@@ -2626,13 +2626,17 @@ impl Guild {
 
     /// Edits the guild incident actions
     ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
-    /// [Discord's docs]: https://github.com/discord/discord-api-docs/pull/6396    
+    /// [Discord's docs]: https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
     pub async fn edit_guild_incident_actions(
         self,
         http: &Http,
@@ -2964,7 +2968,7 @@ enum_number! {
 
 /// The [`Guild`]'s incident's data.
 ///
-/// [Discord docs](https://github.com/discord/discord-api-docs/pull/6396).
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#incidents-data-object).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
