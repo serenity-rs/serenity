@@ -371,14 +371,14 @@ bitflags! {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PrimaryGuild {
-    /// the id of the user's primary guild.
+    /// The id of the user's primary guild.
     pub identity_guild_id: Option<GuildId>,
-    // whether the user is displaying the primary guild's server tag. This can be null if the
-    // system clears the identity, e.g. because the server no longer supports tags.
+    /// Whether the user is displaying the primary guild's server tag. This can be null if the
+    /// system clears the identity, e.g. because the server no longer supports tags.
     pub identity_enabled: Option<bool>,
-    /// the text of the [`User`]'s server tag.
+    /// The text of the [`User`]'s server tag.
     pub tag: Option<String>,
-    /// the hash of the server badge.
+    /// The hash of the server badge.
     pub badge: Option<ImageHash>,
 }
 
@@ -437,7 +437,7 @@ pub struct Nameplate {
     pub asset: String,
     /// The label of this nameplate.
     pub label: String,
-    /// background color of the nameplate, one of: `crimson`, `berry`, `sky`, `teal`, `forest`,
+    /// Background color of the nameplate, one of: `crimson`, `berry`, `sky`, `teal`, `forest`,
     /// `bubble_gum`, `violet`, `cobalt`, `clover`, `lemon`, `white`
     pub palette: String,
 }
@@ -445,11 +445,13 @@ pub struct Nameplate {
 #[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 impl Nameplate {
     /// Gets the static version of the nameplate's url.
+    #[must_use]
     pub fn static_url(&self) -> String {
         static_nameplate_url(&self.asset)
     }
 
     /// Gets the animated version of the nameplate's url.
+    #[must_use]
     pub fn url(&self) -> String {
         nameplate_url(&self.asset)
     }

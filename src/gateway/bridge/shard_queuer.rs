@@ -200,7 +200,7 @@ impl ShardQueuer {
         };
 
         spawn_named("shard_queuer::stop", async move {
-            drop(runner.run().await);
+            drop(Box::pin(runner.run()).await);
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 

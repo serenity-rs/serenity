@@ -271,7 +271,6 @@ pub struct PresenceUser {
     pub primary_guild: Option<PrimaryGuild>,
     pub avatar_decoration_data: Option<AvatarDecorationData>,
     pub collectibles: Option<Collectibles>,
-    // system is ommitted because it'll never be true
     // TODO: should really go over these fields at some point and check them.
 }
 
