@@ -3,25 +3,79 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.12.5] - 2025-xx-yy
+## [0.12.5] - 2025-12-xx
+
+This compiles all of the changes that had accumulated since the prior release,
+and, unless another minor release is warranted, constitutes as the last release
+for the 0.12.x series.
+
+We also extend our heartfelt thanks to [@jamesbt365], who passed away a few
+months ago. We deeply appreciate his code contributions, which started back in
+2023, as well as his social contributions for helping people with using
+Serenity, Songbird, and Poise, on Github and/or Discord. We were saddened to
+hear that he's no longer with us, but we hope he rests well.
 
 Thanks to the following for their contributions:
 
+- [@AshleyBilbrey]
+- [@DPlayer234]
+- [@GnomedDev]
+- [@KiloOscarSix]
+- [@Legorooj]
+- [@LikeLakers2]
+- [@TapGhoul]
+- [@archanyhm]
+- [@arqunis]
+- [@cheesycod]
+- [@dis-archive]
+- [@ivinjabraham]
+- [@jamesbt365]
+- [@mkrasnitski]
+- [@nwerosama]
+- [@valentinegb]
+
 ### Deprecations
 
----
+- [#3083](https://github.com/serenity-rs/serenity/pull/3083) Deprecate `Member::distinct`
+- [#3090](https://github.com/serenity-rs/serenity/pull/3090) Deprecate `ContentSafeOptions::show_discriminator`
+- [#3348](https://github.com/serenity-rs/serenity/pull/3348) Deprecate creating a guild
 
 ### Additions
 
----
+- [#3070](https://github.com/serenity-rs/serenity/pull/3070) Add helper for extracting the guild ID out of an interaction
+- [#3092](https://github.com/serenity-rs/serenity/pull/3092) Add `Message::message_snapshots`
+- [#3094](https://github.com/serenity-rs/serenity/pull/3094) Implement `PartialEq` and `Eq` for `ActivityData`
+- [#3307](https://github.com/serenity-rs/serenity/pull/3307) Support `?with_components` in webhooks
+- [#3321](https://github.com/serenity-rs/serenity/pull/3321) Make `ImageHash` usable as key in std containers
+- [#3319](https://github.com/serenity-rs/serenity/pull/3319) Add `avatar` field to `PartialMember`
+- [#3362](https://github.com/serenity-rs/serenity/pull/3362) Add support for fetching a single guild ban
+- [#3380](https://github.com/serenity-rs/serenity/pull/3380) Add `flags` to `EditWebhookMessage` and `EditInteractionResponse`
+- [#3374](https://github.com/serenity-rs/serenity/pull/3374) Add HTTP soundboard support
+- [#3394](https://github.com/serenity-rs/serenity/pull/3394) Add `get_user_voice_state` endpoint
+- [#2956](https://github.com/serenity-rs/serenity/pull/2956) Add support for `PURCHASE_NOTIFICATION` message type
+- [#3395](https://github.com/serenity-rs/serenity/pull/3395) [#3397](https://github.com/serenity-rs/serenity/pull/3397) Add new AutoMod type for quarantined users, add AutoMod type for quarantined guild tag
+- [#3400](https://github.com/serenity-rs/serenity/pull/3400) Add `resolved` data to `ComponentInteractionData`
+- [#3368](https://github.com/serenity-rs/serenity/pull/3368) Add `banner` to `Member` and `PartialMember`
+
+### Removals
+
+- [#3063](https://github.com/serenity-rs/serenity/pull/3063) Remove broken `Message::super_react`
 
 ### Fixes
 
----
+- [#3105](https://github.com/serenity-rs/serenity/pull/3105) Fix Heartbeat gateway event handling
+- [#3059](https://github.com/serenity-rs/serenity/pull/3059) Fix incorrect parameters for retrieving invites
+- [#3377](https://github.com/serenity-rs/serenity/pull/3377) Fix `Ord` impl for `Role`
 
 ### Documentation improvements
 
----
+- [#3128](https://github.com/serenity-rs/serenity/pull/3128) Update maximum limit of guilds returned by get_guilds to the new limit (200)
+- [#3408](https://github.com/serenity-rs/serenity/pull/3408) Remove duplicate items from `Guild::features` documentation
+- [#3413](https://github.com/serenity-rs/serenity/pull/3413) Fix documentation for `Guild::preferred_locale`, it is only available to guilds with the `COMMUNITY` feature
+
+### Miscellaneous
+
+- [#3421](https://github.com/serenity-rs/serenity/pull/3421) Switch `fxhash` dependency with `rustc-hash`
 
 ## [0.12.4] - 2024-11-15
 
@@ -5638,30 +5692,143 @@ Initial commit.
 <!-- AUTHORS -->
 
 [@7596ff]: https://github.com/7596ff
-[@aawilson]: https://github.com/aawilson
-[@abalabahaha]: https://github.com/abalabahaha
-[@acdenisSK]: https://github.com/acdenisSK
-[@adumbidiot]: https://github.com/adumbidiot
 [@AgathaSorceress]: https://github.com/AgathaSorceress
-[@alakhpc]: https://github.com/alakhpc
 [@Alch-Emi]: https://github.com/Alch-Emi
 [@AldanTanneo]: https://github.com/AldanTanneo
 [@AlexisTM]: https://github.com/AlexisTM
-[@almeidx]: https://github.com/almeidx
-[@anden3]: https://github.com/anden3
-[@andreasots]: https://github.com/andreasots
 [@AngelOnFira]: https://github.com/AngelOnFira
 [@AnnikaCodes]: https://github.com/AnnikaCodes
 [@Arcterus]: https://github.com/Arcterus
 [@AregevDev]: https://github.com/AregevDev
-[@aria-7553]: https://github.com/aria-7553
 [@AriusX7]: https://github.com/AriusX7
-[@arqunis]: https://github.com/arqunis
-[@asherkin]: https://github.com/asherkin
+[@AshleyBilbrey]: https://github.com/AshleyBilbrey
 [@Atakku]: https://github.com/Atakku
 [@B-2U]: https://github.com/B-2U
-[@baeuric]: https://github.com/baeuric
 [@Baev1]: https://github.com/Baev1
+[@Bloectasy]: https://github.com/Bloectasy
+[@Bond-009]: https://github.com/Bond-009
+[@Caemor]: https://github.com/Caemor
+[@CarlGroth]: https://github.com/CarlGroth
+[@Celti]: https://github.com/Celti
+[@Chronophylos]: https://github.com/Chronophylos
+[@Collin-Swish]: https://github.com/Collin-Swish
+[@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
+[@DPlayer234]: https://github.com/DPlayer234
+[@DRuppFv]: https://github.com/DRuppFv
+[@Daggy1234]: https://github.com/Daggy1234
+[@DarkKirb]: https://github.com/DarkKirb
+[@Dean-Coakley]: https://github.com/Dean-Coakley
+[@Deebster]: https://github.com/Deebster
+[@DeltaEvo]: https://github.com/DeltaEvo
+[@DimiDimit]: https://github.com/DimiDimit
+[@Dinnerbone]: https://github.com/Dinnerbone
+[@DoumanAsh]: https://github.com/DoumanAsh
+[@DrBluefall]: https://github.com/DrBluefall
+[@Elinvynia]: https://github.com/Elinvynia
+[@Erk-]: https://github.com/Erk-
+[@FabseGP]: https://github.com/FabseGP
+[@FallenWarrior2k]: https://github.com/FallenWarrior2k
+[@FelixMcFelix]: https://github.com/FelixMcFelix
+[@Flat]: https://github.com/Flat
+[@ForsakenHarmony]: https://github.com/ForsakenHarmony
+[@Friz64]: https://github.com/Friz64
+[@Gabriel-Paulucci]: https://github.com/Gabriel-Paulucci
+[@Gentoli]: https://github.com/Gentoli
+[@GetRektByMe]: https://github.com/GetRektByMe
+[@GnomedDev]: https://github.com/GnomedDev
+[@HarmoGlace]: https://github.com/HarmoGlace
+[@HexPandaa]: https://github.com/HexPandaa
+[@HiccupEnthusiast]: https://github.com/HiccupEnthusiast
+[@JellyWX]: https://github.com/JellyWX
+[@Jerald]: https://github.com/Jerald
+[@JohnTheCoolingFan]: https://github.com/JohnTheCoolingFan
+[@Joshument]: https://github.com/Joshument
+[@KaDiWa4]: https://github.com/KaDiWa4
+[@KamranMackey]: https://github.com/KamranMackey
+[@KangarooCoder]: https://github.com/KangarooCoder
+[@KiloOscarSix]: https://github.com/KiloOscarSix
+[@Kneemund]: https://github.com/Kneemund
+[@Kroisse]: https://github.com/Kroisse
+[@Lakelezz]: https://github.com/Lakelezz
+[@LavaToaster]: https://github.com/LavaToaster
+[@LaytonGB]: https://github.com/LaytonGB
+[@LeSeulArtichaut]: https://github.com/LeSeulArtichaut
+[@Legorooj]: https://github.com/Legorooj
+[@Licenser]: https://github.com/Licenser
+[@LikeLakers2]: https://github.com/LikeLakers2
+[@Lymia]: https://github.com/Lymia
+[@MOZGIII]: https://github.com/MOZGIII
+[@MarkusTheOrt]: https://github.com/MarkusTheOrt
+[@MathyouMB]: https://github.com/MathyouMB
+[@Max2408]: https://github.com/Max2408
+[@MaxOhn]: https://github.com/MaxOhn
+[@MelonShooter]: https://github.com/MelonShooter
+[@Mendess2526]: https://github.com/Mendess2526
+[@MidSpike]: https://github.com/MidSpike
+[@Miezhiko]: https://github.com/Miezhiko
+[@Milo123459]: https://github.com/Milo123459
+[@Mishio595]: https://github.com/Mishio595
+[@MonliH]: https://github.com/MonliH
+[@NieDzejkob]: https://github.com/NieDzejkob
+[@NiiightmareXD]: https://github.com/NiiightmareXD
+[@NilsIrl]: https://github.com/NilsIrl
+[@NinekoTheCat]: https://github.com/NinekoTheCat
+[@Noituri]: https://github.com/Noituri
+[@NotNorom]: https://github.com/NotNorom
+[@NovusTheory]: https://github.com/NovusTheory
+[@OnlyCS]: https://github.com/OnlyCS
+[@OverHash]: https://github.com/OverHash
+[@Polyhistorian]: https://github.com/Polyhistorian
+[@Prof-Bloodstone]: https://github.com/Prof-Bloodstone
+[@Proximyst]: https://github.com/Proximyst
+[@PvdBerg1998]: https://github.com/PvdBerg1998
+[@Qeenon]: https://github.com/Qeenon
+[@RegenJacob]: https://github.com/RegenJacob
+[@Roughsketch]: https://github.com/Roughsketch
+[@Rstar284]: https://github.com/Rstar284
+[@Ruthenic]: https://github.com/Ruthenic
+[@SOF3]: https://github.com/SOF3
+[@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
+[@Scetch]: https://github.com/Scetch
+[@Sei4or]: https://github.com/Sei4or
+[@SenseiHiraku]: https://github.com/SenseiHiraku
+[@Sergiovan]: https://github.com/Sergiovan
+[@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
+[@SimonZehetner]: https://github.com/SimonZehetner
+[@SinsofSloth]: https://github.com/SinsofSloth
+[@Some-Dood]: https://github.com/Some-Dood
+[@Splingush]: https://github.com/Splingush
+[@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
+[@StckOverflw]: https://github.com/StckOverflw
+[@SunDwarf]: https://github.com/SunDwarf
+[@TapGhoul]: https://github.com/TapGhoul
+[@TehPers]: https://github.com/TehPers
+[@Th3-M4jor]: https://github.com/Th3-M4jor
+[@ThatsNoMoon]: https://github.com/ThatsNoMoon
+[@TheBlackfurGuy]: https://github.com/TheBlackfurGuy
+[@TheElec]: https://github.com/TheElec
+[@TheUnitedStatesOfAmerica]: https://github.com/TheUnitedStatesOfAmerica
+[@TitusEntertainment]: https://github.com/TitusEntertainment
+[@Unoqwy]: https://github.com/Unoqwy
+[@Vaimer9]: https://github.com/Vaimer9
+[@ValgulNecron]: https://github.com/ValgulNecron
+[@Web-44]: https://github.com/Web-44
+[@Wolvereness]: https://github.com/Wolvereness
+[@Xaeroxe]: https://github.com/Xaeroxe
+[@Zalaxx]: https://github.com/Zalaxx
+[@aawilson]: https://github.com/aawilson
+[@abalabahaha]: https://github.com/abalabahaha
+[@acdenisSK]: https://github.com/acdenisSK
+[@adumbidiot]: https://github.com/adumbidiot
+[@alakhpc]: https://github.com/alakhpc
+[@almeidx]: https://github.com/almeidx
+[@anden3]: https://github.com/anden3
+[@andreasots]: https://github.com/andreasots
+[@archanyhm]: https://github.com/archanyhm
+[@aria-7553]: https://github.com/aria-7553
+[@arqunis]: https://github.com/arqunis
+[@asherkin]: https://github.com/asherkin
+[@baeuric]: https://github.com/baeuric
 [@barzamin]: https://github.com/barzamin
 [@bdashore3]: https://github.com/bdashore3
 [@ben-brook]: https://github.com/ben-brook
@@ -5670,76 +5837,44 @@ Initial commit.
 [@bikeshedder]: https://github.com/bikeshedder
 [@bippum]: https://github.com/bippum
 [@blaenk]: https://github.com/blaenk
-[@Bloectasy]: https://github.com/Bloectasy
-[@Bond-009]: https://github.com/Bond-009
 [@bumblepie]: https://github.com/bumblepie
 [@cab404]: https://github.com/cab404
-[@Caemor]: https://github.com/Caemor
 [@campbellcole]: https://github.com/campbellcole
 [@caoculus]: https://github.com/caoculus
-[@CarlGroth]: https://github.com/CarlGroth
 [@casey]: https://github.com/casey
-[@Celti]: https://github.com/Celti
 [@cheesycod]: https://github.com/cheesycod
 [@chocological00]: https://github.com/chocological00
-[@Chronophylos]: https://github.com/Chronophylos
-[@Collin-Swish]: https://github.com/Collin-Swish
-[@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@crivasr]: https://github.com/crivasr
 [@cyril-marpaud]: https://github.com/cyril-marpaud
-[@Daggy1234]: https://github.com/Daggy1234
 [@dapper-gh]: https://github.com/dapper-gh
-[@DarkKirb]: https://github.com/DarkKirb
 [@darkyeg]: https://github.com/darkyeg
 [@dclamage]: https://github.com/dclamage
-[@Dean-Coakley]: https://github.com/Dean-Coakley
-[@Deebster]: https://github.com/Deebster
-[@DeltaEvo]: https://github.com/DeltaEvo
 [@devtomio]: https://github.com/devtomio
-[@DimiDimit]: https://github.com/DimiDimit
-[@Dinnerbone]: https://github.com/Dinnerbone
+[@dis-archive]: https://github.com/dis-archive
 [@dmarcoux]: https://github.com/dmarcoux
-[@DoumanAsh]: https://github.com/DoumanAsh
 [@dpytaylo]: https://github.com/dpytaylo
 [@dpytaylo]: https://github.com/dpytaylo
-[@DrBluefall]: https://github.com/DrBluefall
 [@drklee3]: https://github.com/drklee3
 [@drp19]: https://github.com/drp19
-[@DRuppFv]: https://github.com/DRuppFv
+[@eLunate]: https://github.com/eLunate
 [@eatsfoobars]: https://github.com/eatsfoobars
 [@efyang]: https://github.com/efyang
-[@Elinvynia]: https://github.com/Elinvynia
 [@elkowar]: https://github.com/elkowar
-[@eLunate]: https://github.com/eLunate
 [@emoticon]: https://github.com/emoticon
-[@Erk-]: https://github.com/Erk-
-[@FabseGP]: https://github.com/FabseGP
-[@FallenWarrior2k]: https://github.com/FallenWarrior2k
-[@FelixMcFelix]: https://github.com/FelixMcFelix
 [@fenhl]: https://github.com/fenhl
-[@Flat]: https://github.com/Flat
 [@float3]: https://github.com/float3
 [@float3]: https://github.com/float3
-[@ForsakenHarmony]: https://github.com/ForsakenHarmony
 [@foxbot]: https://github.com/foxbot
-[@Friz64]: https://github.com/Friz64
 [@ftriquet]: https://github.com/ftriquet
 [@fwrs]: https://github.com/fwrs
-[@Gabriel-Paulucci]: https://github.com/Gabriel-Paulucci
 [@gBasil]: https://github.com/gBasil
-[@Gentoli]: https://github.com/Gentoli
-[@GetRektByMe]: https://github.com/GetRektByMe
 [@ghost]: https://github.com/ghost
-[@GnomedDev]: https://github.com/GnomedDev
 [@gradiuscypher]: https://github.com/gradiuscypher
-[@HarmoGlace]: https://github.com/HarmoGlace
-[@HexPandaa]: https://github.com/HexPandaa
-[@HiccupEnthusiast]: https://github.com/HiccupEnthusiast
 [@hsiW]: https://github.com/hsiW
 [@hyarsan]: https://github.com/hyarsan
 [@hybras]: https://github.com/hybras
-[@icewind1991]: https://github.com/icewind1991
 [@iCrawl]: https://github.com/iCrawl
+[@icewind1991]: https://github.com/icewind1991
 [@ijks]: https://github.com/ijks
 [@ikkerens]: https://github.com/ikkerens
 [@imnotbad]: https://github.com/imnotbad
@@ -5748,173 +5883,101 @@ Initial commit.
 [@ivinjabraham]: https://github.com/ivinjabraham
 [@james7132]: https://github.com/james7132
 [@jamesbt365]: https://github.com/jamesbt365
-[@JellyWX]: https://github.com/JellyWX
-[@Jerald]: https://github.com/Jerald
 [@jhelwig]: https://github.com/jhelwig
 [@jkcclemens]: https://github.com/jkcclemens
 [@jmgao]: https://github.com/jmgao
 [@joek13]: https://github.com/joek13
 [@johnchildren]: https://github.com/johnchildren
-[@JohnTheCoolingFan]: https://github.com/JohnTheCoolingFan
 [@jontze]: https://github.com/jontze
-[@Joshument]: https://github.com/Joshument
-[@KaDiWa4]: https://github.com/KaDiWa4
 [@kafinsalim]: https://github.com/kafinsalim
-[@KamranMackey]: https://github.com/KamranMackey
 [@kangalio]: https://github.com/kangalio
-[@KangarooCoder]: https://github.com/KangarooCoder
 [@khazhyk]: https://github.com/khazhyk
-[@Kneemund]: https://github.com/Kneemund
 [@kotx]: https://github.com/kotx
 [@kristopherbullinger]: https://github.com/kristopherbullinger
-[@Kroisse]: https://github.com/Kroisse
 [@ks129]: https://github.com/ks129
 [@kyranet]: https://github.com/kyranet
-[@Lakelezz]: https://github.com/Lakelezz
 [@lapin-b]: https://github.com/lapin-b
-[@LavaToaster]: https://github.com/LavaToaster
-[@LaytonGB]: https://github.com/LaytonGB
 [@legendofmiracles]: https://github.com/legendofmiracles
 [@leo-lb]: https://github.com/leo-lb
-[@LeSeulArtichaut]: https://github.com/LeSeulArtichaut
 [@leumasme]: https://github.com/leumasme
 [@lhjt]: https://github.com/lhjt
-[@Licenser]: https://github.com/Licenser
-[@LikeLakers2]: https://github.com/LikeLakers2
 [@limonfort]: https://github.com/limonfort
 [@lo48576]: https://github.com/lo48576
 [@logand22]: https://github.com/logand22
 [@lolzballs]: https://github.com/lolzballs
-[@Lymia]: https://github.com/Lymia
 [@m1sk9]: https://github.com/m1sk9
+[@mTvare6]: https://github.com/mTvare6
 [@marcantoinem]: https://github.com/marcantoinem
-[@MarkusTheOrt]: https://github.com/MarkusTheOrt
-[@MathyouMB]: https://github.com/MathyouMB
 [@mattfbacon]: https://github.com/mattfbacon
 [@mattico]: https://github.com/mattico
-[@Max2408]: https://github.com/Max2408
-[@MaxOhn]: https://github.com/MaxOhn
 [@mbenoukaiss]: https://github.com/mbenoukaiss
 [@mdonoughe]: https://github.com/mdonoughe
 [@megumisonoda]: https://github.com/megumisonoda
-[@MelonShooter]: https://github.com/MelonShooter
 [@mendess]: https://github.com/mendess
-[@Mendess2526]: https://github.com/Mendess2526
 [@merlleu]: https://github.com/merlleu
-[@MidSpike]: https://github.com/MidSpike
-[@Miezhiko]: https://github.com/Miezhiko
-[@Milo123459]: https://github.com/Milo123459
 [@miqbalrr]: https://github.com/miqbalrr
-[@Mishio595]: https://github.com/Mishio595
 [@mjsir911]: https://github.com/mjsir911
 [@mkrasnitski]: https://github.com/mkrasnitski
 [@molenzwiebel]: https://github.com/molenzwiebel
-[@MonliH]: https://github.com/MonliH
-[@MOZGIII]: https://github.com/MOZGIII
 [@mshenrick]: https://github.com/mshenrick
-[@mTvare6]: https://github.com/mTvare6
 [@mysteriouspants]: https://github.com/mysteriouspants
 [@nabijaczleweli]: https://github.com/nabijaczleweli
 [@natsukagami]: https://github.com/natsukagami
 [@natto1784]: https://github.com/natto1784
 [@nickelc]: https://github.com/nickelc
-[@NieDzejkob]: https://github.com/NieDzejkob
-[@NiiightmareXD]: https://github.com/NiiightmareXD
-[@NilsIrl]: https://github.com/NilsIrl
-[@NinekoTheCat]: https://github.com/NinekoTheCat
-[@Noituri]: https://github.com/Noituri
-[@NotNorom]: https://github.com/NotNorom
-[@NovusTheory]: https://github.com/NovusTheory
+[@nwerosama]: https://github.com/nwerosama
 [@nycex]: https://github.com/nycex
-[@OnlyCS]: https://github.com/OnlyCS
-[@onzecki]: https://github.com/onzecki
 [@oSumAtrIX]: https://github.com/oSumAtrIX
-[@OverHash]: https://github.com/OverHash
+[@onzecki]: https://github.com/onzecki
 [@pascalharp]: https://github.com/pascalharp
 [@peppizza]: https://github.com/peppizza
 [@perryprog]: https://github.com/perryprog
-[@Polyhistorian]: https://github.com/Polyhistorian
-[@Prof-Bloodstone]: https://github.com/Prof-Bloodstone
-[@Proximyst]: https://github.com/Proximyst
-[@PvdBerg1998]: https://github.com/PvdBerg1998
-[@Qeenon]: https://github.com/Qeenon
 [@qm3ster]: https://github.com/qm3ster
 [@rand0m-cloud]: https://github.com/rand0m-cloud
 [@rasm47]: https://github.com/rasm47
-[@RegenJacob]: https://github.com/RegenJacob
 [@rhgndf]: https://github.com/rhgndf
-[@Roughsketch]: https://github.com/Roughsketch
 [@rsaihe]: https://github.com/rsaihe
-[@Rstar284]: https://github.com/Rstar284
-[@Ruthenic]: https://github.com/Ruthenic
 [@s0lst1ce]: https://github.com/s0lst1ce
-[@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@sam-kirby]: https://github.com/sam-kirby
 [@sandlotie]: https://github.com/sandlotie
 [@sbrocket]: https://github.com/sbrocket
-[@Scetch]: https://github.com/Scetch
-[@Sei4or]: https://github.com/Sei4or
-[@SenseiHiraku]: https://github.com/SenseiHiraku
-[@Sergiovan]: https://github.com/Sergiovan
-[@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
 [@shnarazk]: https://github.com/shnarazk
-[@SimonZehetner]: https://github.com/SimonZehetner
-[@SinsofSloth]: https://github.com/SinsofSloth
 [@skreborn]: https://github.com/skreborn
-[@SOF3]: https://github.com/SOF3
-[@Some-Dood]: https://github.com/Some-Dood
-[@Splingush]: https://github.com/Splingush
 [@squili]: https://github.com/squili
-[@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@sschroe]: https://github.com/sschroe
-[@StckOverflw]: https://github.com/StckOverflw
 [@stormofice]: https://github.com/stormofice
 [@sudomann]: https://github.com/sudomann
-[@SunDwarf]: https://github.com/SunDwarf
 [@tahahawa]: https://github.com/tahahawa
 [@tarcieri]: https://github.com/tarcieri
 [@tatsuya6502]: https://github.com/tatsuya6502
 [@tazz4843]: https://github.com/tazz4843
 [@tedtramonte]: https://github.com/tedtramonte
-[@TehPers]: https://github.com/TehPers
-[@Th3-M4jor]: https://github.com/Th3-M4jor
-[@ThatsNoMoon]: https://github.com/ThatsNoMoon
-[@TheBlackfurGuy]: https://github.com/TheBlackfurGuy
 [@thebongy]: https://github.com/thebongy
-[@TheElec]: https://github.com/TheElec
 [@thelearnerofcode]: https://github.com/thelearnerofcode
-[@TheUnitedStatesOfAmerica]: https://github.com/TheUnitedStatesOfAmerica
 [@thmasq]: https://github.com/thmasq
 [@thou-vow]: https://github.com/thou-vow
 [@timotree3]: https://github.com/timotree3
-[@TitusEntertainment]: https://github.com/TitusEntertainment
 [@tmcarr]: https://github.com/tmcarr
 [@tverghis]: https://github.com/tverghis
 [@tweirtx]: https://github.com/tweirtx
 [@tylerd008]: https://github.com/tylerd008
 [@u5surf]: https://github.com/u5surf
-[@Unoqwy]: https://github.com/Unoqwy
-[@Vaimer9]: https://github.com/Vaimer9
-[@ValgulNecron]: https://github.com/ValgulNecron
+[@valentinegb]: https://github.com/valentinegb
 [@vaporoxx]: https://github.com/vaporoxx
 [@vicky5124]: https://github.com/vicky5124
 [@vidhanio]: https://github.com/vidhanio
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
-[@Web-44]: https://github.com/Web-44
-[@Wolvereness]: https://github.com/Wolvereness
 [@woongzeyi]: https://github.com/woongzeyi
-[@xacrimon]: https://github.com/xacrimon
-[@Xaeroxe]: https://github.com/Xaeroxe
-[@xentec]: https://github.com/xentec
-[@xfix]: https://github.com/xfix
 [@xMAC94x]: https://github.com/xMAC94x
 [@xSke]: https://github.com/xSke
+[@xacrimon]: https://github.com/xacrimon
+[@xentec]: https://github.com/xentec
+[@xfix]: https://github.com/xfix
 [@yanorei32]: https://github.com/yanorei32
 [@zacck]: https://github.com/zacck
 [@zack37]: https://github.com/zack37
 [@zackradisic]: https://github.com/zackradisic
-[@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
 [@zzzzDev4]: https://github.com/zzzzDev4
 
