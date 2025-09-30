@@ -101,6 +101,12 @@ impl<'a> EditRole<'a> {
         self
     }
 
+    /// Sets the colours of the role. Supports gradient and holographic role colours.
+    pub fn colours(mut self, colours: impl Into<CreateRoleColours>) -> Self {
+        self.colours = Some(colours.into());
+        self
+    }
+
     /// Whether or not to hoist the role above lower-positioned roles in the user list.
     pub fn hoist(mut self, hoist: bool) -> Self {
         self.hoist = Some(hoist);
@@ -162,7 +168,7 @@ impl<'a> EditRole<'a> {
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-colors-object).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-#[expect(clippy::struct_field_names)]
+#[allow(clippy::struct_field_names)]
 pub struct CreateRoleColours {
     primary_color: Colour,
     #[serde(skip_serializing_if = "Option::is_none")]
