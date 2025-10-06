@@ -4,18 +4,9 @@ use serde::Serialize;
 
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug)]
-struct StaticU8<const VAL: u8>;
-
-impl<const VAL: u8> Serialize for StaticU8<VAL> {
-    fn serialize<S: serde::Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        ser.serialize_u8(VAL)
-    }
-}
-
 /// A builder for creating a components action row in a message.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#action-row).
 #[derive(Clone, Debug)]
 #[must_use]
 pub enum CreateActionRow<'a> {
@@ -110,7 +101,7 @@ pub enum CreateComponent<'a> {
 #[must_use]
 pub struct CreateSection<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<9>,
+    kind: ComponentType,
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
     components: Cow<'a, [CreateSectionComponent<'a>]>,
     accessory: CreateSectionAccessory<'a>,
@@ -125,7 +116,7 @@ impl<'a> CreateSection<'a> {
         accessory: CreateSectionAccessory<'a>,
     ) -> Self {
         CreateSection {
-            kind: StaticU8::<9>,
+            kind: ComponentType::Section,
             components: components.into(),
             accessory,
         }
@@ -170,7 +161,7 @@ pub enum CreateSectionComponent<'a> {
 #[derive(Clone, Debug, Serialize)]
 pub struct CreateTextDisplay<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<10>,
+    kind: ComponentType,
     content: Cow<'a, str>,
 }
 
@@ -180,7 +171,7 @@ impl<'a> CreateTextDisplay<'a> {
     /// Note: All components on a message shares the same **4000** character limit.
     pub fn new(content: impl Into<Cow<'a, str>>) -> Self {
         CreateTextDisplay {
-            kind: StaticU8::<10>,
+            kind: ComponentType::TextDisplay,
             content: content.into(),
         }
     }
@@ -210,7 +201,7 @@ pub enum CreateSectionAccessory<'a> {
 #[must_use]
 pub struct CreateThumbnail<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<11>,
+    kind: ComponentType,
     media: CreateUnfurledMediaItem<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<Cow<'a, str>>,
@@ -222,7 +213,7 @@ impl<'a> CreateThumbnail<'a> {
     /// Creates a new thumbnail with a media item.
     pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
         CreateThumbnail {
-            kind: StaticU8::<11>,
+            kind: ComponentType::Thumbnail,
             media,
             description: None,
             spoiler: None,
@@ -277,7 +268,7 @@ impl<'a> CreateUnfurledMediaItem<'a> {
 #[must_use]
 pub struct CreateMediaGallery<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<12>,
+    kind: ComponentType,
     items: Cow<'a, [CreateMediaGalleryItem<'a>]>,
 }
 
@@ -285,7 +276,7 @@ impl<'a> CreateMediaGallery<'a> {
     /// Creates a new media gallery with up to **10** items.
     pub fn new(items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
         CreateMediaGallery {
-            kind: StaticU8::<12>,
+            kind: ComponentType::MediaGallery,
             items: items.into(),
         }
     }
@@ -370,7 +361,7 @@ impl<'a> CreateMediaGalleryItem<'a> {
 #[must_use]
 pub struct CreateFile<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<13>,
+    kind: ComponentType,
     file: CreateUnfurledMediaItem<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spoiler: Option<bool>,
@@ -381,7 +372,7 @@ impl<'a> CreateFile<'a> {
     /// limits.
     pub fn new(file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
         CreateFile {
-            kind: StaticU8::<13>,
+            kind: ComponentType::File,
             file: file.into(),
             spoiler: None,
         }
@@ -406,7 +397,7 @@ impl<'a> CreateFile<'a> {
 #[must_use]
 pub struct CreateSeparator {
     #[serde(rename = "type")]
-    kind: StaticU8<14>,
+    kind: ComponentType,
     divider: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     spacing: Option<Spacing>,
@@ -416,7 +407,7 @@ impl CreateSeparator {
     /// Creates a new separator, with or without a divider.
     pub fn new(divider: bool) -> Self {
         CreateSeparator {
-            kind: StaticU8::<14>,
+            kind: ComponentType::Separator,
             divider,
             spacing: None,
         }
@@ -441,7 +432,7 @@ impl CreateSeparator {
 #[must_use]
 pub struct CreateContainer<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<17>,
+    kind: ComponentType,
     #[serde(skip_serializing_if = "Option::is_none")]
     accent_color: Option<Colour>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -454,7 +445,7 @@ impl<'a> CreateContainer<'a> {
     /// other component except another container!
     pub fn new(components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         CreateContainer {
-            kind: StaticU8::<17>,
+            kind: ComponentType::Container,
             accent_color: None,
             spoiler: None,
             components: components.into(),
@@ -499,11 +490,13 @@ impl<'a> CreateContainer<'a> {
 }
 
 /// A builder for creating a label that can hold an [`InputText`] or [`SelectMenu`].
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#label).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateLabel<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<18>,
+    kind: ComponentType,
     label: Cow<'a, str>,
     description: Option<Cow<'a, str>>,
     component: CreateLabelComponent<'a>,
@@ -513,7 +506,7 @@ impl<'a> CreateLabel<'a> {
     /// Create a select menu with a specific label.
     pub fn select_menu(label: impl Into<Cow<'a, str>>, select_menu: CreateSelectMenu<'a>) -> Self {
         Self {
-            kind: StaticU8::<18>,
+            kind: ComponentType::Label,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::SelectMenu(select_menu),
@@ -523,7 +516,7 @@ impl<'a> CreateLabel<'a> {
     /// Create a text input with a specific label.
     pub fn input_text(label: impl Into<Cow<'a, str>>, input_text: CreateInputText<'a>) -> Self {
         Self {
-            kind: StaticU8::<18>,
+            kind: ComponentType::Label,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::InputText(input_text),
@@ -716,7 +709,7 @@ impl Serialize for CreateSelectMenuDefault {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#component-object-component-types).
 #[derive(Clone, Debug)]
 pub enum CreateSelectMenuKind<'a> {
     String {
@@ -804,7 +797,7 @@ impl Serialize for CreateSelectMenuKind<'_> {
 
 /// A builder for creating a select menu component in a message
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#component-object-component-types).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu<'a> {
@@ -870,7 +863,7 @@ impl<'a> CreateSelectMenu<'a> {
 
 /// A builder for creating an option of a select menu component in a message
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#string-select-select-option-structure)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption<'a> {
@@ -930,7 +923,7 @@ impl<'a> CreateSelectMenuOption<'a> {
 
 /// A builder for creating an input text component in a modal
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#text-input).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText<'a> {

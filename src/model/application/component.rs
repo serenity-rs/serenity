@@ -145,7 +145,7 @@ pub struct Thumbnail {
 
 /// A url or attachment.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#unfurled-media-item-structure)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#unfurled-media-item)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -333,7 +333,7 @@ impl<'de> Deserialize<'de> for LabelComponent {
 
 /// An action row.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#action-rows).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#action-row).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -348,7 +348,7 @@ pub struct ActionRow {
 
 /// A component which can be inside of an [`ActionRow`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object-component-types).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#action-row-action-row-child-components).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
@@ -461,7 +461,7 @@ impl Serialize for ButtonKind {
 
 /// A button component.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#button).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[non_exhaustive]
@@ -500,7 +500,7 @@ enum_number! {
 
 /// A select menu component.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#component-object-component-types).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -533,7 +533,7 @@ pub struct SelectMenu {
 
 /// A select menu component options.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#string-select-select-option-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -553,7 +553,7 @@ pub struct SelectMenuOption {
 
 /// An input text component for modal interactions
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
+/// [Discord docs](https://discord.com/developers/docs/components/reference#text-input).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -591,7 +591,7 @@ pub struct InputText {
 enum_number! {
     /// The style of the input text
     ///
-    /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles).
+    /// [Discord docs](https://discord.com/developers/docs/components/reference#text-input-text-input-styles).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[non_exhaustive]
