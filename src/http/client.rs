@@ -2486,9 +2486,10 @@ impl Http {
         action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
+        after: Option<AuditLogEntryId>,
         limit: Option<NonMaxU8>,
     ) -> Result<AuditLogs> {
-        let (action_type_str, before_str, limit_str, user_id_str);
+        let (action_type_str, before_str, after_str, limit_str, user_id_str);
         let mut params = ArrayVec::<_, 4>::new();
         if let Some(action_type) = action_type {
             action_type_str = action_type.num().to_arraystring();
@@ -2497,6 +2498,10 @@ impl Http {
         if let Some(before) = before {
             before_str = before.to_arraystring();
             params.push(("before", &before_str));
+        }
+        if let Some(after) = after {
+            after_str = after.to_arraystring();
+            params.push(("after", &after_str));
         }
         if let Some(limit) = limit {
             limit_str = limit.get().to_arraystring();

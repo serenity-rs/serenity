@@ -286,9 +286,10 @@ impl GuildId {
         action_type: Option<audit_log::Action>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
+        after: Option<AuditLogEntryId>,
         limit: Option<NonMaxU8>,
     ) -> Result<AuditLogs> {
-        http.get_audit_logs(self, action_type, user_id, before, limit).await
+        http.get_audit_logs(self, action_type, user_id, before, after, limit).await
     }
 
     /// Gets all of the guild's channels over the REST API.
