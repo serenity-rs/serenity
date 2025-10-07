@@ -994,7 +994,7 @@ impl Display for MessageLink {
             guild_id,
         } = self;
 
-        f.write_str("https://discord.com/channels/")?;
+        f.write_str("https://discord.com/channels")?;
         if let Some(guild_id) = guild_id {
             write!(f, "/{guild_id}/{channel_id}/{message_id}")
         } else {
