@@ -21,8 +21,6 @@ impl<const VAL: u8> Serialize for StaticU8<VAL> {
 pub enum CreateActionRow<'a> {
     Buttons(Cow<'a, [CreateButton<'a>]>),
     SelectMenu(CreateSelectMenu<'a>),
-    /// Only valid in modals!
-    InputText(CreateInputText<'a>),
 }
 
 impl<'a> CreateActionRow<'a> {
@@ -32,10 +30,6 @@ impl<'a> CreateActionRow<'a> {
 
     pub fn select_menu(select_menu: impl Into<CreateSelectMenu<'a>>) -> Self {
         Self::SelectMenu(select_menu.into())
-    }
-
-    pub fn input_text(input_text: impl Into<CreateInputText<'a>>) -> Self {
-        Self::InputText(input_text.into())
     }
 }
 
@@ -49,7 +43,6 @@ impl serde::Serialize for CreateActionRow<'_> {
         match self {
             CreateActionRow::Buttons(buttons) => map.serialize_entry("components", &buttons)?,
             CreateActionRow::SelectMenu(select) => map.serialize_entry("components", &[select])?,
-            CreateActionRow::InputText(input) => map.serialize_entry("components", &[input])?,
         }
 
         map.end()
@@ -105,6 +98,10 @@ pub enum CreateComponent<'a> {
     ///
     /// A container is a flexible component that can hold multiple nested components.
     Container(CreateContainer<'a>),
+    /// Represents a label component (V2).
+    ///
+    /// A label is used to hold other components in a modal.
+    Label(CreateLabel<'a>),
 }
 
 /// A builder to create a section component, supports up to a max of **3** components with an
@@ -501,6 +498,54 @@ impl<'a> CreateContainer<'a> {
     }
 }
 
+/// A builder for creating a label that can hold an [`InputText`] or [`SelectMenu`].
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateLabel<'a> {
+    #[serde(rename = "type")]
+    kind: StaticU8<18>,
+    label: Cow<'a, str>,
+    description: Option<Cow<'a, str>>,
+    component: CreateLabelComponent<'a>,
+}
+
+impl<'a> CreateLabel<'a> {
+    /// Create a select menu with a specific label.
+    pub fn select_menu(label: impl Into<Cow<'a, str>>, select_menu: CreateSelectMenu<'a>) -> Self {
+        Self {
+            kind: StaticU8::<18>,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::SelectMenu(select_menu),
+        }
+    }
+
+    /// Create a text input with a specific label.
+    pub fn input_text(label: impl Into<Cow<'a, str>>, input_text: CreateInputText<'a>) -> Self {
+        Self {
+            kind: StaticU8::<18>,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::InputText(input_text),
+        }
+    }
+
+    /// Sets the description of this component, which will display underneath the label text.
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+}
+
+/// An enum of all valid label components.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+enum CreateLabelComponent<'a> {
+    SelectMenu(CreateSelectMenu<'a>),
+    InputText(CreateInputText<'a>),
+}
+
 enum_number! {
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -893,7 +938,6 @@ pub struct CreateInputText<'a> {
     kind: ComponentType,
     custom_id: Cow<'a, str>,
     style: InputTextStyle,
-    label: Option<Cow<'a, str>>,
     min_length: Option<u16>,
     max_length: Option<u16>,
     required: bool,
@@ -906,14 +950,9 @@ pub struct CreateInputText<'a> {
 impl<'a> CreateInputText<'a> {
     /// Creates a text input with the given style, label, and custom id (a developer-defined
     /// identifier), leaving all other fields empty.
-    pub fn new(
-        style: InputTextStyle,
-        label: impl Into<Cow<'a, str>>,
-        custom_id: impl Into<Cow<'a, str>>,
-    ) -> Self {
+    pub fn new(style: InputTextStyle, custom_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             style,
-            label: Some(label.into()),
             custom_id: custom_id.into(),
 
             placeholder: None,
@@ -929,12 +968,6 @@ impl<'a> CreateInputText<'a> {
     /// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     pub fn style(mut self, kind: InputTextStyle) -> Self {
         self.style = kind;
-        self
-    }
-
-    /// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
-    pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
-        self.label = Some(label.into());
         self
     }
 

@@ -215,5 +215,5 @@ pub struct ModalInteractionData {
     /// The custom id of the modal
     pub custom_id: FixedString,
     /// The components.
-    pub components: FixedArray<ActionRow>,
+    pub components: FixedArray<Component>,
 }
