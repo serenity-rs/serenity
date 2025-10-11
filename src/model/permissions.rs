@@ -403,7 +403,9 @@ generate_permissions! {
     /// Allows attaching polls to message sends.
     SEND_POLLS, send_polls, "Send Polls" = 1 << 49;
     /// Allows user-installed apps to send public responses.
-    USE_EXTERNAL_APPS, use_external_apps, "Use External Apps" = 1 << 50
+    USE_EXTERNAL_APPS, use_external_apps, "Use External Apps" = 1 << 50;
+    /// Allows pinning and unpinning messages.
+    PIN_MESSAGES, pin_messages, "Pin Messages" = 1 << 51
 }
 
 #[cfg(feature = "model")]
@@ -428,6 +430,7 @@ impl Permissions {
             | Self::SEND_VOICE_MESSAGES
             | Self::SEND_POLLS
             | Self::USE_EXTERNAL_APPS
+            | Self::PIN_MESSAGES
     }
 }
 

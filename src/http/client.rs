@@ -3970,7 +3970,25 @@ impl Http {
     }
 
     /// Gets all pins of a channel.
-    pub async fn get_pins(&self, channel_id: GenericChannelId) -> Result<Vec<Message>> {
+    pub async fn get_pins(
+        &self,
+        channel_id: GenericChannelId,
+        before: Option<Timestamp>,
+        limit: Option<u8>,
+    ) -> Result<MessagePinsPage> {
+        let (before_str, limit_str);
+        let mut params = ArrayVec::<_, 2>::new();
+
+        if let Some(before) = before {
+            before_str = before.to_string();
+            params.push(("before", before_str.as_str()));
+        }
+
+        if let Some(limit) = limit {
+            limit_str = limit.to_arraystring();
+            params.push(("limit", limit_str.as_str()));
+        }
+
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3979,7 +3997,7 @@ impl Http {
             route: Route::ChannelPins {
                 channel_id,
             },
-            params: None,
+            params: Some(&params),
         })
         .await
     }

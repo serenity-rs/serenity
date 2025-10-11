@@ -786,14 +786,14 @@ impl GenericChannelId {
 
     /// Pins a [`Message`] to the channel.
     ///
-    /// **Note**: Requires the [Manage Messages] permission.
+    /// **Note**: Requires the [Pin Messages] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if the channel has too
     /// many pinned messages.
     ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// [Pin Messages]: Permissions::PIN_MESSAGES
     pub async fn pin(self, http: &Http, message_id: MessageId, reason: Option<&str>) -> Result<()> {
         http.pin_message(self, message_id, reason).await
     }
@@ -811,15 +811,20 @@ impl GenericChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn pins(self, cache_http: impl CacheHttp) -> Result<Vec<Message>> {
-        let messages = cache_http.http().get_pins(self).await?;
+    pub async fn pins(
+        self,
+        cache_http: impl CacheHttp,
+        before: Option<Timestamp>,
+        limit: Option<u8>,
+    ) -> Result<MessagePinsPage> {
+        let page = cache_http.http().get_pins(self, before, limit).await?;
 
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
-            cache.fill_message_cache(self, messages.iter().cloned());
+            cache.fill_message_cache(self, page.items.iter().map(|m| m.message.clone()));
         }
 
-        Ok(messages)
+        Ok(page)
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
@@ -1001,13 +1006,13 @@ impl GenericChannelId {
 
     /// Unpins a [`Message`] in the channel given by its Id.
     ///
-    /// Requires the [Manage Messages] permission.
+    /// Requires the [Pin Messages] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// [Pin Messages]: Permissions::PIN_MESSAGES
     pub async fn unpin(
         self,
         http: &Http,
