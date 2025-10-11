@@ -1,6 +1,7 @@
 // It is recommended that you read the README file, it is very important to this example.
 // This example will help us to use a sqlite database with our bot.
 use std::fmt::Write as _;
+use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::model::prelude::*;
@@ -106,9 +107,9 @@ async fn main() {
     // Run migrations, which updates the database's schema to the latest version.
     sqlx::migrate!("./migrations").run(&database).await.expect("Couldn't run database migrations");
 
-    let bot = Bot {
+    let bot = Arc::new(Bot {
         database,
-    };
+    });
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES

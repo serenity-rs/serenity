@@ -1,4 +1,5 @@
 #![expect(clippy::collapsible_if)]
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
@@ -117,9 +118,9 @@ async fn main() {
         | GatewayIntents::GUILDS
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(token, intents)
-        .event_handler(Handler {
+        .event_handler(Arc::new(Handler {
             is_loop_running: AtomicBool::new(false),
-        })
+        }))
         .await
         .expect("Error creating client");
 

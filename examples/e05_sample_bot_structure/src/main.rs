@@ -1,6 +1,7 @@
 mod commands;
 
 use std::env;
+use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseMessage};
@@ -94,7 +95,7 @@ async fn main() {
 
     // Build our client.
     let mut client = Client::builder(token, GatewayIntents::empty())
-        .event_handler(Handler)
+        .event_handler(Arc::new(Handler))
         .await
         .expect("Error creating client");
 

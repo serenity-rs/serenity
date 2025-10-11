@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::builder::*;
@@ -430,6 +431,7 @@ async fn main() {
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
 
-    let mut client = Client::builder(token, intents).event_handler(Handler).await.unwrap();
+    let mut client =
+        Client::builder(token, intents).event_handler(Arc::new(Handler)).await.unwrap();
     client.start().await.unwrap();
 }
