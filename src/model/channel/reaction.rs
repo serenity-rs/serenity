@@ -368,7 +368,7 @@ impl From<char> for ReactionType {
     /// # fn main() {}
     /// ```
     fn from(ch: char) -> ReactionType {
-        ReactionType::Unicode(ch.to_string().trunc_into())
+        ReactionType::Unicode(ch.into())
     }
 }
 
