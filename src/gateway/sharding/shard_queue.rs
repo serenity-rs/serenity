@@ -13,8 +13,8 @@ pub struct ShardQueue {
 
 impl ShardQueue {
     pub fn new(max_concurrency: NonZeroU16) -> Self {
-        let buckets = vec![VecDeque::new(); max_concurrency.get() as usize].into_boxed_slice();
-        let buckets = FixedArray::try_from(buckets).expect("should fit without truncation");
+        let buckets = vec![VecDeque::new(); max_concurrency.get() as usize];
+        let buckets = buckets.try_into().expect("should fit without truncation");
 
         Self {
             buckets,

@@ -6,7 +6,6 @@ use super::{Context, FullEvent};
 use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::channel::ChannelType;
 use crate::model::event::Event;
@@ -395,11 +394,11 @@ fn update_cache_with_event(
             }
         },
         Event::VoiceChannelStatusUpdate(mut event) => {
-            let old = if_cache!(event.update(cache).map(FixedString::into_string));
+            let old = if_cache!(event.update(cache).map(Into::into));
 
             FullEvent::VoiceChannelStatusUpdate {
                 old,
-                status: event.status.map(FixedString::into_string),
+                status: event.status.map(Into::into),
                 id: event.id,
                 guild_id: event.guild_id,
             }

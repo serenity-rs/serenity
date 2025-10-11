@@ -202,8 +202,8 @@ impl ShardManager {
         // We must wait 5 seconds between IDENTIFYs to avoid session invalidations.
         if let Some(instant) = self.last_start {
             let elapsed = instant.elapsed();
-            if elapsed < self.wait_time_between_shard_start {
-                sleep(self.wait_time_between_shard_start - elapsed).await;
+            if let Some(duration) = self.wait_time_between_shard_start.checked_sub(elapsed) {
+                sleep(duration).await;
             }
         }
 
