@@ -187,7 +187,7 @@ impl ClientBuilder {
     /// Sets the voice gateway handler to be used. It will receive voice events sent over the
     /// gateway and then consider - based on its settings - whether to dispatch a command.
     #[cfg(feature = "voice")]
-    pub fn voice_manager<V>(mut self, voice_manager: Arc<dyn VoiceGatewayManager>) -> Self {
+    pub fn voice_manager(mut self, voice_manager: Arc<dyn VoiceGatewayManager>) -> Self {
         self.voice_manager = Some(voice_manager);
         self
     }
