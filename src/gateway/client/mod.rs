@@ -231,26 +231,25 @@ impl ClientBuilder {
         self.intents
     }
 
-    /// Adds an event handler with multiple methods for each possible event.
+    /// Sets the event handler where all received gateway events will be dispatched.
     pub fn event_handler(mut self, event_handler: Arc<dyn EventHandler>) -> Self {
         self.event_handler = Some(event_handler);
         self
     }
 
-    /// Gets the added event handlers. See [`Self::event_handler`] for more info.
+    /// Gets the added event handler. See [`Self::event_handler`] for more info.
     #[must_use]
     pub fn get_event_handler(&self) -> Option<Arc<dyn EventHandler>> {
         self.event_handler.clone()
     }
 
-    /// Adds an event handler with a single method where all received gateway events will be
-    /// dispatched.
+    /// Sets the raw event handler where all received gateway events will be dispatched.
     pub fn raw_event_handler(mut self, raw_event_handler: Arc<dyn RawEventHandler>) -> Self {
         self.raw_event_handler = Some(raw_event_handler);
         self
     }
 
-    /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
+    /// Gets the added raw event handler. See [`Self::raw_event_handler`] for more info.
     #[must_use]
     pub fn get_raw_event_handler(&self) -> Option<Arc<dyn RawEventHandler>> {
         self.raw_event_handler.clone()
