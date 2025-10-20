@@ -33,7 +33,7 @@ struct CreatePollMedia {
 pub struct CreatePoll<Stage: Sealed> {
     question: CreatePollMedia,
     answers: Vec<CreatePollAnswer>,
-    duration: u8,
+    duration: u16,
     allow_multiselect: bool,
     layout_type: Option<PollLayoutType>,
 
@@ -51,7 +51,7 @@ impl Default for CreatePoll<NeedsQuestion> {
                 text: String::default(),
             },
             answers: Vec::default(),
-            duration: u8::default(),
+            duration: u16::default(),
             allow_multiselect: false,
             layout_type: None,
 
@@ -115,14 +115,16 @@ impl CreatePoll<NeedsAnswers> {
 impl CreatePoll<NeedsDuration> {
     /// Sets the duration for the Poll to run for.
     ///
-    /// This must be less than a week, and will be rounded to hours towards zero.
+    /// This must be at most 32 days, and will be rounded to hours towards zero.
     pub fn duration(self, duration: std::time::Duration) -> CreatePoll<Ready> {
+        const DAYS_32: u16 = 768;
+
         let hours = duration.as_secs() / 3600;
 
         CreatePoll {
             question: self.question,
             answers: self.answers,
-            duration: hours.try_into().unwrap_or(168),
+            duration: hours.try_into().unwrap_or(DAYS_32),
             allow_multiselect: self.allow_multiselect,
             layout_type: self.layout_type,
             _stage: Ready,
