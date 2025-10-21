@@ -28,6 +28,7 @@ enum_number! {
         Separator = 14,
         Container = 17,
         Label = 18,
+        FileUpload = 19,
         _ => Unknown(u8),
     }
 }
@@ -299,6 +300,7 @@ pub struct Label {
 pub enum LabelComponent {
     SelectMenu(SelectMenu),
     InputText(InputText),
+    FileUpload(FileUpload),
 }
 
 impl<'de> Deserialize<'de> for LabelComponent {
@@ -323,12 +325,29 @@ impl<'de> Deserialize<'de> for LabelComponent {
             ComponentType::InputText => {
                 Deserialize::deserialize(raw_data).map(LabelComponent::InputText)
             },
+            ComponentType::FileUpload => {
+                Deserialize::deserialize(raw_data).map(LabelComponent::FileUpload)
+            },
             ComponentType(i) => {
                 return Err(DeError::custom(format_args!("Unknown component type {i}")));
             },
         }
         .map_err(DeError::custom)
     }
+}
+
+/// An interactive component that allows users to upload files in modals.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct FileUpload {
+    /// Always [`ComponentType::FileUpload`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// Developer-defined identifier for the file upload; max 100 characters
+    pub custom_id: FixedString,
+    /// IDs of the uploaded files found in [`ModalInteractionData::resolved`].
+    pub values: FixedArray<AttachmentId>,
 }
 
 /// An action row.

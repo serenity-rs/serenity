@@ -523,6 +523,16 @@ impl<'a> CreateLabel<'a> {
         }
     }
 
+    /// Create a file upload with a specific label.
+    pub fn file_upload(label: impl Into<Cow<'a, str>>, file_upload: CreateFileUpload<'a>) -> Self {
+        Self {
+            kind: ComponentType::Label,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::FileUpload(file_upload),
+        }
+    }
+
     /// Sets the description of this component, which will display underneath the label text.
     pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
@@ -537,6 +547,53 @@ impl<'a> CreateLabel<'a> {
 enum CreateLabelComponent<'a> {
     SelectMenu(CreateSelectMenu<'a>),
     InputText(CreateInputText<'a>),
+    FileUpload(CreateFileUpload<'a>),
+}
+
+/// A builder for creating a file upload in a modal.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#file-upload).
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateFileUpload<'a> {
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    custom_id: Cow<'a, str>,
+    min_values: u8,
+    max_values: u8,
+    required: bool,
+}
+
+impl<'a> CreateFileUpload<'a> {
+    /// Creates a builder with the given custom id.
+    pub fn new(custom_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            kind: ComponentType::FileUpload,
+            custom_id: custom_id.into(),
+            min_values: 1,
+            max_values: 1,
+            required: true,
+        }
+    }
+
+    /// The minimum number of files that must be uploaded. Must be a number from 0 through 10, and
+    /// defaults to 1.
+    pub fn min_values(mut self, min_values: u8) -> Self {
+        self.min_values = min_values;
+        self
+    }
+
+    /// The maximum number of files that can be uploaded. Defaults to 1, but can be at most 10.
+    pub fn max_values(mut self, max_values: u8) -> Self {
+        self.max_values = max_values;
+        self
+    }
+
+    // Whether the file upload is required.
+    pub fn required(mut self, required: bool) -> Self {
+        self.required = required;
+        self
+    }
 }
 
 enum_number! {
