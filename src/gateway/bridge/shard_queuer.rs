@@ -137,14 +137,9 @@ impl ShardQueuer {
         // We must wait 5 seconds between IDENTIFYs to avoid session invalidations.
         let duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
         let elapsed = instant.elapsed();
-
-        if elapsed >= duration {
-            return;
+        if let Some(to_sleep) = duration.checked_sub(elapsed) {
+            sleep(to_sleep).await;
         }
-
-        let to_sleep = duration - elapsed;
-
-        sleep(to_sleep).await;
     }
 
     #[instrument(skip(self))]

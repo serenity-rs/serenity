@@ -21,7 +21,7 @@ macro_rules! event_handler {
                 $( #[deprecated = $deprecated] )?
                 async fn $method_name(&self, $($context: Context,)? $( $arg_name: $arg_type ),*) {
                     // Suppress unused argument warnings
-                    drop(( $($context,)? $($arg_name),* ))
+                    drop(( $($context,)? $($arg_name,)* ))
                 }
             )*
         }
