@@ -43,7 +43,7 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    permissions: Option<u64>,
+    permissions: Option<Permissions>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "color")]
     colour: Option<Colour>,
@@ -78,7 +78,7 @@ impl<'a> EditRole<'a> {
             hoist: Some(role.hoist()),
             mentionable: Some(role.mentionable()),
             name: Some(Cow::Borrowed(&role.name)),
-            permissions: Some(role.permissions.bits()),
+            permissions: Some(role.permissions.clone()),
             position: Some(role.position),
             colour: Some(role.colour),
             unicode_emoji: role.unicode_emoji.as_ref().map(|v| Some(Cow::Borrowed(v.as_str()))),
@@ -122,7 +122,7 @@ impl<'a> EditRole<'a> {
 
     /// Set the role's permissions.
     pub fn permissions(mut self, permissions: Permissions) -> Self {
-        self.permissions = Some(permissions.bits());
+        self.permissions = Some(permissions);
         self
     }
 

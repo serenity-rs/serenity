@@ -58,10 +58,10 @@ impl Interaction {
     #[must_use]
     pub fn app_permissions(&self) -> Permissions {
         match self {
-            Self::Ping(i) => i.app_permissions,
-            Self::Command(i) | Self::Autocomplete(i) => i.app_permissions,
-            Self::Component(i) => i.app_permissions,
-            Self::Modal(i) => i.app_permissions,
+            Self::Ping(i) => i.app_permissions.clone(),
+            Self::Command(i) | Self::Autocomplete(i) => i.app_permissions.clone(),
+            Self::Component(i) => i.app_permissions.clone(),
+            Self::Modal(i) => i.app_permissions.clone(),
         }
     }
 

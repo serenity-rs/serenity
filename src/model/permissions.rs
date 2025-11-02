@@ -38,10 +38,7 @@
 #[cfg(feature = "model")]
 use std::fmt;
 
-use serde::de::{Deserialize, Deserializer};
-use serde::ser::{Serialize, Serializer};
-
-use super::utils::StrOrInt;
+use serde::{Deserialize, Serialize};
 
 /// This macro generates the `Permissions` type and methods.
 ///
@@ -90,19 +87,26 @@ macro_rules! generate_permissions {
     {$ (
         $(#[doc = $doc:literal])*
         $(#[deprecated = $deprecated:literal])?
-        $perm_upper:ident, $perm_lower:ident, $name:literal = $value:expr
+        $perm_upper:ident, $perm_lower:ident, $name:literal = 1 << $value:expr
     );*} => {
-        bitflags::bitflags! {
-            impl Permissions: u64 {
-                $(
-                    $(#[doc = $doc])*
-                    $(#[deprecated = $deprecated])?
-                    const $perm_upper = $value;
-                )*
-            }
+        #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+        #[expect(non_camel_case_types, clippy::upper_case_acronyms)]
+        #[non_exhaustive]
+        pub enum PermissionFlag {
+            $(
+                $(#[doc = $doc])*
+                $(#[deprecated = $deprecated])?
+                $perm_upper = $value,
+            )*
         }
 
         impl Permissions {
+            $(
+                $(#[doc = $doc])*
+                $(#[deprecated = $deprecated])?
+                pub const $perm_upper: Self = Self(smolbitset::SmolBitSet::new_flag($value));
+            )*
+
             $(
                 #[doc = concat!("Shorthand for checking that the set of permissions contains the [", $name, "] permission.")]
                 #[doc = ""]
@@ -112,15 +116,23 @@ macro_rules! generate_permissions {
                     #[deprecated = $deprecated]
                     #[expect(deprecated)]
                 )?
-                pub fn $perm_lower(self) -> bool {
+                pub fn $perm_lower(&self) -> bool {
                     self.contains(Self::$perm_upper)
                 }
             )*
 
+            pub fn all() -> Self {
+                Self(smolbitset::SmolBitSet::from_bits(&[
+                    $(
+                        $value,
+                    )*
+                ]))
+            }
+
             /// Returns a list of names of all contained permissions.
             #[must_use]
             #[cfg(feature = "model")]
-            pub fn get_permission_names(self) -> Vec<&'static str> {
+            pub fn get_permission_names(&self) -> Vec<&'static str> {
                 let mut names = Vec::new();
 
                 $(
@@ -180,22 +192,22 @@ macro_rules! generate_permissions {
 /// [Speak]: Permissions::SPEAK
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
 /// [Use VAD]: Permissions::USE_VAD
-pub const PRESET_GENERAL: Permissions = Permissions::from_bits_truncate(
-    Permissions::ADD_REACTIONS.bits()
-        | Permissions::ATTACH_FILES.bits()
-        | Permissions::CHANGE_NICKNAME.bits()
-        | Permissions::CONNECT.bits()
-        | Permissions::CREATE_INSTANT_INVITE.bits()
-        | Permissions::EMBED_LINKS.bits()
-        | Permissions::MENTION_EVERYONE.bits()
-        | Permissions::READ_MESSAGE_HISTORY.bits()
-        | Permissions::VIEW_CHANNEL.bits()
-        | Permissions::SEND_MESSAGES.bits()
-        | Permissions::SEND_TTS_MESSAGES.bits()
-        | Permissions::SPEAK.bits()
-        | Permissions::USE_EXTERNAL_EMOJIS.bits()
-        | Permissions::USE_VAD.bits(),
-);
+pub const PRESET_GENERAL: Permissions = Permissions::from_individual_flags([
+    PermissionFlag::ADD_REACTIONS,
+    PermissionFlag::ATTACH_FILES,
+    PermissionFlag::CHANGE_NICKNAME,
+    PermissionFlag::CONNECT,
+    PermissionFlag::CREATE_INSTANT_INVITE,
+    PermissionFlag::EMBED_LINKS,
+    PermissionFlag::MENTION_EVERYONE,
+    PermissionFlag::READ_MESSAGE_HISTORY,
+    PermissionFlag::VIEW_CHANNEL,
+    PermissionFlag::SEND_MESSAGES,
+    PermissionFlag::SEND_TTS_MESSAGES,
+    PermissionFlag::SPEAK,
+    PermissionFlag::USE_EXTERNAL_EMOJIS,
+    PermissionFlag::USE_VAD,
+]);
 
 /// Returns a set of text-only permissions with the original `@everyone` permissions set to true.
 ///
@@ -223,19 +235,19 @@ pub const PRESET_GENERAL: Permissions = Permissions::from_bits_truncate(
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
-pub const PRESET_TEXT: Permissions = Permissions::from_bits_truncate(
-    Permissions::ADD_REACTIONS.bits()
-        | Permissions::ATTACH_FILES.bits()
-        | Permissions::CHANGE_NICKNAME.bits()
-        | Permissions::CREATE_INSTANT_INVITE.bits()
-        | Permissions::EMBED_LINKS.bits()
-        | Permissions::MENTION_EVERYONE.bits()
-        | Permissions::READ_MESSAGE_HISTORY.bits()
-        | Permissions::VIEW_CHANNEL.bits()
-        | Permissions::SEND_MESSAGES.bits()
-        | Permissions::SEND_TTS_MESSAGES.bits()
-        | Permissions::USE_EXTERNAL_EMOJIS.bits(),
-);
+pub const PRESET_TEXT: Permissions = Permissions::from_individual_flags([
+    PermissionFlag::ADD_REACTIONS,
+    PermissionFlag::ATTACH_FILES,
+    PermissionFlag::CHANGE_NICKNAME,
+    PermissionFlag::CREATE_INSTANT_INVITE,
+    PermissionFlag::EMBED_LINKS,
+    PermissionFlag::MENTION_EVERYONE,
+    PermissionFlag::READ_MESSAGE_HISTORY,
+    PermissionFlag::VIEW_CHANNEL,
+    PermissionFlag::SEND_MESSAGES,
+    PermissionFlag::SEND_TTS_MESSAGES,
+    PermissionFlag::USE_EXTERNAL_EMOJIS,
+]);
 
 /// Returns a set of voice-only permissions with the original `@everyone` permissions set to true.
 ///
@@ -247,9 +259,11 @@ pub const PRESET_TEXT: Permissions = Permissions::from_bits_truncate(
 /// [Connect]: Permissions::CONNECT
 /// [Speak]: Permissions::SPEAK
 /// [Use VAD]: Permissions::USE_VAD
-pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
-    Permissions::CONNECT.bits() | Permissions::SPEAK.bits() | Permissions::USE_VAD.bits(),
-);
+pub const PRESET_VOICE: Permissions = Permissions::from_individual_flags([
+    PermissionFlag::CONNECT,
+    PermissionFlag::SPEAK,
+    PermissionFlag::USE_VAD,
+]);
 
 /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
 /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
@@ -262,9 +276,9 @@ pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
 /// [`Role`]: super::guild::Role
 /// [`User`]: super::user::User
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-#[repr(Rust, packed)]
-pub struct Permissions(u64);
+#[derive(Clone, Default, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+//#[repr(Rust, packed)]
+pub struct Permissions(smolbitset::SmolBitSet);
 
 generate_permissions! {
     /// Allows for the creation of [`RichInvite`]s.
@@ -410,46 +424,79 @@ generate_permissions! {
     BYPASS_SLOWMODE, bypass_slowmode, "Bypass Slowmode" = 1 << 52
 }
 
+impl Permissions {
+    #[must_use]
+    pub fn empty() -> Self {
+        Self(smolbitset::SmolBitSet::new())
+    }
+
+    #[must_use]
+    const fn from_individual_flags<const N: usize>(perms: [PermissionFlag; N]) -> Self {
+        let mut bits_usize = [0; N];
+        let mut i = 0;
+
+        while i < N {
+            bits_usize[i] = perms[i] as usize;
+            i += 1;
+        }
+
+        Self(smolbitset::SmolBitSet::from_bits_small(bits_usize))
+    }
+
+    pub fn contains(&self, other: impl Into<Self>) -> bool {
+        let other = other.into().0;
+        let shared = self.0.clone() & &other;
+
+        shared == other
+    }
+
+    pub fn set(&mut self, permission: impl Into<Self>, value: bool) {
+        if value {
+            *self |= permission.into();
+        } else {
+            self.and_not_assign(&permission.into());
+        }
+    }
+
+    pub fn toggle(&mut self, permission: impl Into<Self>) {
+        *self ^= permission.into();
+    }
+
+    #[must_use]
+    pub fn and_not(&self, other: &Self) -> Self {
+        Self(self.0.clone().and_not(&other.0))
+    }
+
+    pub fn and_not_assign(&mut self, other: &Self) {
+        self.0.and_not_assign(&other.0);
+    }
+}
+
 #[cfg(feature = "model")]
 impl Permissions {
     #[must_use]
     pub fn dm_permissions() -> Self {
-        Self::ADD_REACTIONS
-            | Self::STREAM
-            | Self::VIEW_CHANNEL
-            | Self::SEND_MESSAGES
-            | Self::SEND_TTS_MESSAGES
-            | Self::EMBED_LINKS
-            | Self::ATTACH_FILES
-            | Self::READ_MESSAGE_HISTORY
-            | Self::MENTION_EVERYONE
-            | Self::USE_EXTERNAL_EMOJIS
-            | Self::CONNECT
-            | Self::SPEAK
-            | Self::USE_VAD
-            | Self::USE_APPLICATION_COMMANDS
-            | Self::USE_EXTERNAL_STICKERS
-            | Self::SEND_VOICE_MESSAGES
-            | Self::SEND_POLLS
-            | Self::USE_EXTERNAL_APPS
-            | Self::PIN_MESSAGES
-    }
-}
-
-// Manual impl needed because Permissions are usually sent as a stringified integer,
-// but audit log changes are sent as an int, which is probably a problem.
-impl<'de> Deserialize<'de> for Permissions {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let val = StrOrInt::deserialize(deserializer)?;
-        let val = val.parse().map_err(serde::de::Error::custom)?;
-
-        Ok(Permissions::from_bits_truncate(val))
-    }
-}
-
-impl Serialize for Permissions {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.collect_str(&self.bits())
+        Self::from_individual_flags([
+            PermissionFlag::ADD_REACTIONS,
+            PermissionFlag::STREAM,
+            PermissionFlag::VIEW_CHANNEL,
+            PermissionFlag::SEND_MESSAGES,
+            PermissionFlag::SEND_TTS_MESSAGES,
+            PermissionFlag::EMBED_LINKS,
+            PermissionFlag::ATTACH_FILES,
+            PermissionFlag::READ_MESSAGE_HISTORY,
+            PermissionFlag::MENTION_EVERYONE,
+            PermissionFlag::USE_EXTERNAL_EMOJIS,
+            PermissionFlag::CONNECT,
+            PermissionFlag::SPEAK,
+            PermissionFlag::USE_VAD,
+            PermissionFlag::USE_APPLICATION_COMMANDS,
+            PermissionFlag::USE_EXTERNAL_STICKERS,
+            PermissionFlag::SEND_VOICE_MESSAGES,
+            PermissionFlag::SEND_POLLS,
+            PermissionFlag::USE_EXTERNAL_APPS,
+            PermissionFlag::PIN_MESSAGES,
+        ])
     }
 }
 
@@ -472,6 +519,62 @@ impl fmt::Display for Permissions {
         }
 
         Ok(())
+    }
+}
+
+impl From<PermissionFlag> for Permissions {
+    fn from(value: PermissionFlag) -> Self {
+        Self(smolbitset::SmolBitSet::new_flag(value as u32))
+    }
+}
+
+impl std::ops::BitOr for Permissions {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        Self(self.0 | rhs.0)
+    }
+}
+
+impl std::ops::BitOrAssign for Permissions {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.0 |= rhs.0;
+    }
+}
+
+impl std::ops::BitAnd for Permissions {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0)
+    }
+}
+
+impl std::ops::BitAndAssign for Permissions {
+    fn bitand_assign(&mut self, rhs: Self) {
+        self.0 &= rhs.0;
+    }
+}
+
+impl std::ops::BitXor for Permissions {
+    type Output = Self;
+
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        Self(self.0 ^ rhs.0)
+    }
+}
+
+impl std::ops::BitXorAssign for Permissions {
+    fn bitxor_assign(&mut self, rhs: Self) {
+        self.0 ^= rhs.0;
+    }
+}
+
+impl std::ops::Deref for Permissions {
+    type Target = smolbitset::SmolBitSet;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 

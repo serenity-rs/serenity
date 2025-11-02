@@ -30,10 +30,9 @@ impl<'a> CreateBotAuthParameters<'a> {
     #[must_use]
     pub fn build(self) -> String {
         // These bindings have to be defined before `valid_data`, due to Drop order.
-        let (client_id_str, guild_id_str, scope_str, bits_str);
+        let (client_id_str, guild_id_str, scope_str, perm_str);
 
         let mut valid_data = ArrayVec::<_, 5>::new();
-        let bits = self.permissions.bits();
 
         if let Some(client_id) = self.client_id {
             client_id_str = client_id.to_arraystring();
@@ -45,9 +44,9 @@ impl<'a> CreateBotAuthParameters<'a> {
             valid_data.push(("scope", &scope_str));
         }
 
-        if bits != 0 {
-            bits_str = bits.to_arraystring();
-            valid_data.push(("permissions", &bits_str));
+        perm_str = self.permissions.to_string();
+        if perm_str != "0" {
+            valid_data.push(("permissions", &perm_str));
         }
 
         if let Some(guild_id) = self.guild_id {
