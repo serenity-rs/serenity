@@ -62,6 +62,8 @@ enum_number! {
         Hello = 10,
         /// Sent immediately following a client heartbeat that was received.
         HeartbeatAck = 11,
+        /// Used to request soundboard sounds from a list of guilds.
+        ReqeustSoundboardSounds = 31,
         _ => Unknown(u8),
     }
 }

@@ -299,6 +299,9 @@ impl ShardRunner {
                 .chunk_guild(guild_id, limit, presences, filter, nonce.as_deref())
                 .await
                 .is_ok(),
+            ShardRunnerMessage::SoundboardSounds {
+                guild_ids,
+            } => self.shard.request_soundboard_sounds(&guild_ids).await.is_ok(),
             ShardRunnerMessage::Close(code, reason) => {
                 let reason = reason.unwrap_or_default();
                 let close = CloseFrame {

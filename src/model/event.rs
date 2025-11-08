@@ -311,6 +311,19 @@ impl Serialize for GuildMembersChunkEvent {
     }
 }
 
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/events/gateway-events#soundboard-sounds).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct SoundboardSoundsEvent {
+    /// ID of the guild.
+    pub guild_id: GuildId,
+    /// The guild's soundboard sounds.
+    pub soundboard_sounds: Vec<Soundboard>,
+}
+
 /// Helper to deserialize `GuildRoleCreateEvent` and `GuildRoleUpdateEvent`.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Deserialize)]
@@ -1295,6 +1308,7 @@ pub enum Event {
     Ready(ReadyEvent),
     /// The connection has successfully resumed after a disconnect.
     Resumed(ResumedEvent),
+    SoundboardSounds(SoundboardSoundsEvent),
     /// A user is typing; considered to last 5 seconds
     TypingStart(TypingStartEvent),
     /// Update to the logged-in user's information

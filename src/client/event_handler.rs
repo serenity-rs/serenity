@@ -327,6 +327,11 @@ event_handler! {
     /// Provides the context of the shard and the event information about the update.
     ShardStageUpdate { event: ShardStageUpdateEvent } => async fn shard_stage_update(&self, ctx: Context);
 
+    /// Dispatched when the data for soundboard sounds is requested.
+    ///
+    /// Provides the guild's id and the data.
+    SoundboardSounds { event: SoundboardSoundsEvent } => async fn soundboard_sounds(&self, ctx: Context);
+
     /// Dispatched when a user starts typing.
     TypingStart { event: TypingStartEvent } => async fn typing_start(&self, ctx: Context);
 

@@ -129,6 +129,21 @@ impl ShardMessenger {
         });
     }
 
+    /// Requests [Soundboard sounds][soundboard] to be fetched from one or multiple [`Guild`]s.
+    ///
+    /// This will ask the gateway to start sending soundboard sounds.
+    ///
+    /// Soundboard sounds are sent as the [`Event::SoundboardSounds`] event.
+    ///
+    /// [`Event::SoundboardSounds`]: crate::model::event::Event::SoundboardSounds
+    /// [`Guild`]: crate::model::guild::Guild
+    /// [soundboard]: crate::model::soundboard::Soundboard
+    pub async fn request_soundboard_sounds(&self, guild_ids: Vec<GuildId>) {
+        self.send_to_shard(ShardRunnerMessage::SoundboardSounds {
+            guild_ids,
+        });
+    }
+
     /// Sets the user's current activity, if any.
     ///
     /// Other presence settings are maintained.

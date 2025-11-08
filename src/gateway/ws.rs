@@ -70,6 +70,9 @@ struct PresenceUpdateMessage<'a> {
 enum WebSocketMessageData<'a> {
     Heartbeat(Option<u64>),
     ChunkGuild(ChunkGuildMessage<'a>),
+    SoundboardSounds {
+        guild_ids: &'a [GuildId],
+    },
     Identify {
         compress: bool,
         token: &'a str,
@@ -210,6 +213,25 @@ impl WsClient {
                 user_ids,
                 nonce: nonce.unwrap_or(""),
             }),
+        })
+        .await
+    }
+
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    pub async fn request_soundboard_sounds(
+        &mut self,
+        guild_ids: &[GuildId],
+        shard_info: &ShardInfo,
+    ) -> Result<()> {
+        debug!("[{:?}] Requesting soundboard sounds", shard_info);
+
+        self.send_json(&WebSocketMessage {
+            op: Opcode::ReqeustSoundboardSounds,
+            d: WebSocketMessageData::SoundboardSounds {
+                guild_ids,
+            },
         })
         .await
     }

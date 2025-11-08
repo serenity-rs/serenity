@@ -365,6 +365,9 @@ fn update_cache_with_event(
         Event::Resumed(event) => FullEvent::Resume {
             event,
         },
+        Event::SoundboardSounds(event) => FullEvent::SoundboardSounds {
+            event,
+        },
         Event::TypingStart(event) => FullEvent::TypingStart {
             event,
         },

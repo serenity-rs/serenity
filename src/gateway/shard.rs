@@ -650,6 +650,28 @@ impl Shard {
         self.client.send_chunk_guild(guild_id, &self.info, limit, presences, filter, nonce).await
     }
 
+    /// Requests [Soundboard sounds][soundboard] to be fetched from one or multiple [`Guild`]s.
+    ///
+    /// This will ask the gateway to start sending soundboard sounds.
+    ///
+    /// Soundboard sounds are sent as the [`Event::SoundboardSounds`] event.
+    ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    ///
+    /// [`Event::SoundboardSounds`]: crate::model::event::Event::SoundboardSounds
+    /// [`Guild`]: crate::model::guild::Guild
+    /// [soundboard]: crate::model::soundboard::Soundboard
+    #[instrument(skip(self))]
+    pub async fn request_soundboard_sounds(
+        &mut self,
+        guild_ids: &[GuildId],
+    ) -> Result<()> {
+        debug!("[{:?}] Requesting soundboard sounds", self.info);
+
+        self.client.request_soundboard_sounds(guild_ids, &self.info).await
+    }
+
     /// Sets the shard as going into identifying stage, which sets:
     /// - the time that the last heartbeat sent as being now
     /// - the `stage` to [`ConnectionStage::Identifying`]
