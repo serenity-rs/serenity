@@ -324,6 +324,50 @@ pub struct SoundboardSoundsEvent {
     pub soundboard_sounds: Vec<Soundboard>,
 }
 
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/events/gateway-events#guild-soundboard-sound-create).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct SoundboardSoundCreateEvent {
+    pub soundboard: Soundboard,
+}
+
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/events/gateway-events#guild-soundboard-sound-update).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct SoundboardSoundUpdateEvent {
+    pub soundboard: Soundboard,
+}
+
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/events/gateway-events#guild-soundboard-sounds-update).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct SoundboardSoundsUpdateEvent {
+    pub guild_id: GuildId,
+    pub soundboard_sounds: Vec<Soundboard>,
+}
+
+/// Requires no gateway intents.
+///
+/// [Discord docs](https://discord.com/developers/docs/events/gateway-events#guild-soundboard-sound-delete).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct SoundboardSoundDeleteEvent {
+    pub guild_id: GuildId,
+    pub sound_id: SoundId,
+}
+
 /// Helper to deserialize `GuildRoleCreateEvent` and `GuildRoleUpdateEvent`.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Deserialize)]
@@ -1309,6 +1353,14 @@ pub enum Event {
     /// The connection has successfully resumed after a disconnect.
     Resumed(ResumedEvent),
     SoundboardSounds(SoundboardSoundsEvent),
+    #[serde(rename = "GUILD_SOUNDBOARD_SOUND_CREATE")]
+    SoundboardSoundCreate(SoundboardSoundCreateEvent),
+    #[serde(rename = "GUILD_SOUNDBOARD_SOUND_UPDATE")]
+    SoundboardSoundUpdate(SoundboardSoundUpdateEvent),
+    #[serde(rename = "GUILD_SOUNDBOARD_SOUNDS_UPDATE")]
+    SoundboardSoundsUpdate(SoundboardSoundsUpdateEvent),
+    #[serde(rename = "GUILD_SOUNDBOARD_SOUND_DELETE")]
+    SoundboardSoundDelete(SoundboardSoundDeleteEvent),
     /// A user is typing; considered to last 5 seconds
     TypingStart(TypingStartEvent),
     /// Update to the logged-in user's information
