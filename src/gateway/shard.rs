@@ -663,10 +663,7 @@ impl Shard {
     /// [`Guild`]: crate::model::guild::Guild
     /// [soundboard]: crate::model::soundboard::Soundboard
     #[instrument(skip(self))]
-    pub async fn request_soundboard_sounds(
-        &mut self,
-        guild_ids: &[GuildId],
-    ) -> Result<()> {
+    pub async fn request_soundboard_sounds(&mut self, guild_ids: &[GuildId]) -> Result<()> {
         debug!("[{:?}] Requesting soundboard sounds", self.info);
 
         self.client.request_soundboard_sounds(guild_ids, &self.info).await
