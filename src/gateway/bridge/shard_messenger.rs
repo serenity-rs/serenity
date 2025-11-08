@@ -138,7 +138,7 @@ impl ShardMessenger {
     /// [`Event::SoundboardSounds`]: crate::model::event::Event::SoundboardSounds
     /// [`Guild`]: crate::model::guild::Guild
     /// [soundboard]: crate::model::soundboard::Soundboard
-    pub async fn request_soundboard_sounds(&self, guild_ids: Vec<GuildId>) {
+    pub fn request_soundboard_sounds(&self, guild_ids: Vec<GuildId>) {
         self.send_to_shard(ShardRunnerMessage::SoundboardSounds {
             guild_ids,
         });
