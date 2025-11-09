@@ -253,9 +253,9 @@ full_event! {
     /// Provides the channel's id, message's id, and guild's id if in a guild.
     ReactionRemoveAll { guild_id: Option<GuildId>, channel_id: GenericChannelId, removed_from_message_id: MessageId };
 
-    /// Dispatched when all reactions of a message are detached from a message.
+    /// Dispatched when all reactions of a message for a given emoji are explicitly detached from a message.
     ///
-    /// Provides the channel's id and the message's id.
+    /// Provides the emoji's data, channel's id, message's id and guild's id if in a guild.
     ReactionRemoveEmoji { removed_reactions: Reaction };
 
     /// Dispatched when a user's presence is updated (e.g off -> on).
