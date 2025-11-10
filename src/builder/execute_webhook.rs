@@ -75,6 +75,8 @@ pub struct ExecuteWebhook {
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
     thread_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    applied_tags: Option<Vec<ForumTagId>>,
     attachments: EditAttachments,
 
     #[serde(skip)]
@@ -340,6 +342,12 @@ impl ExecuteWebhook {
     /// Name of thread to create (requires the webhook channel to be a forum channel)
     pub fn thread_name(mut self, thread_name: String) -> Self {
         self.thread_name = Some(thread_name);
+        self
+    }
+
+    /// Tags for thread being created (requires the webhook channel to be a forum channel)
+    pub fn applied_tags(mut self, applied_tags: Vec<ForumTagId>) -> Self {
+        self.applied_tags = Some(applied_tags);
         self
     }
 
