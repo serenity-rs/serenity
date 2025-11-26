@@ -548,6 +548,8 @@ pub struct SelectMenu {
     /// Whether select menu is disabled.
     #[serde(default)]
     pub disabled: bool,
+    #[serde(default)]
+    pub values: FixedArray<String>,
 }
 
 /// A select menu component options.
