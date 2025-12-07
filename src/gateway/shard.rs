@@ -75,6 +75,7 @@ pub struct Shard {
     pub started: Instant,
     pub token: String,
     ws_url: Arc<Mutex<String>>,
+    ws_proxy: Arc<Mutex<Option<String>>>,
     pub intents: GatewayIntents,
 }
 
@@ -121,13 +122,15 @@ impl Shard {
     /// TLS error.
     pub async fn new(
         ws_url: Arc<Mutex<String>>,
+        ws_proxy: Arc<Mutex<Option<String>>>,
         token: &str,
         info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
-        let client = connect(&url).await?;
+        let proxy = ws_proxy.lock().await.clone();
+        let client = connect(&url, &proxy).await?;
 
         let presence = presence.unwrap_or_default();
         let last_heartbeat_sent = None;
@@ -153,6 +156,7 @@ impl Shard {
             session_id,
             info,
             ws_url,
+            ws_proxy,
             intents,
         })
     }
@@ -687,7 +691,8 @@ impl Shard {
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
         let url = &self.ws_url.lock().await.clone();
-        let client = connect(url).await?;
+        let proxy = &self.ws_proxy.lock().await.clone();
+        let client = connect(url, proxy).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)
@@ -744,13 +749,25 @@ impl Shard {
     }
 }
 
-async fn connect(base_url: &str) -> Result<WsClient> {
-    let url =
+async fn connect(base_url: &str, proxy_url: &Option<String>) -> Result<WsClient> {
+    let ws_url =
         Url::parse(&format!("{base_url}?v={}", constants::GATEWAY_VERSION)).map_err(|why| {
             warn!("Error building gateway URL with base `{}`: {:?}", base_url, why);
 
             Error::Gateway(GatewayError::BuildingUrl)
         })?;
 
-    WsClient::connect(url).await
+    let parsed_proxy = match proxy_url {
+        Some(proxy) => {
+            let parsed_proxy = Url::parse(&proxy).map_err(|why| {
+                warn!("Error building proxy URL with base `{}`: {:?}", proxy, why);
+
+                Error::Gateway(GatewayError::BuildingUrl)
+            })?;
+            Some(parsed_proxy)
+        },
+        None => None,
+    };
+
+    WsClient::connect(ws_url, parsed_proxy).await
 }

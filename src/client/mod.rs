@@ -35,7 +35,7 @@ use futures::StreamExt as _;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, instrument};
 use typemap_rev::{TypeMap, TypeMapKey};
-
+use url::Url;
 pub use self::context::Context;
 pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
@@ -76,6 +76,7 @@ pub struct ClientBuilder {
     event_handlers: Vec<Arc<dyn EventHandler>>,
     raw_event_handlers: Vec<Arc<dyn RawEventHandler>>,
     presence: PresenceData,
+    ws_proxy: Option<String>,
 }
 
 #[cfg(feature = "gateway")]
@@ -94,6 +95,7 @@ impl ClientBuilder {
             event_handlers: vec![],
             raw_event_handlers: vec![],
             presence: PresenceData::default(),
+            ws_proxy: None,
         }
     }
 
@@ -155,6 +157,17 @@ impl ClientBuilder {
     /// Gets the type map. See [`Self::type_map`] for more info.
     pub fn get_type_map(&self) -> &TypeMap {
         &self.data
+    }
+
+    /// Sets http proxy for the websocket connection.
+    pub fn ws_proxy<T: Into<String>>(mut self, proxy: T) -> Self {
+        self.ws_proxy = Some(proxy.into());
+        self
+    }
+
+    /// Gets the websocket proxy. See [`Self::ws_proxy`] for more info.
+    pub fn get_ws_proxy(&self) -> Option<&str> {
+        self.ws_proxy.as_deref()
     }
 
     /// Insert a single `value` into the internal [`TypeMap`] that will be available in
@@ -339,6 +352,7 @@ impl IntoFuture for ClientBuilder {
         let raw_event_handlers = self.raw_event_handlers;
         let intents = self.intents;
         let presence = self.presence;
+        let ws_proxy = self.ws_proxy;
 
         let mut http = self.http;
 
@@ -369,6 +383,8 @@ impl IntoFuture for ClientBuilder {
                 },
             }));
 
+            let ws_proxy = Arc::new(Mutex::new(ws_proxy));
+
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceLock::new());
             let (shard_manager, shard_manager_ret_value) = ShardManager::new(ShardManagerOptions {
@@ -383,6 +399,7 @@ impl IntoFuture for ClientBuilder {
                 #[cfg(feature = "voice")]
                 voice_manager: voice_manager.clone(),
                 ws_url: Arc::clone(&ws_url),
+                ws_proxy: Arc::clone(&ws_proxy),
                 #[cfg(feature = "cache")]
                 cache: Arc::clone(&cache),
                 http: Arc::clone(&http),
