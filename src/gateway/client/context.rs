@@ -3,6 +3,7 @@ use std::sync::Arc;
 use dashmap::DashMap;
 use futures::channel::mpsc::UnboundedSender as Sender;
 
+use crate::builder::DataUri;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -324,11 +325,11 @@ impl Context {
     ///
     /// See [`GuildId::create_emoji`] for information about name and filesize requirements. This
     /// method will error if said requirements are not met.
-    pub async fn create_application_emoji(&self, name: &str, image: &str) -> Result<Emoji> {
+    pub async fn create_application_emoji(&self, name: &str, image: DataUri<'_>) -> Result<Emoji> {
         #[derive(serde::Serialize)]
         struct CreateEmoji<'a> {
             name: &'a str,
-            image: &'a str,
+            image: DataUri<'a>,
         }
 
         let body = CreateEmoji {
