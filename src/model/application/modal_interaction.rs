@@ -207,7 +207,7 @@ impl Serialize for ModalInteraction {
 
 /// A modal submit interaction data, provided by [`ModalInteraction::data`]
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -215,5 +215,8 @@ pub struct ModalInteractionData {
     /// The custom id of the modal
     pub custom_id: FixedString,
     /// The components.
-    pub components: FixedArray<ActionRow>,
+    pub components: FixedArray<Component>,
+    /// The resolved entities from the selected options.
+    #[serde(default)]
+    pub resolved: CommandDataResolved,
 }

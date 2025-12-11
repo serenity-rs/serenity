@@ -3,7 +3,6 @@ use std::collections::HashMap;
 
 use super::create_poll::Ready;
 use super::{
-    CreateActionRow,
     CreateAllowedMentions,
     CreateAttachment,
     CreateComponent,
@@ -424,7 +423,7 @@ impl<'a> CreateAutocompleteResponse<'a> {
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateModal<'a> {
-    components: Cow<'a, [CreateActionRow<'a>]>,
+    components: Cow<'a, [CreateComponent<'a>]>,
     custom_id: Cow<'a, str>,
     title: Cow<'a, str>,
 }
@@ -442,7 +441,7 @@ impl<'a> CreateModal<'a> {
     /// Sets the components of this message.
     ///
     /// Overwrites existing components.
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateActionRow<'a>]>>) -> Self {
+    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         self.components = components.into();
         self
     }

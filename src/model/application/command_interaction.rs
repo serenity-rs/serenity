@@ -228,7 +228,7 @@ impl Serialize for CommandInteraction {
 
 /// The command data payload.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -240,9 +240,10 @@ pub struct CommandData {
     /// The application command type of the triggered application command.
     #[serde(rename = "type")]
     pub kind: CommandType,
-    /// The parameters and the given values. The converted objects from the given options.
+    /// The converted objects from the given options.
     #[serde(default)]
     pub resolved: CommandDataResolved,
+    /// The parameters and the given values.
     #[serde(default)]
     pub options: FixedArray<CommandDataOption>,
     /// The Id of the guild the command is registered to.

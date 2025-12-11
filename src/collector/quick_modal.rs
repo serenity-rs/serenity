@@ -1,6 +1,13 @@
 use std::borrow::Cow;
 
-use crate::builder::{CreateActionRow, CreateInputText, CreateInteractionResponse, CreateModal};
+use crate::builder::{
+    CreateComponent,
+    CreateInputText,
+    CreateInteractionResponse,
+    CreateLabel,
+    CreateModal,
+    CreateTextDisplay,
+};
 use crate::collector::ModalInteractionCollector;
 use crate::gateway::client::Context;
 use crate::internal::prelude::*;
@@ -31,7 +38,7 @@ pub struct QuickModalResponse {
 pub struct CreateQuickModal<'a> {
     title: Cow<'a, str>,
     timeout: Option<std::time::Duration>,
-    input_texts: Vec<CreateInputText<'a>>,
+    components: Vec<CreateComponent<'a>>,
 }
 
 impl<'a> CreateQuickModal<'a> {
@@ -39,7 +46,7 @@ impl<'a> CreateQuickModal<'a> {
         Self {
             title: title.into(),
             timeout: None,
-            input_texts: Vec::new(),
+            components: Vec::new(),
         }
     }
 
@@ -52,12 +59,21 @@ impl<'a> CreateQuickModal<'a> {
         self
     }
 
+    /// Adds a text display field.
+    pub fn text(mut self, content: impl Into<Cow<'a, str>>) -> Self {
+        self.components.push(CreateComponent::TextDisplay(CreateTextDisplay::new(content)));
+        self
+    }
+
     /// Adds an input text field.
-    ///
-    /// As the `custom_id` field of [`CreateInputText`], just supply an empty string. All custom
-    /// IDs are overwritten by [`CreateQuickModal`] when sending the modal.
-    pub fn field(mut self, input_text: CreateInputText<'a>) -> Self {
-        self.input_texts.push(input_text);
+    pub fn field(
+        mut self,
+        label: impl Into<Cow<'a, str>>,
+        input_text: CreateInputText<'a>,
+    ) -> Self {
+        self.components.push(CreateComponent::Label(
+            CreateLabel::input_text(label, input_text).description("test"),
+        ));
         self
     }
 
@@ -65,14 +81,18 @@ impl<'a> CreateQuickModal<'a> {
     ///
     /// Wraps [`Self::field`].
     pub fn short_field(self, label: impl Into<Cow<'a, str>>) -> Self {
-        self.field(CreateInputText::new(InputTextStyle::Short, label, ""))
+        let input_text =
+            CreateInputText::new(InputTextStyle::Short, self.components.len().to_string());
+        self.field(label, input_text)
     }
 
     /// Convenience method to add a multi-line input text field.
     ///
     /// Wraps [`Self::field`].
     pub fn paragraph_field(self, label: impl Into<Cow<'a, str>>) -> Self {
-        self.field(CreateInputText::new(InputTextStyle::Paragraph, label, ""))
+        let input_text =
+            CreateInputText::new(InputTextStyle::Paragraph, self.components.len().to_string());
+        self.field(label, input_text)
     }
 
     /// # Errors
@@ -84,22 +104,13 @@ impl<'a> CreateQuickModal<'a> {
         interaction_id: InteractionId,
         token: &str,
     ) -> Result<Option<QuickModalResponse>, crate::Error> {
-        let modal_custom_id = interaction_id.to_arraystring();
         let builder = CreateInteractionResponse::Modal(
-            CreateModal::new(modal_custom_id.as_str(), self.title).components(
-                self.input_texts
-                    .into_iter()
-                    .enumerate()
-                    .map(|(i, input_text)| {
-                        CreateActionRow::InputText(input_text.custom_id(i.to_string()))
-                    })
-                    .collect::<Vec<_>>(),
-            ),
+            CreateModal::new(interaction_id.to_string(), self.title).components(self.components),
         );
         builder.execute(&ctx.http, interaction_id, token).await?;
 
         let collector = ModalInteractionCollector::new(ctx)
-            .custom_ids(vec![FixedString::from_str_trunc(&modal_custom_id)]);
+            .custom_ids(vec![FixedString::from_str_trunc(&interaction_id.to_string())]);
 
         let collector = match self.timeout {
             Some(timeout) => collector.timeout(timeout),
@@ -114,23 +125,22 @@ impl<'a> CreateQuickModal<'a> {
             .data
             .components
             .iter()
-            .filter_map(|row| match row.components.first() {
-                Some(ActionRowComponent::InputText(text)) => {
+            .filter_map(|component| {
+                if let Component::Label(label) = component
+                    && let LabelComponent::InputText(text) = &label.component
+                {
                     if let Some(value) = &text.value {
                         Some(value.clone())
                     } else {
                         tracing::warn!("input text value was empty in modal response");
                         None
                     }
-                },
-                Some(other) => {
-                    tracing::warn!("expected input text in modal response, got {:?}", other);
+                } else {
+                    if !matches!(component, Component::TextDisplay(_)) {
+                        tracing::warn!("expected input text in modal response, got {component:?}");
+                    }
                     None
-                },
-                None => {
-                    tracing::warn!("empty action row");
-                    None
-                },
+                }
             })
             .collect();
 
