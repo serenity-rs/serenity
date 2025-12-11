@@ -27,6 +27,8 @@ enum_number! {
         File = 13,
         Separator = 14,
         Container = 17,
+        Label = 18,
+        FileUpload = 19,
         _ => Unknown(u8),
     }
 }
@@ -53,11 +55,12 @@ pub enum Component {
     Separator(Separator),
     File(FileComponent),
     Container(Container),
+    Label(Label),
     Unknown(u8),
 }
 
 impl<'de> Deserialize<'de> for Component {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
@@ -93,6 +96,7 @@ impl<'de> Deserialize<'de> for Component {
             ComponentType::File => Deserialize::deserialize(value).map(Component::File),
             ComponentType::Container => Deserialize::deserialize(value).map(Component::Container),
             ComponentType::Thumbnail => Deserialize::deserialize(value).map(Component::Thumbnail),
+            ComponentType::Label => Deserialize::deserialize(value).map(Component::Label),
             ComponentType(i) => Ok(Component::Unknown(i)),
         }
         .map_err(DeError::custom)
@@ -142,7 +146,7 @@ pub struct Thumbnail {
 
 /// A url or attachment.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#unfurled-media-item-structure)
+/// [Discord docs](https://discord.com/developers/docs/components/reference#unfurled-media-item)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -272,6 +276,80 @@ pub struct Container {
     pub components: FixedArray<Component>,
 }
 
+/// A layout component that wraps modal components with a label and optional description.
+///
+/// **Note**: Labels can only appear within modals, and will not include the `label` or
+/// `description` field when part of a modal response.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#label-label-interaction-response-structure)
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct Label {
+    /// Always [`ComponentType::Label`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The component within the label.
+    pub component: LabelComponent,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[serde(untagged)]
+#[non_exhaustive]
+pub enum LabelComponent {
+    SelectMenu(SelectMenu),
+    InputText(InputText),
+    FileUpload(FileUpload),
+}
+
+impl<'de> Deserialize<'de> for LabelComponent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct LabelComponentRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
+
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = LabelComponentRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        match raw.kind {
+            ComponentType::StringSelect
+            | ComponentType::UserSelect
+            | ComponentType::RoleSelect
+            | ComponentType::MentionableSelect
+            | ComponentType::ChannelSelect => {
+                Deserialize::deserialize(raw_data).map(LabelComponent::SelectMenu)
+            },
+            ComponentType::InputText => {
+                Deserialize::deserialize(raw_data).map(LabelComponent::InputText)
+            },
+            ComponentType::FileUpload => {
+                Deserialize::deserialize(raw_data).map(LabelComponent::FileUpload)
+            },
+            ComponentType(i) => {
+                return Err(DeError::custom(format_args!("Unknown component type {i}")));
+            },
+        }
+        .map_err(DeError::custom)
+    }
+}
+
+/// An interactive component that allows users to upload files in modals.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct FileUpload {
+    /// Always [`ComponentType::FileUpload`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// Developer-defined identifier for the file upload; max 100 characters
+    pub custom_id: FixedString,
+    /// IDs of the uploaded files found in [`ModalInteractionData::resolved`].
+    pub values: FixedArray<AttachmentId>,
+}
+
 /// An action row.
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#action-row).
@@ -291,16 +369,16 @@ pub struct ActionRow {
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#action-row-action-row-child-components).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
 #[non_exhaustive]
 pub enum ActionRowComponent {
     Button(Button),
     SelectMenu(SelectMenu),
-    InputText(InputText),
 }
 
 impl<'de> Deserialize<'de> for ActionRowComponent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         #[derive(Deserialize)]
         struct ActionRowRaw {
             #[serde(rename = "type")]
@@ -313,9 +391,6 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
         match raw.kind {
             ComponentType::Button => {
                 Deserialize::deserialize(raw_data).map(ActionRowComponent::Button)
-            },
-            ComponentType::InputText => {
-                Deserialize::deserialize(raw_data).map(ActionRowComponent::InputText)
             },
             ComponentType::StringSelect
             | ComponentType::UserSelect
@@ -332,16 +407,6 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
             },
         }
         .map_err(DeError::custom)
-    }
-}
-
-impl Serialize for ActionRowComponent {
-    fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
-        match self {
-            Self::Button(c) => c.serialize(serializer),
-            Self::InputText(c) => c.serialize(serializer),
-            Self::SelectMenu(c) => c.serialize(serializer),
-        }
     }
 }
 
@@ -465,7 +530,7 @@ pub struct SelectMenu {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// An identifier defined by the developer for the select menu.
-    pub custom_id: Option<FixedString>,
+    pub custom_id: FixedString,
     /// The options of this select menu.
     ///
     /// Required for [`ComponentType::StringSelect`] and unavailable for all others.
@@ -516,19 +581,13 @@ pub struct InputText {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// Developer-defined identifier for the input; max 100 characters
-    pub custom_id: FixedString<u16>,
+    pub custom_id: FixedString,
     /// The [`InputTextStyle`]. Required when sending modal data.
     ///
     /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
     /// but it's not. It's only required when _sending_ modal data to Discord.
     /// <https://github.com/discord/discord-api-docs/issues/6141>
     pub style: Option<InputTextStyle>,
-    /// Label for this component; max 45 characters. Required when sending modal data.
-    ///
-    /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
-    /// but it's not. It's only required when _sending_ modal data to Discord.
-    /// <https://github.com/discord/discord-api-docs/issues/6141>
-    pub label: Option<FixedString<u8>>,
     /// Minimum input length for a text input; min 0, max 4000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<u16>,

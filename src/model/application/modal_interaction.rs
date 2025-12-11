@@ -217,5 +217,8 @@ pub struct ModalInteractionData {
     /// The custom id of the modal
     pub custom_id: FixedString,
     /// The components.
-    pub components: FixedArray<ActionRow>,
+    pub components: FixedArray<Component>,
+    /// The resolved entities from the selected options.
+    #[serde(default)]
+    pub resolved: CommandDataResolved,
 }

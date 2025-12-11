@@ -4,26 +4,14 @@ use serde::Serialize;
 
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug)]
-struct StaticU8<const VAL: u8>;
-
-impl<const VAL: u8> Serialize for StaticU8<VAL> {
-    fn serialize<S: serde::Serializer>(&self, ser: S) -> Result<S::Ok, S::Error> {
-        ser.serialize_u8(VAL)
-    }
-}
-
 /// A builder for creating a components action row in a message.
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#action-row).
 #[derive(Clone, Debug)]
->>>>>>> 4d9c1b5f0d (Remove `PartialEq` implementations from all builders (#2734))
 #[must_use]
 pub enum CreateActionRow<'a> {
     Buttons(Cow<'a, [CreateButton<'a>]>),
     SelectMenu(CreateSelectMenu<'a>),
-    /// Only valid in modals!
-    InputText(CreateInputText<'a>),
 }
 
 impl<'a> CreateActionRow<'a> {
@@ -33,10 +21,6 @@ impl<'a> CreateActionRow<'a> {
 
     pub fn select_menu(select_menu: impl Into<CreateSelectMenu<'a>>) -> Self {
         Self::SelectMenu(select_menu.into())
-    }
-
-    pub fn input_text(input_text: impl Into<CreateInputText<'a>>) -> Self {
-        Self::InputText(input_text.into())
     }
 }
 
@@ -50,7 +34,6 @@ impl serde::Serialize for CreateActionRow<'_> {
         match self {
             CreateActionRow::Buttons(buttons) => map.serialize_entry("components", &buttons)?,
             CreateActionRow::SelectMenu(select) => map.serialize_entry("components", &[select])?,
-            CreateActionRow::InputText(input) => map.serialize_entry("components", &[input])?,
         }
 
         map.end()
@@ -106,6 +89,10 @@ pub enum CreateComponent<'a> {
     ///
     /// A container is a flexible component that can hold multiple nested components.
     Container(CreateContainer<'a>),
+    /// Represents a label component (V2).
+    ///
+    /// A label is used to hold other components in a modal.
+    Label(CreateLabel<'a>),
 }
 
 /// A builder to create a section component, supports up to a max of **3** components with an
@@ -114,7 +101,7 @@ pub enum CreateComponent<'a> {
 #[must_use]
 pub struct CreateSection<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<9>,
+    kind: ComponentType,
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
     components: Cow<'a, [CreateSectionComponent<'a>]>,
     accessory: CreateSectionAccessory<'a>,
@@ -129,7 +116,7 @@ impl<'a> CreateSection<'a> {
         accessory: CreateSectionAccessory<'a>,
     ) -> Self {
         CreateSection {
-            kind: StaticU8::<9>,
+            kind: ComponentType::Section,
             components: components.into(),
             accessory,
         }
@@ -174,7 +161,7 @@ pub enum CreateSectionComponent<'a> {
 #[derive(Clone, Debug, Serialize)]
 pub struct CreateTextDisplay<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<10>,
+    kind: ComponentType,
     content: Cow<'a, str>,
 }
 
@@ -184,7 +171,7 @@ impl<'a> CreateTextDisplay<'a> {
     /// Note: All components on a message shares the same **4000** character limit.
     pub fn new(content: impl Into<Cow<'a, str>>) -> Self {
         CreateTextDisplay {
-            kind: StaticU8::<10>,
+            kind: ComponentType::TextDisplay,
             content: content.into(),
         }
     }
@@ -214,7 +201,7 @@ pub enum CreateSectionAccessory<'a> {
 #[must_use]
 pub struct CreateThumbnail<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<11>,
+    kind: ComponentType,
     media: CreateUnfurledMediaItem<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<Cow<'a, str>>,
@@ -226,7 +213,7 @@ impl<'a> CreateThumbnail<'a> {
     /// Creates a new thumbnail with a media item.
     pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
         CreateThumbnail {
-            kind: StaticU8::<11>,
+            kind: ComponentType::Thumbnail,
             media,
             description: None,
             spoiler: None,
@@ -281,7 +268,7 @@ impl<'a> CreateUnfurledMediaItem<'a> {
 #[must_use]
 pub struct CreateMediaGallery<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<12>,
+    kind: ComponentType,
     items: Cow<'a, [CreateMediaGalleryItem<'a>]>,
 }
 
@@ -289,7 +276,7 @@ impl<'a> CreateMediaGallery<'a> {
     /// Creates a new media gallery with up to **10** items.
     pub fn new(items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
         CreateMediaGallery {
-            kind: StaticU8::<12>,
+            kind: ComponentType::MediaGallery,
             items: items.into(),
         }
     }
@@ -374,7 +361,7 @@ impl<'a> CreateMediaGalleryItem<'a> {
 #[must_use]
 pub struct CreateFile<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<13>,
+    kind: ComponentType,
     file: CreateUnfurledMediaItem<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spoiler: Option<bool>,
@@ -385,7 +372,7 @@ impl<'a> CreateFile<'a> {
     /// limits.
     pub fn new(file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
         CreateFile {
-            kind: StaticU8::<13>,
+            kind: ComponentType::File,
             file: file.into(),
             spoiler: None,
         }
@@ -410,7 +397,7 @@ impl<'a> CreateFile<'a> {
 #[must_use]
 pub struct CreateSeparator {
     #[serde(rename = "type")]
-    kind: StaticU8<14>,
+    kind: ComponentType,
     divider: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     spacing: Option<Spacing>,
@@ -420,7 +407,7 @@ impl CreateSeparator {
     /// Creates a new separator, with or without a divider.
     pub fn new(divider: bool) -> Self {
         CreateSeparator {
-            kind: StaticU8::<14>,
+            kind: ComponentType::Separator,
             divider,
             spacing: None,
         }
@@ -445,7 +432,7 @@ impl CreateSeparator {
 #[must_use]
 pub struct CreateContainer<'a> {
     #[serde(rename = "type")]
-    kind: StaticU8<17>,
+    kind: ComponentType,
     #[serde(skip_serializing_if = "Option::is_none")]
     accent_color: Option<Colour>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -458,7 +445,7 @@ impl<'a> CreateContainer<'a> {
     /// other component except another container!
     pub fn new(components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
         CreateContainer {
-            kind: StaticU8::<17>,
+            kind: ComponentType::Container,
             accent_color: None,
             spoiler: None,
             components: components.into(),
@@ -498,6 +485,113 @@ impl<'a> CreateContainer<'a> {
     /// **Note**: This will add additional components. Use [`Self::components()`] to replace them.
     pub fn add_component(mut self, component: CreateComponent<'a>) -> Self {
         self.components.to_mut().push(component);
+        self
+    }
+}
+
+/// A builder for creating a label that can hold an [`InputText`] or [`SelectMenu`].
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#label).
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateLabel<'a> {
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    label: Cow<'a, str>,
+    description: Option<Cow<'a, str>>,
+    component: CreateLabelComponent<'a>,
+}
+
+impl<'a> CreateLabel<'a> {
+    /// Create a select menu with a specific label.
+    pub fn select_menu(label: impl Into<Cow<'a, str>>, select_menu: CreateSelectMenu<'a>) -> Self {
+        Self {
+            kind: ComponentType::Label,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::SelectMenu(select_menu),
+        }
+    }
+
+    /// Create a text input with a specific label.
+    pub fn input_text(label: impl Into<Cow<'a, str>>, input_text: CreateInputText<'a>) -> Self {
+        Self {
+            kind: ComponentType::Label,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::InputText(input_text),
+        }
+    }
+
+    /// Create a file upload with a specific label.
+    pub fn file_upload(label: impl Into<Cow<'a, str>>, file_upload: CreateFileUpload<'a>) -> Self {
+        Self {
+            kind: ComponentType::Label,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::FileUpload(file_upload),
+        }
+    }
+
+    /// Sets the description of this component, which will display underneath the label text.
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+}
+
+/// An enum of all valid label components.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+enum CreateLabelComponent<'a> {
+    SelectMenu(CreateSelectMenu<'a>),
+    InputText(CreateInputText<'a>),
+    FileUpload(CreateFileUpload<'a>),
+}
+
+/// A builder for creating a file upload in a modal.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#file-upload).
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateFileUpload<'a> {
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    custom_id: Cow<'a, str>,
+    min_values: u8,
+    max_values: u8,
+    required: bool,
+}
+
+impl<'a> CreateFileUpload<'a> {
+    /// Creates a builder with the given custom id.
+    pub fn new(custom_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            kind: ComponentType::FileUpload,
+            custom_id: custom_id.into(),
+            min_values: 1,
+            max_values: 1,
+            required: true,
+        }
+    }
+
+    /// The minimum number of files that must be uploaded. Must be a number from 0 through 10, and
+    /// defaults to 1.
+    pub fn min_values(mut self, min_values: u8) -> Self {
+        self.min_values = min_values;
+        self
+    }
+
+    /// The maximum number of files that can be uploaded. Defaults to 1, but can be at most 10.
+    pub fn max_values(mut self, max_values: u8) -> Self {
+        self.max_values = max_values;
+        self
+    }
+
+    // Whether the file upload is required.
+    pub fn required(mut self, required: bool) -> Self {
+        self.required = required;
         self
     }
 }
@@ -894,7 +988,6 @@ pub struct CreateInputText<'a> {
     kind: ComponentType,
     custom_id: Cow<'a, str>,
     style: InputTextStyle,
-    label: Option<Cow<'a, str>>,
     min_length: Option<u16>,
     max_length: Option<u16>,
     required: bool,
@@ -907,14 +1000,9 @@ pub struct CreateInputText<'a> {
 impl<'a> CreateInputText<'a> {
     /// Creates a text input with the given style, label, and custom id (a developer-defined
     /// identifier), leaving all other fields empty.
-    pub fn new(
-        style: InputTextStyle,
-        label: impl Into<Cow<'a, str>>,
-        custom_id: impl Into<Cow<'a, str>>,
-    ) -> Self {
+    pub fn new(style: InputTextStyle, custom_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             style,
-            label: Some(label.into()),
             custom_id: custom_id.into(),
 
             placeholder: None,
@@ -930,12 +1018,6 @@ impl<'a> CreateInputText<'a> {
     /// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     pub fn style(mut self, kind: InputTextStyle) -> Self {
         self.style = kind;
-        self
-    }
-
-    /// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
-    pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
-        self.label = Some(label.into());
         self
     }
 
