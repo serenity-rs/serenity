@@ -88,7 +88,7 @@ async fn main() {
         // guarantee that Context::data will not panic if the same type is given, as providing the
         // incorrect type will lead to a compiler error, rather than a runtime panic.
         .data::<UserData>(Arc::new(data))
-        .event_handler(Handler)
+        .event_handler(Arc::new( Handler))
         .await
         .expect("Err creating client");
 

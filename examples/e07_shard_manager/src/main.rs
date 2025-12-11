@@ -19,6 +19,7 @@
 //! Note that it may take a minute or more for a latency to be recorded or to update, depending on
 //! how often Discord tells the client to send a heartbeat.
 #![expect(clippy::collapsible_if)]
+use std::sync::Arc;
 use std::time::Duration;
 
 use serenity::async_trait;
@@ -54,8 +55,10 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client =
-        Client::builder(token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(token, intents)
+        .event_handler(Arc::new(Handler))
+        .await
+        .expect("Err creating client");
 
     // Here we get a DashMap of of the shards' status that we move into a new thread.
     let runners = client.shard_manager.runners.clone();

@@ -150,11 +150,10 @@ impl ClientBuilder {
     /// *Info*: If a reference to the framework is required for manual dispatch, you can implement
     /// [`Framework`] on [`Arc<YourFrameworkType>`] instead of `YourFrameworkType`.
     #[cfg(feature = "framework")]
-    pub fn framework<F>(mut self, framework: F) -> Self
-    where
-        F: Framework + 'static,
-    {
-        self.framework = Some(Box::new(framework));
+    pub fn framework(mut self, framework: Box<dyn Framework>) -> Self {
+        // This `Box` is converted to an `Arc` after `init` is called. The init step requires a
+        // mutable reference, and therefore accepting an `Arc` here would be misleading at best.
+        self.framework = Some(framework);
 
         self
     }
@@ -188,11 +187,8 @@ impl ClientBuilder {
     /// Sets the voice gateway handler to be used. It will receive voice events sent over the
     /// gateway and then consider - based on its settings - whether to dispatch a command.
     #[cfg(feature = "voice")]
-    pub fn voice_manager<V>(mut self, voice_manager: impl Into<Arc<V>>) -> Self
-    where
-        V: VoiceGatewayManager + 'static,
-    {
-        self.voice_manager = Some(voice_manager.into());
+    pub fn voice_manager(mut self, voice_manager: Arc<dyn VoiceGatewayManager>) -> Self {
+        self.voice_manager = Some(voice_manager);
         self
     }
 
@@ -235,35 +231,28 @@ impl ClientBuilder {
         self.intents
     }
 
-    /// Adds an event handler with multiple methods for each possible event.
-    pub fn event_handler<H>(mut self, event_handler: impl Into<Arc<H>>) -> Self
-    where
-        H: EventHandler + 'static,
-    {
-        self.event_handler = Some(event_handler.into());
+    /// Sets the event handler where all received gateway events will be dispatched.
+    pub fn event_handler(mut self, event_handler: Arc<dyn EventHandler>) -> Self {
+        self.event_handler = Some(event_handler);
         self
     }
 
-    /// Gets the added event handlers. See [`Self::event_handler`] for more info.
+    /// Gets the added event handler. See [`Self::event_handler`] for more info.
     #[must_use]
-    pub fn get_event_handler(&self) -> Option<&Arc<dyn EventHandler>> {
-        self.event_handler.as_ref()
+    pub fn get_event_handler(&self) -> Option<Arc<dyn EventHandler>> {
+        self.event_handler.clone()
     }
 
-    /// Adds an event handler with a single method where all received gateway events will be
-    /// dispatched.
-    pub fn raw_event_handler<H>(mut self, raw_event_handler: impl Into<Arc<H>>) -> Self
-    where
-        H: RawEventHandler + 'static,
-    {
-        self.raw_event_handler = Some(raw_event_handler.into());
+    /// Sets the raw event handler where all received gateway events will be dispatched.
+    pub fn raw_event_handler(mut self, raw_event_handler: Arc<dyn RawEventHandler>) -> Self {
+        self.raw_event_handler = Some(raw_event_handler);
         self
     }
 
-    /// Gets the added raw event handlers. See [`Self::raw_event_handler`] for more info.
+    /// Gets the added raw event handler. See [`Self::raw_event_handler`] for more info.
     #[must_use]
-    pub fn get_raw_event_handler(&self) -> Option<&Arc<dyn RawEventHandler>> {
-        self.raw_event_handler.as_ref()
+    pub fn get_raw_event_handler(&self) -> Option<Arc<dyn RawEventHandler>> {
+        self.raw_event_handler.clone()
     }
 
     /// Sets the initial activity.

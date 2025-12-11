@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use serenity::async_trait;
 use serenity::builder::CreateMessage;
 use serenity::gateway::client::FullEvent;
@@ -47,8 +49,10 @@ async fn main() {
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
-    let mut client =
-        Client::builder(token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(token, intents)
+        .event_handler(Arc::new(Handler))
+        .await
+        .expect("Err creating client");
 
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");
