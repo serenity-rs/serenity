@@ -1,6 +1,7 @@
 //! This example will showcase the beauty of collectors. They allow to await messages or reactions
 //! from a user in the middle of a control flow, one being a command.
 use std::collections::HashSet;
+use std::sync::Arc;
 use std::time::Duration;
 
 use serenity::async_trait;
@@ -163,8 +164,10 @@ async fn main() {
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::GUILD_MESSAGE_REACTIONS;
 
-    let mut client =
-        Client::builder(token, intents).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(token, intents)
+        .event_handler(Arc::new(Handler))
+        .await
+        .expect("Err creating client");
 
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");

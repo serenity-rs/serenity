@@ -43,21 +43,28 @@ docs.
 A basic ping-pong bot looks like:
 
 ```rust
-use std::env;
+use std::sync::Arc;
 
 use serenity::async_trait;
-use serenity::model::channel::Message;
+use serenity::gateway::client::FullEvent;
 use serenity::prelude::*;
 
 struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn message(&self, ctx: &Context, msg: &Message) {
-        if msg.content == "!ping" {
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
-                println!("Error sending message: {why:?}");
-            }
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Message {
+                new_message, ..
+            } => {
+                if new_message.content == "!ping" {
+                    if let Err(why) = new_message.channel_id.say(&ctx.http, "Pong!").await {
+                        println!("Error sending message: {why:?}");
+                    }
+                }
+            },
+            _ => {},
         }
     }
 }
@@ -65,15 +72,16 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Login with a bot token from the environment
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let token =
+        Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
 
     // Create a new instance of the Client, logging in as a bot.
-    let mut client = Client::builder(&token, intents)
-        .event_handler(Handler)
+    let mut client = Client::builder(token, intents)
+        .event_handler(Arc::new(Handler))
         .await
         .expect("Error creating client");
 
