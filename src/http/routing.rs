@@ -310,6 +310,10 @@ routes! ('a, {
     api!("/guilds/{}/roles", guild_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));
 
+    GuildRoleMemberCounts { guild_id: GuildId },
+    api!("/guilds/{}/roles/member-counts", guild_id),
+    Some(RatelimitingKind::PathAndId(guild_id.into()));
+
     GuildScheduledEvent { guild_id: GuildId, event_id: ScheduledEventId },
     api!("/guilds/{}/scheduled-events/{}", guild_id, event_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));

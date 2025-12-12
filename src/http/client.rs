@@ -1,6 +1,7 @@
 #![allow(clippy::missing_errors_doc)]
 
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::num::NonZeroU64;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
@@ -3896,6 +3897,27 @@ impl Http {
         if let Some(map) = value.as_object_mut() {
             map.insert("guild_id".to_string(), guild_id.get().into());
         }
+
+        from_value(value)
+    }
+
+    /// Retrieves a map of role IDs with total members each. Does not include `everyone` role.
+    pub async fn get_guild_role_member_counts(
+        &self,
+        guild_id: GuildId,
+    ) -> Result<HashMap<RoleId, u32>> {
+        let value: Value = self
+            .fire(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::GuildRoleMemberCounts {
+                    guild_id,
+                },
+                params: None,
+            })
+            .await?;
 
         from_value(value)
     }
