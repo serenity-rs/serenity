@@ -71,8 +71,19 @@ impl<'a> CreateQuickModal<'a> {
         label: impl Into<Cow<'a, str>>,
         input_text: CreateInputText<'a>,
     ) -> Self {
+        self.components.push(CreateComponent::Label(CreateLabel::input_text(label, input_text)));
+        self
+    }
+
+    /// Adds an input text field with a description.
+    pub fn field_with_description(
+        mut self,
+        label: impl Into<Cow<'a, str>>,
+        description: impl Into<Cow<'a, str>>,
+        input_text: CreateInputText<'a>,
+    ) -> Self {
         self.components.push(CreateComponent::Label(
-            CreateLabel::input_text(label, input_text).description("test"),
+            CreateLabel::input_text(label, input_text).description(description),
         ));
         self
     }
