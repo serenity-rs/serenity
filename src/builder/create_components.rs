@@ -370,18 +370,18 @@ pub struct CreateFile<'a> {
 impl<'a> CreateFile<'a> {
     /// Create a new builder for the file component. Refer to this builders documentation for
     /// limits.
-    pub fn new(file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
+    pub fn new(file: CreateUnfurledMediaItem<'a>) -> Self {
         CreateFile {
             kind: ComponentType::File,
-            file: file.into(),
+            file,
             spoiler: None,
         }
     }
 
     // Only supports `attachment://filename.extension` format, refer to this builders documentation
     // for more details. Replaces the current value as set in [`Self::new`].
-    pub fn file(mut self, file: impl Into<CreateUnfurledMediaItem<'a>>) -> Self {
-        self.file = file.into();
+    pub fn file(mut self, file: CreateUnfurledMediaItem<'a>) -> Self {
+        self.file = file;
         self
     }
 
@@ -437,13 +437,12 @@ pub struct CreateContainer<'a> {
     accent_color: Option<Colour>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spoiler: Option<bool>,
-    components: Cow<'a, [CreateComponent<'a>]>,
+    components: Cow<'a, [CreateContainerComponent<'a>]>,
 }
 
 impl<'a> CreateContainer<'a> {
-    /// Create a new container, with an array of components inside. This component may contain any
-    /// other component except another container!
-    pub fn new(components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+    /// Create a new container, with an array of components inside.
+    pub fn new(components: impl Into<Cow<'a, [CreateContainerComponent<'a>]>>) -> Self {
         CreateContainer {
             kind: ComponentType::Container,
             accent_color: None,
@@ -475,7 +474,10 @@ impl<'a> CreateContainer<'a> {
     ///
     /// **Note**: This will replace all existing components. Use [`Self::add_component()`] to add
     /// additional components.
-    pub fn components(mut self, components: impl Into<Cow<'a, [CreateComponent<'a>]>>) -> Self {
+    pub fn components(
+        mut self,
+        components: impl Into<Cow<'a, [CreateContainerComponent<'a>]>>,
+    ) -> Self {
         self.components = components.into();
         self
     }
@@ -483,10 +485,23 @@ impl<'a> CreateContainer<'a> {
     /// Adds an additional component to this container.
     ///
     /// **Note**: This will add additional components. Use [`Self::components()`] to replace them.
-    pub fn add_component(mut self, component: CreateComponent<'a>) -> Self {
+    pub fn add_component(mut self, component: CreateContainerComponent<'a>) -> Self {
         self.components.to_mut().push(component);
         self
     }
+}
+
+/// An enum of all valid container components.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+#[serde(untagged)]
+pub enum CreateContainerComponent<'a> {
+    ActionRow(CreateActionRow<'a>),
+    Section(CreateSection<'a>),
+    TextDisplay(CreateTextDisplay<'a>),
+    MediaGallery(CreateMediaGallery<'a>),
+    File(CreateFile<'a>),
+    Separator(CreateSeparator),
 }
 
 /// A builder for creating a label that can hold an [`InputText`] or [`SelectMenu`].

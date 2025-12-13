@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 
 use crate::builder::{
-    CreateComponent,
     CreateInputText,
     CreateInteractionResponse,
     CreateLabel,
     CreateModal,
+    CreateModalComponent,
     CreateTextDisplay,
 };
 use crate::collector::ModalInteractionCollector;
@@ -38,7 +38,7 @@ pub struct QuickModalResponse {
 pub struct CreateQuickModal<'a> {
     title: Cow<'a, str>,
     timeout: Option<std::time::Duration>,
-    components: Vec<CreateComponent<'a>>,
+    components: Vec<CreateModalComponent<'a>>,
 }
 
 impl<'a> CreateQuickModal<'a> {
@@ -61,7 +61,7 @@ impl<'a> CreateQuickModal<'a> {
 
     /// Adds a text display field.
     pub fn text(mut self, content: impl Into<Cow<'a, str>>) -> Self {
-        self.components.push(CreateComponent::TextDisplay(CreateTextDisplay::new(content)));
+        self.components.push(CreateModalComponent::TextDisplay(CreateTextDisplay::new(content)));
         self
     }
 
@@ -71,7 +71,8 @@ impl<'a> CreateQuickModal<'a> {
         label: impl Into<Cow<'a, str>>,
         input_text: CreateInputText<'a>,
     ) -> Self {
-        self.components.push(CreateComponent::Label(CreateLabel::input_text(label, input_text)));
+        self.components
+            .push(CreateModalComponent::Label(CreateLabel::input_text(label, input_text)));
         self
     }
 
@@ -82,7 +83,7 @@ impl<'a> CreateQuickModal<'a> {
         description: impl Into<Cow<'a, str>>,
         input_text: CreateInputText<'a>,
     ) -> Self {
-        self.components.push(CreateComponent::Label(
+        self.components.push(CreateModalComponent::Label(
             CreateLabel::input_text(label, input_text).description(description),
         ));
         self
