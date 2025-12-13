@@ -1015,14 +1015,18 @@ pub enum DeserializedEvent {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct UnknownEvent {
-    #[serde(rename = "t")]
-    pub ty: String,
-    #[serde(rename = "d")]
     #[cfg_attr(feature = "typesize", typesize(with = raw_value_len))]
     pub data: Box<RawValue>,
+    pub err: String,
+}
+
+impl Serialize for UnknownEvent {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        self.data.serialize(serializer)
+    }
 }
 
 #[cfg(feature = "typesize")]
@@ -1056,11 +1060,12 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
                 Self::Dispatch {
                     seq: raw.seq.ok_or_else(|| DeError::missing_field("s"))?,
-                    event: match Box::<Event>::deserialize(raw_data) {
+                    event: match Deserialize::deserialize(raw_data) {
                         Ok(event) => DeserializedEvent::Success(event),
-                        Err(_) => DeserializedEvent::Unknown(
-                            UnknownEvent::deserialize(raw_data).map_err(DeError::custom)?,
-                        ),
+                        Err(e) => DeserializedEvent::Unknown(UnknownEvent {
+                            data: Deserialize::deserialize(raw_data).map_err(DeError::custom)?,
+                            err: e.to_string(),
+                        }),
                     },
                 }
             },
