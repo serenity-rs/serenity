@@ -229,8 +229,6 @@ pub struct TextDisplay {
     /// Always [`ComponentType::TextDisplay`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// The content of this text display component.
-    pub content: FixedString<u16>,
 }
 
 /// A Media Gallery is a component that allows you to display media attachments in an organized
