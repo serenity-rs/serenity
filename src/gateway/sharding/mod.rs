@@ -57,7 +57,7 @@ pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
-use crate::model::event::{DeserializedEvent, Event, GatewayEvent, UnknownEvent};
+use crate::model::event::{DeserializedEvent, Event, GatewayEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
 use crate::model::id::ChannelId;
@@ -318,12 +318,9 @@ impl Shard {
 
         let event = match event {
             DeserializedEvent::Success(event) => event,
-            DeserializedEvent::Unknown(UnknownEvent {
-                ty,
-                ref data,
-            }) => {
-                debug!("Unknown event: {ty}");
-                debug!("Failing event data: {data:?}");
+            DeserializedEvent::Unknown(event) => {
+                debug!("Failed to deserialize event data: {}", event.err);
+                debug!("Raw event data: {}", event.data);
                 return None;
             },
         };
