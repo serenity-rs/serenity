@@ -33,7 +33,7 @@ enum_number! {
     }
 }
 
-/// Represents Discord components, a part of messages that are usually interactable.
+/// Represents top-level Discord components, a part of messages that are usually interactable.
 ///
 /// # Component Versioning
 ///
@@ -46,14 +46,11 @@ enum_number! {
 #[non_exhaustive]
 pub enum Component {
     ActionRow(ActionRow),
-    Button(Button),
-    SelectMenu(SelectMenu),
     Section(Section),
     TextDisplay(TextDisplay),
-    Thumbnail(Thumbnail),
     MediaGallery(MediaGallery),
-    Separator(Separator),
     File(FileComponent),
+    Separator(Separator),
     Container(Container),
     Label(Label),
     Unknown(u8),
@@ -77,14 +74,6 @@ impl<'de> Deserialize<'de> for Component {
 
         match raw.kind {
             ComponentType::ActionRow => Deserialize::deserialize(value).map(Component::ActionRow),
-            ComponentType::Button => Deserialize::deserialize(value).map(Component::Button),
-            ComponentType::StringSelect
-            | ComponentType::UserSelect
-            | ComponentType::RoleSelect
-            | ComponentType::MentionableSelect
-            | ComponentType::ChannelSelect => {
-                Deserialize::deserialize(value).map(Component::SelectMenu)
-            },
             ComponentType::Section => Deserialize::deserialize(value).map(Component::Section),
             ComponentType::TextDisplay => {
                 Deserialize::deserialize(value).map(Component::TextDisplay)
@@ -95,7 +84,6 @@ impl<'de> Deserialize<'de> for Component {
             ComponentType::Separator => Deserialize::deserialize(value).map(Component::Separator),
             ComponentType::File => Deserialize::deserialize(value).map(Component::File),
             ComponentType::Container => Deserialize::deserialize(value).map(Component::Container),
-            ComponentType::Thumbnail => Deserialize::deserialize(value).map(Component::Thumbnail),
             ComponentType::Label => Deserialize::deserialize(value).map(Component::Label),
             ComponentType(i) => Ok(Component::Unknown(i)),
         }
@@ -113,15 +101,82 @@ pub struct Section {
     /// Always [`ComponentType::Section`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// The components inside of the section.
-    ///
-    /// As of 2025-02-28, this is limited to just [`ComponentType::TextDisplay`] with up to 3 max.
-    pub components: FixedArray<Component>,
+    /// The components inside of the section. At least one is required, with a maximum limit of 3.
+    pub components: FixedArray<SectionComponent>,
     /// The accessory to the side of the section.
-    ///
-    /// As of 2025-02-28, this is limited to [`ComponentType::Button`] or
-    /// [`ComponentType::Thumbnail`]
-    pub accessory: Box<Component>,
+    pub accessory: Box<SectionAccessory>,
+}
+
+/// A child component representing the content of a section.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#section-section-child-components)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub enum SectionComponent {
+    TextDisplay(TextDisplay),
+}
+
+impl<'de> Deserialize<'de> for SectionComponent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct SectionComponentRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
+
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = SectionComponentRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        match raw.kind {
+            ComponentType::TextDisplay => {
+                Deserialize::deserialize(raw_data).map(SectionComponent::TextDisplay)
+            },
+            ComponentType(i) => {
+                return Err(DeError::custom(format_args!("Unknown section component type {i}")));
+            },
+        }
+        .map_err(DeError::custom)
+    }
+}
+
+/// A component that is contextually associated to the content of a section.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#section-section-accessory-components)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub enum SectionAccessory {
+    Button(Button),
+    Thumbnail(Thumbnail),
+}
+
+impl<'de> Deserialize<'de> for SectionAccessory {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct SectionAccessoryRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
+
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = SectionAccessoryRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        match raw.kind {
+            ComponentType::Button => {
+                Deserialize::deserialize(raw_data).map(SectionAccessory::Button)
+            },
+            ComponentType::Thumbnail => {
+                Deserialize::deserialize(raw_data).map(SectionAccessory::Thumbnail)
+            },
+            ComponentType(i) => {
+                return Err(DeError::custom(format_args!(
+                    "Unknown section accessory component type {i}"
+                )));
+            },
+        }
+        .map_err(DeError::custom)
+    }
 }
 
 /// A section component's thumbnail.
@@ -174,8 +229,6 @@ pub struct TextDisplay {
     /// Always [`ComponentType::TextDisplay`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// The content of this text display component.
-    pub content: FixedString<u16>,
 }
 
 /// A Media Gallery is a component that allows you to display media attachments in an organized
@@ -269,11 +322,63 @@ pub struct Container {
     /// Whether or not this component is spoilered.
     pub spoiler: Option<bool>,
     /// The components within this container.
-    ///
-    /// As of 2025-02-28, this can be [`ComponentType::ActionRow`], [`ComponentType::Section`],
-    /// [`ComponentType::TextDisplay`], [`ComponentType::MediaGallery`], [`ComponentType::File`] or
-    /// [`ComponentType::Separator`]
-    pub components: FixedArray<Component>,
+    pub components: FixedArray<ContainerComponent>,
+}
+
+/// A child component encapsulated within a container.
+///
+/// [Discord docs](https://discord.com/developers/docs/components/reference#container-container-child-components)
+#[derive(Clone, Debug, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub enum ContainerComponent {
+    ActionRow(ActionRow),
+    Section(Section),
+    TextDisplay(TextDisplay),
+    MediaGallery(MediaGallery),
+    File(FileComponent),
+    Separator(Separator),
+}
+
+impl<'de> Deserialize<'de> for ContainerComponent {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        use serde_json::value::RawValue;
+
+        #[derive(Deserialize)]
+        struct ContainerComponentRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
+
+        let value = <&RawValue>::deserialize(deserializer)?;
+        let raw = ContainerComponentRaw::deserialize(value).map_err(DeError::custom)?;
+
+        match raw.kind {
+            ComponentType::ActionRow => {
+                Deserialize::deserialize(value).map(ContainerComponent::ActionRow)
+            },
+            ComponentType::Section => {
+                Deserialize::deserialize(value).map(ContainerComponent::Section)
+            },
+            ComponentType::TextDisplay => {
+                Deserialize::deserialize(value).map(ContainerComponent::TextDisplay)
+            },
+            ComponentType::MediaGallery => {
+                Deserialize::deserialize(value).map(ContainerComponent::MediaGallery)
+            },
+            ComponentType::Separator => {
+                Deserialize::deserialize(value).map(ContainerComponent::Separator)
+            },
+            ComponentType::File => Deserialize::deserialize(value).map(ContainerComponent::File),
+            ComponentType(i) => {
+                return Err(DeError::custom(format_args!("Unknown container component type {i}")));
+            },
+        }
+        .map_err(DeError::custom)
+    }
 }
 
 /// A layout component that wraps modal components with a label and optional description.
@@ -329,7 +434,7 @@ impl<'de> Deserialize<'de> for LabelComponent {
                 Deserialize::deserialize(raw_data).map(LabelComponent::FileUpload)
             },
             ComponentType(i) => {
-                return Err(DeError::custom(format_args!("Unknown component type {i}")));
+                return Err(DeError::custom(format_args!("Unknown label component type {i}")));
             },
         }
         .map_err(DeError::custom)
@@ -403,7 +508,7 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
                 return Err(DeError::custom("Invalid component type ActionRow"));
             },
             ComponentType(i) => {
-                return Err(DeError::custom(format_args!("Unknown component type {i}")));
+                return Err(DeError::custom(format_args!("Unknown action row component type {i}")));
             },
         }
         .map_err(DeError::custom)

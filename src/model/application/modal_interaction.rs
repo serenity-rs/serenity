@@ -216,9 +216,20 @@ impl Serialize for ModalInteraction {
 pub struct ModalInteractionData {
     /// The custom id of the modal
     pub custom_id: FixedString,
-    /// The components.
+    /// The components of the submitted modal interaction.
     pub components: FixedArray<Component>,
     /// The resolved entities from the selected options.
     #[serde(default)]
     pub resolved: CommandDataResolved,
+}
+
+/// A component which can appear inside a modal form submission.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-component-interaction-response-structures)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub enum ModalInteractionComponent {
+    TextDisplay(TextDisplay),
+    Label(Label),
 }
