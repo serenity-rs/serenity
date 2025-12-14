@@ -60,7 +60,7 @@ pub struct ModalInteraction {
     pub guild_locale: Option<String>,
     /// For monetized applications, any entitlements of the invoking user.
     pub entitlements: Vec<Entitlement>,
-    /// Attachment size limit in bytes
+    /// Attachment size limit in bytes.
     pub attachment_size_limit: u32,
 }
 
