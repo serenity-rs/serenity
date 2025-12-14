@@ -68,7 +68,7 @@ pub struct ComponentInteraction {
     /// The context where the interaction was triggered from.
     pub context: Option<InteractionContext>,
     /// Attachment size limit in bytes
-    pub attachment_size_limit: u64,
+    pub attachment_size_limit: u32,
 }
 
 #[cfg(feature = "model")]
