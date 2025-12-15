@@ -217,7 +217,7 @@ impl ShardRunner {
                             self.collectors.write().retain(|callback| (callback.0)(&event));
 
                             dispatch_model(
-                                event,
+                                *event,
                                 context,
                                 #[cfg(feature = "framework")]
                                 self.framework.clone(),
