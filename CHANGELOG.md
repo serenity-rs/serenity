@@ -46,24 +46,24 @@ Thanks to the following for their contributions:
 
 ### Additions
 
-- [#3437](https://github.com/serenity-rs/serenity/pull/3437) Add the `applied_tags` field to ExecuteWebhook
+- [#2956](https://github.com/serenity-rs/serenity/pull/2956) Add support for `PURCHASE_NOTIFICATION` message type
 - [#3020](https://github.com/serenity-rs/serenity/pull/3020) Add Consume Entitlement endpoint and missing fields for SKUs and Entitlements
 - [#3070](https://github.com/serenity-rs/serenity/pull/3070) Add helper for extracting the guild ID out of an interaction
 - [#3092](https://github.com/serenity-rs/serenity/pull/3092) Add `Message::message_snapshots`
 - [#3094](https://github.com/serenity-rs/serenity/pull/3094) Implement `PartialEq` and `Eq` for `ActivityData`
 - [#3307](https://github.com/serenity-rs/serenity/pull/3307) Support `?with_components` in webhooks
-- [#3321](https://github.com/serenity-rs/serenity/pull/3321) Make `ImageHash` usable as key in std containers
 - [#3319](https://github.com/serenity-rs/serenity/pull/3319) Add `avatar` field to `PartialMember`
+- [#3321](https://github.com/serenity-rs/serenity/pull/3321) Make `ImageHash` usable as key in std containers
 - [#3362](https://github.com/serenity-rs/serenity/pull/3362) Add support for fetching a single guild ban
-- [#3380](https://github.com/serenity-rs/serenity/pull/3380) Add `flags` to `EditWebhookMessage` and `EditInteractionResponse`
+- [#3368](https://github.com/serenity-rs/serenity/pull/3368) Add `banner` to `Member` and `PartialMember`
 - [#3374](https://github.com/serenity-rs/serenity/pull/3374), [#3435](https://github.com/serenity-rs/serenity/pull/3435) Add soundboard support
-- [#3452](https://github.com/serenity-rs/serenity/pull/3452) Add guild role member counts endpoint
-- [#3456](https://github.com/serenity-rs/serenity/pull/3456) Add `attachment_size_limit` field
+- [#3380](https://github.com/serenity-rs/serenity/pull/3380) Add `flags` to `EditWebhookMessage` and `EditInteractionResponse`
 - [#3394](https://github.com/serenity-rs/serenity/pull/3394) Add `get_user_voice_state` endpoint
-- [#2956](https://github.com/serenity-rs/serenity/pull/2956) Add support for `PURCHASE_NOTIFICATION` message type
 - [#3395](https://github.com/serenity-rs/serenity/pull/3395) [#3397](https://github.com/serenity-rs/serenity/pull/3397) Add new AutoMod type for quarantined users, add AutoMod type for quarantined guild tag
 - [#3400](https://github.com/serenity-rs/serenity/pull/3400) Add `resolved` data to `ComponentInteractionData`
-- [#3368](https://github.com/serenity-rs/serenity/pull/3368) Add `banner` to `Member` and `PartialMember`
+- [#3437](https://github.com/serenity-rs/serenity/pull/3437) Add the `applied_tags` field to ExecuteWebhook
+- [#3452](https://github.com/serenity-rs/serenity/pull/3452) Add guild role member counts endpoint
+- [#3456](https://github.com/serenity-rs/serenity/pull/3456) Add `attachment_size_limit` field
 
 ### Removals
 
@@ -71,8 +71,8 @@ Thanks to the following for their contributions:
 
 ### Fixes
 
-- [#3105](https://github.com/serenity-rs/serenity/pull/3105) Fix Heartbeat gateway event handling
 - [#3059](https://github.com/serenity-rs/serenity/pull/3059) Fix incorrect parameters for retrieving invites
+- [#3105](https://github.com/serenity-rs/serenity/pull/3105) Fix Heartbeat gateway event handling
 - [#3377](https://github.com/serenity-rs/serenity/pull/3377) Fix `Ord` impl for `Role`
 
 ### Documentation improvements
