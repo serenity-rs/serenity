@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.12.5] - 2025-12-xx
+## [0.12.5] - 2025-12-20
 
 This compiles all of the changes that had accumulated since the prior release,
 and, unless another minor release is warranted, constitutes as the last release
@@ -19,10 +19,12 @@ Thanks to the following for their contributions:
 
 - [@AshleyBilbrey]
 - [@DPlayer234]
+- [@DerPlayer2001]
 - [@GnomedDev]
 - [@KiloOscarSix]
 - [@Legorooj]
 - [@LikeLakers2]
+- [@Nonanti]
 - [@TapGhoul]
 - [@archanyhm]
 - [@arqunis]
@@ -31,7 +33,9 @@ Thanks to the following for their contributions:
 - [@ivinjabraham]
 - [@jamesbt365]
 - [@mkrasnitski]
+- [@nomanoma121]
 - [@nwerosama]
+- [@smolestcookie]
 - [@valentinegb]
 
 ### Deprecations
@@ -42,6 +46,8 @@ Thanks to the following for their contributions:
 
 ### Additions
 
+- [#3437](https://github.com/serenity-rs/serenity/pull/3437) Add the `applied_tags` field to ExecuteWebhook
+- [#3020](https://github.com/serenity-rs/serenity/pull/3020) Add Consume Entitlement endpoint and missing fields for SKUs and Entitlements
 - [#3070](https://github.com/serenity-rs/serenity/pull/3070) Add helper for extracting the guild ID out of an interaction
 - [#3092](https://github.com/serenity-rs/serenity/pull/3092) Add `Message::message_snapshots`
 - [#3094](https://github.com/serenity-rs/serenity/pull/3094) Implement `PartialEq` and `Eq` for `ActivityData`
@@ -50,7 +56,9 @@ Thanks to the following for their contributions:
 - [#3319](https://github.com/serenity-rs/serenity/pull/3319) Add `avatar` field to `PartialMember`
 - [#3362](https://github.com/serenity-rs/serenity/pull/3362) Add support for fetching a single guild ban
 - [#3380](https://github.com/serenity-rs/serenity/pull/3380) Add `flags` to `EditWebhookMessage` and `EditInteractionResponse`
-- [#3374](https://github.com/serenity-rs/serenity/pull/3374) Add HTTP soundboard support
+- [#3374](https://github.com/serenity-rs/serenity/pull/3374), [#3435](https://github.com/serenity-rs/serenity/pull/3435) Add soundboard support
+- [#3452](https://github.com/serenity-rs/serenity/pull/3452) Add guild role member counts endpoint
+- [#3456](https://github.com/serenity-rs/serenity/pull/3456) Add `attachment_size_limit` field
 - [#3394](https://github.com/serenity-rs/serenity/pull/3394) Add `get_user_voice_state` endpoint
 - [#2956](https://github.com/serenity-rs/serenity/pull/2956) Add support for `PURCHASE_NOTIFICATION` message type
 - [#3395](https://github.com/serenity-rs/serenity/pull/3395) [#3397](https://github.com/serenity-rs/serenity/pull/3397) Add new AutoMod type for quarantined users, add AutoMod type for quarantined guild tag
@@ -5720,6 +5728,7 @@ Initial commit.
 [@Dean-Coakley]: https://github.com/Dean-Coakley
 [@Deebster]: https://github.com/Deebster
 [@DeltaEvo]: https://github.com/DeltaEvo
+[@DerPlayer2001]: https://github.com/DerPlayer2001
 [@DimiDimit]: https://github.com/DimiDimit
 [@Dinnerbone]: https://github.com/Dinnerbone
 [@DoumanAsh]: https://github.com/DoumanAsh
@@ -5774,6 +5783,7 @@ Initial commit.
 [@NilsIrl]: https://github.com/NilsIrl
 [@NinekoTheCat]: https://github.com/NinekoTheCat
 [@Noituri]: https://github.com/Noituri
+[@Nonanti]: https://github.com/Nonanti
 [@NotNorom]: https://github.com/NotNorom
 [@NovusTheory]: https://github.com/NovusTheory
 [@OnlyCS]: https://github.com/OnlyCS
@@ -5925,6 +5935,7 @@ Initial commit.
 [@natsukagami]: https://github.com/natsukagami
 [@natto1784]: https://github.com/natto1784
 [@nickelc]: https://github.com/nickelc
+[@nomanoma121]: https://github.com/nomanoma121
 [@nwerosama]: https://github.com/nwerosama
 [@nycex]: https://github.com/nycex
 [@oSumAtrIX]: https://github.com/oSumAtrIX
@@ -5943,6 +5954,7 @@ Initial commit.
 [@sbrocket]: https://github.com/sbrocket
 [@shnarazk]: https://github.com/shnarazk
 [@skreborn]: https://github.com/skreborn
+[@smolestcookie]: https://github.com/smolestcookie
 [@squili]: https://github.com/squili
 [@sschroe]: https://github.com/sschroe
 [@stormofice]: https://github.com/stormofice
