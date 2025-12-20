@@ -1,6 +1,6 @@
 [package]
 name = "serenity-voice-model"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Alex M. M. <acdenissk69@gmail.com>"]
 description = "A Rust library for (de)serializing Discord Voice API gateway messages."
 # readme = "README.md"
