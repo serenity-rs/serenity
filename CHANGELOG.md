@@ -84,6 +84,8 @@ Thanks to the following for their contributions:
 ### Miscellaneous
 
 - [#3421](https://github.com/serenity-rs/serenity/pull/3421) Switch `fxhash` dependency with `rustc-hash`
+- [#3433](https://github.com/serenity-rs/serenity/pull/3433) Update `CreatePoll` to use `u16` for duration
+
 
 ## [0.12.4] - 2024-11-15
 
