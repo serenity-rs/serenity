@@ -121,6 +121,17 @@ macro_rules! enum_number {
             $vis const fn Unknown(val: $T) -> Self {
                 Self(val)
             }
+
+            /// Get a string representation
+            #[must_use]
+            $vis const fn as_str(&self) -> &'static str {
+                match &self.0 {
+                    $(
+                        $value => stringify!($Variant),
+                    )*
+                    _ => "Unknown",
+                }
+            }
         }
     };
 }
@@ -196,5 +207,10 @@ mod tests {
         assert_json(&T::B, json!(2));
         assert_json(&T::C, json!(3));
         assert_json(&T::Unknown(123), json!(123));
+
+        assert_eq!(T::A.as_str(), "A");
+        assert_eq!(T::B.as_str(), "B");
+        assert_eq!(T::C.as_str(), "C");
+        assert_eq!(T::Unknown(123).as_str(), "Unknown");
     }
 }
