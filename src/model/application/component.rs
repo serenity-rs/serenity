@@ -233,7 +233,7 @@ pub struct TextDisplay {
     /// Discord’s official documentation does not mention this field; however, it is currently
     /// returned by the API and represents meaningful data, so it is included here. This
     /// behavior is undocumented and may change or be removed by Discord at any time.
-    #[cfg(feature = "unstable_discord_api")]
+    #[cfg(feature = "unstable")]
     pub content: Option<String>,
 }
 
