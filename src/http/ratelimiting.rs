@@ -38,13 +38,13 @@
 use std::borrow::Cow;
 use std::fmt;
 use std::str::{self, FromStr};
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 
 use dashmap::DashMap;
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
 use tokio::sync::Mutex;
-use tokio::time::{Duration, sleep};
+use tokio::time::sleep;
 use tracing::debug;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;

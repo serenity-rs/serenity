@@ -1,13 +1,13 @@
 use std::env::consts;
 use std::io::Read;
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 
 #[cfg(feature = "transport_compression_zlib")]
 use flate2::Decompress as ZlibInflater;
 use flate2::read::ZlibDecoder;
 use futures::{SinkExt, StreamExt};
 use tokio::net::TcpStream;
-use tokio::time::{Duration, timeout};
+use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
 use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async_with_config};

@@ -449,7 +449,7 @@ impl ShardRunner {
         if let TryResult::Present(mut entry) = self.runners.try_get_mut(&self.shard.info.id) {
             let (runner_info, _) = entry.value_mut();
 
-            runner_info.latency = self.shard.latency();
+            runner_info.latency = self.shard.heartbeat_latency();
             runner_info.stage = self.shard.stage();
         }
     }

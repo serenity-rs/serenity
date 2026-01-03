@@ -34,7 +34,7 @@ mod shard_runner;
 
 use std::fmt;
 use std::sync::Arc;
-use std::time::{Duration as StdDuration, Instant};
+use std::time::{Duration, Instant};
 
 #[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
 use aformat::aformat_into;
@@ -92,23 +92,13 @@ use crate::model::user::OnlineStatus;
 pub struct Shard {
     pub client: WsClient,
     presence: PresenceData,
-    last_heartbeat_sent: Option<Instant>,
-    last_heartbeat_ack: Option<Instant>,
-    heartbeat_interval: Option<std::time::Duration>,
     application_id_callback: Option<Box<dyn FnOnce(ApplicationId) + Send + Sync>>,
-    /// This is used by the heartbeater to determine whether the last heartbeat was sent without an
-    /// acknowledgement, and whether to reconnect.
-    // This must be set to `true` in `Shard::handle_event`'s `Ok(GatewayEvent::HeartbeatAck)` arm.
-    last_heartbeat_acknowledged: bool,
     seq: u64,
     info: ShardInfo,
     stage: ConnectionStage,
-    /// Instant of when the shard was started.
-    // This acts as a timeout to determine if the shard has - for some reason - not started within
-    // a decent amount of time.
-    pub started: Instant,
     token: Token,
     ws_url: Arc<str>,
+    heartbeater: HeartbeatMetadata,
     resume_metadata: Option<ResumeMetadata>,
     compression: TransportCompression,
     pub intents: GatewayIntents,
@@ -176,27 +166,19 @@ impl Shard {
         let client = connect(&ws_url, compression).await?;
 
         let presence = presence.unwrap_or_default();
-        let last_heartbeat_sent = None;
-        let last_heartbeat_ack = None;
-        let heartbeat_interval = None;
-        let last_heartbeat_acknowledged = true;
         let seq = 0;
         let stage = ConnectionStage::Handshake;
 
         Ok(Shard {
             client,
             presence,
-            last_heartbeat_sent,
-            last_heartbeat_ack,
-            heartbeat_interval,
             application_id_callback: None,
-            last_heartbeat_acknowledged,
             seq,
             stage,
-            started: Instant::now(),
             token,
             info,
             ws_url,
+            heartbeater: HeartbeatMetadata::default(),
             resume_metadata: None,
             compression,
             intents,
@@ -218,16 +200,6 @@ impl Shard {
         &self.presence
     }
 
-    /// Retrieves the value of when the last heartbeat was sent.
-    pub fn last_heartbeat_sent(&self) -> Option<Instant> {
-        self.last_heartbeat_sent
-    }
-
-    /// Retrieves the value of when the last heartbeat ack was received.
-    pub fn last_heartbeat_ack(&self) -> Option<Instant> {
-        self.last_heartbeat_ack
-    }
-
     /// Sends a heartbeat to the gateway with the current sequence.
     ///
     /// This sets the last heartbeat time to now, and [`Self::last_heartbeat_acknowledged`] to
@@ -239,34 +211,21 @@ impl Shard {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn heartbeat(&mut self) -> Result<()> {
         match self.client.send_heartbeat(&self.info, Some(self.seq)).await {
-            Ok(()) => {
-                self.last_heartbeat_sent = Some(Instant::now());
-                self.last_heartbeat_acknowledged = false;
-
-                Ok(())
-            },
+            Ok(()) => self.heartbeater.send(),
             Err(why) => {
                 if let Error::Tungstenite(err) = &why
                     && let TungsteniteError::Io(err) = &**err
                     && err.raw_os_error() != Some(32)
                 {
                     debug!("[{:?}] Err heartbeating: {:?}", self.info, err);
-                    return Err(Error::Gateway(GatewayError::HeartbeatFailed));
+                } else {
+                    warn!("[{:?}] Other err w/ keepalive: {:?}", self.info, why);
                 }
-
-                warn!("[{:?}] Other err w/ keepalive: {:?}", self.info, why);
-                Err(Error::Gateway(GatewayError::HeartbeatFailed))
+                return Err(Error::Gateway(GatewayError::HeartbeatFailed));
             },
         }
-    }
 
-    /// Returns the heartbeat interval dictated by Discord, if the Hello packet has been received.
-    pub fn heartbeat_interval(&self) -> Option<std::time::Duration> {
-        self.heartbeat_interval
-    }
-
-    pub fn last_heartbeat_acknowledged(&self) -> bool {
-        self.last_heartbeat_acknowledged
+        Ok(())
     }
 
     pub fn seq(&self) -> u64 {
@@ -343,9 +302,7 @@ impl Shard {
                 info!("[{:?}] Resumed", self.info);
 
                 self.stage = ConnectionStage::Connected;
-                self.last_heartbeat_acknowledged = true;
-                self.last_heartbeat_sent = Some(Instant::now());
-                self.last_heartbeat_ack = None;
+                self.heartbeater.resume();
             },
             _ => {},
         }
@@ -443,16 +400,12 @@ impl Shard {
                 event,
             }) => Ok(self.handle_gateway_dispatch(seq, event).map(ShardAction::Dispatch)),
             Ok(GatewayEvent::Heartbeat) => {
-                info!("[{:?}] Received shard heartbeat", self.info);
-
+                info!("[{:?}] Received a request to heartbeat", self.info);
                 Ok(Some(ShardAction::Heartbeat))
             },
             Ok(GatewayEvent::HeartbeatAck) => {
-                self.last_heartbeat_ack = Some(Instant::now());
-                self.last_heartbeat_acknowledged = true;
-
+                self.heartbeater.ack();
                 trace!("[{:?}] Received heartbeat ack", self.info);
-
                 Ok(None)
             },
             Ok(GatewayEvent::Hello(interval)) => {
@@ -461,7 +414,7 @@ impl Shard {
                 if self.stage == ConnectionStage::Resuming {
                     Ok(None)
                 } else {
-                    self.heartbeat_interval = Some(std::time::Duration::from_millis(interval));
+                    self.heartbeater.set_interval(interval);
                     let action = if self.stage == ConnectionStage::Handshake {
                         ShardAction::Identify
                     } else {
@@ -511,51 +464,25 @@ impl Shard {
     /// - an error occurred while heartbeating
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn do_heartbeat(&mut self) -> bool {
-        let Some(heartbeat_interval) = self.heartbeat_interval else {
-            // No Hello received yet
-            return self.started.elapsed() < StdDuration::from_secs(15);
-        };
-
-        // If a duration of time less than the heartbeat_interval has passed, then don't perform a
-        // keepalive or attempt to reconnect.
-        if let Some(last_sent) = self.last_heartbeat_sent
-            && last_sent.elapsed() <= heartbeat_interval
-        {
-            return true;
-        }
-
-        // If the last heartbeat didn't receive an acknowledgement, then auto-reconnect.
-        if !self.last_heartbeat_acknowledged {
-            debug!("[{:?}] Last heartbeat not acknowledged", self.info,);
-
-            return false;
-        }
-
+        // Check if we already acked the last heartbeat, or didn't receive a heartbeat ACK in time.
         // Otherwise, we're good to heartbeat.
-        if let Err(why) = self.heartbeat().await {
+        if let Some(acked) = self.heartbeater.last_heartbeat_acked() {
+            if !acked {
+                debug!("[{:?}] Last heartbeat not acknowledged", self.info);
+            }
+            acked
+        } else if let Err(why) = self.heartbeat().await {
             warn!("[{:?}] Err heartbeating: {:?}", self.info, why);
-
             false
         } else {
             trace!("[{:?}] Heartbeat", self.info);
-
             true
         }
     }
 
-    /// Calculates the heartbeat latency between the shard and the gateway.
-    // Shamelessly stolen from brayzure's commit in eris:
-    // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    pub fn latency(&self) -> Option<StdDuration> {
-        if let Some(sent) = self.last_heartbeat_sent
-            && let Some(received) = self.last_heartbeat_ack
-            && received > sent
-        {
-            return Some(received - sent);
-        }
-
-        None
+    /// Returns the heartbeat latency between the shard and the gateway.
+    pub fn heartbeat_latency(&self) -> Option<Duration> {
+        self.heartbeater.latency()
     }
 
     /// Requests that one or multiple [`Guild`]s be chunked.
@@ -636,7 +563,7 @@ impl Shard {
             .send_identify(&self.info, self.token.expose_secret(), self.intents, &self.presence)
             .await?;
 
-        self.last_heartbeat_sent = Some(Instant::now());
+        self.heartbeater.send();
         self.stage = ConnectionStage::Identifying;
 
         Ok(())
@@ -667,7 +594,7 @@ impl Shard {
         // This is used to accurately assess whether the state of the shard is accurate when a
         // Hello is received.
         self.stage = ConnectionStage::Connecting;
-        self.started = Instant::now();
+        self.heartbeater.start();
         let client = connect(ws_url, self.compression).await?;
         self.stage = ConnectionStage::Handshake;
 
@@ -717,6 +644,84 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
     WsClient::connect(url, compression).await
 }
 
+struct HeartbeatMetadata {
+    /// Instant when the shard was started.
+    started: Instant,
+    /// When the last heartbeat was sent by the client.
+    last_sent: Option<Instant>,
+    /// When the last heartbeat was acknowledged by the server.
+    last_ack: Option<Instant>,
+    /// The heartbeat interval dictated by Discord, if the Hello packet has been received.
+    interval: Option<Duration>,
+}
+
+impl HeartbeatMetadata {
+    fn start(&mut self) {
+        self.started = Instant::now();
+    }
+
+    fn resume(&mut self) {
+        self.last_sent = Some(Instant::now());
+        self.last_ack = None;
+    }
+
+    fn send(&mut self) {
+        self.last_sent = Some(Instant::now());
+    }
+
+    fn ack(&mut self) {
+        self.last_ack = Some(Instant::now());
+    }
+
+    fn set_interval(&mut self, millis: u64) {
+        self.interval = Some(Duration::from_millis(millis));
+    }
+
+    fn last_heartbeat_acked(&self) -> Option<bool> {
+        let Some(interval) = self.interval else {
+            // No Hello received yet, wait a bit longer before reconnecting.
+            return Some(self.started.elapsed() < Duration::from_secs(15));
+        };
+
+        // If the heartbeat interval has not yet passed, then we don't need to perform a keepalive
+        // or attempt to reconnect. Similarly, if we've just resumed then simply keep waiting for
+        // the first heartbeat ACK.
+        if let Some(last_sent) = self.last_sent {
+            if last_sent.elapsed() <= interval {
+                return Some(true);
+            } else if let Some(last_ack) = self.last_ack
+                && last_ack <= last_sent
+            {
+                return Some(false);
+            }
+        }
+
+        None
+    }
+
+    fn latency(&self) -> Option<Duration> {
+        if let Some(sent) = self.last_sent
+            && let Some(ack) = self.last_ack
+            && ack > sent
+        {
+            return Some(ack - sent);
+        }
+
+        None
+    }
+}
+
+impl Default for HeartbeatMetadata {
+    fn default() -> Self {
+        Self {
+            started: Instant::now(),
+            last_sent: None,
+            last_ack: None,
+            interval: None,
+        }
+    }
+}
+
 struct ResumeMetadata {
     session_id: FixedString,
     resume_ws_url: FixedString,
@@ -738,7 +743,7 @@ pub enum ShardAction {
 #[derive(Debug)]
 pub struct ShardRunnerInfo {
     /// The latency between when a heartbeat was sent and when the acknowledgement was received.
-    pub latency: Option<StdDuration>,
+    pub latency: Option<Duration>,
     /// The current connection stage of the shard.
     pub stage: ConnectionStage,
 }
