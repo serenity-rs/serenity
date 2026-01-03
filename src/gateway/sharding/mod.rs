@@ -202,8 +202,7 @@ impl Shard {
 
     /// Sends a heartbeat to the gateway with the current sequence.
     ///
-    /// This sets the last heartbeat time to now, and [`Self::last_heartbeat_acknowledged`] to
-    /// `false`.
+    /// This sets the last heartbeat time to now.
     ///
     /// # Errors
     ///
