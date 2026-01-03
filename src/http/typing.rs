@@ -1,8 +1,9 @@
 use std::sync::Arc;
+use std::time::Duration;
 
 use tokio::sync::oneshot::error::TryRecvError;
 use tokio::sync::oneshot::{self, Sender};
-use tokio::time::{Duration, sleep};
+use tokio::time::sleep;
 
 use crate::http::Http;
 use crate::internal::prelude::*;

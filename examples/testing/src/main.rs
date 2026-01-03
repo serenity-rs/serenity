@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use std::sync::Arc;
+use std::time::Duration;
 
 use serenity::async_trait;
 use serenity::builder::*;
@@ -123,11 +124,8 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
                         .button(CreateButton::new(custom_id.clone()).label(custom_id)),
                 )
                 .await?;
-            let button_press = msg
-                .id
-                .collect_component_interactions(ctx)
-                .timeout(std::time::Duration::from_secs(10))
-                .await;
+            let button_press =
+                msg.id.collect_component_interactions(ctx).timeout(Duration::from_secs(10)).await;
             match button_press {
                 Some(x) => x.defer(&ctx.http).await?,
                 None => break,
@@ -179,7 +177,6 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .await?;
     } else if msg.content == "embedrace" {
         use serenity::futures::StreamExt;
-        use tokio::time::Duration;
 
         let mut msg = channel_id
             .say(&ctx.http, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id))
@@ -229,7 +226,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         let (_guild_id, channel_id, _message_id) =
             serenity::utils::parse_message_url(forum_post_url).unwrap();
         msg.channel_id.say(&ctx.http, format!("Deleting <#{channel_id}> in 10 seconds...")).await?;
-        tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+        tokio::time::sleep(Duration::from_secs(10)).await;
         channel_id.delete(&ctx.http, None).await?;
     } else {
         return Ok(());
@@ -270,7 +267,7 @@ async fn command_interaction(
             )
             .await?;
 
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(Duration::from_secs(1)).await;
 
         // Only keep the new image, removing the first image
         let _msg = interaction
