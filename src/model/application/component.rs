@@ -650,7 +650,8 @@ pub struct SelectMenu {
     pub min_values: Option<u8>,
     /// The maximum number of selections allowed.
     pub max_values: Option<u8>,
-    /// Whether select menu is required to be filled in a modal. Default is true. Ignored in messages.
+    /// Whether select menu is required to be filled in a modal. Default is true. Ignored in
+    /// messages.
     #[serde(default = "default_true")]
     pub required: bool,
     /// Whether select menu is disabled.
