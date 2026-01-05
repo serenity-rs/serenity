@@ -881,6 +881,8 @@ pub struct CreateSelectMenu<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     max_values: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    required: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
 
     #[serde(flatten)]
@@ -896,6 +898,7 @@ impl<'a> CreateSelectMenu<'a> {
             placeholder: None,
             min_values: None,
             max_values: None,
+            required: None,
             disabled: None,
             kind,
         }
@@ -926,7 +929,13 @@ impl<'a> CreateSelectMenu<'a> {
         self
     }
 
-    /// Sets the disabled state for the button.
+    /// Sets the required state for the select menu in modals. Ignored in messages.
+    pub fn required(mut self, required: bool) -> Self {
+        self.required = Some(required);
+        self
+    }
+
+    /// Sets the disabled state for the select menu.
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = Some(disabled);
         self
