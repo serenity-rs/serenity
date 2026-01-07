@@ -308,19 +308,35 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> FullEvent {
                 new_data: event.presence,
             }
         },
-        Event::ReactionAdd(event) => FullEvent::ReactionAdd {
-            add_reaction: event.reaction,
+        Event::ReactionAdd(event) => {
+            if_cache!(update_cache!(&ctx.cache, event));
+
+            FullEvent::ReactionAdd {
+                add_reaction: event.reaction,
+            }
         },
-        Event::ReactionRemove(event) => FullEvent::ReactionRemove {
-            removed_reaction: event.reaction,
+        Event::ReactionRemove(event) => {
+            if_cache!(update_cache!(&ctx.cache, event));
+
+            FullEvent::ReactionRemove {
+                removed_reaction: event.reaction,
+            }
         },
-        Event::ReactionRemoveAll(event) => FullEvent::ReactionRemoveAll {
-            guild_id: event.guild_id,
-            channel_id: event.channel_id,
-            removed_from_message_id: event.message_id,
+        Event::ReactionRemoveAll(event) => {
+            if_cache!(update_cache!(&ctx.cache, event));
+
+            FullEvent::ReactionRemoveAll {
+                guild_id: event.guild_id,
+                channel_id: event.channel_id,
+                removed_from_message_id: event.message_id,
+            }
         },
-        Event::ReactionRemoveEmoji(event) => FullEvent::ReactionRemoveEmoji {
-            removed_reactions: event.reaction,
+        Event::ReactionRemoveEmoji(event) => {
+            if_cache!(update_cache!(&ctx.cache, event));
+
+            FullEvent::ReactionRemoveEmoji {
+                removed_reactions: event.reaction,
+            }
         },
         Event::Ready(event) => FullEvent::Ready {
             data_about_bot: event.ready,
