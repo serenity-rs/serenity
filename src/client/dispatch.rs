@@ -328,18 +328,33 @@ fn update_cache_with_event(
                 new_data: event.presence,
             }
         },
-        Event::ReactionAdd(event) => FullEvent::ReactionAdd {
-            add_reaction: event.reaction,
+        Event::ReactionAdd(mut event) => {
+            update_cache!(cache, event);
+            FullEvent::ReactionAdd {
+                add_reaction: event.reaction,
+            }
         },
-        Event::ReactionRemove(event) => FullEvent::ReactionRemove {
-            removed_reaction: event.reaction,
+        Event::ReactionRemove(mut event) => {
+            update_cache!(cache, event);
+
+            FullEvent::ReactionRemove {
+                removed_reaction: event.reaction,
+            }
         },
-        Event::ReactionRemoveAll(event) => FullEvent::ReactionRemoveAll {
-            channel_id: event.channel_id,
-            removed_from_message_id: event.message_id,
+        Event::ReactionRemoveAll(mut event) => {
+            update_cache!(cache, event);
+
+            FullEvent::ReactionRemoveAll {
+                channel_id: event.channel_id,
+                removed_from_message_id: event.message_id,
+            }
         },
-        Event::ReactionRemoveEmoji(event) => FullEvent::ReactionRemoveEmoji {
-            removed_reactions: event.reaction,
+        Event::ReactionRemoveEmoji(mut event) => {
+            update_cache!(cache, event);
+
+            FullEvent::ReactionRemoveEmoji {
+                removed_reactions: event.reaction,
+            }
         },
         Event::Ready(mut event) => {
             update_cache!(cache, event);

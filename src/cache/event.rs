@@ -1,4 +1,5 @@
 use super::{Cache, CacheUpdate};
+use crate::all::{CountDetails, MessageReaction};
 use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
     ChannelCreateEvent,
@@ -20,6 +21,10 @@ use crate::model::event::{
     MessageCreateEvent,
     MessageUpdateEvent,
     PresenceUpdateEvent,
+    ReactionAddEvent,
+    ReactionRemoveAllEvent,
+    ReactionRemoveEmojiEvent,
+    ReactionRemoveEvent,
     ReadyEvent,
     ThreadCreateEvent,
     ThreadDeleteEvent,
@@ -592,5 +597,103 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
         let old = channel.status.clone();
         channel.status.clone_from(&self.status);
         old
+    }
+}
+
+impl CacheUpdate for ReactionAddEvent {
+    type Output = Message;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let reaction = &self.reaction;
+        let mut messages = cache.messages.get_mut(&reaction.channel_id)?;
+        let message = messages.get_mut(&reaction.message_id)?;
+        let old_message = message.clone();
+
+        match message.reactions.iter_mut().find(|r| r.reaction_type == reaction.emoji) {
+            Some(existing) => {
+                existing.count += 1;
+                if reaction.burst {
+                    existing.count_details.burst += 1;
+                } else {
+                    existing.count_details.normal += 1;
+                }
+            },
+            None => {
+                let me = self.reaction.user_id == Some(cache.current_user().id);
+                let new_reaction = MessageReaction {
+                    me,
+                    burst_colours: reaction.burst_colours.clone().unwrap_or_default(),
+                    count: 1,
+                    count_details: CountDetails {
+                        burst: if reaction.burst { 1 } else { 0 },
+                        normal: if reaction.burst { 0 } else { 1 },
+                    },
+                    me_burst: if me { reaction.burst } else { false },
+                    reaction_type: reaction.emoji.clone(),
+                };
+                message.reactions.push(new_reaction);
+            },
+        };
+
+        Some(old_message)
+    }
+}
+
+impl CacheUpdate for ReactionRemoveEvent {
+    type Output = Message;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let reaction = &self.reaction;
+        let mut messages = cache.messages.get_mut(&reaction.channel_id)?;
+        let message = messages.get_mut(&reaction.message_id)?;
+        let old_message = message.clone();
+
+        let index = message.reactions.iter().position(|r| r.reaction_type == reaction.emoji)?;
+
+        let existing_reaction = &mut message.reactions[index];
+
+        existing_reaction.count -= 1;
+        if reaction.burst {
+            existing_reaction.count_details.burst -= 1;
+        } else {
+            existing_reaction.count_details.normal -= 1;
+        }
+
+        if existing_reaction.count == 0 {
+            message.reactions.remove(index);
+        }
+
+        Some(old_message)
+    }
+}
+
+impl CacheUpdate for ReactionRemoveEmojiEvent {
+    type Output = Message;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let reaction = &self.reaction;
+        let mut messages = cache.messages.get_mut(&reaction.channel_id)?;
+        let message = messages.get_mut(&reaction.message_id)?;
+        let old_message = message.clone();
+
+        let index = message.reactions.iter().position(|r| r.reaction_type == reaction.emoji)?;
+
+        message.reactions.remove(index);
+
+        Some(old_message)
+    }
+}
+
+impl CacheUpdate for ReactionRemoveAllEvent {
+    type Output = Message;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let mut messages = cache.messages.get_mut(&self.channel_id)?;
+        let message = messages.get_mut(&self.message_id)?;
+        let old_message = message.clone();
+
+        message.reactions.clear();
+
+        Some(old_message)
     }
 }
