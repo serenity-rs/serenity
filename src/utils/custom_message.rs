@@ -152,7 +152,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is an empty vector (`Vec::default()`).
     pub fn reactions(&mut self, reactions: Vec<MessageReaction>) -> &mut Self {
-        self.msg.reactions = reactions.trunc_into();
+        self.msg.reactions = reactions;
 
         self
     }

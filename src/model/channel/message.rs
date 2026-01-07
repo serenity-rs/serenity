@@ -74,7 +74,7 @@ pub struct Message {
     pub embeds: FixedArray<Embed>,
     /// Array of reactions performed on the message.
     #[serde(default)]
-    pub reactions: FixedArray<MessageReaction>,
+    pub reactions: Vec<MessageReaction>,
     /// Non-repeating number used for ensuring message order.
     #[serde(default)]
     pub nonce: Option<Nonce>,
