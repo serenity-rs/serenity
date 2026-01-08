@@ -680,32 +680,32 @@ impl CacheUpdate for ReactionAddEvent {
 
             let prev = message.clone();
 
-            match message.reactions.iter_mut().find(|r| r.reaction_type == reaction.emoji) {
-                Some(existing) => {
-                    existing.count += 1;
-                    if reaction.burst {
-                        existing.count_details.burst += 1;
-                    } else {
-                        existing.count_details.normal += 1;
-                    }
-                },
-                None => {
-                    let me = self.reaction.user_id == Some(cache.current_user().id);
-                    let new_reaction = MessageReaction {
-                        me,
-                        burst_colours: reaction.burst_colours.clone().unwrap_or_default(),
-                        count: 1,
-                        count_details: CountDetails {
-                            burst: if reaction.burst { 1 } else { 0 },
-                            normal: if reaction.burst { 0 } else { 1 },
-                        },
-                        me_burst: if me { reaction.burst } else { false },
-                        reaction_type: reaction.emoji.clone(),
-                    };
+            if let Some(existing) =
+                message.reactions.iter_mut().find(|r| r.reaction_type == reaction.emoji)
+            {
+                existing.count += 1;
+                if reaction.burst {
+                    existing.count_details.burst += 1;
+                } else {
+                    existing.count_details.normal += 1;
+                }
+                return Some(prev);
+            }
 
-                    message.reactions.push(new_reaction);
+            let me = self.reaction.user_id == Some(cache.current_user().id);
+            let new_reaction = MessageReaction {
+                me,
+                burst_colours: reaction.burst_colours.clone().unwrap_or_default(),
+                count: 1,
+                count_details: CountDetails {
+                    burst: u64::from(reaction.burst),
+                    normal: u64::from(!reaction.burst),
                 },
+                me_burst: if me { reaction.burst } else { false },
+                reaction_type: reaction.emoji.clone(),
             };
+
+            message.reactions.push(new_reaction);
 
             return Some(prev);
         }

@@ -566,8 +566,9 @@ mod test {
 
         // Add a reaction for a channel
         let message = &event.message;
-        let reaction_type = ReactionType::Unicode(FixedString::from_str("❓").unwrap());
-        let second_reaction_type = ReactionType::Unicode(FixedString::from_str("❗").unwrap());
+        let reaction_type = ReactionType::Unicode(FixedString::from_str("\u{2753}").unwrap());
+        let second_reaction_type =
+            ReactionType::Unicode(FixedString::from_str("\u{2757}").unwrap());
 
         let mut reaction_event = ReactionAddEvent {
             reaction: Reaction {
