@@ -197,7 +197,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
             let item = if let Some(mut member) = guild.members.get_mut(&self.user.id) {
                 let item = Some(member.clone());
 
-                member.joined_at.clone_from(&Some(self.joined_at));
+                member.joined_at.clone_from(&self.joined_at);
                 member.nick.clone_from(&self.nick);
                 member.roles.clone_from(&self.roles);
                 member.user.clone_from(&self.user);
@@ -219,7 +219,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 let mut new_member = Member {
                     __generated_flags: MemberGeneratedFlags::empty(),
                     guild_id: self.guild_id,
-                    joined_at: Some(self.joined_at),
+                    joined_at: self.joined_at,
                     nick: self.nick.clone(),
                     roles: self.roles.clone(),
                     user: self.user.clone(),
