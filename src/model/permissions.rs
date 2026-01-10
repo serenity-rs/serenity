@@ -405,7 +405,9 @@ generate_permissions! {
     /// Allows user-installed apps to send public responses.
     USE_EXTERNAL_APPS, use_external_apps, "Use External Apps" = 1 << 50;
     /// Allows pinning and unpinning messages.
-    PIN_MESSAGES, pin_messages, "Pin Messages" = 1 << 51
+    PIN_MESSAGES, pin_messages, "Pin Messages" = 1 << 51;
+    /// Allows bypassing slowmode restrictions
+    BYPASS_SLOWMODE, bypass_slowmode, "Bypass Slowmode" = 1 << 52
 }
 
 #[cfg(feature = "model")]
