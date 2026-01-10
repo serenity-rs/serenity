@@ -132,3 +132,91 @@ pub struct Speaking {
     /// Used alongside the SSRC to map individual packets to their sender.
     pub user_id: Option<UserId>,
 }
+
+/// DAVE protocol version field in the Identify payload.
+///
+/// Signals to Discord that the bot supports end-to-end encryption
+/// and which protocol version(s) it supports.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+#[serde(transparent)]
+pub struct MaxDaveProtocolVersion(pub u16);
+
+impl MaxDaveProtocolVersion {
+    /// Protocol version 1 - Current DAVE protocol version
+    pub const V1: Self = Self(1);
+}
+
+impl Default for MaxDaveProtocolVersion {
+    fn default() -> Self {
+        Self::V1
+    }
+}
+
+/// External sender package for DAVE MLS group creation.
+///
+/// Received from the server (Opcode 25) and used to establish the MLS group.
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveMlsExternalSender {
+    /// Serialized external sender data used to create the MLS group.
+    pub external_sender: Vec<u8>,
+}
+
+/// Key package for DAVE MLS group participation.
+///
+/// Sent to the server (Opcode 26) during the join handshake.
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveMlsKeyPackage {
+    /// Serialized key package bytes.
+    pub key_package: Vec<u8>,
+}
+
+/// Proposals for group member changes.
+///
+/// Received from the server (Opcode 27) for add/remove operations.
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveMlsProposals {
+    /// The type of operation (0 = append members, 1 = revoke).
+    pub operation_type: u16,
+    /// Serialized proposals data.
+    pub proposals: Vec<u8>,
+}
+
+/// Commit with welcome message for group transitions.
+///
+/// Received from the server (Opcode 28) after accepting proposals.
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveMlsCommitWelcome {
+    /// Serialized commit data.
+    pub commit: Vec<u8>,
+    /// Optional welcome data for new members.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub welcome: Option<Vec<u8>>,
+}
+
+/// Welcome message for new members joining the group.
+///
+/// Received from the server (Opcode 30) as confirmation of successful join.
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveMlsWelcome {
+    /// Serialized welcome data.
+    pub welcome: Vec<u8>,
+}
+
+/// Prepare epoch notification before group transition.
+///
+/// Received from the server (Opcode 24) to signal an upcoming epoch change.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DavePrepareEpoch {
+    /// The new epoch number after the transition.
+    pub epoch: u64,
+}
+
+/// Transition ready confirmation.
+///
+/// Can be sent by the bot (Opcode 23) to confirm it's ready for group operations.
+/// May also be received from the server (Opcode 23) to indicate readiness.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
+pub struct DaveTransitionReady {
+    /// Epoch number this transition applies to.
+    pub epoch: u64,
+}
