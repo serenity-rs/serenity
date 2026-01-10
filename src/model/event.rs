@@ -240,7 +240,7 @@ pub struct GuildMemberRemoveEvent {
 pub struct GuildMemberUpdateEvent {
     pub guild_id: GuildId,
     pub nick: Option<FixedString<u8>>,
-    pub joined_at: Timestamp,
+    pub joined_at: Option<Timestamp>,
     pub roles: FixedArray<RoleId>,
     pub user: User,
     pub premium_since: Option<Timestamp>,
