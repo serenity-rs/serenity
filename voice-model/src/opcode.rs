@@ -47,4 +47,12 @@ pub enum Opcode {
     DaveMlsCommitWelcome = 28,
     /// DAVE: Provides the welcome message for new members.
     DaveMlsWelcome = 30,
+    /// DAVE: Prepares for a protocol transition.
+    DavePrepareTransition = 21,
+    /// DAVE: Executes a prepared protocol transition.
+    DaveExecuteTransition = 22,
+    /// DAVE: Announces a commit for group transition.
+    DaveMlsAnnounceCommitTransition = 29,
+    /// DAVE: Reports an invalid commit or welcome message.
+    DaveMlsInvalidCommitWelcome = 31,
 }

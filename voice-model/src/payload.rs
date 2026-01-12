@@ -154,41 +154,59 @@ impl Default for MaxDaveProtocolVersion {
 
 /// External sender package for DAVE MLS group creation.
 ///
-/// Received from the server (Opcode 25) and used to establish the MLS group.
+/// Received from the server (Opcode 25) containing the voice gateway's
+/// credential and signature public key for the MLS group's external_senders extension.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsExternalSender {
-    /// Serialized external sender data used to create the MLS group.
+    /// Serialized ExternalSender containing signature_key and credential.
     pub external_sender: Vec<u8>,
 }
 
 /// Key package for DAVE MLS group participation.
 ///
 /// Sent to the server (Opcode 26) during the join handshake.
+/// The basic credential identity is the big-endian 64-bit user ID.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsKeyPackage {
-    /// Serialized key package bytes.
+    /// Serialized MLSMessage containing the KeyPackage (see RFC 9420).
     pub key_package: Vec<u8>,
+}
+
+/// Operation type for MLS proposals.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+#[repr(u8)]
+pub enum DaveMlsProposalsOperationType {
+    /// Append proposals to the pending proposal list.
+    Append = 0,
+    /// Revoke previously sent proposals by their reference.
+    Revoke = 1,
 }
 
 /// Proposals for group member changes.
 ///
 /// Received from the server (Opcode 27) for add/remove operations.
+/// Contains either proposals to append or proposal refs to revoke.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsProposals {
-    /// The type of operation (0 = append members, 1 = revoke).
-    pub operation_type: u16,
-    /// Serialized proposals data.
+    /// The type of operation (append or revoke).
+    pub operation_type: DaveMlsProposalsOperationType,
+    /// Serialized proposal data.
+    /// For append: serialized MLSMessage proposal messages.
+    /// For revoke: serialized ProposalRef values.
     pub proposals: Vec<u8>,
 }
 
-/// Commit with welcome message for group transitions.
+/// Commit with optional welcome message for group transitions.
 ///
-/// Received from the server (Opcode 28) after accepting proposals.
+/// Sent by the client (Opcode 28) after processing proposals.
+/// When at least one add proposal is handled, the welcome message MUST be included.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsCommitWelcome {
-    /// Serialized commit data.
+    /// Serialized MLS commit message (see RFC 9420 MLSMessage and Commit definitions).
     pub commit: Vec<u8>,
-    /// Optional welcome data for new members.
+    /// Optional MLS Welcome message for new members (see RFC 9420 Welcome definition).
+    /// Required when the commit includes one or more add proposals.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub welcome: Option<Vec<u8>>,
 }
@@ -196,27 +214,77 @@ pub struct DaveMlsCommitWelcome {
 /// Welcome message for new members joining the group.
 ///
 /// Received from the server (Opcode 30) as confirmation of successful join.
+/// Includes the transition ID for the group transition.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsWelcome {
-    /// Serialized welcome data.
+    /// The transition ID for this group transition.
+    pub transition_id: u16,
+    /// Serialized MLS Welcome message (see RFC 9420 Welcome definition).
     pub welcome: Vec<u8>,
 }
 
 /// Prepare epoch notification before group transition.
 ///
 /// Received from the server (Opcode 24) to signal an upcoming epoch change.
+/// When `epoch` is 1, this indicates a new MLS group is to be created.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DavePrepareEpoch {
+    /// The protocol version for the upcoming epoch.
+    pub protocol_version: u16,
     /// The new epoch number after the transition.
     pub epoch: u64,
 }
 
 /// Transition ready confirmation.
 ///
-/// Can be sent by the bot (Opcode 23) to confirm it's ready for group operations.
-/// May also be received from the server (Opcode 23) to indicate readiness.
+/// Sent by the client (Opcode 23) to confirm it's ready for a previously announced transition.
+/// The client sends this after processing a commit or preparing receive-side decryptors.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub struct DaveTransitionReady {
-    /// Epoch number this transition applies to.
-    pub epoch: u64,
+    /// The transition ID the client is ready to execute.
+    pub transition_id: u16,
+}
+
+/// Prepare protocol transition notification.
+///
+/// Received from the server (Opcode 21) to announce an upcoming protocol transition.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DavePrepareTransition {
+    /// The protocol version for the transition.
+    pub protocol_version: u16,
+    /// The transition ID for this transition.
+    pub transition_id: u16,
+}
+
+/// Execute protocol transition notification.
+///
+/// Received from the server (Opcode 22) to execute a previously prepared transition.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveExecuteTransition {
+    /// The transition ID for this transition.
+    pub transition_id: u16,
+}
+
+/// Announce commit for group transition.
+///
+/// Received from the server (Opcode 29) to broadcast an MLS commit for moving to the next epoch.
+/// The commit is one received from a group member via dave_mls_commit_welcome (Opcode 28).
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveMlsAnnounceCommitTransition {
+    /// Sequence number for the announcement.
+    pub sequence_number: u16,
+    /// The transition ID for this group epoch change.
+    pub transition_id: u16,
+    /// Serialized MLS commit message (see RFC 9420 MLSMessage and Commit definitions).
+    pub commit_message: Vec<u8>,
+}
+
+/// Invalid commit or welcome report.
+///
+/// Sent to the server (Opcode 31) to report an invalid commit or welcome message.
+/// This asks the voice gateway to remove and re-add the member to recover.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct DaveMlsInvalidCommitWelcome {
+    /// The transition ID in which the invalid Commit or Welcome was received.
+    pub transition_id: u16,
 }

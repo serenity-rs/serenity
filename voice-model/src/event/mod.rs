@@ -54,6 +54,14 @@ pub enum Event {
     DaveMlsCommitWelcome(DaveMlsCommitWelcome),
     /// DAVE: Provides the welcome message for new members.
     DaveMlsWelcome(DaveMlsWelcome),
+    /// DAVE: Prepares for a protocol transition.
+    DavePrepareTransition(DavePrepareTransition),
+    /// DAVE: Executes a prepared protocol transition.
+    DaveExecuteTransition(DaveExecuteTransition),
+    /// DAVE: Announces a commit for group transition.
+    DaveMlsAnnounceCommitTransition(DaveMlsAnnounceCommitTransition),
+    /// DAVE: Reports an invalid commit or welcome message.
+    DaveMlsInvalidCommitWelcome(DaveMlsInvalidCommitWelcome),
 }
 
 impl Event {
@@ -79,6 +87,10 @@ impl Event {
             DaveMlsProposals(_) => Opcode::DaveMlsProposals,
             DaveMlsCommitWelcome(_) => Opcode::DaveMlsCommitWelcome,
             DaveMlsWelcome(_) => Opcode::DaveMlsWelcome,
+            DavePrepareTransition(_) => Opcode::DavePrepareTransition,
+            DaveExecuteTransition(_) => Opcode::DaveExecuteTransition,
+            DaveMlsAnnounceCommitTransition(_) => Opcode::DaveMlsAnnounceCommitTransition,
+            DaveMlsInvalidCommitWelcome(_) => Opcode::DaveMlsInvalidCommitWelcome,
         }
     }
 }
@@ -113,6 +125,10 @@ impl Serialize for Event {
             DaveMlsProposals(e) => s.serialize_field("d", e)?,
             DaveMlsCommitWelcome(e) => s.serialize_field("d", e)?,
             DaveMlsWelcome(e) => s.serialize_field("d", e)?,
+            DavePrepareTransition(e) => s.serialize_field("d", e)?,
+            DaveExecuteTransition(e) => s.serialize_field("d", e)?,
+            DaveMlsAnnounceCommitTransition(e) => s.serialize_field("d", e)?,
+            DaveMlsInvalidCommitWelcome(e) => s.serialize_field("d", e)?,
         }
 
         s.end()
@@ -143,7 +159,7 @@ impl<'de> Visitor<'de> for EventVisitor {
                     let valid_op = Opcode::deserialize(des).map_err(|_| {
                         DeError::invalid_value(
                             Unexpected::Unsigned(raw.into()),
-                            &"opcode in [0--9] + [12--13] + [23--28] + [30]",
+                            &"opcode in [0--9] + [12--13] + [21--24] + [26--31]",
                         )
                     })?;
                     op = Some(valid_op);
@@ -185,6 +201,14 @@ impl<'de> Visitor<'de> for EventVisitor {
                         return Ok(map.next_value::<DaveMlsCommitWelcome>()?.into()),
                     Some(Opcode::DaveMlsWelcome) =>
                         return Ok(map.next_value::<DaveMlsWelcome>()?.into()),
+                    Some(Opcode::DavePrepareTransition) =>
+                        return Ok(map.next_value::<DavePrepareTransition>()?.into()),
+                    Some(Opcode::DaveExecuteTransition) =>
+                        return Ok(map.next_value::<DaveExecuteTransition>()?.into()),
+                    Some(Opcode::DaveMlsAnnounceCommitTransition) =>
+                        return Ok(map.next_value::<DaveMlsAnnounceCommitTransition>()?.into()),
+                    Some(Opcode::DaveMlsInvalidCommitWelcome) =>
+                        return Ok(map.next_value::<DaveMlsInvalidCommitWelcome>()?.into()),
                     None => {
                         d = Some(map.next_value::<&RawValue>()?);
                     },
@@ -233,6 +257,14 @@ impl<'de> Visitor<'de> for EventVisitor {
             Opcode::DaveMlsCommitWelcome =>
                 serde_json::from_str::<DaveMlsCommitWelcome>(d).map(Into::into),
             Opcode::DaveMlsWelcome => serde_json::from_str::<DaveMlsWelcome>(d).map(Into::into),
+            Opcode::DavePrepareTransition =>
+                serde_json::from_str::<DavePrepareTransition>(d).map(Into::into),
+            Opcode::DaveExecuteTransition =>
+                serde_json::from_str::<DaveExecuteTransition>(d).map(Into::into),
+            Opcode::DaveMlsAnnounceCommitTransition =>
+                serde_json::from_str::<DaveMlsAnnounceCommitTransition>(d).map(Into::into),
+            Opcode::DaveMlsInvalidCommitWelcome =>
+                serde_json::from_str::<DaveMlsInvalidCommitWelcome>(d).map(Into::into),
         })
         .map_err(DeError::custom)
     }

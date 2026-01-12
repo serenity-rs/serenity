@@ -108,3 +108,27 @@ impl From<DaveMlsWelcome> for Event {
         Event::DaveMlsWelcome(i)
     }
 }
+
+impl From<DavePrepareTransition> for Event {
+    fn from(i: DavePrepareTransition) -> Self {
+        Event::DavePrepareTransition(i)
+    }
+}
+
+impl From<DaveExecuteTransition> for Event {
+    fn from(i: DaveExecuteTransition) -> Self {
+        Event::DaveExecuteTransition(i)
+    }
+}
+
+impl From<DaveMlsAnnounceCommitTransition> for Event {
+    fn from(i: DaveMlsAnnounceCommitTransition) -> Self {
+        Event::DaveMlsAnnounceCommitTransition(i)
+    }
+}
+
+impl From<DaveMlsInvalidCommitWelcome> for Event {
+    fn from(i: DaveMlsInvalidCommitWelcome) -> Self {
+        Event::DaveMlsInvalidCommitWelcome(i)
+    }
+}
