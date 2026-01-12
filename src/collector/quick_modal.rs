@@ -138,7 +138,7 @@ impl<'a> CreateQuickModal<'a> {
             .components
             .iter()
             .filter_map(|component| {
-                if let Component::Label(label) = component
+                if let ModalComponent::Label(label) = component
                     && let LabelComponent::InputText(text) = &label.component
                 {
                     if let Some(value) = &text.value {
@@ -148,7 +148,7 @@ impl<'a> CreateQuickModal<'a> {
                         None
                     }
                 } else {
-                    if !matches!(component, Component::TextDisplay(_)) {
+                    if !matches!(component, ModalComponent::TextDisplay(_)) {
                         tracing::warn!("expected input text in modal response, got {component:?}");
                     }
                     None
