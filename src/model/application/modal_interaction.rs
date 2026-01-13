@@ -1,4 +1,6 @@
 use serde::Serialize;
+use serde::de::Error as DeError;
+use serde_json::value::RawValue;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -217,7 +219,7 @@ pub struct ModalInteractionData {
     /// The custom id of the modal
     pub custom_id: FixedString,
     /// The components of the submitted modal interaction.
-    pub components: FixedArray<Component>,
+    pub components: FixedArray<ModalComponent>,
     /// The resolved entities from the selected options.
     #[serde(default)]
     pub resolved: CommandDataResolved,
@@ -229,7 +231,29 @@ pub struct ModalInteractionData {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub enum ModalInteractionComponent {
+pub enum ModalComponent {
     TextDisplay(TextDisplay),
     Label(Label),
+}
+
+impl<'de> Deserialize<'de> for ModalComponent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct ModalComponentRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+        }
+
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = ModalComponentRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        match raw.kind {
+            ComponentType::TextDisplay => Deserialize::deserialize(raw_data).map(Self::TextDisplay),
+            ComponentType::Label => Deserialize::deserialize(raw_data).map(Self::Label),
+            ComponentType(i) => {
+                return Err(DeError::custom(format_args!("Unknown modal component type {i}")));
+            },
+        }
+        .map_err(DeError::custom)
+    }
 }
