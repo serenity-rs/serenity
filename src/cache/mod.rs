@@ -524,6 +524,8 @@ impl Default for Cache {
 
 #[cfg(test)]
 mod test {
+    use std::str::FromStr;
+
     use crate::cache::{Cache, CacheUpdate, Settings};
     use crate::model::prelude::*;
 
@@ -561,6 +563,186 @@ mod test {
         // Add a third message, the first should now be removed.
         event.message.id = MessageId::new(5);
         assert!(event.update(&cache).is_some());
+
+        // Add a reaction for a channel
+        let message = &event.message;
+        let reaction_type = ReactionType::Unicode(FixedString::from_str("\u{2753}").unwrap());
+        let second_reaction_type =
+            ReactionType::Unicode(FixedString::from_str("\u{2757}").unwrap());
+
+        let mut reaction_event = ReactionAddEvent {
+            reaction: Reaction {
+                user_id: Some(UserId::new(1)),
+                channel_id: message.channel_id,
+                message_id: message.id,
+                guild_id: message.guild_id,
+                member: None,
+                emoji: reaction_type.clone(),
+                message_author_id: Some(message.author.id),
+                burst: false,
+                burst_colours: None,
+                reaction_type: ReactionTypes::Normal,
+            },
+        };
+
+        assert!(cache.update(&mut reaction_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+
+            assert_eq!(message.reactions.len(), 1);
+        }
+
+        // Add second reaction
+        reaction_event.reaction.emoji = second_reaction_type;
+
+        assert!(cache.update(&mut reaction_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+
+            assert_eq!(message.reactions.len(), 2);
+        }
+
+        // Add a burst reaction
+        reaction_event.reaction.emoji = reaction_type.clone();
+        reaction_event.reaction.burst = true;
+        reaction_event.reaction.reaction_type = ReactionTypes::Burst;
+
+        assert!(cache.update(&mut reaction_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+
+            assert_eq!(message.reactions.len(), 2);
+            assert!(
+                message
+                    .reactions
+                    .iter()
+                    .find(|r| r.reaction_type == reaction_type
+                        && r.count == 2
+                        && r.count_details.burst == 1)
+                    .is_some()
+            );
+        }
+
+        // Remove a reaction
+        let mut reaction_remove_event = ReactionRemoveEvent {
+            reaction: reaction_event.reaction.clone(),
+        };
+
+        reaction_remove_event.reaction.emoji = reaction_type.clone();
+
+        assert!(cache.update(&mut reaction_remove_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+
+            assert_eq!(message.reactions.len(), 2);
+            assert!(
+                message
+                    .reactions
+                    .iter()
+                    .find(|r| r.reaction_type == reaction_type
+                        && r.count == 1
+                        && r.count_details.burst == 0)
+                    .is_some()
+            );
+        }
+
+        // Remove normal reaction, so the entire reaction should be removed
+        reaction_remove_event.reaction.burst = false;
+        reaction_remove_event.reaction.reaction_type = ReactionTypes::Normal;
+
+        assert!(cache.update(&mut reaction_remove_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+
+            assert_eq!(message.reactions.len(), 1);
+        }
+
+        // The instance should be removed when ReactionRemoveEmojiEvent is fired
+        let mut reaction_remove_event = ReactionRemoveEmojiEvent {
+            reaction: reaction_event.reaction.clone(),
+        };
+
+        // First prepare test data
+        reaction_event.reaction.emoji = reaction_type.clone();
+        assert!(cache.update(&mut reaction_event).is_some());
+
+        reaction_event.reaction.burst = false;
+        reaction_event.reaction.reaction_type = ReactionTypes::Normal;
+
+        assert!(cache.update(&mut reaction_event).is_some());
+
+        reaction_event.reaction.user_id = Some(UserId::new(2));
+        assert!(cache.update(&mut reaction_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+
+            assert_eq!(message.reactions.len(), 2);
+            assert!(
+                message
+                    .reactions
+                    .iter()
+                    .find(|r| r.reaction_type == reaction_type
+                        && r.count == 3
+                        && r.count_details.burst == 1
+                        && r.count_details.normal == 2)
+                    .is_some()
+            );
+        }
+
+        assert!(cache.update(&mut reaction_remove_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+            assert_eq!(message.reactions.len(), 1);
+        }
+
+        // All reactions should be removed when ReactionRemoveAllEvent is fired
+        let mut reaction_remove_event = ReactionRemoveAllEvent {
+            message_id: reaction_event.reaction.message_id,
+            channel_id: reaction_event.reaction.channel_id,
+            guild_id: reaction_event.reaction.guild_id,
+        };
+
+        // First add second reaction
+        assert!(cache.update(&mut reaction_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+            assert_eq!(message.reactions.len(), 2);
+        }
+
+        // Remove all reactions
+        assert!(cache.update(&mut reaction_remove_event).is_some());
+
+        {
+            let channel = cache.messages.get(&reaction_event.reaction.channel_id).unwrap();
+            let message =
+                channel.iter().find(|m| m.id == reaction_event.reaction.message_id).unwrap();
+
+            assert_eq!(message.reactions.len(), 0);
+        }
 
         {
             let channel = cache.messages.get(&event.message.channel_id).unwrap();

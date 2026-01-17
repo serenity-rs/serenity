@@ -241,22 +241,22 @@ full_event! {
     /// Dispatched when a new reaction is attached to a message.
     ///
     /// Provides the reaction's data.
-    ReactionAdd { add_reaction: Reaction };
+    ReactionAdd { old_message_if_available: Option<Message>, add_reaction: Reaction };
 
     /// Dispatched when a reaction is detached from a message.
     ///
     /// Provides the reaction's data.
-    ReactionRemove { removed_reaction: Reaction };
+    ReactionRemove { old_message_if_available: Option<Message>, removed_reaction: Reaction };
 
     /// Dispatched when all reactions of a message are detached from a message.
     ///
     /// Provides the channel's id, message's id, and guild's id if in a guild.
-    ReactionRemoveAll { guild_id: Option<GuildId>, channel_id: GenericChannelId, removed_from_message_id: MessageId };
+    ReactionRemoveAll { old_message_if_available: Option<Message>, guild_id: Option<GuildId>, channel_id: GenericChannelId, removed_from_message_id: MessageId };
 
     /// Dispatched when all reactions of a message for a given emoji are explicitly detached from a message.
     ///
     /// Provides the emoji's data, channel's id, message's id and guild's id if in a guild.
-    ReactionRemoveEmoji { removed_reactions: Reaction };
+    ReactionRemoveEmoji { old_message_if_available: Option<Message>, removed_reactions: Reaction };
 
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///

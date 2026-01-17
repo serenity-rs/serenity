@@ -4,6 +4,14 @@ use std::num::NonZeroU16;
 use extract_map::entry::Entry;
 
 use super::{BaseGuildChannel, Cache, CacheUpdate, GenericChannelId, GuildThread};
+use crate::all::{
+    CountDetails,
+    MessageReaction,
+    ReactionAddEvent,
+    ReactionRemoveAllEvent,
+    ReactionRemoveEmojiEvent,
+    ReactionRemoveEvent,
+};
 use crate::internal::prelude::*;
 use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
@@ -655,5 +663,136 @@ impl CacheUpdate for GuildScheduledEventDeleteEvent {
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         let mut guild = cache.guilds.get_mut(&self.event.guild_id)?;
         guild.scheduled_events.remove(&self.event.id)
+    }
+}
+
+impl CacheUpdate for ReactionAddEvent {
+    type Output = Message;
+
+    fn update(&self, cache: &Cache) -> Option<Self::Output> {
+        let reaction = &self.reaction;
+        let mut messages = cache.messages.get_mut(&reaction.channel_id)?;
+
+        for message in messages.iter_mut() {
+            if message.id != reaction.message_id {
+                continue;
+            }
+
+            let prev = message.clone();
+
+            if let Some(existing) =
+                message.reactions.iter_mut().find(|r| r.reaction_type == reaction.emoji)
+            {
+                existing.count += 1;
+                if reaction.burst {
+                    existing.count_details.burst += 1;
+                } else {
+                    existing.count_details.normal += 1;
+                }
+                return Some(prev);
+            }
+
+            let me = self.reaction.user_id == Some(cache.current_user().id);
+            let new_reaction = MessageReaction {
+                me,
+                burst_colours: reaction.burst_colours.clone().unwrap_or_default(),
+                count: 1,
+                count_details: CountDetails {
+                    burst: u64::from(reaction.burst),
+                    normal: u64::from(!reaction.burst),
+                },
+                me_burst: if me { reaction.burst } else { false },
+                reaction_type: reaction.emoji.clone(),
+            };
+
+            message.reactions.push(new_reaction);
+
+            return Some(prev);
+        }
+
+        None
+    }
+}
+
+impl CacheUpdate for ReactionRemoveEvent {
+    type Output = Message;
+
+    fn update(&self, cache: &Cache) -> Option<Self::Output> {
+        let reaction = &self.reaction;
+        let mut messages = cache.messages.get_mut(&reaction.channel_id)?;
+
+        for message in messages.iter_mut() {
+            if message.id != reaction.message_id {
+                continue;
+            }
+
+            let old_message = message.clone();
+
+            let index = message.reactions.iter().position(|r| r.reaction_type == reaction.emoji)?;
+
+            let existing_reaction = &mut message.reactions[index];
+
+            existing_reaction.count -= 1;
+            if reaction.burst {
+                existing_reaction.count_details.burst -= 1;
+            } else {
+                existing_reaction.count_details.normal -= 1;
+            }
+
+            if existing_reaction.count == 0 {
+                message.reactions.remove(index);
+            }
+
+            return Some(old_message);
+        }
+
+        None
+    }
+}
+
+impl CacheUpdate for ReactionRemoveEmojiEvent {
+    type Output = Message;
+
+    fn update(&self, cache: &Cache) -> Option<Self::Output> {
+        let reaction = &self.reaction;
+        let mut messages = cache.messages.get_mut(&reaction.channel_id)?;
+
+        for message in messages.iter_mut() {
+            if message.id != reaction.message_id {
+                continue;
+            }
+
+            let old_message = message.clone();
+
+            let index = message.reactions.iter().position(|r| r.reaction_type == reaction.emoji)?;
+
+            message.reactions.remove(index);
+
+            return Some(old_message);
+        }
+
+        None
+    }
+}
+
+impl CacheUpdate for ReactionRemoveAllEvent {
+    type Output = Message;
+
+    fn update(&self, cache: &Cache) -> Option<Self::Output> {
+        let mut messages = cache.messages.get_mut(&self.channel_id)?;
+
+        for message in messages.iter_mut() {
+            if message.id != self.message_id {
+                continue;
+            }
+
+            let old_message = message.clone();
+
+            message.reactions.clear();
+
+            return Some(old_message);
+        }
+
+        None
     }
 }
