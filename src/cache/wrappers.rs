@@ -83,8 +83,8 @@ impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
         self.0.is_some_and(|m| m.contains_key(k))
     }
 }
-pub struct Hasher(foldhash::fast::FoldHasher);
-impl std::hash::Hasher for Hasher {
+pub struct Hasher<'a>(foldhash::fast::FoldHasher<'a>);
+impl std::hash::Hasher for Hasher<'_> {
     fn finish(&self) -> u64 {
         self.0.finish()
     }
@@ -95,12 +95,12 @@ impl std::hash::Hasher for Hasher {
 }
 
 #[cfg(feature = "typesize")]
-impl typesize::TypeSize for Hasher {}
+impl typesize::TypeSize for Hasher<'_> {}
 
 #[derive(Clone, Default)]
 pub struct BuildHasher(foldhash::fast::RandomState);
 impl std::hash::BuildHasher for BuildHasher {
-    type Hasher = Hasher;
+    type Hasher = Hasher<'static>;
 
     fn build_hasher(&self) -> Self::Hasher {
         Hasher(self.0.build_hasher())
