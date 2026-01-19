@@ -33,4 +33,26 @@ pub enum Opcode {
     ClientConnect = 12,
     /// Message indicating that another user has disconnected from the voice channel.
     ClientDisconnect = 13,
+    /// DAVE: Signals the bot is ready for group operations after epoch transition.
+    DaveTransitionReady = 23,
+    /// DAVE: Notifies of an upcoming epoch change.
+    DavePrepareEpoch = 24,
+    /// DAVE: Provides the external sender package for MLS group initialization.
+    DaveMlsExternalSender = 25,
+    /// DAVE: Sends the key package for MLS group participation.
+    DaveMlsKeyPackage = 26,
+    /// DAVE: Provides proposals for group member changes (add/remove).
+    DaveMlsProposals = 27,
+    /// DAVE: Provides a commit with optional welcome for group transitions.
+    DaveMlsCommitWelcome = 28,
+    /// DAVE: Provides the welcome message for new members.
+    DaveMlsWelcome = 30,
+    /// DAVE: Prepares for a protocol transition.
+    DavePrepareTransition = 21,
+    /// DAVE: Executes a prepared protocol transition.
+    DaveExecuteTransition = 22,
+    /// DAVE: Announces a commit for group transition.
+    DaveMlsAnnounceCommitTransition = 29,
+    /// DAVE: Reports an invalid commit or welcome message.
+    DaveMlsInvalidCommitWelcome = 31,
 }
