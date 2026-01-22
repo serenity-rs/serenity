@@ -1,8 +1,8 @@
 #![allow(clippy::missing_errors_doc)]
 
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::cell::Cell;
+use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use arrayvec::ArrayVec;
@@ -3104,7 +3104,7 @@ impl Http {
     ///
     /// [`Consumable`]: SkuKind::Consumable
     pub async fn consume_entitlement(&self, entitlement_id: EntitlementId) -> Result<()> {
-        self.wind(204, Request {
+        self.wind(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3574,7 +3574,7 @@ impl Http {
             })
             .await?;
 
-        from_value(value)
+        from_value(value).map_err(From::from)
     }
 
     /// Retrieves a list of roles in a [`Guild`].

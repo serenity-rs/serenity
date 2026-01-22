@@ -525,6 +525,13 @@ pub enum ShardRunnerMessage {
         /// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent
         nonce: Option<String>,
     },
+    /// Indicates that the client is to send a request soundboard sounds message.
+    SoundboardSounds {
+        /// The IDs of the [`Guild`] to request soundboard sounds from.
+        ///
+        /// [`Guild`]: crate::model::guild::Guild
+        guild_ids: Vec<GuildId>,
+    },
     /// Indicates that the client is to update the shard's presence.
     ///
     /// Pass `None` to keep a value unmodified. The `activity` field is nullable, in other words

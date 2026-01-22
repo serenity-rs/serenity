@@ -282,19 +282,19 @@ full_event! {
     /// Dispatched when the data for soundboard sounds is requested.
     ///
     /// Provides the guild's id and the data.
-    SoundboardSounds { event: SoundboardSoundsEvent } => async fn soundboard_sounds(&self, ctx: Context);
+    SoundboardSounds { event: SoundboardSoundsEvent };
 
     /// Dispatched when a soundboard sound is created.
-    SoundboardSoundCreate { event: SoundboardSoundCreateEvent } => async fn soundboard_sound_create(&self, ctx: Context);
+    SoundboardSoundCreate { event: SoundboardSoundCreateEvent };
 
     /// Dispatched when a soundboard sound is updated.
-    SoundboardSoundUpdate { event: SoundboardSoundUpdateEvent } => async fn soundboard_sound_update(&self, ctx: Context);
+    SoundboardSoundUpdate { event: SoundboardSoundUpdateEvent };
 
     /// Dispatched when multiple soundboard sounds at once are updated.
-    SoundboardSoundsUpdate { event: SoundboardSoundsUpdateEvent } => async fn soundboard_sounds_update(&self, ctx: Context);
+    SoundboardSoundsUpdate { event: SoundboardSoundsUpdateEvent };
 
     /// Dispatched when a soundboard sound is deleted.
-    SoundboardSoundDelete { event: SoundboardSoundDeleteEvent } => async fn soundboard_sound_delete(&self, ctx: Context);
+    SoundboardSoundDelete { event: SoundboardSoundDeleteEvent };
 
     /// Dispatched when a user starts typing.
     TypingStart { event: TypingStartEvent };
