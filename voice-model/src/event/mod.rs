@@ -40,6 +40,20 @@ pub enum Event {
     ClientConnect(ClientConnect),
     /// Status update in the current channel, indicating that a user has disconnected.
     ClientDisconnect(ClientDisconnect),
+    /// Video stream information (unused by bots).
+    Video(Video),
+    /// List of user IDs currently in the voice channel.
+    ClientsConnect(ClientsConnect),
+    /// Media sink wants update (unused by bots).
+    MediaSinkWants(MediaSinkWants),
+    /// Voice backend version (unused by bots).
+    VoiceBackendVersion(VoiceBackendVersion),
+    /// Channel options update (unused by bots).
+    ChannelOptionsUpdate(ChannelOptionsUpdate),
+    /// User flags update (muted, deafened, etc.).
+    Flags(Flags),
+    /// Platform information for a user.
+    Platform(Platform),
     /// DAVE: Signals the bot is ready for group operations after epoch transition.
     DaveTransitionReady(DaveTransitionReady),
     /// DAVE: Notifies of an upcoming epoch change.
@@ -78,8 +92,15 @@ impl Event {
             Resume(_) => Opcode::Resume,
             Hello(_) => Opcode::Hello,
             Resumed => Opcode::Resumed,
+            Video(_) => Opcode::Video,
+            ClientsConnect(_) => Opcode::ClientsConnect,
             ClientConnect(_) => Opcode::ClientConnect,
             ClientDisconnect(_) => Opcode::ClientDisconnect,
+            MediaSinkWants(_) => Opcode::MediaSinkWants,
+            VoiceBackendVersion(_) => Opcode::VoiceBackendVersion,
+            ChannelOptionsUpdate(_) => Opcode::ChannelOptionsUpdate,
+            Flags(_) => Opcode::Flags,
+            Platform(_) => Opcode::Platform,
             DaveTransitionReady(_) => Opcode::DaveTransitionReady,
             DavePrepareEpoch(_) => Opcode::DavePrepareEpoch,
             DaveMlsExternalSender(_) => Opcode::DaveMlsExternalSender,
@@ -116,8 +137,15 @@ impl Serialize for Event {
             Resume(e) => s.serialize_field("d", e)?,
             Hello(e) => s.serialize_field("d", e)?,
             Resumed => s.serialize_field("d", &None::<()>)?,
+            Video(e) => s.serialize_field("d", e)?,
+            ClientsConnect(e) => s.serialize_field("d", e)?,
             ClientConnect(e) => s.serialize_field("d", e)?,
             ClientDisconnect(e) => s.serialize_field("d", e)?,
+            MediaSinkWants(e) => s.serialize_field("d", e)?,
+            VoiceBackendVersion(e) => s.serialize_field("d", e)?,
+            ChannelOptionsUpdate(e) => s.serialize_field("d", e)?,
+            Flags(e) => s.serialize_field("d", e)?,
+            Platform(e) => s.serialize_field("d", e)?,
             DaveTransitionReady(e) => s.serialize_field("d", e)?,
             DavePrepareEpoch(e) => s.serialize_field("d", e)?,
             DaveMlsExternalSender(e) => s.serialize_field("d", e)?,
@@ -159,7 +187,7 @@ impl<'de> Visitor<'de> for EventVisitor {
                     let valid_op = Opcode::deserialize(des).map_err(|_| {
                         DeError::invalid_value(
                             Unexpected::Unsigned(raw.into()),
-                            &"opcode in [0--9] + [12--13] + [21--24] + [26--31]",
+                            &"opcode in [0--20] + [21--31]",
                         )
                     })?;
                     op = Some(valid_op);
@@ -168,14 +196,17 @@ impl<'de> Visitor<'de> for EventVisitor {
                 // So, if order correct then we don't need to pass the RawValue back out.
                 Some("d") => match op {
                     Some(Opcode::Identify) => return Ok(map.next_value::<Identify>()?.into()),
-                    Some(Opcode::SelectProtocol) =>
-                        return Ok(map.next_value::<SelectProtocol>()?.into()),
+                    Some(Opcode::SelectProtocol) => {
+                        return Ok(map.next_value::<SelectProtocol>()?.into());
+                    },
                     Some(Opcode::Ready) => return Ok(map.next_value::<Ready>()?.into()),
                     Some(Opcode::Heartbeat) => return Ok(map.next_value::<Heartbeat>()?.into()),
-                    Some(Opcode::HeartbeatAck) =>
-                        return Ok(map.next_value::<HeartbeatAck>()?.into()),
-                    Some(Opcode::SessionDescription) =>
-                        return Ok(map.next_value::<SessionDescription>()?.into()),
+                    Some(Opcode::HeartbeatAck) => {
+                        return Ok(map.next_value::<HeartbeatAck>()?.into());
+                    },
+                    Some(Opcode::SessionDescription) => {
+                        return Ok(map.next_value::<SessionDescription>()?.into());
+                    },
                     Some(Opcode::Speaking) => return Ok(map.next_value::<Speaking>()?.into()),
                     Some(Opcode::Resume) => return Ok(map.next_value::<Resume>()?.into()),
                     Some(Opcode::Hello) => return Ok(map.next_value::<Hello>()?.into()),
@@ -183,32 +214,66 @@ impl<'de> Visitor<'de> for EventVisitor {
                         let _ = map.next_value::<Option<()>>()?;
                         return Ok(Event::Resumed);
                     },
-                    Some(Opcode::ClientConnect) =>
-                        return Ok(map.next_value::<ClientConnect>()?.into()),
-                    Some(Opcode::ClientDisconnect) =>
-                        return Ok(map.next_value::<ClientDisconnect>()?.into()),
-                    Some(Opcode::DaveTransitionReady) =>
-                        return Ok(map.next_value::<DaveTransitionReady>()?.into()),
-                    Some(Opcode::DavePrepareEpoch) =>
-                        return Ok(map.next_value::<DavePrepareEpoch>()?.into()),
-                    Some(Opcode::DaveMlsExternalSender) =>
-                        return Ok(map.next_value::<DaveMlsExternalSender>()?.into()),
-                    Some(Opcode::DaveMlsKeyPackage) =>
-                        return Ok(map.next_value::<DaveMlsKeyPackage>()?.into()),
-                    Some(Opcode::DaveMlsProposals) =>
-                        return Ok(map.next_value::<DaveMlsProposals>()?.into()),
-                    Some(Opcode::DaveMlsCommitWelcome) =>
-                        return Ok(map.next_value::<DaveMlsCommitWelcome>()?.into()),
-                    Some(Opcode::DaveMlsWelcome) =>
-                        return Ok(map.next_value::<DaveMlsWelcome>()?.into()),
-                    Some(Opcode::DavePrepareTransition) =>
-                        return Ok(map.next_value::<DavePrepareTransition>()?.into()),
-                    Some(Opcode::DaveExecuteTransition) =>
-                        return Ok(map.next_value::<DaveExecuteTransition>()?.into()),
-                    Some(Opcode::DaveMlsAnnounceCommitTransition) =>
-                        return Ok(map.next_value::<DaveMlsAnnounceCommitTransition>()?.into()),
-                    Some(Opcode::DaveMlsInvalidCommitWelcome) =>
-                        return Ok(map.next_value::<DaveMlsInvalidCommitWelcome>()?.into()),
+                    Some(Opcode::Video) => {
+                        return Ok(map.next_value::<Video>()?.into());
+                    },
+                    Some(Opcode::ClientsConnect) => {
+                        return Ok(map.next_value::<ClientsConnect>()?.into());
+                    },
+                    Some(Opcode::ClientConnect) => {
+                        return Ok(map.next_value::<ClientConnect>()?.into());
+                    },
+                    Some(Opcode::ClientDisconnect) => {
+                        return Ok(map.next_value::<ClientDisconnect>()?.into());
+                    },
+                    Some(Opcode::MediaSinkWants) => {
+                        return Ok(map.next_value::<MediaSinkWants>()?.into());
+                    },
+                    Some(Opcode::VoiceBackendVersion) => {
+                        return Ok(map.next_value::<VoiceBackendVersion>()?.into());
+                    },
+                    Some(Opcode::ChannelOptionsUpdate) => {
+                        return Ok(map.next_value::<ChannelOptionsUpdate>()?.into());
+                    },
+                    Some(Opcode::Flags) => {
+                        return Ok(map.next_value::<Flags>()?.into());
+                    },
+                    Some(Opcode::Platform) => {
+                        return Ok(map.next_value::<Platform>()?.into());
+                    },
+                    Some(Opcode::DaveTransitionReady) => {
+                        return Ok(map.next_value::<DaveTransitionReady>()?.into());
+                    },
+                    Some(Opcode::DavePrepareEpoch) => {
+                        return Ok(map.next_value::<DavePrepareEpoch>()?.into());
+                    },
+                    Some(Opcode::DaveMlsExternalSender) => {
+                        return Ok(map.next_value::<DaveMlsExternalSender>()?.into());
+                    },
+                    Some(Opcode::DaveMlsKeyPackage) => {
+                        return Ok(map.next_value::<DaveMlsKeyPackage>()?.into());
+                    },
+                    Some(Opcode::DaveMlsProposals) => {
+                        return Ok(map.next_value::<DaveMlsProposals>()?.into());
+                    },
+                    Some(Opcode::DaveMlsCommitWelcome) => {
+                        return Ok(map.next_value::<DaveMlsCommitWelcome>()?.into());
+                    },
+                    Some(Opcode::DaveMlsWelcome) => {
+                        return Ok(map.next_value::<DaveMlsWelcome>()?.into());
+                    },
+                    Some(Opcode::DavePrepareTransition) => {
+                        return Ok(map.next_value::<DavePrepareTransition>()?.into());
+                    },
+                    Some(Opcode::DaveExecuteTransition) => {
+                        return Ok(map.next_value::<DaveExecuteTransition>()?.into());
+                    },
+                    Some(Opcode::DaveMlsAnnounceCommitTransition) => {
+                        return Ok(map.next_value::<DaveMlsAnnounceCommitTransition>()?.into());
+                    },
+                    Some(Opcode::DaveMlsInvalidCommitWelcome) => {
+                        return Ok(map.next_value::<DaveMlsInvalidCommitWelcome>()?.into());
+                    },
                     None => {
                         d = Some(map.next_value::<&RawValue>()?);
                     },
@@ -242,8 +307,17 @@ impl<'de> Visitor<'de> for EventVisitor {
             Opcode::Resume => serde_json::from_str::<Resume>(d).map(Into::into),
             Opcode::Hello => serde_json::from_str::<Hello>(d).map(Into::into),
             Opcode::Resumed => Ok(Event::Resumed),
+            Opcode::Video => serde_json::from_str::<Video>(d).map(Into::into),
+            Opcode::ClientsConnect => serde_json::from_str::<ClientsConnect>(d).map(Into::into),
             Opcode::ClientConnect => serde_json::from_str::<ClientConnect>(d).map(Into::into),
             Opcode::ClientDisconnect => serde_json::from_str::<ClientDisconnect>(d).map(Into::into),
+            Opcode::MediaSinkWants => serde_json::from_str::<MediaSinkWants>(d).map(Into::into),
+            Opcode::VoiceBackendVersion =>
+                serde_json::from_str::<VoiceBackendVersion>(d).map(Into::into),
+            Opcode::ChannelOptionsUpdate =>
+                serde_json::from_str::<ChannelOptionsUpdate>(d).map(Into::into),
+            Opcode::Flags => serde_json::from_str::<Flags>(d).map(Into::into),
+            Opcode::Platform => serde_json::from_str::<Platform>(d).map(Into::into),
             Opcode::DaveTransitionReady =>
                 serde_json::from_str::<DaveTransitionReady>(d).map(Into::into),
             Opcode::DavePrepareEpoch => serde_json::from_str::<DavePrepareEpoch>(d).map(Into::into),

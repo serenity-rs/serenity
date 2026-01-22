@@ -30,6 +30,72 @@ pub struct ClientDisconnect {
     pub user_id: UserId,
 }
 
+/// List of user IDs currently in the voice channel.
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct ClientsConnect {
+    /// List of user IDs in the voice channel.
+    pub user_ids: Vec<UserId>,
+}
+
+/// Video stream information (opcode 10, unused by bots).
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct Video {
+    /// SSRC for the video stream.
+    #[serde(default)]
+    pub audio_ssrc: u32,
+    /// Video SSRC.
+    #[serde(default)]
+    pub video_ssrc: u32,
+    /// User ID of the video sender.
+    #[serde(default)]
+    pub user_id: Option<UserId>,
+}
+
+/// Media sink wants update (opcode 14, unused by bots).
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct MediaSinkWants {
+    /// Any value - structure unknown.
+    #[serde(default)]
+    pub any: Option<u32>,
+}
+
+/// Voice backend version (opcode 15, unused by bots).
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct VoiceBackendVersion {
+    /// Voice backend version string.
+    #[serde(default)]
+    pub voice: String,
+    /// RTC worker version string.
+    #[serde(default)]
+    pub rtc_worker: String,
+}
+
+/// Channel options update (opcode 16, unused by bots).
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct ChannelOptionsUpdate {
+    /// Any value - structure unknown.
+    #[serde(default)]
+    pub any: Option<u32>,
+}
+
+/// User flags in voice (muted, deafened, etc.).
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct Flags {
+    /// User ID whose flags changed.
+    pub user_id: UserId,
+    /// Flags bitfield.
+    pub flags: u32,
+}
+
+/// Platform information for a user.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+pub struct Platform {
+    /// User ID.
+    pub user_id: UserId,
+    /// Platform code (0 = desktop, 1 = mobile, 2 = web, etc.).
+    pub platform: u32,
+}
+
 /// Used to keep the websocket connection alive.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 #[serde(transparent)]
@@ -67,6 +133,12 @@ pub struct Identify {
     pub token: String,
     /// UserId of the client who is connecting.
     pub user_id: UserId,
+    /// Maximum DAVE protocol version supported by the client.
+    ///
+    /// Signals to Discord that the bot supports end-to-end encryption.
+    /// If omitted, the client does not support DAVE.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_dave_protocol_version: Option<u16>,
 }
 
 /// RTP server's connection offer and supported encryption modes.
@@ -156,8 +228,13 @@ impl Default for MaxDaveProtocolVersion {
 ///
 /// Received from the server (Opcode 25) containing the voice gateway's
 /// credential and signature public key for the MLS group's external_senders extension.
+///
+/// **Note:** This opcode uses binary WebSocket frames, not JSON.
+/// Binary format: `[sequence_number: u16][opcode: u8][external_sender: Vec<u8>]`
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsExternalSender {
+    /// Sequence number for message ordering.
+    pub sequence_number: u16,
     /// Serialized ExternalSender containing signature_key and credential.
     pub external_sender: Vec<u8>,
 }
@@ -166,6 +243,9 @@ pub struct DaveMlsExternalSender {
 ///
 /// Sent to the server (Opcode 26) during the join handshake.
 /// The basic credential identity is the big-endian 64-bit user ID.
+///
+/// **Note:** This opcode uses binary WebSocket frames, not JSON.
+/// Binary format: `[opcode: u8][key_package: Vec<u8>]` (no sequence number)
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsKeyPackage {
     /// Serialized MLSMessage containing the KeyPackage (see RFC 9420).
@@ -187,8 +267,13 @@ pub enum DaveMlsProposalsOperationType {
 ///
 /// Received from the server (Opcode 27) for add/remove operations.
 /// Contains either proposals to append or proposal refs to revoke.
+///
+/// **Note:** This opcode uses binary WebSocket frames, not JSON.
+/// Binary format: `[sequence_number: u16][opcode: u8][operation_type: u8][proposals: Vec<u8>]`
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsProposals {
+    /// Sequence number for message ordering.
+    pub sequence_number: u16,
     /// The type of operation (append or revoke).
     pub operation_type: DaveMlsProposalsOperationType,
     /// Serialized proposal data.
@@ -201,6 +286,9 @@ pub struct DaveMlsProposals {
 ///
 /// Sent by the client (Opcode 28) after processing proposals.
 /// When at least one add proposal is handled, the welcome message MUST be included.
+///
+/// **Note:** This opcode uses binary WebSocket frames, not JSON.
+/// Binary format: `[opcode: u8][commit: Vec<u8>][welcome: Option<Vec<u8>>]` (no sequence number)
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsCommitWelcome {
     /// Serialized MLS commit message (see RFC 9420 MLSMessage and Commit definitions).
@@ -215,8 +303,13 @@ pub struct DaveMlsCommitWelcome {
 ///
 /// Received from the server (Opcode 30) as confirmation of successful join.
 /// Includes the transition ID for the group transition.
+///
+/// **Note:** This opcode uses binary WebSocket frames, not JSON.
+/// Binary format: `[sequence_number: u16][opcode: u8][transition_id: u16][welcome: Vec<u8>]`
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsWelcome {
+    /// Sequence number for message ordering.
+    pub sequence_number: u16,
     /// The transition ID for this group transition.
     pub transition_id: u16,
     /// Serialized MLS Welcome message (see RFC 9420 Welcome definition).
@@ -243,6 +336,8 @@ pub struct DavePrepareEpoch {
 pub struct DaveTransitionReady {
     /// The transition ID the client is ready to execute.
     pub transition_id: u16,
+    /// The protocol version for the transition.
+    pub protocol_version: u16,
 }
 
 /// Prepare protocol transition notification.
@@ -269,6 +364,9 @@ pub struct DaveExecuteTransition {
 ///
 /// Received from the server (Opcode 29) to broadcast an MLS commit for moving to the next epoch.
 /// The commit is one received from a group member via dave_mls_commit_welcome (Opcode 28).
+///
+/// **Note:** This opcode uses binary WebSocket frames, not JSON.
+/// Binary format: `[sequence_number: u16][opcode: u8][transition_id: u16][commit_message: Vec<u8>]`
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct DaveMlsAnnounceCommitTransition {
     /// Sequence number for the announcement.

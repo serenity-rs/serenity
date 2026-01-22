@@ -14,7 +14,9 @@ impl EventHandler for Handler {
             // This event will be dispatched for guilds, but not for direct messages.
             FullEvent::Message {
                 new_message, ..
-            } => println!("Received message: {}", new_message.content),
+            } => {
+                println!("Received message: {}", new_message.content)
+            },
             // As the intents set in this example, this event shall never be dispatched.
             // Try it by changing your status.
             FullEvent::PresenceUpdate {

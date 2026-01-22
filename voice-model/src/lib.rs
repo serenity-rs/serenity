@@ -2,6 +2,7 @@
 //! (de)serialisation.
 #![deny(rustdoc::broken_intra_doc_links)]
 
+pub mod binary;
 mod close_code;
 pub mod constants;
 mod event;
@@ -14,6 +15,7 @@ mod util;
 
 pub use num_traits::FromPrimitive;
 
+pub use self::binary::{BinaryError, deserialize_binary_event, serialize_binary_event};
 pub use self::close_code::CloseCode;
 pub use self::event::Event;
 pub use self::opcode::Opcode;

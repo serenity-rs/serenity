@@ -29,11 +29,29 @@ pub enum Opcode {
     Hello = 8,
     /// Sent by the server if a session could successfully be resumed.
     Resumed = 9,
+    /// Video stream information.
+    Video = 10,
+    /// List of user IDs in channel.
+    ClientsConnect = 11,
     /// Message indicating that another user has connected to the voice channel.
     ClientConnect = 12,
     /// Message indicating that another user has disconnected from the voice channel.
     ClientDisconnect = 13,
-    /// DAVE: Signals the bot is ready for group operations after epoch transition.
+    /// Media Sink wants (internal).
+    MediaSinkWants = 14,
+    /// Voice backend version (internal).
+    VoiceBackendVersion = 15,
+    /// Channel options update (internal).
+    ChannelOptionsUpdate = 16,
+    /// Flags update (muted, deafened, etc.).
+    Flags = 18,
+    /// Platform information.
+    Platform = 20,
+    /// DAVE: Prepares for a protocol transition.
+    DavePrepareTransition = 21,
+    /// DAVE: Executes a prepared protocol transition.
+    DaveExecuteTransition = 22,
+    /// DAVE: Signals the bot is ready for group operations.
     DaveTransitionReady = 23,
     /// DAVE: Notifies of an upcoming epoch change.
     DavePrepareEpoch = 24,
@@ -45,14 +63,10 @@ pub enum Opcode {
     DaveMlsProposals = 27,
     /// DAVE: Provides a commit with optional welcome for group transitions.
     DaveMlsCommitWelcome = 28,
-    /// DAVE: Provides the welcome message for new members.
-    DaveMlsWelcome = 30,
-    /// DAVE: Prepares for a protocol transition.
-    DavePrepareTransition = 21,
-    /// DAVE: Executes a prepared protocol transition.
-    DaveExecuteTransition = 22,
     /// DAVE: Announces a commit for group transition.
     DaveMlsAnnounceCommitTransition = 29,
+    /// DAVE: Provides the welcome message for new members.
+    DaveMlsWelcome = 30,
     /// DAVE: Reports an invalid commit or welcome message.
     DaveMlsInvalidCommitWelcome = 31,
 }

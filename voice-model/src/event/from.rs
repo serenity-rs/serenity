@@ -67,6 +67,48 @@ impl From<ClientDisconnect> for Event {
     }
 }
 
+impl From<Video> for Event {
+    fn from(i: Video) -> Self {
+        Event::Video(i)
+    }
+}
+
+impl From<ClientsConnect> for Event {
+    fn from(i: ClientsConnect) -> Self {
+        Event::ClientsConnect(i)
+    }
+}
+
+impl From<MediaSinkWants> for Event {
+    fn from(i: MediaSinkWants) -> Self {
+        Event::MediaSinkWants(i)
+    }
+}
+
+impl From<VoiceBackendVersion> for Event {
+    fn from(i: VoiceBackendVersion) -> Self {
+        Event::VoiceBackendVersion(i)
+    }
+}
+
+impl From<ChannelOptionsUpdate> for Event {
+    fn from(i: ChannelOptionsUpdate) -> Self {
+        Event::ChannelOptionsUpdate(i)
+    }
+}
+
+impl From<Flags> for Event {
+    fn from(i: Flags) -> Self {
+        Event::Flags(i)
+    }
+}
+
+impl From<Platform> for Event {
+    fn from(i: Platform) -> Self {
+        Event::Platform(i)
+    }
+}
+
 impl From<DaveTransitionReady> for Event {
     fn from(i: DaveTransitionReady) -> Self {
         Event::DaveTransitionReady(i)
