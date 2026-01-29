@@ -897,7 +897,27 @@ impl EmbedMessageBuilding for MessageBuilder {
         self.0.push('[');
         self.push_safe_(name.into(), |c| normalize(c).replace(['[', ']'], " "));
         self.0.push_str("](");
-        self.push_safe_(url.into(), |c| normalize(c).replace(')', "\\)"));
+        self.push_safe_(url.into(), |c| {
+            let normalized = normalize(c);
+            let mut safe_url = String::with_capacity(normalized.len());
+            let mut fs = 0;
+            for char in normalized.chars() {
+                if char == '/' {
+                    fs += 1;
+                }
+                match char {
+                    // Percent-encoding before three forward slashes have been used breaks
+                    // link markdown, so remove any parentheses or backslashes occurring before
+                    // three forward slashes have been used, and percent-encode all others.
+                    '(' | ')' | '\\' if fs < 3 => (),
+                    '(' => safe_url.push_str("%28"),
+                    ')' => safe_url.push_str("%29"),
+                    '\\' => safe_url.push_str("%5C"),
+                    _ => safe_url.push(char),
+                }
+            }
+            safe_url
+        });
         self.0.push(')');
 
         self
