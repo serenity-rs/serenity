@@ -867,7 +867,10 @@ pub trait EmbedMessageBuilding {
     ///     .push_named_link_safe("[Try] to [ break links ([(", "https://rust-lang.org")
     ///     .build();
     ///
-    /// assert_eq!(content, "A weird website name: [ Try  to   break links ( (](https://rust-lang.org)");
+    /// assert_eq!(
+    ///     content,
+    ///     "A weird website name: [ Try  to   break links ( (](https://rust-lang.org)"
+    /// );
     /// ```
     #[must_use]
     fn push_named_link_safe<'a>(
