@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust-version-badge]][rust-version-link]
+[![crates.io badge]][crates.io] [![build badge]][build] [![docs badge]][docs] [![current docs badge]][current docs] [![next docs badge]][next docs] [![msrv badge]][msrv] [![license badge]][license] [![guild badge]][guild]
 
 # serenity
 
@@ -220,7 +220,7 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 
 - [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink] and [Andesite][repo:andesite], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 - [Songbird][project:songbird]: An async Rust library for the Discord voice API.
-- [Poise][project:poise]: Experimental command framework, with advanced features like edit tracking, single function slash and prefix commands and flexible argument parsing.
+- [Poise][project:poise]: A command framework for Serenity, with advanced features like edit tracking, single function slash and prefix commands, and flexible argument parsing.
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
@@ -232,18 +232,10 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
 [`validate_token`]: https://docs.rs/serenity/*/serenity/utils/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
-[ci]: https://github.com/serenity-rs/serenity/actions
-[ci-badge]: https://img.shields.io/github/actions/workflow/status/serenity-rs/serenity/ci.yml?branch=current&style=flat-square
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
-[crates.io link]: https://crates.io/crates/serenity
-[crates.io version]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
 [discord docs]: https://docs.discord.com/developers/intro
-[docs]: https://docs.rs/serenity
-[docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
 [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
-[guild]: https://discord.gg/serenity-rs
-[guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
 [project:lavalink-rs]: https://gitlab.com/vicky5124/lavalink-rs/
 [project:songbird]: https://github.com/serenity-rs/songbird
 [project:poise]: https://github.com/kangalioo/poise
@@ -252,5 +244,21 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 [repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust-version-badge]: https://img.shields.io/badge/rust-1.92.0+-93450a.svg?style=flat-square
-[rust-version-link]: https://blog.rust-lang.org/2025/12/11/Rust-1.92.0
+
+<!-- Badges -->
+[crates.io]: https://crates.io/crates/serenity
+[crates.io badge]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
+[build]: https://github.com/serenity-rs/serenity/actions
+[build badge]: https://img.shields.io/github/actions/workflow/status/serenity-rs/serenity/ci.yml?branch=current&style=flat-square
+[docs]: https://docs.rs/serenity/
+[docs badge]: https://img.shields.io/badge/docs-online-informational?style=flat-square
+[current docs]: https://serenity-rs.github.io/serenity/current/serenity/index.html
+[current docs badge]: https://img.shields.io/badge/docs-current-4d76ae.svg?style=flat-square
+[next docs]: https://serenity-rs.github.io/serenity/next/serenity/index.html
+[next docs badge]: https://img.shields.io/badge/docs-next-4d76ae.svg?style=flat-square
+[msrv]: https://blog.rust-lang.org/2025/12/11/Rust-1.92.0
+[msrv badge]: https://img.shields.io/badge/rust-1.92.0+-93450a.svg?style=flat-square
+[license]: LICENSE
+[license badge]: https://img.shields.io/crates/l/serenity.svg?style=flat-square&color=yellow
+[guild]: https://discord.gg/serenity-rs
+[guild badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
