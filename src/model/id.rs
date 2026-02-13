@@ -8,6 +8,7 @@ use serde::de::Error;
 use to_arraystring::ToArrayString;
 
 use super::prelude::*;
+use super::timestamp::TimestampOutOfRange;
 
 macro_rules! newtype_display_impl {
     ($name:ident, |$this:ident| $inner:expr) => {
@@ -136,6 +137,15 @@ macro_rules! id_u64 {
 
             #[cfg(feature = "typesize")]
             impl typesize::TypeSize for $name {}
+
+            impl TryFrom<Timestamp> for $name {
+                type Error = TimestampOutOfRange;
+
+                fn try_from(value: Timestamp) -> Result<Self, Self::Error> {
+                    Ok(value.try_as_discord_id()?.into())
+                }
+            }
+
         )*
     }
 }
