@@ -159,7 +159,7 @@ impl Timestamp {
     pub(crate) fn try_as_discord_id(self) -> Result<u64, TimestampOutOfRange> {
         let unix_millis = TryInto::<u64>::try_into(self.unix_timestamp_millis())
             .map_err(|_| TimestampOutOfRange)?;
-        if unix_millis < DISCORD_EPOCH || unix_millis > MAX_DISCORD_ID_MILLIS {
+        if !(DISCORD_EPOCH..=MAX_DISCORD_ID_MILLIS).contains(&unix_millis) {
             return Err(TimestampOutOfRange);
         }
         Ok((unix_millis - DISCORD_EPOCH) << 22)
