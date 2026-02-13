@@ -256,7 +256,7 @@ pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
 /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
 /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to [`GuildChannel`]s.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
+/// [Discord docs](https://docs.discord.com/developers/topics/permissions#permissions-bitwise-permission-flags).
 ///
 /// [`Guild`]: super::guild::Guild
 /// [`GuildChannel`]: super::channel::GuildChannel

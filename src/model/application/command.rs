@@ -22,7 +22,7 @@ use crate::model::Permissions;
 
 /// The base command model that belongs to an application.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -44,13 +44,13 @@ pub struct Command {
     ///
     /// If the name is localized, either this field or [`Self::name_localizations`] is set,
     /// depending on which endpoint this data was retrieved from
-    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    /// ([source](https://docs.discord.com/developers/interactions/application-commands#retrieving-localized-commands)).
     pub name_localized: Option<String>,
     /// All localized command names.
     ///
     /// If the name is localized, either this field or [`Self::name_localized`] is set, depending
     /// on which endpoint this data was retrieved from
-    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    /// ([source](https://docs.discord.com/developers/interactions/application-commands#retrieving-localized-commands)).
     pub name_localizations: Option<HashMap<String, String>>,
     /// The command description.
     pub description: String,
@@ -58,13 +58,13 @@ pub struct Command {
     ///
     /// If the description is localized, either this field or [`Self::description_localizations`]
     /// is set, depending on which endpoint this data was retrieved from
-    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    /// ([source](https://docs.discord.com/developers/interactions/application-commands#retrieving-localized-commands)).
     pub description_localized: Option<String>,
     /// All localized command descriptions.
     ///
     /// If the description is localized, either this field or [`Self::description_localized`] is
     /// set, depending on which endpoint this data was retrieved from
-    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    /// ([source](https://docs.discord.com/developers/interactions/application-commands#retrieving-localized-commands)).
     pub description_localizations: Option<HashMap<String, String>>,
     /// The parameters for the command.
     #[serde(default)]
@@ -79,7 +79,7 @@ pub struct Command {
         deprecated = "Use Command::contexts"
     )]
     pub dm_permission: Option<bool>,
-    /// Indicates whether the command is [age-restricted](https://discord.com/developers/docs/interactions/application-commands#agerestricted-commands),
+    /// Indicates whether the command is [age-restricted](https://docs.discord.com/developers/interactions/application-commands#age-restricted-commands),
     /// defaults to false.
     #[serde(default)]
     pub nsfw: bool,
@@ -237,7 +237,7 @@ impl Command {
 enum_number! {
     /// The type of an application command.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).
+    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -255,7 +255,7 @@ enum_number! {
     /// Signifies how the invocation of a command of type [`PrimaryEntryPoint`] should be handled.
     ///
     /// [`PrimaryEntryPoint`]: CommandType::PrimaryEntryPoint
-    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-entry-point-command-handler-types)
+    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-entry-point-command-handler-types)
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -269,7 +269,7 @@ enum_number! {
 
 /// The parameters for an [`Command`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -330,7 +330,7 @@ pub struct CommandOption {
 enum_number! {
     /// The type of an [`CommandOption`].
     ///
-    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
+    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -353,7 +353,7 @@ enum_number! {
 
 /// The only valid values a user can pick in an [`CommandOption`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-choice-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -369,7 +369,7 @@ pub struct CommandOptionChoice {
 
 /// An [`Command`] permission.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -386,7 +386,7 @@ pub struct CommandPermissions {
 
 /// The [`CommandPermission`] data.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -403,7 +403,7 @@ pub struct CommandPermission {
 enum_number! {
     /// The type of a [`CommandPermission`].
     ///
-    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
+    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]

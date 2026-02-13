@@ -7,7 +7,7 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event)
+/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#create-guild-scheduled-event)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateScheduledEvent<'a> {

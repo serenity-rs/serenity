@@ -159,7 +159,7 @@ impl std::str::FromStr for ImageHash {
 
 /// A version of an emoji used only when solely the animated state, Id, and name are known.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-emoji).
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub struct EmojiIdentifier {

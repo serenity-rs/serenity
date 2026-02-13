@@ -13,7 +13,7 @@ use crate::model::utils::single_recipient;
 
 /// A Direct Message text channel with another user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]

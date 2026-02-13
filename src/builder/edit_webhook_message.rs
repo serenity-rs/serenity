@@ -17,7 +17,7 @@ use crate::model::prelude::*;
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
+/// [Discord docs](https://docs.discord.com/developers/resources/webhook#edit-webhook-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditWebhookMessage {

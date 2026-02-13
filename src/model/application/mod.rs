@@ -27,7 +27,7 @@ use super::Permissions;
 
 /// Partial information about the given application.
 ///
-/// Discord docs: [application field of Ready](https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields)
+/// Discord docs: [application field of Ready](https://docs.discord.com/developers/events/gateway-events#ready-ready-event-fields)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -40,7 +40,7 @@ pub struct PartialCurrentApplicationInfo {
 
 /// Information about the current application and its owner.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/application#application-object-application-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CurrentApplicationInfo {
@@ -92,7 +92,7 @@ impl CurrentApplicationInfo {
     /// Returns the store url for the application. If included in a message, will render as a rich
     /// embed. See the [Discord docs] for details.
     ///
-    /// [Discord docs]: https://discord.com/developers/docs/monetization/managing-your-store#linking-to-your-store
+    /// [Discord docs]: https://docs.discord.com/developers/monetization/managing-skus#linking-to-your-store
     #[must_use]
     pub fn store_url(&self) -> String {
         format!("https://discord.com/application-directory/{}/store", self.id)
@@ -102,7 +102,7 @@ impl CurrentApplicationInfo {
 enum_number! {
     /// An enum representing the [installation contexts].
     ///
-    /// [interaction contexts](https://discord.com/developers/docs/resources/application#application-object-application-integration-types).
+    /// [interaction contexts](https://docs.discord.com/developers/resources/application#application-object-application-integration-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -117,7 +117,8 @@ enum_number! {
 enum_number! {
     /// An enum representing the different [interaction contexts].
     ///
-    /// [interaction contexts](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types).
+    /// [interaction contexts](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
+    // TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-context-types
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -135,7 +136,7 @@ enum_number! {
 
 /// Information about how the [`CurrentApplicationInfo`] is installed.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-integration-types).
+/// [Discord docs](https://docs.discord.com/developers/resources/application#application-object-application-integration-types).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InstallationContextConfig {
     pub oauth2_install_params: Option<InstallParams>,
@@ -143,7 +144,7 @@ pub struct InstallationContextConfig {
 
 /// Information about the Team group of the application.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-object).
+/// [Discord docs](https://docs.discord.com/developers/topics/teams#data-models-team-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Team {
@@ -161,7 +162,7 @@ pub struct Team {
 
 /// Information about a Member on a Team.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-member-object).
+/// [Discord docs](https://docs.discord.com/developers/topics/teams#data-models-team-member-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct TeamMember {
@@ -181,7 +182,7 @@ pub struct TeamMember {
 }
 
 enum_number! {
-    /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
+    /// [Discord docs](https://docs.discord.com/developers/topics/teams#data-models-membership-state-enum).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
@@ -237,7 +238,7 @@ impl Ord for TeamMemberRole {
 bitflags! {
     /// The flags of the application.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-flags).
+    /// [Discord docs](https://docs.discord.com/developers/resources/application#application-object-application-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ApplicationFlags: u64 {
@@ -249,11 +250,11 @@ bitflags! {
         /// on the Bot page in your app's settings
         const GATEWAY_PRESENCE_LIMITED = 1 << 13;
         /// Intent required for bots in 100 or more servers to receive member-related events like
-        /// guild_member_add. See the list of member-related events under [GUILD_MEMBERS](https://discord.com/developers/docs/topics/gateway#list-of-intents)
+        /// guild_member_add. See the list of member-related events under [GUILD_MEMBERS](https://docs.discord.com/developers/events/gateway#list-of-intents)
         const GATEWAY_GUILD_MEMBERS = 1 << 14;
         /// Intent required for bots in under 100 servers to receive member-related events like
         /// guild_member_add, found on the Bot page in your app's settings. See the list of
-        /// member-related events under [GUILD_MEMBERS](https://discord.com/developers/docs/topics/gateway#list-of-intents)
+        /// member-related events under [GUILD_MEMBERS](https://docs.discord.com/developers/events/gateway#list-of-intents)
         const GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15;
         /// Indicates unusual growth of an app that prevents verification
         const VERIFICATION_PENDING_GUILD_LIMIT = 1 << 16;
@@ -272,7 +273,7 @@ bitflags! {
 
 /// Settings for the application's default in-app authorization link
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/application#install-params-object-install-params-structure).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct InstallParams {

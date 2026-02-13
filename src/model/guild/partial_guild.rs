@@ -32,7 +32,7 @@ use crate::model::utils::{emojis, roles, stickers};
 
 /// Partial information about a [`Guild`]. This does not include information like member data.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
@@ -117,7 +117,8 @@ pub struct PartialGuild {
     /// - `PRIVATE_THREADS`
     ///
     ///
-    /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
+    /// [`discord documentation`]: https://docs.discord.com/developers/resources/guild#guild-object
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.

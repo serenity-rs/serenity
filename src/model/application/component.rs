@@ -27,7 +27,7 @@ enum_number! {
 
 /// An action row.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#action-rows).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#action-row).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -42,7 +42,8 @@ pub struct ActionRow {
 
 /// A component which can be inside of an [`ActionRow`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object-component-types).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#action-row).
+// TODO: https://docs.discord.com/developers/components/reference#action-row-action-row-child-components
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
@@ -158,7 +159,8 @@ impl Serialize for ButtonKind {
 
 /// A button component.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#button).
+// TODO: https://docs.discord.com/developers/components/reference#button-button-structure
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[non_exhaustive]
@@ -198,7 +200,7 @@ enum_number! {
 
 /// A select menu component.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
+/// Discord docs: [String Select](https://docs.discord.com/developers/components/reference#string-select), [User Select](https://docs.discord.com/developers/components/reference#user-select), [Role Select](https://docs.discord.com/developers/components/reference#role-select), [Mentionable Select](https://docs.discord.com/developers/components/reference#mentionable-select), [Channel Select](https://docs.discord.com/developers/components/reference#channel-select).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -231,7 +233,8 @@ pub struct SelectMenu {
 
 /// A select menu component options.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#string-select)
+// TODO: https://docs.discord.com/developers/components/reference#string-select-select-option-structure
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -251,7 +254,8 @@ pub struct SelectMenuOption {
 
 /// An input text component for modal interactions
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#text-input).
+// TODO: https://docs.discord.com/developers/components/reference#text-input-text-input-structure
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -295,7 +299,8 @@ pub struct InputText {
 enum_number! {
     /// The style of the input text
     ///
-    /// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles).
+    /// [Discord docs](https://docs.discord.com/developers/components/reference#text-input).
+    // TODO: https://docs.discord.com/developers/components/reference#text-input-text-input-styles
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]

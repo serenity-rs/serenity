@@ -8,7 +8,7 @@ use crate::model::prelude::*;
 
 /// A builder to add parameters when using [`GuildId::add_member`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#add-guild-member).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#add-guild-member).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct AddMember {

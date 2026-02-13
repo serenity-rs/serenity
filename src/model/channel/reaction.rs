@@ -19,7 +19,7 @@ use crate::model::utils::discord_colours_opt;
 
 /// An emoji reaction to a message.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-add-message-reaction-add-event-fields).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#message-reaction-add-message-reaction-add-event-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]

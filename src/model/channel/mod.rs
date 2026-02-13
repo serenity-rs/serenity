@@ -218,7 +218,8 @@ impl fmt::Display for Channel {
 enum_number! {
     /// A representation of a type of channel.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
+    // TODO: https://docs.discord.com/developers/resources/channel#channel-object-channel-types
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -279,7 +280,7 @@ impl ChannelType {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#overwrite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub(crate) struct PermissionOverwriteData {
     allow: Permissions,
@@ -333,7 +334,7 @@ impl From<PermissionOverwrite> for PermissionOverwriteData {
 
 /// A channel-specific permission overwrite for a member or role.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#overwrite-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(try_from = "PermissionOverwriteData", into = "PermissionOverwriteData")]
@@ -350,7 +351,8 @@ pub struct PermissionOverwrite {
 /// If you would like to modify the default permissions of a channel, you can get its [`RoleId`]
 /// from [`GuildId::everyone_role`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#overwrite-object) (field `type`).
+// TODO: https://docs.discord.com/developers/resources/channel#overwrite-object-overwrite-structure
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[non_exhaustive]
@@ -364,7 +366,8 @@ pub enum PermissionOverwriteType {
 enum_number! {
     /// The video quality mode for a voice channel.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
+    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
+    // TODO: https://docs.discord.com/developers/resources/channel#channel-object-video-quality-modes
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -382,7 +385,7 @@ enum_number! {
 enum_number! {
     /// See [`StageInstance::privacy_level`].
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level).
+    /// [Discord docs](https://docs.discord.com/developers/resources/stage-instance#stage-instance-object-privacy-level).
     #[derive(Clone, Copy, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -400,7 +403,7 @@ enum_number! {
 enum_number! {
     /// See [`ThreadMetadata::auto_archive_duration`].
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object)
+    /// [Discord docs](https://docs.discord.com/developers/resources/channel#thread-metadata-object)
     #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u16", into = "u16")]
@@ -415,7 +418,7 @@ enum_number! {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/stage-instance#stage-instance-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -438,7 +441,7 @@ pub struct StageInstance {
 
 /// A thread data.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#thread-metadata-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -466,11 +469,15 @@ pub struct ThreadMetadata {
 
 /// A response to getting several threads channels.
 ///
-/// Discord docs: defined [multiple times](https://discord.com/developers/docs/topics/threads#enumerating-threads):
-/// [1](https://discord.com/developers/docs/resources/guild#list-active-guild-threads-response-body),
-/// [2](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body),
-/// [3](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body),
-/// [4](https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body)
+/// Discord docs: defined [multiple times](https://docs.discord.com/developers/topics/threads#enumerating-threads):
+/// [1](https://docs.discord.com/developers/resources/guild#list-active-guild-threads),
+// TODO: https://docs.discord.com/developers/resources/guild#list-active-guild-threads-response-body
+/// [2](https://docs.discord.com/developers/resources/channel#list-private-archived-threads),
+// TODO: https://docs.discord.com/developers/resources/channel#list-private-archived-threads-response-body
+/// [3](https://docs.discord.com/developers/resources/channel#list-public-archived-threads),
+// TODO: https://docs.discord.com/developers/resources/channel#list-public-archived-threads-response-body
+/// [4](https://docs.discord.com/developers/resources/channel#list-joined-private-archived-threads)
+// TODO: https://docs.discord.com/developers/resources/channel#list-joined-private-archived-threads-response-body
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -486,7 +493,7 @@ pub struct ThreadsData {
 
 /// An object that specifies the emoji to use for Forum related emoji parameters.
 ///
-/// See [Discord](https://discord.com/developers/docs/resources/channel#default-reaction-object)
+/// See [Discord](https://docs.discord.com/developers/resources/channel#default-reaction-object)
 /// [docs]()
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone)]
@@ -540,7 +547,7 @@ impl<'de> serde::Deserialize<'de> for ForumEmoji {
 
 /// An object that represents a tag able to be applied to a thread in a `GUILD_FORUM` channel.
 ///
-/// See [Discord docs](https://discord.com/developers/docs/resources/channel#forum-tag-object)
+/// See [Discord docs](https://docs.discord.com/developers/resources/channel#forum-tag-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
@@ -560,7 +567,8 @@ pub struct ForumTag {
 enum_number! {
     /// The sort order for threads in a forum.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
+    // TODO: https://docs.discord.com/developers/resources/channel#channel-object-sort-order-types
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
@@ -577,7 +585,8 @@ enum_number! {
 bitflags! {
     /// Describes extra features of the channel.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-flags).
+    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
+    // TODO: https://docs.discord.com/developers/resources/channel#channel-object-channel-flags
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ChannelFlags: u64 {

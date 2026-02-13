@@ -8,7 +8,7 @@ use crate::model::{Colour, Timestamp};
 /// **Note**: Maximum amount of characters you can put is 256 in a field name,
 /// 1024 in a field value, and 2048 in a description.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object).
 ///
 /// [slack's attachments]: https://api.slack.com/docs/message-attachments
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -71,7 +71,7 @@ pub struct Embed {
 
 /// An author object in an embed.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[non_exhaustive]
@@ -93,7 +93,7 @@ pub struct EmbedAuthor {
 
 /// A field object in an embed.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[non_exhaustive]
@@ -135,7 +135,7 @@ impl EmbedField {
 
 /// Footer information for an embed.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[non_exhaustive]
@@ -154,7 +154,7 @@ pub struct EmbedFooter {
 
 /// An image object in an embed.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[non_exhaustive]
@@ -173,7 +173,7 @@ pub struct EmbedImage {
 
 /// The provider of an embed.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-provider-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[non_exhaustive]
@@ -186,7 +186,7 @@ pub struct EmbedProvider {
 
 /// The dimensions and URL of an embed thumbnail.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-thumbnail-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[non_exhaustive]
@@ -205,7 +205,7 @@ pub struct EmbedThumbnail {
 
 /// Video information for an embed.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-video-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[non_exhaustive]

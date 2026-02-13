@@ -4,7 +4,7 @@ use crate::model::prelude::*;
 
 /// A builder for creating a components action row in a message.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#component-object).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#action-row).
 #[derive(Clone, Debug, PartialEq)]
 #[must_use]
 pub enum CreateActionRow {
@@ -154,7 +154,7 @@ impl Serialize for CreateSelectMenuDefault {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
+/// Discord docs: [String Select](https://docs.discord.com/developers/components/reference#string-select), [User Select](https://docs.discord.com/developers/components/reference#user-select), [Role Select](https://docs.discord.com/developers/components/reference#role-select), [Mentionable Select](https://docs.discord.com/developers/components/reference#mentionable-select), [Channel Select](https://docs.discord.com/developers/components/reference#channel-select).
 #[derive(Clone, Debug, PartialEq)]
 pub enum CreateSelectMenuKind {
     String { options: Vec<CreateSelectMenuOption> },
@@ -225,7 +225,7 @@ impl Serialize for CreateSelectMenuKind {
 
 /// A builder for creating a select menu component in a message
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#component-object).
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateSelectMenu {
@@ -291,7 +291,8 @@ impl CreateSelectMenu {
 
 /// A builder for creating an option of a select menu component in a message
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#string-select)
+// TODO: https://docs.discord.com/developers/components/reference#string-select-select-option-structure
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateSelectMenuOption {
@@ -351,7 +352,8 @@ impl CreateSelectMenuOption {
 
 /// A builder for creating an input text component in a modal
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-structure).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#text-input).
+// TODO: https://docs.discord.com/developers/components/reference#text-input-text-input-structure
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateInputText(InputText);

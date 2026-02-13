@@ -23,7 +23,7 @@ fn minus1_as_0<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<u16,
 /// guild and do not cross over to other guilds in any way, and can have channel-specific permission
 /// overrides in addition to guild-level permissions.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
+/// [Discord docs](https://docs.discord.com/developers/topics/permissions#role-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -236,7 +236,7 @@ impl From<&Role> for RoleId {
 
 /// The tags of a [`Role`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure).
+/// [Discord docs](https://docs.discord.com/developers/topics/permissions#role-object-role-tags-structure).
 #[derive(Clone, Debug, Default, Eq, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]

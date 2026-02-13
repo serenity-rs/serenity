@@ -45,7 +45,7 @@
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 //! [cache docs]: crate::cache
 //! [client's module-level documentation]: crate::client
-//! [docs]: https://discord.com/developers/docs/intro
+//! [docs]: https://docs.discord.com/developers/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]

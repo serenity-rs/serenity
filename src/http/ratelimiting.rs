@@ -33,7 +33,7 @@
 //! associated u64 as data. This is the Id of the parameter, differentiating between different
 //! ratelimits.
 //!
-//! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
+//! [Taken from]: https://docs.discord.com/developers/topics/rate-limits
 
 use std::collections::HashMap;
 use std::fmt;
@@ -263,7 +263,7 @@ impl Ratelimiter {
 /// **Note**: You should _not_ mutate any of the fields, as this can help cause 429s.
 ///
 /// [`Http`]: super::Http
-/// [Discord docs]: https://discord.com/developers/docs/topics/rate-limits
+/// [Discord docs]: https://docs.discord.com/developers/topics/rate-limits
 #[derive(Debug)]
 pub struct Ratelimit {
     /// The total number of requests that can be made in a period of time.

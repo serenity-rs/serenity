@@ -16,7 +16,7 @@ use crate::model::prelude::*;
 /// - [`GuildId::edit_sticker`]
 /// - [`Sticker::edit`]
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/sticker#modify-guild-sticker)
+/// [Discord docs](https://docs.discord.com/developers/resources/sticker#modify-guild-sticker)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditSticker<'a> {

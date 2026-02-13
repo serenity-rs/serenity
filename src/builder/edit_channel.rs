@@ -9,8 +9,8 @@ use crate::model::prelude::*;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel).
-///
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#modify-channel).
+// TODO: https://docs.discord.com/developers/resources/channel#modify-channel-json-params-guild-channel
 /// # Examples
 ///
 /// Edit a channel, providing a new name and topic:

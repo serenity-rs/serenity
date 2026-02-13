@@ -7,7 +7,7 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// [Discord docs](https://discord.com/developers/docs/resources/webhook#modify-webhook)
+/// [Discord docs](https://docs.discord.com/developers/resources/webhook#modify-webhook)
 #[derive(Debug, Default, Clone, Serialize)]
 #[must_use]
 pub struct EditWebhook<'a> {

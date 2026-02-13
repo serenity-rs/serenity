@@ -1801,7 +1801,7 @@ impl GuildId {
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
-    /// [Discord's docs]: https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
+    /// [Discord's docs]: https://docs.discord.com/developers/resources/guild#modify-guild-incident-actions
     pub async fn edit_guild_incident_actions(
         self,
         http: &Http,

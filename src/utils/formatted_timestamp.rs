@@ -6,7 +6,7 @@ use crate::all::Timestamp;
 
 /// Represents a combination of a timestamp and a style for formatting time in messages.
 ///
-/// [Discord docs](https://discord.com/developers/docs/reference#message-formatting-formats).
+/// [Discord docs](https://docs.discord.com/developers/reference#message-formatting-formats).
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 pub struct FormattedTimestamp {
     timestamp: i64,
@@ -15,7 +15,8 @@ pub struct FormattedTimestamp {
 
 /// Enum representing various styles for formatting time in messages.
 ///
-/// [Discord docs](https://discord.com/developers/docs/reference#message-formatting-timestamp-styles).
+/// [Discord docs](https://docs.discord.com/developers/reference#message-formatting).
+// TODO: https://docs.discord.com/developers/reference#message-formatting-timestamp-styles
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub enum FormattedTimestampStyle {
     /// Represents a short time format, e.g., "12:34 PM".

@@ -33,7 +33,7 @@ pub const USER_AGENT: &str = concat!(
 enum_number! {
     /// An enum representing the [gateway opcodes].
     ///
-    /// [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes).
+    /// [Discord docs](https://docs.discord.com/developers/topics/opcodes-and-status-codes#gateway-gateway-opcodes).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]

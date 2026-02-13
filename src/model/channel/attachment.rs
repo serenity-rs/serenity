@@ -26,7 +26,7 @@ where
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object).
 ///
 /// [`Embed`]: super::Embed
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]

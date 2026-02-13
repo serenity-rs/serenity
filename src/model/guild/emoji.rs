@@ -17,7 +17,7 @@ use crate::model::ModelError;
 /// Represents a custom guild emoji, which can either be created using the API, or via an
 /// integration. Emojis created using the API only work within the guild it was created in.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/emoji#emoji-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/emoji#emoji-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

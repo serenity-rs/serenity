@@ -11,7 +11,7 @@ use crate::model::user::CurrentUser;
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#modify-current-user)
+/// [Discord docs](https://docs.discord.com/developers/resources/user#modify-current-user)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditProfile {

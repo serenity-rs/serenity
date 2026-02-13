@@ -7,7 +7,7 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event)
+/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#modify-guild-scheduled-event)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditScheduledEvent<'a> {
@@ -105,7 +105,7 @@ impl<'a> EditScheduledEvent<'a> {
     /// [`StageInstance`]: ScheduledEventType::StageInstance
     /// [`Voice`]: ScheduledEventType::Voice
     /// [`External`]: ScheduledEventType::External
-    /// [Discord docs]: https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-field-requirements-by-entity-type
+    /// [Discord docs]: https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-object-field-requirements-by-entity-type
     pub fn kind(mut self, kind: ScheduledEventType) -> Self {
         if let ScheduledEventType::External = kind {
             self.channel_id = Some(None);

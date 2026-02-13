@@ -180,7 +180,7 @@ fn reason_into_header(reason: &str) -> Headers {
     let mut headers = Headers::new();
 
     // "The X-Audit-Log-Reason header supports 1-512 URL-encoded UTF-8 characters."
-    // https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
+    // https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object
     let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
         Cow::Borrowed(value) => HeaderValue::from_str(value),
         Cow::Owned(value) => HeaderValue::try_from(value),
@@ -319,7 +319,7 @@ impl Http {
 
     /// Bans multiple users from a [`Guild`], optionally removing their messages.
     ///
-    /// See the [Discord docs](https://discord.com/developers/docs/resources/guild#bulk-guild-ban)
+    /// See the [Discord docs](https://docs.discord.com/developers/resources/guild#bulk-guild-ban)
     /// for more information.
     pub async fn bulk_ban_users(
         &self,
@@ -367,7 +367,7 @@ impl Http {
     ///
     /// **Note**: Requires the [Manage Channels] permission.
     ///
-    /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-channel
+    /// [docs]: https://docs.discord.com/developers/resources/guild#create-guild-channel
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(
         &self,
@@ -576,7 +576,7 @@ impl Http {
     /// **Note**: Creating a command with the same name as an existing command for your application
     /// will overwrite the old command.
     ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
+    /// [docs]: https://docs.discord.com/developers/interactions/application-commands#create-global-application-command
     pub async fn create_global_command(&self, map: &impl serde::Serialize) -> Result<Command> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -635,8 +635,7 @@ impl Http {
     /// over a [`Shard`], if at least one is running.
     ///
     /// **Note**: This endpoint is currently limited to 10 active guilds. The limits are raised for
-    /// whitelisted [GameBridge] applications. See the [documentation on this endpoint] for more
-    /// info.
+    /// whitelisted GameBridge applications.
     ///
     /// # Examples
     ///
@@ -658,11 +657,7 @@ impl Http {
     /// ```
     ///
     /// [`Shard`]: crate::gateway::Shard
-    /// [GameBridge]: https://discord.com/developers/docs/topics/gamebridge
-    /// [documentation on this endpoint]:
-    /// https://discord.com/developers/docs/resources/guild#create-guild
-    /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
-    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://discord.com/developers/docs/change-log#deprecating-guild-creation-by-apps"]
+    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
     pub async fn create_guild(&self, map: &Value) -> Result<PartialGuild> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -681,7 +676,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
+    /// [docs]: https://docs.discord.com/developers/interactions/application-commands#create-guild-application-command
     pub async fn create_guild_command(
         &self,
         guild_id: GuildId,
@@ -708,7 +703,7 @@ impl Http {
     /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-integration
+    /// [docs]: https://docs.discord.com/developers/resources/guild#integration-object
     pub async fn create_guild_integration(
         &self,
         guild_id: GuildId,
@@ -735,7 +730,7 @@ impl Http {
     /// Refer to Discord's [docs] for the object it takes.
     ///
     /// [`Interaction`]: crate::model::application::Interaction
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
+    /// [docs]: https://docs.discord.com/developers/interactions/receiving-and-responding#create-interaction-response
     pub async fn create_interaction_response(
         &self,
         interaction_id: InteractionId,
@@ -777,7 +772,7 @@ impl Http {
     /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    /// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite
+    /// [docs]: https://docs.discord.com/developers/resources/channel#create-channel-invite
     pub async fn create_invite(
         &self,
         channel_id: ChannelId,
@@ -1664,7 +1659,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    /// [docs]: https://docs.discord.com/developers/resources/webhook#edit-webhook-message
     pub async fn edit_followup_message(
         &self,
         interaction_token: &str,
@@ -1702,7 +1697,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for Get Webhook Message for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#get-webhook-message
+    /// [docs]: https://docs.discord.com/developers/resources/webhook#get-webhook-message
     pub async fn get_followup_message(
         &self,
         interaction_token: &str,
@@ -1729,7 +1724,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
+    /// [docs]: https://docs.discord.com/developers/interactions/application-commands#edit-global-application-command
     pub async fn edit_global_command(
         &self,
         command_id: CommandId,
@@ -1777,7 +1772,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    /// [docs]: https://docs.discord.com/developers/interactions/application-commands#edit-guild-application-command
     pub async fn edit_guild_command(
         &self,
         guild_id: GuildId,
@@ -1805,7 +1800,7 @@ impl Http {
     ///
     /// Refer to Discord's [documentation] for field information.
     ///
-    /// [documentation]: https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions
+    /// [documentation]: https://docs.discord.com/developers/interactions/application-commands#edit-application-command-permissions
     pub async fn edit_guild_command_permissions(
         &self,
         guild_id: GuildId,
@@ -2100,7 +2095,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    /// [docs]: https://docs.discord.com/developers/resources/webhook#edit-webhook-message
     pub async fn edit_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -2565,7 +2560,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
+    /// [Discord docs]: https://docs.discord.com/developers/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook(
         &self,
         webhook_id: WebhookId,
@@ -2583,7 +2578,7 @@ impl Http {
     ///
     /// Refer to the [Discord docs] for more information on how this works.
     ///
-    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
+    /// [Discord docs]: https://docs.discord.com/developers/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook_with_components(
         &self,
         webhook_id: WebhookId,
@@ -3706,7 +3701,7 @@ impl Http {
     }
 
     /// Gets a guild widget information.
-    // TODO: according to Discord, this returns different data; namely https://discord.com/developers/docs/resources/guild#guild-widget-object-guild-widget-structure.
+    // TODO: according to Discord, this returns different data; namely https://docs.discord.com/developers/resources/guild#guild-widget-object.
     // Should investigate if this endpoint actually works
     pub async fn get_guild_widget(&self, guild_id: GuildId) -> Result<GuildWidget> {
         self.fire(Request {
@@ -4160,7 +4155,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guilds
+    /// [docs]: https://docs.discord.com/developers/resources/user#get-current-user-guilds
     pub async fn get_guilds(
         &self,
         target: Option<GuildPagination>,
@@ -4216,7 +4211,7 @@ impl Http {
     ///
     /// See the [Discord Developer Portal documentation][docs] for more.
     ///
-    /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
+    /// [docs]: https://docs.discord.com/developers/resources/user#get-current-user-guild-member
     pub async fn get_current_user_guild_member(&self, guild_id: GuildId) -> Result<Member> {
         let mut value: Value = self
             .fire(Request {
@@ -4248,7 +4243,7 @@ impl Http {
     /// * `event_id` - An optional server event ID to include with the invite.
     ///
     /// More information about these arguments can be found on Discord's
-    /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
+    /// [API documentation](https://docs.discord.com/developers/resources/invite#get-invite).
     pub async fn get_invite(
         &self,
         code: &str,

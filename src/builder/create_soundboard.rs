@@ -9,7 +9,7 @@ use crate::model::prelude::*;
 
 /// A builder to create a soundboard sound.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/soundboard#soundboard-resource)
+/// [Discord docs](https://docs.discord.com/developers/resources/soundboard#create-guild-soundboard-sound)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSoundboard<'a> {

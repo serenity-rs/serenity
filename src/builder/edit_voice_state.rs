@@ -10,8 +10,8 @@ use crate::model::prelude::*;
 /// [`GuildChannel::edit_voice_state`].
 ///
 /// Discord docs:
-/// - [current user](https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state)
-/// - [other users](https://discord.com/developers/docs/resources/guild#modify-user-voice-state)
+/// - [current user](https://docs.discord.com/developers/resources/voice#modify-current-user-voice-state)
+/// - [other users](https://docs.discord.com/developers/resources/voice#modify-user-voice-state)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditVoiceState {

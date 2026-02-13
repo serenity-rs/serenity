@@ -254,7 +254,7 @@ pub enum ReconnectType {
     Resume,
 }
 
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#request-guild-members).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#request-guild-members).
 #[derive(Clone, Debug)]
 pub enum ChunkGuildFilter {
     /// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.

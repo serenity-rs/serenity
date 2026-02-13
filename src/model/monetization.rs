@@ -6,7 +6,7 @@ use crate::model::prelude::*;
 
 /// A premium offering that can be made available to an application's users and guilds.
 ///
-/// [Discord docs](https://discord.com/developers/docs/monetization/skus#sku-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/sku#sku-object).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Sku {
     /// The unique ID of the SKU.
@@ -28,7 +28,7 @@ impl Sku {
     /// Returns the store url for this SKU. If included in a message, will render as a rich embed.
     /// See the [Discord docs] for details.
     ///
-    /// [Discord docs]: https://discord.com/developers/docs/monetization/skus#linking-to-your-skus
+    /// [Discord docs]: https://docs.discord.com/developers/monetization/managing-skus#linking-to-a-specific-sku
     #[must_use]
     pub fn url(&self) -> String {
         format!(
@@ -41,7 +41,7 @@ impl Sku {
 enum_number! {
     /// Differentiates between SKU classes.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/monetization/skus#sku-object-sku-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/sku#sku-object-sku-types).
     #[derive(Clone, Debug, Serialize, Deserialize)]
     #[serde(from = "u8", into = "u8")]
     #[non_exhaustive]
@@ -61,7 +61,7 @@ enum_number! {
 bitflags! {
     /// Differentates between user and server subscriptions.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/monetization/skus#sku-object-sku-flags).
+    /// [Discord docs](https://docs.discord.com/developers/resources/sku#sku-object-sku-flags).
     #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
     pub struct SkuFlags: u64 {
         /// SKU is available for purchase.
@@ -77,7 +77,7 @@ bitflags! {
 
 /// Represents that a user or guild has access to a premium offering in the application.
 ///
-/// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#entitlement-object-entitlement-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/entitlement#entitlement-object-entitlement-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Entitlement {
@@ -149,7 +149,7 @@ impl Entitlement {
 enum_number! {
     /// Differentiates between Entitlement types.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/monetization/entitlements#entitlement-object-entitlement-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/entitlement#entitlement-object-entitlement-types).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Clone, Debug, Serialize, Deserialize)]
     #[serde(from = "u8", into = "u8")]

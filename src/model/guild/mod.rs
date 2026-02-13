@@ -68,7 +68,7 @@ use crate::model::utils::*;
 
 /// A representation of a banning of a user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#ban-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#ban-object).
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Ban {
@@ -80,7 +80,7 @@ pub struct Ban {
 
 /// The response from [`GuildId::bulk_ban`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#bulk-guild-ban).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#bulk-guild-ban).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -103,8 +103,8 @@ pub struct AfkMetadata {
 
 /// Information about a Discord guild, such as channels, emojis, etc.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
-/// [extension](https://discord.com/developers/docs/topics/gateway-events#guild-create).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object) plus
+/// [extension](https://docs.discord.com/developers/events/gateway-events#guild-create).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -158,7 +158,8 @@ pub struct Guild {
     /// The guild features. These are user-invisible options which are used for Discord rollouts
     /// and/or paid benefits. More information is available at [`discord's documentation`].
     ///
-    /// [`discord's documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
+    /// [`discord's documentation`]: https://docs.discord.com/developers/resources/guild#guild-object
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
@@ -651,10 +652,6 @@ impl Guild {
     /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
     /// over a [`Shard`].
     ///
-    /// **Note**: This endpoint is usually only available for user accounts. Refer to Discord's
-    /// information for the endpoint [here][whitelist] for more information. If you require this as
-    /// a bot, re-think what you are doing and if it _really_ needs to be doing this.
-    ///
     /// # Examples
     ///
     /// Create a guild called `"test"` in the [US West region] with no icon:
@@ -670,8 +667,7 @@ impl Guild {
     /// Returns [`Error::Http`] if the current user cannot create a Guild.
     ///
     /// [`Shard`]: crate::gateway::Shard
-    /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
-    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://discord.com/developers/docs/change-log#deprecating-guild-creation-by-apps"]
+    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
     pub async fn create(
         http: impl AsRef<Http>,
         name: &str,
@@ -2636,7 +2632,7 @@ impl Guild {
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
-    /// [Discord's docs]: https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
+    /// [Discord's docs]: https://docs.discord.com/developers/resources/guild#modify-guild-incident-actions
     pub async fn edit_guild_incident_actions(
         self,
         http: &Http,
@@ -2686,7 +2682,7 @@ impl Default for CalculatePermissions {
     }
 }
 
-/// Translated from the pseudo code at https://discord.com/developers/docs/topics/permissions#permission-overwrites
+/// Translated from the pseudo code at https://docs.discord.com/developers/topics/permissions#permission-overwrites
 ///
 /// The comments within this file refer to the above link
 #[cfg(feature = "model")]
@@ -2764,7 +2760,7 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
 
 /// A [`Guild`] widget.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-widget-settings-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-widget-settings-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildWidget {
@@ -2776,7 +2772,7 @@ pub struct GuildWidget {
 
 /// Representation of the number of members that would be pruned by a guild prune operation.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#get-guild-prune-count).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -2787,8 +2783,8 @@ pub struct GuildPrune {
 
 /// Variant of [`Guild`] returned from [`Http::get_guilds`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object),
-/// [subset example](https://discord.com/developers/docs/resources/user#get-current-user-guilds-example-partial-guild).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object),
+/// [subset example](https://docs.discord.com/developers/resources/user#get-current-user-guilds-example-partial-guild).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -2833,7 +2829,7 @@ impl InviteGuild {
 
 /// Data for an unavailable guild.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#unavailable-guild-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#unavailable-guild-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -2848,7 +2844,8 @@ pub struct UnavailableGuild {
 enum_number! {
     /// Default message notification level for a guild.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-default-message-notification-level
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2866,7 +2863,8 @@ enum_number! {
 enum_number! {
     /// Setting used to filter explicit messages from members.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-explicit-content-filter-level
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2886,7 +2884,8 @@ enum_number! {
 enum_number! {
     /// Multi-Factor Authentication level for guild moderators.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-mfa-level).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-mfa-level
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2905,7 +2904,8 @@ enum_number! {
     /// The level to set as criteria prior to a user being able to send
     /// messages in a [`Guild`].
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-verification-level).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-verification-level
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2929,7 +2929,8 @@ enum_number! {
 enum_number! {
     /// The [`Guild`] nsfw level.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-guild-nsfw-level
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2968,7 +2969,7 @@ enum_number! {
 
 /// The [`Guild`]'s incident's data.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#incidents-data-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#incidents-data-object).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]

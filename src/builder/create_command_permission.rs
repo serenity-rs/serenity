@@ -8,7 +8,7 @@ use crate::model::prelude::*;
 
 /// A builder for creating several [`CommandPermission`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#edit-application-command-permissions).
 // Cannot be replaced by a simple Vec<CreateCommandPermission> because we need the schema with
 // the `permissions` field, and also to be forward compatible if a new field beyond just
 // `permissions` is added to the HTTP endpoint
@@ -43,7 +43,7 @@ impl Builder for EditCommandPermissions {
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
-    /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
+    /// [Discord's docs]: https://docs.discord.com/developers/interactions/application-commands#slash-commands
     #[cfg(feature = "http")]
     async fn execute(
         self,
@@ -56,7 +56,7 @@ impl Builder for EditCommandPermissions {
 
 /// A builder for creating an [`CommandPermission`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateCommandPermission(CommandPermission);

@@ -14,7 +14,7 @@ use crate::internal::prelude::*;
 ///
 /// Information can not be accessed for guilds the current user is banned from.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Invite {
@@ -121,7 +121,7 @@ impl Invite {
     /// * `event_id` - An optional server event ID to include with the invite.
     ///
     /// More information about these arguments can be found on Discord's
-    /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
+    /// [API documentation](https://docs.discord.com/developers/resources/invite#get-invite).
     ///
     /// # Errors
     ///
@@ -194,7 +194,8 @@ impl Invite {
 
 /// A minimal amount of information about the channel an invite points to.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object).
+// TODO: https://docs.discord.com/developers/resources/invite#invite-object-example-invite-object
 #[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
@@ -206,7 +207,8 @@ pub struct InviteChannel {
 
 /// Subset of [`Guild`] used in [`Invite`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object).
+// TODO: https://docs.discord.com/developers/resources/invite#invite-object-example-invite-object
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteGuild {
@@ -273,7 +275,7 @@ impl InviteGuild {
 ///
 /// [Manage Guild]: Permissions::MANAGE_GUILD
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-metadata-object) (extends [`Invite`] fields).
+/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-metadata-object) (extends [`Invite`] fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct RichInvite {
@@ -388,7 +390,7 @@ impl RichInvite {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-stage-instance-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteStageInstance {
@@ -405,7 +407,8 @@ pub struct InviteStageInstance {
 enum_number! {
     /// Type of target for a voice channel invite.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object).
+    // TODO: https://docs.discord.com/developers/resources/invite#invite-object-invite-target-types
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]

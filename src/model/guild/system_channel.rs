@@ -1,7 +1,8 @@
 bitflags! {
     /// Describes a system channel flags.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-system-channel-flags).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-system-channel-flags
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct SystemChannelFlags: u64 {

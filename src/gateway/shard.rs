@@ -52,7 +52,7 @@ use crate::model::user::OnlineStatus;
 ///
 /// [`Client`]: crate::Client
 /// [`receive`]: #method.receive
-/// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
+/// [docs]: https://docs.discord.com/developers/events/gateway#sharding
 /// [module docs]: crate::gateway#sharding
 pub struct Shard {
     pub client: WsClient,

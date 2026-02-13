@@ -123,7 +123,7 @@ pub(crate) mod discriminator {
 
 /// Information about the current user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/user#user-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(transparent)]
@@ -187,7 +187,7 @@ impl CurrentUser {
 
 /// The representation of a user's status.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#update-presence-status-types).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(
     Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
@@ -222,8 +222,8 @@ impl OnlineStatus {
 
 /// Information about a user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object), existence of
-/// additional partial member field documented [here](https://discord.com/developers/docs/topics/gateway-events#message-create).
+/// [Discord docs](https://docs.discord.com/developers/resources/user#user-object), existence of
+/// additional partial member field documented [here](https://docs.discord.com/developers/events/gateway-events#message-create).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -286,7 +286,7 @@ pub struct User {
     pub public_flags: Option<UserPublicFlags>,
     /// Only included in [`Message::mentions`] for messages from the gateway.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields).
+    /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#message-create-message-create-extra-fields).
     // Box required to avoid infinitely recursive types
     pub member: Option<Box<PartialMember>>,
     /// The primary guild and tag the user has active.
@@ -304,7 +304,7 @@ enum_number! {
     /// Premium types denote the level of premium a user has. Visit the [Nitro](https://discord.com/nitro)
     /// page to learn more about the premium plans Discord currently offers.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-premium-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/user#user-object-premium-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -322,7 +322,7 @@ enum_number! {
 bitflags! {
     /// User's public flags
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-flags).
+    /// [Discord docs](https://docs.discord.com/developers/resources/user#user-object-user-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct UserPublicFlags: u32 {
@@ -366,7 +366,7 @@ bitflags! {
 
 /// User's Primary Guild object
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-primary-guild)
+/// [Discord docs](https://docs.discord.com/developers/resources/user#user-object-user-primary-guild)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -396,7 +396,7 @@ impl PrimaryGuild {
 #[non_exhaustive]
 /// The data for a [`User`]'s avatar decoration.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#avatar-decoration-data-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/user#avatar-decoration-data-object).
 pub struct AvatarDecorationData {
     /// The avatar decoration hash
     pub asset: ImageHash,
@@ -415,7 +415,7 @@ impl AvatarDecorationData {
 
 /// The collectibles the user has, excluding Avatar Decorations and Profile Effects.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#collectibles).
+/// [Discord docs](https://docs.discord.com/developers/resources/user#collectibles).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -426,7 +426,7 @@ pub struct Collectibles {
 
 /// A nameplate, shown on the member list on official clients.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#nameplate-nameplate-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/user#nameplate-nameplate-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

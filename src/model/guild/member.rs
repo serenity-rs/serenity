@@ -16,8 +16,8 @@ use crate::model::utils::{avatar_url, user_banner_url};
 
 /// Information about a member of a guild.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
-/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#guild-member-add-guild-member-add-extra-fields).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-member-object),
+/// [extra fields](https://docs.discord.com/developers/events/gateway-events#guild-member-add-guild-member-add-extra-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -73,7 +73,8 @@ pub struct Member {
 bitflags! {
     /// Flags for a guild member.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-member-object).
+    // TODO: https://docs.discord.com/developers/resources/guild#guild-member-object-guild-member-flags
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct GuildMemberFlags: u32 {
@@ -574,13 +575,14 @@ impl fmt::Display for Member {
 ///
 /// This is used in [`Message`]s from [`Guild`]s.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object),
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-member-object),
 /// subset specification unknown (field type "partial member" is used in
-/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
-/// [link](https://discord.com/developers/docs/resources/invite#invite-stage-instance-object),
-/// [link](https://discord.com/developers/docs/topics/gateway-events#message-create),
-/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
-/// [link](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object))
+/// [link](https://docs.discord.com/developers/events/gateway-events#message-create),
+/// [link](https://docs.discord.com/developers/resources/invite#invite-stage-instance-object),
+/// [link](https://docs.discord.com/developers/events/gateway-events#message-create),
+/// [link](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object),
+// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure
+/// [link](https://docs.discord.com/developers/interactions/receiving-and-responding#message-interaction-object))
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -685,8 +687,8 @@ pub struct PartialThreadMember {
 
 /// A model representing a user in a Guild Thread.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object),
-/// [extra fields](https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#thread-member-object),
+/// [extra fields](https://docs.discord.com/developers/events/gateway-events#thread-member-update-thread-member-update-event-extra-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -706,17 +708,17 @@ pub struct ThreadMember {
     ///
     /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
     pub guild_id: Option<GuildId>,
-    // According to https://discord.com/developers/docs/topics/gateway-events#thread-members-update,
+    // According to https://docs.discord.com/developers/events/gateway-events#thread-members-update,
     // > the thread member objects will also include the guild member and nullable presence objects
     // > for each added thread member
-    // Which implies that ThreadMember has a presence field. But https://discord.com/developers/docs/resources/channel#thread-member-object
+    // Which implies that ThreadMember has a presence field. But https://docs.discord.com/developers/resources/channel#thread-member-object
     // says that's not true. I'm not adding the presence field here for now
 }
 
 bitflags! {
     /// Describes extra features of the message.
     ///
-    /// Discord docs: flags field on [Thread Member](https://discord.com/developers/docs/resources/channel#thread-member-object).
+    /// Discord docs: flags field on [Thread Member](https://docs.discord.com/developers/resources/channel#thread-member-object).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ThreadMemberFlags: u64 {

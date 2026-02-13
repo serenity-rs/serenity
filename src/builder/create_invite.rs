@@ -24,7 +24,7 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#create-channel-invite)
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#create-channel-invite)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInvite<'a> {

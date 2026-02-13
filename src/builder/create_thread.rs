@@ -7,8 +7,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Discord docs:
-/// - [starting thread from message](https://discord.com/developers/docs/resources/channel#start-thread-from-message)
-/// - [starting thread without message](https://discord.com/developers/docs/resources/channel#start-thread-without-message)
+/// - [starting thread from message](https://docs.discord.com/developers/resources/channel#start-thread-from-message)
+/// - [starting thread without message](https://docs.discord.com/developers/resources/channel#start-thread-without-message)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateThread<'a> {

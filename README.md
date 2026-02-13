@@ -230,7 +230,7 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [crates.io link]: https://crates.io/crates/serenity
 [crates.io version]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
-[discord docs]: https://discord.com/developers/docs/intro
+[discord docs]: https://docs.discord.com/developers/intro
 [docs]: https://docs.rs/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
 [examples]: https://github.com/serenity-rs/serenity/tree/current/examples

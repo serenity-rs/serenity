@@ -55,7 +55,7 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/webhook#execute-webhook)
+/// [Discord docs](https://docs.discord.com/developers/resources/webhook#execute-webhook)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct ExecuteWebhook {

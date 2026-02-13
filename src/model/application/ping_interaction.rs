@@ -4,7 +4,8 @@ use crate::model::id::{ApplicationId, InteractionId};
 
 /// A ping interaction, which can only be received through an endpoint url.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
+// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-structure
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

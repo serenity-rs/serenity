@@ -16,7 +16,7 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object).
 #[derive(Clone, Debug)]
 pub enum CreateInteractionResponse {
     /// Acknowledges a Ping (only required when your bot uses an HTTP endpoint URL).
@@ -173,7 +173,8 @@ impl Builder for CreateInteractionResponse {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object).
+// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-messages
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseMessage {
@@ -319,7 +320,7 @@ impl CreateInteractionResponseMessage {
 }
 
 // Same as CommandOptionChoice according to Discord, see
-// [Autocomplete docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
+// [Autocomplete docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 #[must_use]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
@@ -354,7 +355,8 @@ impl<S: Into<String>> From<S> for AutocompleteChoice {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object)
+// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-autocomplete
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAutocompleteResponse {
@@ -371,7 +373,7 @@ impl CreateAutocompleteResponse {
     ///
     /// See the official docs on [`Application Command Option Choices`] for more information.
     ///
-    /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+    /// [`Application Command Option Choices`]: https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-choice-structure
     pub fn set_choices(mut self, choices: Vec<AutocompleteChoice>) -> Self {
         self.choices = choices;
         self
@@ -427,7 +429,8 @@ impl Builder for CreateAutocompleteResponse {
     }
 }
 
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object).
+// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-modal
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateModal {

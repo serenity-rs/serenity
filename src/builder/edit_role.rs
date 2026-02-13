@@ -42,7 +42,7 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-role)
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#modify-guild-role)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditRole<'a> {
@@ -165,7 +165,7 @@ impl<'a> EditRole<'a> {
 ///
 /// Note: 2024-07-05 - tertiary_colour is currently enforced to be set with a specific pair of
 /// primary and secondary colours, for current validation see
-/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-colors-object).
+/// [Discord docs](https://docs.discord.com/developers/topics/permissions#role-object-role-colors-object).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 #[allow(clippy::struct_field_names)]

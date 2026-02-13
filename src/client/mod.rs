@@ -255,9 +255,9 @@ impl ClientBuilder {
     /// enabled in the *developer portal*. Once the bot is in 100 guilds or more, [the bot must be
     /// verified] in order to use privileged intents.
     ///
-    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
-    /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
-    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    /// [gateway intent]: https://docs.discord.com/developers/events/gateway#gateway-intents
+    /// [Privileged intents]: https://docs.discord.com/developers/events/gateway#privileged-intents
+    /// [the bot must be verified]: https://support.discord.com/hc/en-us/community/posts/360050817314-Discord-Bots-Info
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
         self.intents = intents;
 

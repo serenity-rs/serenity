@@ -17,7 +17,7 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message)
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#create-followup-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseFollowup {

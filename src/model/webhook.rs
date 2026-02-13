@@ -18,7 +18,7 @@ use crate::model::prelude::*;
 enum_number! {
     /// A representation of a type of webhook.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/webhook#webhook-object-webhook-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -51,7 +51,7 @@ impl WebhookType {
 /// A representation of a webhook, which is a low-effort way to post messages to channels. They do
 /// not necessarily require a bot user or authentication to use.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/webhook#webhook-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[non_exhaustive]

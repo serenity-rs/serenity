@@ -5,7 +5,7 @@ use crate::model::prelude::*;
 /// A representation of a soundboard sound, a kind of audio that users can play
 /// in voice channels.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/soundboard#soundboard-resource).
+/// [Discord docs](https://docs.discord.com/developers/resources/soundboard#soundboard-resource).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Soundboard {
