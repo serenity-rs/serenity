@@ -44,6 +44,8 @@ use time::{Duration, OffsetDateTime, format_description::well_known::Rfc3339, se
 
 /// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
 const DISCORD_EPOCH: u64 = 1_420_070_400_000;
+// `(u64::MAX >> 22) + DISCORD_EPOCH` = 5818116911103 = "Wed May 15 2154 07:35:11 GMT+0000"
+const MAX_DISCORD_ID_MILLIS: u64 = 5_818_116_911_103;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -107,6 +109,17 @@ impl Timestamp {
         x
     }
 
+    /// Returns the number of non-leap milliseconds since January 1, 1970 0:00:00 UTC
+    #[must_use]
+    pub fn unix_timestamp_millis(&self) -> i64 {
+        #[cfg(feature = "chrono")]
+        let x = self.0.timestamp_millis();
+        #[cfg(not(feature = "chrono"))]
+        let x =
+            Duration::nanoseconds_i128(self.0.unix_timestamp_nanos()).whole_milliseconds() as i64;
+        x
+    }
+
     /// Parse a timestamp from an RFC 3339 date and time string.
     ///
     /// # Examples
@@ -141,6 +154,15 @@ impl Timestamp {
             .0
             .format(&Rfc3339)
             .expect("as the OffsetDateTime is always parsed from rfc3339, this should never fail");
+    }
+
+    pub(crate) fn try_as_discord_id(self) -> Result<u64, TimestampOutOfRange> {
+        let unix_millis = TryInto::<u64>::try_into(self.unix_timestamp_millis())
+            .map_err(|_| TimestampOutOfRange)?;
+        if !(DISCORD_EPOCH..=MAX_DISCORD_ID_MILLIS).contains(&unix_millis) {
+            return Err(TimestampOutOfRange);
+        }
+        Ok((unix_millis - DISCORD_EPOCH) << 22)
     }
 }
 
@@ -195,6 +217,17 @@ impl fmt::Display for InvalidTimestamp {
     }
 }
 
+#[derive(Debug)]
+pub struct TimestampOutOfRange;
+
+impl std::error::Error for TimestampOutOfRange {}
+
+impl fmt::Display for TimestampOutOfRange {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("timestamp is outside the valid range of Discord id timestamps")
+    }
+}
+
 /// Signifies the failure to parse the `Timestamp` from an RFC 3339 string.
 #[derive(Debug)]
 pub struct ParseError(InnerError);
@@ -233,7 +266,7 @@ impl From<&Timestamp> for Timestamp {
 
 #[cfg(test)]
 mod tests {
-    use super::Timestamp;
+    use super::{DISCORD_EPOCH, MAX_DISCORD_ID_MILLIS, Timestamp, TimestampOutOfRange};
 
     #[test]
     fn from_unix_timestamp() {
@@ -244,5 +277,26 @@ mod tests {
         } else {
             assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25Z");
         }
+    }
+
+    #[test]
+    fn test_try_as_discord_id() {
+        // https://docs.discord.com/developers/reference#convert-snowflake-to-datetime
+        let timestamp = Timestamp::from_millis(1462015105796).unwrap();
+        let as_discord_id = timestamp.try_as_discord_id().unwrap();
+        assert_eq!(as_discord_id, 175928847298985984);
+
+        let too_early = Timestamp::from_millis((DISCORD_EPOCH - 1) as i64).unwrap();
+        let result = too_early.try_as_discord_id();
+        assert!(matches!(result, Err(TimestampOutOfRange)));
+
+        let too_late = Timestamp::from_millis((MAX_DISCORD_ID_MILLIS + 1) as i64).unwrap();
+        let result = too_late.try_as_discord_id();
+        assert!(matches!(result, Err(TimestampOutOfRange)));
+
+        // The Discord epoch itself should be a valid conversion, and should produce an id of 0.
+        let just_right = Timestamp::from_millis(DISCORD_EPOCH as i64).unwrap();
+        let zero = just_right.try_as_discord_id().unwrap();
+        assert_eq!(zero, 0);
     }
 }
