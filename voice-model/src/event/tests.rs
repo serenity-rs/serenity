@@ -433,7 +433,7 @@ fn serialize_session_description() {
         Token::Str("d"),
         Token::Struct {
             name: "SessionDescription",
-            len: 2,
+            len: 3,
         },
         Token::Str("mode"),
         Token::Str("xsalsa20_poly1305_suffix"),
