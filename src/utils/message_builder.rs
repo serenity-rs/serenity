@@ -852,8 +852,8 @@ pub trait EmbedMessageBuilding {
     fn push_named_link<'a>(self, name: impl Into<Content<'a>>, url: impl Into<Content<'a>>)
     -> Self;
 
-    /// Pushes a named link intended for use in an embed, but with a normalized name to avoid
-    /// escaping issues.
+    /// Pushes a named link intended for use in an embed, normalizing content and escaping or
+    /// removing characters that would break the link markdown.
     ///
     /// Refer to [`Self::push_named_link`] for more information.
     ///
@@ -864,10 +864,13 @@ pub trait EmbedMessageBuilding {
     ///
     /// let content = MessageBuilder::new()
     ///     .push("A weird website name: ")
-    ///     .push_named_link_safe("Try to ] break links (](", "https://rust-lang.org")
+    ///     .push_named_link_safe("[Try] to [ break links ([(", "https://rust-lang.org")
     ///     .build();
     ///
-    /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
+    /// assert_eq!(
+    ///     content,
+    ///     "A weird website name: [ Try  to   break links ( (](https://rust-lang.org)"
+    /// );
     /// ```
     #[must_use]
     fn push_named_link_safe<'a>(
@@ -895,9 +898,29 @@ impl EmbedMessageBuilding for MessageBuilder {
         url: impl Into<Content<'a>>,
     ) -> Self {
         self.0.push('[');
-        self.push_safe_(name.into(), |c| normalize(c).replace(']', " "));
+        self.push_safe_(name.into(), |c| normalize(c).replace(['[', ']'], " "));
         self.0.push_str("](");
-        self.push_safe_(url.into(), |c| normalize(c).replace(')', " "));
+        self.push_safe_(url.into(), |c| {
+            let normalized = normalize(c);
+            let mut safe_url = String::with_capacity(normalized.len());
+            let mut fs = 0;
+            for char in normalized.chars() {
+                if char == '/' {
+                    fs += 1;
+                }
+                match char {
+                    // Percent-encoding before three forward slashes have been used breaks
+                    // link markdown, so remove any parentheses or backslashes occurring before
+                    // three forward slashes have been used, and percent-encode all others.
+                    '(' | ')' | '\\' if fs < 3 => (),
+                    '(' => safe_url.push_str("%28"),
+                    ')' => safe_url.push_str("%29"),
+                    '\\' => safe_url.push_str("%5C"),
+                    _ => safe_url.push(char),
+                }
+            }
+            safe_url
+        });
         self.0.push(')');
 
         self
