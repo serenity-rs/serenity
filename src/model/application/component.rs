@@ -486,7 +486,7 @@ pub struct RadioGroup {
     pub kind: ComponentType,
     /// Developer-defined identifier for the radio group; max 100 characters
     pub custom_id: FixedString,
-    /// Value of the selected [`CreateRadioGroupOption`].
+    /// Value of the selected [`CreateRadioGroupOption`][crate::builder::CreateRadioGroupOption].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<FixedString>,
 }
@@ -501,7 +501,7 @@ pub struct CheckboxGroup {
     pub kind: ComponentType,
     /// Developer-defined identifier for the checkbox group; max 100 characters
     pub custom_id: FixedString,
-    /// Values of the selected [`CreateCheckboxGroupOption`].
+    /// Values of the selected [`CreateCheckboxGroupOption`][crate::builder::CreateCheckboxGroupOption].
     pub values: FixedArray<String>,
 }
 
