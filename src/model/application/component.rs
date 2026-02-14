@@ -501,7 +501,8 @@ pub struct CheckboxGroup {
     pub kind: ComponentType,
     /// Developer-defined identifier for the checkbox group; max 100 characters
     pub custom_id: FixedString,
-    /// Values of the selected [`CreateCheckboxGroupOption`][crate::builder::CreateCheckboxGroupOption].
+    /// Values of the selected
+    /// [`CreateCheckboxGroupOption`][crate::builder::CreateCheckboxGroupOption].
     pub values: FixedArray<String>,
 }
 
