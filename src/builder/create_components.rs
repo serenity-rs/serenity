@@ -548,6 +548,39 @@ impl<'a> CreateLabel<'a> {
         }
     }
 
+    /// Create a radio group with a specific label.
+    pub fn radio_group(label: impl Into<Cow<'a, str>>, radio_group: CreateRadioGroup<'a>) -> Self {
+        Self {
+            kind: ComponentType::Label,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::RadioGroup(radio_group),
+        }
+    }
+
+    /// Create a checkbox group with a specific label.
+    pub fn checkbox_group(
+        label: impl Into<Cow<'a, str>>,
+        checkbox_group: CreateCheckboxGroup<'a>,
+    ) -> Self {
+        Self {
+            kind: ComponentType::Label,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::CheckboxGroup(checkbox_group),
+        }
+    }
+
+    /// Create a checkbox with a specific label.
+    pub fn checkbox(label: impl Into<Cow<'a, str>>, checkbox: CreateCheckbox<'a>) -> Self {
+        Self {
+            kind: ComponentType::Label,
+            label: label.into(),
+            description: None,
+            component: CreateLabelComponent::Checkbox(checkbox),
+        }
+    }
+
     /// Sets the description of this component, which will display underneath the label text.
     pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
@@ -563,6 +596,9 @@ enum CreateLabelComponent<'a> {
     SelectMenu(CreateSelectMenu<'a>),
     InputText(CreateInputText<'a>),
     FileUpload(CreateFileUpload<'a>),
+    RadioGroup(CreateRadioGroup<'a>),
+    CheckboxGroup(CreateCheckboxGroup<'a>),
+    Checkbox(CreateCheckbox<'a>),
 }
 
 /// A builder for creating a file upload in a modal.
@@ -607,6 +643,246 @@ impl<'a> CreateFileUpload<'a> {
     // Whether the file upload is required.
     pub fn required(mut self, required: bool) -> Self {
         self.required = required;
+        self
+    }
+}
+
+/// A builder for creating a radio group.
+///
+/// [Discord docs](https://docs.discord.com/developers/components/reference#radio-group).
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateRadioGroup<'a> {
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    custom_id: Cow<'a, str>,
+    options: Cow<'a, [CreateRadioGroupOption<'a>]>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    required: Option<bool>,
+}
+
+impl<'a> CreateRadioGroup<'a> {
+    /// Creates a builder with the given custom id and options.
+    ///
+    /// Note - As of 2026-02-13 a minimum of 2 and max of 10 radio group options is required,
+    /// view [here](https://docs.discord.com/developers/components/reference#radio-group-structure).
+    pub fn new(
+        custom_id: impl Into<Cow<'a, str>>,
+        options: impl Into<Cow<'a, [CreateRadioGroupOption<'a>]>>,
+    ) -> Self {
+        Self {
+            kind: ComponentType::RadioGroup,
+            custom_id: custom_id.into(),
+            options: options.into(),
+            required: None,
+        }
+    }
+
+    /// Whether the radio group is required.
+    pub fn required(mut self, required: bool) -> Self {
+        self.required = Some(required);
+        self
+    }
+}
+
+/// A builder for creating an option of a radio group component in a message.
+///
+/// [Discord docs](https://docs.discord.com/developers/components/reference#radio-group-option-structure)
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateRadioGroupOption<'a> {
+    label: Cow<'a, str>,
+    value: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default: Option<bool>,
+}
+
+impl<'a> CreateRadioGroupOption<'a> {
+    /// Creates a radio group option with the given label and value, leaving all other fields
+    /// empty.
+    pub fn new(label: impl Into<Cow<'a, str>>, value: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            label: label.into(),
+            value: value.into(),
+            description: None,
+            default: None,
+        }
+    }
+
+    /// Sets the label of this option, replacing the current value as set in [`Self::new`].
+    pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
+        self.label = label.into();
+        self
+    }
+
+    /// Sets the value of this option, replacing the current value as set in [`Self::new`].
+    pub fn value(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.value = value.into();
+        self
+    }
+
+    /// Sets the description shown on this option.
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    /// Sets this option as selected by default.
+    pub fn default_selection(mut self, default: bool) -> Self {
+        self.default = Some(default);
+        self
+    }
+}
+
+/// A builder for creating a checkbox group.
+///
+/// [Discord docs](https://docs.discord.com/developers/components/reference#checkbox-group).
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateCheckboxGroup<'a> {
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    custom_id: Cow<'a, str>,
+    options: Cow<'a, [CreateCheckboxGroupOption<'a>]>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    min_values: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_values: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    required: Option<bool>,
+}
+
+impl<'a> CreateCheckboxGroup<'a> {
+    /// Creates a builder with the given custom id and options.
+    ///
+    /// Note - As of 2026-02-13 a minimum of 0 and max of 10 checkbox group options is required,
+    /// view [here](https://docs.discord.com/developers/components/reference#checkbox-group-structure).
+    pub fn new(
+        custom_id: impl Into<Cow<'a, str>>,
+        options: impl Into<Cow<'a, [CreateCheckboxGroupOption<'a>]>>,
+    ) -> Self {
+        Self {
+            kind: ComponentType::CheckboxGroup,
+            custom_id: custom_id.into(),
+            options: options.into(),
+            min_values: None,
+            max_values: None,
+            required: None,
+        }
+    }
+
+    /// The minimum number of checkboxes that must be checked. Must be a number from 0 through 10,
+    /// and defaults to 1.
+    ///
+    /// Note - In the event `0` is passed, `self.required` will be set to `false`.
+    pub fn min_values(mut self, min_values: u8) -> Self {
+        if min_values == 0 {
+            self.required = Some(false);
+        }
+
+        self.min_values = Some(min_values);
+        self
+    }
+
+    /// The maximum number of checkboxes that can be checked. Defaults to the number of options
+    /// provided, and can be at most 10.
+    pub fn max_values(mut self, max_values: u8) -> Self {
+        self.max_values = Some(max_values);
+        self
+    }
+
+    /// Whether the checkbox group is required.
+    ///
+    /// Note - If `true` is passed and `self.min_values` is `0`, it will be set to `1`.
+    pub fn required(mut self, required: bool) -> Self {
+        if required && self.min_values == Some(0) {
+            self.min_values = Some(1);
+        }
+
+        self.required = Some(required);
+        self
+    }
+}
+
+/// A builder for creating an option of a checkbox group component in a message.
+///
+/// [Discord docs](https://docs.discord.com/developers/components/reference#checkbox-group-option-structure)
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateCheckboxGroupOption<'a> {
+    label: Cow<'a, str>,
+    value: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default: Option<bool>,
+}
+
+impl<'a> CreateCheckboxGroupOption<'a> {
+    /// Creates a checkbox group option with the given label and value, leaving all other fields
+    /// empty.
+    pub fn new(label: impl Into<Cow<'a, str>>, value: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            label: label.into(),
+            value: value.into(),
+            description: None,
+            default: None,
+        }
+    }
+
+    /// Sets the label of this option, replacing the current value as set in [`Self::new`].
+    pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
+        self.label = label.into();
+        self
+    }
+
+    /// Sets the value of this option, replacing the current value as set in [`Self::new`].
+    pub fn value(mut self, value: impl Into<Cow<'a, str>>) -> Self {
+        self.value = value.into();
+        self
+    }
+
+    /// Sets the description shown on this option.
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    /// Sets this option as selected by default.
+    pub fn default_selection(mut self, default: bool) -> Self {
+        self.default = Some(default);
+        self
+    }
+}
+
+/// A builder for creating a checkbox.
+///
+/// [Discord docs](https://docs.discord.com/developers/components/reference#checkbox).
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateCheckbox<'a> {
+    #[serde(rename = "type")]
+    kind: ComponentType,
+    custom_id: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default: Option<bool>,
+}
+
+impl<'a> CreateCheckbox<'a> {
+    /// Creates a builder with the given custom id.
+    pub fn new(custom_id: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            kind: ComponentType::Checkbox,
+            custom_id: custom_id.into(),
+            default: None,
+        }
+    }
+
+    /// Sets this checkbox as selected by default.
+    pub fn default_selected(mut self, default: bool) -> Self {
+        self.default = Some(default);
         self
     }
 }
@@ -942,7 +1218,7 @@ impl<'a> CreateSelectMenu<'a> {
     }
 }
 
-/// A builder for creating an option of a select menu component in a message
+/// A builder for creating an option of a select menu component in a message.
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#string-select-select-option-structure)
 #[derive(Clone, Debug, Serialize)]
@@ -1080,5 +1356,64 @@ impl<'a> CreateInputText<'a> {
     pub fn required(mut self, required: bool) -> Self {
         self.required = required;
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_checkbox_group_min_values() {
+        let mut checkbox_group = CreateCheckboxGroup::new("foo", &[]);
+        assert_eq!(checkbox_group.min_values, None);
+        assert_eq!(checkbox_group.required, None);
+
+        checkbox_group = checkbox_group.min_values(5);
+        assert_eq!(checkbox_group.min_values, Some(5));
+        assert_eq!(checkbox_group.required, None);
+
+        checkbox_group = checkbox_group.min_values(0);
+        assert_eq!(checkbox_group.min_values, Some(0));
+        assert_eq!(checkbox_group.required, Some(false));
+
+        checkbox_group = checkbox_group.min_values(5);
+        assert_eq!(checkbox_group.min_values, Some(5));
+        assert_eq!(checkbox_group.required, Some(false));
+    }
+
+    #[test]
+    fn test_checkbox_group_required() {
+        let mut checkbox_group = CreateCheckboxGroup::new("foo", &[]);
+        assert_eq!(checkbox_group.min_values, None);
+        assert_eq!(checkbox_group.required, None);
+
+        checkbox_group = checkbox_group.required(true);
+        assert_eq!(checkbox_group.min_values, None);
+        assert_eq!(checkbox_group.required, Some(true));
+
+        checkbox_group = checkbox_group.required(false);
+        assert_eq!(checkbox_group.min_values, None);
+        assert_eq!(checkbox_group.required, Some(false));
+
+        checkbox_group = checkbox_group.min_values(5);
+        assert_eq!(checkbox_group.min_values, Some(5));
+        assert_eq!(checkbox_group.required, Some(false));
+
+        checkbox_group = checkbox_group.required(true);
+        assert_eq!(checkbox_group.min_values, Some(5));
+        assert_eq!(checkbox_group.required, Some(true));
+
+        checkbox_group = checkbox_group.required(false);
+        assert_eq!(checkbox_group.min_values, Some(5));
+        assert_eq!(checkbox_group.required, Some(false));
+
+        checkbox_group = checkbox_group.min_values(0);
+        assert_eq!(checkbox_group.min_values, Some(0));
+        assert_eq!(checkbox_group.required, Some(false));
+
+        checkbox_group = checkbox_group.required(true);
+        assert_eq!(checkbox_group.min_values, Some(1));
+        assert_eq!(checkbox_group.required, Some(true));
     }
 }

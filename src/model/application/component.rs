@@ -29,6 +29,9 @@ enum_number! {
         Container = 17,
         Label = 18,
         FileUpload = 19,
+        RadioGroup = 21,
+        CheckboxGroup = 22,
+        Checkbox = 23,
         _ => Unknown(u8),
     }
 }
@@ -412,6 +415,9 @@ pub enum LabelComponent {
     SelectMenu(SelectMenu),
     InputText(InputText),
     FileUpload(FileUpload),
+    RadioGroup(RadioGroup),
+    CheckboxGroup(CheckboxGroup),
+    Checkbox(Checkbox),
 }
 
 impl<'de> Deserialize<'de> for LabelComponent {
@@ -439,6 +445,15 @@ impl<'de> Deserialize<'de> for LabelComponent {
             ComponentType::FileUpload => {
                 Deserialize::deserialize(raw_data).map(LabelComponent::FileUpload)
             },
+            ComponentType::RadioGroup => {
+                Deserialize::deserialize(raw_data).map(LabelComponent::RadioGroup)
+            },
+            ComponentType::CheckboxGroup => {
+                Deserialize::deserialize(raw_data).map(LabelComponent::CheckboxGroup)
+            },
+            ComponentType::Checkbox => {
+                Deserialize::deserialize(raw_data).map(LabelComponent::Checkbox)
+            },
             ComponentType(i) => {
                 return Err(DeError::custom(format_args!("Unknown label component type {i}")));
             },
@@ -459,6 +474,49 @@ pub struct FileUpload {
     pub custom_id: FixedString,
     /// IDs of the uploaded files found in [`ModalInteractionData::resolved`].
     pub values: FixedArray<AttachmentId>,
+}
+
+/// An interactive component that allows users to select a radio button in modals.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct RadioGroup {
+    /// Always [`ComponentType::RadioGroup`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// Developer-defined identifier for the radio group; max 100 characters
+    pub custom_id: FixedString,
+    /// Value of the selected [`CreateRadioGroupOption`].
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<FixedString>,
+}
+
+/// An interactive component that allows users to group together multiple checkboxes in modals.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct CheckboxGroup {
+    /// Always [`ComponentType::CheckboxGroup`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// Developer-defined identifier for the checkbox group; max 100 characters
+    pub custom_id: FixedString,
+    /// Values of the selected [`CreateCheckboxGroupOption`].
+    pub values: FixedArray<String>,
+}
+
+/// An interactive component that allows users to use a checkbox in modals.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[non_exhaustive]
+pub struct Checkbox {
+    /// Always [`ComponentType::Checkbox`]
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// Developer-defined identifier for the checkbox group; max 100 characters
+    pub custom_id: FixedString,
+    /// The state of the checkbox (`true` if checked, `false` if unchecked).
+    pub value: bool,
 }
 
 /// An action row.
