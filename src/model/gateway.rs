@@ -15,7 +15,7 @@ use super::utils::*;
 ///
 /// This is only applicable to bot users.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-bot-json-response).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway#get-gateway-bot-json-response).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct BotGateway {
@@ -30,7 +30,7 @@ pub struct BotGateway {
 
 /// Representation of an activity that a [`User`] is performing.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-structure).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -80,7 +80,7 @@ pub struct Activity {
     pub created_at: u64,
 }
 
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-buttons).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
@@ -96,7 +96,7 @@ pub struct ActivityButton {
 
 /// The assets for an activity.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-assets).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -114,7 +114,7 @@ pub struct ActivityAssets {
 bitflags! {
     /// A set of flags defining what is in an activity's payload.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).
+    /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ActivityFlags: u64 {
@@ -141,7 +141,7 @@ bitflags! {
 
 /// Information about an activity's party.
 ///
-/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activityparty-struct).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-party).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -154,7 +154,7 @@ pub struct ActivityParty {
 
 /// Secrets for an activity.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-secrets).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -170,7 +170,7 @@ pub struct ActivitySecrets {
 
 /// Representation of an emoji used in a custom status
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-emoji).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -184,7 +184,7 @@ pub struct ActivityEmoji {
 }
 
 enum_number! {
-    /// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types).
+    /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[non_exhaustive]
@@ -209,7 +209,7 @@ enum_number! {
 ///
 /// For the bot-specific gateway, refer to [`BotGateway`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-example-response).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway#get-gateway-example-response).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Gateway {
@@ -219,7 +219,7 @@ pub struct Gateway {
 
 /// Information detailing the current active status of a [`User`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#client-status-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -234,8 +234,8 @@ pub struct ClientStatus {
 /// Fields should be identical to those of [`User`], except that every field but `id` is
 /// optional. This is currently not implemented fully.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object),
-/// [modification description](https://discord.com/developers/docs/topics/gateway-events#presence-update).
+/// [Discord docs](https://docs.discord.com/developers/resources/user#user-object),
+/// [modification description](https://docs.discord.com/developers/events/gateway-events#presence-update).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
@@ -321,7 +321,7 @@ impl PresenceUser {
 
 /// Information detailing the current online status of a [`User`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#presence-update-presence-update-event-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -347,7 +347,7 @@ impl ExtractKey<UserId> for Presence {
 
 /// An initial set of information given after IDENTIFYing to the gateway.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#ready-ready-event-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -371,7 +371,7 @@ pub struct Ready {
 
 /// Information describing how many gateway sessions you can initiate within a ratelimit period.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway#session-start-limit-object-session-start-limit-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct SessionStartLimit {
@@ -424,7 +424,7 @@ impl serde::Serialize for ShardInfo {
 
 /// Timestamps of when a user started and/or is ending their activity.
 ///
-/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-timestamps).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -453,11 +453,11 @@ bitflags! {
     /// **Note**: Once the bot is in 100 guilds or more, [the bot must be verified] in order to use
     /// privileged intents.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).
+    /// [Discord docs](https://docs.discord.com/developers/events/gateway#list-of-intents).
     ///
-    /// [Gateway Intents]: https://discord.com/developers/docs/topics/gateway#gateway-intents
-    /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
-    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    /// [Gateway Intents]: https://docs.discord.com/developers/events/gateway#gateway-intents
+    /// [Privileged Intents]: https://docs.discord.com/developers/events/gateway#privileged-intents
+    /// [the bot must be verified]: https://support.discord.com/hc/en-us/community/posts/360050817314-Discord-Bots-Info
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
     pub struct GatewayIntents: u64 {
@@ -483,7 +483,7 @@ bitflags! {
         ///  - STAGE_INSTANCE_DELETE
         ///
         /// **Info:** The THREAD_MEMBERS_UPDATE event contains different data depending on which
-        /// intents are used. See [Discord's Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
+        /// intents are used. See [Discord's Docs](https://docs.discord.com/developers/events/gateway-events#thread-members-update)
         /// for more information.
         const GUILDS = 1;
         /// Enables the following gateway events:
@@ -497,7 +497,7 @@ bitflags! {
         /// well as enabling it in your code.
         ///
         /// **Info:** The THREAD_MEMBERS_UPDATE event contains different data depending on which
-        /// intents are used. See [Discord's Docs](https://discord.com/developers/docs/topics/gateway-events#thread-members-update)
+        /// intents are used. See [Discord's Docs](https://docs.discord.com/developers/events/gateway-events#thread-members-update)
         /// for more information.
         const GUILD_MEMBERS = 1 << 1;
 
@@ -570,7 +570,7 @@ bitflags! {
 
         /// Enables receiving message content in gateway events
         ///
-        /// See [Discord's Docs](https://discord.com/developers/docs/topics/gateway#message-content-intent) for more information
+        /// See [Discord's Docs](https://docs.discord.com/developers/events/gateway#message-content-intent) for more information
         ///
         /// **Info**: This intent is *privileged*. In order to use it, you must head to your
         /// application in the Developer Portal and enable the toggle for *Privileged Intents*,

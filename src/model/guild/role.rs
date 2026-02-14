@@ -15,7 +15,7 @@ use crate::model::utils::is_false;
 /// guild and do not cross over to other guilds in any way, and can have channel-specific
 /// permission overrides in addition to guild-level permissions.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
+/// [Discord docs](https://docs.discord.com/developers/topics/permissions#role-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
@@ -199,7 +199,7 @@ impl From<&Role> for RoleId {
 
 /// The tags of a [`Role`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure).
+/// [Discord docs](https://docs.discord.com/developers/topics/permissions#role-object-role-tags-structure).
 #[bool_to_bitflags::bool_to_bitflags]
 #[derive(Clone, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]

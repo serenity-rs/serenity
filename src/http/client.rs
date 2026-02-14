@@ -221,7 +221,7 @@ fn reason_into_header(reason: &str) -> Headers {
     let mut headers = Headers::new();
 
     // "The X-Audit-Log-Reason header supports 1-512 URL-encoded UTF-8 characters."
-    // https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
+    // https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object
     let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
         Cow::Borrowed(value) => HeaderValue::from_str(value),
         Cow::Owned(value) => HeaderValue::try_from(value),
@@ -354,7 +354,7 @@ impl Http {
 
     /// Bans multiple users from a [`Guild`], optionally removing their messages.
     ///
-    /// See the [Discord docs](https://discord.com/developers/docs/resources/guild#bulk-guild-ban)
+    /// See the [Discord docs](https://docs.discord.com/developers/resources/guild#bulk-guild-ban)
     /// for more information.
     pub async fn bulk_ban_users(
         &self,
@@ -632,7 +632,7 @@ impl Http {
     /// over a [`Shard`], if at least one is running.
     ///
     /// [`Shard`]: crate::gateway::Shard
-    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://discord.com/developers/docs/change-log#deprecating-guild-creation-by-apps"]
+    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
     pub async fn create_guild(&self, map: &impl serde::Serialize) -> Result<PartialGuild> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -2201,7 +2201,7 @@ impl Http {
     ///
     /// Refer to the [Discord docs] for more information on how this works.
     ///
-    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
+    /// [Discord docs]: https://docs.discord.com/developers/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook_with_components(
         &self,
         webhook_id: WebhookId,

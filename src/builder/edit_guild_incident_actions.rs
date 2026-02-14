@@ -6,7 +6,7 @@ use crate::model::prelude::*;
 
 /// A builder for editing guild incident actions.
 ///
-/// [Discord's docs]: https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions
+/// [Discord's docs]: https://docs.discord.com/developers/resources/guild#modify-guild-incident-actions
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildIncidentActions {

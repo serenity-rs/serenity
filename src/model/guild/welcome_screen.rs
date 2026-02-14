@@ -4,7 +4,7 @@ use crate::model::prelude::*;
 
 /// Information relating to a guild's welcome screen.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -19,7 +19,7 @@ pub struct GuildWelcomeScreen {
 
 /// A channel shown in the [`GuildWelcomeScreen`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
@@ -89,7 +89,7 @@ impl Serialize for GuildWelcomeChannel {
 
 /// A [`GuildWelcomeScreen`] emoji.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]

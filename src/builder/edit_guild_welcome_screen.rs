@@ -8,7 +8,7 @@ use crate::model::prelude::*;
 
 /// A builder to edit the welcome screen of a guild
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen)
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#modify-guild-welcome-screen)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildWelcomeScreen<'a> {
@@ -78,7 +78,7 @@ impl<'a> EditGuildWelcomeScreen<'a> {
 
 /// A builder for creating a [`GuildWelcomeChannel`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure)
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateGuildWelcomeChannel<'a> {

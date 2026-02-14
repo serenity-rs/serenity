@@ -224,7 +224,7 @@ impl ExtractKey<ThreadId> for GuildThread {
 
 /// A thread data.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#thread-metadata-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
@@ -253,8 +253,8 @@ pub struct ThreadMetadata {
 
 /// A partial guild thread.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
-/// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object),
+/// [subset description](https://docs.discord.com/developers/events/gateway-events#thread-delete)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -284,8 +284,8 @@ pub struct PartialThreadMember {
 ///
 /// [Discord docs], [extra fields].
 ///
-/// [Discord docs]: https://discord.com/developers/docs/resources/channel#thread-member-object,
-/// [extra fields]: https://discord.com/developers/docs/topics/gateway-events#thread-member-update-thread-member-update-event-extra-fields
+/// [Discord docs]: https://docs.discord.com/developers/resources/channel#thread-member-object,
+/// [extra fields]: https://docs.discord.com/developers/events/gateway-events#thread-member-update-thread-member-update-event-extra-fields
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -305,17 +305,17 @@ pub struct ThreadMember {
     ///
     /// Always present in [`ThreadMemberUpdateEvent`], otherwise `None`.
     pub guild_id: Option<GuildId>,
-    // According to https://discord.com/developers/docs/topics/gateway-events#thread-members-update,
+    // According to https://docs.discord.com/developers/events/gateway-events#thread-members-update,
     // > the thread member objects will also include the guild member and nullable presence objects
     // > for each added thread member
-    // Which implies that ThreadMember has a presence field. But https://discord.com/developers/docs/resources/channel#thread-member-object
+    // Which implies that ThreadMember has a presence field. But https://docs.discord.com/developers/resources/channel#thread-member-object
     // says that's not true. I'm not adding the presence field here for now
 }
 
 bitflags! {
     /// Describes extra features of the message.
     ///
-    /// Discord docs: flags field on [Thread Member](https://discord.com/developers/docs/resources/channel#thread-member-object).
+    /// Discord docs: flags field on [Thread Member](https://docs.discord.com/developers/resources/channel#thread-member-object).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct ThreadMemberFlags: u64 {

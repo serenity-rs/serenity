@@ -15,7 +15,7 @@ use crate::model::prelude::*;
 
 /// An interaction triggered by a modal submit.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
@@ -211,7 +211,7 @@ impl Serialize for ModalInteraction {
 
 /// A modal submit interaction data, provided by [`ModalInteraction::data`]
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -227,7 +227,7 @@ pub struct ModalInteractionData {
 
 /// A component which can appear inside a modal form submission.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-component-interaction-response-structures)
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-component-interaction-response-structures)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]

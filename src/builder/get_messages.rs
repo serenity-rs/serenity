@@ -45,7 +45,7 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#get-channel-messages)
+/// [Discord docs](https://docs.discord.com/developers/resources/message#get-channel-messages)
 #[derive(Clone, Copy, Debug, Default)]
 #[must_use]
 pub struct GetMessages {

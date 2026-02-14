@@ -21,7 +21,7 @@ pub enum AttachmentData<'a> {
 
 /// A builder for creating a new attachment from a file path, file data, or URL.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-structure).
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 #[must_use]
@@ -165,7 +165,7 @@ impl<'a> DataUri<'a> {
     /// # Errors
     ///
     /// Returns a [`Error::Url`] if the string is not a valid data URI. See the [Discord
-    /// docs](https://discord.com/developers/docs/reference#image-data).
+    /// docs](https://docs.discord.com/developers/reference#image-data).
     pub fn from_base64(s: impl Into<Cow<'a, str>>) -> Result<Self> {
         let s = s.into();
         if let Some(("data", tail)) = s.split_once(':')

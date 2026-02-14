@@ -4,7 +4,7 @@ use super::prelude::*;
 
 /// Information about a connection between the current user and a third party service.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-connection-structure).
+/// [Discord docs](https://docs.discord.com/developers/resources/user#connection-object-connection-structure).
 #[bool_to_bitflags::bool_to_bitflags]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
@@ -15,7 +15,7 @@ pub struct Connection {
     pub name: FixedString,
     /// The service that this connection represents (e.g. twitch, youtube)
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-services).
+    /// [Discord docs](https://docs.discord.com/developers/resources/user#connection-object-services).
     #[serde(rename = "type")]
     pub kind: FixedString,
     /// Whether this connection has been revoked and is no longer valid.
@@ -39,7 +39,7 @@ pub struct Connection {
 enum_number! {
     /// The visibility of a user connection on a user's profile.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/user#connection-object-visibility-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/user#connection-object-visibility-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[non_exhaustive]
     pub enum ConnectionVisibility {

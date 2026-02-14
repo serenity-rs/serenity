@@ -7,7 +7,7 @@ use crate::model::prelude::*;
 
 /// Information about an available voice region.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/voice#voice-region-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/voice#voice-region-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[non_exhaustive]
@@ -26,7 +26,7 @@ pub struct VoiceRegion {
 
 /// A user's state within a voice channel.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/voice#voice-state-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/voice#voice-state-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]

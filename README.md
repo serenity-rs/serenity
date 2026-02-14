@@ -228,7 +228,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [`validate_token`]: https://docs.rs/serenity/*/serenity/utils/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
-[discord docs]: https://discord.com/developers/docs/intro
+[discord docs]: https://docs.discord.com/developers/intro
 [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [project:lavalink-rs]: https://gitlab.com/vicky5124/lavalink-rs/

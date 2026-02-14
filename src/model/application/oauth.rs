@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// The available OAuth2 Scopes.
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
+/// [Discord docs](https://docs.discord.com/developers/topics/oauth2#shared-resources-oauth2-scopes).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]

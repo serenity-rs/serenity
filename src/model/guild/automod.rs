@@ -1,6 +1,6 @@
 //! Auto moderation types
 //!
-//! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
+//! [Discord docs](https://docs.discord.com/developers/resources/auto-moderation)
 
 use std::time::Duration;
 
@@ -12,7 +12,7 @@ use crate::model::prelude::*;
 
 /// Configured auto moderation rule.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -46,7 +46,7 @@ pub struct AutoModRule {
 
 /// Indicates in what event context a rule should be checked.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-event-types).
+/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-event-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
@@ -77,8 +77,8 @@ impl From<EventType> for u8 {
 /// Characterizes the type of content which can trigger the rule.
 ///
 /// Discord docs:
-/// [type](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types),
-/// [metadata](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)
+/// [type](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-types),
+/// [metadata](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
@@ -87,7 +87,7 @@ pub enum Trigger {
         /// Substrings which will be searched for in content (Maximum of 1000)
         ///
         /// A keyword can be a phrase which contains multiple words.
-        /// [Wildcard symbols](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies)
+        /// [Wildcard symbols](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies)
         /// can be used to customize how each keyword will be matched. Each keyword must be 60
         /// characters or less.
         strings: Vec<String>,
@@ -217,7 +217,7 @@ impl Trigger {
 
 /// Type of [`Trigger`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types).
+/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
@@ -261,7 +261,7 @@ impl From<TriggerType> for u8 {
 ///
 /// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
+/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -280,7 +280,7 @@ pub struct TriggerMetadata {
 
 /// Internally pre-defined wordsets which will be searched for in content.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-preset-types).
+/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-keyword-preset-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
@@ -319,7 +319,7 @@ impl From<KeywordPresetType> for u8 {
 
 /// An action which will execute whenever a rule is triggered.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-action-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
@@ -349,7 +349,7 @@ pub enum Action {
 /// Gateway event payload sent when a rule is triggered and an action is executed (e.g. message is
 /// blocked).
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#auto-moderation-action-execution).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -493,7 +493,7 @@ impl Action {
 enum_number! {
     /// See [`Action`]
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-action-object-action-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[non_exhaustive]
     pub enum ActionType {
