@@ -96,7 +96,7 @@ impl<'de> Deserialize<'de> for Component {
 
 /// A component that is a container for up to 3 text display components and an accessory.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#section)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#section)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -112,7 +112,7 @@ pub struct Section {
 
 /// A child component representing the content of a section.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#section-section-child-components)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#section-section-child-components)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
@@ -145,7 +145,7 @@ impl<'de> Deserialize<'de> for SectionComponent {
 
 /// A component that is contextually associated to the content of a section.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#section-section-accessory-components)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#section-section-accessory-components)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
@@ -186,7 +186,7 @@ impl<'de> Deserialize<'de> for SectionAccessory {
 ///
 /// See [`Section`] for how this fits within a section.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#thumbnail)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#thumbnail)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -204,7 +204,7 @@ pub struct Thumbnail {
 
 /// A url or attachment.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#unfurled-media-item)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#unfurled-media-item)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -224,7 +224,7 @@ pub struct UnfurledMediaItem {
 /// A component that allows you to add text to your message, similiar to the `content` field of a
 /// message.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#text-display)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#text-display)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -243,7 +243,7 @@ pub struct TextDisplay {
 /// A Media Gallery is a component that allows you to display media attachments in an organized
 /// gallery format.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#media-gallery)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#media-gallery)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -259,7 +259,7 @@ pub struct MediaGallery {
 ///
 /// Belongs to [`MediaGallery`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#media-gallery-media-gallery-item-structure)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#media-gallery-media-gallery-item-structure)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -274,7 +274,7 @@ pub struct MediaGalleryItem {
 
 /// A component that adds vertical padding and visual division between other components.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#separator)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#separator)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -302,7 +302,7 @@ enum_number! {
 
 /// A file component, will not render a text preview to the user.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#file)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#file)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
@@ -318,7 +318,7 @@ pub struct FileComponent {
 
 /// A container component, similar to an embed but without all the functionality.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#container)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#container)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
@@ -336,7 +336,7 @@ pub struct Container {
 
 /// A child component encapsulated within a container.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#container-container-child-components)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#container-container-child-components)
 #[derive(Clone, Debug, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
@@ -395,7 +395,7 @@ impl<'de> Deserialize<'de> for ContainerComponent {
 /// **Note**: Labels can only appear within modals, and will not include the `label` or
 /// `description` field when part of a modal response.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#label-label-interaction-response-structure)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#label-label-interaction-response-structure)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[non_exhaustive]
@@ -486,7 +486,7 @@ pub struct RadioGroup {
     pub kind: ComponentType,
     /// Developer-defined identifier for the radio group; max 100 characters
     pub custom_id: FixedString,
-    /// Value of the selected [`CreateRadioGroupOption`].
+    /// Value of the selected [`CreateRadioGroupOption`][crate::builder::CreateRadioGroupOption].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<FixedString>,
 }
@@ -501,7 +501,8 @@ pub struct CheckboxGroup {
     pub kind: ComponentType,
     /// Developer-defined identifier for the checkbox group; max 100 characters
     pub custom_id: FixedString,
-    /// Values of the selected [`CreateCheckboxGroupOption`].
+    /// Values of the selected
+    /// [`CreateCheckboxGroupOption`][crate::builder::CreateCheckboxGroupOption].
     pub values: FixedArray<String>,
 }
 
@@ -689,6 +690,7 @@ enum_number! {
 /// A select menu component.
 ///
 /// Discord docs: [String Select](https://docs.discord.com/developers/components/reference#string-select), [User Select](https://docs.discord.com/developers/components/reference#user-select), [Role Select](https://docs.discord.com/developers/components/reference#role-select), [Mentionable Select](https://docs.discord.com/developers/components/reference#mentionable-select), [Channel Select](https://docs.discord.com/developers/components/reference#channel-select).
+>>>>>>> 55743c53c8 (Update Discord docs links (#3490))
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -727,7 +729,7 @@ pub struct SelectMenu {
 
 /// A select menu component options.
 ///
-/// [Discord docs](https://docs.discord.com/developers/components/reference#string-select-select-option-structure)
+/// [Discord docs](https://docs.discord.com/developers/components/reference#string-select-select-option-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

@@ -502,7 +502,7 @@ pub enum ShardRunnerMessage {
     ///
     /// See the [Discord docs].
     ///
-    /// [Discord docs]: https://discord.com/developers/docs/events/gateway#initiating-a-disconnect
+    /// [Discord docs]: https://docs.discord.com/developers/events/gateway#initiating-a-disconnect
     Shutdown(u16),
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {

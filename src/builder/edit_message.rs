@@ -121,7 +121,7 @@ impl<'a> EditMessage<'a> {
     ///
     /// [`CreateMessage::flags`]: super::CreateMessage::flags
     pub fn suppress_embeds(mut self, suppress: bool) -> Self {
-        // See for details: https://docs.discord.com/developers/resources/message#edit-message
+        // See for details: https://docs.discord.com/developers/resources/message#edit-message-json/form-params
         self.flags
             .get_or_insert(MessageFlags::empty())
             .set(MessageFlags::SUPPRESS_EMBEDS, suppress);

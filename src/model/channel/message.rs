@@ -853,7 +853,6 @@ impl From<&Message> for MessageReference {
     }
 }
 
-
 /// [Discord docs](https://docs.discord.com/developers/resources/message#channel-mention-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -963,7 +962,7 @@ bitflags! {
         /// - Files will not have a simple text preview.
         /// - URLs will not generate embeds.
         ///
-        /// For more details, refer to the Discord documentation: [https://discord.com/developers/docs/components/reference#component-reference]
+        /// For more details, refer to the Discord documentation: [https://docs.discord.com/developers/components/reference#component-reference]
         const IS_COMPONENTS_V2 = 1 << 15;
 
     }
@@ -1162,7 +1161,8 @@ pub struct PollResults {
 
 /// The count of a single [`PollAnswer`]'s results.
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/poll#poll-answer-object-poll-answer-object-structure)
+/// [Discord docs](https://docs.discord.com/developers/resources/poll#poll-results-object-poll-results-object-structure)
+// TODO: https://docs.discord.com/developers/resources/poll#poll-results-object-poll-answer-count-object-structure
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -1174,7 +1174,7 @@ pub struct PollAnswerCount {
 
 /// A pinned message returned as part of a paginated Get Channel Pins query.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/message#message-pin-object)
+/// [Discord docs](https://docs.discord.com/developers/resources/message#message-pin-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -1185,7 +1185,7 @@ pub struct MessagePin {
 
 /// The response data for a paginated Get Channel Pins query.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/message#get-channel-pins)
+/// [Discord docs](https://docs.discord.com/developers/resources/message#get-channel-pins)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]

@@ -33,7 +33,7 @@
 //! associated u64 as data. This is the Id of the parameter, differentiating between different
 //! ratelimits.
 //!
-//! [Taken from]: https://docs.discord.com/developers/topics/rate-limits
+//! [Taken from]: https://docs.discord.com/developers/topics/rate-limits#rate-limits
 
 use std::borrow::Cow;
 use std::fmt;

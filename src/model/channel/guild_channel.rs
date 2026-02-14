@@ -19,7 +19,7 @@ use crate::model::prelude::*;
 
 /// Represents the shared fields between [`GuildChannel`] and [`GuildThread`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/threads#thread-fields)
+/// [Discord docs](https://docs.discord.com/developers/topics/threads#thread-fields)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]

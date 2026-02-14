@@ -75,7 +75,7 @@ enum_number! {
 enum_number! {
     /// An enum representing the gateway close codes.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes)
+    /// [Discord docs](https://docs.discord.com/developers/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes)
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[non_exhaustive]
     pub enum CloseCode {

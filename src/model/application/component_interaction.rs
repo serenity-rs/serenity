@@ -307,7 +307,7 @@ impl Serialize for ComponentInteractionDataKind {
 
 /// A message component interaction data, provided by [`ComponentInteraction::data`]
 ///
-/// [Discord docs](https://docs.discord.com/developers/components/reference#anatomy-of-a-component).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

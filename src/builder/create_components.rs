@@ -356,7 +356,7 @@ impl<'a> CreateMediaGalleryItem<'a> {
 /// item to "attachment://example.txt".
 ///
 /// For more details on naming and rules for attachments,
-/// refer to the [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files).
+/// refer to the [Discord Documentation](https://docs.discord.com/developers/reference#uploading-files).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateFile<'a> {
@@ -506,7 +506,7 @@ pub enum CreateContainerComponent<'a> {
 
 /// A builder for creating a label that can hold an [`InputText`] or [`SelectMenu`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#label).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#label).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateLabel<'a> {
@@ -603,7 +603,7 @@ enum CreateLabelComponent<'a> {
 
 /// A builder for creating a file upload in a modal.
 ///
-/// [Discord docs](https://discord.com/developers/docs/components/reference#file-upload).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#file-upload).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateFileUpload<'a> {
@@ -1145,7 +1145,7 @@ impl Serialize for CreateSelectMenuKind<'_> {
 
 /// A builder for creating a select menu component in a message
 ///
-/// [Discord docs](https://docs.discord.com/developers/components/reference#component-object).
+/// [Discord docs](https://docs.discord.com/developers/components/reference#component-object-component-types).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu<'a> {

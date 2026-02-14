@@ -227,7 +227,7 @@ pub struct ModalInteractionData {
 
 /// A component which can appear inside a modal form submission.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-component-interaction-response-structures)
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-component-interaction-response-structures)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]

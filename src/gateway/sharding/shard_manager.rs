@@ -189,7 +189,7 @@ impl ShardManager {
     // This function assumes that each of the shard ids are bucketed separately according to
     // `max_concurrency`. If this assumption is violated, you will likely get ratelimited.
     //
-    // See: https://discord.com/developers/docs/events/gateway#sharding-max-concurrency
+    // See: https://docs.discord.com/developers/events/gateway#sharding-max-concurrency
     async fn checked_start(&mut self, shard_ids: Vec<ShardId>) {
         if shard_ids.is_empty() {
             return;
