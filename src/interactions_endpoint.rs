@@ -3,7 +3,7 @@
 //! "You can optionally configure an interactions endpoint to receive interactions via HTTP POSTs
 //! rather than over Gateway with a bot user."
 //!
-//! <https://discord.com/developers/docs/tutorials/upgrading-to-application-commands#adding-an-interactions-endpoint-url>
+//! <https://docs.discord.com/developers/tutorials/upgrading-to-application-commands#adding-an-interactions-endpoint-url>
 //!
 //! See [`Verifier`] for example usage.
 

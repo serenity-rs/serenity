@@ -12,7 +12,7 @@ use crate::model::utils::icon_url;
 
 /// Partial information about a [`Guild`]. This does not include information like member data.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -96,7 +96,7 @@ pub struct PartialGuild {
     /// - `PRIVATE_THREADS`
     ///
     ///
-    /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
+    /// [`discord documentation`]: https://docs.discord.com/developers/resources/guild#guild-object-guild-features
     pub features: FixedArray<FixedString>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.

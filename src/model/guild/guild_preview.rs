@@ -2,7 +2,7 @@ use crate::model::prelude::*;
 
 /// Preview [`Guild`] information.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-preview-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-preview-object).
 ///
 /// [`Guild`]: super::Guild
 #[derive(Clone, Debug, Deserialize, Serialize)]

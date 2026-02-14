@@ -18,7 +18,7 @@ use crate::model::prelude::*;
 
 /// An interaction when a user invokes a slash command.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
@@ -230,7 +230,7 @@ impl Serialize for CommandInteraction {
 
 /// The command data payload.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-data-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-application-command-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -443,7 +443,7 @@ pub enum ResolvedTarget<'a> {
 /// The resolved data of a command data interaction payload. It contains the objects of
 /// [`CommandDataOption`]s.
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -497,7 +497,7 @@ pub struct CommandDataResolved {
 ///
 /// Their resolved objects can be found on [`CommandData::resolved`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
@@ -620,7 +620,7 @@ impl Serialize for CommandDataOption {
 
 /// The value of an [`CommandDataOption`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-type).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]

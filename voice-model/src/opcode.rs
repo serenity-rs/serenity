@@ -2,7 +2,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// An enum representing the [voice opcodes].
 ///
-/// [voice opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#voice
+/// [voice opcodes]: https://docs.discord.com/developers/topics/opcodes-and-status-codes#voice
 #[derive(
     Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize_repr, Serialize_repr,
 )]

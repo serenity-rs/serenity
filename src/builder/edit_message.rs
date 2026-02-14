@@ -32,7 +32,7 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message)
+/// [Discord docs](https://docs.discord.com/developers/resources/message#edit-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditMessage<'a> {
@@ -121,7 +121,7 @@ impl<'a> EditMessage<'a> {
     ///
     /// [`CreateMessage::flags`]: super::CreateMessage::flags
     pub fn suppress_embeds(mut self, suppress: bool) -> Self {
-        // See for details: https://discord.com/developers/docs/resources/message#edit-message-jsonform-params
+        // See for details: https://docs.discord.com/developers/resources/message#edit-message-json/form-params
         self.flags
             .get_or_insert(MessageFlags::empty())
             .set(MessageFlags::SUPPRESS_EMBEDS, suppress);

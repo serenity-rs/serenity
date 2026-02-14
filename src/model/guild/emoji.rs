@@ -6,7 +6,7 @@ use crate::model::utils::default_true;
 /// Represents a custom guild emoji, which can either be created using the API, or via an
 /// integration. Emojis created using the API only work within the guild it was created in.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/emoji#emoji-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/emoji#emoji-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]

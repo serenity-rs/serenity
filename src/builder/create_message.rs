@@ -48,7 +48,7 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#create-message)
+/// [Discord docs](https://docs.discord.com/developers/resources/message#create-message)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateMessage<'a> {

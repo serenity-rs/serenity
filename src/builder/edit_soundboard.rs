@@ -6,7 +6,7 @@ use crate::model::prelude::*;
 
 /// A builder to create or edit a [`Soundboard`] for use with [`GuildId::edit_soundboard`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/soundboard#soundboard-resource)
+/// [Discord docs](https://docs.discord.com/developers/resources/soundboard#modify-guild-soundboard-sound)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditSoundboard<'a> {

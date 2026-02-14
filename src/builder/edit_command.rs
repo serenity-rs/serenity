@@ -11,8 +11,8 @@ use crate::model::prelude::*;
 /// [`Command`]: crate::model::application::Command
 ///
 /// Discord docs:
-/// - [global command](https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command)
-/// - [guild command](https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command)
+/// - [global command](https://docs.discord.com/developers/interactions/application-commands#edit-global-application-command)
+/// - [guild command](https://docs.discord.com/developers/interactions/application-commands#edit-guild-application-command)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditCommand<'a> {
@@ -163,7 +163,7 @@ impl<'a> EditCommand<'a> {
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
-    /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
+    /// [Discord's docs]: https://docs.discord.com/developers/interactions/application-commands#slash-commands
     #[cfg(feature = "http")]
     pub async fn execute(
         self,

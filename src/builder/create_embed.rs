@@ -12,7 +12,7 @@
 //!
 //! [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
-//! [here]: https://discord.com/developers/docs/resources/channel#embed-object
+//! [here]: https://docs.discord.com/developers/resources/message#embed-object
 
 use std::borrow::Cow;
 
@@ -20,7 +20,7 @@ use crate::model::prelude::*;
 
 /// A builder to create an embed in a message
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object)
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateEmbed<'a> {
@@ -133,7 +133,7 @@ impl<'a> CreateEmbed<'a> {
 
     /// Set the image associated with the embed.
     ///
-    /// Refer [Discord Documentation](https://discord.com/developers/docs/reference#uploading-files)
+    /// Refer [Discord Documentation](https://docs.discord.com/developers/reference#uploading-files)
     /// for rules on naming local attachments.
     pub fn image(mut self, url: impl Into<Cow<'a, str>>) -> Self {
         self.image = Some(CreateEmbedImage {

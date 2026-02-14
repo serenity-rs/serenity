@@ -2,7 +2,7 @@ use super::{ChannelId, WebhookId};
 
 /// A container for the IDs returned by following a news channel.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#followed-channel-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#followed-channel-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct FollowedChannel {

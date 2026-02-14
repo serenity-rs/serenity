@@ -4,9 +4,9 @@ use crate::model::prelude::*;
 
 /// Various information about integrations.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object),
-/// [extra fields 1](https://discord.com/developers/docs/topics/gateway-events#integration-create),
-/// [extra fields 2](https://discord.com/developers/docs/topics/gateway-events#integration-update),
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-object),
+/// [extra fields 1](https://docs.discord.com/developers/events/gateway-events#integration-create),
+/// [extra fields 2](https://docs.discord.com/developers/events/gateway-events#integration-update),
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -37,7 +37,7 @@ pub struct Integration {
 enum_number! {
     /// The behavior once the integration expires.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object-integration-expire-behaviors).
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-object-integration-expire-behaviors).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[non_exhaustive]
@@ -57,7 +57,7 @@ impl From<Integration> for IntegrationId {
 
 /// Integration account object.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-account-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-account-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -68,7 +68,7 @@ pub struct IntegrationAccount {
 
 /// Integration application object.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-application-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-application-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

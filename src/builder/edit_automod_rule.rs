@@ -13,7 +13,7 @@ use crate::model::prelude::*;
 ///
 /// See [`GuildId::create_automod_rule`] for details.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule)
+/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#modify-auto-moderation-rule)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct EditAutoModRule<'a> {

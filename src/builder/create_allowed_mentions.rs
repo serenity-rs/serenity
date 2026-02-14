@@ -70,7 +70,7 @@ impl ParseAction {
 /// # }
 /// ```
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/message#allowed-mentions-object).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAllowedMentions<'a> {

@@ -8,7 +8,7 @@ use crate::model::prelude::*;
 
 /// Edits a [`StageInstance`].
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance)
+/// [Discord docs](https://docs.discord.com/developers/resources/stage-instance#modify-stage-instance)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditStageInstance<'a> {

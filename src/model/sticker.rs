@@ -33,7 +33,7 @@ impl StickerId {
 
 /// The smallest amount of data required to render a sticker.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-item-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-item-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -61,7 +61,7 @@ impl StickerItem {
 ///
 /// Bots currently can only receive messages with stickers, not send.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-pack-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-pack-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct StickerPack {
@@ -102,7 +102,7 @@ fn banner_url(banner_asset_id: StickerPackBannerId) -> String {
 
 /// A sticker sent with a message.
 ///
-/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object).
+/// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -219,7 +219,7 @@ impl ExtractKey<StickerId> for Sticker {
 enum_number! {
     /// Differentiates between sticker types.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-object-sticker-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[non_exhaustive]
@@ -235,7 +235,7 @@ enum_number! {
 enum_number! {
     /// Differentiates between sticker formats.
     ///
-    /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types).
+    /// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-object-sticker-format-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[non_exhaustive]

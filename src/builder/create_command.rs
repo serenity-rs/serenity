@@ -12,7 +12,7 @@ use crate::model::prelude::*;
 ///
 /// [`CommandOption`]: crate::model::application::CommandOption
 ///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
+/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateCommandOption<'a> {
@@ -323,8 +323,8 @@ impl<'a> CreateCommandOption<'a> {
 /// [`Command`]: crate::model::application::Command
 ///
 /// Discord docs:
-/// - [global command](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command)
-/// - [guild command](https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command)
+/// - [global command](https://docs.discord.com/developers/interactions/application-commands#create-global-application-command)
+/// - [guild command](https://docs.discord.com/developers/interactions/application-commands#create-guild-application-command)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateCommand<'a> {
@@ -487,7 +487,7 @@ impl<'a> CreateCommand<'a> {
     ///
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     ///
-    /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
+    /// [Discord's docs]: https://docs.discord.com/developers/interactions/application-commands#slash-commands
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: Option<GuildId>) -> Result<Command> {
         match guild_id {
