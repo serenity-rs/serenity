@@ -69,7 +69,7 @@ fn permissions_in(
             }
         }
 
-        data.sort_by(|a, b| a.0.cmp(&b.0));
+        data.sort_by_key(|a| a.0);
 
         for overwrite in data {
             permissions = (permissions & !overwrite.1) | overwrite.2;

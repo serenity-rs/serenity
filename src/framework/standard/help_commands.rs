@@ -492,8 +492,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                     &help_options.dm_and_guild_text
                 };
 
-                similar_commands
-                    .sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
+                similar_commands.sort_unstable_by_key(|a| a.levenshtein_distance);
 
                 let check_names: Vec<String> = command
                     .options
