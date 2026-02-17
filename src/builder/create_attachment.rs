@@ -15,8 +15,7 @@ use crate::model::id::AttachmentId;
 
 /// A builder for creating a new attachment from a file path, file data, or URL.
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object).
-// TODO: https://docs.discord.com/developers/resources/message#attachment-object-attachment-structure
+/// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-structure).
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[non_exhaustive]
 #[must_use]

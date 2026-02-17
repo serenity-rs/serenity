@@ -1,7 +1,6 @@
 use crate::model::prelude::*;
 
-/// [Discord docs](https://docs.discord.com/developers/resources/channel#forum-tag-object)
-// TODO: https://docs.discord.com/developers/resources/channel#forum-tag-object-forum-tag-structure
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#forum-tag-object-forum-tag-structure)
 /// Contrary to the [`ForumTag`] struct, only the name field is required.
 #[must_use]
 #[derive(Clone, Debug, Serialize)]

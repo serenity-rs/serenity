@@ -173,8 +173,7 @@ impl Builder for CreateInteractionResponse {
     }
 }
 
-/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object).
-// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-messages
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-messages).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseMessage {
@@ -355,8 +354,7 @@ impl<S: Into<String>> From<S> for AutocompleteChoice {
     }
 }
 
-/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object)
-// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-autocomplete
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-autocomplete)
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAutocompleteResponse {
@@ -429,8 +427,7 @@ impl Builder for CreateAutocompleteResponse {
     }
 }
 
-/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object).
-// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-modal
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-modal).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateModal {

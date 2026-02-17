@@ -158,8 +158,7 @@ pub struct Guild {
     /// The guild features. These are user-invisible options which are used for Discord rollouts
     /// and/or paid benefits. More information is available at [`discord's documentation`].
     ///
-    /// [`discord's documentation`]: https://docs.discord.com/developers/resources/guild#guild-object
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-guild-features
+    /// [`discord's documentation`]: https://docs.discord.com/developers/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.
@@ -2844,8 +2843,7 @@ pub struct UnavailableGuild {
 enum_number! {
     /// Default message notification level for a guild.
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-default-message-notification-level
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-default-message-notification-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2863,8 +2861,7 @@ enum_number! {
 enum_number! {
     /// Setting used to filter explicit messages from members.
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-explicit-content-filter-level
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-explicit-content-filter-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2884,8 +2881,7 @@ enum_number! {
 enum_number! {
     /// Multi-Factor Authentication level for guild moderators.
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-mfa-level
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-mfa-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2904,8 +2900,7 @@ enum_number! {
     /// The level to set as criteria prior to a user being able to send
     /// messages in a [`Guild`].
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-verification-level
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-verification-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -2929,8 +2924,7 @@ enum_number! {
 enum_number! {
     /// The [`Guild`] nsfw level.
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-guild-nsfw-level
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-guild-nsfw-level).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]

@@ -1,8 +1,7 @@
 enum_number! {
     /// The guild's premium tier, depends on the amount of users boosting the guild currently
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-premium-tier
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-premium-tier).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]

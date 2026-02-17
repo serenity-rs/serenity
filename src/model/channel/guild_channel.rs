@@ -178,8 +178,7 @@ pub struct GuildChannel {
 enum_number! {
     /// See [`GuildChannel::default_forum_layout`].
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
-    // TODO: https://docs.discord.com/developers/resources/channel#channel-object-forum-layout-types
+    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-forum-layout-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]

@@ -276,8 +276,7 @@ impl Serialize for Interaction {
 enum_number! {
     /// The type of an Interaction.
     ///
-    /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
-    // TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-type
+    /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
@@ -296,8 +295,7 @@ bitflags! {
     /// The flags for an interaction response message.
     ///
     /// [Discord docs](https://docs.discord.com/developers/resources/message#message-object-message-flags)
-    /// ([only some are valid in this context](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object))
-    // TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-messages
+    /// ([only some are valid in this context](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object-messages))
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct InteractionResponseFlags: u64 {
         /// Do not include any embeds when serializing this message.
@@ -312,8 +310,7 @@ bitflags! {
 
 /// A cleaned up enum for determining the authorizing owner for an [`Interaction`].
 ///
-/// [Discord Docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object)
-// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object
+/// [Discord Docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]

@@ -6,8 +6,7 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// [Discord docs](https://docs.discord.com/developers/resources/channel#modify-channel).
-// TODO: https://docs.discord.com/developers/resources/channel#modify-channel-json-params-thread
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#modify-channel-json-params-thread).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditThread<'a> {

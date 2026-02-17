@@ -215,8 +215,7 @@ impl Serialize for ModalInteraction {
 
 /// A modal submit interaction data, provided by [`ModalInteraction::data`]
 ///
-/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
-// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

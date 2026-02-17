@@ -21,8 +21,7 @@ use crate::utils::{CreateQuickModal, QuickModalResponse};
 
 /// An interaction triggered by a message component.
 ///
-/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
-// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-structure
+/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]

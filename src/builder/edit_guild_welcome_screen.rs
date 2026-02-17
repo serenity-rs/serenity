@@ -85,8 +85,7 @@ impl Builder for EditGuildWelcomeScreen<'_> {
 
 /// A builder for creating a [`GuildWelcomeChannel`].
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object)
-// TODO: https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure)
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateGuildWelcomeChannel(GuildWelcomeChannel);

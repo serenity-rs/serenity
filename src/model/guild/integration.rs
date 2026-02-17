@@ -34,8 +34,7 @@ pub struct Integration {
 enum_number! {
     /// The behavior once the integration expires.
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#integration-object-integration-expire-behaviors
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-object-integration-expire-behaviors).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]

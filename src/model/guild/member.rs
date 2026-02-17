@@ -73,8 +73,7 @@ pub struct Member {
 bitflags! {
     /// Flags for a guild member.
     ///
-    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-member-object).
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-member-object-guild-member-flags
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-member-object-guild-member-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
     pub struct GuildMemberFlags: u32 {
@@ -580,8 +579,7 @@ impl fmt::Display for Member {
 /// [link](https://docs.discord.com/developers/events/gateway-events#message-create),
 /// [link](https://docs.discord.com/developers/resources/invite#invite-stage-instance-object),
 /// [link](https://docs.discord.com/developers/events/gateway-events#message-create),
-/// [link](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object),
-// TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure
+/// [link](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure),
 /// [link](https://docs.discord.com/developers/interactions/receiving-and-responding#message-interaction-object))
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]

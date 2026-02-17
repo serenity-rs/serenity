@@ -19,8 +19,7 @@ pub struct GuildWelcomeScreen {
 
 /// A channel shown in the [`GuildWelcomeScreen`].
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object).
-// TODO: https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
@@ -90,8 +89,7 @@ impl Serialize for GuildWelcomeChannel {
 
 /// A [`GuildWelcomeScreen`] emoji.
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object).
-// TODO: https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]

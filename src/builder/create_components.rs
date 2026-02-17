@@ -291,8 +291,7 @@ impl CreateSelectMenu {
 
 /// A builder for creating an option of a select menu component in a message
 ///
-/// [Discord docs](https://docs.discord.com/developers/components/reference#string-select)
-// TODO: https://docs.discord.com/developers/components/reference#string-select-select-option-structure
+/// [Discord docs](https://docs.discord.com/developers/components/reference#string-select-select-option-structure)
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateSelectMenuOption {
@@ -352,8 +351,7 @@ impl CreateSelectMenuOption {
 
 /// A builder for creating an input text component in a modal
 ///
-/// [Discord docs](https://docs.discord.com/developers/components/reference#text-input).
-// TODO: https://docs.discord.com/developers/components/reference#text-input-text-input-structure
+/// [Discord docs](https://docs.discord.com/developers/components/reference#text-input-text-input-structure).
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[must_use]
 pub struct CreateInputText(InputText);

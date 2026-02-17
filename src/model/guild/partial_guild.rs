@@ -117,8 +117,7 @@ pub struct PartialGuild {
     /// - `PRIVATE_THREADS`
     ///
     ///
-    /// [`discord documentation`]: https://docs.discord.com/developers/resources/guild#guild-object
-    // TODO: https://docs.discord.com/developers/resources/guild#guild-object-guild-features
+    /// [`discord documentation`]: https://docs.discord.com/developers/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// Indicator of whether the guild requires multi-factor authentication for [`Role`]s or
     /// [`User`]s with moderation permissions.

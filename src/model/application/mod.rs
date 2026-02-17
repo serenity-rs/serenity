@@ -117,8 +117,7 @@ enum_number! {
 enum_number! {
     /// An enum representing the different [interaction contexts].
     ///
-    /// [interaction contexts](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object).
-    // TODO: https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-context-types
+    /// [interaction contexts](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-context-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[serde(from = "u8", into = "u8")]
