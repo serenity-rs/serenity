@@ -361,13 +361,13 @@ impl ShardRunner {
     #[instrument(skip(self))]
     async fn recv(&mut self) -> bool {
         loop {
-            match self.runner_rx.try_next() {
-                Ok(Some(value)) => {
+            match self.runner_rx.try_recv() {
+                Ok(value) => {
                     if !self.handle_rx_value(value).await {
                         return false;
                     }
                 },
-                Ok(None) => {
+                Err(mpsc::TryRecvError::Closed) => {
                     warn!(
                         "[ShardRunner {:?}] Sending half DC; restarting",
                         self.shard.shard_info(),
@@ -376,7 +376,7 @@ impl ShardRunner {
                     self.request_restart().await;
                     return false;
                 },
-                Err(_) => break,
+                Err(mpsc::TryRecvError::Empty) => break,
             }
         }
 
