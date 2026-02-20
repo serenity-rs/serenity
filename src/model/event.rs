@@ -995,7 +995,6 @@ pub struct MessagePollVoteRemoveEvent {
 /// [`ConnectionStage::Connected`].
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
 pub struct ShardStageUpdateEvent {
     /// The new connection stage.
     pub new: ConnectionStage,
