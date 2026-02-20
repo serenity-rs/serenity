@@ -262,7 +262,7 @@ impl ShardManager {
             info: Arc::clone(&runner_info),
             tx: runner_tx,
             #[cfg(feature = "collector")]
-            collectors: Default::default(),
+            collectors: Arc::default(),
         });
 
         let mut runner = ShardRunner {

@@ -460,7 +460,7 @@ impl ConnectionStage {
     /// Assert that [`ConnectionStage::Identifying`] is a connecting stage:
     ///
     /// ```rust
-    /// use serenity::gateway::ConnectionStage;
+    /// use serenity::model::gateway::ConnectionStage;
     ///
     /// assert!(ConnectionStage::Identifying.is_connecting());
     /// ```
@@ -468,7 +468,7 @@ impl ConnectionStage {
     /// Assert that [`ConnectionStage::Connected`] is _not_ a connecting stage:
     ///
     /// ```rust
-    /// use serenity::gateway::ConnectionStage;
+    /// use serenity::model::gateway::ConnectionStage;
     ///
     /// assert!(!ConnectionStage::Connected.is_connecting());
     /// ```
