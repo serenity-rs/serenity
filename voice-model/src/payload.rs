@@ -185,6 +185,8 @@ pub struct SessionDescription {
     pub mode: String,
     /// Key used for encryption of RTP payloads using the chosen mode.
     pub secret_key: Vec<u8>,
+    /// The DAVE protocol version used.
+    pub dave_protocol_version: u16,
 }
 
 /// Used to indicate which users are speaking, or to inform Discord that the client is now
