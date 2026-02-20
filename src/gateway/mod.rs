@@ -21,6 +21,7 @@ mod ws;
 #[cfg(feature = "http")]
 use reqwest::IntoUrl;
 use reqwest::Url;
+use serde::Serialize;
 
 pub use self::error::Error as GatewayError;
 pub use self::sharding::*;
