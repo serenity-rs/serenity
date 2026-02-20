@@ -183,6 +183,7 @@ impl ShardRunner {
             // Do not block if the channel is empty
             let msg = match self.runner_rx.try_recv() {
                 Ok(msg) => msg,
+                Err(TryRecvError::Empty) => return true,
                 Err(TryRecvError::Closed) => {
                     // This should never happen, because `ShardManager::runners` always holds a
                     // copy of the other end of the channel, and it's only dropped if the shard is
@@ -195,7 +196,6 @@ impl ShardRunner {
                     self.restart().await;
                     return false;
                 },
-                Err(TryRecvError::Empty) => return true,
             };
 
             let res = match msg {

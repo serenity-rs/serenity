@@ -35,7 +35,7 @@ tracing = { version = "0.1.44", features = ["log"] }
 serde = { version = "1.0.228", features = ["derive", "rc"] }
 url = { version = "2.5.7", features = ["serde"] }
 tokio = { version = "1.48.0", features = ["macros", "rt", "sync", "time", "io-util"] }
-futures = { version = "0.3.31", default-features = false, features = ["std"] }
+futures = { version = "0.3.32", default-features = false, features = ["std"] }
 time = { version = "0.3.44", features = ["formatting", "parsing", "serde-well-known"] }
 base64 = { version = "0.22.1" }
 zeroize = { version = "1.8.2" } # Not used in serenity, but bumps the minimal version from secrecy
