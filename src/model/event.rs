@@ -3,8 +3,8 @@
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
-use serde::Serialize;
 use serde::de::Error as DeError;
+use serde::{Serialize, Serializer};
 use serde_json::value::RawValue;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
 
@@ -987,6 +987,23 @@ pub struct MessagePollVoteRemoveEvent {
     pub answer_id: AnswerId,
 }
 
+/// An internal event denoting that a shard's connection stage was changed.
+///
+/// # Examples
+///
+/// This might happen when a shard changes from [`ConnectionStage::Identifying`] to
+/// [`ConnectionStage::Connected`].
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ShardStageUpdateEvent {
+    /// The new connection stage.
+    pub new: ConnectionStage,
+    /// The old connection stage.
+    pub old: ConnectionStage,
+    /// The ID of the shard that had its connection stage change.
+    pub shard_id: ShardId,
+}
+
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#payload-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Serialize)]
@@ -1024,7 +1041,7 @@ pub struct UnknownEvent {
 }
 
 impl Serialize for UnknownEvent {
-    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
         self.data.serialize(serializer)
     }
 }
@@ -1240,6 +1257,8 @@ pub enum Event {
     MessagePollVoteAdd(MessagePollVoteAddEvent),
     /// A user has removed a previous vote on a Message Poll.
     MessagePollVoteRemove(MessagePollVoteRemoveEvent),
+    /// A shard has changed its connection stage.
+    ShardStageUpdate(ShardStageUpdateEvent),
 }
 
 impl Event {

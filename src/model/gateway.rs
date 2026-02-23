@@ -1,5 +1,6 @@
 //! Models pertaining to the gateway.
 
+use std::fmt;
 use std::num::{NonZeroU16, NonZeroU64};
 
 use serde::ser::SerializeSeq;
@@ -419,6 +420,75 @@ impl serde::Serialize for ShardInfo {
         seq.serialize_element(&self.id.0)?;
         seq.serialize_element(&self.total)?;
         seq.end()
+    }
+}
+
+/// Indicates the current connection stage of a shard.
+///
+/// This can be useful for knowing which shards are currently "down"/"up".
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[non_exhaustive]
+pub enum ConnectionStage {
+    /// Indicator that the shard is normally connected and is not in, e.g., a resume phase.
+    Connected,
+    /// Indicator that the shard is connecting and is in, e.g., a resume phase.
+    Connecting,
+    /// Indicator that the shard is fully disconnected and is not in a reconnecting phase.
+    Disconnected,
+    /// Indicator that the shard is currently initiating a handshake.
+    Handshake,
+    /// Indicator that the shard has sent an IDENTIFY packet and is awaiting a READY packet.
+    Identifying,
+    /// Indicator that the shard has sent a RESUME packet and is awaiting a RESUMED packet.
+    Resuming,
+}
+
+impl ConnectionStage {
+    /// Whether the stage is a form of connecting.
+    ///
+    /// This will return `true` on:
+    /// - [`Connecting`][`ConnectionStage::Connecting`]
+    /// - [`Handshake`][`ConnectionStage::Handshake`]
+    /// - [`Identifying`][`ConnectionStage::Identifying`]
+    /// - [`Resuming`][`ConnectionStage::Resuming`]
+    ///
+    /// All other variants will return `false`.
+    ///
+    /// # Examples
+    ///
+    /// Assert that [`ConnectionStage::Identifying`] is a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::model::gateway::ConnectionStage;
+    ///
+    /// assert!(ConnectionStage::Identifying.is_connecting());
+    /// ```
+    ///
+    /// Assert that [`ConnectionStage::Connected`] is _not_ a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::model::gateway::ConnectionStage;
+    ///
+    /// assert!(!ConnectionStage::Connected.is_connecting());
+    /// ```
+    #[must_use]
+    pub fn is_connecting(self) -> bool {
+        use self::ConnectionStage::{Connecting, Handshake, Identifying, Resuming};
+        matches!(self, Connecting | Handshake | Identifying | Resuming)
+    }
+}
+
+impl fmt::Display for ConnectionStage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match *self {
+            Self::Connected => "connected",
+            Self::Connecting => "connecting",
+            Self::Disconnected => "disconnected",
+            Self::Handshake => "handshaking",
+            Self::Identifying => "identifying",
+            Self::Resuming => "resuming",
+        })
     }
 }
 

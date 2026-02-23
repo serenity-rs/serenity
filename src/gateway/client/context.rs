@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use dashmap::DashMap;
 use futures::channel::mpsc::UnboundedSender as Sender;
+use parking_lot::RwLock;
 
 use crate::builder::DataUri;
 #[cfg(feature = "cache")]
@@ -48,8 +48,8 @@ pub struct Context {
     pub http: Arc<Http>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
-    /// Metadata about the initialised shards, and their control channels.
-    pub runners: Arc<DashMap<ShardId, (ShardRunnerInfo, Sender<ShardRunnerMessage>)>>,
+    /// Metadata about the shard.
+    pub runner_info: Arc<RwLock<ShardRunnerInfo>>,
     #[cfg(feature = "collector")]
     pub(crate) collectors: Arc<parking_lot::RwLock<Vec<CollectorCallback>>>,
 }
