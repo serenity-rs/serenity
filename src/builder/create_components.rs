@@ -398,25 +398,25 @@ impl<'a> CreateFile<'a> {
 pub struct CreateSeparator {
     #[serde(rename = "type")]
     kind: ComponentType,
-    divider: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    divider: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spacing: Option<SeparatorSpacingSize>,
 }
 
 impl CreateSeparator {
-    /// Creates a new separator, with or without a divider.
-    pub fn new(divider: bool) -> Self {
+    /// Creates a new separator.
+    pub fn new() -> Self {
         CreateSeparator {
             kind: ComponentType::Separator,
-            divider,
+            divider: None,
             spacing: None,
         }
     }
 
-    /// Sets if this separator should have a divider or not. Replaces the current value as set in
-    /// [`Self::new`].
+    /// Sets if this separator should have a divider or not.
     pub fn divider(mut self, divider: bool) -> Self {
-        self.divider = divider;
+        self.divider = Some(divider);
         self
     }
 
@@ -424,6 +424,12 @@ impl CreateSeparator {
     pub fn spacing(mut self, spacing: SeparatorSpacingSize) -> Self {
         self.spacing = Some(spacing);
         self
+    }
+}
+
+impl Default for CreateSeparator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -962,9 +968,9 @@ impl<'a> CreateButton<'a> {
     /// Sets the custom id of the button, a developer-defined identifier. Replaces the current
     /// value as set in [`Self::new`].
     ///
-    /// Has no effect on link buttons and premium buttons.
+    /// Has no effect on link buttons or premium buttons.
     pub fn custom_id(mut self, id: impl Into<Cow<'a, str>>) -> Self {
-        if self.url.is_none() {
+        if self.url.is_none() && self.sku_id.is_none() {
             self.custom_id = Some(id.into());
         }
 
@@ -973,9 +979,9 @@ impl<'a> CreateButton<'a> {
 
     /// Sets the style of this button.
     ///
-    /// Has no effect on link buttons and premium buttons.
+    /// Has no effect on link buttons or premium buttons.
     pub fn style(mut self, new_style: ButtonStyle) -> Self {
-        if self.url.is_none() {
+        if self.url.is_none() && self.sku_id.is_none() {
             self.style = new_style;
         }
 
@@ -983,14 +989,24 @@ impl<'a> CreateButton<'a> {
     }
 
     /// Sets label of the button.
+    ///
+    /// Has no effect on premium buttons.
     pub fn label(mut self, label: impl Into<Cow<'a, str>>) -> Self {
-        self.label = Some(label.into());
+        if self.sku_id.is_none() {
+            self.label = Some(label.into());
+        }
+
         self
     }
 
     /// Sets emoji of the button.
+    ///
+    /// Has no effect on premium buttons.
     pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
-        self.emoji = Some(emoji.into());
+        if self.sku_id.is_none() {
+            self.emoji = Some(emoji.into());
+        }
+
         self
     }
 
