@@ -400,7 +400,7 @@ pub struct CreateSeparator {
     kind: ComponentType,
     divider: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    spacing: Option<Spacing>,
+    spacing: Option<SeparatorSpacingSize>,
 }
 
 impl CreateSeparator {
@@ -421,7 +421,7 @@ impl CreateSeparator {
     }
 
     /// Sets the spacing of this separator.
-    pub fn spacing(mut self, spacing: Spacing) -> Self {
+    pub fn spacing(mut self, spacing: SeparatorSpacingSize) -> Self {
         self.spacing = Some(spacing);
         self
     }
@@ -886,17 +886,6 @@ impl<'a> CreateCheckbox<'a> {
     pub fn default_selected(mut self, default: bool) -> Self {
         self.default = Some(default);
         self
-    }
-}
-
-enum_number! {
-    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
-    pub enum Spacing {
-        Small = 1,
-        Large = 2,
-        _ => Unknown(u8),
     }
 }
 
