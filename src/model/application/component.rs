@@ -232,12 +232,8 @@ pub struct TextDisplay {
     /// Always [`ComponentType::TextDisplay`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
-
-    /// Discord’s official documentation does not mention this field; however, it is currently
-    /// returned by the API and represents meaningful data, so it is included here. This
-    /// behavior is undocumented and may change or be removed by Discord at any time.
-    #[cfg(feature = "unstable")]
-    pub content: Option<String>,
+    /// The text content of this component.
+    pub content: String,
 }
 
 /// A Media Gallery is a component that allows you to display media attachments in an organized
