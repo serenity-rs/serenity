@@ -8,7 +8,6 @@ use strum::{EnumCount, IntoStaticStr, VariantNames};
 use super::context::Context;
 #[cfg(doc)]
 use crate::gateway::ShardRunner;
-use crate::gateway::ShardStageUpdateEvent;
 use crate::http::RatelimitInfo;
 use crate::model::prelude::*;
 
