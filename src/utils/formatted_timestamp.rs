@@ -22,17 +22,22 @@ pub struct FormattedTimestamp {
 pub enum FormattedTimestampStyle {
     /// Represents a short time format, e.g., "12:34 PM".
     ShortTime,
-    /// Represents a long time format, e.g., "12:34:56 PM".
-    LongTime,
+    /// Represents a medium time format, e.g., "12:34:56 PM".
+    MediumTime,
     /// Represents a short date format, e.g., "2023-11-17".
     ShortDate,
     /// Represents a long date format, e.g., "November 17, 2023".
     LongDate,
-    /// Represents a short date and time format, e.g., "November 17, 2023 12:34 PM".
+    /// Represents a long date and short time format, e.g., "November 17, 2023 at 12:34 PM".
     #[default]
-    ShortDateTime,
-    /// Represents a long date and time format, e.g., "Thursday, November 17, 2023 12:34 PM".
-    LongDateTime,
+    LongDateShortTime,
+    /// Represents a full date and short time format, e.g., "Thursday, November 17, 2023 at 12:34
+    /// PM".
+    FullDateShortTime,
+    /// Represents a short date and time format, e.g., "2023-11-17, 12:34 PM".
+    ShortDateShortTime,
+    /// Represents a short date and medium time format, e.g., "2023-11-17, 12:34:56 PM".
+    ShortDateMediumTime,
     /// Represents a relative time format, indicating the time relative to the current moment,
     /// e.g., "2 hours ago" or "in 2 hours".
     RelativeTime,
@@ -112,11 +117,13 @@ impl ToArrayString for FormattedTimestampStyle {
     fn to_arraystring(self) -> Self::ArrayString {
         let style = match self {
             Self::ShortTime => "t",
-            Self::LongTime => "T",
+            Self::MediumTime => "T",
             Self::ShortDate => "d",
             Self::LongDate => "D",
-            Self::ShortDateTime => "f",
-            Self::LongDateTime => "F",
+            Self::LongDateShortTime => "f",
+            Self::FullDateShortTime => "F",
+            Self::ShortDateShortTime => "s",
+            Self::ShortDateMediumTime => "S",
             Self::RelativeTime => "R",
         };
 
@@ -179,11 +186,13 @@ impl FromStr for FormattedTimestampStyle {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "t" => Ok(Self::ShortTime),
-            "T" => Ok(Self::LongTime),
+            "T" => Ok(Self::MediumTime),
             "d" => Ok(Self::ShortDate),
             "D" => Ok(Self::LongDate),
-            "f" => Ok(Self::ShortDateTime),
-            "F" => Ok(Self::LongDateTime),
+            "f" => Ok(Self::LongDateShortTime),
+            "F" => Ok(Self::FullDateShortTime),
+            "s" => Ok(Self::ShortDateShortTime),
+            "S" => Ok(Self::ShortDateMediumTime),
             "R" => Ok(Self::RelativeTime),
             _ => Err(FormattedTimestampParseError {
                 string: s.into(),
@@ -202,7 +211,8 @@ mod tests {
     fn test_message_time() {
         let timestamp = Timestamp::now();
 
-        let time = FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::ShortDateTime));
+        let time =
+            FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::LongDateShortTime));
         let time_str = time.to_arraystring();
 
         assert_eq!(
@@ -210,7 +220,7 @@ mod tests {
             aformat!(
                 "<t:{}:{}>",
                 timestamp.unix_timestamp(),
-                FormattedTimestampStyle::ShortDateTime
+                FormattedTimestampStyle::LongDateShortTime
             )
         );
 
@@ -224,11 +234,13 @@ mod tests {
     #[test]
     fn test_message_time_style() {
         assert_eq!(&*FormattedTimestampStyle::ShortTime.to_arraystring(), "t");
-        assert_eq!(&*FormattedTimestampStyle::LongTime.to_arraystring(), "T");
+        assert_eq!(&*FormattedTimestampStyle::MediumTime.to_arraystring(), "T");
         assert_eq!(&*FormattedTimestampStyle::ShortDate.to_arraystring(), "d");
         assert_eq!(&*FormattedTimestampStyle::LongDate.to_arraystring(), "D");
-        assert_eq!(&*FormattedTimestampStyle::ShortDateTime.to_arraystring(), "f");
-        assert_eq!(&*FormattedTimestampStyle::LongDateTime.to_arraystring(), "F");
+        assert_eq!(&*FormattedTimestampStyle::LongDateShortTime.to_arraystring(), "f");
+        assert_eq!(&*FormattedTimestampStyle::FullDateShortTime.to_arraystring(), "F");
+        assert_eq!(&*FormattedTimestampStyle::ShortDateShortTime.to_arraystring(), "s");
+        assert_eq!(&*FormattedTimestampStyle::ShortDateMediumTime.to_arraystring(), "S");
         assert_eq!(&*FormattedTimestampStyle::RelativeTime.to_arraystring(), "R");
     }
 
@@ -236,12 +248,13 @@ mod tests {
     fn test_message_time_parse() {
         let timestamp = Timestamp::now();
 
-        let time = FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::ShortDateTime));
+        let time =
+            FormattedTimestamp::new(timestamp, Some(FormattedTimestampStyle::LongDateShortTime));
 
         let time_str = aformat!(
             "<t:{}:{}>",
             timestamp.unix_timestamp(),
-            FormattedTimestampStyle::ShortDateTime
+            FormattedTimestampStyle::LongDateShortTime
         );
 
         let time_parsed = time_str.parse::<FormattedTimestamp>().unwrap();
@@ -260,11 +273,13 @@ mod tests {
     #[test]
     fn test_message_time_style_parse() {
         assert!(matches!("t".parse(), Ok(FormattedTimestampStyle::ShortTime)));
-        assert!(matches!("T".parse(), Ok(FormattedTimestampStyle::LongTime)));
+        assert!(matches!("T".parse(), Ok(FormattedTimestampStyle::MediumTime)));
         assert!(matches!("d".parse(), Ok(FormattedTimestampStyle::ShortDate)));
         assert!(matches!("D".parse(), Ok(FormattedTimestampStyle::LongDate)));
-        assert!(matches!("f".parse(), Ok(FormattedTimestampStyle::ShortDateTime)));
-        assert!(matches!("F".parse(), Ok(FormattedTimestampStyle::LongDateTime)));
+        assert!(matches!("f".parse(), Ok(FormattedTimestampStyle::LongDateShortTime)));
+        assert!(matches!("F".parse(), Ok(FormattedTimestampStyle::FullDateShortTime)));
+        assert!(matches!("s".parse(), Ok(FormattedTimestampStyle::ShortDateShortTime)));
+        assert!(matches!("S".parse(), Ok(FormattedTimestampStyle::ShortDateMediumTime)));
         assert!(matches!("R".parse(), Ok(FormattedTimestampStyle::RelativeTime)));
     }
 }
