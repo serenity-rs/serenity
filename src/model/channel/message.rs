@@ -1161,8 +1161,7 @@ pub struct PollResults {
 
 /// The count of a single [`PollAnswer`]'s results.
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/poll#poll-results-object-poll-results-object-structure)
-// TODO: https://docs.discord.com/developers/resources/poll#poll-results-object-poll-answer-count-object-structure
+/// [Discord docs](https://docs.discord.com/developers/resources/poll#poll-results-object-poll-answer-count-object-structure)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
