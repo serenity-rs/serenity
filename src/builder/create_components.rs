@@ -168,7 +168,7 @@ pub struct CreateTextDisplay<'a> {
 impl<'a> CreateTextDisplay<'a> {
     /// Creates a new text display component.
     ///
-    /// Note: All components on a message shares the same **4000** character limit.
+    /// Note: All components on a message share the same **4000** character limit.
     pub fn new(content: impl Into<Cow<'a, str>>) -> Self {
         CreateTextDisplay {
             kind: ComponentType::TextDisplay,
@@ -179,7 +179,7 @@ impl<'a> CreateTextDisplay<'a> {
     /// Sets the content of this text display component. Replaces the current value as set in
     /// [`Self::new`].
     ///
-    /// Note: All components on a message shares the same **4000** character limit.
+    /// Note: All components on a message share the same **4000** character limit.
     #[must_use]
     pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = content.into();
@@ -284,7 +284,7 @@ impl<'a> CreateMediaGallery<'a> {
     /// Sets the items of the gallery. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: This will replace all existing items. Use [`Self::add_item()`] to add additional
-    /// items
+    /// items.
     pub fn items(mut self, items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
         self.items = items.into();
         self
@@ -368,7 +368,7 @@ pub struct CreateFile<'a> {
 }
 
 impl<'a> CreateFile<'a> {
-    /// Create a new builder for the file component. Refer to this builders documentation for
+    /// Create a new builder for the file component. Refer to this builder's documentation for
     /// limits.
     pub fn new(file: CreateUnfurledMediaItem<'a>) -> Self {
         CreateFile {
@@ -378,8 +378,8 @@ impl<'a> CreateFile<'a> {
         }
     }
 
-    // Only supports `attachment://filename.extension` format, refer to this builders documentation
-    // for more details. Replaces the current value as set in [`Self::new`].
+    /// Only supports `attachment://filename.extension` format. Refer to this builder's
+    /// documentation for more details. Replaces the current value as set in [`Self::new`].
     pub fn file(mut self, file: CreateUnfurledMediaItem<'a>) -> Self {
         self.file = file;
         self
@@ -451,7 +451,7 @@ impl<'a> CreateContainer<'a> {
         }
     }
 
-    // Set the colour of the left-hand side of the container.
+    /// Set the colour of the left-hand side of the container.
     pub fn accent_colour<C: Into<Colour>>(mut self, colour: C) -> Self {
         self.accent_color = Some(colour.into());
         self
@@ -504,7 +504,8 @@ pub enum CreateContainerComponent<'a> {
     Separator(CreateSeparator),
 }
 
-/// A builder for creating a label that can hold an [`InputText`] or [`SelectMenu`].
+/// A builder for creating a label, a top-level layout component that wraps modal
+/// components with a text label and optional description.
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#label).
 #[derive(Clone, Debug, Serialize)]
@@ -581,7 +582,8 @@ impl<'a> CreateLabel<'a> {
         }
     }
 
-    /// Sets the description of this component, which will display underneath the label text.
+    /// Sets the description of this component, which will display below the label text.
+    /// May display above or below the component depending on the platform.
     pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
         self.description = Some(description.into());
         self

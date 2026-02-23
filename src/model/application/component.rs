@@ -678,7 +678,7 @@ enum_number! {
         Secondary = 2,
         Success = 3,
         Danger = 4,
-        // No Link, because we represent Link using enum variants
+        // No Link or Premium, because we represent Link and Premium using enum variants.
         _ => Unknown(u8),
     }
 }
