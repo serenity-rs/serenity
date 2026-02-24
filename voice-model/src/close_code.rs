@@ -29,6 +29,19 @@ pub enum CloseCode {
     VoiceServerCrash = 4015,
     /// Discord didn't recognise the encryption scheme.
     UnknownEncryptionMode = 4016,
+    /// E2EE via the DAVE protocol is required to connect to this channel.
+    DaveProtocolRequired = 4017,
+    /// Malformed request sent.
+    BadRequest = 4020,
+    /// Disconnected due to rate limit exceeded.
+    ///
+    /// Should not reconnect.
+    RateLimited = 4021,
+    /// Disconnected due to call terminated (channel deleted, voice server
+    /// changed, etc.).
+    ///
+    /// Should not reconnect.
+    CallTerminated = 4022,
 }
 
 impl CloseCode {
@@ -56,6 +69,10 @@ impl num_traits::cast::FromPrimitive for CloseCode {
             4014 => Self::Disconnected,
             4015 => Self::VoiceServerCrash,
             4016 => Self::UnknownEncryptionMode,
+            4017 => Self::DaveProtocolRequired,
+            4020 => Self::BadRequest,
+            4021 => Self::RateLimited,
+            4022 => Self::CallTerminated,
             _ => return None,
         })
     }
