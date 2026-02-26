@@ -279,7 +279,8 @@ pub struct Separator {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// Whether or not this contains a separating divider.
-    pub divider: Option<bool>,
+    #[serde(default = "default_true")]
+    pub divider: bool,
     /// The spacing of the separator.
     pub spacing: Option<SeparatorSpacingSize>,
 }
