@@ -1,4 +1,4 @@
-#![expect(clippy::collapsible_if)]
+#![expect(clippy::collapsible_if, clippy::collapsible_match)]
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
