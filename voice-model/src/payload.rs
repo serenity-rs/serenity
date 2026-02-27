@@ -84,7 +84,7 @@ pub struct Flags {
     /// User ID whose flags changed.
     pub user_id: UserId,
     /// Flags bitfield.
-    pub flags: u32,
+    pub flags: Option<u32>,
 }
 
 /// Platform information for a user.
@@ -93,7 +93,7 @@ pub struct Platform {
     /// User ID.
     pub user_id: UserId,
     /// Platform code (0 = desktop, 1 = mobile, 2 = web, etc.).
-    pub platform: u32,
+    pub platform: Option<u32>,
 }
 
 /// Used to keep the websocket connection alive.
