@@ -62,29 +62,29 @@ pub fn deserialize_binary_event(data: &[u8]) -> Result<crate::Event, BinaryError
     match opcode {
         25 => {
             // DaveMlsExternalSender
-            let external_sender = data[3..].to_vec();
+            let external_sender = data[1..].to_vec();
             Ok(crate::Event::DaveMlsExternalSender(DaveMlsExternalSender { external_sender }))
         },
         27 => {
             // DaveMlsProposals
-            if data.len() < 4 {
+            if data.len() < 2 {
                 return Err(BinaryError::InsufficientData);
             }
-            let operation_type = match data[3] {
+            let operation_type = match data[1] {
                 0 => DaveMlsProposalsOperationType::Append,
                 1 => DaveMlsProposalsOperationType::Revoke,
                 other => return Err(BinaryError::InvalidOperationType(other)),
             };
-            let proposals = data[4..].to_vec();
+            let proposals = data[2..].to_vec();
             Ok(crate::Event::DaveMlsProposals(DaveMlsProposals { operation_type, proposals }))
         },
         29 => {
             // DaveMlsAnnounceCommitTransition
-            if data.len() < 5 {
+            if data.len() < 3 {
                 return Err(BinaryError::InsufficientData);
             }
-            let transition_id = read_u16(&data[3..5])?;
-            let commit_message = data[5..].to_vec();
+            let transition_id = read_u16(&data[1..3])?;
+            let commit_message = data[3..].to_vec();
             Ok(crate::Event::DaveMlsAnnounceCommitTransition(DaveMlsAnnounceCommitTransition {
                 transition_id,
                 commit_message,
@@ -92,11 +92,11 @@ pub fn deserialize_binary_event(data: &[u8]) -> Result<crate::Event, BinaryError
         },
         30 => {
             // DaveMlsWelcome
-            if data.len() < 5 {
+            if data.len() < 3 {
                 return Err(BinaryError::InsufficientData);
             }
-            let transition_id = read_u16(&data[3..5])?;
-            let welcome = data[5..].to_vec();
+            let transition_id = read_u16(&data[1..3])?;
+            let welcome = data[3..].to_vec();
             Ok(crate::Event::DaveMlsWelcome(DaveMlsWelcome { transition_id, welcome }))
         },
         // Unknown opcodes: Log and skip (might be new Discord protocol extensions)
