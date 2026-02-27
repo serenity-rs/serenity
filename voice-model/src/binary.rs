@@ -63,7 +63,9 @@ pub fn deserialize_binary_event(data: &[u8]) -> Result<crate::Event, BinaryError
         25 => {
             // DaveMlsExternalSender
             let external_sender = data[1..].to_vec();
-            Ok(crate::Event::DaveMlsExternalSender(DaveMlsExternalSender { external_sender }))
+            Ok(crate::Event::DaveMlsExternalSender(DaveMlsExternalSender {
+                external_sender,
+            }))
         },
         27 => {
             // DaveMlsProposals
@@ -76,7 +78,10 @@ pub fn deserialize_binary_event(data: &[u8]) -> Result<crate::Event, BinaryError
                 other => return Err(BinaryError::InvalidOperationType(other)),
             };
             let proposals = data[2..].to_vec();
-            Ok(crate::Event::DaveMlsProposals(DaveMlsProposals { operation_type, proposals }))
+            Ok(crate::Event::DaveMlsProposals(DaveMlsProposals {
+                operation_type,
+                proposals,
+            }))
         },
         29 => {
             // DaveMlsAnnounceCommitTransition
@@ -97,7 +102,10 @@ pub fn deserialize_binary_event(data: &[u8]) -> Result<crate::Event, BinaryError
             }
             let transition_id = read_u16(&data[1..3])?;
             let welcome = data[3..].to_vec();
-            Ok(crate::Event::DaveMlsWelcome(DaveMlsWelcome { transition_id, welcome }))
+            Ok(crate::Event::DaveMlsWelcome(DaveMlsWelcome {
+                transition_id,
+                welcome,
+            }))
         },
         // Unknown opcodes: Log and skip (might be new Discord protocol extensions)
         other => {
