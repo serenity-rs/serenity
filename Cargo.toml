@@ -66,8 +66,6 @@ parking_lot = { version = "0.12.5" }
 ed25519-dalek = { version = "2.2.0", optional = true }
 typesize = { version = "0.1.14", optional = true, features = ["url", "time", "serde_json", "secrecy", "parking_lot", "nonmax"] }
 # serde feature only allows for serialisation,
-# Serenity workspace crates
-serenity-voice-model = { version = "0.2.1", path = "./voice-model", optional = true }
 
 [dev-dependencies.http_crate]
 version = "1.4.0"
@@ -107,7 +105,6 @@ http = ["dashmap", "mime", "mime_guess", "percent-encoding"]
 # Note: the model type definitions themselves are always active, regardless of this feature.
 # TODO: remove dependeny on utils feature
 model = ["builder", "http", "utils"]
-voice_model = ["serenity-voice-model"]
 # Enables zlib-stream transport compression of incoming gateway events.
 transport_compression_zlib = ["flate2", "gateway"]
 # Enables zstd-stream transport compression of incoming gateway events.
@@ -128,7 +125,7 @@ chrono = ["dep:chrono", "typesize?/chrono"]
 # (Note: all feature-gated APIs to be documented should have their features listed here!)
 #
 # Unstable functionality should be gated under the `unstable` feature.
-full = ["default", "collector", "voice", "voice_model", "interactions_endpoint"]
+full = ["default", "collector", "voice", "interactions_endpoint"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka", "typesize?/mini_moka", "typesize?/dashmap"]
