@@ -50,6 +50,7 @@ pub use self::shard_manager::{
     ShardManager,
     ShardManagerMessage,
     ShardManagerOptions,
+    ShardRunnerMetadata,
 };
 pub use self::shard_queue::ShardQueue;
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage};

@@ -232,9 +232,6 @@ id_u64! {
 }
 
 /// An identifier for a Shard.
-///
-/// This identifier is special, it simply models internal IDs for type safety and therefore cannot
-/// be deserialized
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 pub struct ShardId(pub u16);
