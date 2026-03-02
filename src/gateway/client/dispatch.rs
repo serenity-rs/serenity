@@ -2,14 +2,15 @@ use std::sync::Arc;
 
 use super::event_handler::{EventHandler, RawEventHandler};
 use super::{Context, FullEvent};
-use crate::all::{Cache, GuildId};
 #[cfg(feature = "cache")]
-use crate::cache::CacheUpdate;
+use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::internal::tokio::spawn_named;
 use crate::model::channel::ChannelType;
 use crate::model::event::Event;
+#[cfg(feature = "cache")]
+use crate::model::id::GuildId;
 
 #[cfg(feature = "cache")]
 macro_rules! if_cache {
@@ -37,6 +38,24 @@ macro_rules! update_cache {
     ($cache:expr, $event:ident) => {};
 }
 
+#[cfg(feature = "cache")]
+type MaybeCache = Cache;
+
+#[cfg(not(feature = "cache"))]
+type MaybeCache = ();
+
+fn maybe_cache_from_context(ctx: &Context) -> &MaybeCache {
+    #[cfg(feature = "cache")]
+    {
+        &ctx.cache
+    }
+
+    #[cfg(not(feature = "cache"))]
+    {
+        &()
+    }
+}
+
 /// Calls the user's event handlers and the framework handler.
 pub(crate) async fn dispatch_model(
     event: Event,
@@ -50,7 +69,8 @@ pub(crate) async fn dispatch_model(
     }
 
     let mut extra_event = None;
-    let full_event = update_cache_with_event(&context.cache, event, &mut extra_event);
+    let full_event =
+        update_cache_with_event(maybe_cache_from_context(&context), event, &mut extra_event);
 
     spawn_named("dispatch::user", async move {
         #[cfg(feature = "framework")]
@@ -95,13 +115,14 @@ async fn dispatch_event_handler(
     }
 }
 
+#[cfg(feature = "cache")]
 fn is_guild_new(cache: &Cache, guild_id: GuildId) -> bool {
     !cache.unavailable_guilds().contains(&guild_id)
 }
 
 /// Updates the cache with the incoming event data and builds the full event data out of it.
 fn update_cache_with_event(
-    cache: &Cache,
+    cache: &MaybeCache,
     event: Event,
     extra_event: &mut Option<FullEvent>,
 ) -> FullEvent {
