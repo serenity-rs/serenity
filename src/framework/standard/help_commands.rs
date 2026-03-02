@@ -900,7 +900,7 @@ fn flatten_group_to_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        writeln!(group_text, "{repeated_indent_str}__**{}**__", group.name,)?;
+        writeln!(group_text, "{repeated_indent_str}__**{}**__", group.name)?;
     }
 
     let mut summary_or_prefixes = false;
