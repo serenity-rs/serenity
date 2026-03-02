@@ -48,7 +48,7 @@ pub(crate) async fn dispatch_model(
         raw_handler.raw_event(context.clone(), &event).await;
     }
 
-    let mut extra_event: Option<FullEvent> = None;
+    let mut extra_event = None;
     let full_event = update_cache_with_event(&context, event, &mut extra_event);
 
     spawn_named("dispatch::user", async move {
