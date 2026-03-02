@@ -48,8 +48,8 @@ pub(crate) async fn dispatch_model(
         raw_handler.raw_event(context.clone(), &event).await;
     }
 
-    let extra_event = get_virtual_event(&context, &event);
-    let full_event = update_cache_with_event(&context, event);
+    let mut extra_event: Option<FullEvent> = None;
+    let full_event = update_cache_with_event(&context, event, &mut extra_event);
 
     spawn_named("dispatch::user", async move {
         #[cfg(feature = "framework")]
@@ -95,7 +95,11 @@ async fn dispatch_event_handler(
 }
 
 /// Updates the cache with the incoming event data and builds the full event data out of it.
-fn update_cache_with_event(ctx: &Context, event: Event) -> FullEvent {
+fn update_cache_with_event(
+    ctx: &Context,
+    event: Event,
+    extra_event: &mut Option<FullEvent>,
+) -> FullEvent {
     match event {
         Event::CommandPermissionsUpdate(event) => FullEvent::CommandPermissionsUpdate {
             permission: event.permission,
@@ -167,6 +171,13 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> FullEvent {
         Event::GuildCreate(event) => {
             let is_new =
                 if_cache!(Some(!&ctx.cache.unavailable_guilds().contains(&event.guild.id)));
+
+            #[cfg(feature = "cache")]
+            if let Some(guilds) = update_cache!(&ctx.cache, event) {
+                *extra_event = Some(FullEvent::CacheReady {
+                    guilds,
+                });
+            }
 
             FullEvent::GuildCreate {
                 guild: event.guild,
@@ -342,8 +353,17 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> FullEvent {
                 old_message_if_available,
             }
         },
-        Event::Ready(event) => FullEvent::Ready {
-            data_about_bot: event.ready,
+        Event::Ready(event) => {
+            #[cfg(feature = "cache")]
+            if let Some(total_shards) = update_cache!(&ctx.cache, event) {
+                *extra_event = Some(FullEvent::ShardsReady {
+                    total_shards,
+                });
+            }
+
+            FullEvent::Ready {
+                data_about_bot: event.ready,
+            }
         },
         Event::Resumed(event) => FullEvent::Resume {
             event,
@@ -506,29 +526,4 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> FullEvent {
             event,
         },
     }
-}
-
-fn get_virtual_event(ctx: &Context, event: &Event) -> Option<FullEvent> {
-    match event {
-        Event::GuildCreate(event) =>
-        {
-            #[cfg(feature = "cache")]
-            if let Some(guilds) = update_cache!(&ctx.cache, event) {
-                return Some(FullEvent::CacheReady {
-                    guilds,
-                });
-            }
-        },
-        Event::Ready(event) =>
-        {
-            #[cfg(feature = "cache")]
-            if let Some(total_shards) = update_cache!(&ctx.cache, event) {
-                return Some(FullEvent::ShardsReady {
-                    total_shards,
-                });
-            }
-        },
-        _ => {},
-    }
-    None
 }
