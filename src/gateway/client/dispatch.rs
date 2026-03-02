@@ -556,33 +556,27 @@ mod tests {
     use extract_map::ExtractMap;
     use small_fixed_array::{FixedArray, FixedString};
 
-    use super::is_guild_new;
-    use crate::all::dispatch::update_cache_with_event;
-    use crate::all::{
-        ApplicationFlags,
-        ApplicationId,
-        Cache,
-        CurrentUser,
+    use super::{is_guild_new, update_cache_with_event};
+    use crate::cache::Cache;
+    use crate::gateway::client::FullEvent;
+    use crate::model::Timestamp;
+    use crate::model::application::{ApplicationFlags, PartialCurrentApplicationInfo};
+    use crate::model::event::{Event, GuildCreateEvent, ReadyEvent};
+    use crate::model::gateway::Ready;
+    use crate::model::guild::{
         DefaultMessageNotificationLevel,
-        Event,
         ExplicitContentFilter,
-        FullEvent,
         Guild,
-        GuildCreateEvent,
         GuildGeneratedFlags,
-        GuildId,
         MfaLevel,
         NsfwLevel,
-        PartialCurrentApplicationInfo,
         PremiumTier,
-        Ready,
-        ReadyEvent,
         SystemChannelFlags,
-        Timestamp,
         UnavailableGuild,
-        UserId,
         VerificationLevel,
     };
+    use crate::model::id::{ApplicationId, GuildId, UserId};
+    use crate::model::user::CurrentUser;
 
     #[test]
     fn guild_is_new() {
