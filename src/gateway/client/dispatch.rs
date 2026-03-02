@@ -502,9 +502,6 @@ fn update_cache_with_event(ctx: &Context, event: Event) -> FullEvent {
         Event::MessagePollVoteRemove(event) => FullEvent::MessagePollVoteRemove {
             event,
         },
-        Event::ShardStageUpdate(event) => FullEvent::ShardStageUpdate {
-            event,
-        },
     }
 }
 

@@ -68,9 +68,11 @@ async fn main() {
             sleep(Duration::from_secs(30)).await;
 
             for entry in runners.iter() {
-                let (id, runner) = entry.pair();
-                let info = runner.info.read();
-                println!("Shard ID {} is {} with a latency of {:?}", id, info.stage, info.latency,);
+                let (id, (runner, _)) = entry.pair();
+                println!(
+                    "Shard ID {} is {} with a latency of {:?}",
+                    id, runner.stage, runner.latency,
+                );
             }
         }
     });

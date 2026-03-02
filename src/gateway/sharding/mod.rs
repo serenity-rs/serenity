@@ -32,6 +32,7 @@ mod shard_manager;
 mod shard_queue;
 mod shard_runner;
 
+use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
@@ -46,18 +47,15 @@ use tracing::{debug, error, info, trace, warn};
 use url::Url;
 
 pub use self::shard_manager::{
-    DEFAULT_WAIT_BETWEEN_SHARD_START,
-    ShardManager,
-    ShardManagerMessage,
-    ShardManagerOptions,
+    DEFAULT_WAIT_BETWEEN_SHARD_START, ShardManager, ShardManagerMessage, ShardManagerOptions,
 };
 pub use self::shard_queue::ShardQueue;
-pub use self::shard_runner::{ShardRunner, ShardRunnerMessage};
+pub use self::shard_runner::{ShardRunner, ShardRunnerMessage, ShardRunnerOptions};
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient};
 use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
 use crate::model::event::{DeserializedEvent, Event, GatewayEvent};
-use crate::model::gateway::{ConnectionStage, GatewayIntents, ShardInfo};
+use crate::model::gateway::{GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
 use crate::model::id::ChannelId;
 use crate::model::id::{ApplicationId, GuildId, ShardId};
@@ -393,10 +391,9 @@ impl Shard {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub fn handle_event(&mut self, event: Result<GatewayEvent>) -> Result<Option<ShardAction>> {
         match event {
-            Ok(GatewayEvent::Dispatch {
-                seq,
-                event,
-            }) => Ok(self.handle_gateway_dispatch(seq, event).map(ShardAction::Dispatch)),
+            Ok(GatewayEvent::Dispatch { seq, event }) => {
+                Ok(self.handle_gateway_dispatch(seq, event).map(ShardAction::Dispatch))
+            },
             Ok(GatewayEvent::Heartbeat) => {
                 info!("[{:?}] Received a request to heartbeat", self.info);
                 Ok(Some(ShardAction::Heartbeat))
@@ -711,12 +708,7 @@ impl HeartbeatMetadata {
 
 impl Default for HeartbeatMetadata {
     fn default() -> Self {
-        Self {
-            started: Instant::now(),
-            last_sent: None,
-            last_ack: None,
-            interval: None,
-        }
+        Self { started: Instant::now(), last_sent: None, last_ack: None, interval: None }
     }
 }
 
@@ -746,12 +738,103 @@ pub struct ShardRunnerInfo {
     pub stage: ConnectionStage,
 }
 
+/// An event denoting that a shard's connection stage was changed.
+///
+/// # Examples
+///
+/// This might happen when a shard changes from [`ConnectionStage::Identifying`] to
+/// [`ConnectionStage::Connected`].
+#[derive(Clone, Debug, Serialize)]
+pub struct ShardStageUpdateEvent {
+    /// The new connection stage.
+    pub new: ConnectionStage,
+    /// The old connection stage.
+    pub old: ConnectionStage,
+    /// The ID of the shard that had its connection stage change.
+    pub shard_id: ShardId,
+}
+
+/// Indicates the current connection stage of a [`Shard`].
+///
+/// This can be useful for knowing which shards are currently "down"/"up".
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
+pub enum ConnectionStage {
+    /// Indicator that the [`Shard`] is normally connected and is not in, e.g., a resume phase.
+    Connected,
+    /// Indicator that the [`Shard`] is connecting and is in, e.g., a resume phase.
+    Connecting,
+    /// Indicator that the [`Shard`] is fully disconnected and is not in a reconnecting phase.
+    Disconnected,
+    /// Indicator that the [`Shard`] is currently initiating a handshake.
+    Handshake,
+    /// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting a READY packet.
+    Identifying,
+    /// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a RESUMED packet.
+    Resuming,
+}
+
+impl ConnectionStage {
+    /// Whether the stage is a form of connecting.
+    ///
+    /// This will return `true` on:
+    /// - [`Connecting`][`ConnectionStage::Connecting`]
+    /// - [`Handshake`][`ConnectionStage::Handshake`]
+    /// - [`Identifying`][`ConnectionStage::Identifying`]
+    /// - [`Resuming`][`ConnectionStage::Resuming`]
+    ///
+    /// All other variants will return `false`.
+    ///
+    /// # Examples
+    ///
+    /// Assert that [`ConnectionStage::Identifying`] is a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(ConnectionStage::Identifying.is_connecting());
+    /// ```
+    ///
+    /// Assert that [`ConnectionStage::Connected`] is _not_ a connecting stage:
+    ///
+    /// ```rust
+    /// use serenity::gateway::ConnectionStage;
+    ///
+    /// assert!(!ConnectionStage::Connected.is_connecting());
+    /// ```
+    #[must_use]
+    pub fn is_connecting(self) -> bool {
+        use self::ConnectionStage::{Connecting, Handshake, Identifying, Resuming};
+        matches!(self, Connecting | Handshake | Identifying | Resuming)
+    }
+}
+
+impl fmt::Display for ConnectionStage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match *self {
+            Self::Connected => "connected",
+            Self::Connecting => "connecting",
+            Self::Disconnected => "disconnected",
+            Self::Handshake => "handshaking",
+            Self::Identifying => "identifying",
+            Self::Resuming => "resuming",
+        })
+    }
+}
+
 /// Newtype around a callback that will be called on every incoming request. As long as this
 /// collector should still receive events, it should return `true`. Once it returns `false`, it is
 /// removed.
 #[cfg(feature = "collector")]
 #[derive(Clone)]
 pub struct CollectorCallback(pub Arc<dyn Fn(&Event) -> bool + Send + Sync>);
+
+#[cfg(feature = "collector")]
+impl fmt::Debug for CollectorCallback {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("CollectorCallback").finish()
+    }
+}
 
 /// The transport compression method to use.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
