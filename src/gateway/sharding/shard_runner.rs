@@ -1,18 +1,16 @@
-use std::sync::Arc;
-
 use futures::channel::mpsc::{
     TryRecvError,
     UnboundedReceiver as Receiver,
     UnboundedSender as Sender,
 };
-use parking_lot::RwLock;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, error, trace, warn};
 
-use super::{Shard, ShardAction, ShardManagerMessage, ShardRunnerInfo};
+use super::{Shard, ShardAction, ShardManagerMessage};
+use crate::gateway::client::dispatch::EventDispatcher;
 use crate::gateway::{ActivityData, ChunkGuildFilter, GatewayError};
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent, ShardStageUpdateEvent};
@@ -28,7 +26,7 @@ pub struct ShardRunner {
     // Channel to receive messages from both the shard manager and dispatches
     pub(crate) runner_rx: Receiver<ShardRunnerMessage>,
     pub(crate) shard: Shard,
-    pub(crate) runner_info: Arc<RwLock<ShardRunnerInfo>>,
+    pub(crate) dispatcher: EventDispatcher,
 }
 
 impl ShardRunner {
@@ -93,11 +91,13 @@ impl ShardRunner {
 
             if post != pre {
                 self.update_runner_info();
-                self.dispatch(Box::new(Event::ShardStageUpdate(ShardStageUpdateEvent {
-                    new: post,
-                    old: pre,
-                    shard_id: self.shard.shard_info().id,
-                })));
+                self.dispatcher
+                    .dispatch(Event::ShardStageUpdate(ShardStageUpdateEvent {
+                        new: post,
+                        old: pre,
+                        shard_id: self.shard.shard_info().id,
+                    }))
+                    .await;
             }
 
             if let Some(action) = action {
@@ -131,23 +131,11 @@ impl ShardRunner {
                             }
                         }
                     },
-                    ShardAction::Dispatch(event) => self.dispatch(event),
+                    ShardAction::Dispatch(event) => self.dispatcher.dispatch(*event).await,
                 }
             }
 
             trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
-        }
-    }
-
-    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
-    fn dispatch(&self, event: Box<Event>) {
-        let shard_info = self.shard.shard_info();
-        if let Err(why) =
-            self.manager_tx.unbounded_send(ShardManagerMessage::DispatchEvent(shard_info.id, event))
-        {
-            warn!(
-                "[ShardRunner {shard_info:?}] Failed to send event to shard manager for dispatch: {why:?}",
-            );
         }
     }
 
@@ -338,7 +326,7 @@ impl ShardRunner {
 
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     fn update_runner_info(&self) {
-        let mut runner_info = self.runner_info.write();
+        let mut runner_info = self.dispatcher.context.runner_info.write();
         runner_info.latency = self.shard.heartbeat_latency();
         runner_info.stage = self.shard.stage();
     }

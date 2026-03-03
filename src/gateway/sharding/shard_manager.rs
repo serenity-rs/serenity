@@ -26,17 +26,14 @@ use super::{
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-#[cfg(feature = "collector")]
-use crate::gateway::CollectorCallback;
 #[cfg(feature = "voice")]
 use crate::gateway::VoiceGatewayManager;
-use crate::gateway::client::dispatch::dispatch_model;
+use crate::gateway::client::dispatch::EventDispatcher;
 use crate::gateway::client::{Context, EventHandler, RawEventHandler};
 use crate::gateway::{GatewayError, PresenceData, TransportCompression};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::event::Event;
 use crate::model::gateway::{ConnectionStage, GatewayIntents};
 
 /// The default time to wait between starting each shard or set of shards.
@@ -169,9 +166,6 @@ impl ShardManager {
                         }
                         self.queue_for_start(shard_id);
                     },
-                    ShardManagerMessage::DispatchEvent(shard_id, event) => {
-                        self.dispatch_event(shard_id, *event).await;
-                    },
                     ShardManagerMessage::Quit(res) => return res,
                 }
             }
@@ -260,83 +254,39 @@ impl ShardManager {
 
         self.runners.insert(shard_id, ShardRunnerMetadata {
             info: Arc::clone(&runner_info),
-            tx: runner_tx,
-            #[cfg(feature = "collector")]
-            collectors: Arc::default(),
+            tx: runner_tx.clone(),
         });
+
+        let dispatcher = EventDispatcher {
+            context: Context {
+                data: Arc::clone(&self.data),
+                shard: runner_tx,
+                runner_info,
+                manager: self.manager_tx.clone(),
+                shard_id,
+                http: Arc::clone(&self.http),
+                #[cfg(feature = "cache")]
+                cache: Arc::clone(&self.cache),
+                #[cfg(feature = "collector")]
+                collectors: Arc::default(),
+            },
+            event_handler: self.event_handler.clone(),
+            raw_event_handler: self.raw_event_handler.clone(),
+            #[cfg(feature = "framework")]
+            framework: self.framework.get().cloned(),
+            #[cfg(feature = "voice")]
+            voice_manager: self.voice_manager.clone(),
+        };
 
         let mut runner = ShardRunner {
             manager_tx: self.manager_tx.clone(),
             runner_rx,
             shard,
-            runner_info,
+            dispatcher,
         };
         spawn_named("shard_runner::run", async move { runner.run().await });
 
         Ok(())
-    }
-
-    async fn dispatch_event(&self, shard_id: ShardId, event: Event) {
-        let Some(entry) = self.runners.get(&shard_id) else {
-            return;
-        };
-
-        let runner = entry.value();
-
-        #[cfg(feature = "voice")]
-        {
-            if let Some(voice_manager) = &self.voice_manager {
-                match &event {
-                    Event::Ready(_) => {
-                        voice_manager.register_shard(shard_id.0, runner.tx.clone()).await;
-                    },
-                    Event::VoiceServerUpdate(event) => {
-                        voice_manager
-                            .server_update(event.guild_id, event.endpoint.as_deref(), &event.token)
-                            .await;
-                    },
-                    Event::VoiceStateUpdate(event) => {
-                        if let Some(guild_id) = event.voice_state.guild_id {
-                            voice_manager.state_update(guild_id, &event.voice_state).await;
-                        }
-                    },
-                    _ => {},
-                }
-            }
-        }
-
-        let context = Context {
-            data: Arc::clone(&self.data),
-            shard: runner.tx.clone(),
-            runner_info: Arc::clone(&runner.info),
-            manager: self.manager_tx.clone(),
-            shard_id,
-            http: Arc::clone(&self.http),
-            #[cfg(feature = "cache")]
-            cache: Arc::clone(&self.cache),
-            #[cfg(feature = "collector")]
-            collectors: Arc::clone(&runner.collectors),
-        };
-
-        if self.event_handler.as_ref().is_none_or(|handler| handler.filter_event(&context, &event))
-            && self
-                .raw_event_handler
-                .as_ref()
-                .is_none_or(|handler| handler.filter_event(&context, &event))
-        {
-            #[cfg(feature = "collector")]
-            runner.collectors.write().retain(|callback| (callback.0)(&event));
-
-            dispatch_model(
-                event,
-                context,
-                #[cfg(feature = "framework")]
-                self.framework.get().cloned(),
-                self.event_handler.clone(),
-                self.raw_event_handler.clone(),
-            )
-            .await;
-        }
     }
 
     /// Returns the gateway intents used for this gateway connection.
@@ -394,8 +344,6 @@ pub enum ShardManagerMessage {
     /// the queue is operating in concurrent mode (in order to start multiple shards at once),
     /// the shard is not guaranteed to immediately start, until more shards are queued.
     RestartShard(ShardId),
-    /// Indicates that the manager should dispatch an event to the client.
-    DispatchEvent(ShardId, Box<Event>),
     /// Indicates that a shard runner encountered a fatal error and the shard manager should quit.
     Quit(Result<(), GatewayError>),
 }
@@ -406,6 +354,4 @@ pub struct ShardRunnerMetadata {
     pub info: Arc<RwLock<ShardRunnerInfo>>,
     /// A channel for sending messages to the [`ShardRunner`].
     pub tx: Sender<ShardRunnerMessage>,
-    #[cfg(feature = "collector")]
-    collectors: Arc<RwLock<Vec<CollectorCallback>>>,
 }
