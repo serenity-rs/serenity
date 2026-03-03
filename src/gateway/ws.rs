@@ -111,17 +111,15 @@ enum Compression {
 
 impl Compression {
     #[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
-    const DECOMPRESSED_CAPACITY: usize = 256 * 1024;
+    const DECOMPRESSED_CAPACITY: usize = 174_504;
 
     fn inflate(&mut self, slice: &[u8]) -> Result<Option<&[u8]>> {
         match self {
             Compression::Payload {
                 decompressed,
             } => {
-                const DECOMPRESSION_MULTIPLIER: usize = 3;
-
                 decompressed.clear();
-                decompressed.reserve(slice.len() * DECOMPRESSION_MULTIPLIER);
+                decompressed.reserve(Self::DECOMPRESSED_CAPACITY);
 
                 ZlibDecoder::new(slice).read_to_end(decompressed).map_err(|why| {
                     warn!("Err decompressing bytes: {why:?}");
