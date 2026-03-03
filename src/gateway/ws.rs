@@ -110,6 +110,9 @@ enum Compression {
 }
 
 impl Compression {
+    #[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
+    const DECOMPRESSED_CAPACITY: usize = 256 * 1024;
+
     fn inflate(&mut self, slice: &[u8]) -> Result<Option<&[u8]>> {
         match self {
             Compression::Payload {
@@ -180,13 +183,14 @@ impl From<TransportCompression> for Compression {
 
             #[cfg(feature = "transport_compression_zlib")]
             TransportCompression::Zlib => Compression::Zlib {
-                decoder: ZlibWriter::new(Vec::new()),
+                decoder: ZlibWriter::new(Vec::with_capacity(Self::DECOMPRESSED_CAPACITY)),
                 compressed: Vec::new(),
             },
 
             #[cfg(feature = "transport_compression_zstd")]
             TransportCompression::Zstd => Compression::Zstd {
-                decoder: ZstdWriter::new(Vec::new()).expect("Failed to initialize Zstd decoder"),
+                decoder: ZstdWriter::new(Vec::with_capacity(Self::DECOMPRESSED_CAPACITY))
+                    .expect("Failed to initialize Zstd decoder"),
             },
         }
     }
