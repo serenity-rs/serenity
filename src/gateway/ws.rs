@@ -1,10 +1,10 @@
 use std::env::consts;
-use std::io::Read;
+use std::io::{Read, Write};
 use std::time::{Duration, SystemTime};
 
-#[cfg(feature = "transport_compression_zlib")]
-use flate2::Decompress as ZlibInflater;
 use flate2::read::ZlibDecoder;
+#[cfg(feature = "transport_compression_zlib")]
+use flate2::write::ZlibDecoder as ZlibWriter;
 use futures::{SinkExt, StreamExt};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
@@ -16,7 +16,7 @@ use tracing::instrument;
 use tracing::{debug, trace, warn};
 use url::Url;
 #[cfg(feature = "transport_compression_zstd")]
-use zstd_safe::{DStream as ZstdInflater, InBuffer, OutBuffer};
+use zstd::stream::write::Decoder as ZstdWriter;
 
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, TransportCompression};
 use crate::constants::{self, Opcode};
@@ -99,22 +99,17 @@ enum Compression {
 
     #[cfg(feature = "transport_compression_zlib")]
     Zlib {
-        inflater: ZlibInflater,
+        decoder: ZlibWriter<Vec<u8>>,
         compressed: Vec<u8>,
-        decompressed: Box<[u8]>,
     },
 
     #[cfg(feature = "transport_compression_zstd")]
     Zstd {
-        inflater: ZstdInflater<'static>,
-        decompressed: Box<[u8]>,
+        decoder: ZstdWriter<'static, Vec<u8>>,
     },
 }
 
 impl Compression {
-    #[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
-    const DECOMPRESSED_CAPACITY: usize = 64 * 1024;
-
     fn inflate(&mut self, slice: &[u8]) -> Result<Option<&[u8]>> {
         match self {
             Compression::Payload {
@@ -127,8 +122,6 @@ impl Compression {
 
                 ZlibDecoder::new(slice).read_to_end(decompressed).map_err(|why| {
                     warn!("Err decompressing bytes: {why:?}");
-                    debug!("Failing bytes: {slice:?}");
-
                     why
                 })?;
 
@@ -137,67 +130,42 @@ impl Compression {
 
             #[cfg(feature = "transport_compression_zlib")]
             Compression::Zlib {
-                inflater,
+                decoder,
                 compressed,
-                decompressed,
             } => {
                 const ZLIB_SUFFIX: [u8; 4] = [0x00, 0x00, 0xFF, 0xFF];
 
                 compressed.extend_from_slice(slice);
-                let length = compressed.len();
 
-                if length < 4 || compressed[length - 4..] != ZLIB_SUFFIX {
+                let len = compressed.len();
+
+                if len < 4 || compressed[len - 4..] != ZLIB_SUFFIX {
                     return Ok(None);
                 }
 
-                let pre_out = inflater.total_out();
-                inflater
-                    .decompress(compressed, decompressed, flate2::FlushDecompress::Sync)
-                    .map_err(GatewayError::DecompressZlib)?;
+                decoder.get_mut().clear();
+                decoder.write_all(compressed).map_err(|why| {
+                    warn!("Err decompressing bytes: {why:?}");
+                    why
+                })?;
+                decoder.flush()?;
                 compressed.clear();
-                let produced = (inflater.total_out() - pre_out) as usize;
 
-                Ok(Some(&decompressed[..produced]))
+                Ok(Some(decoder.get_ref().as_slice()))
             },
 
             #[cfg(feature = "transport_compression_zstd")]
             Compression::Zstd {
-                inflater,
-                decompressed,
+                decoder,
             } => {
-                let mut in_buffer = InBuffer::around(slice);
-                let mut out_buffer = OutBuffer::around(decompressed.as_mut());
+                decoder.get_mut().clear();
+                decoder.write_all(slice).map_err(|why| {
+                    warn!("Err decompressing bytes: {why:?}");
+                    why
+                })?;
+                decoder.flush()?;
 
-                let length = slice.len();
-                let mut processed = 0;
-
-                loop {
-                    match inflater.decompress_stream(&mut out_buffer, &mut in_buffer) {
-                        Ok(0) => break,
-                        Ok(_hint) => {},
-                        Err(code) => {
-                            return Err(Error::Gateway(GatewayError::DecompressZstd(code)));
-                        },
-                    }
-
-                    let in_pos = in_buffer.pos();
-
-                    let progressed = in_pos > processed;
-                    let read_all_input = in_pos == length;
-
-                    if !progressed {
-                        if read_all_input {
-                            break;
-                        }
-
-                        return Err(Error::Gateway(GatewayError::DecompressZstdCorrupted));
-                    }
-
-                    processed = in_pos;
-                }
-
-                let produced = out_buffer.pos();
-                Ok(Some(&decompressed[..produced]))
+                Ok(Some(decoder.get_ref().as_slice()))
             },
         }
     }
@@ -212,20 +180,13 @@ impl From<TransportCompression> for Compression {
 
             #[cfg(feature = "transport_compression_zlib")]
             TransportCompression::Zlib => Compression::Zlib {
-                inflater: ZlibInflater::new(true),
+                decoder: ZlibWriter::new(Vec::new()),
                 compressed: Vec::new(),
-                decompressed: vec![0; Self::DECOMPRESSED_CAPACITY].into_boxed_slice(),
             },
 
             #[cfg(feature = "transport_compression_zstd")]
-            TransportCompression::Zstd => {
-                let mut inflater = ZstdInflater::create();
-                inflater.init().expect("Failed to initialize Zstd decompressor");
-
-                Compression::Zstd {
-                    inflater,
-                    decompressed: vec![0; Self::DECOMPRESSED_CAPACITY].into_boxed_slice(),
-                }
+            TransportCompression::Zstd => Compression::Zstd {
+                decoder: ZstdWriter::new(Vec::new()).expect("Failed to initialize Zstd decoder"),
             },
         }
     }

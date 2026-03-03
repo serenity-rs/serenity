@@ -53,8 +53,8 @@ ref-cast = "1.0.25"
 # Optional dependencies
 foldhash = { version = "0.2.0", optional = true }
 chrono = { version = "0.4.42", default-features = false, features = ["clock", "serde"], optional = true }
-flate2 = { version = "1.1.5", optional = true }
-zstd-safe = { version = "7.2.4", features = ["std"], optional = true }
+flate2 = { version = "1.1.9", features = ["zlib-rs"], optional = true }
+zstd = { version = "0.13", default-features = false, optional = true }
 reqwest = { version = ">=0.13", default-features = false, features = ["multipart", "stream", "json"], optional = true }
 tokio-tungstenite = { version = "0.28.0", features = ["url"], optional = true }
 percent-encoding = { version = "2.3.2", optional = true }
@@ -108,7 +108,7 @@ model = ["builder", "http", "utils"]
 # Enables zlib-stream transport compression of incoming gateway events.
 transport_compression_zlib = ["flate2", "gateway"]
 # Enables zstd-stream transport compression of incoming gateway events.
-transport_compression_zstd = ["zstd-safe", "gateway"]
+transport_compression_zstd = ["zstd", "gateway"]
 # Enables support for Discord API functionality that's not stable yet, as well as serenity APIs that
 # are allowed to change even in semver non-breaking updates.
 unstable = []
