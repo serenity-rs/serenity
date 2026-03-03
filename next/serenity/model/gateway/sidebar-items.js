@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ConnectionStage"],"struct":["Activity","ActivityAssets","ActivityButton","ActivityEmoji","ActivityFlags","ActivityParty","ActivitySecrets","ActivityTimestamps","ActivityType","BotGateway","ClientStatus","Gateway","GatewayIntents","Presence","PresenceUser","PresenceUserGeneratedOriginal","Ready","SessionStartLimit","ShardInfo"]};

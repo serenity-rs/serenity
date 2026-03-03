@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["InviteTargetType"],"struct":["Invite","InviteChannel","InviteGuild","InviteStageInstance","RichInvite"]};

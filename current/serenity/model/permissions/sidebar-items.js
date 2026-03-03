@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["PRESET_GENERAL","PRESET_TEXT","PRESET_VOICE"],"struct":["Permissions"]};

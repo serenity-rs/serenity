@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CustomisedHelpData"],"fn":["create_customised_help_data","has_all_requirements","plain","searched_lowercase","with_embeds"],"struct":["Command","GroupCommandsPair","SuggestedCommandName","Suggestions"]};

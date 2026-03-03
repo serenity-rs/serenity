@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Webhook","WebhookChannel","WebhookGuild","WebhookType"]};

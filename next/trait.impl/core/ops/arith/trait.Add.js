@@ -1,0 +1,9 @@
+(function() {
+    const implementors = Object.fromEntries([["serenity",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/arith/trait.Add.html\" title=\"trait core::ops::arith::Add\">Add</a> for <a class=\"enum\" href=\"serenity/utils/enum.ContentModifier.html\" title=\"enum serenity::utils::ContentModifier\">ContentModifier</a>",0],["impl&lt;'a&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/arith/trait.Add.html\" title=\"trait core::ops::arith::Add\">Add</a>&lt;&amp;'a <a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.str.html\">str</a>&gt; for <a class=\"enum\" href=\"serenity/utils/enum.ContentModifier.html\" title=\"enum serenity::utils::ContentModifier\">ContentModifier</a>",0],["impl&lt;'a&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/arith/trait.Add.html\" title=\"trait core::ops::arith::Add\">Add</a>&lt;<a class=\"enum\" href=\"serenity/utils/enum.ContentModifier.html\" title=\"enum serenity::utils::ContentModifier\">ContentModifier</a>&gt; for &amp;'a <a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.str.html\">str</a>",0],["impl&lt;'a&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/arith/trait.Add.html\" title=\"trait core::ops::arith::Add\">Add</a>&lt;<a class=\"enum\" href=\"serenity/utils/enum.ContentModifier.html\" title=\"enum serenity::utils::ContentModifier\">ContentModifier</a>&gt; for <a class=\"struct\" href=\"serenity/utils/struct.Content.html\" title=\"struct serenity::utils::Content\">Content</a>&lt;'a&gt;",0]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":59,"fragment_lengths":[1559]}

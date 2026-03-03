@@ -1,0 +1,1 @@
+searchState.loadedDescShard("command_attr", 0, "A macro for marking a function as a condition checker to …\nThe heart of the attribute-based framework.\nCreate a grouping of commands.\nA brother macro to <code>command</code>, but for the help command.\nA macro that transforms <code>async</code> functions (and closures) …")

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["VoiceRegion","VoiceRegionGeneratedOriginal","VoiceState","VoiceStateGeneratedOriginal"]};

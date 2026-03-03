@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Invite","InviteChannel","InviteGuild","InviteStageInstance","InviteTargetType","RichInvite"]};

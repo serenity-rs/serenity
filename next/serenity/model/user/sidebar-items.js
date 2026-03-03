@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["OnlineStatus"],"struct":["AvatarDecorationData","Collectibles","CurrentUser","Nameplate","PremiumType","PrimaryGuild","User","UserGeneratedOriginal","UserPublicFlags"]};

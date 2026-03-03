@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_WAIT_BETWEEN_SHARD_START"],"enum":["ShardAction","ShardManagerMessage","ShardRunnerMessage","TransportCompression"],"struct":["CollectorCallback","Shard","ShardManager","ShardManagerOptions","ShardQueue","ShardRunner","ShardRunnerInfo","ShardRunnerMetadata"]};

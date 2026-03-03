@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["CreatePoll","CreatePollAnswer","NeedsAnswers","NeedsDuration","NeedsQuestion","Ready"]};

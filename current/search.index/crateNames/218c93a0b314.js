@@ -1,0 +1,1 @@
+rd_("lcommand_attrhserenity")

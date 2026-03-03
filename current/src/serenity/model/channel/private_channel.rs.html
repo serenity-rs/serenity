@@ -1,0 +1,376 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/private_channel.rs`."><title>private_channel.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b7b9f40b.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0-nightly (80381278a 2026-03-01)" data-channel="nightly" data-search-js="search-63369b7b.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/channel/</div>private_channel.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::fmt;
+<a href=#2 id=2 data-nosnippet>2</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span>std::sync::Arc;
+<a href=#4 id=4 data-nosnippet>4</a>
+<a href=#5 id=5 data-nosnippet>5</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#6 id=6 data-nosnippet>6</a></span><span class="kw">use </span><span class="kw">crate</span>::builder::{CreateAttachment, CreateMessage, EditMessage, GetMessages};
+<a href=#7 id=7 data-nosnippet>7</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#8 id=8 data-nosnippet>8</a></span><span class="kw">use </span><span class="kw">crate</span>::http::CacheHttp;
+<a href=#9 id=9 data-nosnippet>9</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#10 id=10 data-nosnippet>10</a></span><span class="kw">use </span><span class="kw">crate</span>::http::{Http, Typing};
+<a href=#11 id=11 data-nosnippet>11</a><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
+<a href=#12 id=12 data-nosnippet>12</a><span class="kw">use </span><span class="kw">crate</span>::model::utils::single_recipient;
+<a href=#13 id=13 data-nosnippet>13</a>
+<a href=#14 id=14 data-nosnippet>14</a><span class="doccomment">/// A Direct Message text channel with another user.
+<a href=#15 id=15 data-nosnippet>15</a>///
+<a href=#16 id=16 data-nosnippet>16</a>/// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
+<a href=#17 id=17 data-nosnippet>17</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#18 id=18 data-nosnippet>18</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+<a href=#19 id=19 data-nosnippet>19</a>#[non_exhaustive]
+<a href=#20 id=20 data-nosnippet>20</a></span><span class="kw">pub struct </span>PrivateChannel {
+<a href=#21 id=21 data-nosnippet>21</a>    <span class="doccomment">/// The unique Id of the private channel.
+<a href=#22 id=22 data-nosnippet>22</a>    ///
+<a href=#23 id=23 data-nosnippet>23</a>    /// Can be used to calculate the first message's creation date.
+<a href=#24 id=24 data-nosnippet>24</a>    </span><span class="kw">pub </span>id: ChannelId,
+<a href=#25 id=25 data-nosnippet>25</a>    <span class="doccomment">/// The Id of the last message sent.
+<a href=#26 id=26 data-nosnippet>26</a>    </span><span class="kw">pub </span>last_message_id: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
+<a href=#27 id=27 data-nosnippet>27</a>    <span class="doccomment">/// Timestamp of the last time a [`Message`] was pinned.
+<a href=#28 id=28 data-nosnippet>28</a>    </span><span class="kw">pub </span>last_pin_timestamp: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+<a href=#29 id=29 data-nosnippet>29</a>    <span class="doccomment">/// Indicator of the type of channel this is.
+<a href=#30 id=30 data-nosnippet>30</a>    ///
+<a href=#31 id=31 data-nosnippet>31</a>    /// This should always be [`ChannelType::Private`].
+<a href=#32 id=32 data-nosnippet>32</a>    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
+<a href=#33 id=33 data-nosnippet>33</a>    </span><span class="kw">pub </span>kind: ChannelType,
+<a href=#34 id=34 data-nosnippet>34</a>    <span class="doccomment">/// The recipient to the private channel.
+<a href=#35 id=35 data-nosnippet>35</a>    </span><span class="attr">#[serde(with = <span class="string">"single_recipient"</span>, rename = <span class="string">"recipients"</span>)]
+<a href=#36 id=36 data-nosnippet>36</a>    </span><span class="kw">pub </span>recipient: User,
+<a href=#37 id=37 data-nosnippet>37</a>}
+<a href=#38 id=38 data-nosnippet>38</a>
+<a href=#39 id=39 data-nosnippet>39</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#40 id=40 data-nosnippet>40</a></span><span class="kw">impl </span>PrivateChannel {
+<a href=#41 id=41 data-nosnippet>41</a>    <span class="doccomment">/// Broadcasts that the current user is typing to the recipient.
+<a href=#42 id=42 data-nosnippet>42</a>    ///
+<a href=#43 id=43 data-nosnippet>43</a>    /// See [ChannelId::broadcast_typing] for more details.
+<a href=#44 id=44 data-nosnippet>44</a>    </span><span class="attr">#[allow(clippy::missing_errors_doc)]
+<a href=#45 id=45 data-nosnippet>45</a>    #[inline]
+<a href=#46 id=46 data-nosnippet>46</a>    </span><span class="kw">pub async fn </span>broadcast_typing(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#47 id=47 data-nosnippet>47</a>        <span class="self">self</span>.id.broadcast_typing(http).<span class="kw">await
+<a href=#48 id=48 data-nosnippet>48</a>    </span>}
+<a href=#49 id=49 data-nosnippet>49</a>
+<a href=#50 id=50 data-nosnippet>50</a>    <span class="doccomment">/// React to a [`Message`] with a custom [`Emoji`] or unicode character.
+<a href=#51 id=51 data-nosnippet>51</a>    ///
+<a href=#52 id=52 data-nosnippet>52</a>    /// [`Message::react`] may be a more suited method of reacting in most cases.
+<a href=#53 id=53 data-nosnippet>53</a>    ///
+<a href=#54 id=54 data-nosnippet>54</a>    /// # Errors
+<a href=#55 id=55 data-nosnippet>55</a>    ///
+<a href=#56 id=56 data-nosnippet>56</a>    /// Returns [`Error::Http`] if the reaction cannot be added, or if a message with that Id does
+<a href=#57 id=57 data-nosnippet>57</a>    /// not exist.
+<a href=#58 id=58 data-nosnippet>58</a>    </span><span class="attr">#[inline]
+<a href=#59 id=59 data-nosnippet>59</a>    </span><span class="kw">pub async fn </span>create_reaction(
+<a href=#60 id=60 data-nosnippet>60</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#61 id=61 data-nosnippet>61</a>        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+<a href=#62 id=62 data-nosnippet>62</a>        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+<a href=#63 id=63 data-nosnippet>63</a>        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+<a href=#64 id=64 data-nosnippet>64</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#65 id=65 data-nosnippet>65</a>        <span class="self">self</span>.id.create_reaction(http, message_id, reaction_type).<span class="kw">await
+<a href=#66 id=66 data-nosnippet>66</a>    </span>}
+<a href=#67 id=67 data-nosnippet>67</a>
+<a href=#68 id=68 data-nosnippet>68</a>    <span class="doccomment">/// Deletes the channel. This does not delete the contents of the channel, and is equivalent to
+<a href=#69 id=69 data-nosnippet>69</a>    /// closing a private channel on the client, which can be re-opened.
+<a href=#70 id=70 data-nosnippet>70</a>    </span><span class="attr">#[allow(clippy::missing_errors_doc)]
+<a href=#71 id=71 data-nosnippet>71</a>    #[inline]
+<a href=#72 id=72 data-nosnippet>72</a>    </span><span class="kw">pub async fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateChannel&gt; {
+<a href=#73 id=73 data-nosnippet>73</a>        <span class="self">self</span>.id.delete(http).<span class="kw">await</span><span class="question-mark">?</span>.private().ok_or(Error::Model(ModelError::InvalidChannelType))
+<a href=#74 id=74 data-nosnippet>74</a>    }
+<a href=#75 id=75 data-nosnippet>75</a>
+<a href=#76 id=76 data-nosnippet>76</a>    <span class="doccomment">/// Deletes all messages by Ids from the given vector in the channel.
+<a href=#77 id=77 data-nosnippet>77</a>    ///
+<a href=#78 id=78 data-nosnippet>78</a>    /// The minimum amount of messages is 2 and the maximum amount is 100.
+<a href=#79 id=79 data-nosnippet>79</a>    ///
+<a href=#80 id=80 data-nosnippet>80</a>    /// Requires the [Manage Messages] permission.
+<a href=#81 id=81 data-nosnippet>81</a>    ///
+<a href=#82 id=82 data-nosnippet>82</a>    /// **Note**: Messages that are older than 2 weeks can't be deleted using this method.
+<a href=#83 id=83 data-nosnippet>83</a>    ///
+<a href=#84 id=84 data-nosnippet>84</a>    /// # Errors
+<a href=#85 id=85 data-nosnippet>85</a>    ///
+<a href=#86 id=86 data-nosnippet>86</a>    /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to delete either 0 or more
+<a href=#87 id=87 data-nosnippet>87</a>    /// than 100 messages.
+<a href=#88 id=88 data-nosnippet>88</a>    ///
+<a href=#89 id=89 data-nosnippet>89</a>    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+<a href=#90 id=90 data-nosnippet>90</a>    </span><span class="attr">#[inline]
+<a href=#91 id=91 data-nosnippet>91</a>    </span><span class="kw">pub async fn </span>delete_messages&lt;T: AsRef&lt;MessageId&gt;&gt;(
+<a href=#92 id=92 data-nosnippet>92</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#93 id=93 data-nosnippet>93</a>        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+<a href=#94 id=94 data-nosnippet>94</a>        message_ids: <span class="kw">impl </span>IntoIterator&lt;Item = T&gt;,
+<a href=#95 id=95 data-nosnippet>95</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#96 id=96 data-nosnippet>96</a>        <span class="self">self</span>.id.delete_messages(http, message_ids).<span class="kw">await
+<a href=#97 id=97 data-nosnippet>97</a>    </span>}
+<a href=#98 id=98 data-nosnippet>98</a>
+<a href=#99 id=99 data-nosnippet>99</a>    <span class="doccomment">/// Deletes all permission overrides in the channel from a member or role.
+<a href=#100 id=100 data-nosnippet>100</a>    ///
+<a href=#101 id=101 data-nosnippet>101</a>    /// **Note**: Requires the [Manage Channel] permission.
+<a href=#102 id=102 data-nosnippet>102</a>    ///
+<a href=#103 id=103 data-nosnippet>103</a>    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
+<a href=#104 id=104 data-nosnippet>104</a>    </span><span class="attr">#[allow(clippy::missing_errors_doc)]
+<a href=#105 id=105 data-nosnippet>105</a>    #[inline]
+<a href=#106 id=106 data-nosnippet>106</a>    </span><span class="kw">pub async fn </span>delete_permission(
+<a href=#107 id=107 data-nosnippet>107</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#108 id=108 data-nosnippet>108</a>        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+<a href=#109 id=109 data-nosnippet>109</a>        permission_type: PermissionOverwriteType,
+<a href=#110 id=110 data-nosnippet>110</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#111 id=111 data-nosnippet>111</a>        <span class="self">self</span>.id.delete_permission(http, permission_type).<span class="kw">await
+<a href=#112 id=112 data-nosnippet>112</a>    </span>}
+<a href=#113 id=113 data-nosnippet>113</a>
+<a href=#114 id=114 data-nosnippet>114</a>    <span class="doccomment">/// Deletes the given [`Reaction`] from the channel.
+<a href=#115 id=115 data-nosnippet>115</a>    ///
+<a href=#116 id=116 data-nosnippet>116</a>    /// **Note**: In private channels, the current user may only delete it's own reactions.
+<a href=#117 id=117 data-nosnippet>117</a>    ///
+<a href=#118 id=118 data-nosnippet>118</a>    /// # Errors
+<a href=#119 id=119 data-nosnippet>119</a>    ///
+<a href=#120 id=120 data-nosnippet>120</a>    /// Returns [`Error::Http`] if the reaction is not from the current user.
+<a href=#121 id=121 data-nosnippet>121</a>    </span><span class="attr">#[inline]
+<a href=#122 id=122 data-nosnippet>122</a>    </span><span class="kw">pub async fn </span>delete_reaction(
+<a href=#123 id=123 data-nosnippet>123</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#124 id=124 data-nosnippet>124</a>        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+<a href=#125 id=125 data-nosnippet>125</a>        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+<a href=#126 id=126 data-nosnippet>126</a>        user_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+<a href=#127 id=127 data-nosnippet>127</a>        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+<a href=#128 id=128 data-nosnippet>128</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#129 id=129 data-nosnippet>129</a>        <span class="self">self</span>.id.delete_reaction(http, message_id, user_id, reaction_type).<span class="kw">await
+<a href=#130 id=130 data-nosnippet>130</a>    </span>}
+<a href=#131 id=131 data-nosnippet>131</a>
+<a href=#132 id=132 data-nosnippet>132</a>    <span class="doccomment">/// Edits a [`Message`] in the channel given its Id.
+<a href=#133 id=133 data-nosnippet>133</a>    ///
+<a href=#134 id=134 data-nosnippet>134</a>    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+<a href=#135 id=135 data-nosnippet>135</a>    /// attachments.
+<a href=#136 id=136 data-nosnippet>136</a>    ///
+<a href=#137 id=137 data-nosnippet>137</a>    /// **Note**: In most cases requires that the current user be the author of the message.
+<a href=#138 id=138 data-nosnippet>138</a>    ///
+<a href=#139 id=139 data-nosnippet>139</a>    /// Refer to the documentation for [`EditMessage`] for information regarding content
+<a href=#140 id=140 data-nosnippet>140</a>    /// restrictions and requirements.
+<a href=#141 id=141 data-nosnippet>141</a>    ///
+<a href=#142 id=142 data-nosnippet>142</a>    /// # Errors
+<a href=#143 id=143 data-nosnippet>143</a>    ///
+<a href=#144 id=144 data-nosnippet>144</a>    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
+<a href=#145 id=145 data-nosnippet>145</a>    /// reasons.
+<a href=#146 id=146 data-nosnippet>146</a>    ///
+<a href=#147 id=147 data-nosnippet>147</a>    /// [`EditMessage::execute`]: ../../builder/struct.EditMessage.html#method.execute
+<a href=#148 id=148 data-nosnippet>148</a>    </span><span class="attr">#[inline]
+<a href=#149 id=149 data-nosnippet>149</a>    </span><span class="kw">pub async fn </span>edit_message(
+<a href=#150 id=150 data-nosnippet>150</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#151 id=151 data-nosnippet>151</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#152 id=152 data-nosnippet>152</a>        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+<a href=#153 id=153 data-nosnippet>153</a>        builder: EditMessage,
+<a href=#154 id=154 data-nosnippet>154</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#155 id=155 data-nosnippet>155</a>        <span class="self">self</span>.id.edit_message(cache_http, message_id, builder).<span class="kw">await
+<a href=#156 id=156 data-nosnippet>156</a>    </span>}
+<a href=#157 id=157 data-nosnippet>157</a>
+<a href=#158 id=158 data-nosnippet>158</a>    <span class="doccomment">/// Determines if the channel is NSFW.
+<a href=#159 id=159 data-nosnippet>159</a>    </span><span class="attr">#[inline]
+<a href=#160 id=160 data-nosnippet>160</a>    #[must_use]
+<a href=#161 id=161 data-nosnippet>161</a>    #[allow(clippy::unused_self)]
+<a href=#162 id=162 data-nosnippet>162</a>    #[deprecated = <span class="string">"This always returns false"</span>]
+<a href=#163 id=163 data-nosnippet>163</a>    </span><span class="kw">pub fn </span>is_nsfw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+<a href=#164 id=164 data-nosnippet>164</a>        <span class="bool-val">false
+<a href=#165 id=165 data-nosnippet>165</a>    </span>}
+<a href=#166 id=166 data-nosnippet>166</a>
+<a href=#167 id=167 data-nosnippet>167</a>    <span class="doccomment">/// Gets a message from the channel.
+<a href=#168 id=168 data-nosnippet>168</a>    ///
+<a href=#169 id=169 data-nosnippet>169</a>    /// # Errors
+<a href=#170 id=170 data-nosnippet>170</a>    ///
+<a href=#171 id=171 data-nosnippet>171</a>    /// Returns [`Error::Http`] if a message with that Id does not exist in this channel.
+<a href=#172 id=172 data-nosnippet>172</a>    </span><span class="attr">#[inline]
+<a href=#173 id=173 data-nosnippet>173</a>    </span><span class="kw">pub async fn </span>message(
+<a href=#174 id=174 data-nosnippet>174</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#175 id=175 data-nosnippet>175</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#176 id=176 data-nosnippet>176</a>        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+<a href=#177 id=177 data-nosnippet>177</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#178 id=178 data-nosnippet>178</a>        <span class="self">self</span>.id.message(cache_http, message_id).<span class="kw">await
+<a href=#179 id=179 data-nosnippet>179</a>    </span>}
+<a href=#180 id=180 data-nosnippet>180</a>
+<a href=#181 id=181 data-nosnippet>181</a>    <span class="doccomment">/// Gets messages from the channel.
+<a href=#182 id=182 data-nosnippet>182</a>    ///
+<a href=#183 id=183 data-nosnippet>183</a>    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+<a href=#184 id=184 data-nosnippet>184</a>    /// [`Vec`].
+<a href=#185 id=185 data-nosnippet>185</a>    ///
+<a href=#186 id=186 data-nosnippet>186</a>    /// # Errors
+<a href=#187 id=187 data-nosnippet>187</a>    ///
+<a href=#188 id=188 data-nosnippet>188</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#189 id=189 data-nosnippet>189</a>    ///
+<a href=#190 id=190 data-nosnippet>190</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+<a href=#191 id=191 data-nosnippet>191</a>    </span><span class="attr">#[inline]
+<a href=#192 id=192 data-nosnippet>192</a>    </span><span class="kw">pub async fn </span>messages(
+<a href=#193 id=193 data-nosnippet>193</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#194 id=194 data-nosnippet>194</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#195 id=195 data-nosnippet>195</a>        builder: GetMessages,
+<a href=#196 id=196 data-nosnippet>196</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
+<a href=#197 id=197 data-nosnippet>197</a>        <span class="self">self</span>.id.messages(cache_http, builder).<span class="kw">await
+<a href=#198 id=198 data-nosnippet>198</a>    </span>}
+<a href=#199 id=199 data-nosnippet>199</a>
+<a href=#200 id=200 data-nosnippet>200</a>    <span class="doccomment">/// Returns "DM with $username#discriminator".
+<a href=#201 id=201 data-nosnippet>201</a>    </span><span class="attr">#[must_use]
+<a href=#202 id=202 data-nosnippet>202</a>    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+<a href=#203 id=203 data-nosnippet>203</a>        <span class="macro">format!</span>(<span class="string">"DM with {}"</span>, <span class="self">self</span>.recipient.tag())
+<a href=#204 id=204 data-nosnippet>204</a>    }
+<a href=#205 id=205 data-nosnippet>205</a>
+<a href=#206 id=206 data-nosnippet>206</a>    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
+<a href=#207 id=207 data-nosnippet>207</a>    ///
+<a href=#208 id=208 data-nosnippet>208</a>    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
+<a href=#209 id=209 data-nosnippet>209</a>    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
+<a href=#210 id=210 data-nosnippet>210</a>    /// then it is automatically reduced.
+<a href=#211 id=211 data-nosnippet>211</a>    ///
+<a href=#212 id=212 data-nosnippet>212</a>    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+<a href=#213 id=213 data-nosnippet>213</a>    /// useful for pagination.
+<a href=#214 id=214 data-nosnippet>214</a>    ///
+<a href=#215 id=215 data-nosnippet>215</a>    /// # Errors
+<a href=#216 id=216 data-nosnippet>216</a>    ///
+<a href=#217 id=217 data-nosnippet>217</a>    /// Returns [`Error::Http`] if a message with the given Id does not exist in the channel.
+<a href=#218 id=218 data-nosnippet>218</a>    </span><span class="attr">#[inline]
+<a href=#219 id=219 data-nosnippet>219</a>    </span><span class="kw">pub async fn </span>reaction_users(
+<a href=#220 id=220 data-nosnippet>220</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#221 id=221 data-nosnippet>221</a>        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+<a href=#222 id=222 data-nosnippet>222</a>        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+<a href=#223 id=223 data-nosnippet>223</a>        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+<a href=#224 id=224 data-nosnippet>224</a>        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+<a href=#225 id=225 data-nosnippet>225</a>        after: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;UserId&gt;&gt;,
+<a href=#226 id=226 data-nosnippet>226</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
+<a href=#227 id=227 data-nosnippet>227</a>        <span class="self">self</span>.id.reaction_users(http, message_id, reaction_type, limit, after).<span class="kw">await
+<a href=#228 id=228 data-nosnippet>228</a>    </span>}
+<a href=#229 id=229 data-nosnippet>229</a>
+<a href=#230 id=230 data-nosnippet>230</a>    <span class="doccomment">/// Pins a [`Message`] to the channel.
+<a href=#231 id=231 data-nosnippet>231</a>    ///
+<a href=#232 id=232 data-nosnippet>232</a>    /// # Errors
+<a href=#233 id=233 data-nosnippet>233</a>    ///
+<a href=#234 id=234 data-nosnippet>234</a>    /// Returns [`Error::Http`] if the number of pinned messages would exceed the 50 message limit.
+<a href=#235 id=235 data-nosnippet>235</a>    </span><span class="attr">#[inline]
+<a href=#236 id=236 data-nosnippet>236</a>    </span><span class="kw">pub async fn </span>pin(
+<a href=#237 id=237 data-nosnippet>237</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#238 id=238 data-nosnippet>238</a>        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+<a href=#239 id=239 data-nosnippet>239</a>        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+<a href=#240 id=240 data-nosnippet>240</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#241 id=241 data-nosnippet>241</a>        <span class="self">self</span>.id.pin(http, message_id).<span class="kw">await
+<a href=#242 id=242 data-nosnippet>242</a>    </span>}
+<a href=#243 id=243 data-nosnippet>243</a>
+<a href=#244 id=244 data-nosnippet>244</a>    <span class="doccomment">/// Retrieves the list of messages that have been pinned in the private channel.
+<a href=#245 id=245 data-nosnippet>245</a>    </span><span class="attr">#[allow(clippy::missing_errors_doc)]
+<a href=#246 id=246 data-nosnippet>246</a>    #[inline]
+<a href=#247 id=247 data-nosnippet>247</a>    </span><span class="kw">pub async fn </span>pins(<span class="kw-2">&amp;</span><span class="self">self</span>, http: <span class="kw">impl </span>AsRef&lt;Http&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
+<a href=#248 id=248 data-nosnippet>248</a>        <span class="self">self</span>.id.pins(http).<span class="kw">await
+<a href=#249 id=249 data-nosnippet>249</a>    </span>}
+<a href=#250 id=250 data-nosnippet>250</a>
+<a href=#251 id=251 data-nosnippet>251</a>    <span class="doccomment">/// Sends a message with just the given message content in the channel.
+<a href=#252 id=252 data-nosnippet>252</a>    ///
+<a href=#253 id=253 data-nosnippet>253</a>    /// **Note**: Message content must be under 2000 unicode code points.
+<a href=#254 id=254 data-nosnippet>254</a>    ///
+<a href=#255 id=255 data-nosnippet>255</a>    /// # Errors
+<a href=#256 id=256 data-nosnippet>256</a>    ///
+<a href=#257 id=257 data-nosnippet>257</a>    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+<a href=#258 id=258 data-nosnippet>258</a>    /// [`CreateMessage::execute`] for more details.
+<a href=#259 id=259 data-nosnippet>259</a>    ///
+<a href=#260 id=260 data-nosnippet>260</a>    /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
+<a href=#261 id=261 data-nosnippet>261</a>    </span><span class="attr">#[inline]
+<a href=#262 id=262 data-nosnippet>262</a>    </span><span class="kw">pub async fn </span>say(
+<a href=#263 id=263 data-nosnippet>263</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#264 id=264 data-nosnippet>264</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#265 id=265 data-nosnippet>265</a>        content: <span class="kw">impl </span>Into&lt;String&gt;,
+<a href=#266 id=266 data-nosnippet>266</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#267 id=267 data-nosnippet>267</a>        <span class="self">self</span>.id.say(cache_http, content).<span class="kw">await
+<a href=#268 id=268 data-nosnippet>268</a>    </span>}
+<a href=#269 id=269 data-nosnippet>269</a>
+<a href=#270 id=270 data-nosnippet>270</a>    <span class="doccomment">/// Sends file(s) along with optional message contents.
+<a href=#271 id=271 data-nosnippet>271</a>    ///
+<a href=#272 id=272 data-nosnippet>272</a>    /// Refer to [`ChannelId::send_files`] for examples and more information.
+<a href=#273 id=273 data-nosnippet>273</a>    ///
+<a href=#274 id=274 data-nosnippet>274</a>    /// # Errors
+<a href=#275 id=275 data-nosnippet>275</a>    ///
+<a href=#276 id=276 data-nosnippet>276</a>    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+<a href=#277 id=277 data-nosnippet>277</a>    /// reasons.
+<a href=#278 id=278 data-nosnippet>278</a>    ///
+<a href=#279 id=279 data-nosnippet>279</a>    /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
+<a href=#280 id=280 data-nosnippet>280</a>    </span><span class="attr">#[inline]
+<a href=#281 id=281 data-nosnippet>281</a>    </span><span class="kw">pub async fn </span>send_files(
+<a href=#282 id=282 data-nosnippet>282</a>        <span class="self">self</span>,
+<a href=#283 id=283 data-nosnippet>283</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#284 id=284 data-nosnippet>284</a>        files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&gt;,
+<a href=#285 id=285 data-nosnippet>285</a>        builder: CreateMessage,
+<a href=#286 id=286 data-nosnippet>286</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#287 id=287 data-nosnippet>287</a>        <span class="self">self</span>.id.send_files(cache_http, files, builder).<span class="kw">await
+<a href=#288 id=288 data-nosnippet>288</a>    </span>}
+<a href=#289 id=289 data-nosnippet>289</a>
+<a href=#290 id=290 data-nosnippet>290</a>    <span class="doccomment">/// Sends a message to the channel.
+<a href=#291 id=291 data-nosnippet>291</a>    ///
+<a href=#292 id=292 data-nosnippet>292</a>    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+<a href=#293 id=293 data-nosnippet>293</a>    /// restrictions and requirements.
+<a href=#294 id=294 data-nosnippet>294</a>    ///
+<a href=#295 id=295 data-nosnippet>295</a>    /// # Errors
+<a href=#296 id=296 data-nosnippet>296</a>    ///
+<a href=#297 id=297 data-nosnippet>297</a>    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+<a href=#298 id=298 data-nosnippet>298</a>    /// reasons.
+<a href=#299 id=299 data-nosnippet>299</a>    ///
+<a href=#300 id=300 data-nosnippet>300</a>    /// [`CreateMessage::execute`]: ../../builder/struct.CreateMessage.html#method.execute
+<a href=#301 id=301 data-nosnippet>301</a>    </span><span class="attr">#[inline]
+<a href=#302 id=302 data-nosnippet>302</a>    </span><span class="kw">pub async fn </span>send_message(
+<a href=#303 id=303 data-nosnippet>303</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#304 id=304 data-nosnippet>304</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#305 id=305 data-nosnippet>305</a>        builder: CreateMessage,
+<a href=#306 id=306 data-nosnippet>306</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#307 id=307 data-nosnippet>307</a>        <span class="self">self</span>.id.send_message(cache_http, builder).<span class="kw">await
+<a href=#308 id=308 data-nosnippet>308</a>    </span>}
+<a href=#309 id=309 data-nosnippet>309</a>
+<a href=#310 id=310 data-nosnippet>310</a>    <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
+<a href=#311 id=311 data-nosnippet>311</a>    ///
+<a href=#312 id=312 data-nosnippet>312</a>    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+<a href=#313 id=313 data-nosnippet>313</a>    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+<a href=#314 id=314 data-nosnippet>314</a>    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+<a href=#315 id=315 data-nosnippet>315</a>    /// dropped.
+<a href=#316 id=316 data-nosnippet>316</a>    ///
+<a href=#317 id=317 data-nosnippet>317</a>    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+<a href=#318 id=318 data-nosnippet>318</a>    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+<a href=#319 id=319 data-nosnippet>319</a>    /// is dropped.
+<a href=#320 id=320 data-nosnippet>320</a>    ///
+<a href=#321 id=321 data-nosnippet>321</a>    /// This should rarely be used for bots, although it is a good indicator that a long-running
+<a href=#322 id=322 data-nosnippet>322</a>    /// command is still being processed.
+<a href=#323 id=323 data-nosnippet>323</a>    ///
+<a href=#324 id=324 data-nosnippet>324</a>    /// ## Examples
+<a href=#325 id=325 data-nosnippet>325</a>    ///
+<a href=#326 id=326 data-nosnippet>326</a>    /// ```rust,no_run
+<a href=#327 id=327 data-nosnippet>327</a>    /// # #[cfg(feature = "cache")]
+<a href=#328 id=328 data-nosnippet>328</a>    /// # async fn run() {
+<a href=#329 id=329 data-nosnippet>329</a>    /// # use serenity::{cache::Cache, http::Http, model::channel::PrivateChannel, Result};
+<a href=#330 id=330 data-nosnippet>330</a>    /// # use std::sync::Arc;
+<a href=#331 id=331 data-nosnippet>331</a>    /// #
+<a href=#332 id=332 data-nosnippet>332</a>    /// # fn long_process() {}
+<a href=#333 id=333 data-nosnippet>333</a>    /// # let http: Arc&lt;Http&gt; = unimplemented!();
+<a href=#334 id=334 data-nosnippet>334</a>    /// # let cache = Cache::default();
+<a href=#335 id=335 data-nosnippet>335</a>    /// # let channel: PrivateChannel = unimplemented!();
+<a href=#336 id=336 data-nosnippet>336</a>    /// // Initiate typing (assuming http is `Arc&lt;Http&gt;` and `channel` is bound)
+<a href=#337 id=337 data-nosnippet>337</a>    /// let typing = channel.start_typing(&amp;http);
+<a href=#338 id=338 data-nosnippet>338</a>    ///
+<a href=#339 id=339 data-nosnippet>339</a>    /// // Run some long-running process
+<a href=#340 id=340 data-nosnippet>340</a>    /// long_process();
+<a href=#341 id=341 data-nosnippet>341</a>    ///
+<a href=#342 id=342 data-nosnippet>342</a>    /// // Stop typing
+<a href=#343 id=343 data-nosnippet>343</a>    /// typing.stop();
+<a href=#344 id=344 data-nosnippet>344</a>    /// # }
+<a href=#345 id=345 data-nosnippet>345</a>    /// ```
+<a href=#346 id=346 data-nosnippet>346</a>    ///
+<a href=#347 id=347 data-nosnippet>347</a>    /// # Errors
+<a href=#348 id=348 data-nosnippet>348</a>    ///
+<a href=#349 id=349 data-nosnippet>349</a>    /// May return [`Error::Http`] if the current user cannot send a direct message to this user.
+<a href=#350 id=350 data-nosnippet>350</a>    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Arc&lt;Http&gt;) -&gt; Typing {
+<a href=#351 id=351 data-nosnippet>351</a>        http.start_typing(<span class="self">self</span>.id)
+<a href=#352 id=352 data-nosnippet>352</a>    }
+<a href=#353 id=353 data-nosnippet>353</a>
+<a href=#354 id=354 data-nosnippet>354</a>    <span class="doccomment">/// Unpins a [`Message`] in the channel given by its Id.
+<a href=#355 id=355 data-nosnippet>355</a>    ///
+<a href=#356 id=356 data-nosnippet>356</a>    /// # Errors
+<a href=#357 id=357 data-nosnippet>357</a>    ///
+<a href=#358 id=358 data-nosnippet>358</a>    /// Returns [`Error::Http`] if the current user lacks permission, if the message was deleted,
+<a href=#359 id=359 data-nosnippet>359</a>    /// or if the channel already has the limit of 50 pinned messages.
+<a href=#360 id=360 data-nosnippet>360</a>    </span><span class="attr">#[inline]
+<a href=#361 id=361 data-nosnippet>361</a>    </span><span class="kw">pub async fn </span>unpin(
+<a href=#362 id=362 data-nosnippet>362</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#363 id=363 data-nosnippet>363</a>        http: <span class="kw">impl </span>AsRef&lt;Http&gt;,
+<a href=#364 id=364 data-nosnippet>364</a>        message_id: <span class="kw">impl </span>Into&lt;MessageId&gt;,
+<a href=#365 id=365 data-nosnippet>365</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#366 id=366 data-nosnippet>366</a>        <span class="self">self</span>.id.unpin(http, message_id).<span class="kw">await
+<a href=#367 id=367 data-nosnippet>367</a>    </span>}
+<a href=#368 id=368 data-nosnippet>368</a>}
+<a href=#369 id=369 data-nosnippet>369</a>
+<a href=#370 id=370 data-nosnippet>370</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>PrivateChannel {
+<a href=#371 id=371 data-nosnippet>371</a>    <span class="doccomment">/// Formats the private channel, displaying the recipient's username.
+<a href=#372 id=372 data-nosnippet>372</a>    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+<a href=#373 id=373 data-nosnippet>373</a>        f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.recipient.name)
+<a href=#374 id=374 data-nosnippet>374</a>    }
+<a href=#375 id=375 data-nosnippet>375</a>}
+</code></pre></div></section></main></body></html>

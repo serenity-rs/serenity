@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ChunkGuildFilter","GatewayError"],"mod":["client","sharding"],"struct":["ActivityData","PresenceData","WsClient"],"trait":["VoiceGatewayManager"]};
