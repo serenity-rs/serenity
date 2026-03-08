@@ -1107,9 +1107,15 @@ impl<'de> serde::Deserialize<'de> for PollMediaEmoji {
     }
 }
 
-impl From<FixedString<u8>> for PollMediaEmoji {
-    fn from(value: FixedString<u8>) -> Self {
-        Self::Name(value)
+impl From<String> for PollMediaEmoji {
+    fn from(value: String) -> Self {
+        Self::Name(FixedString::from_string_trunc(value))
+    }
+}
+
+impl From<&'static str> for PollMediaEmoji {
+    fn from(value: &'static str) -> Self {
+        Self::Name(FixedString::from_static_trunc(value))
     }
 }
 

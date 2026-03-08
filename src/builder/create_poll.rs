@@ -73,8 +73,8 @@ impl<'a> CreatePoll<'a, NeedsQuestion> {
     /// let poll = CreatePoll::new()
     ///     .question("Cats or Dogs?")
     ///     .answers(vec![
-    ///         CreatePollAnswer::new().emoji("🐱".to_string()).text("Cats!"),
-    ///         CreatePollAnswer::new().emoji("🐶".to_string()).text("Dogs!"),
+    ///         CreatePollAnswer::new().emoji("🐱").text("Cats!"),
+    ///         CreatePollAnswer::new().emoji("🐶").text("Dogs!"),
     ///         CreatePollAnswer::new().text("Neither..."),
     ///     ])
     ///     .duration(std::time::Duration::from_secs(60 * 60 * 24 * 7));
