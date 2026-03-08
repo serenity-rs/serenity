@@ -1084,7 +1084,7 @@ pub struct PollMedia {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum PollMediaEmoji {
-    Name(String),
+    Name(FixedString<u8>),
     Id(EmojiId),
 }
 
@@ -1092,7 +1092,7 @@ impl<'de> serde::Deserialize<'de> for PollMediaEmoji {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(serde::Deserialize)]
         struct RawPollMediaEmoji {
-            name: Option<String>,
+            name: Option<FixedString<u8>>,
             id: Option<EmojiId>,
         }
 
@@ -1107,8 +1107,8 @@ impl<'de> serde::Deserialize<'de> for PollMediaEmoji {
     }
 }
 
-impl From<String> for PollMediaEmoji {
-    fn from(value: String) -> Self {
+impl From<FixedString<u8>> for PollMediaEmoji {
+    fn from(value: FixedString<u8>) -> Self {
         Self::Name(value)
     }
 }
