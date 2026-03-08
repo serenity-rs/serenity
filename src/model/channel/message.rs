@@ -1073,7 +1073,7 @@ pub struct Poll {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PollMedia {
-    pub text: Option<String>,
+    pub text: Option<FixedString<u16>>,
     pub emoji: Option<PollMediaEmoji>,
 }
 

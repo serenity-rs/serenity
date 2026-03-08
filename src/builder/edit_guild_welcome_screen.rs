@@ -83,7 +83,7 @@ impl<'a> EditGuildWelcomeScreen<'a> {
 #[must_use]
 pub struct CreateGuildWelcomeChannel<'a> {
     channel_id: GenericChannelId,
-    emoji_name: Option<String>,
+    emoji_name: Option<Cow<'a, str>>,
     emoji_id: Option<EmojiId>,
     description: Cow<'a, str>,
 }

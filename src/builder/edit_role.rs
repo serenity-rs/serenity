@@ -134,8 +134,8 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a unicode emoji.
-    pub fn unicode_emoji(mut self, unicode_emoji: Option<String>) -> Self {
-        self.unicode_emoji = Some(unicode_emoji.map(Into::into));
+    pub fn unicode_emoji(mut self, unicode_emoji: Option<Cow<'a, str>>) -> Self {
+        self.unicode_emoji = Some(unicode_emoji);
         self.icon = Some(None);
         self
     }
