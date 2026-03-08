@@ -461,6 +461,8 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     StageInstancesChannelId(u64),
+    
+    
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
@@ -1759,6 +1761,9 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
+    EditGuildRolePositions{
+        guild_id: u64,
+    },
 }
 
 impl<'a> RouteInfo<'a> {
@@ -2975,6 +2980,11 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::ChannelsIdPinsMessageId(channel_id),
                 Cow::from(Route::channel_pin(channel_id, message_id)),
+            ),
+            RouteInfo::EditGuildRolePositions { guild_id } => (
+                LightMethod::Patch,
+                Route::GuildsIdRoles(guild_id),
+                Cow::from(Route::guild_roles(guild_id))
             ),
         }
     }

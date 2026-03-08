@@ -951,7 +951,7 @@ impl PartialGuild {
         where
             It: IntoIterator<Item = (RoleId, u64)>,
     {
-        self.id.reorder_roles(&http, roles).await
+        self.id.edit_role_positions(&http, roles).await
     }
 
     /// Edits a sticker, optionally setting its fields.
