@@ -2227,7 +2227,7 @@ impl Http {
             headers: None,
             method: LightMethod::Patch,
             route: Route::GuildRoles {
-                guild_id
+                guild_id,
             },
             params: None,
         })
