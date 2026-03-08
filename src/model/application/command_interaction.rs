@@ -56,7 +56,7 @@ pub struct CommandInteraction {
     /// The guild's preferred locale.
     pub guild_locale: Option<FixedString>,
     /// For monetized applications, any entitlements of the invoking user.
-    pub entitlements: Vec<Entitlement>,
+    pub entitlements: FixedArray<Entitlement>,
     /// The owners of the applications that authorized the interaction, such as a guild or user.
     #[serde(default)]
     pub authorizing_integration_owners: AuthorizingIntegrationOwners,

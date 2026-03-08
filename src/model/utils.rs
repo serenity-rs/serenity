@@ -212,7 +212,7 @@ pub mod single_recipient {
     }
 }
 
-pub fn discord_colours_opt<'de, D>(deserializer: D) -> Result<Option<Vec<Colour>>, D::Error>
+pub fn discord_colours_opt<'de, D>(deserializer: D) -> Result<Option<FixedArray<Colour>>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -227,7 +227,7 @@ where
     deserialize_colours::<D>(vec_str).map(Some)
 }
 
-pub fn discord_colours<'de, D>(deserializer: D) -> Result<Vec<Colour>, D::Error>
+pub fn discord_colours<'de, D>(deserializer: D) -> Result<FixedArray<Colour>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -236,7 +236,7 @@ where
     deserialize_colours::<D>(vec_str)
 }
 
-fn deserialize_colours<'de, D>(vec_str: Vec<CowStr<'_>>) -> Result<Vec<Colour>, D::Error>
+fn deserialize_colours<'de, D>(vec_str: Vec<CowStr<'_>>) -> Result<FixedArray<Colour>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -253,5 +253,7 @@ where
                 .map(Colour::new)
                 .map_err(|_| DeError::custom("Invalid colour data"))
         })
-        .collect()
+        .collect::<Result<Vec<_>, _>>()?
+        .try_into()
+        .map_err(D::Error::custom)
 }

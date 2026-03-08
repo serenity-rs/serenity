@@ -28,9 +28,9 @@ pub struct EditCommand<'a> {
     #[cfg(not(feature = "unstable"))]
     dm_permission: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    integration_types: Option<Vec<InstallationContext>>,
+    integration_types: Option<Cow<'a, [InstallationContext]>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    contexts: Option<Vec<InteractionContext>>,
+    contexts: Option<Cow<'a, [InteractionContext]>>,
     nsfw: bool,
 }
 
@@ -124,24 +124,24 @@ impl<'a> EditCommand<'a> {
 
     /// Adds an installation context that this application command can be used in.
     pub fn add_integration_type(mut self, integration_type: InstallationContext) -> Self {
-        self.integration_types.get_or_insert_with(Vec::default).push(integration_type);
+        self.integration_types.get_or_insert_default().to_mut().push(integration_type);
         self
     }
 
     /// Sets the installation contexts that this application command can be used in.
-    pub fn integration_types(mut self, integration_types: Vec<InstallationContext>) -> Self {
+    pub fn integration_types(mut self, integration_types: Cow<'a, [InstallationContext]>) -> Self {
         self.integration_types = Some(integration_types);
         self
     }
 
     /// Adds an interaction context that this application command can be used in.
     pub fn add_context(mut self, context: InteractionContext) -> Self {
-        self.contexts.get_or_insert_with(Vec::default).push(context);
+        self.contexts.get_or_insert_default().to_mut().push(context);
         self
     }
 
     /// Sets the interaction contexts that this application command can be used in.
-    pub fn contexts(mut self, contexts: Vec<InteractionContext>) -> Self {
+    pub fn contexts(mut self, contexts: Cow<'a, [InteractionContext]>) -> Self {
         self.contexts = Some(contexts);
         self
     }

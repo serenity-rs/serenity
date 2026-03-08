@@ -444,7 +444,7 @@ impl<'a> CreateCommand<'a> {
     }
 
     /// Sets the installation contexts that this application command can be used in.
-    pub fn integration_types(mut self, integration_types: Vec<InstallationContext>) -> Self {
+    pub fn integration_types(mut self, integration_types: Cow<'a, [InstallationContext]>) -> Self {
         self.fields = self.fields.integration_types(integration_types);
         self
     }
@@ -456,7 +456,7 @@ impl<'a> CreateCommand<'a> {
     }
 
     /// Sets the interaction contexts that this application command can be used in.
-    pub fn contexts(mut self, contexts: Vec<InteractionContext>) -> Self {
+    pub fn contexts(mut self, contexts: Cow<'a, [InteractionContext]>) -> Self {
         self.fields = self.fields.contexts(contexts);
         self
     }

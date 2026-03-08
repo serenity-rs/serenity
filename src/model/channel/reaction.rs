@@ -53,7 +53,7 @@ pub struct Reaction {
     ///
     /// Only present on the ReactionAdd gateway event.
     #[serde(rename = "burst_colors", default, deserialize_with = "discord_colours_opt")]
-    pub burst_colours: Option<Vec<Colour>>,
+    pub burst_colours: Option<FixedArray<Colour>>,
     /// The type of reaction.
     #[serde(rename = "type")]
     pub reaction_type: ReactionTypes,

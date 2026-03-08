@@ -6,6 +6,7 @@ use std::borrow::Cow;
 use std::fmt::Display;
 
 use nonmax::NonMaxU64;
+use serde::de::Error as _;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage};
@@ -101,7 +102,7 @@ pub struct Message {
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
     /// An array of message snapshots, known as forwarded messages.
     #[serde(default, deserialize_with = "deserialize_snapshots")]
-    pub message_snapshots: Vec<MessageSnapshot>,
+    pub message_snapshots: FixedArray<MessageSnapshot>,
     #[cfg(not(feature = "unstable"))]
     pub interaction: Option<Box<MessageInteraction>>,
     /// Sent if the message is a response to an [`Interaction`].
@@ -640,7 +641,7 @@ pub struct MessageReaction {
     pub reaction_type: ReactionType,
     // The colours used for super reactions.
     #[serde(rename = "burst_colors", deserialize_with = "discord_colours")]
-    pub burst_colours: Vec<Colour>,
+    pub burst_colours: FixedArray<Colour>,
 }
 
 /// A representation of reaction count details.
@@ -894,7 +895,7 @@ pub struct MessageSnapshot {
 }
 
 /// Custom deserialization function to handle the nested "message" field
-fn deserialize_snapshots<'de, D>(deserializer: D) -> Result<Vec<MessageSnapshot>, D::Error>
+fn deserialize_snapshots<'de, D>(deserializer: D) -> Result<FixedArray<MessageSnapshot>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -903,11 +904,10 @@ where
         pub message: MessageSnapshot,
     }
 
-    let snapshots: Vec<MessageSnapshotWrapper> = Deserialize::deserialize(deserializer)?;
+    let snapshots_wrapped: Vec<MessageSnapshotWrapper> = Deserialize::deserialize(deserializer)?;
+    let snapshots: Vec<_> = snapshots_wrapped.into_iter().map(|wrapper| wrapper.message).collect();
 
-    let result = snapshots.into_iter().map(|wrapper| wrapper.message).collect();
-
-    Ok(result)
+    snapshots.try_into().map_err(D::Error::custom)
 }
 
 bitflags! {
@@ -1053,7 +1053,7 @@ pub struct RoleSubscriptionData {
 #[non_exhaustive]
 pub struct Poll {
     pub question: PollMedia,
-    pub answers: Vec<PollAnswer>,
+    pub answers: FixedArray<PollAnswer, u8>,
     pub expiry: Option<Timestamp>,
     pub allow_multiselect: bool,
     pub layout_type: PollLayoutType,
@@ -1162,7 +1162,7 @@ enum_number! {
 #[non_exhaustive]
 pub struct PollResults {
     pub is_finalized: bool,
-    pub answer_counts: Vec<PollAnswerCount>,
+    pub answer_counts: FixedArray<PollAnswerCount, u8>,
 }
 
 /// The count of a single [`PollAnswer`]'s results.
