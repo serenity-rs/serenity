@@ -13,6 +13,7 @@ use super::prelude::*;
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::model::utils::deserialize_null_as_default;
 #[cfg(feature = "model")]
 use crate::model::utils::{avatar_url, user_banner_url};
 
@@ -292,6 +293,7 @@ pub struct User {
     /// The collectibles the user currently has active, excluding avatar decorations and profile
     /// effects.
     #[serde(default)]
+    #[serde(deserialize_with = "deserialize_null_as_default")]
     pub collectibles: Collectibles,
 }
 
