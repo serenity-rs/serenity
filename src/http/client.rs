@@ -2221,7 +2221,7 @@ impl Http {
     ) -> Result<Vec<Role>> {
         let body = to_vec(value)?;
 
-        self.fire(Request{
+        self.fire(Request {
             body: Some(body),
             multipart: None,
             headers: None,
@@ -2231,7 +2231,7 @@ impl Http {
             },
             params: None,
         })
-            .await
+        .await
     }
 
     /// Modifies a scheduled event.
