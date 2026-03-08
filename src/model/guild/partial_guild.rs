@@ -959,7 +959,8 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         roles: impl IntoIterator<Item = (RoleId, Option<u64>)>,
     ) -> Result<Vec<Role>> {
-        self.id.edit_roles_positions(http, roles).await }
+        self.id.edit_roles_positions(http, roles).await
+    }
 
     /// Edits a sticker.
     ///
