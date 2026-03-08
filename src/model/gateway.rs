@@ -258,9 +258,9 @@ pub struct PresenceUser {
     pub banner: Option<ImageHash>,
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<Colour>,
-    pub locale: Option<FixedString>,
+    pub locale: Option<FixedString<u8>>,
     pub verified: Option<bool>,
-    pub email: Option<FixedString>,
+    pub email: Option<FixedString<u8>>,
     #[serde(default)]
     pub flags: Option<UserPublicFlags>,
     #[serde(default)]
@@ -269,7 +269,7 @@ pub struct PresenceUser {
     pub member: Option<Box<PartialMember>>,
     pub primary_guild: Option<PrimaryGuild>,
     pub avatar_decoration_data: Option<AvatarDecorationData>,
-    pub collectibles: Option<Collectibles>,
+    pub collectibles: Collectibles,
     // TODO: should really go over these fields at some point and check them.
 }
 

@@ -261,7 +261,7 @@ pub struct User {
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<Colour>,
     /// The user's chosen language option
-    pub locale: Option<FixedString>,
+    pub locale: Option<FixedString<u8>>,
     /// Whether the email on this account has been verified
     ///
     /// Requires [`Scope::Email`]
@@ -269,7 +269,7 @@ pub struct User {
     /// The user's email
     ///
     /// Requires [`Scope::Email`]
-    pub email: Option<FixedString>,
+    pub email: Option<FixedString<u8>>,
     /// The flags on a user's account
     #[serde(default)]
     pub flags: UserPublicFlags,
@@ -291,7 +291,8 @@ pub struct User {
     pub avatar_decoration_data: Option<AvatarDecorationData>,
     /// The collectibles the user currently has active, excluding avatar decorations and profile
     /// effects.
-    pub collectibles: Option<Collectibles>,
+    #[serde(default)]
+    pub collectibles: Collectibles,
 }
 
 impl ExtractKey<UserId> for User {
@@ -375,7 +376,7 @@ pub struct PrimaryGuild {
     /// system clears the identity, e.g. because the server no longer supports tags.
     pub identity_enabled: Option<bool>,
     /// The text of the [`User`]'s server tag.
-    pub tag: Option<FixedString>,
+    pub tag: Option<FixedString<u8>>,
     /// The hash of the server badge.
     pub badge: Option<ImageHash>,
 }
@@ -415,11 +416,11 @@ impl AvatarDecorationData {
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/user#collectibles).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Collectibles {
     /// The [`User`]'s nameplate, if they have one.
-    pub nameplate: Option<Nameplate>,
+    pub nameplate: Option<Box<Nameplate>>,
 }
 
 /// A nameplate, shown on the member list on official clients.

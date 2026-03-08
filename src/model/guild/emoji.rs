@@ -23,7 +23,7 @@ pub struct Emoji {
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can only contain
     /// alphanumeric characters and underscores.
-    pub name: FixedString,
+    pub name: FixedString<u8>,
     /// Whether the emoji is managed via an [`Integration`] service.
     ///
     /// [`Integration`]: super::Integration
@@ -37,7 +37,7 @@ pub struct Emoji {
     ///
     /// [`Role`]: super::Role
     #[serde(default)]
-    pub roles: FixedArray<RoleId>,
+    pub roles: FixedArray<RoleId, u8>,
     /// The user who created the emoji.
     pub user: Option<User>,
 }

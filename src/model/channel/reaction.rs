@@ -239,10 +239,10 @@ pub enum ReactionType {
         id: EmojiId,
         /// The name of the custom emoji. This is primarily used for decoration and distinguishing
         /// the emoji client-side.
-        name: Option<FixedString>,
+        name: Option<FixedString<u8>>,
     },
     /// A reaction with a twemoji.
-    Unicode(FixedString),
+    Unicode(FixedString<u8>),
 }
 
 // Manual impl needed to decide enum variant by presence of `id`
@@ -253,7 +253,7 @@ impl<'de> Deserialize<'de> for ReactionType {
             #[serde(default)]
             animated: bool,
             id: Option<EmojiId>,
-            name: Option<FixedString>,
+            name: Option<FixedString<u8>>,
         }
         let emoji = PartialEmoji::deserialize(deserializer)?;
         Ok(match (emoji.id, emoji.name) {

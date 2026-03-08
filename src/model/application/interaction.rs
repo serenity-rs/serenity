@@ -475,7 +475,6 @@ pub struct MessageModalSubmitInteractionMetadata {
 
 /// Metadata about the interaction, including the source of the interaction relevant server and
 /// user IDs.
-#[expect(clippy::large_enum_variant)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]

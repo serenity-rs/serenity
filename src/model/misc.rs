@@ -169,7 +169,7 @@ pub struct EmojiIdentifier {
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can only contain
     /// alphanumeric characters and underscores.
-    pub name: FixedString,
+    pub name: FixedString<u8>,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
