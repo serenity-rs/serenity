@@ -239,10 +239,10 @@
 <a href=#239 id=239 data-nosnippet>239</a>        </span>id: EmojiId,
 <a href=#240 id=240 data-nosnippet>240</a>        <span class="doccomment">/// The name of the custom emoji. This is primarily used for decoration and distinguishing
 <a href=#241 id=241 data-nosnippet>241</a>        /// the emoji client-side.
-<a href=#242 id=242 data-nosnippet>242</a>        </span>name: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+<a href=#242 id=242 data-nosnippet>242</a>        </span>name: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
 <a href=#243 id=243 data-nosnippet>243</a>    },
 <a href=#244 id=244 data-nosnippet>244</a>    <span class="doccomment">/// A reaction with a twemoji.
-<a href=#245 id=245 data-nosnippet>245</a>    </span>Unicode(FixedString),
+<a href=#245 id=245 data-nosnippet>245</a>    </span>Unicode(FixedString&lt;u8&gt;),
 <a href=#246 id=246 data-nosnippet>246</a>}
 <a href=#247 id=247 data-nosnippet>247</a>
 <a href=#248 id=248 data-nosnippet>248</a><span class="comment">// Manual impl needed to decide enum variant by presence of `id`
@@ -253,7 +253,7 @@
 <a href=#253 id=253 data-nosnippet>253</a>            <span class="attr">#[serde(default)]
 <a href=#254 id=254 data-nosnippet>254</a>            </span>animated: bool,
 <a href=#255 id=255 data-nosnippet>255</a>            id: <span class="prelude-ty">Option</span>&lt;EmojiId&gt;,
-<a href=#256 id=256 data-nosnippet>256</a>            name: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+<a href=#256 id=256 data-nosnippet>256</a>            name: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
 <a href=#257 id=257 data-nosnippet>257</a>        }
 <a href=#258 id=258 data-nosnippet>258</a>        <span class="kw">let </span>emoji = PartialEmoji::deserialize(deserializer)<span class="question-mark">?</span>;
 <a href=#259 id=259 data-nosnippet>259</a>        <span class="prelude-val">Ok</span>(<span class="kw">match </span>(emoji.id, emoji.name) {

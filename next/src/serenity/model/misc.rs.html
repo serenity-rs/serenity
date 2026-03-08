@@ -169,7 +169,7 @@
 <a href=#169 id=169 data-nosnippet>169</a>    </span><span class="kw">pub </span>id: EmojiId,
 <a href=#170 id=170 data-nosnippet>170</a>    <span class="doccomment">/// The name of the emoji. It must be at least 2 characters long and can only contain
 <a href=#171 id=171 data-nosnippet>171</a>    /// alphanumeric characters and underscores.
-<a href=#172 id=172 data-nosnippet>172</a>    </span><span class="kw">pub </span>name: FixedString,
+<a href=#172 id=172 data-nosnippet>172</a>    </span><span class="kw">pub </span>name: FixedString&lt;u8&gt;,
 <a href=#173 id=173 data-nosnippet>173</a>}
 <a href=#174 id=174 data-nosnippet>174</a>
 <a href=#175 id=175 data-nosnippet>175</a><span class="attr">#[cfg(all(feature = <span class="string">"model"</span>, feature = <span class="string">"utils"</span>))]

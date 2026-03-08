@@ -23,7 +23,7 @@
 <a href=#23 id=23 data-nosnippet>23</a>    </span><span class="kw">pub </span>id: EmojiId,
 <a href=#24 id=24 data-nosnippet>24</a>    <span class="doccomment">/// The name of the emoji. It must be at least 2 characters long and can only contain
 <a href=#25 id=25 data-nosnippet>25</a>    /// alphanumeric characters and underscores.
-<a href=#26 id=26 data-nosnippet>26</a>    </span><span class="kw">pub </span>name: FixedString,
+<a href=#26 id=26 data-nosnippet>26</a>    </span><span class="kw">pub </span>name: FixedString&lt;u8&gt;,
 <a href=#27 id=27 data-nosnippet>27</a>    <span class="doccomment">/// Whether the emoji is managed via an [`Integration`] service.
 <a href=#28 id=28 data-nosnippet>28</a>    ///
 <a href=#29 id=29 data-nosnippet>29</a>    /// [`Integration`]: super::Integration
@@ -37,7 +37,7 @@
 <a href=#37 id=37 data-nosnippet>37</a>    ///
 <a href=#38 id=38 data-nosnippet>38</a>    /// [`Role`]: super::Role
 <a href=#39 id=39 data-nosnippet>39</a>    </span><span class="attr">#[serde(default)]
-<a href=#40 id=40 data-nosnippet>40</a>    </span><span class="kw">pub </span>roles: FixedArray&lt;RoleId&gt;,
+<a href=#40 id=40 data-nosnippet>40</a>    </span><span class="kw">pub </span>roles: FixedArray&lt;RoleId, u8&gt;,
 <a href=#41 id=41 data-nosnippet>41</a>    <span class="doccomment">/// The user who created the emoji.
 <a href=#42 id=42 data-nosnippet>42</a>    </span><span class="kw">pub </span>user: <span class="prelude-ty">Option</span>&lt;User&gt;,
 <a href=#43 id=43 data-nosnippet>43</a>}

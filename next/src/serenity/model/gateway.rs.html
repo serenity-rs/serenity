@@ -258,9 +258,9 @@
 <a href=#258 id=258 data-nosnippet>258</a>    <span class="kw">pub </span>banner: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
 <a href=#259 id=259 data-nosnippet>259</a>    <span class="attr">#[serde(rename = <span class="string">"accent_color"</span>)]
 <a href=#260 id=260 data-nosnippet>260</a>    </span><span class="kw">pub </span>accent_colour: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
-<a href=#261 id=261 data-nosnippet>261</a>    <span class="kw">pub </span>locale: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+<a href=#261 id=261 data-nosnippet>261</a>    <span class="kw">pub </span>locale: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
 <a href=#262 id=262 data-nosnippet>262</a>    <span class="kw">pub </span>verified: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-<a href=#263 id=263 data-nosnippet>263</a>    <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+<a href=#263 id=263 data-nosnippet>263</a>    <span class="kw">pub </span>email: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
 <a href=#264 id=264 data-nosnippet>264</a>    <span class="attr">#[serde(default)]
 <a href=#265 id=265 data-nosnippet>265</a>    </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;UserPublicFlags&gt;,
 <a href=#266 id=266 data-nosnippet>266</a>    <span class="attr">#[serde(default)]
@@ -269,7 +269,7 @@
 <a href=#269 id=269 data-nosnippet>269</a>    <span class="kw">pub </span>member: <span class="prelude-ty">Option</span>&lt;Box&lt;PartialMember&gt;&gt;,
 <a href=#270 id=270 data-nosnippet>270</a>    <span class="kw">pub </span>primary_guild: <span class="prelude-ty">Option</span>&lt;PrimaryGuild&gt;,
 <a href=#271 id=271 data-nosnippet>271</a>    <span class="kw">pub </span>avatar_decoration_data: <span class="prelude-ty">Option</span>&lt;AvatarDecorationData&gt;,
-<a href=#272 id=272 data-nosnippet>272</a>    <span class="kw">pub </span>collectibles: <span class="prelude-ty">Option</span>&lt;Collectibles&gt;,
+<a href=#272 id=272 data-nosnippet>272</a>    <span class="kw">pub </span>collectibles: Collectibles,
 <a href=#273 id=273 data-nosnippet>273</a>    <span class="comment">// TODO: should really go over these fields at some point and check them.
 <a href=#274 id=274 data-nosnippet>274</a></span>}
 <a href=#275 id=275 data-nosnippet>275</a>
