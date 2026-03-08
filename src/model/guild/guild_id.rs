@@ -828,7 +828,7 @@ impl GuildId {
         http.as_ref().edit_sticker(self.0, sticker_id.into().0, &map, None).await
     }
 
-    /// Edits the order of [`Role`]s
+    /// Edits the order of a single [`Role`]
     /// Requires the [Manage Roles] permission.
     ///
     /// # Examples
@@ -855,7 +855,24 @@ impl GuildId {
         http.as_ref().edit_role_position(self.0, role_id.into().0, position, None).await
     }
 
-    pub async fn reorder_roles<It>(self, http: impl AsRef<Http>, roles: It) -> Result<()>
+    /// Edits the order of given [`Role`]s
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change the order of a role:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{GuildId, RoleId};
+    /// GuildId(7).edit_role_positions(&context, Vec::new((RoleId(8), 2));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    pub async fn edit_role_positions<It>(self, http: impl AsRef<Http>, roles: It) -> Result<()>
         where
             It: IntoIterator<Item = (RoleId, u64)>,
     {

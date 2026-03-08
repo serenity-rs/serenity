@@ -1758,6 +1758,25 @@ impl Http {
         .await
     }
 
+    /// Reorder roles for the provided [`Guild`] via its Id.
+    pub async fn edit_guild_role_positions(
+        &self,
+        guild_id: u64,
+        value: &Value,
+    ) -> Result<Vec<Role>> {
+        let body = to_vec(value)?;
+
+        self.fire(Request{
+            body: Some(&body),
+            multipart: None,
+            headers: None,
+            route: RouteInfo::EditGuildRolePositions {
+                guild_id
+            }
+        })
+            .await
+    }
+
     /// Follow a News Channel to send messages to a target channel.
     pub async fn follow_news_channel(
         &self,
@@ -1863,7 +1882,7 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
-    /// Changes the position of a role in a guild.
+    /// Changes the position of a single role in a guild.
     pub async fn edit_role_position(
         &self,
         guild_id: u64,
@@ -1900,19 +1919,13 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
-    /// Edits the positions of a guild's channels.
+    /// Changes multiple roles positions in a guild.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn edit_roles_positions(&self, guild_id: u64, value: &Value, audit_log_reason: Option<&str>) -> Result<()> {
         let body = to_vec(value)?;
-
-        // self.wind(204, Request {
-        //     body: Some(&body),
-        //     multipart: None,
-        //     headers: None,
-        //     route: RouteInfo::EditGuildChannels {
-        //         guild_id,
-        //     },
-        // })
-        //     .await
 
         let mut value = self
             .request(Request {
@@ -1936,7 +1949,6 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
-
     }
 
     /// Modifies a scheduled event.
