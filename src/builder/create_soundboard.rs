@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
@@ -11,13 +13,13 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSoundboard<'a> {
-    name: String,
+    name: Cow<'a, str>,
     sound: DataUri<'a>,
     volume: f64,
     #[serde(skip_serializing_if = "Option::is_none")]
     emoji_id: Option<EmojiId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    emoji_name: Option<String>,
+    emoji_name: Option<Cow<'a, str>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -25,7 +27,7 @@ pub struct CreateSoundboard<'a> {
 
 impl<'a> CreateSoundboard<'a> {
     /// Creates a new builder with the given data.
-    pub fn new(name: impl Into<String>, sound: DataUri<'a>) -> Self {
+    pub fn new(name: impl Into<Cow<'a, str>>, sound: DataUri<'a>) -> Self {
         Self {
             name: name.into(),
             sound,
@@ -39,7 +41,7 @@ impl<'a> CreateSoundboard<'a> {
     /// Set the name of the soundboard sound, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 32 characters long.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
+    pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = name.into();
         self
     }
@@ -68,8 +70,8 @@ impl<'a> CreateSoundboard<'a> {
     }
 
     /// Set the Unicode character of the custom emoji.
-    pub fn emoji_name(mut self, name: String) -> Self {
-        self.emoji_name = Some(name);
+    pub fn emoji_name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
+        self.emoji_name = Some(name.into());
         self
     }
 
