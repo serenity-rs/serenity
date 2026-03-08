@@ -854,7 +854,7 @@ impl GuildId {
     ) -> Result<Vec<Role>> {
         http.as_ref().edit_role_position(self.0, role_id.into().0, position, None).await
     }
-
+  
     /// Edits the order of given [`Role`]s
     /// Requires the [Manage Roles] permission.
     ///
@@ -872,7 +872,7 @@ impl GuildId {
     /// Returns an [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit_role_positions<It>(self, http: impl AsRef<Http>, roles: It) -> Result<()>
+    pub async fn reorder_roles<It>(self, http: impl AsRef<Http>, roles: It) -> Result<Vec<Role>>
         where
             It: IntoIterator<Item = (RoleId, u64)>,
     {

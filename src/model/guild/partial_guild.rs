@@ -947,7 +947,7 @@ impl PartialGuild {
     ///
     /// [Manage Channels]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit_roles_positions<It>(&self, http: impl AsRef<Http>, roles: It) -> Result<()>
+    pub async fn edit_roles_positions<It>(&self, http: impl AsRef<Http>, roles: It) -> Result<Vec<Role>>
         where
             It: IntoIterator<Item = (RoleId, u64)>,
     {

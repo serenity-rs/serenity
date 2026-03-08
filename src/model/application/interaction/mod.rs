@@ -3,6 +3,7 @@ pub mod autocomplete;
 pub mod message_component;
 pub mod modal;
 pub mod ping;
+pub mod interaction_trait;
 
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};

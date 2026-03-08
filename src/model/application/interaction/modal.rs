@@ -24,6 +24,8 @@ use crate::model::id::MessageId;
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
 use crate::model::Permissions;
+use crate::model::prelude::interaction::interaction_trait::InteractionResponse;
+use async_trait::async_trait;
 
 /// An interaction triggered by a modal submit.
 ///
@@ -72,104 +74,6 @@ pub struct ModalSubmitInteraction {
 
 #[cfg(feature = "model")]
 impl ModalSubmitInteraction {
-    /// Gets the interaction response.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if there is no interaction response.
-    pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
-        http.as_ref().get_original_interaction_response(&self.token).await
-    }
-
-    /// Creates a response to the interaction received.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the message content is too long.
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    pub async fn create_interaction_response<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
-    where
-        for<'b> F:
-            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponse::default();
-        f(&mut interaction_response);
-
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        if interaction_response.1.is_empty() {
-            http.as_ref()
-                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
-                .await
-        } else {
-            http.as_ref()
-                .create_interaction_response_with_files(
-                    self.id.0,
-                    &self.token,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
-                .await
-        }
-    }
-
-    /// Edits the initial interaction response.
-    ///
-    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
-    ///
-    /// Refer to Discord's docs for Edit Webhook Message for field information.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// [`UserId`]: crate::model::id::UserId
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Model`] if the edited content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error deserializing the response.
-    pub async fn edit_original_interaction_response<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
-    {
-        let mut interaction_response = EditInteractionResponse::default();
-        f(&mut interaction_response);
-
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
-    }
-
-    /// Deletes the initial interaction response.
-    ///
-    /// Does not work on ephemeral messages.
-    ///
-    /// # Errors
-    ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
-    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_original_interaction_response(&self.token).await
-    }
-
     /// Creates a followup response to the response sent.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
@@ -246,6 +150,106 @@ impl ModalSubmitInteraction {
     ) -> Result<()> {
         http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
     }
+}
+
+#[async_trait]
+#[cfg(feature = "http")]
+impl<'m> InteractionResponse for &'m ModalSubmitInteraction {
+    /// Gets the interaction response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if there is no interaction response.
+    async fn get_interaction_response(&self, http: impl AsRef<Http> + std::marker::Send + std::marker::Sync) -> Result<Message> {
+        http.as_ref().get_original_interaction_response(&self.token).await
+    }
+
+    /// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    async fn create_interaction_response<'a, F>(
+        &'a self,
+        http: impl AsRef<Http> + std::marker::Send + std::marker::Sync,
+        f: F,
+    ) -> Result<()>
+        where
+                for<'b> F:
+        FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a> + std::marker::Send,
+    {
+        let mut interaction_response = CreateInteractionResponse::default();
+        f(&mut interaction_response);
+
+        let map = json::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        if interaction_response.1.is_empty() {
+            http.as_ref()
+                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
+                .await
+        } else {
+            http.as_ref()
+                .create_interaction_response_with_files(
+                    self.id.0,
+                    &self.token,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
+    }
+
+    /// Edits the initial interaction response.
+    ///
+    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
+    ///
+    /// Refer to Discord's docs for Edit Webhook Message for field information.
+    ///
+    /// **Note**:   Message contents must be under 2000 unicode code points.
+    ///
+    /// [`UserId`]: crate::model::id::UserId
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the edited content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error deserializing the response.
+    async fn edit_original_interaction_response<F>(
+        &self,
+        http: impl AsRef<Http> + std::marker::Send + std::marker::Sync,
+        f: F,
+    ) -> Result<Message>
+        where
+            F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse + std::marker::Send,
+    {
+        let mut interaction_response = EditInteractionResponse::default();
+        f(&mut interaction_response);
+
+        let map = json::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
+    }
+
+    /// Deletes the initial interaction response.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    async fn delete_original_interaction_response(&self, http: impl AsRef<Http> + std::marker::Send + std::marker::Sync) -> Result<()> {
+        http.as_ref().delete_original_interaction_response(&self.token).await
+    }
     /// Helper function to defer an interaction
     ///
     /// # Errors
@@ -253,26 +257,15 @@ impl ModalSubmitInteraction {
     /// May also return an [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
-    pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
+    async fn defer(&self, http: impl AsRef<Http> + std::marker::Send + std::marker::Sync) -> Result<()> {
         self.create_interaction_response(http, |f| {
             f.kind(InteractionResponseType::DeferredUpdateMessage)
         })
-        .await
+            .await
     }
 
-    /// Helper function to defer an interaction ephemerally
-    ///
-    /// # Errors
-    ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredChannelMessageWithSource)
-                .interaction_response_data(|f| f.ephemeral(true))
-        })
-        .await
+    fn get_locale<'a>(&'a self) -> &str{
+        self.locale.as_str()
     }
 }
 
