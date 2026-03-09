@@ -233,6 +233,7 @@ pub struct TextDisplay {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The text content of this component.
+    #[serde(default)]
     pub content: FixedString<u16>,
 }
 
