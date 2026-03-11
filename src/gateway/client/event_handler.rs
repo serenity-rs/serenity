@@ -13,17 +13,20 @@ use crate::model::prelude::*;
 
 #[async_trait]
 pub trait EventHandler: Send + Sync {
-    /// Checks if the `event` should be dispatched or ignored. Returns `true` by default.
+    /// Checks if the `event` should be dispatched or ignored. Returns Some(event) by default
     ///
-    /// Returning `false` will drop an event and prevent it being dispatched by any
-    /// frameworks and will exclude it from any collectors.
+    /// Returning `None` will drop the event and never process it.
+    ///
+    /// Returning a mutated `Some` is a supported use case, but may cause contradictions to
+    /// documented behaviour or otherwise case unexpected errors within serenity/library
+    /// consumers. Mutate at extreme caution.
     ///
     /// ## Warning
     ///
     /// Similar to [`RawEventHandler`], this method runs synchronously to the [`ShardRunner`], keep
     /// runtime complexity low.
-    fn filter_event(&self, _context: &Context, _event: &Event) -> bool {
-        true
+    fn filter_event(&self, _context: &Context, event: Box<Event>) -> Option<Box<Event>> {
+        Some(event)
     }
 
     /// Dispatches an event through this handler, allowing for event matching and handling
@@ -445,12 +448,14 @@ pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
     async fn raw_event(&self, _ctx: Context, _ev: &Event) {}
 
-    /// Checks if the `event` should be dispatched or ignored. Returns `true` by default.
+    /// Checks if the `event` should be dispatched or ignored. Returns Some(event) by default.
     ///
-    /// Returning `false` will drop an event and prevent it being dispatched by any frameworks and
-    /// will exclude it from any collectors.
-    fn filter_event(&self, _context: &Context, _event: &Event) -> bool {
-        // Suppress unused argument warnings
-        true
+    /// Returning `None` will drop the event and never process it.
+    ///
+    /// Returning a mutated `Some` is a supported use case, but may cause contradictions to
+    /// documented behaviour or otherwise case unexpected errors within serenity/library
+    /// consumers. Mutate at extreme caution.
+    fn filter_event(&self, _context: &Context, event: Box<Event>) -> Option<Box<Event>> {
+        Some(event)
     }
 }

@@ -92,11 +92,11 @@ impl ShardRunner {
             if post != pre {
                 self.update_runner_info();
                 self.dispatcher
-                    .dispatch(Event::ShardStageUpdate(ShardStageUpdateEvent {
+                    .dispatch(Box::new(Event::ShardStageUpdate(ShardStageUpdateEvent {
                         new: post,
                         old: pre,
                         shard_id: self.shard.shard_info().id,
-                    }))
+                    })))
                     .await;
             }
 
@@ -131,7 +131,7 @@ impl ShardRunner {
                             }
                         }
                     },
-                    ShardAction::Dispatch(event) => self.dispatcher.dispatch(*event).await,
+                    ShardAction::Dispatch(event) => self.dispatcher.dispatch(event).await,
                 }
             }
 
