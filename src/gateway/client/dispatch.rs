@@ -110,43 +110,36 @@ impl EventDispatcher {
             }
         }
 
-        {
-            #[cfg(feature = "collector")]
-            self.context.collectors.write().retain(|callback| (callback.0)(&event));
+        #[cfg(feature = "collector")]
+        self.context.collectors.write().retain(|callback| (callback.0)(&event));
 
-            if let Some(raw_handler) = &self.raw_event_handler {
-                raw_handler.raw_event(self.context.clone(), &event).await;
-            }
+        if let Some(raw_handler) = &self.raw_event_handler {
+            raw_handler.raw_event(self.context.clone(), &event).await;
+        }
 
-            let mut extra_event = None;
-            let full_event = update_cache_with_event(
-                maybe_cache_from_context(&self.context),
-                event,
-                &mut extra_event,
+        let mut extra_event = None;
+        let full_event = update_cache_with_event(
+            maybe_cache_from_context(&self.context),
+            event,
+            &mut extra_event,
+        );
+
+        #[cfg(feature = "framework")]
+        let framework = self.framework.clone();
+        let event_handler = self.event_handler.clone();
+        let context = self.context.clone();
+
+        spawn_named("dispatch::user", async move {
+            #[cfg(feature = "framework")]
+            tokio::join!(
+                dispatch_framework(&context, framework, &full_event, extra_event.as_ref()),
+                dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref())
             );
 
-            #[cfg(feature = "framework")]
-            let framework = self.framework.clone();
-            let event_handler = self.event_handler.clone();
-            let context = self.context.clone();
-
-            spawn_named("dispatch::user", async move {
-                #[cfg(feature = "framework")]
-                tokio::join!(
-                    dispatch_framework(&context, framework, &full_event, extra_event.as_ref()),
-                    dispatch_event_handler(
-                        &context,
-                        event_handler,
-                        &full_event,
-                        extra_event.as_ref()
-                    )
-                );
-
-                #[cfg(not(feature = "framework"))]
-                dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref())
-                    .await;
-            });
-        }
+            #[cfg(not(feature = "framework"))]
+            dispatch_event_handler(&context, event_handler, &full_event, extra_event.as_ref())
+                .await;
+        });
     }
 }
 
