@@ -119,6 +119,20 @@ impl<'a> CreateAllowedMentions<'a> {
         self
     }
 
+    /// Adds a *specific* user that will be allowed to be mentionable.
+    pub fn push_user(mut self, user: UserId) -> Self {
+        self.users.to_mut().push(user);
+
+        self
+    }
+
+    /// Extends the *specific* users that will be allowed mentionable.
+    pub fn extend_users(mut self, iter: impl IntoIterator<Item = UserId>) -> Self {
+        self.users.to_mut().extend(iter);
+
+        self
+    }
+
     /// Clear the list of mentionable users.
     pub fn empty_users(mut self) -> Self {
         self.users = Cow::default();
@@ -128,6 +142,20 @@ impl<'a> CreateAllowedMentions<'a> {
     /// Sets the *specific* roles that will be allowed mentionable.
     pub fn roles(mut self, roles: impl Into<Cow<'a, [RoleId]>>) -> Self {
         self.roles = roles.into();
+        self
+    }
+
+    /// Adds a *specific* role that will be allowed to be mentionable.
+    pub fn push_role(mut self, role: RoleId) -> Self {
+        self.roles.to_mut().push(role);
+
+        self
+    }
+
+    /// Extends the *specific* roles that will be allowed mentionable.
+    pub fn extend_roles(mut self, iter: impl IntoIterator<Item = RoleId>) -> Self {
+        self.roles.to_mut().extend(iter);
+
         self
     }
 
