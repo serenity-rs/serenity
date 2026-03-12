@@ -73,7 +73,7 @@ impl EventDispatcher {
         #[cfg(feature = "voice")]
         {
             if let Some(voice_manager) = &self.voice_manager {
-                match &event {
+                match &*event {
                     Event::Ready(_) => {
                         voice_manager
                             .register_shard(self.context.shard_id.0, self.context.shard.clone())
