@@ -13,13 +13,13 @@ use crate::model::prelude::*;
 
 #[async_trait]
 pub trait EventHandler: Send + Sync {
-    /// Checks if the `event` should be dispatched or ignored. Returns Some(event) by default
+    /// Checks if the `event` should be dispatched or ignored. Returns Some(event) by default.
     ///
     /// Returning `None` will drop the event and never process it.
     ///
     /// Returning a mutated `Some` is a supported use case, but may cause contradictions to
-    /// documented behaviour or otherwise case unexpected errors within serenity/library
-    /// consumers. Mutate at extreme caution.
+    /// documented behaviour or otherwise cause unexpected errors within serenity/library
+    /// consumers. Mutate with extreme caution.
     ///
     /// ## Warning
     ///
@@ -453,8 +453,8 @@ pub trait RawEventHandler: Send + Sync {
     /// Returning `None` will drop the event and never process it.
     ///
     /// Returning a mutated `Some` is a supported use case, but may cause contradictions to
-    /// documented behaviour or otherwise case unexpected errors within serenity/library
-    /// consumers. Mutate at extreme caution.
+    /// documented behaviour or otherwise cause unexpected errors within serenity/library
+    /// consumers. Mutate with extreme caution.
     fn filter_event(&self, _context: &Context, event: Box<Event>) -> Option<Box<Event>> {
         Some(event)
     }
