@@ -110,7 +110,6 @@ enum Compression {
 }
 
 impl Compression {
-    #[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
     const DECOMPRESSED_CAPACITY: usize = 174_504;
 
     fn inflate(&mut self, slice: &[u8]) -> Result<Option<&[u8]>> {
