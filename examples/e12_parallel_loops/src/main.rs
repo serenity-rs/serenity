@@ -77,6 +77,9 @@ impl EventHandler for Handler {
 }
 
 async fn log_system_load(ctx: &Context) {
+    // Register the crypto provider used for TLS by this application.
+    _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     let cpu_load = sys_info::loadavg().unwrap();
     let mem_use = sys_info::mem_info().unwrap();
 

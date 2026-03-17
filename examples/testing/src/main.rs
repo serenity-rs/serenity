@@ -418,6 +418,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+    // Register the crypto provider used for TLS by this application.
+    _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     if let Some(arg) = std::env::args().nth(1) {
         if arg == "--print-sizes" {
             model_type_sizes::print_ranking();

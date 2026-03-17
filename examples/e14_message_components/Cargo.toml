@@ -5,6 +5,7 @@ authors = ["my name <my@email.address>"]
 edition.workspace = true
 
 [dependencies]
+rustls = "0.23"
 serenity = { path = "../../", default-features = false, features = ["gateway", "model", "collector", "rustls_backend"] }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 dotenv = { version = "0.15.0" }

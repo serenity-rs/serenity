@@ -71,6 +71,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+    // Register the crypto provider used for TLS by this application.
+    _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 

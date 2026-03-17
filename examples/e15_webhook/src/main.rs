@@ -4,6 +4,9 @@ use serenity::model::webhook::Webhook;
 
 #[tokio::main]
 async fn main() {
+    // Register the crypto provider used for TLS by this application.
+    _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     // You don't need a token when you are only dealing with webhooks.
     let http = Http::without_token();
     let webhook = Webhook::from_url(&http, "https://discord.com/api/webhooks/133742013374206969/hello-there-oPNtRN5UY5DVmBe7m1N0HE-replace-me-Dw9LRkgq3zI7LoW3Rb-k-q")

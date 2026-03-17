@@ -161,6 +161,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+    // Register the crypto provider used for TLS by this application.
+    _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     dotenv().ok();
     // Configure the client with your Discord bot token in the environment.
     let token =

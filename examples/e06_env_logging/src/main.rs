@@ -35,6 +35,9 @@ impl EventHandler for Handler {
 #[tokio::main]
 #[instrument]
 async fn main() {
+    // Register the crypto provider used for TLS by this application.
+    _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     // Call tracing_subscriber's initialize function, which configures `tracing` via environment
     // variables.
     //

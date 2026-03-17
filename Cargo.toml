@@ -138,7 +138,7 @@ tracing_instrument = ["tracing/attributes"]
 # Backends to pick from:
 # - Rustls Backends
 rustls_backend = [
-    "reqwest/rustls",
+    "reqwest/rustls-no-provider",
     "tokio-tungstenite/rustls-tls-webpki-roots",
 ]
 

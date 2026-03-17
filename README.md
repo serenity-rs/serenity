@@ -71,6 +71,9 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+    // Register the crypto provider used for TLS by this application.
+    _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
+
     // Login with a bot token from the environment
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
@@ -103,9 +106,21 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
+rustls = "0.23"
 serenity = "0.12"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 ```
+
+You must additionally register a crypto provider before initializing serenity,
+f.e. by adding this to the top of your app's `main` function:
+
+```rust
+rustls::crypto::aws_lc_rs::default_provider().install_default();
+```
+
+Alternatively, you may use the `native_tls_backend` feature (see the Features
+section), in which case you don't need the `rustls` dependency and don't have
+to register a crypto provider.
 
 ## MSRV Policy
 
