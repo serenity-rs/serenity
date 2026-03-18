@@ -269,6 +269,8 @@ pub struct PresenceUser {
     pub member: Option<Box<PartialMember>>,
     pub primary_guild: Option<PrimaryGuild>,
     pub avatar_decoration_data: Option<AvatarDecorationData>,
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_null_as_default")]
     pub collectibles: Collectibles,
     // TODO: should really go over these fields at some point and check them.
 }

@@ -10,7 +10,7 @@ use crate::cache::Cache;
 use crate::http::Http;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
-use crate::model::utils::{avatar_url, user_banner_url};
+use crate::model::utils::{avatar_url, deserialize_null_as_default, user_banner_url};
 
 /// Information about a member of a guild.
 ///
@@ -67,6 +67,11 @@ pub struct Member {
     pub unusual_dm_activity_until: Option<Timestamp>,
     /// Information about this member's guild specific avatar decoration.
     pub avatar_decoration_data: Option<AvatarDecorationData>,
+    /// The collectibles the member currently has active, excluding avatar decorations and profile
+    /// effects.
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_null_as_default")]
+    pub collectibles: Collectibles,
 }
 
 bitflags! {
@@ -502,6 +507,11 @@ pub struct PartialMember {
     pub banner: Option<ImageHash>,
     /// Information about this member's avatar decoration.
     pub avatar_decoration_data: Option<AvatarDecorationData>,
+    /// The collectibles the member currently has active, excluding avatar decorations and profile
+    /// effects.
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_null_as_default")]
+    pub collectibles: Collectibles,
 }
 
 impl From<PartialMember> for Member {
@@ -522,6 +532,7 @@ impl From<PartialMember> for Member {
             guild_id: partial.guild_id.unwrap_or_default(),
             unusual_dm_activity_until: partial.unusual_dm_activity_until,
             avatar_decoration_data: partial.avatar_decoration_data,
+            collectibles: partial.collectibles,
         };
 
         member.set_pending(pending);
@@ -547,6 +558,7 @@ impl From<Member> for PartialMember {
             avatar: member.avatar,
             banner: member.banner,
             avatar_decoration_data: member.avatar_decoration_data,
+            collectibles: member.collectibles,
         };
 
         partial.set_deaf(deaf);

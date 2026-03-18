@@ -10,6 +10,7 @@ use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 use crate::constants::Opcode;
 use crate::model::prelude::*;
+use crate::model::utils::deserialize_null_as_default;
 
 /// Requires no gateway intents.
 ///
@@ -257,6 +258,9 @@ pub struct GuildMemberUpdateEvent {
     pub unusual_dm_activity_until: Option<Timestamp>,
     pub flags: Option<GuildMemberFlags>,
     pub avatar_decoration_data: Option<AvatarDecorationData>,
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_null_as_default")]
+    pub collectibles: Collectibles,
 }
 
 /// Requires no gateway intents.

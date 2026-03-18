@@ -56,7 +56,7 @@ use crate::model::guild::{
     ScheduledEvent,
 };
 use crate::model::id::GuildId;
-use crate::model::user::{CurrentUser, OnlineStatus};
+use crate::model::user::{Collectibles, CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 
 impl CacheUpdate for ChannelCreateEvent {
@@ -214,6 +214,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.banner.clone_from(&self.banner);
                 member.communication_disabled_until.clone_from(&self.communication_disabled_until);
                 member.unusual_dm_activity_until.clone_from(&self.unusual_dm_activity_until);
+                member.collectibles.clone_from(&self.collectibles);
                 member.set_pending(self.pending());
                 member.set_deaf(self.deaf());
                 member.set_mute(self.mute());
@@ -239,6 +240,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     flags: self.flags.unwrap_or_default(),
                     unusual_dm_activity_until: self.unusual_dm_activity_until,
                     avatar_decoration_data: self.avatar_decoration_data,
+                    collectibles: self.collectibles.clone(),
                 };
 
                 new_member.set_pending(self.pending());
@@ -470,6 +472,9 @@ impl CacheUpdate for PresenceUpdateEvent {
                     flags: GuildMemberFlags::default(),
                     unusual_dm_activity_until: None,
                     avatar_decoration_data: None,
+                    collectibles: Collectibles {
+                        nameplate: None,
+                    },
                     __generated_flags: MemberGeneratedFlags::empty(),
                 });
             }
