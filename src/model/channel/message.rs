@@ -139,6 +139,10 @@ pub struct Message {
     ///
     /// Only present in [`MessageCreateEvent`].
     pub poll: Option<Box<Poll>>,
+    /// The custom client-side theme attached to a message.
+    ///
+    /// Only present in [`MessageCreateEvent`]
+    pub shared_client_theme: Option<Box<SharedClientTheme>>,
 }
 
 #[cfg(feature = "model")]
@@ -1197,6 +1201,41 @@ pub struct MessagePin {
 pub struct MessagePinsPage {
     pub items: Vec<MessagePin>,
     pub has_more: bool,
+}
+
+enum_number! {
+    /// The mode of the shared client theme.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/message#base-theme-types)
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum BaseTheme {
+        Unset = 0,
+        Dark = 1,
+        Light = 2,
+        Darker = 3,
+        Midnight = 4,
+        _ => Unknown(u8),
+    }
+}
+
+/// A shared client theme that is attached to [`Message`].
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/message#shared-client-theme-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct SharedClientTheme {
+    /// The hexadecimal-encoded colours of the theme.
+    #[serde(rename = "colors", deserialize_with = "discord_colours")]
+    pub colours: FixedArray<Colour>,
+    /// The direction of the theme's colours.
+    pub gradient_angle: u16,
+    /// The intensity of the theme's colours.
+    pub base_mix: u16,
+    /// The mode of the theme.
+    pub base_theme: Option<BaseTheme>,
 }
 
 // all tests here require cache, move if non-cache test is added

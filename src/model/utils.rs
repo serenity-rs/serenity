@@ -243,7 +243,7 @@ where
     vec_str
         .into_iter()
         .map(|s| {
-            let s = s.0.strip_prefix('#').ok_or_else(|| DeError::custom("Invalid colour data"))?;
+            let s = s.0.strip_prefix('#').unwrap_or(s.0.as_ref());
 
             if s.len() != 6 {
                 return Err(DeError::custom("Invalid colour data length"));
