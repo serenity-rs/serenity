@@ -9,8 +9,9 @@ use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::prelude::*;
+use crate::model::utils::deserialize_null_as_default;
 #[cfg(feature = "model")]
-use crate::model::utils::{avatar_url, deserialize_null_as_default, user_banner_url};
+use crate::model::utils::{avatar_url, user_banner_url};
 
 /// Information about a member of a guild.
 ///
