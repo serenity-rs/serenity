@@ -64,6 +64,34 @@ enum CacheRefInner<'a, K, V, T> {
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
+/// A reference to data in the [`Cache`].
+///
+/// This type wraps a reference to cached data and dereferences to `V`. It is deliberately
+/// `!Send` to prevent holding it across `.await` points in most situations, since doing so can
+/// cause deadlocks: the underlying [`DashMap`] shard lock is held for the lifetime of this
+/// reference, so any cache update (e.g. from a gateway event) that needs the same shard will
+/// block indefinitely.
+///
+/// # Deadlock warning
+///
+/// Although `CacheRef` is `!Send`, which makes the compiler reject it across `.await` in
+/// spawned tasks, there are contexts where `!Send` futures are permitted (notably the
+/// `#[tokio::main]` top-level future). In those contexts the compiler will **not** prevent you
+/// from holding a `CacheRef` over an `.await`, but a deadlock can still occur.
+///
+/// As a general rule, never hold a `CacheRef` across an `.await` point. Instead, clone or copy
+/// the data you need and drop the reference before awaiting:
+///
+/// ```rust,no_run
+/// # use serenity::cache::Cache;
+/// # use serenity::model::prelude::*;
+/// # fn example(cache: &Cache, guild_id: GuildId) {
+/// // Good: extract what you need, then drop the reference.
+/// let channel_count = cache.guild(guild_id).map(|g| g.channels.len());
+/// # }
+/// ```
+///
+/// [`DashMap`]: dashmap::DashMap
 pub struct CacheRef<'a, K, V, T = ()> {
     inner: CacheRefInner<'a, K, V, T>,
     phantom: std::marker::PhantomData<*const NotSend>,
