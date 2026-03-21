@@ -68,11 +68,8 @@ enum CacheRefInner<'a, K, V, T> {
 ///
 /// This type wraps a reference to cached data and dereferences to `V`. It is deliberately
 /// `!Send` to prevent holding it across `.await` points in most situations, since doing so can
-/// cause deadlocks: the underlying [`DashMap`] shard lock is held for the lifetime of this
-/// reference, so any cache update (e.g. from a gateway event) that needs the same shard will
-/// block indefinitely.
-///
-/// # Deadlock warning
+/// cause deadlocks: the underlying read lock is held for the lifetime of this reference, so any
+/// cache update (e.g. from a gateway event) that needs the same lock will block indefinitely.
 ///
 /// Although `CacheRef` is `!Send`, which makes the compiler reject it across `.await` in
 /// spawned tasks, there are contexts where `!Send` futures are permitted (notably the
@@ -90,8 +87,6 @@ enum CacheRefInner<'a, K, V, T> {
 /// let channel_count = cache.guild(guild_id).map(|g| g.channels.len());
 /// # }
 /// ```
-///
-/// [`DashMap`]: dashmap::DashMap
 pub struct CacheRef<'a, K, V, T = ()> {
     inner: CacheRefInner<'a, K, V, T>,
     phantom: std::marker::PhantomData<*const NotSend>,
