@@ -66,18 +66,18 @@ enum CacheRefInner<'a, K, V, T> {
 
 /// A reference to data in the [`Cache`].
 ///
-/// This type wraps a reference to cached data and dereferences to `V`. It is deliberately
-/// `!Send` to prevent holding it across `.await` points in most situations, since doing so can
-/// cause deadlocks: the underlying read lock is held for the lifetime of this reference, so any
-/// cache update (e.g. from a gateway event) that needs the same lock will block indefinitely.
+/// This type wraps a reference to cached data and dereferences to `V`. It is deliberately marked
+/// `!Send` to prevent holding it across an `.await` point. Doing so can cause a deadlock: the
+/// underlying read lock is held for the lifetime of the `CacheRef`, so any task that tries taking
+/// the same lock while it is still held (i.e. across an `.await` point) will block indefinitely.
 ///
-/// Although `CacheRef` is `!Send`, which makes the compiler reject it across `.await` in
-/// spawned tasks, there are contexts where `!Send` futures are permitted (notably the
-/// `#[tokio::main]` top-level future). In those contexts the compiler will **not** prevent you
-/// from holding a `CacheRef` over an `.await`, but a deadlock can still occur.
+/// In general, the compiler will reject holding a `CacheRef` across an `.await` point in spawned
+/// tasks because it is `!Send`. Notably, however, the `#[tokio::main]` top-level future permits
+/// `.await`-ing `!Send` futures in its body. In this case the compiler will **not** prevent you
+/// from holding a `CacheRef` over an `.await` point, and a deadlock may still occur.
 ///
-/// As a general rule, never hold a `CacheRef` across an `.await` point. Instead, clone or copy
-/// the data you need and drop the reference before awaiting:
+/// As a rule of thumb, never hold a `CacheRef` across an `.await` point. Instead, clone or copy the
+/// data you need and drop the reference before awaiting:
 ///
 /// ```rust,no_run
 /// # use serenity::cache::Cache;
