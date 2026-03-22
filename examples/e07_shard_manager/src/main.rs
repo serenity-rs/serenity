@@ -23,7 +23,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use serenity::async_trait;
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 use serenity::prelude::*;
 use tokio::time::sleep;
 

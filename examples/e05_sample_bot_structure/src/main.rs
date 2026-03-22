@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseMessage};
-use serenity::gateway::client::FullEvent;
 use serenity::model::application::{Command, Interaction};
+use serenity::model::event::FullEvent;
 use serenity::model::id::GuildId;
 use serenity::prelude::*;
 

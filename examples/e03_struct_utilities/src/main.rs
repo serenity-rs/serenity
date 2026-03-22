@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use serenity::async_trait;
 use serenity::builder::CreateMessage;
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 use serenity::prelude::*;
 
 struct Handler;

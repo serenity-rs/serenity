@@ -299,7 +299,7 @@ impl Cache {
     /// Print all of the Ids of guilds in the Cache:
     ///
     /// ```rust,no_run
-    /// # use serenity::gateway::client::FullEvent;
+    /// # use serenity::model::event::FullEvent;
     /// # use serenity::prelude::*;
     ///
     /// struct Handler;

@@ -6,7 +6,7 @@ use tracing::{debug, error, info, instrument};
 
 struct Handler;
 
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 
 #[async_trait]
 impl EventHandler for Handler {

@@ -189,8 +189,8 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
+    /// # use serenity::model::event::FullEvent;
     /// # use serenity::model::gateway::Ready;
-    /// # use serenity::gateway::client::FullEvent;
     /// # use serenity::gateway::{ChunkGuildFilter, Shard};
     /// # use serenity::all::GuildId;
     ///
@@ -223,8 +223,8 @@ impl Context {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
+    /// # use serenity::model::event::FullEvent;
     /// # use serenity::model::gateway::Ready;
-    /// # use serenity::gateway::client::FullEvent;
     /// # use serenity::gateway::{ChunkGuildFilter, Shard};
     /// # use serenity::all::GuildId;
     ///

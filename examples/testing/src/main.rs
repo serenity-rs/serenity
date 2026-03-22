@@ -378,7 +378,7 @@ async fn command_interaction(
 
 struct Handler;
 
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 
 #[async_trait]
 impl EventHandler for Handler {

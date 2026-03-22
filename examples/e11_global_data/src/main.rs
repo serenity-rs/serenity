@@ -14,7 +14,7 @@ struct UserData {
     message_count: AtomicUsize,
 }
 
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 struct Handler;
 
 #[async_trait]

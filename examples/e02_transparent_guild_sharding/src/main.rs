@@ -2,7 +2,7 @@
 use std::sync::Arc;
 
 use serenity::async_trait;
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 use serenity::prelude::*;
 
 // Serenity implements transparent sharding in a way that you do not need to handle separate

@@ -14,7 +14,7 @@ struct Handler {
     is_loop_running: AtomicBool,
 }
 
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 
 #[async_trait]
 impl EventHandler for Handler {

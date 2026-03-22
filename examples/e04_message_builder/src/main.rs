@@ -2,7 +2,7 @@
 use std::sync::Arc;
 
 use serenity::async_trait;
-use serenity::gateway::client::FullEvent;
+use serenity::model::event::FullEvent;
 use serenity::prelude::*;
 use serenity::utils::MessageBuilder;
 
