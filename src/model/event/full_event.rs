@@ -403,32 +403,6 @@ full_event! {
     MessagePollVoteRemove { event: MessagePollVoteRemoveEvent };
 }
 
-#[cfg(feature = "cache")]
-macro_rules! if_cache {
-    ($e:expr) => {
-        $e
-    };
-}
-
-#[cfg(not(feature = "cache"))]
-macro_rules! if_cache {
-    ($e:expr) => {
-        None
-    };
-}
-
-#[cfg(feature = "cache")]
-macro_rules! update_cache {
-    ($cache:expr, $event:ident) => {
-        $event.update($cache)
-    };
-}
-
-#[cfg(not(feature = "cache"))]
-macro_rules! update_cache {
-    ($cache:expr, $event:ident) => {};
-}
-
 impl FullEvent {
     pub fn from_event(
         event: Box<Event>,
@@ -452,7 +426,8 @@ impl FullEvent {
                 execution: event.execution,
             },
             Event::ChannelCreate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 let channel = event.channel;
                 if channel.base.kind == ChannelType::Category {
@@ -466,7 +441,10 @@ impl FullEvent {
                 }
             },
             Event::ChannelDelete(event) => {
-                let cached_messages = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let cached_messages = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let cached_messages = None;
 
                 let channel = event.channel;
                 if channel.base.kind == ChannelType::Category {
@@ -484,7 +462,10 @@ impl FullEvent {
                 pin: event,
             },
             Event::ChannelUpdate(event) => {
-                let old_channel = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let old_channel = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let old_channel = None;
 
                 Self::ChannelUpdate {
                     old: old_channel,
@@ -504,10 +485,13 @@ impl FullEvent {
                 unbanned_user: event.user,
             },
             Event::GuildCreate(event) => {
-                let is_new = if_cache!(Some(is_guild_new(cache, event.guild.id)));
+                #[cfg(feature = "cache")]
+                let is_new = Some(is_guild_new(cache, event.guild.id));
+                #[cfg(not(feature = "cache"))]
+                let is_new = None;
 
                 #[cfg(feature = "cache")]
-                if let Some(guilds) = update_cache!(cache, event) {
+                if let Some(guilds) = event.update(cache) {
                     *extra_event = Some(Self::CacheReady {
                         guilds,
                     });
@@ -519,7 +503,10 @@ impl FullEvent {
                 }
             },
             Event::GuildDelete(event) => {
-                let full = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let full = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let full = None;
 
                 Self::GuildDelete {
                     incomplete: event.guild,
@@ -527,7 +514,8 @@ impl FullEvent {
                 }
             },
             Event::GuildEmojisUpdate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildEmojisUpdate {
                     guild_id: event.guild_id,
@@ -538,14 +526,18 @@ impl FullEvent {
                 guild_id: event.guild_id,
             },
             Event::GuildMemberAdd(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildMemberAddition {
                     new_member: event.member,
                 }
             },
             Event::GuildMemberRemove(event) => {
-                let member = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let member = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let member = None;
 
                 Self::GuildMemberRemoval {
                     guild_id: event.guild_id,
@@ -554,12 +546,15 @@ impl FullEvent {
                 }
             },
             Event::GuildMemberUpdate(event) => {
-                let before = if_cache!(update_cache!(cache, event));
-                let after = if_cache!(
+                #[cfg(feature = "cache")]
+                let (before, after) = (
+                    event.update(cache),
                     cache
                         .guild(event.guild_id)
-                        .and_then(|g| g.members.get(&event.user.id).cloned())
+                        .and_then(|g| g.members.get(&event.user.id).cloned()),
                 );
+                #[cfg(not(feature = "cache"))]
+                let (before, after) = (None, None);
 
                 Self::GuildMemberUpdate {
                     old_if_available: before,
@@ -568,21 +563,26 @@ impl FullEvent {
                 }
             },
             Event::GuildMembersChunk(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildMembersChunk {
                     chunk: event,
                 }
             },
             Event::GuildRoleCreate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildRoleCreate {
                     new: event.role,
                 }
             },
             Event::GuildRoleDelete(event) => {
-                let role = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let role = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let role = None;
 
                 Self::GuildRoleDelete {
                     guild_id: event.guild_id,
@@ -591,7 +591,10 @@ impl FullEvent {
                 }
             },
             Event::GuildRoleUpdate(event) => {
-                let before = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let before = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let before = None;
 
                 Self::GuildRoleUpdate {
                     old_data_if_available: before,
@@ -599,7 +602,8 @@ impl FullEvent {
                 }
             },
             Event::GuildStickersUpdate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildStickersUpdate {
                     guild_id: event.guild_id,
@@ -607,7 +611,10 @@ impl FullEvent {
                 }
             },
             Event::GuildUpdate(event) => {
-                let before = if_cache!(cache.guild(event.guild.id).map(|g| g.clone()));
+                #[cfg(feature = "cache")]
+                let before = cache.guild(event.guild.id).map(|g| g.clone());
+                #[cfg(not(feature = "cache"))]
+                let before = None;
 
                 Self::GuildUpdate {
                     old_data_if_available: before,
@@ -621,7 +628,8 @@ impl FullEvent {
                 data: event,
             },
             Event::MessageCreate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::Message {
                     new_message: event.message,
@@ -638,7 +646,10 @@ impl FullEvent {
                 guild_id: event.guild_id,
             },
             Event::MessageUpdate(event) => {
-                let before = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let before = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let before = None;
 
                 Self::MessageUpdate {
                     old_if_available: before,
@@ -646,7 +657,10 @@ impl FullEvent {
                 }
             },
             Event::PresenceUpdate(event) => {
-                let old_data = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let old_data = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let old_data = None;
 
                 Self::PresenceUpdate {
                     old_data,
@@ -654,7 +668,10 @@ impl FullEvent {
                 }
             },
             Event::ReactionAdd(event) => {
-                let old_message_if_available = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let old_message_if_available = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let old_message_if_available = None;
 
                 Self::ReactionAdd {
                     add_reaction: event.reaction,
@@ -662,7 +679,10 @@ impl FullEvent {
                 }
             },
             Event::ReactionRemove(event) => {
-                let old_message_if_available = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let old_message_if_available = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let old_message_if_available = None;
 
                 Self::ReactionRemove {
                     removed_reaction: event.reaction,
@@ -670,7 +690,10 @@ impl FullEvent {
                 }
             },
             Event::ReactionRemoveAll(event) => {
-                let old_message_if_available = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let old_message_if_available = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let old_message_if_available = None;
 
                 Self::ReactionRemoveAll {
                     guild_id: event.guild_id,
@@ -680,7 +703,10 @@ impl FullEvent {
                 }
             },
             Event::ReactionRemoveEmoji(event) => {
-                let old_message_if_available = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let old_message_if_available = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let old_message_if_available = None;
 
                 Self::ReactionRemoveEmoji {
                     removed_reactions: event.reaction,
@@ -689,7 +715,7 @@ impl FullEvent {
             },
             Event::Ready(event) => {
                 #[cfg(feature = "cache")]
-                if let Some(total_shards) = update_cache!(cache, event) {
+                if let Some(total_shards) = event.update(cache) {
                     *extra_event = Some(Self::ShardsReady {
                         total_shards,
                     });
@@ -721,7 +747,10 @@ impl FullEvent {
                 event,
             },
             Event::UserUpdate(event) => {
-                let before = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let before = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let before = None;
 
                 Self::UserUpdate {
                     old_data: before,
@@ -732,7 +761,10 @@ impl FullEvent {
                 event,
             },
             Event::VoiceStateUpdate(event) => {
-                let before = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let before = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let before = None;
 
                 Self::VoiceStateUpdate {
                     old: before,
@@ -740,7 +772,10 @@ impl FullEvent {
                 }
             },
             Event::VoiceChannelStatusUpdate(event) => {
-                let old = if_cache!(event.update(cache).map(Into::into));
+                #[cfg(feature = "cache")]
+                let old = event.update(cache).map(Into::into);
+                #[cfg(not(feature = "cache"))]
+                let old = None;
 
                 Self::VoiceChannelStatusUpdate {
                     old,
@@ -778,7 +813,8 @@ impl FullEvent {
                 stage_instance: event.stage_instance,
             },
             Event::ThreadCreate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::ThreadCreate {
                     thread: event.thread,
@@ -786,7 +822,10 @@ impl FullEvent {
                 }
             },
             Event::ThreadUpdate(event) => {
-                let old = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let old = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let old = None;
 
                 Self::ThreadUpdate {
                     old,
@@ -794,7 +833,10 @@ impl FullEvent {
                 }
             },
             Event::ThreadDelete(event) => {
-                let full_thread_data = if_cache!(update_cache!(cache, event));
+                #[cfg(feature = "cache")]
+                let full_thread_data = event.update(cache);
+                #[cfg(not(feature = "cache"))]
+                let full_thread_data = None;
 
                 Self::ThreadDelete {
                     thread: event.thread,
@@ -802,7 +844,8 @@ impl FullEvent {
                 }
             },
             Event::ThreadListSync(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::ThreadListSync {
                     thread_list_sync: event,
@@ -815,21 +858,24 @@ impl FullEvent {
                 thread_members_update: event,
             },
             Event::GuildScheduledEventCreate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildScheduledEventCreate {
                     event: event.event,
                 }
             },
             Event::GuildScheduledEventUpdate(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildScheduledEventUpdate {
                     event: event.event,
                 }
             },
             Event::GuildScheduledEventDelete(event) => {
-                update_cache!(cache, event);
+                #[cfg(feature = "cache")]
+                event.update(cache);
 
                 Self::GuildScheduledEventDelete {
                     event: event.event,
