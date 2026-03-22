@@ -3,11 +3,14 @@
 //! Every event includes the gateway intent required to receive it, as well as a link to the
 //! Discord documentation for the event.
 
+mod full_event;
+
 use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
 use serde_json::value::RawValue;
 use strum::{EnumCount, IntoStaticStr, VariantNames};
 
+pub use self::full_event::*;
 use crate::constants::Opcode;
 use crate::model::prelude::*;
 use crate::model::utils::deserialize_null_as_default;

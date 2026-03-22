@@ -6,7 +6,8 @@
 
 use async_trait::async_trait;
 
-use crate::gateway::client::{Client, Context, FullEvent};
+use crate::gateway::client::{Client, Context};
+use crate::model::event::FullEvent;
 
 /// A trait for defining your own framework for serenity to use.
 ///
