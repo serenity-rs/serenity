@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["FullEvent"],"struct":["Client","ClientBuilder","Context"],"trait":["EventHandler","RawEventHandler"]};
+window.SIDEBAR_ITEMS = {"struct":["Client","ClientBuilder","Context"],"trait":["EventHandler","RawEventHandler"]};
