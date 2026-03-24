@@ -383,7 +383,7 @@ generate_permissions! {
     USE_EXTERNAL_STICKERS, use_external_stickers, "Use External Stickers" = 1 << 37;
     /// Allows for sending messages in threads
     SEND_MESSAGES_IN_THREADS, send_messages_in_threads, "Send Messages in Threads" = 1 << 38;
-    /// Allows for launching activities in a voice channel
+    /// Allows for using Activities (applications with the `EMBEDDED` flag)
     USE_EMBEDDED_ACTIVITIES, use_embedded_activities, "Use Embedded Activities" = 1 << 39;
     /// Allows for timing out users to prevent them from sending or reacting to messages in
     /// chat and threads, and from speaking in voice and stage channels.
