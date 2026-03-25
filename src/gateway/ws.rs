@@ -304,7 +304,7 @@ impl WsClient {
         debug!("[{:?}] Requesting soundboard sounds", shard_info);
 
         self.send_json(&WebSocketMessage {
-            op: Opcode::ReqeustSoundboardSounds,
+            op: Opcode::RequestSoundboardSounds,
             d: WebSocketMessageData::SoundboardSounds {
                 guild_ids,
             },
