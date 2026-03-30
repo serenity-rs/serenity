@@ -469,6 +469,7 @@ pub struct InviteCreateEvent {
     pub target_user: Option<User>,
     /// Embedded application to open for this voice channel embedded application invite.
     pub target_application: Option<Value>,
+    /// Whether or not the invite is temporary (invited users will be kicked on disconnect unless
     /// they're assigned a role).
     pub temporary: bool,
     /// How many times the invite has been used (always will be 0).
