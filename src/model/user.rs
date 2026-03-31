@@ -360,8 +360,6 @@ bitflags! {
         /// User's flag for suspected spam activity.
         #[cfg(feature = "unstable")]
         const SPAMMER = 1 << 20;
-        /// User's flag as active developer
-        const ACTIVE_DEVELOPER = 1 << 22;
     }
 }
 
