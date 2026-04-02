@@ -63,6 +63,29 @@ enum CacheRefInner<'a, K, V, T> {
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
+/// A reference to data in the [`Cache`].
+///
+/// This type wraps a reference to cached data and dereferences to `V`. It is deliberately marked
+/// `!Send` to prevent holding it across an `.await` point. Doing so can cause a deadlock: the
+/// underlying read lock is held for the lifetime of the `CacheRef`, so any task that tries taking
+/// the same lock while it is still held (i.e. across an `.await` point) will block indefinitely.
+///
+/// In general, the compiler will reject holding a `CacheRef` across an `.await` point in spawned
+/// tasks because it is `!Send`. Notably, however, the `#[tokio::main]` top-level future permits
+/// `.await`-ing `!Send` futures in its body. In this case the compiler will **not** prevent you
+/// from holding a `CacheRef` over an `.await` point, and a deadlock may still occur.
+///
+/// As a rule of thumb, never hold a `CacheRef` across an `.await` point. Instead, clone or copy the
+/// data you need and drop the reference before awaiting:
+///
+/// ```rust,no_run
+/// # use serenity::cache::Cache;
+/// # use serenity::model::prelude::*;
+/// # fn example(cache: &Cache, guild_id: GuildId) {
+/// // Good: extract what you need, then drop the reference.
+/// let channel_count = cache.guild(guild_id).map(|g| g.channels.len());
+/// # }
+/// ```
 pub struct CacheRef<'a, K, V, T = ()> {
     inner: CacheRefInner<'a, K, V, T>,
     phantom: std::marker::PhantomData<*const NotSend>,
