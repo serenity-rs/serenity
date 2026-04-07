@@ -46,6 +46,7 @@ enum_number! {
 ///   other message limitations are applied.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
 #[non_exhaustive]
 pub enum Component {
     ActionRow(ActionRow),
@@ -115,6 +116,7 @@ pub struct Section {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#section-section-child-components)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
 #[non_exhaustive]
 pub enum SectionComponent {
     TextDisplay(TextDisplay),
@@ -148,6 +150,7 @@ impl<'de> Deserialize<'de> for SectionComponent {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#section-section-accessory-components)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
 #[non_exhaustive]
 pub enum SectionAccessory {
     Button(Button),
@@ -337,6 +340,7 @@ pub struct Container {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#container-container-child-components)
 #[derive(Clone, Debug, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[serde(untagged)]
 #[non_exhaustive]
 pub enum ContainerComponent {
     ActionRow(ActionRow),
@@ -600,7 +604,7 @@ pub enum ButtonKind {
 }
 
 impl Serialize for ButtonKind {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -696,39 +700,144 @@ enum_number! {
 /// [Mentionable Select]: https://docs.discord.com/developers/components/reference#mentionable-select
 /// [Channel Select]: https://docs.discord.com/developers/components/reference#channel-select
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct SelectMenu {
-    /// The component type, which may either be [`ComponentType::StringSelect`],
-    /// [`ComponentType::UserSelect`], [`ComponentType::RoleSelect`],
-    /// [`ComponentType::MentionableSelect`], or [`ComponentType::ChannelSelect`].
-    #[serde(rename = "type")]
-    pub kind: ComponentType,
+    #[serde(flatten)]
+    pub kind: SelectMenuKind,
     /// An identifier defined by the developer for the select menu.
     pub custom_id: FixedString,
-    /// The options of this select menu.
-    ///
-    /// Required for [`ComponentType::StringSelect`] and unavailable for all others.
-    #[serde(default)]
-    pub options: FixedArray<SelectMenuOption>,
-    /// List of channel types to include in the [`ComponentType::ChannelSelect`].
-    #[serde(default)]
-    pub channel_types: FixedArray<ChannelType>,
     /// The placeholder shown when nothing is selected.
     pub placeholder: Option<FixedString>,
     /// The minimum number of selections allowed.
     pub min_values: Option<u8>,
     /// The maximum number of selections allowed.
     pub max_values: Option<u8>,
-    /// Whether select menu is required to be filled in a modal. Default is true. Ignored in
+    /// Whether the select menu is required to be filled in a modal. Default is true. Ignored in
     /// messages.
-    #[serde(default = "default_true")]
     pub required: bool,
     /// Whether select menu is disabled.
-    #[serde(default)]
     pub disabled: bool,
-    #[serde(default)]
+    /// The selected values chosen by the user. Only present in modals.
     pub values: FixedArray<String>,
+}
+
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub enum SelectMenuKind {
+    String { options: FixedArray<SelectMenuOption> },
+    User {},
+    Role {},
+    Mentionable {},
+    Channel { channel_types: FixedArray<ChannelType> },
+}
+
+impl<'de> Deserialize<'de> for SelectMenu {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct SelectMenuRaw {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+            custom_id: FixedString,
+            placeholder: Option<FixedString>,
+            min_values: Option<u8>,
+            max_values: Option<u8>,
+            #[serde(default = "default_true")]
+            required: bool,
+            #[serde(default)]
+            disabled: bool,
+            #[serde(default)]
+            values: FixedArray<String>,
+        }
+
+        #[derive(Deserialize)]
+        struct StringSelectRaw {
+            #[serde(default)]
+            options: FixedArray<SelectMenuOption>,
+        }
+
+        #[derive(Deserialize)]
+        struct ChannelSelectRaw {
+            #[serde(default)]
+            channel_types: FixedArray<ChannelType>,
+        }
+
+        let value = <&RawValue>::deserialize(deserializer)?;
+        let raw = SelectMenuRaw::deserialize(value).map_err(DeError::custom)?;
+
+        let kind = match raw.kind {
+            ComponentType::StringSelect => {
+                StringSelectRaw::deserialize(value).map(|s| SelectMenuKind::String {
+                    options: s.options,
+                })
+            },
+            ComponentType::UserSelect => Ok(SelectMenuKind::User {}),
+            ComponentType::RoleSelect => Ok(SelectMenuKind::Role {}),
+            ComponentType::MentionableSelect => Ok(SelectMenuKind::Mentionable {}),
+            ComponentType::ChannelSelect => {
+                ChannelSelectRaw::deserialize(value).map(|s| SelectMenuKind::Channel {
+                    channel_types: s.channel_types,
+                })
+            },
+            ComponentType(i) => {
+                return Err(DeError::custom(format_args!("Unknown select menu type {i}")));
+            },
+        }
+        .map_err(DeError::custom)?;
+
+        Ok(Self {
+            kind,
+            custom_id: raw.custom_id,
+            placeholder: raw.placeholder,
+            min_values: raw.min_values,
+            max_values: raw.max_values,
+            required: raw.required,
+            disabled: raw.disabled,
+            values: raw.values,
+        })
+    }
+}
+
+impl Serialize for SelectMenuKind {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        #[derive(Serialize)]
+        struct SelectMenuKindRaw<'a> {
+            #[serde(rename = "type")]
+            kind: ComponentType,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            options: Option<&'a [SelectMenuOption]>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            channel_types: Option<&'a [ChannelType]>,
+        }
+
+        #[rustfmt::skip]
+        let helper = SelectMenuKindRaw {
+            kind: match self {
+                Self::String { .. } => ComponentType::StringSelect,
+                Self::User { .. } => ComponentType::UserSelect,
+                Self::Role { .. } => ComponentType::RoleSelect,
+                Self::Mentionable { .. } => ComponentType::MentionableSelect,
+                Self::Channel { .. } => ComponentType::ChannelSelect,
+            },
+            options: match self {
+                Self::String { options } => Some(options),
+                _ => None,
+            },
+            channel_types: match self {
+                Self::Channel { channel_types } => Some(channel_types),
+                _ => None,
+            },
+        };
+
+        helper.serialize(serializer)
+    }
 }
 
 /// A select menu component options.
@@ -763,29 +872,8 @@ pub struct InputText {
     pub kind: ComponentType,
     /// Developer-defined identifier for the input; max 100 characters
     pub custom_id: FixedString,
-    /// The [`InputTextStyle`]. Required when sending modal data.
-    ///
-    /// Discord docs are wrong here; it says the field is always sent in modal submit interactions
-    /// but it's not. It's only required when _sending_ modal data to Discord.
-    /// <https://github.com/discord/discord-api-docs/issues/6141>
-    pub style: Option<InputTextStyle>,
-    /// Minimum input length for a text input; min 0, max 4000
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub min_length: Option<u16>,
-    /// Maximum input length for a text input; min 1, max 4000
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub max_length: Option<u16>,
-    /// Whether this component is required to be filled (defaults to true)
-    #[serde(default = "default_true")]
-    pub required: bool,
-    /// When sending: Pre-filled value for this component; max 4000 characters (may be None).
-    ///
-    /// When receiving: The input from the user (always Some)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<FixedString<u16>>,
-    /// Custom placeholder text if the input is empty; max 100 characters
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub placeholder: Option<FixedString<u16>>,
+    /// The input from the user.
+    pub value: FixedString<u16>,
 }
 
 enum_number! {

@@ -1098,7 +1098,7 @@ impl Serialize for CreateSelectMenuKind<'_> {
         #[derive(Serialize)]
         struct Json<'a> {
             #[serde(rename = "type")]
-            kind: u8,
+            kind: ComponentType,
             #[serde(skip_serializing_if = "Option::is_none")]
             options: Option<&'a [CreateSelectMenuOption<'a>]>,
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -1123,31 +1123,31 @@ impl Serialize for CreateSelectMenuKind<'_> {
         #[rustfmt::skip]
         let default_values = match self {
             Self::String { .. } => vec![],
-            Self::User { default_users: default_values } => map(default_values).collect(),
-            Self::Role { default_roles: default_values } => map(default_values).collect(),
+            Self::User { default_users } => map(default_users).collect(),
+            Self::Role { default_roles } => map(default_roles).collect(),
             Self::Mentionable { default_users, default_roles } => {
                 let users = map(default_users);
                 let roles = map(default_roles);
                 users.chain(roles).collect()
             },
-            Self::Channel { channel_types: _, default_channels: default_values } => map(default_values).collect(),
+            Self::Channel { default_channels, .. } => map(default_channels).collect(),
         };
 
         #[rustfmt::skip]
         let json = Json {
             kind: match self {
-                Self::String { .. } => 3,
-                Self::User { .. } => 5,
-                Self::Role { .. } => 6,
-                Self::Mentionable { .. } => 7,
-                Self::Channel { .. } => 8,
+                Self::String { .. } => ComponentType::StringSelect,
+                Self::User { .. } => ComponentType::UserSelect,
+                Self::Role { .. } => ComponentType::RoleSelect,
+                Self::Mentionable { .. } => ComponentType::MentionableSelect,
+                Self::Channel { .. } => ComponentType::ChannelSelect,
             },
             options: match self {
                 Self::String { options } => Some(options),
                 _ => None,
             },
             channel_types: match self {
-                Self::Channel { channel_types, default_channels: _ } => channel_types.as_deref(),
+                Self::Channel { channel_types, .. } => channel_types.as_deref(),
                 _ => None,
             },
             default_values: &default_values,

@@ -141,12 +141,7 @@ impl<'a> CreateQuickModal<'a> {
                 if let ModalComponent::Label(label) = component
                     && let LabelComponent::InputText(text) = &label.component
                 {
-                    if let Some(value) = &text.value {
-                        Some(value.clone())
-                    } else {
-                        tracing::warn!("input text value was empty in modal response");
-                        None
-                    }
+                    Some(text.value.clone())
                 } else {
                     if !matches!(component, ModalComponent::TextDisplay(_)) {
                         tracing::warn!("expected input text in modal response, got {component:?}");
