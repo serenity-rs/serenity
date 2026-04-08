@@ -6,6 +6,7 @@ use tokio::sync::RwLock;
 use tokio_tungstenite::tungstenite;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
+use tokio_tungstenite::tungstenite::Utf8Bytes;
 use tracing::{debug, error, info, instrument, trace, warn};
 use typemap_rev::TypeMap;
 
@@ -240,7 +241,7 @@ impl ShardRunner {
                 .client
                 .close(Some(CloseFrame {
                     code: close_code.into(),
-                    reason: Cow::from(""),
+                    reason: Utf8Bytes::from_static(""),
                 }))
                 .await,
         );
@@ -306,7 +307,7 @@ impl ShardRunner {
                 let reason = reason.unwrap_or_default();
                 let close = CloseFrame {
                     code: code.into(),
-                    reason: Cow::from(reason),
+                    reason: reason.into(),
                 };
                 self.shard.client.close(Some(close)).await.is_ok()
             },
