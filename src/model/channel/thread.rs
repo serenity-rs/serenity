@@ -33,7 +33,6 @@ impl ThreadId {
         guild_id: Option<GuildId>,
     ) -> Result<GuildThread> {
         #[cfg(feature = "cache")]
-        #[cfg_attr(not(feature = "temp_cache"), expect(clippy::collapsible_if))]
         if let Some(cache) = cache_http.cache() {
             if let Some(guild_id) = guild_id
                 && let Some(guild) = cache.guild(guild_id)
