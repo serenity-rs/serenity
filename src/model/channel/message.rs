@@ -69,7 +69,8 @@ pub struct Message {
     /// [discord-docs]: https://docs.discord.com/developers/resources/message#message-object
     #[serde(default)]
     pub mention_channels: FixedArray<ChannelMention>,
-    /// An vector of the files attached to a message.
+    /// A vector of the files attached to a message that are not referenced in embeds or
+    /// components.
     pub attachments: FixedArray<Attachment>,
     /// Array of embeds sent with the message.
     pub embeds: FixedArray<Embed>,
