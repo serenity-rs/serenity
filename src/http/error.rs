@@ -194,6 +194,7 @@ enum_number! {
         CannotDeleteGuildSubscriptionIntegration = 50163,
         CannotSendVoiceMessagesInChannel = 50173,
         UserAccountMustBeVerified = 50178,
+        CannotSendMessagesToUserDueToHavingNoMutualGuilds = 50278,
         NoPermissionForSticker = 50600,
 
         TwoFactorRequired = 60003,
