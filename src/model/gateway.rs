@@ -118,7 +118,7 @@ bitflags! {
     /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct ActivityFlags: u64 {
+    pub struct ActivityFlags: u16 {
         /// Whether the activity is an instance activity.
         const INSTANCE = 1 << 0;
         /// Whether the activity is joinable.
@@ -532,7 +532,7 @@ bitflags! {
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/community/posts/360050817314-Discord-Bots-Info
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-    pub struct GatewayIntents: u64 {
+    pub struct GatewayIntents: u32 {
         /// Enables the following gateway events:
         ///  - GUILD_CREATE
         ///  - GUILD_UPDATE

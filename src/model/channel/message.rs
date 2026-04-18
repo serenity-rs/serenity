@@ -921,7 +921,7 @@ bitflags! {
     /// [Discord docs](https://docs.discord.com/developers/resources/message#message-object-message-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct MessageFlags: u64 {
+    pub struct MessageFlags: u16 {
         /// This message has been published to subscribed channels (via Channel Following).
         const CROSSPOSTED = 1 << 0;
         /// This message originated from a message in another channel (via Channel Following).

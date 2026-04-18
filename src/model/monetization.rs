@@ -62,7 +62,7 @@ bitflags! {
     ///
     /// [Discord docs](https://docs.discord.com/developers/resources/sku#sku-object-sku-flags).
     #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-    pub struct SkuFlags: u64 {
+    pub struct SkuFlags: u16 {
         /// SKU is available for purchase.
         const AVAILABLE = 1 << 2;
         /// Recurring SKU that can be purchased by a user and applied to a single server. Grants

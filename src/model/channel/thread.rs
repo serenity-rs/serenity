@@ -317,7 +317,7 @@ bitflags! {
     /// Discord docs: flags field on [Thread Member](https://docs.discord.com/developers/resources/channel#thread-member-object).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct ThreadMemberFlags: u64 {
+    pub struct ThreadMemberFlags: u8 {
         // Not documented.
         const NOTIFICATIONS = 1 << 0;
     }

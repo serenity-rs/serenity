@@ -578,7 +578,7 @@ bitflags! {
     /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-channel-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct ChannelFlags: u64 {
+    pub struct ChannelFlags: u8 {
         /// This thread is pinned to the top of its parent GUILD_FORUM channel
         const PINNED = 1 << 1;
         /// Whether a tag is required to be specified when creating a

@@ -229,7 +229,7 @@ bitflags! {
     /// [Discord docs](https://docs.discord.com/developers/resources/application#application-object-application-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct ApplicationFlags: u64 {
+    pub struct ApplicationFlags: u32 {
         /// Indicates if an app uses the Auto Moderation API
         const APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE = 1 << 6;
         /// Intent required for bots in 100 or more servers to receive presence_update events

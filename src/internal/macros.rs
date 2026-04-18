@@ -170,7 +170,7 @@ macro_rules! bitflags {
     (__impl_serde $BitFlags:ident: $T:tt) => {
         impl<'de> serde::de::Deserialize<'de> for $BitFlags {
             fn deserialize<D: serde::de::Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
-                Ok(Self::from_bits_truncate(<$T>::deserialize(deserializer)?))
+                Ok(Self::from_bits_truncate(u64::deserialize(deserializer)? as $T))
             }
         }
 
