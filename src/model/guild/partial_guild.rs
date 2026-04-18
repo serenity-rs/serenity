@@ -1,4 +1,3 @@
-use nonmax::NonMaxU64;
 use serde::Serialize;
 
 use super::IncidentsData;
@@ -114,35 +113,35 @@ pub struct PartialGuild {
     /// The maximum number of presences for the guild. The default value is currently 25000.
     ///
     /// **Note**: It is in effect when it is `None`.
-    pub max_presences: Option<NonMaxU64>,
+    pub max_presences: Option<MemberCount>,
     /// The maximum number of members for the guild.
-    pub max_members: Option<NonMaxU64>,
+    pub max_members: Option<MemberCount>,
     /// The vanity url code for the guild, if it has one.
-    pub vanity_url_code: Option<FixedString>,
+    pub vanity_url_code: Option<FixedString<u8>>,
     /// The server's description, if it has one.
     pub description: Option<FixedString>,
     /// The guild's banner, if it has one.
-    pub banner: Option<FixedString>,
+    pub banner: Option<ImageHash>,
     /// The server's premium boosting level.
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server.
-    pub premium_subscription_count: Option<NonMaxU64>,
+    pub premium_subscription_count: Option<MemberCount>,
     /// The preferred locale of this guild only set if guild has the "COMMUNITY" feature,
     /// defaults to en-US.
-    pub preferred_locale: FixedString,
+    pub preferred_locale: FixedString<u8>,
     /// The id of the channel where admins and moderators of Community guilds receive notices from
     /// Discord.
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     pub public_updates_channel_id: Option<ChannelId>,
     /// The maximum amount of users in a video channel.
-    pub max_video_channel_users: Option<NonMaxU64>,
+    pub max_video_channel_users: Option<MemberCount>,
     /// The maximum amount of users in a stage video channel
-    pub max_stage_video_channel_users: Option<NonMaxU64>,
+    pub max_stage_video_channel_users: Option<MemberCount>,
     /// Approximate number of members in this guild.
-    pub approximate_member_count: Option<NonMaxU64>,
+    pub approximate_member_count: Option<MemberCount>,
     /// Approximate number of non-offline members in this guild.
-    pub approximate_presence_count: Option<NonMaxU64>,
+    pub approximate_presence_count: Option<MemberCount>,
     /// The welcome screen of the guild.
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
@@ -158,7 +157,7 @@ pub struct PartialGuild {
     /// The id of the channel where this guild will recieve safety alerts.
     pub safety_alerts_channel_id: Option<ChannelId>,
     /// The incidents data for this guild, if any.
-    pub incidents_data: Option<IncidentsData>,
+    pub incidents_data: Option<Box<IncidentsData>>,
 }
 
 #[cfg(feature = "model")]

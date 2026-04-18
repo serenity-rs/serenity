@@ -51,6 +51,7 @@ use crate::model::guild::{
     Guild,
     GuildMemberFlags,
     Member,
+    MemberCount,
     MemberGeneratedFlags,
     Role,
     ScheduledEvent,
@@ -176,7 +177,8 @@ impl CacheUpdate for GuildMemberAddEvent {
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.member.guild_id) {
-            guild.member_count += 1;
+            guild.member_count = MemberCount::new(guild.member_count.get() + 1)
+                .expect("member count should not overflow");
             guild.members.insert(self.member.clone());
         }
 
@@ -189,7 +191,8 @@ impl CacheUpdate for GuildMemberRemoveEvent {
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
-            guild.member_count -= 1;
+            guild.member_count = MemberCount::new(guild.member_count.get() - 1)
+                .expect("member count should not underflow");
             return guild.members.remove(&self.user.id);
         }
 

@@ -272,16 +272,16 @@ impl Cache {
     /// how many members have not yet been received.
     ///
     /// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild
-    pub fn unknown_members(&self) -> u64 {
+    pub fn unknown_members(&self) -> u32 {
         let mut total = 0;
 
         for guild_entry in self.guilds.iter() {
             let guild = guild_entry.value();
 
-            let members = guild.members.len() as u64;
-
-            if guild.member_count > members {
-                total += guild.member_count - members;
+            let known_member_count = guild.members.len() as u32;
+            let member_count_estimate = guild.member_count.get();
+            if member_count_estimate > known_member_count {
+                total += member_count_estimate - known_member_count;
             }
         }
 
