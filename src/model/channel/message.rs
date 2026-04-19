@@ -230,11 +230,10 @@ impl Message {
         let (channel_id, thread_id) = self.channel_id.split();
         let (channel, is_thread) = if let Some(channel) = guild.channels.get(&channel_id) {
             (channel, false)
-        } else if let Some(thread) = guild.threads.get(&thread_id) {
+        } else {
+            let thread = guild.threads.get(&thread_id)?;
             let channel = guild.channels.get(&thread.parent_id)?;
             (channel, true)
-        } else {
-            return None;
         };
 
         let mut permissions = if let Some(member) = &self.member {
