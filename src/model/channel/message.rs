@@ -973,6 +973,64 @@ bitflags! {
     }
 }
 
+/// Query parameters for [`Http::search_guild_messages`].
+///
+/// All fields are optional. Repeatable filters (channels, authors, mentions, and `has` tokens)
+/// map to repeated query-string entries, matching the Discord API shape.
+///
+/// [`Http::search_guild_messages`]: crate::http::Http::search_guild_messages
+/// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
+#[derive(Clone, Debug, Default)]
+#[non_exhaustive]
+pub struct SearchGuildMessagesParams<'a> {
+    /// Match against the message content.
+    pub content: Option<&'a str>,
+    /// When searching as a user account, whether to include NSFW channel matches.
+    pub include_nsfw: Option<bool>,
+    /// Restrict to the given channel ids.
+    pub channel_ids: &'a [GenericChannelId],
+    /// Restrict to messages authored by any of the given user ids.
+    pub author_ids: &'a [UserId],
+    /// Restrict to messages mentioning any of the given user ids.
+    pub mentions: &'a [UserId],
+    /// Restrict to messages that contain the given `has` filters (e.g. `"attachment"`, `"sound"`,
+    /// `"poll"`).
+    pub has: &'a [&'a str],
+    /// Return messages whose id is greater than this snowflake.
+    pub min_id: Option<MessageId>,
+    /// Return messages whose id is lower than this snowflake.
+    pub max_id: Option<MessageId>,
+    /// Restrict to messages that do (or do not) mention everyone.
+    pub mention_everyone: Option<bool>,
+    /// Sort by field (`"timestamp"` or `"relevance"`). Defaults to Discord's API default when `None`.
+    pub sort_by: Option<&'a str>,
+    /// Sort order (`"asc"` or `"desc"`). Defaults to Discord's API default when `None`.
+    pub sort_order: Option<&'a str>,
+    /// Pagination offset (0 to 5000).
+    pub offset: Option<u16>,
+    /// Number of results to return (1 to 25).
+    pub limit: Option<u8>,
+}
+
+/// Response from [`Http::search_guild_messages`].
+///
+/// Each entry in [`Self::messages`] is a hit group: the matched message plus surrounding
+/// context messages returned by Discord.
+///
+/// [`Http::search_guild_messages`]: crate::http::Http::search_guild_messages
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct SearchGuildMessagesResult {
+    /// Message hit groups returned by Discord.
+    pub messages: Vec<Vec<Message>>,
+    /// Total number of messages matching the query across pages.
+    pub total_results: u64,
+    /// Opaque identifier Discord attaches to the search for analytics purposes.
+    #[serde(default)]
+    pub analytics_id: Option<FixedString<u8>>,
+}
+
 /// Uniquely identifies a message.
 ///
 /// Implements Display to format to a url to the message.

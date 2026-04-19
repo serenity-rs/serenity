@@ -4419,6 +4419,73 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
+    /// Searches the messages of a guild.
+    ///
+    /// Requires the `View Channel` permission on every channel included in the result.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
+    pub async fn search_guild_messages(
+        &self,
+        guild_id: GuildId,
+        params: &SearchGuildMessagesParams<'_>,
+    ) -> Result<SearchGuildMessagesResult> {
+        let mut storage: Vec<(&'static str, String)> = Vec::new();
+        if let Some(content) = params.content {
+            storage.push(("content", content.to_owned()));
+        }
+        if let Some(include_nsfw) = params.include_nsfw {
+            storage.push(("include_nsfw", include_nsfw.to_string()));
+        }
+        for id in params.channel_ids {
+            storage.push(("channel_id", id.get().to_string()));
+        }
+        for id in params.author_ids {
+            storage.push(("author_id", id.get().to_string()));
+        }
+        for id in params.mentions {
+            storage.push(("mentions", id.get().to_string()));
+        }
+        for h in params.has {
+            storage.push(("has", (*h).to_owned()));
+        }
+        if let Some(min_id) = params.min_id {
+            storage.push(("min_id", min_id.get().to_string()));
+        }
+        if let Some(max_id) = params.max_id {
+            storage.push(("max_id", max_id.get().to_string()));
+        }
+        if let Some(mention_everyone) = params.mention_everyone {
+            storage.push(("mention_everyone", mention_everyone.to_string()));
+        }
+        if let Some(sort_by) = params.sort_by {
+            storage.push(("sort_by", sort_by.to_owned()));
+        }
+        if let Some(sort_order) = params.sort_order {
+            storage.push(("sort_order", sort_order.to_owned()));
+        }
+        if let Some(offset) = params.offset {
+            storage.push(("offset", offset.to_string()));
+        }
+        if let Some(limit) = params.limit {
+            storage.push(("limit", limit.to_string()));
+        }
+
+        let params_slice: Vec<(&str, &str)> =
+            storage.iter().map(|(k, v)| (*k, v.as_str())).collect();
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildMessagesSearch {
+                guild_id,
+            },
+            params: Some(&params_slice),
+        })
+        .await
+    }
+
     /// Starts removing some members from a guild based on the last time they've been online.
     pub async fn start_guild_prune(
         &self,
