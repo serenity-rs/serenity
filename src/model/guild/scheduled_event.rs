@@ -1,4 +1,4 @@
-use nonmax::NonMaxU64;
+use nonmax::{NonMaxU32, NonMaxU64};
 
 use crate::model::prelude::*;
 
@@ -141,21 +141,21 @@ pub struct RecurrenceRule {
     pub interval: u32,
     /// Weekdays the event recurs on.
     #[serde(default)]
-    pub by_weekday: Option<Vec<RecurrenceRuleWeekday>>,
+    pub by_weekday: Option<FixedArray<RecurrenceRuleWeekday, u8>>,
     /// Specific weekdays within a month the event recurs on.
     #[serde(default)]
-    pub by_n_weekday: Option<Vec<RecurrenceRuleNWeekday>>,
+    pub by_n_weekday: Option<FixedArray<RecurrenceRuleNWeekday, u8>>,
     /// Months within a year the event recurs on (1-12).
     #[serde(default)]
-    pub by_month: Option<Vec<RecurrenceRuleMonth>>,
+    pub by_month: Option<FixedArray<RecurrenceRuleMonth, u8>>,
     /// Days within a month the event recurs on (1-31).
     #[serde(default)]
-    pub by_month_day: Option<Vec<u8>>,
+    pub by_month_day: Option<FixedArray<u8, u8>>,
     /// Days within a year the event recurs on (1-364).
     #[serde(default)]
-    pub by_year_day: Option<Vec<u16>>,
+    pub by_year_day: Option<FixedArray<u16, u16>>,
     /// Total amount of times the event is allowed to recur before stopping.
-    pub count: Option<u32>,
+    pub count: Option<NonMaxU32>,
 }
 
 enum_number! {
