@@ -955,6 +955,8 @@ bitflags! {
         /// As of 2023-04-20, bots are currently not able to send voice messages
         /// ([source](https://github.com/discord/discord-api-docs/pull/6082)).
         const IS_VOICE_MESSAGE = 1 << 13;
+        /// This message has a snapshot (via Message Forwarding).
+        const HAS_SNAPSHOT = 1 << 14;
         /// Enables support for sending Components V2.
         ///
         /// Setting this flag is required to use V2 components.
