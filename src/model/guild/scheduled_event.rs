@@ -53,6 +53,8 @@ pub struct ScheduledEvent {
     pub user_count: Option<NonMaxU64>,
     /// The hash of the event's cover image, if present.
     pub image: Option<ImageHash>,
+    /// The recurrence rule of the event, if the event recurs.
+    pub recurrence_rule: Option<RecurrenceRule>,
 }
 
 impl extract_map::ExtractKey<ScheduledEventId> for ScheduledEvent {
@@ -119,4 +121,111 @@ enum_number! {
         GuildOnly = 2,
         _ => Unknown(u8),
     }
+}
+
+/// Defines how a scheduled event recurs.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct RecurrenceRule {
+    /// Starting time of the recurrence interval.
+    pub start: Timestamp,
+    /// Ending time of the recurrence interval, if any.
+    pub end: Option<Timestamp>,
+    /// How often the event occurs.
+    pub frequency: RecurrenceRuleFrequency,
+    /// Spacing between recurrences, in units of [`Self::frequency`]. Must be `1` except for
+    /// weekly events, where `2` is also valid to indicate bi-weekly recurrence.
+    pub interval: u32,
+    /// Weekdays the event recurs on.
+    #[serde(default)]
+    pub by_weekday: Option<Vec<RecurrenceRuleWeekday>>,
+    /// Specific weekdays within a month the event recurs on.
+    #[serde(default)]
+    pub by_n_weekday: Option<Vec<RecurrenceRuleNWeekday>>,
+    /// Months within a year the event recurs on (1-12).
+    #[serde(default)]
+    pub by_month: Option<Vec<RecurrenceRuleMonth>>,
+    /// Days within a month the event recurs on (1-31).
+    #[serde(default)]
+    pub by_month_day: Option<Vec<u8>>,
+    /// Days within a year the event recurs on (1-364).
+    #[serde(default)]
+    pub by_year_day: Option<Vec<u16>>,
+    /// Total amount of times the event is allowed to recur before stopping.
+    pub count: Option<u32>,
+}
+
+enum_number! {
+    /// How often a scheduled event recurs.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-frequency).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum RecurrenceRuleFrequency {
+        Yearly = 0,
+        Monthly = 1,
+        Weekly = 2,
+        Daily = 3,
+        _ => Unknown(u8),
+    }
+}
+
+enum_number! {
+    /// Weekday for a recurrence rule.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-weekday).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum RecurrenceRuleWeekday {
+        Monday = 0,
+        Tuesday = 1,
+        Wednesday = 2,
+        Thursday = 3,
+        Friday = 4,
+        Saturday = 5,
+        Sunday = 6,
+        _ => Unknown(u8),
+    }
+}
+
+enum_number! {
+    /// Month within a year for a recurrence rule.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-month).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum RecurrenceRuleMonth {
+        January = 1,
+        February = 2,
+        March = 3,
+        April = 4,
+        May = 5,
+        June = 6,
+        July = 7,
+        August = 8,
+        September = 9,
+        October = 10,
+        November = 11,
+        December = 12,
+        _ => Unknown(u8),
+    }
+}
+
+/// Specific weekday within a month for a recurrence rule (e.g. "the 2nd Tuesday").
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-nweekday-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct RecurrenceRuleNWeekday {
+    /// The week to recur on (1-5).
+    pub n: u8,
+    /// The day within the week to recur on.
+    pub day: RecurrenceRuleWeekday,
 }
