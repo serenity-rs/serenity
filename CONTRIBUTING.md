@@ -120,6 +120,13 @@ Set `blame.ignoreRevsFile` to ignore [noise commits][noise-commits] in `git blam
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
+# AI Usage
+Line-based autocomplete tools (such as GitHub Copilot's inline suggestions) are acceptable to use when contributing to this project.
+
+However, generating entire functions, structs, or other substantial code blocks using AI tools is not permitted. Similarly, using LLMs to write documentation, comments, or other prose content is not allowed.
+
+All contributions should represent your own understanding and work. AI tools may assist with syntax and boilerplate, but the logic, design, and written content must be your own.
+
 [test_ci]: .github/workflows/ci.yml
 [noise-commits]: https://github.com/serenity-rs/serenity/commit/9bbb25aac4d651804286f333eb503a72d41e473b
 [make]: https://github.com/sagiegurari/cargo-make
