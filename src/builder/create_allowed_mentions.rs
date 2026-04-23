@@ -93,7 +93,6 @@ pub struct CreateAllowedMentions<'a> {
 }
 
 impl<'a> CreateAllowedMentions<'a> {
-    /// Equivalent to [`Self::default`]. Usable in `const` contexts.
     pub const fn new() -> Self {
         Self {
             parse: Parse::new(),
@@ -103,13 +102,13 @@ impl<'a> CreateAllowedMentions<'a> {
         }
     }
 
-    /// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.
+    /// Toggles mentions for all users.
     pub const fn all_users(mut self, allow: bool) -> Self {
         self.parse.users = allow;
         self
     }
 
-    /// Toggles mentions for all roles. Overrides [`Self::roles`] if it was previously set.
+    /// Toggles mentions for all roles.
     pub const fn all_roles(mut self, allow: bool) -> Self {
         self.parse.roles = allow;
         self
