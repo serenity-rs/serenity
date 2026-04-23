@@ -5,6 +5,7 @@ use extract_map::entry::Entry;
 
 use super::{BaseGuildChannel, Cache, CacheUpdate, GenericChannelId, GuildThread};
 use crate::all::{
+    ChannelInfoChannel,
     CountDetails,
     MessageReaction,
     ReactionAddEvent,
@@ -17,6 +18,7 @@ use crate::model::channel::{GuildChannel, Message};
 use crate::model::event::{
     ChannelCreateEvent,
     ChannelDeleteEvent,
+    ChannelInfoEvent,
     ChannelPinsUpdateEvent,
     ChannelUpdateEvent,
     GuildCreateEvent,
@@ -43,6 +45,7 @@ use crate::model::event::{
     ThreadListSyncEvent,
     ThreadUpdateEvent,
     UserUpdateEvent,
+    VoiceChannelStartTimeUpdateEvent,
     VoiceChannelStatusUpdateEvent,
     VoiceStateUpdateEvent,
 };
@@ -92,6 +95,30 @@ impl CacheUpdate for ChannelUpdateEvent {
             .guilds
             .get_mut(&self.channel.base.guild_id)
             .and_then(|mut g| g.channels.insert(self.channel.clone()))
+    }
+}
+
+impl CacheUpdate for ChannelInfoEvent {
+    type Output = Vec<ChannelInfoChannel>;
+
+    fn update(&self, cache: &Cache) -> Option<Self::Output> {
+        let mut old: Vec<ChannelInfoChannel> = Vec::new();
+        let mut guild = cache.guilds.get_mut(&self.guild_id)?;
+
+        for channel_info_channel in &self.channels {
+            let mut channel = guild.channels.get_mut(&channel_info_channel.id)?;
+            let old_status = std::mem::take(&mut channel.status);
+            let old_voice_start_time = channel.voice_start_time;
+            channel.status.clone_from(&channel_info_channel.status);
+            channel.voice_start_time.clone_from(&channel_info_channel.voice_start_time);
+            old.push(ChannelInfoChannel::new(
+                channel_info_channel.id,
+                old_status,
+                old_voice_start_time,
+            ));
+        }
+
+        if old.is_empty() { None } else { Some(old) }
     }
 }
 
@@ -630,6 +657,19 @@ impl CacheUpdate for VoiceStateUpdateEvent {
     }
 }
 
+impl CacheUpdate for VoiceChannelStartTimeUpdateEvent {
+    type Output = i64;
+
+    fn update(&self, cache: &Cache) -> Option<Self::Output> {
+        let mut guild = cache.guilds.get_mut(&self.guild_id)?;
+        let mut channel = guild.channels.get_mut(&self.id)?;
+
+        let old = channel.voice_start_time;
+        channel.voice_start_time.clone_from(&self.voice_start_time);
+        old
+    }
+}
+
 impl CacheUpdate for VoiceChannelStatusUpdateEvent {
     type Output = FixedString<u16>;
 
@@ -637,7 +677,11 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;
         let mut channel = guild.channels.get_mut(&self.id)?;
 
-        let old = channel.status.clone();
+        let old = if channel.status.as_ref().is_some_and(FixedString::is_empty) {
+            None
+        } else {
+            channel.status.clone()
+        };
         channel.status.clone_from(&self.status);
         old
     }

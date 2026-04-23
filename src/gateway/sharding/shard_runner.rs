@@ -209,6 +209,13 @@ impl ShardRunner {
                 ShardRunnerMessage::SoundboardSounds {
                     guild_ids,
                 } => self.shard.request_soundboard_sounds(&guild_ids).await,
+                ShardRunnerMessage::ChannelInfo {
+                    guild_id,
+                    fields,
+                } => {
+                    let fields = fields.iter().map(String::as_str).collect::<Vec<_>>();
+                    self.shard.request_channel_info(guild_id, fields.as_slice()).await
+                },
                 ShardRunnerMessage::SetPresence {
                     activity,
                     status,
@@ -372,6 +379,15 @@ pub enum ShardRunnerMessage {
         ///
         /// [`Guild`]: crate::model::guild::Guild
         guild_ids: Vec<GuildId>,
+    },
+    /// Indicates that the client is to send a request channel info message.
+    ChannelInfo {
+        /// The ID  of the [`Guild`] to request channel info for.
+        ///
+        /// [`Guild`]: crate::model::guild::Guild
+        guild_id: GuildId,
+        /// The fields to request. Current available fields are `status` and `voice_start_time`.
+        fields: Vec<String>,
     },
     /// Indicates that the client is to update the shard's presence.
     ///

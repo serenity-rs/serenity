@@ -145,11 +145,16 @@ impl<'a> EditChannel<'a> {
 
     /// The status of the voice channel. Can be empty.
     ///
-    /// Must be between 0 and 1024 characters long.
+    /// Must be between 0 and 500 characters long.
     ///
     /// This is for [voice] channels only.
     ///
+    /// **Note:** Requires the [SET_VOICE_CHANNEL_STATUS] permission, and additionally the
+    /// [MANAGE_CHANNELS] permission if the current user is not connected to the voice channel.
+    ///
     /// [voice]: ChannelType::Voice
+    /// [SET_VOICE_CHANNEL_STATUS]: Permissions::SET_VOICE_CHANNEL_STATUS
+    /// [MANAGE_CHANNELS]: Permissions::MANAGE_CHANNELS
     pub fn status(mut self, status: impl Into<Cow<'a, str>>) -> Self {
         self.status = Some(status.into());
         self
@@ -304,8 +309,11 @@ impl<'a> EditChannel<'a> {
 
     /// Edits the channel's settings.
     ///
-    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
-    /// [`Self::permissions`] also requires the [Manage Roles] permission.
+    /// **Note**: Requires the [Manage Channels] permission, with the exception of setting a voice
+    /// channel status via [`Self::status`], which always requires the [Set Voice Channel Status]
+    /// permission, but only requires the [Manage Channels] permission when the current user is not
+    /// connected to the voice channel. Modifying permissions via [`Self::permissions`] also
+    /// requires the [Manage Roles] permission.
     ///
     /// # Errors
     ///
@@ -313,6 +321,7 @@ impl<'a> EditChannel<'a> {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
+    /// [Set Voice Channel Status]: Permissions::SET_VOICE_CHANNEL_STATUS
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
         if let Some(status) = &self.status {

@@ -303,7 +303,7 @@ pub enum CreatorMonetizationAction {
     TermsAccepted = 151,
 }
 
-/// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
+/// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]

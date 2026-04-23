@@ -71,6 +71,10 @@ enum WebSocketMessageData<'a> {
         properties: IdentifyProperties,
         presence: PresenceUpdateMessage<'a>,
     },
+    ChannelInfo {
+        guild_id: GuildId,
+        fields: &'a [&'a str],
+    },
     #[cfg(feature = "voice")]
     VoiceStateUpdate {
         guild_id: GuildId,
@@ -307,6 +311,27 @@ impl WsClient {
             op: Opcode::RequestSoundboardSounds,
             d: WebSocketMessageData::SoundboardSounds {
                 guild_ids,
+            },
+        })
+        .await
+    }
+
+    /// # Errors
+    ///
+    /// Errors if there is a problem with the WS connection.
+    pub async fn request_channel_info(
+        &mut self,
+        shard_info: &ShardInfo,
+        guild_id: GuildId,
+        fields: &[&str],
+    ) -> Result<()> {
+        debug!("[{:?}] Requesting channel info", shard_info);
+
+        self.send_json(&WebSocketMessage {
+            op: Opcode::RequestChannelInfo,
+            d: WebSocketMessageData::ChannelInfo {
+                guild_id,
+                fields,
             },
         })
         .await

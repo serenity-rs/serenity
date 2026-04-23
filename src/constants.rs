@@ -68,6 +68,8 @@ enum_number! {
         HeartbeatAck = 11,
         /// Used to request soundboard sounds from a list of guilds.
         RequestSoundboardSounds = 31,
+        /// Used to request ephemeral channel data for channels in a guild.
+        RequestChannelInfo = 43,
         _ => Unknown(u8),
     }
 }

@@ -531,6 +531,19 @@ impl Shard {
         self.client.request_soundboard_sounds(guild_ids, &self.info).await
     }
 
+    /// Requests ephemeral channel data for channels in a [`Guild`].
+    ///
+    /// # Errors
+    /// Errors if there is a problem with the WS connection.
+    ///
+    /// [`Guild`]: crate::model::guild::Guild
+    #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
+    pub async fn request_channel_info(&mut self, guild_id: GuildId, fields: &[&str]) -> Result<()> {
+        debug!("[{:?}] Requesting channel info", self.info);
+
+        self.client.request_channel_info(&self.info, guild_id, fields).await
+    }
+
     /// Indicates to the gateway that the client wants to join, move, or disconnect from a voice
     /// channel.
     ///

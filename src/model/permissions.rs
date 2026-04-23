@@ -398,8 +398,8 @@ generate_permissions! {
     USE_EXTERNAL_SOUNDS, use_external_sounds, "Use External Sounds" = 1 << 45;
     /// Allows sending voice messages.
     SEND_VOICE_MESSAGES, send_voice_messages, "Send Voice Messages" = 1 << 46;
-    /// Allows setting the status of a voice channel.
-    SET_VOICE_CHANNEL_STATUS, set_voice_channel_status, "Set Voice Channel status" = 1 << 48;
+    /// Allows setting voice channel status.
+    SET_VOICE_CHANNEL_STATUS, set_voice_channel_status, "Set Voice Channel Status" = 1 << 48;
     /// Allows attaching polls to message sends.
     SEND_POLLS, send_polls, "Send Polls" = 1 << 49;
     /// Allows user-installed apps to send public responses.

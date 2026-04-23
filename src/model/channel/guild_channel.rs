@@ -129,8 +129,20 @@ pub struct GuildChannel {
     pub default_thread_rate_limit_per_user: Option<NonMaxU16>,
     /// The status of a voice channel.
     ///
-    /// **Note**: This is only available in voice channels.
+    /// **Note**: This is only available in voice channels and will only be [`Some`] when the cache
+    /// is enabled. To manually retrieve the value and trigger population in the cache, see
+    /// [`Context::channel_info`].
+    /// 
+    /// [`Context::channel_info`]: crate::gateway::client::Context::channel_info
     pub status: Option<FixedString<u16>>,
+    /// Unix timestamp (in seconds) of when a voice session started.
+    ///
+    /// **Note**: This is only available in voice channels and will only be [`Some`] when the cache
+    /// is enabled.  To manually retrieve the value and trigger population in the cache, see
+    /// [`Context::channel_info`].
+    /// 
+    /// [`Context::channel_info`]: crate::gateway::client::Context::channel_info
+    pub voice_start_time: Option<i64>,
     /// The default sort order type used to order posts
     ///
     /// **Note**: This is only available in a forum.

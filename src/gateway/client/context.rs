@@ -10,6 +10,7 @@ pub use crate::cache::Cache;
 use crate::gateway::CollectorCallback;
 use crate::gateway::{
     ActivityData,
+    ChannelInfoField,
     ChunkGuildFilter,
     ShardManagerMessage,
     ShardRunnerInfo,
@@ -265,6 +266,17 @@ impl Context {
             presences,
             filter,
             nonce,
+        });
+    }
+
+    /// Requests ephemeral channel data for channels in a guild.
+    ///
+    /// This will ask the gateway to send ephemeral channel data for channels in a guild. The
+    /// server will send an [`Event::ChannelInfo`] event in response.
+    pub fn channel_info(&self, guild_id: GuildId, fields: ChannelInfoField) {
+        self.send_to_shard(ShardRunnerMessage::ChannelInfo {
+            guild_id,
+            fields: fields.into(),
         });
     }
 

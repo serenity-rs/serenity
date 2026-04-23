@@ -12,6 +12,7 @@ use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 pub use self::full_event::*;
 use crate::constants::Opcode;
+use crate::gateway::ChannelInfoChannel;
 use crate::model::prelude::*;
 use crate::model::utils::deserialize_null_as_default;
 
@@ -96,6 +97,15 @@ pub struct ChannelCreateEvent {
 #[non_exhaustive]
 pub struct ChannelDeleteEvent {
     pub channel: GuildChannel,
+}
+
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#channel-info).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ChannelInfoEvent {
+    pub guild_id: GuildId,
+    pub channels: Vec<ChannelInfoChannel>,
 }
 
 /// Requires [`GatewayIntents::GUILDS`] or [`GatewayIntents::DIRECT_MESSAGES`].
@@ -685,7 +695,19 @@ pub struct VoiceStateUpdateEvent {
 
 /// Requires [`GatewayIntents::GUILDS`].
 ///
-/// [Incomplete documentation](https://github.com/discord/discord-api-docs/pull/6398)
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-start-time-update).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct VoiceChannelStartTimeUpdateEvent {
+    pub id: ChannelId,
+    pub guild_id: GuildId,
+    pub voice_start_time: Option<i64>,
+}
+
+/// Requires [`GatewayIntents::GUILDS`].
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-status-update).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -1144,6 +1166,8 @@ pub enum Event {
     ChannelCreate(ChannelCreateEvent),
     /// A [`Channel`] has been deleted.
     ChannelDelete(ChannelDeleteEvent),
+    /// Sent in response to [Opcode::RequestChannelInfo].
+    ChannelInfo(ChannelInfoEvent),
     /// The pins for a [`Channel`] have been updated.
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`Channel`] has been updated.
@@ -1212,7 +1236,9 @@ pub enum Event {
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
-    /// Fired when the status of a Voice Channel changes.
+    /// Sent when the voice channel start time changes.
+    VoiceChannelStartTimeUpdate(VoiceChannelStartTimeUpdateEvent),
+    /// Sent when the voice channel status changes.
     VoiceChannelStatusUpdate(VoiceChannelStatusUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     #[serde(rename = "WEBHOOKS_UPDATE")]
