@@ -6,7 +6,6 @@ use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
-use crate::gateway::ChannelInfoChannel;
 use crate::model::prelude::*;
 
 macro_rules! full_event {

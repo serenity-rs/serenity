@@ -132,7 +132,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available in voice channels and will only be [`Some`] when the cache
     /// is enabled. To manually retrieve the value and trigger population in the cache, see
     /// [`Context::channel_info`].
-    /// 
+    ///
     /// [`Context::channel_info`]: crate::gateway::client::Context::channel_info
     pub status: Option<FixedString<u16>>,
     /// Unix timestamp (in seconds) of when a voice session started.
@@ -140,7 +140,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available in voice channels and will only be [`Some`] when the cache
     /// is enabled.  To manually retrieve the value and trigger population in the cache, see
     /// [`Context::channel_info`].
-    /// 
+    ///
     /// [`Context::channel_info`]: crate::gateway::client::Context::channel_info
     pub voice_start_time: Option<i64>,
     /// The default sort order type used to order posts

@@ -586,3 +586,49 @@ bitflags! {
         const REQUIRE_TAG = 1 << 4;
     }
 }
+
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#channel-info-channel-info-channel-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct ChannelInfoChannel {
+    pub id: ChannelId,
+    #[serde(default)]
+    pub status: Option<FixedString<u16>>,
+    #[serde(default)]
+    pub voice_start_time: Option<i64>,
+}
+
+impl ChannelInfoChannel {
+    #[must_use]
+    pub(crate) fn new(
+        id: ChannelId,
+        status: Option<FixedString<u16>>,
+        voice_start_time: Option<i64>,
+    ) -> Self {
+        Self {
+            id,
+            status,
+            voice_start_time,
+        }
+    }
+}
+
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#request-channel-info-request-channel-info-structure).
+#[derive(Debug)]
+pub enum ChannelInfoField {
+    All,
+    Status,
+    VoiceStartTime,
+}
+
+impl From<ChannelInfoField> for Vec<String> {
+    fn from(field: ChannelInfoField) -> Self {
+        match field {
+            ChannelInfoField::All => {
+                Vec::from([String::from("status"), String::from("voice_start_time")])
+            },
+            ChannelInfoField::Status => Vec::from([String::from("status")]),
+            ChannelInfoField::VoiceStartTime => Vec::from([String::from("voice_start_time")]),
+        }
+    }
+}

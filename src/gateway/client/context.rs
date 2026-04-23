@@ -10,7 +10,6 @@ pub use crate::cache::Cache;
 use crate::gateway::CollectorCallback;
 use crate::gateway::{
     ActivityData,
-    ChannelInfoField,
     ChunkGuildFilter,
     ShardManagerMessage,
     ShardRunnerInfo,

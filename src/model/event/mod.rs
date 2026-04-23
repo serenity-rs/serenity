@@ -12,7 +12,6 @@ use strum::{EnumCount, IntoStaticStr, VariantNames};
 
 pub use self::full_event::*;
 use crate::constants::Opcode;
-use crate::gateway::ChannelInfoChannel;
 use crate::model::prelude::*;
 use crate::model::utils::deserialize_null_as_default;
 

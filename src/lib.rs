@@ -157,4 +157,6 @@ pub mod all {
 
 // Re-exports of crates used internally which are already publically exposed.
 pub use async_trait::async_trait;
-pub use {futures, nonmax, small_fixed_array};
+pub use futures;
+pub use nonmax;
+pub use small_fixed_array;

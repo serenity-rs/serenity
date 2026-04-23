@@ -5,7 +5,6 @@ use extract_map::entry::Entry;
 
 use super::{BaseGuildChannel, Cache, CacheUpdate, GenericChannelId, GuildThread};
 use crate::all::{
-    ChannelInfoChannel,
     CountDetails,
     MessageReaction,
     ReactionAddEvent,
@@ -14,7 +13,7 @@ use crate::all::{
     ReactionRemoveEvent,
 };
 use crate::internal::prelude::*;
-use crate::model::channel::{GuildChannel, Message};
+use crate::model::channel::{ChannelInfoChannel, GuildChannel, Message};
 use crate::model::event::{
     ChannelCreateEvent,
     ChannelDeleteEvent,
