@@ -1831,26 +1831,6 @@ impl Http {
     }
 
     /// Edits the current member for the provided [`Guild`] via its Id.
-    pub async fn edit_member_me(
-        &self,
-        guild_id: GuildId,
-        map: &impl serde::Serialize,
-        audit_log_reason: Option<&str>,
-    ) -> Result<Member> {
-        self.fire(Request {
-            body: Some(to_vec(map)?),
-            multipart: None,
-            headers: audit_log_reason.map(reason_into_header),
-            method: LightMethod::Patch,
-            route: Route::GuildMemberMe {
-                guild_id,
-            },
-            params: None,
-        })
-        .await
-    }
-
-    /// Edits the current member for the provided [`Guild`] via its Id.
     pub async fn edit_current_member(
         &self,
         guild_id: GuildId,
