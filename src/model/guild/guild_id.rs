@@ -17,6 +17,7 @@ use crate::builder::{
     EditAutoModRule,
     EditCommand,
     EditCommandPermissions,
+    EditCurrentMember,
     EditGuild,
     EditGuildIncidentActions,
     EditGuildWelcomeScreen,
@@ -697,33 +698,20 @@ impl GuildId {
         http.edit_guild_mfa_level(self, &map, reason).await
     }
 
-    /// Edits the current member's nickname for the guild.
+    /// Edits the properties of the bot's member.
     ///
-    /// Pass [`None`] to reset the nickname.
-    ///
-    /// Requires the [Change Nickname] permission.
+    /// Refer to the documentation of [`EditCurrentMember`] for a full list of methods and
+    /// permission restrictions.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-    pub async fn edit_nickname(
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn edit_current_member(
         self,
         http: &Http,
-        new_nickname: Option<&str>,
-        reason: Option<&str>,
+        builder: EditCurrentMember<'_>,
     ) -> Result<Member> {
-        #[derive(serde::Serialize)]
-        struct EditMember<'a> {
-            nick: Option<&'a str>,
-        }
-
-        let map = EditMember {
-            nick: new_nickname,
-        };
-
-        http.edit_current_member(self, &map, reason).await
+        builder.execute(http, self).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.

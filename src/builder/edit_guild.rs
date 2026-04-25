@@ -31,9 +31,9 @@ pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     owner_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    splash: Option<Option<Cow<'a, str>>>,
+    splash: Option<Option<DataUri<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    discovery_splash: Option<Option<Cow<'a, str>>>,
+    discovery_splash: Option<Option<DataUri<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     banner: Option<Option<DataUri<'a>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -158,7 +158,7 @@ impl<'a> EditGuild<'a> {
     /// through a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn splash(mut self, splash: Option<Cow<'a, str>>) -> Self {
+    pub fn splash(mut self, splash: Option<DataUri<'a>>) -> Self {
         self.splash = Some(splash);
         self
     }
@@ -171,7 +171,7 @@ impl<'a> EditGuild<'a> {
     /// a guild's [`features`] list.
     ///
     /// [`features`]: Guild::features
-    pub fn discovery_splash(mut self, splash: Option<Cow<'a, str>>) -> Self {
+    pub fn discovery_splash(mut self, splash: Option<DataUri<'a>>) -> Self {
         self.discovery_splash = Some(splash);
         self
     }
