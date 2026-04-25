@@ -57,9 +57,9 @@ impl<'a> EditCurrentMember<'a> {
         self
     }
 
-    /// Changes the bot's (about me) in the guild.
-    pub fn bio(mut self, bio: Option<impl Into<Cow<'a, str>>>) -> Self {
-        self.bio = Some(bio.map(Into::into));
+    /// Changes the bot's bio (about me) in the guild.
+    pub fn bio(mut self, bio: Option<Cow<'a, str>>) -> Self {
+        self.bio = Some(bio);
         self
     }
 
