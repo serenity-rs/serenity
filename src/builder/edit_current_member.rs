@@ -31,7 +31,7 @@ impl<'a> EditCurrentMember<'a> {
         Self::default()
     }
 
-    /// Changes the bots's nickname. Pass an empty string to reset the nickname.
+    /// Changes the bots's nickname. Pass `None` or an empty string to reset the nickname.
     ///
     /// **Note**: Requires the [Change Nickname] permission.
     ///
