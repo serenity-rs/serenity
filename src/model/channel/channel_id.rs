@@ -75,7 +75,7 @@ impl ChannelId {
             }
         }
 
-        let channel = cache_http.http().get_channel(self.widen()).await?;
+        let channel: Channel = cache_http.http().get_channel(self.widen()).await?;
         let guild_channel = channel.guild().ok_or(ModelError::InvalidChannelType)?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
@@ -722,7 +722,7 @@ impl GenericChannelId {
             return Ok(message.clone());
         }
 
-        let message = cache_http.http().get_message(self, message_id).await?;
+        let message: Message = cache_http.http().get_message(self, message_id).await?;
 
         #[cfg(feature = "temp_cache")]
         if let Some(cache) = cache_http.cache() {
@@ -821,7 +821,7 @@ impl GenericChannelId {
         before: Option<Timestamp>,
         limit: Option<u8>,
     ) -> Result<MessagePinsPage> {
-        let page = cache_http.http().get_pins(self, before, limit).await?;
+        let page: MessagePinsPage = cache_http.http().get_pins(self, before, limit).await?;
 
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {

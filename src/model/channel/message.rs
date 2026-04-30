@@ -592,7 +592,7 @@ impl Message {
             }
         }
 
-        let current_user = cache_http.http().get_current_user().await?;
+        let current_user: CurrentUser = cache_http.http().get_current_user().await?;
         Ok(self.mentions_user_id(current_user.id))
     }
 
@@ -642,7 +642,8 @@ impl Message {
             return channel.parent_id;
         }
 
-        cache_http.http().get_channel(self.channel_id).await.ok()?.guild()?.parent_id
+        let channel: Channel = cache_http.http().get_channel(self.channel_id).await.ok()?;
+        channel.guild()?.parent_id
     }
 }
 

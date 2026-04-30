@@ -118,7 +118,7 @@ impl Shard {
     /// use std::sync::Arc;
     ///
     /// use serenity::gateway::{Shard, TransportCompression};
-    /// use serenity::model::gateway::{GatewayIntents, ShardInfo};
+    /// use serenity::model::gateway::{Gateway, GatewayIntents, ShardInfo};
     /// use serenity::model::id::ShardId;
     /// use serenity::secrets::Token;
     /// use tokio::sync::Mutex;
@@ -134,7 +134,7 @@ impl Shard {
     /// };
     ///
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = Arc::from(http.get_gateway().await?.url);
+    /// let gateway = Arc::from(http.get_gateway::<Gateway>().await?.url);
     /// let shard = Shard::new(
     ///     gateway,
     ///     token,

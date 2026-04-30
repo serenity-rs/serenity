@@ -51,7 +51,7 @@ impl ThreadId {
             }
         }
 
-        let channel = cache_http.http().get_channel(self.widen()).await?;
+        let channel: Channel = cache_http.http().get_channel(self.widen()).await?;
         let guild_thread = channel.thread().ok_or(ModelError::InvalidChannelType)?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
