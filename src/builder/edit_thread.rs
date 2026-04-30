@@ -134,9 +134,8 @@ impl<'a> EditThread<'a> {
     /// Returns [`ModelError::InvalidChannelType`] if the `ThreadId` is not identifying a thread.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, thread_id: ThreadId) -> Result<GuildThread> {
-        http.edit_channel(thread_id.widen(), &self, self.audit_log_reason.as_deref())
-            .await?
-            .thread()
-            .ok_or(Error::Model(ModelError::InvalidChannelType))
+        let channel: Channel =
+            http.edit_channel(thread_id.widen(), &self, self.audit_log_reason.as_deref()).await?;
+        channel.thread().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }

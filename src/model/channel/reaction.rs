@@ -174,7 +174,8 @@ impl Reaction {
                 }
             }
 
-            Ok(cache_http.http().get_current_user().await?.into())
+            let current_user: CurrentUser = cache_http.http().get_current_user().await?;
+            Ok(current_user.into())
         }
     }
 

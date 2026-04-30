@@ -388,9 +388,8 @@ impl<'a> EditChannel<'a> {
             .await?;
         }
 
-        http.edit_channel(channel_id.widen(), &self, self.audit_log_reason.as_deref())
-            .await?
-            .guild()
-            .ok_or(Error::Model(ModelError::InvalidChannelType))
+        let channel: Channel =
+            http.edit_channel(channel_id.widen(), &self, self.audit_log_reason.as_deref()).await?;
+        channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }

@@ -8,8 +8,6 @@ use std::time::Duration;
 use nonmax::{NonMaxU8, NonMaxU16};
 use strum::{AsRefStr, IntoStaticStr};
 
-#[cfg(feature = "http")]
-use crate::http::{MessageSearchOutcome, MessageSearchResults};
 use crate::model::prelude::*;
 
 /// Builds a request to the API to search messages in a Guild.
