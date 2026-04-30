@@ -1,13 +1,16 @@
+#[cfg(feature = "model")]
 use std::sync::Arc;
-use std::time::Duration;
 
-use tokio::sync::oneshot::error::TryRecvError;
-use tokio::sync::oneshot::{self, Sender};
-use tokio::time::sleep;
+#[cfg(feature = "model")]
+use tokio::sync::oneshot;
 
+#[cfg(feature = "model")]
 use crate::http::Http;
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
+#[cfg(feature = "model")]
 use crate::internal::tokio::spawn_named;
+#[cfg(feature = "model")]
 use crate::model::id::GenericChannelId;
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
@@ -27,7 +30,7 @@ use crate::model::id::GenericChannelId;
 /// ## Examples
 ///
 /// ```rust,no_run
-/// # use serenity::{http::{Http, Typing}, Result, model::prelude::*};
+/// # use serenity::{http::Http, Result, model::prelude::*};
 /// # use std::sync::Arc;
 /// #
 /// # fn long_process() {}
@@ -46,9 +49,11 @@ use crate::model::id::GenericChannelId;
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
+#[cfg(feature = "model")]
 #[derive(Debug)]
-pub struct Typing(Sender<()>);
+pub struct Typing(oneshot::Sender<()>);
 
+#[cfg(feature = "model")]
 impl Typing {
     /// Starts typing in the specified [`Channel`] for an indefinite period of time.
     ///
@@ -67,7 +72,7 @@ impl Typing {
         spawn_named::<_, Result<_>>("typing::start", async move {
             loop {
                 match rx.try_recv() {
-                    Ok(()) | Err(TryRecvError::Closed) => break,
+                    Ok(()) | Err(oneshot::error::TryRecvError::Closed) => break,
                     _ => (),
                 }
 
@@ -75,7 +80,7 @@ impl Typing {
 
                 // It is unclear for how long typing persists after this method is called.
                 // It is generally assumed to be 7 or 10 seconds, so we use 7 to be safe.
-                sleep(Duration::from_secs(7)).await;
+                tokio::time::sleep(std::time::Duration::from_secs(7)).await;
             }
 
             Ok(())

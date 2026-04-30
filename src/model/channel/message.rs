@@ -349,7 +349,12 @@ impl Message {
         http: &Http,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into()).await
+        http.delete_message_reaction_emoji(
+            self.channel_id,
+            self.id,
+            &reaction_type.into().as_data(),
+        )
+        .await
     }
 
     /// Edits this message, replacing the original content with new content.
@@ -516,7 +521,7 @@ impl Message {
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     pub async fn react(&self, http: &Http, reaction_type: impl Into<ReactionType>) -> Result<()> {
-        http.create_reaction(self.channel_id, self.id, &reaction_type.into()).await
+        http.create_reaction(self.channel_id, self.id, &reaction_type.into().as_data()).await
     }
 
     /// Uses Discord's inline reply to a user without pinging them.

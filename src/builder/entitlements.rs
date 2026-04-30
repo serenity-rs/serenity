@@ -6,6 +6,55 @@ use nonmax::NonMaxU8;
 use crate::http::Http;
 use crate::model::prelude::*;
 
+/// Builds a request to create a test [`Entitlement`].
+///
+/// This is a helper for [`Http::create_test_entitlement`].
+///
+/// [`Http::create_test_entitlement`]: crate::http::Http::create_test_entitlement
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateTestEntitlement {
+    sku_id: SkuId,
+    owner_id: GenericId,
+    owner_type: u8,
+}
+
+impl CreateTestEntitlement {
+    pub fn new(sku_id: SkuId, owner: EntitlementOwner) -> Self {
+        let (owner_id, owner_type) = owner.deconstruct();
+
+        Self {
+            sku_id,
+            owner_id,
+            owner_type,
+        }
+    }
+
+    /// Creates a test entitlement.
+    ///
+    /// # Errors
+    ///
+    /// May error due to an invalid response from discord, or network error.
+    #[cfg(feature = "http")]
+    pub async fn execute(self, http: &Http) -> Result<Entitlement> {
+        http.create_test_entitlement(&self).await
+    }
+}
+
+pub enum EntitlementOwner {
+    Guild(GuildId),
+    User(UserId),
+}
+
+impl EntitlementOwner {
+    fn deconstruct(self) -> (GenericId, u8) {
+        match self {
+            EntitlementOwner::Guild(id) => (id.get().into(), 1),
+            EntitlementOwner::User(id) => (id.get().into(), 2),
+        }
+    }
+}
+
 /// Builds a request to fetch active and ended [`Entitlement`]s.
 ///
 /// This is a helper for [`Http::get_entitlements`] used via [`Entitlement::list`].

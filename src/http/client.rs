@@ -283,11 +283,9 @@ impl Http {
         user_id: UserId,
         map: &impl serde::Serialize,
     ) -> Result<Option<Member>> {
-        let body = to_vec(map)?;
-
         let response = self
             .request(Request {
-                body: Some(body),
+                body: Some(to_vec(map)?),
                 multipart: None,
                 headers: None,
                 method: LightMethod::Put,
@@ -396,10 +394,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -436,10 +432,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildThread> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -459,10 +453,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildThread> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -728,10 +720,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Invite> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -751,10 +741,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        let body = to_vec(map)?;
-
         self.wind(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Put,
@@ -772,10 +760,8 @@ impl Http {
         &self,
         map: &impl serde::Serialize,
     ) -> Result<PrivateChannel> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             method: LightMethod::Post,
@@ -790,7 +776,7 @@ impl Http {
         &self,
         channel_id: GenericChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -800,7 +786,7 @@ impl Http {
             route: Route::ChannelMessageReactionMe {
                 channel_id,
                 message_id,
-                reaction: &reaction_type.as_data(),
+                reaction,
             },
             params: None,
         })
@@ -811,12 +797,12 @@ impl Http {
     pub async fn create_role(
         &self,
         guild_id: GuildId,
-        body: &impl serde::Serialize,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
         let mut value: Value = self
             .fire(Request {
-                body: Some(to_vec(body)?),
+                body: Some(to_vec(map)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 method: LightMethod::Post,
@@ -841,9 +827,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent> {
-        let body = to_vec(map)?;
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -885,27 +870,8 @@ impl Http {
     /// entitlement will have `starts_at` and `ends_at` both be `None`.
     pub async fn create_test_entitlement(
         &self,
-        sku_id: SkuId,
-        owner: EntitlementOwner,
+        map: &impl serde::Serialize,
     ) -> Result<Entitlement> {
-        #[derive(serde::Serialize)]
-        struct TestEntitlement {
-            sku_id: SkuId,
-            owner_id: u64,
-            owner_type: u8,
-        }
-
-        let (owner_id, owner_type) = match owner {
-            EntitlementOwner::Guild(id) => (id.get(), 1),
-            EntitlementOwner::User(id) => (id.get(), 2),
-        };
-
-        let map = TestEntitlement {
-            sku_id,
-            owner_id,
-            owner_type,
-        };
-
         self.fire(Request {
             body: Some(to_vec(&map)?),
             multipart: None,
@@ -926,10 +892,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -1195,7 +1159,7 @@ impl Http {
         &self,
         channel_id: GenericChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -1205,7 +1169,7 @@ impl Http {
             route: Route::ChannelMessageReactionEmoji {
                 channel_id,
                 message_id,
-                reaction: &reaction_type.as_data(),
+                reaction,
             },
             params: None,
         })
@@ -1258,7 +1222,7 @@ impl Http {
         channel_id: GenericChannelId,
         message_id: MessageId,
         user_id: UserId,
-        reaction_type: &ReactionType,
+        reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -1269,7 +1233,7 @@ impl Http {
                 channel_id,
                 message_id,
                 user_id,
-                reaction: &reaction_type.as_data(),
+                reaction,
             },
             params: None,
         })
@@ -1281,7 +1245,7 @@ impl Http {
         &self,
         channel_id: GenericChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -1291,7 +1255,7 @@ impl Http {
             route: Route::ChannelMessageReactionMe {
                 channel_id,
                 message_id,
-                reaction: &reaction_type.as_data(),
+                reaction,
             },
             params: None,
         })
@@ -1467,10 +1431,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -1589,10 +1551,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<PartialGuild> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -1673,7 +1633,7 @@ impl Http {
     pub async fn edit_guild_mfa_level(
         &self,
         guild_id: GuildId,
-        value: &impl serde::Serialize,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<MfaLevel> {
         #[derive(Deserialize)]
@@ -1681,10 +1641,8 @@ impl Http {
             level: MfaLevel,
         }
 
-        let body = to_vec(value)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -1704,10 +1662,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildWidget> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -1726,10 +1682,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildWelcomeScreen> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -1749,11 +1703,9 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Member> {
-        let body = to_vec(map)?;
-
         let mut value: Value = self
             .fire(Request {
-                body: Some(body),
+                body: Some(to_vec(map)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 method: LightMethod::Patch,
@@ -1921,10 +1873,8 @@ impl Http {
 
     /// Edits the current user's profile settings.
     pub async fn edit_profile(&self, map: &impl serde::Serialize) -> Result<CurrentUser> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             method: LightMethod::Patch,
@@ -2008,9 +1958,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent> {
-        let body = to_vec(map)?;
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -2033,11 +1982,9 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
-        let body = to_vec(&map)?;
-
         let mut value: Value = self
             .fire(Request {
-                body: Some(body),
+                body: Some(to_vec(map)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 method: LightMethod::Patch,
@@ -2103,10 +2050,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        let body = to_vec(map)?;
-
         self.wind(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Put,
@@ -2146,10 +2091,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -2462,7 +2405,7 @@ impl Http {
     pub async fn get_audit_logs(
         &self,
         guild_id: GuildId,
-        action_type: Option<audit_log::Action>,
+        action_type: Option<u16>,
         user_id: Option<UserId>,
         before: Option<AuditLogEntryId>,
         after: Option<AuditLogEntryId>,
@@ -2471,7 +2414,7 @@ impl Http {
         let (action_type_str, before_str, after_str, limit_str, user_id_str);
         let mut params = ArrayVec::<_, 4>::new();
         if let Some(action_type) = action_type {
-            action_type_str = action_type.num().to_arraystring();
+            action_type_str = action_type.to_arraystring();
             params.push(("action_type", action_type_str.as_str()));
         }
         if let Some(before) = before {
@@ -2546,10 +2489,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<AutoModRule> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Post,
@@ -2569,10 +2510,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<AutoModRule> {
-        let body = to_vec(map)?;
-
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             method: LightMethod::Patch,
@@ -3980,7 +3919,7 @@ impl Http {
         &self,
         channel_id: GenericChannelId,
         message_id: MessageId,
-        emoji: &ReactionType,
+        emoji: &str,
         reaction_type: Option<ReactionTypes>,
         limit: Option<NonMaxU8>,
         after: Option<UserId>,
@@ -4011,7 +3950,7 @@ impl Http {
             route: Route::ChannelMessageReactionEmoji {
                 channel_id,
                 message_id,
-                reaction: &emoji.as_data(),
+                reaction: emoji,
             },
             params: Some(&params),
         })

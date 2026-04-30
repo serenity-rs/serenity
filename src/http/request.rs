@@ -15,8 +15,16 @@ use tracing::instrument;
 use super::multipart::Multipart;
 use super::routing::Route;
 use super::{HttpError, LightMethod};
-use crate::constants;
 use crate::internal::prelude::*;
+
+/// The [UserAgent] sent along with every request.
+///
+/// [UserAgent]: reqwest::header::USER_AGENT
+pub const SERENITY_USER_AGENT: &str = concat!(
+    "DiscordBot (https://github.com/serenity-rs/serenity, ",
+    env!("CARGO_PKG_VERSION"),
+    ")"
+);
 
 #[derive(Clone, Debug)]
 #[must_use]
@@ -99,7 +107,7 @@ impl<'a> Request<'a> {
         let mut builder = client.request(self.method.reqwest_method(), path);
 
         let mut headers = self.headers.unwrap_or_default();
-        headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
+        headers.insert(USER_AGENT, HeaderValue::from_static(SERENITY_USER_AGENT));
         if let Some(token) = token {
             headers.insert(
                 AUTHORIZATION,

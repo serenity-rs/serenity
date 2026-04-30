@@ -39,6 +39,8 @@ pub mod permissions;
 pub mod soundboard;
 pub mod sticker;
 pub mod timestamp;
+#[cfg(feature = "model")]
+pub mod typing;
 pub mod user;
 pub mod voice;
 pub mod webhook;
@@ -74,6 +76,9 @@ pub mod prelude {
         TriggerMetadata,
         TriggerType,
     };
+    #[cfg(feature = "model")]
+    #[doc(hidden)]
+    pub use super::typing::*;
     #[doc(hidden)]
     pub use super::{
         ModelError,

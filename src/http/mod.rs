@@ -25,7 +25,6 @@ mod multipart;
 mod ratelimiting;
 mod request;
 mod routing;
-mod typing;
 
 use std::sync::Arc;
 
@@ -38,10 +37,9 @@ pub use self::multipart::*;
 pub use self::ratelimiting::*;
 pub use self::request::*;
 pub use self::routing::*;
-pub use self::typing::*;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-use crate::model::prelude::*;
+use crate::model::id::*;
 
 /// This trait will be required by functions that need [`Http`] and can optionally use a [`Cache`]
 /// to potentially avoid REST-requests.

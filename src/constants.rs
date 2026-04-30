@@ -26,15 +26,6 @@ pub const MEMBER_FETCH_LIMIT: NonMaxU16 = match NonMaxU16::new(1000) {
     None => unreachable!(),
 };
 
-/// The [UserAgent] sent along with every request.
-///
-/// [UserAgent]: ::reqwest::header::USER_AGENT
-pub const USER_AGENT: &str = concat!(
-    "DiscordBot (https://github.com/serenity-rs/serenity, ",
-    env!("CARGO_PKG_VERSION"),
-    ")"
-);
-
 enum_number! {
     /// An enum representing the gateway opcodes.
     ///

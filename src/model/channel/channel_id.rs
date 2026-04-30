@@ -27,7 +27,7 @@ use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "temp_cache", feature = "model"))]
 use crate::cache::MaybeOwnedArc;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http, Typing};
+use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
 
 impl ChannelId {
@@ -476,7 +476,7 @@ impl GenericChannelId {
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.create_reaction(self, message_id, &reaction_type.into()).await
+        http.create_reaction(self, message_id, &reaction_type.into().as_data()).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -577,8 +577,10 @@ impl GenericChannelId {
     ) -> Result<()> {
         let reaction_type = reaction_type.into();
         match user_id {
-            Some(user_id) => http.delete_reaction(self, message_id, user_id, &reaction_type).await,
-            None => http.delete_reaction_me(self, message_id, &reaction_type).await,
+            Some(user_id) => {
+                http.delete_reaction(self, message_id, user_id, &reaction_type.as_data()).await
+            },
+            None => http.delete_reaction_me(self, message_id, &reaction_type.as_data()).await,
         }
     }
     /// Deletes all of the [`Reaction`]s associated with the provided message id.
@@ -611,7 +613,7 @@ impl GenericChannelId {
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.delete_message_reaction_emoji(self, message_id, &reaction_type.into()).await
+        http.delete_message_reaction_emoji(self, message_id, &reaction_type.into().as_data()).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -861,7 +863,15 @@ impl GenericChannelId {
         limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
-        http.get_reaction_users(self, message_id, &emoji.into(), reaction_type, limit, after).await
+        http.get_reaction_users(
+            self,
+            message_id,
+            &emoji.into().as_data(),
+            reaction_type,
+            limit,
+            after,
+        )
+        .await
     }
 
     /// Sends a message with just the given message content in the channel.

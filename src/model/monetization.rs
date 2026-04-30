@@ -169,8 +169,3 @@ enum_number! {
         _ => Unknown(u8),
     }
 }
-
-pub enum EntitlementOwner {
-    Guild(GuildId),
-    User(UserId),
-}
