@@ -158,9 +158,9 @@ impl ChannelId {
     /// Change a voice channel's name and bitrate:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditChannel;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity_core::builder::EditChannel;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::id::ChannelId;
     /// # async fn run() {
     /// # let http: Http = unimplemented!();
     /// # let channel_id = ChannelId::new(1234);
@@ -438,10 +438,10 @@ impl GenericChannelId {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// use serenity::model::id::GenericChannelId;
+    /// use serenity_core::model::id::GenericChannelId;
     ///
     /// # async fn run() {
-    /// # let http: serenity::http::Http = unimplemented!();
+    /// # let http: serenity_core::http::Http = unimplemented!();
     /// let _successful = GenericChannelId::new(7).broadcast_typing(&http).await;
     /// # }
     /// ```
@@ -759,14 +759,14 @@ impl GenericChannelId {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::GenericChannelId;
-    /// # use serenity::http::Http;
+    /// # use serenity_core::model::id::GenericChannelId;
+    /// # use serenity_core::http::Http;
     /// #
     /// # async fn run() {
     /// # let channel_id = GenericChannelId::new(1);
     /// # let ctx: Http = unimplemented!();
-    /// use serenity::futures::StreamExt;
-    /// use serenity::model::channel::MessagesIter;
+    /// use futures::StreamExt;
+    /// use serenity_core::model::channel::MessagesIter;
     ///
     /// let mut messages = channel_id.messages_iter(&ctx).boxed();
     /// while let Some(message_result) = messages.next().await {
@@ -886,13 +886,13 @@ impl GenericChannelId {
     /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
+    /// # use serenity_core::http::Http;
     /// # use std::sync::Arc;
     /// #
-    /// # async fn run() -> Result<(), serenity::Error> {
+    /// # async fn run() -> Result<(), serenity_core::error::Error> {
     /// # let http: Arc<Http> = unimplemented!();
-    /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::id::GenericChannelId;
+    /// use serenity_core::builder::{CreateAttachment, CreateMessage};
+    /// use serenity_core::model::id::GenericChannelId;
     ///
     /// let channel_id = GenericChannelId::new(7);
     ///
@@ -909,13 +909,13 @@ impl GenericChannelId {
     /// Send files using [`File`]:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
+    /// # use serenity_core::http::Http;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Arc<Http> = unimplemented!();
-    /// use serenity::builder::{CreateAttachment, CreateMessage};
-    /// use serenity::model::id::GenericChannelId;
+    /// use serenity_core::builder::{CreateAttachment, CreateMessage};
+    /// use serenity_core::model::id::GenericChannelId;
     /// use tokio::fs::File;
     ///
     /// let channel_id = GenericChannelId::new(7);
@@ -979,7 +979,7 @@ impl GenericChannelId {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::Http, Result, model::id::GenericChannelId};
+    /// # use serenity_core::{http::Http, error::Result, model::id::GenericChannelId};
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
@@ -1190,14 +1190,14 @@ impl<'a> MessagesIter<'a> {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::GenericChannelId;
-    /// # use serenity::http::Http;
+    /// # use serenity_core::model::id::GenericChannelId;
+    /// # use serenity_core::http::Http;
     /// #
     /// # async fn run() {
     /// # let channel_id = GenericChannelId::new(1);
     /// # let http: Http = unimplemented!();
-    /// use serenity::futures::StreamExt;
-    /// use serenity::model::channel::MessagesIter;
+    /// use futures::StreamExt;
+    /// use serenity_core::model::channel::MessagesIter;
     ///
     /// let mut messages = MessagesIter::stream(&http, channel_id).boxed();
     /// while let Some(message_result) = messages.next().await {

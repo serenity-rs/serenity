@@ -53,7 +53,7 @@ impl<'a> EditCommand<'a> {
     /// Specifies a localized name of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::EditCommand::new()
+    /// # serenity_core::builder::EditCommand::new()
     /// .name("birthday")
     /// .name_localized("zh-CN", "生日")
     /// .name_localized("el", "γενέθλια")
@@ -92,7 +92,7 @@ impl<'a> EditCommand<'a> {
     /// Specifies a localized description of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateCommand::new("")
+    /// # serenity_core::builder::CreateCommand::new("")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;

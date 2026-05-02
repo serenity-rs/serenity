@@ -82,7 +82,7 @@ impl Token {
 /// Validate that a token is valid and that a number of malformed tokens are actually invalid:
 ///
 /// ```
-/// use serenity::secrets::Token;
+/// use serenity_core::secrets::Token;
 ///
 /// // ensure a valid token is in fact a valid format:
 /// assert!("Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg".parse::<Token>().is_ok());

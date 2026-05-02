@@ -27,7 +27,7 @@ use crate::model::id::GenericChannelId;
 /// ## Examples
 ///
 /// ```rust,no_run
-/// # use serenity::{http::{Http, Typing}, Result, model::prelude::*};
+/// # use serenity_core::{http::{Http, Typing}, error::Result, model::prelude::*};
 /// # use std::sync::Arc;
 /// #
 /// # fn long_process() {}

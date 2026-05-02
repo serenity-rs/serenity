@@ -34,9 +34,9 @@ use crate::model::prelude::*;
 /// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
 /// ```rust,no_run
-/// use serenity::builder::{CreateEmbed, CreateMessage};
-/// use serenity::model::id::GenericChannelId;
-/// # use serenity::http::Http;
+/// use serenity_core::builder::{CreateEmbed, CreateMessage};
+/// use serenity_core::model::id::GenericChannelId;
+/// # use serenity_core::http::Http;
 /// # use std::sync::Arc;
 /// #
 /// # async fn run() {

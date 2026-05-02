@@ -51,7 +51,7 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
+    /// # use serenity_core::model::guild::Emoji;
     /// #
     /// # fn run(emoji: Emoji) {
     /// // assuming emoji has been set already

@@ -23,13 +23,13 @@ pub trait Mentionable {
     ///
     /// ```
     /// # #[cfg(feature = "client")] {
-    /// # use serenity::builder::CreateMessage;
-    /// # use serenity::model::guild::Member;
-    /// # use serenity::model::channel::GuildChannel;
-    /// # use serenity::model::id::ChannelId;
-    /// # use serenity::prelude::Context;
-    /// # use serenity::Error;
-    /// use serenity::model::mention::Mentionable;
+    /// # use serenity_core::builder::CreateMessage;
+    /// # use serenity_core::model::guild::Member;
+    /// # use serenity_core::model::channel::GuildChannel;
+    /// # use serenity_core::model::id::ChannelId;
+    /// # use serenity_core::prelude::Context;
+    /// # use serenity_core::Error;
+    /// use serenity_core::model::mention::Mentionable;
     /// async fn greet(
     ///     ctx: Context,
     ///     member: Member,
@@ -49,8 +49,8 @@ pub trait Mentionable {
     /// # }
     /// ```
     /// ```
-    /// # use serenity::model::id::{RoleId, ChannelId, UserId};
-    /// use serenity::model::mention::Mentionable;
+    /// # use serenity_core::model::id::{RoleId, ChannelId, UserId};
+    /// use serenity_core::model::mention::Mentionable;
     /// let user = UserId::new(1);
     /// let channel = ChannelId::new(2);
     /// let role = RoleId::new(3);
@@ -73,8 +73,8 @@ pub trait Mentionable {
 /// # Examples
 ///
 /// ```
-/// # use serenity::model::id::{RoleId, GenericChannelId, UserId};
-/// use serenity::model::mention::Mention;
+/// # use serenity_core::model::id::{RoleId, GenericChannelId, UserId};
+/// use serenity_core::model::mention::Mention;
 /// let user = UserId::new(1);
 /// let channel = GenericChannelId::new(2);
 /// let role = RoleId::new(3);

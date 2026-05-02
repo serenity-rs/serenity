@@ -23,10 +23,10 @@ use crate::model::prelude::*;
 /// Creating two embeds, and then sending them as part of the payload using [`Webhook::execute`]:
 ///
 /// ```rust,no_run
-/// use serenity::builder::{CreateEmbed, ExecuteWebhook};
-/// use serenity::http::Http;
-/// use serenity::model::webhook::Webhook;
-/// use serenity::model::Colour;
+/// use serenity_core::builder::{CreateEmbed, ExecuteWebhook};
+/// use serenity_core::http::Http;
+/// use serenity_core::model::webhook::Webhook;
+/// use serenity_core::model::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http: Http = unimplemented!();
@@ -101,9 +101,9 @@ impl<'a> ExecuteWebhook<'a> {
     /// Overriding the default avatar:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::ExecuteWebhook;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::builder::ExecuteWebhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -130,9 +130,9 @@ impl<'a> ExecuteWebhook<'a> {
     /// Sending a webhook with a content of `"foo"`:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::ExecuteWebhook;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::builder::ExecuteWebhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -161,9 +161,9 @@ impl<'a> ExecuteWebhook<'a> {
     /// Execute a webhook with message content of `test`, in a thread with Id `12345678`:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::ExecuteWebhook;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::{id::ThreadId, webhook::Webhook};
+    /// # use serenity_core::builder::ExecuteWebhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::{id::ThreadId, webhook::Webhook};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -243,9 +243,9 @@ impl<'a> ExecuteWebhook<'a> {
     /// Sending a webhook with text-to-speech enabled:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::ExecuteWebhook;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::builder::ExecuteWebhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -271,9 +271,9 @@ impl<'a> ExecuteWebhook<'a> {
     /// Overriding the username to `"hakase"`:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::ExecuteWebhook;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::builder::ExecuteWebhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -299,10 +299,10 @@ impl<'a> ExecuteWebhook<'a> {
     /// Suppressing an embed on the message.
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::ExecuteWebhook;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::channel::MessageFlags;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::builder::ExecuteWebhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::channel::MessageFlags;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();

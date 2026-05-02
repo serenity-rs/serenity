@@ -29,12 +29,12 @@ use crate::model::prelude::*;
 /// Id of `158339864557912064`:
 ///
 /// ```rust,no_run
-/// # use serenity::http::Http;
+/// # use serenity_core::http::Http;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http: Http = unimplemented!();
-/// use serenity::builder::GetMessages;
-/// use serenity::model::id::{GenericChannelId, MessageId};
+/// use serenity_core::builder::GetMessages;
+/// use serenity_core::model::id::{GenericChannelId, MessageId};
 ///
 /// // you can then pass it into a function which retrieves messages:
 /// let channel_id = GenericChannelId::new(81384788765712384);

@@ -20,10 +20,10 @@ use crate::model::prelude::*;
 /// Editing the content of a [`Message`] to `"hello"`:
 ///
 /// ```rust,no_run
-/// # use serenity::builder::EditMessage;
-/// # use serenity::model::channel::Message;
-/// # use serenity::model::id::ChannelId;
-/// # use serenity::http::Http;
+/// # use serenity_core::builder::EditMessage;
+/// # use serenity_core::model::channel::Message;
+/// # use serenity_core::model::id::ChannelId;
+/// # use serenity_core::http::Http;
 ///
 /// # async fn example(http: &Http, mut message: Message) -> Result<(), Box<dyn std::error::Error>> {
 /// let builder = EditMessage::new().content("hello");

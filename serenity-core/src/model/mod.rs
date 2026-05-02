@@ -5,16 +5,16 @@
 //! Normally you can import models through the sub-modules:
 //!
 //! ```rust,no_run
-//! use serenity::model::channel::{ChannelType, GuildChannel, Message};
-//! use serenity::model::id::{ChannelId, GuildId};
-//! use serenity::model::user::User;
+//! use serenity_core::model::channel::{ChannelType, GuildChannel, Message};
+//! use serenity_core::model::id::{ChannelId, GuildId};
+//! use serenity_core::model::user::User;
 //! ```
 //!
 //! This can get a bit tedious - especially with a large number of imports - so this can be
 //! simplified by simply glob importing everything from the prelude:
 //!
 //! ```rust,no_run
-//! use serenity::model::prelude::*;
+//! use serenity_core::model::prelude::*;
 //! ```
 
 #[macro_use]
@@ -57,7 +57,7 @@ pub use self::timestamp::Timestamp;
 /// Import all model types into scope:
 ///
 /// ```rust,no_run
-/// use serenity::model::prelude::*;
+/// use serenity_core::model::prelude::*;
 /// ```
 pub mod prelude {
     pub(crate) use serde::{Deserialize, Deserializer};

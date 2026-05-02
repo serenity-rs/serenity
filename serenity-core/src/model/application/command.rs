@@ -104,14 +104,14 @@ impl Command {
     /// Create a simple ping command:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
+    /// # use serenity_core::http::Http;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
     /// # let http: Arc<Http> = unimplemented!();
-    /// use serenity::builder::CreateCommand;
-    /// use serenity::model::application::Command;
-    /// use serenity::model::id::ApplicationId;
+    /// use serenity_core::builder::CreateCommand;
+    /// use serenity_core::model::application::Command;
+    /// use serenity_core::model::id::ApplicationId;
     ///
     /// let builder = CreateCommand::new("ping").description("A simple ping command");
     /// let _ = Command::create_global_command(&http, builder).await;
@@ -121,14 +121,14 @@ impl Command {
     /// Create a command that echoes what is inserted:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
+    /// # use serenity_core::http::Http;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
     /// # let http: Arc<Http> = unimplemented!();
-    /// use serenity::builder::{CreateCommand, CreateCommandOption as CreateOption};
-    /// use serenity::model::application::{Command, CommandOptionType};
-    /// use serenity::model::id::ApplicationId;
+    /// use serenity_core::builder::{CreateCommand, CreateCommandOption as CreateOption};
+    /// use serenity_core::model::application::{Command, CommandOptionType};
+    /// use serenity_core::model::id::ApplicationId;
     ///
     /// let builder =
     ///     CreateCommand::new("echo").description("Makes the bot send a message").add_option(

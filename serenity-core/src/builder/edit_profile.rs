@@ -34,13 +34,13 @@ impl<'a> EditProfile<'a> {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::{EditProfile, CreateAttachment};
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::http::Http;
+    /// # use serenity_core::builder::{EditProfile, CreateAttachment};
+    /// # use serenity_core::error::Error;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::prelude::*;
     /// #
     /// # #[cfg(feature = "http")]
-    /// # async fn run() -> Result<(), SerenityError> {
+    /// # async fn run() -> Result<(), Error> {
     /// # let http: Http = unimplemented!();
     /// # let mut user = CurrentUser::default();
     /// let avatar = CreateAttachment::path("./my_image.jpg".as_ref())?.encode("image/jpeg").await?;

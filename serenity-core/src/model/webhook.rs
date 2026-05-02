@@ -125,8 +125,8 @@ impl Webhook {
     /// Retrieve a webhook by Id:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::{webhook::Webhook, id::WebhookId};
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -156,8 +156,8 @@ impl Webhook {
     /// Retrieve a webhook by Id and its unique token:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::{webhook::Webhook, id::WebhookId};
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -192,8 +192,8 @@ impl Webhook {
     /// Retrieve a webhook by url:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -240,9 +240,9 @@ impl Webhook {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::builder::EditWebhook;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::builder::EditWebhook;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -275,9 +275,9 @@ impl Webhook {
     /// Execute a webhook with message content of `test`:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::ExecuteWebhook;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::builder::ExecuteWebhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -294,12 +294,12 @@ impl Webhook {
     /// and sending an embed:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
-    /// use serenity::builder::{CreateEmbed, ExecuteWebhook};
+    /// use serenity_core::builder::{CreateEmbed, ExecuteWebhook};
     ///
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;

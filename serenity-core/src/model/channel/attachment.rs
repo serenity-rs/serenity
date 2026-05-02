@@ -94,9 +94,8 @@ impl Attachment {
     /// use std::io::Write;
     /// use std::path::Path;
     ///
-    /// # use serenity::http::Http;
-    /// use serenity::model::prelude::*;
-    /// use serenity::prelude::*;
+    /// # use serenity_core::http::Http;
+    /// use serenity_core::model::prelude::*;
     /// use tokio::fs::File;
     /// use tokio::io::AsyncWriteExt;
     ///

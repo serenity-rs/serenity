@@ -203,9 +203,9 @@ impl GuildChannel {
     /// Change a voice channels name and bitrate:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditChannel;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity_core::builder::EditChannel;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::id::ChannelId;
     /// # async fn run() {
     /// # let http: Http = unimplemented!();
     /// # let channel = ChannelId::new(1234);
@@ -240,13 +240,13 @@ impl GuildChannel {
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use std::sync::Arc;
-    /// # use serenity::{cache::Cache, http::Http, model::id::{GuildId, ChannelId, UserId}};
+    /// # use serenity_core::{cache::Cache, http::Http, model::id::{GuildId, ChannelId, UserId}};
     /// #
     /// # let http: Http = unimplemented!();
     /// # let cache = Cache::default();
     /// # let (guild_id, channel_id, user_id) = (GuildId::new(1), ChannelId::new(1), UserId::new(1));
-    /// use serenity::builder::EditVoiceState;
-    /// use serenity::model::ModelError;
+    /// use serenity_core::builder::EditVoiceState;
+    /// use serenity_core::model::ModelError;
     ///
     /// let channel = {
     ///     let guild = cache.guild(guild_id).ok_or(ModelError::ItemMissing)?;
@@ -293,13 +293,13 @@ impl GuildChannel {
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use std::sync::Arc;
-    /// # use serenity::{cache::Cache, http::Http, model::id::{GuildId, ChannelId}};
+    /// # use serenity_core::{cache::Cache, http::Http, model::id::{GuildId, ChannelId}};
     /// #
     /// # let http: Http = unimplemented!();
     /// # let cache = Cache::default();
     /// # let (guild_id, channel_id) = (GuildId::new(1), ChannelId::new(1));
-    /// use serenity::builder::EditVoiceState;
-    /// use serenity::model::ModelError;
+    /// use serenity_core::builder::EditVoiceState;
+    /// use serenity_core::model::ModelError;
     ///
     /// let channel = {
     ///     let guild = cache.guild(guild_id).ok_or(ModelError::ItemMissing)?;

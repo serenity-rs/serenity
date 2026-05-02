@@ -85,8 +85,8 @@ impl<'a> EditGuild<'a> {
     /// base64, to then set as the guild icon.
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::{EditGuild, CreateAttachment};
-    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use serenity_core::builder::{EditGuild, CreateAttachment};
+    /// # use serenity_core::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -246,13 +246,13 @@ impl<'a> EditGuild<'a> {
     /// Setting the verification level to [`High`][`VerificationLevel::High`]:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditGuild;
-    /// # use serenity::{http::Http, model::guild::Guild};
+    /// # use serenity_core::builder::EditGuild;
+    /// # use serenity_core::{http::Http, model::guild::Guild};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild: Guild = unimplemented!();
-    /// use serenity::model::guild::VerificationLevel;
+    /// use serenity_core::model::guild::VerificationLevel;
     ///
     /// let builder = EditGuild::new().verification_level(VerificationLevel::High);
     ///
@@ -272,13 +272,13 @@ impl<'a> EditGuild<'a> {
     /// Modifies the notifications that are sent by discord to the configured system channel.
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditGuild;
-    /// # use serenity::{http::Http, model::guild::Guild};
+    /// # use serenity_core::builder::EditGuild;
+    /// # use serenity_core::{http::Http, model::guild::Guild};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let mut guild: Guild = unimplemented!();
-    /// use serenity::model::guild::SystemChannelFlags;
+    /// use serenity_core::model::guild::SystemChannelFlags;
     ///
     /// let builder = EditGuild::new().system_channel_flags(
     ///     SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS

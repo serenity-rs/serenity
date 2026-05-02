@@ -322,12 +322,11 @@ impl PartialGuild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::prelude::*;
+    /// # use serenity_core::model::prelude::*;
     ///
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let cache: serenity::cache::Cache = unimplemented!();
+    /// # let cache: serenity_core::cache::Cache = unimplemented!();
     /// # let msg: Message = unimplemented!();
     ///
     /// if let Some(guild_id) = msg.guild_id {

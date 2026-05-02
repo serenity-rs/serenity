@@ -5,8 +5,8 @@
 //!
 //! # Formatting
 //! ```
-//! # use serenity::model::id::GuildId;
-//! # use serenity::model::Timestamp;
+//! # use serenity_core::model::id::GuildId;
+//! # use serenity_core::model::Timestamp;
 //! #
 //! let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();
 //! assert_eq!(timestamp.unix_timestamp(), 1462015105);
@@ -15,7 +15,7 @@
 //!
 //! # Parsing RFC 3339 string
 //! ```
-//! # use serenity::model::Timestamp;
+//! # use serenity_core::model::Timestamp;
 //! #
 //! let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
 //! let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
@@ -124,7 +124,7 @@ impl Timestamp {
     ///
     /// # Examples
     /// ```
-    /// # use serenity::model::Timestamp;
+    /// # use serenity_core::model::Timestamp;
     /// #
     /// let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
     /// let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();

@@ -285,8 +285,8 @@ impl Member {
     /// Kick a member from the guild:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::guild::Member;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::guild::Member;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// # let member: Member = unimplemented!();

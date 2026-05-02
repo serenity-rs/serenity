@@ -156,7 +156,7 @@ impl<'a> DataUri<'a> {
     /// URI, for example:
     ///
     /// ```
-    /// use serenity::builder::DataUri;
+    /// use serenity_core::builder::DataUri;
     ///
     /// let s = "data:image/png;base64,R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=";
     /// assert!(DataUri::from_base64(s).is_ok());
@@ -198,7 +198,10 @@ enum EditAttachmentsInner<'a> {
 /// ## Removing all attachments
 ///
 /// ```rust,no_run
-/// # use serenity::all::*;
+/// # use serenity_core::builder::{EditMessage, EditAttachments};
+/// # use serenity_core::error::Error;
+/// # use serenity_core::http::Http;
+/// # use serenity_core::model::prelude::*;
 /// # async fn foo_(ctx: Http, mut msg: Message) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(EditAttachments::new())).await?;
 /// # Ok(()) }
@@ -207,7 +210,10 @@ enum EditAttachmentsInner<'a> {
 /// ## Adding a new attachment without deleting existing attachments
 ///
 /// ```rust,no_run
-/// # use serenity::all::*;
+/// # use serenity_core::builder::{CreateAttachment, EditMessage, EditAttachments};
+/// # use serenity_core::error::Error;
+/// # use serenity_core::http::Http;
+/// # use serenity_core::model::prelude::*;
 /// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&msg).add(my_attachment)
@@ -218,7 +224,10 @@ enum EditAttachmentsInner<'a> {
 /// ## Delete all but the first attachment
 ///
 /// ```rust,no_run
-/// # use serenity::all::*;
+/// # use serenity_core::builder::{CreateAttachment, EditMessage, EditAttachments};
+/// # use serenity_core::error::Error;
+/// # use serenity_core::http::Http;
+/// # use serenity_core::model::prelude::*;
 /// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::new().keep(msg.attachments[0].id)
@@ -229,7 +238,10 @@ enum EditAttachmentsInner<'a> {
 /// ## Delete only the first attachment
 ///
 /// ```rust,no_run
-/// # use serenity::all::*;
+/// # use serenity_core::builder::{CreateAttachment, EditMessage, EditAttachments};
+/// # use serenity_core::error::Error;
+/// # use serenity_core::http::Http;
+/// # use serenity_core::model::prelude::*;
 /// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::keep_all(&msg).remove(msg.attachments[0].id)

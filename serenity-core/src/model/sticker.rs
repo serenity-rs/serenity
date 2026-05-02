@@ -172,10 +172,10 @@ impl Sticker {
     /// Rename a sticker:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::id::GuildId;
-    /// # use serenity::model::sticker::Sticker;
-    /// use serenity::builder::EditSticker;
+    /// # use serenity_core::http::Http;
+    /// # use serenity_core::model::id::GuildId;
+    /// # use serenity_core::model::sticker::Sticker;
+    /// use serenity_core::builder::EditSticker;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();

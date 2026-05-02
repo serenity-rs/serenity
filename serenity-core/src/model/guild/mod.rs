@@ -299,8 +299,8 @@ impl Guild {
     /// Create a guild called `"test"` in the [US West region] with no icon:
     ///
     /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// use serenity::model::guild::Guild;
+    /// # use serenity_core::http::Http;
+    /// use serenity_core::model::guild::Guild;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
     /// let guild = Guild::create(&http, "test", None).await;
@@ -361,8 +361,8 @@ impl Guild {
     /// Change a guild's icon using a file named "icon.png":
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::{EditGuild, CreateAttachment};
-    /// # use serenity::{http::Http, model::guild::Guild};
+    /// # use serenity_core::builder::{EditGuild, CreateAttachment};
+    /// # use serenity_core::{http::Http, model::guild::Guild};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http: Http = unimplemented!();
@@ -957,12 +957,11 @@ impl Guild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// # use serenity::model::prelude::*;
-    /// # use serenity::prelude::*;
+    /// # use serenity_core::model::prelude::*;
     ///
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let cache: serenity::cache::Cache = unimplemented!();
+    /// # let cache: serenity_core::cache::Cache = unimplemented!();
     /// # let msg: Message = unimplemented!();
     ///
     /// if let Some(guild_id) = msg.guild_id {

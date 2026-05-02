@@ -70,7 +70,7 @@ where
 /// Create an instance of [`Http`] with a proxy and rate limiter disabled
 ///
 /// ```rust
-/// # use serenity::http::HttpBuilder;
+/// # use serenity_core::http::HttpBuilder;
 /// # fn run() {
 /// let http = HttpBuilder::without_token()
 ///     .proxy("http://127.0.0.1:3000")

@@ -13,9 +13,9 @@ use crate::model::prelude::*;
 /// Create an invite with a max age of 3600 seconds and 10 max uses:
 ///
 /// ```rust,no_run
-/// # use serenity::{prelude::*, model::prelude::*};
-/// use serenity::builder::CreateInvite;
-/// use serenity::http::Http;
+/// # use serenity_core::model::prelude::*;
+/// use serenity_core::builder::CreateInvite;
+/// use serenity_core::http::Http;
 /// # async fn run(http: &Http, channel_id: ChannelId) -> Result<(), Box<dyn std::error::Error>> {
 /// let builder = CreateInvite::new().max_age(3600).max_uses(10);
 /// let creation = channel_id.create_invite(http, builder).await?;

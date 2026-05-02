@@ -20,9 +20,9 @@ use crate::model::prelude::*;
 /// Create a hoisted, mentionable role named `"a test role"`:
 ///
 /// ```rust,no_run
-/// # use serenity::builder::EditRole;
-/// # use serenity::http::Http;
-/// # use serenity::model::id::GuildId;
+/// # use serenity_core::builder::EditRole;
+/// # use serenity_core::http::Http;
+/// # use serenity_core::model::id::GuildId;
 /// # use std::sync::Arc;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {

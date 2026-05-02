@@ -5,7 +5,7 @@
 /// Create new settings, specifying the maximum number of messages:
 ///
 /// ```rust
-/// use serenity::cache::Settings as CacheSettings;
+/// use serenity_core::cache::Settings as CacheSettings;
 ///
 /// let mut settings = CacheSettings::default();
 /// settings.max_messages = 10;
