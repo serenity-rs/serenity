@@ -50,8 +50,8 @@ pub struct Attachment {
     pub url: String,
     /// If the attachment is an image, then the width of the image is provided.
     pub width: Option<u32>,
-    /// The attachment's [media type].
-    ///
+    /// The proxied attachment's [media type].
+    /// 
     /// [media type]: https://en.wikipedia.org/wiki/Media_type
     pub content_type: Option<String>,
     /// Whether this attachment is ephemeral.
